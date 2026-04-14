@@ -21,9 +21,9 @@ export class ProductService {
         return this.getProductByGroup(storeContext, 'FEATURED_ITEMS');
     }
 
-    public static getRelatedProductGroup = async (storeContext: StoreContext, product: number): Promise<ProductGroupPage | undefined> => {
-        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/${product}/related?store=${storeContext.store}&lang=${storeContext.locale}`, get())
-            .then(it => handleResponse<ProductGroupPage>(it))
+    public static getRelatedProductGroup = async (storeContext: StoreContext, product: number): Promise<ProductGroup | undefined> => {
+        return fetch(`${storeBaseServiceUrl('catalog', storeContext)}/api/v1/products/${product}/relationship?store=${storeContext.store}&lang=${storeContext.locale}`, get())
+            .then(it => handleResponse<ProductGroup>(it))
     }
 
     public static getProductByGroup = async (storeContext: StoreContext, group: string): Promise<ProductGroup | undefined> => {

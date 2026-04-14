@@ -4,7 +4,6 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.group.ProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
-import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableMinimalProductPopulator;
 import com.asrevo.cvhome.catalog.service.populator.catalog.product.PersistableProductGroupPopulator;
@@ -32,8 +31,6 @@ import java.util.stream.Collectors;
 @Service("productGroupFacade")
 @Slf4j
 public class ProductGroupFacadeImpl implements ProductGroupFacade {
-
-	private static final String DEFAULT_RELATIONSHIP_CODE = "RELATED_ITEM";
 
 	private final ProductGroupService productGroupService;
 
@@ -176,21 +173,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 	}
 
 	@Override
-	public List<ReadableProductGroup> listByParentProduct(StoreMerchantId store, Long productId,
-			LanguageCode language) {
-		try {
-			return productGroupService.listByParentProduct(store, productId)
-				.stream()
-				.map(pg -> populateReadable(pg, store, language))
-				.collect(Collectors.toList());
-		}
-		catch (ServiceException e) {
-			throw new ServiceRuntimeException(e);
-		}
-	}
-
-	@Override
-	public ReadableProductGroup getByParentProductAndCode(StoreMerchantId store, Long productId, String code,
+	public ReadableProductGroup getByCodeAndParent(StoreMerchantId store, Long productId, String code,
 			LanguageCode language) {
 		try {
 			return productGroupService.getByParentProductAndCode(store, productId, code)
@@ -205,8 +188,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
 	@Override
 	@Transactional
-	public void addProductToParentRelationship(StoreMerchantId store, Long parentProductId, String code,
-			Long productId) {
+	public void addProductToGroupForParent(StoreMerchantId store, Long parentProductId, String code, Long productId) {
 		try {
 			ProductGroup group = productGroupService.getByParentProductAndCode(store, parentProductId, code)
 				.orElseGet(() -> {
@@ -233,7 +215,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
 	@Override
 	@Transactional
-	public void removeProductFromParentRelationship(StoreMerchantId store, Long parentProductId, String code,
+	public void removeProductFromGroupForParent(StoreMerchantId store, Long parentProductId, String code,
 			Long productId) {
 		try {
 			ProductGroup group = productGroupService.getByParentProductAndCode(store, parentProductId, code)
@@ -244,19 +226,6 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 		catch (ServiceException e) {
 			throw new ServiceRuntimeException(e);
 		}
-	}
-
-	@Override
-	@Transactional
-	public void addProductToDefaultParentRelationship(StoreMerchantId store, Long parentProductId, Long productId) {
-		this.addProductToParentRelationship(store, parentProductId, DEFAULT_RELATIONSHIP_CODE, productId);
-	}
-
-	@Override
-	@Transactional
-	public void removeProductFromDefaultParentRelationship(StoreMerchantId store, Long parentProductId,
-			Long productId) {
-		this.removeProductFromParentRelationship(store, parentProductId, DEFAULT_RELATIONSHIP_CODE, productId);
 	}
 
 }

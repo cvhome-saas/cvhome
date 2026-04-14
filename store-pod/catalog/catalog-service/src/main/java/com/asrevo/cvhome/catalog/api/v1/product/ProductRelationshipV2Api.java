@@ -19,13 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Product Relationship V2 Management Api")
 @Slf4j
 public class ProductRelationshipV2Api {
+
+	private static final String DEFAULT_RELATIONSHIP_CODE = "RELATED_ITEM";
 
 	private final ProductGroupFacade productGroupFacade;
 
@@ -35,16 +35,16 @@ public class ProductRelationshipV2Api {
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("/products/{id}/relationship")
-	@Operation(summary = "Get all relationship groups for a product (V2)",
-			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
+	@Operation(summary = "Get default relationship group for a product (V2)",
+			responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductGroup.class))))
 	@Parameters({
 			@Parameter(name = "store",
 					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
 			@Parameter(name = "lang",
 					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
-	public List<ReadableProductGroup> getProductRelationships(@PathVariable Long id, StoreMerchantId merchantStore,
+	public ReadableProductGroup getProductRelationships(@PathVariable Long id, StoreMerchantId merchantStore,
 			LanguageCode language) {
-		return productGroupFacade.listByParentProduct(merchantStore, id, language);
+		return productGroupFacade.getByCodeAndParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, language);
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
@@ -55,7 +55,7 @@ public class ProductRelationshipV2Api {
 	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void addProductToRelationship(@PathVariable Long id, @PathVariable Long productId,
 			StoreMerchantId merchantStore) {
-		productGroupFacade.addProductToDefaultParentRelationship(merchantStore, id, productId);
+		productGroupFacade.addProductToGroupForParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, productId);
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
@@ -66,7 +66,7 @@ public class ProductRelationshipV2Api {
 	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 	public void removeProductFromRelationship(@PathVariable Long id, @PathVariable Long productId,
 			StoreMerchantId merchantStore) {
-		productGroupFacade.removeProductFromDefaultParentRelationship(merchantStore, id, productId);
+		productGroupFacade.removeProductFromGroupForParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, productId);
 	}
 
 }
