@@ -1,0 +1,41 @@
+package com.asrevo.cvhome.catalog.service.facade.product.group;
+
+import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroup;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
+import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
+
+public interface ProductGroupFacade {
+
+	ReadableProductGroup getByCode(StoreMerchantId store, String code, LanguageCode language);
+
+	ReadableProductGroupListV2 list(StoreMerchantId store, LanguageCode language, Pageable pageable);
+
+	void delete(StoreMerchantId store, String code);
+
+	PersistableProductGroup saveProductGroup(StoreMerchantId store, PersistableProductGroup productGroup);
+
+	void addProductToGroup(StoreMerchantId store, String groupCode, Long productId);
+
+	void removeProductFromGroup(StoreMerchantId store, String groupCode, Long productId);
+
+	boolean existByCode(StoreMerchantId store, String code);
+
+	List<ReadableProductGroup> listByParentProduct(StoreMerchantId store, Long productId, LanguageCode language);
+
+	ReadableProductGroup getByParentProductAndCode(StoreMerchantId store, Long productId, String code,
+			LanguageCode language);
+
+	void addProductToParentRelationship(StoreMerchantId store, Long parentProductId, String code, Long productId);
+
+	void removeProductFromParentRelationship(StoreMerchantId store, Long parentProductId, String code, Long productId);
+
+	void addProductToDefaultParentRelationship(StoreMerchantId store, Long parentProductId, Long productId);
+
+	void removeProductFromDefaultParentRelationship(StoreMerchantId store, Long parentProductId, Long productId);
+
+}
