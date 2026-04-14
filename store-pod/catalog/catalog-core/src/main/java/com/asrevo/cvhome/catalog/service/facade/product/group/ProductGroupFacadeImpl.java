@@ -6,16 +6,20 @@ import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupList;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
+import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableMinimalProductPopulator;
 import com.asrevo.cvhome.catalog.service.populator.catalog.product.PersistableProductGroupPopulator;
 import com.asrevo.cvhome.catalog.service.populator.catalog.product.ReadableProductGroupPopulator;
+import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.store.utils.ImageFilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,11 +44,12 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 	private final PersistableProductGroupPopulator persistableProductGroupPopulator;
 
 	public ProductGroupFacadeImpl(ProductGroupService productGroupService, ProductService productService,
-			ReadableProductGroupPopulator readableProductGroupPopulator,
-			PersistableProductGroupPopulator persistableProductGroupPopulator) {
+			PersistableProductGroupPopulator persistableProductGroupPopulator, PricingService pricingService,
+			ImageFilePath imageUtils, ExternalMerchantStoreService externalMerchantStoreService) {
 		this.productGroupService = productGroupService;
 		this.productService = productService;
-		this.readableProductGroupPopulator = readableProductGroupPopulator;
+		this.readableProductGroupPopulator = new ReadableProductGroupPopulator(
+				new ReadableMinimalProductPopulator(pricingService, imageUtils, externalMerchantStoreService));
 		this.persistableProductGroupPopulator = persistableProductGroupPopulator;
 	}
 

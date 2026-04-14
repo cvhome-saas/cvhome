@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-@Component
 public class ReadableProductGroupPopulator
 		extends AbstractDataPopulator<ProductGroup, StoreMerchantId, ReadableProductGroup> {
 
