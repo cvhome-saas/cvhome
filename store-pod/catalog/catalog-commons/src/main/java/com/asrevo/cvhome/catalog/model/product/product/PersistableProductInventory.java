@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.catalog.model.product.product;
 
-import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import java.io.Serial;
 import java.io.Serializable;
+
+import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,13 +12,13 @@ import lombok.Setter;
 @Getter
 public class PersistableProductInventory implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String sku;
+    private String sku;
 
-	private int quantity = 0;
+    private int quantity = 0;
 
-	private PersistableProductPrice price;
+    private PersistableProductPrice price;
 
 }

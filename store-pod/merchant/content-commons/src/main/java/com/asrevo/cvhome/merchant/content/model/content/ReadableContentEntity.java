@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.merchant.content.model.content;
 
 import java.io.Serial;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +10,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableContentEntity extends ContentEntity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ContentDescriptionEntity description = null;
+    private ContentDescriptionEntity description = null;
 
 }

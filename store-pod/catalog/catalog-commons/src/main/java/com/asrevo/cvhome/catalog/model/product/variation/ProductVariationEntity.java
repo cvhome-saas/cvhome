@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.catalog.model.product.variation;
 
-import com.asrevo.cvhome.commons.domain.Entity;
 import java.io.Serial;
+
+import com.asrevo.cvhome.commons.domain.Entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,18 +11,18 @@ import lombok.Setter;
 @Getter
 public class ProductVariationEntity extends Entity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String code; // sku
+    private String code; // sku
 
-	private String date;
+    private String date;
 
-	private int sortOrder;
+    private int sortOrder;
 
-	private boolean defaultValue = false;
+    private boolean defaultValue = false;
 
 }

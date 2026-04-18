@@ -6,6 +6,6 @@ import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 
 public interface ProductImageRemove extends ImageRemove {
 
-	void removeProductImage(CmsProductImage productImage) throws ServiceException;
+    void removeProductImage(CmsProductImage productImage) throws ServiceException;
 
 }

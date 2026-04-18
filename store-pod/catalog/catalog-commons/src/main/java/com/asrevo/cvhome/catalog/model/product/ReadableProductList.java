@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.catalog.model.product;
 
+import java.io.Serial;
+
 import com.asrevo.cvhome.catalog.model.product.group.ProductGroup;
 import com.asrevo.cvhome.commons.domain.ReadableList;
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,12 +13,12 @@ import lombok.Setter;
 @Deprecated
 public class ReadableProductList extends ReadableList<ReadableProduct> {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ProductGroup productGroup;
+    private ProductGroup productGroup;
 
 }

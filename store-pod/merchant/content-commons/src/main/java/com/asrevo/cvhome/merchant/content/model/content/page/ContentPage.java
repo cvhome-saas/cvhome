@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.merchant.content.model.content.page;
 
-import com.asrevo.cvhome.merchant.content.model.content.common.Content;
 import java.io.Serial;
+
+import com.asrevo.cvhome.merchant.content.model.content.common.Content;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +11,12 @@ import lombok.Setter;
 @Getter
 public class ContentPage extends Content {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private boolean linkToMenu;
+    private boolean linkToMenu;
 
 }

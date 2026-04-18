@@ -1,14 +1,20 @@
 package com.asrevo.cvhome.cua.domain;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
@@ -16,38 +22,39 @@ import java.util.UUID;
 @NoArgsConstructor
 public class User {
 
-	@Id
-	private UUID id;
+    @Id
+    private UUID id;
 
-	@Column(name = "client_id", nullable = false, length = 190)
-	private String clientId;
+    @Column(name = "client_id", nullable = false, length = 190)
+    private String clientId;
 
-	@Column(nullable = false, length = 190)
-	private String username;
+    @Column(nullable = false, length = 190)
+    private String username;
 
-	@Column(length = 254)
-	private String email;
+    @Column(length = 254)
+    private String email;
 
-	@Column(name = "first_name", length = 50)
-	private String firstName;
+    @Column(name = "first_name", length = 50)
+    private String firstName;
 
-	@Column(name = "last_name", length = 50)
-	private String lastName;
+    @Column(name = "last_name", length = 50)
+    private String lastName;
 
-	@Column(name = "password_hash", length = 100)
-	private String passwordHash;
+    @Column(name = "password_hash", length = 100)
+    private String passwordHash;
 
-	@Column(nullable = false)
-	private boolean enabled = true;
+    @Column(nullable = false)
+    private boolean enabled = true;
 
-	@JdbcTypeCode(SqlTypes.JSON)
-	@Column(name = "metadata", columnDefinition = "jsonb")
-	private Map<String, Object> metadata = new HashMap<>();
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "metadata", columnDefinition = "jsonb")
+    private Map<String, Object> metadata = new HashMap<>();
 
-	@PrePersist
-	public void prePersist() {
-		if (id == null)
-			id = UUID.randomUUID();
-	}
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 
 }

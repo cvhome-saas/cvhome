@@ -8,8 +8,8 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
  */
 public interface DataPopulator<Source, Store, Target> {
 
-	Target populate(Source source, Target target, Store store, LanguageCode language) throws ConversionException;
+    Target populate(Source source, Target target, Store store, LanguageCode language) throws ConversionException;
 
-	Target populate(Source source, Store store, LanguageCode language) throws ConversionException;
+    Target populate(Source source, Store store, LanguageCode language) throws ConversionException;
 
 }

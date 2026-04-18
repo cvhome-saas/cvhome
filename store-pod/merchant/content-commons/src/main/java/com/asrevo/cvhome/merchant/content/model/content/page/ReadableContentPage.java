@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.merchant.content.model.content.page;
 
-import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
 import java.io.Serial;
 import java.util.List;
+
+import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,16 +12,16 @@ import lombok.Setter;
 @Getter
 public class ReadableContentPage extends ContentPage {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ContentDescription description;
+    private ContentDescription description;
 
-	private String path;
+    private String path;
 
-	private List<ContentDescription> descriptions;
+    private List<ContentDescription> descriptions;
 
 }

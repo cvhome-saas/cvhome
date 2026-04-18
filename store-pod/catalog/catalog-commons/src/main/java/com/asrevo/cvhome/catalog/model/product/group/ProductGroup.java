@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 public class ProductGroup {
 
-	private String code;
+    private String code;
 
-	private boolean active;
+    private boolean active;
 
-	private Long id;
+    private Long id;
 
 }

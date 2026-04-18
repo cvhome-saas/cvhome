@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.model.order.total;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,14 +10,14 @@ import lombok.Setter;
 @Getter
 public class ReadableOrderTotal extends OrderTotal implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String total;
+    private String total;
 
-	private boolean discounted;
+    private boolean discounted;
 
 }

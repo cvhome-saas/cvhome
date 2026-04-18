@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.fargate.task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,31 +11,31 @@ import lombok.Setter;
 @Setter
 public class Network {
 
-	@JsonProperty("NetworkMode")
-	private String networkMode;
+    @JsonProperty("NetworkMode")
+    private String networkMode;
 
-	@JsonProperty("IPv4Addresses")
-	private ArrayList<String> iPv4Addresses;
+    @JsonProperty("IPv4Addresses")
+    private ArrayList<String> iPv4Addresses;
 
-	@JsonProperty("AttachmentIndex")
-	private int attachmentIndex;
+    @JsonProperty("AttachmentIndex")
+    private int attachmentIndex;
 
-	@JsonProperty("MACAddress")
-	private String mACAddress;
+    @JsonProperty("MACAddress")
+    private String mACAddress;
 
-	@JsonProperty("IPv4SubnetCIDRBlock")
-	private String iPv4SubnetCIDRBlock;
+    @JsonProperty("IPv4SubnetCIDRBlock")
+    private String iPv4SubnetCIDRBlock;
 
-	@JsonProperty("DomainNameServers")
-	private ArrayList<String> domainNameServers;
+    @JsonProperty("DomainNameServers")
+    private ArrayList<String> domainNameServers;
 
-	@JsonProperty("DomainNameSearchList")
-	private ArrayList<String> domainNameSearchList;
+    @JsonProperty("DomainNameSearchList")
+    private ArrayList<String> domainNameSearchList;
 
-	@JsonProperty("PrivateDNSName")
-	private String privateDNSName;
+    @JsonProperty("PrivateDNSName")
+    private String privateDNSName;
 
-	@JsonProperty("SubnetGatewayIpv4Address")
-	private String subnetGatewayIpv4Address;
+    @JsonProperty("SubnetGatewayIpv4Address")
+    private String subnetGatewayIpv4Address;
 
 }

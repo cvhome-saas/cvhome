@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.domain.user;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,24 +10,24 @@ import lombok.Setter;
 @Setter
 public class UserEntity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String id;
+    private String id;
 
-	private String firstName;
+    private String firstName;
 
-	private String lastName;
+    private String lastName;
 
-	private String emailAddress;
+    private String emailAddress;
 
-	private String defaultLanguage;
+    private String defaultLanguage;
 
-	private String userName;
+    private String userName;
 
-	private boolean active;
+    private boolean active;
 
 }

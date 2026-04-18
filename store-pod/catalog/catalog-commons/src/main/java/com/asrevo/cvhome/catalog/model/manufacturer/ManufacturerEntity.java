@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.manufacturer;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +10,12 @@ import lombok.Setter;
 @Getter
 public class ManufacturerEntity extends Manufacturer implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int order;
+    private int order;
 
 }

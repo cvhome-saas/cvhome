@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.customer.model.customer;
 
 import java.io.Serial;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class PersistableCustomer extends CustomerEntity {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
 }

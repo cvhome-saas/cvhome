@@ -7,10 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RecurringPlan {
 
-	MONTH(1, 1), YEAR(12, .83333333f);
+    MONTH(1, 1), YEAR(12, .83333333f);
 
-	private final int times;
+    private final int times;
 
-	private final float factor;
+    private final float factor;
 
 }

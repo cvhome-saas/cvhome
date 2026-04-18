@@ -1,8 +1,5 @@
 package com.asrevo.cvhome.uaa.sdk;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import tools.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,89 +9,102 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import tools.jackson.databind.ObjectMapper;
+
 public class OAuth2TokenManager {
 
-	private final String tokenEndpoint;
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
 
-	private final String clientId;
+    private static final String CONTENT_TYPE_X_WWW_FORM_URL_ENCODED = "application/x-www-form-urlencoded";
 
-	private final String clientSecret;
+    private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
 
-	private final HttpClient httpClient;
+    private static final String AUTHORIZATION_HEADER = "Authorization";
 
-	private final ObjectMapper objectMapper;
+    private static final String ACCEPT_HEADER = "Accept";
 
-	private TokenResponse currentToken;
+    private final String tokenEndpoint;
 
-	private Instant expiryTime;
+    private final String clientId;
 
-	public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret) {
-		this.tokenEndpoint = baseUrl + "/oauth2/token";
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
-		this.httpClient = HttpClient.newBuilder().build();
-		this.objectMapper = new ObjectMapper();
-	}
+    private final String clientSecret;
 
-	public synchronized String getAccessToken() {
-		if (currentToken == null || isExpired()) {
-			refreshToken();
-		}
-		return currentToken.accessToken();
-	}
+    private final HttpClient httpClient;
 
-	private boolean isExpired() {
-		// Refresh 1 minute before actual expiry to be safe
-		return expiryTime == null || Instant.now().isAfter(expiryTime.minusSeconds(60));
-	}
+    private final ObjectMapper objectMapper;
 
-	private void refreshToken() {
-		// admin-sdk uses client_credentials
-		// V2 says client_secret_post for admin-sdk
+    private TokenResponse currentToken;
 
-		String form = "grant_type=client_credentials&scope=super_admin&client_id=" + clientId + "&client_secret="
-				+ clientSecret;
+    private Instant expiryTime;
 
-		HttpRequest request = HttpRequest.newBuilder()
-			.uri(URI.create(tokenEndpoint))
-			.header("Content-Type", "application/x-www-form-urlencoded")
-			.header("Accept", "application/json")
-			.POST(HttpRequest.BodyPublishers.ofString(form))
-			.build();
+    public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret) {
+        this.tokenEndpoint = baseUrl + "/oauth2/token";
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.httpClient = HttpClient.newBuilder().build();
+        this.objectMapper = new ObjectMapper();
+    }
 
-		try {
-			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			if (response.statusCode() != 200) {
-				// Try Basic Auth as fallback
-				String auth = clientId + ":" + clientSecret;
-				String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+    public synchronized String getAccessToken() {
+        if (currentToken == null || isExpired()) {
+            refreshToken();
+        }
+        return currentToken.accessToken();
+    }
 
-				String fallbackForm = "grant_type=client_credentials&scope=super_admin";
-				HttpRequest fallbackRequest = HttpRequest.newBuilder()
-					.uri(URI.create(tokenEndpoint))
-					.header("Content-Type", "application/x-www-form-urlencoded")
-					.header("Authorization", "Basic " + encodedAuth)
-					.header("Accept", "application/json")
-					.POST(HttpRequest.BodyPublishers.ofString(fallbackForm))
-					.build();
+    private boolean isExpired() {
+        // Refresh 1 minute before actual expiry to be safe
+        return expiryTime == null || Instant.now().isAfter(expiryTime.minusSeconds(60));
+    }
 
-				response = httpClient.send(fallbackRequest, HttpResponse.BodyHandlers.ofString());
-			}
+    private void refreshToken() {
+        // admin-sdk uses client_credentials
+        // V2 says client_secret_post for admin-sdk
 
-			if (response.statusCode() != 200) {
-				throw new RuntimeException("Failed to get token: " + response.body());
-			}
-			currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
-			expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());
-		}
-		catch (IOException | InterruptedException e) {
-			throw new RuntimeException("Error during token request", e);
-		}
-	}
+        String form = "grant_type=client_credentials&scope=super_admin&client_id=" + clientId + "&client_secret="
+                + clientSecret;
 
-	private record TokenResponse(@JsonProperty("access_token") String accessToken,
-			@JsonProperty("token_type") String tokenType, @JsonProperty("expires_in") long expiresIn,
-			@JsonProperty("scope") String scope) {
-	}
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(tokenEndpoint))
+                .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_X_WWW_FORM_URL_ENCODED)
+                .header(ACCEPT_HEADER, CONTENT_TYPE_APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(form))
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                // Try Basic Auth as fallback
+                String auth = clientId + ":" + clientSecret;
+                String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+
+                String fallbackForm = "grant_type=client_credentials&scope=super_admin";
+                HttpRequest fallbackRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(tokenEndpoint))
+                        .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_X_WWW_FORM_URL_ENCODED)
+                        .header(AUTHORIZATION_HEADER, "Basic " + encodedAuth)
+                        .header(ACCEPT_HEADER, CONTENT_TYPE_APPLICATION_JSON)
+                        .POST(HttpRequest.BodyPublishers.ofString(fallbackForm))
+                        .build();
+
+                response = httpClient.send(fallbackRequest, HttpResponse.BodyHandlers.ofString());
+            }
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Failed to get token: " + response.body());
+            }
+            currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
+            expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error during token request", e);
+        }
+    }
+
+    private record TokenResponse(@JsonProperty("access_token") String accessToken,
+                                 @JsonProperty("token_type") String tokenType, @JsonProperty("expires_in") long expiresIn,
+                                 @JsonProperty("scope") String scope) {
+    }
 
 }

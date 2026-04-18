@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.fargate.task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +11,13 @@ import lombok.Setter;
 @Setter
 public class ClockDrift {
 
-	@JsonProperty("ClockErrorBound")
-	private double clockErrorBound;
+    @JsonProperty("ClockErrorBound")
+    private double clockErrorBound;
 
-	@JsonProperty("ReferenceTimestamp")
-	private Date referenceTimestamp;
+    @JsonProperty("ReferenceTimestamp")
+    private Date referenceTimestamp;
 
-	@JsonProperty("ClockSynchronizationStatus")
-	private String clockSynchronizationStatus;
+    @JsonProperty("ClockSynchronizationStatus")
+    private String clockSynchronizationStatus;
 
 }

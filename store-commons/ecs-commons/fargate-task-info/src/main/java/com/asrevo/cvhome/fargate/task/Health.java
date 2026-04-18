@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class Health {
 
-	private String status;
+    private String status;
 
-	private String statusSince;
+    private String statusSince;
 
 }

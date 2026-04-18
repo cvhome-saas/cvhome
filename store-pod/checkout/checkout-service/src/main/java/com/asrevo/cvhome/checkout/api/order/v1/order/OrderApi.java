@@ -1,8 +1,24 @@
 package com.asrevo.cvhome.checkout.api.order.v1.order;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import java.util.Optional;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import jakarta.validation.Valid;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
@@ -14,6 +30,7 @@ import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
@@ -21,20 +38,15 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -42,118 +54,115 @@ import java.util.Optional;
 @Slf4j
 public class OrderApi {
 
-	private final OrderFacade orderFacade;
+    private final OrderFacade orderFacade;
 
-	private final ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
 
-	private final CustomerFacade customerFacade;
+    private final CustomerFacade customerFacade;
 
-	private final ExternalMerchantStoreService externalMerchantStoreService;
+    private final ExternalMerchantStoreService externalMerchantStoreService;
 
-	public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade,
-			ExternalMerchantStoreService externalMerchantStoreService) {
-		this.orderFacade = orderFacade;
-		this.shoppingCartService = shoppingCartService;
-		this.customerFacade = customerFacade;
-		this.externalMerchantStoreService = externalMerchantStoreService;
-	}
+    public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade,
+                    ExternalMerchantStoreService externalMerchantStoreService) {
+        this.orderFacade = orderFacade;
+        this.shoppingCartService = shoppingCartService;
+        this.customerFacade = customerFacade;
+        this.externalMerchantStoreService = externalMerchantStoreService;
+    }
 
-	/**
-	 * Main checkout resource that will complete the order flow
-	 */
-	@RequestMapping(value = { "/cart/{code}/checkout" }, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    /**
+     * Main checkout resource that will complete the order flow
+     */
+    @PostMapping(value = {"/cart/{code}/checkout"})
+    @ResponseStatus(HttpStatus.OK)
+    @Parameters({
+            @Parameter(name = "store",
+                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang",
+                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
 
-	public ReadableOrderConfirmation checkout(@PathVariable String code,
-			@Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
-			StoreMerchantId merchantStore, LanguageCode language) {
+    public ReadableOrderConfirmation checkout(@PathVariable String code,
+                                              @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
+                                              StoreMerchantId merchantStore, LanguageCode language) {
 
-		Assert.notNull(order.getCustomer(), "Customer must not be null");
+        Assert.notNull(order.getCustomer(), "Customer must not be null");
 
-		ShoppingCart cart;
-		try {
-			ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
+        ShoppingCart cart;
+        try {
+            ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
-			if (store.isRequireLoginForOrderPlacement()) {
-				if (auth == null || !auth.isAuthenticated()) {
-					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
-				}
-				if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
-					throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
-				}
-			}
+            if (store.isRequireLoginForOrderPlacement()) {
+                if (auth == null || !auth.isAuthenticated()) {
+                    throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
+                }
+                if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
+                    throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
+                }
+            }
 
-			cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
+            cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
-			if (cart == null) {
-				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
-			}
-			else {
-				order.setShoppingCartId(cart.getId());
-			}
+            if (cart == null) {
+                throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+            } else {
+                order.setShoppingCartId(cart.getId());
+            }
 
-			Optional.ofNullable(auth)
-				.filter(JwtAuthenticationToken::isAuthenticated)
-				.flatMap(token -> Optional.ofNullable(token.getTokenAttributes().get("sub")))
-				.map(Object::toString)
-				.ifPresent(it -> order.getCustomer().setCuaExternalId(it));
+            Optional.ofNullable(auth)
+                    .filter(JwtAuthenticationToken::isAuthenticated)
+                    .flatMap(token -> Optional.ofNullable(token.getTokenAttributes().get("sub")))
+                    .map(Object::toString)
+                    .ifPresent(it -> order.getCustomer().setCuaExternalId(it));
 
-			Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
-				.orElseThrow(() -> new ServiceRuntimeException(
-						"Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
+            Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
+                    .orElseThrow(() -> new ServiceRuntimeException(
+                            "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
-			Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
-					LocaleUtils.getLocale(language));
+            Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
+                    LocaleUtils.getLocale(language));
 
-			return orderFacade.orderConfirmation(modelOrder, customer, merchantStore, language);
+            return orderFacade.orderConfirmation(modelOrder, customer, merchantStore, language);
 
-		}
-		catch (Exception e) {
-			throw new ServiceRuntimeException("Error during checkout", e);
-		}
-	}
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("Error during checkout", e);
+        }
+    }
 
-	@RequestMapping(value = { "/private/orders" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
+    @GetMapping(value = {"/private/orders"})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+    public ReadableOrderList list(@RequestParam(value = "name", required = false) String name,
+                                  @RequestParam(value = "id", required = false) Long id,
+                                  @RequestParam(value = "status", required = false) String status,
+                                  @RequestParam(value = "phone", required = false) String phone,
+                                  @RequestParam(value = "email", required = false) String email, StoreMerchantId merchantStore,
+                                  LanguageCode language, Pageable pageable) {
 
-	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
-	public ReadableOrderList list(@RequestParam(value = "name", required = false) String name,
-			@RequestParam(value = "id", required = false) Long id,
-			@RequestParam(value = "status", required = false) String status,
-			@RequestParam(value = "phone", required = false) String phone,
-			@RequestParam(value = "email", required = false) String email, StoreMerchantId merchantStore,
-			LanguageCode language, Pageable pageable) {
+        OrderCriteria orderCriteria = new OrderCriteria();
+        orderCriteria.setPageable(pageable);
 
-		OrderCriteria orderCriteria = new OrderCriteria();
-		orderCriteria.setPageable(pageable);
+        orderCriteria.setCustomerName(name);
+        orderCriteria.setCustomerPhone(phone);
+        orderCriteria.setStatus(status);
+        orderCriteria.setEmail(email);
+        orderCriteria.setId(id);
+        return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
+    }
 
-		orderCriteria.setCustomerName(name);
-		orderCriteria.setCustomerPhone(phone);
-		orderCriteria.setStatus(status);
-		orderCriteria.setEmail(email);
-		orderCriteria.setId(id);
-		return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
-	}
+    @GetMapping(value = {"/private/orders/{id}"})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store",
+                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang",
+                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
 
-	@RequestMapping(value = { "/private/orders/{id}" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+    public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
-	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
-	public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language) {
-
-		return orderFacade.getReadableOrder(id, merchantStore, language);
-	}
+        return orderFacade.getReadableOrder(id, merchantStore, language);
+    }
 
 }

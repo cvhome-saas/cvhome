@@ -6,6 +6,6 @@ import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface CurrencyService extends SalesManagerEntityService<CurrencyCode, Currency> {
 
-	Currency getByCode(CurrencyCode code);
+    Currency getByCode(CurrencyCode code);
 
 }

@@ -3,6 +3,7 @@ package com.asrevo.cvhome.store.core.entity.content;
 import java.io.ByteArrayOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +18,9 @@ import lombok.Setter;
 @Getter
 public class OutputContentFile extends StaticContentFile implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ByteArrayOutputStream file;
+    private ByteArrayOutputStream file;
 
 }

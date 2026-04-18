@@ -1,10 +1,12 @@
 package com.asrevo.cvhome.checkout.model.shoppingcart;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.variation.ReadableProductVariation;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.variation.ReadableProductVariation;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,18 +19,18 @@ import lombok.Setter;
 @Getter
 public class ReadableShoppingCartItem extends ReadableMinimalProduct implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private BigDecimal subTotal;
+    private BigDecimal subTotal;
 
-	private String displaySubTotal;
+    private String displaySubTotal;
 
-	private ReadableProductVariation variant = null;
+    private ReadableProductVariation variant = null;
 
-	private ReadableProductVariation variantValue = null;
+    private ReadableProductVariation variantValue = null;
 
 }

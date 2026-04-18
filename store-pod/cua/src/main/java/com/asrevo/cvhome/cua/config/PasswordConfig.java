@@ -8,11 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class PasswordConfig {
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		// Delegating encoder supports multiple encodings and prefixes, defaults to
-		// {bcrypt}
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // Delegating encoder supports multiple encodings and prefixes, defaults to
+        // {bcrypt}
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
 }

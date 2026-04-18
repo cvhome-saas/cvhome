@@ -1,7 +1,12 @@
 package com.asrevo.cvhome.cua.config;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
+
 import jakarta.servlet.http.HttpServletRequest;
-import org.jspecify.annotations.NonNull;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -14,75 +19,70 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-
 public class DynamicRegisteredClientRepository implements RegisteredClientRepository {
 
-	@Override
-	public void save(RegisteredClient registeredClient) {
-		throw new UnsupportedOperationException("Saving registered clients is not supported");
-	}
+    private static String extractHost(boolean useLang) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
-	@Override
-	public @Nullable RegisteredClient findById(String id) {
-		return createRegisteredClient(id);
-	}
+        if (Objects.isNull(attributes)) {
+            return null;
+        }
 
-	@Override
-	public @Nullable RegisteredClient findByClientId(String clientId) {
-		return createRegisteredClient(clientId);
-	}
+        HttpServletRequest request = attributes.getRequest();
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
 
-	private RegisteredClient createRegisteredClient(String id) {
+        StringBuilder dynamicUri = new StringBuilder();
+        dynamicUri.append(scheme).append("://").append(serverName);
+        if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
+            dynamicUri.append(":").append(serverPort);
+        }
+        if (useLang) {
+            String lang = request.getParameter("lang");
+            if (Objects.nonNull(lang)) {
+                dynamicUri.append("/").append(lang);
+            }
+        }
+        return dynamicUri.toString();
+    }
 
-		return RegisteredClient.withId(id)
-			.clientId(id)
-			.clientIdIssuedAt(Instant.now())
-			.clientName("Web App")
-			.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			.redirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(host -> it.add(host + "/callback")))
-			.postLogoutRedirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(it::add))
-			.scope(OidcScopes.OPENID)
-			.clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(false).build())
-			.tokenSettings(TokenSettings.builder()
-				.reuseRefreshTokens(false)
-				.accessTokenTimeToLive(Duration.ofSeconds(86400))
-				.refreshTokenTimeToLive(Duration.ofSeconds(86400))
-				.authorizationCodeTimeToLive(Duration.ofSeconds(86400))
-				.deviceCodeTimeToLive(Duration.ofSeconds(300))
-				.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-				.build())
-			.build();
-	}
+    @Override
+    public void save(RegisteredClient registeredClient) {
+        throw new UnsupportedOperationException("Saving registered clients is not supported");
+    }
 
-	private static String extractHost(boolean useLang) {
-		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		if (attributes != null) {
+    @Override
+    public @Nullable RegisteredClient findById(String id) {
+        return createRegisteredClient(id);
+    }
 
-			HttpServletRequest request = attributes.getRequest();
-			String scheme = request.getScheme();
-			String serverName = request.getServerName();
-			int serverPort = request.getServerPort();
+    @Override
+    public @Nullable RegisteredClient findByClientId(String clientId) {
+        return createRegisteredClient(clientId);
+    }
 
-			StringBuilder dynamicUri = new StringBuilder();
-			dynamicUri.append(scheme).append("://").append(serverName);
-			if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
-				dynamicUri.append(":").append(serverPort);
-			}
-			if (useLang) {
-				String lang = request.getParameter("lang");
-				if (Objects.nonNull(lang)) {
-					dynamicUri.append("/").append(lang);
-				}
-			}
-			return dynamicUri.toString();
-		}
-		else {
-			return null;
-		}
-	}
+    private RegisteredClient createRegisteredClient(String id) {
+
+        return RegisteredClient.withId(id)
+                .clientId(id)
+                .clientIdIssuedAt(Instant.now())
+                .clientName("Web App")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(host -> it.add(host + "/callback")))
+                .postLogoutRedirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(it::add))
+                .scope(OidcScopes.OPENID)
+                .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(false).build())
+                .tokenSettings(TokenSettings.builder()
+                        .reuseRefreshTokens(false)
+                        .accessTokenTimeToLive(Duration.ofSeconds(86400))
+                        .refreshTokenTimeToLive(Duration.ofSeconds(86400))
+                        .authorizationCodeTimeToLive(Duration.ofSeconds(86400))
+                        .deviceCodeTimeToLive(Duration.ofSeconds(300))
+                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                        .build())
+                .build();
+    }
 
 }

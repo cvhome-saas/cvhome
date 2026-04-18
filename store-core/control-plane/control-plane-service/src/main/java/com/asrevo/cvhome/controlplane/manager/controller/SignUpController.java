@@ -1,14 +1,17 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
-import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
-import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
-import com.asrevo.cvhome.controlplane.manager.service.SignupService;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
+import com.asrevo.cvhome.controlplane.manager.service.SignupService;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -17,12 +20,12 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SignUpController {
 
-	private final SignupService signupService;
+    private final SignupService signupService;
 
-	@PostMapping("public/create")
+    @PostMapping("public/create")
 
-	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-		return Mono.just(signupService.createOrgUser(request));
-	}
+    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
+        return Mono.just(signupService.createOrgUser(request));
+    }
 
 }

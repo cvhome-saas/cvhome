@@ -1,23 +1,32 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
+import java.security.Principal;
+import java.util.Set;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
-import com.asrevo.cvhome.commons.domain.Groups;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.controlplane.manager.service.ManagedUserAccountService;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
-import com.asrevo.cvhome.controlplane.manager.service.ManagedUserAccountService;
-import java.security.Principal;
-import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -26,86 +35,84 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class UserAccountController {
 
-	private final ManagedUserAccountService managedUserAccountService;
+    private final ManagedUserAccountService managedUserAccountService;
 
-	@GetMapping("current")
+    @GetMapping("current")
 
-	public Mono<ReadableUser> current(@AuthenticationPrincipal Principal principal) {
-		return Mono.just(managedUserAccountService.findOne(principal.getName()));
-	}
+    public Mono<ReadableUser> current(@AuthenticationPrincipal Principal principal) {
+        return Mono.just(managedUserAccountService.findOne(principal.getName()));
+    }
 
-	@GetMapping("list")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
+    @GetMapping("list")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
 
-	public Mono<ReadableUserList> list(@AuthenticationPrincipal Principal principal,
-			@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-			Pageable pageable) {
-		return managedUserAccountService.list(identity, store, pageable);
-	}
+    public Mono<ReadableUserList> list(@AuthenticationPrincipal Principal principal,
+                                       @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                                       Pageable pageable) {
+        return managedUserAccountService.list(identity, store, pageable);
+    }
 
-	@GetMapping("find-one")
-	// @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
+    @GetMapping("find-one")
+    // @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
 
-	public Mono<ReadableUser> findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam ManagerStoreId store, @RequestParam String userId) {
-		return managedUserAccountService.findOne(identity, store, userId);
-	}
+    public Mono<ReadableUser> findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                      @RequestParam ManagerStoreId store, @RequestParam String userId) {
+        return managedUserAccountService.findOne(identity, store, userId);
+    }
 
-	@GetMapping("assignable-roles")
+    @GetMapping("assignable-roles")
 
-	public Mono<Set<String>> assignableRoles() {
-		return managedUserAccountService.getAssignableRoles();
-	}
+    public Mono<Set<String>> assignableRoles() {
+        return managedUserAccountService.getAssignableRoles();
+    }
 
-	@PostMapping("create")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.CREATE')")
+    @PostMapping("create")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.CREATE')")
 
-	public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
-		return managedUserAccountService.createUser(identity, store, user);
-	}
+    public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                     @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+        return managedUserAccountService.createUser(identity, store, user);
+    }
 
-	@PutMapping("update")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.UPDATE')")
+    @PutMapping("update")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.UPDATE')")
 
-	public Mono<ReadableUser> update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
-		return managedUserAccountService.updateUser(identity, store, user);
-		//
-		// {"firstName":"12313","lastName":"55555","userName":"org1-store1-moderator","emailAddress":"sfds@dfsf.vv","password":"","repeatPassword":"","active":true,"groups":[{"name":"STORE_MODERATOR"}],"id":"3dea29fd-f6b2-48b1-8231-f4b5f1c68715"}
-	}
+    public Mono<ReadableUser> update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                     @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+        return managedUserAccountService.updateUser(identity, store, user);
+    }
 
-	@PostMapping("reset")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.RESET_PASSWORD')")
+    @PostMapping("reset")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.RESET_PASSWORD')")
 
-	public Mono<Void> resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-			@RequestParam ManagerStoreId store, @RequestParam String userId,
-			@RequestBody UserPassword passwordRequestDto) {
-		return managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
-	}
+    public Mono<Void> resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                    @RequestParam ManagerStoreId store, @RequestParam String userId,
+                                    @RequestBody UserPassword passwordRequestDto) {
+        return managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
+    }
 
-	@DeleteMapping("delete")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DELETE')")
+    @DeleteMapping("delete")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DELETE')")
 
-	public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-			@RequestParam String userId) {
-		return managedUserAccountService.deleteUser(identity, store, userId);
-	}
+    public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                             @RequestParam String userId) {
+        return managedUserAccountService.deleteUser(identity, store, userId);
+    }
 
-	@PostMapping("enable")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.ENABLE')")
+    @PostMapping("enable")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.ENABLE')")
 
-	public Mono<Void> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-			@RequestParam String userId) {
-		return managedUserAccountService.enableUser(identity, store, userId);
-	}
+    public Mono<Void> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                             @RequestParam String userId) {
+        return managedUserAccountService.enableUser(identity, store, userId);
+    }
 
-	@PostMapping("disable")
-	@PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DISABLE')")
+    @PostMapping("disable")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DISABLE')")
 
-	public Mono<Void> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-			@RequestParam String userId) {
-		return managedUserAccountService.disableUser(identity, store, userId);
-	}
+    public Mono<Void> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                              @RequestParam String userId) {
+        return managedUserAccountService.disableUser(identity, store, userId);
+    }
 
 }

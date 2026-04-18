@@ -1,10 +1,15 @@
 package com.asrevo.cvhome.uaa.domain;
 
-import jakarta.persistence.*;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
@@ -12,20 +17,21 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Role {
 
-	@Id
-	private UUID id;
+    @Id
+    private UUID id;
 
-	@Column(nullable = false, unique = true, length = 80)
-	private String name;
+    @Column(nullable = false, unique = true, length = 80)
+    private String name;
 
-	public Role(String name) {
-		this.name = name;
-	}
+    public Role(String name) {
+        this.name = name;
+    }
 
-	@PrePersist
-	public void prePersist() {
-		if (id == null)
-			id = UUID.randomUUID();
-	}
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 
 }

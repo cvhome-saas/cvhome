@@ -1,25 +1,34 @@
 package com.asrevo.cvhome.checkout.api.order.v2.statistic;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import java.util.Date;
+import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.asrevo.cvhome.checkout.repositories.order.orderproduct.OrderProductRepository;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StatisticList;
 import com.asrevo.cvhome.commons.domain.StatisticRange;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.checkout.repositories.order.orderproduct.OrderProductRepository;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Date;
-import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 
 @RestController
 @RequestMapping("/api/v2")
@@ -28,24 +37,24 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ProductStatisticApi {
 
-	private final OrderProductRepository orderProductRepository;
+    private final OrderProductRepository orderProductRepository;
 
-	@RequestMapping(value = { "/private/product-statistic" }, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    @PostMapping(value = {"/private/product-statistic"})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @Parameters({
+            @Parameter(name = "store",
+                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
+            @Parameter(name = "lang",
+                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
 
-	@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
-	public StatisticList productStatistic(StoreMerchantId merchantStore, LanguageCode language,
-			@RequestBody StatisticRange range) {
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
+    public StatisticList productStatistic(StoreMerchantId merchantStore, LanguageCode language,
+                                          @RequestBody StatisticRange range) {
 
-		List<StatisticEntry> entries = orderProductRepository.productStatistic(Date.from(range.fromDate().toInstant()),
-				Date.from(range.toDate().toInstant()), merchantStore);
-		return new StatisticList(entries);
-	}
+        List<StatisticEntry> entries = orderProductRepository.productStatistic(Date.from(range.fromDate().toInstant()),
+                Date.from(range.toDate().toInstant()), merchantStore);
+        return new StatisticList(entries);
+    }
 
 }

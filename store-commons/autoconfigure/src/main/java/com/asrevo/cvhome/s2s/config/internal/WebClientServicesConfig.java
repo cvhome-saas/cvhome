@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -10,7 +8,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
@@ -18,117 +22,124 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+
+import lombok.extern.slf4j.Slf4j;
+
 import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.REACTIVE;
 import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
 
 @Configuration
 @Slf4j
-@Import({ WebClientServicesConfig.ReactiveWebClientServicesConfig.class,
-		WebClientServicesConfig.ServletWebClientServicesConfig.class })
+@Import({WebClientServicesConfig.ReactiveWebClientServicesConfig.class,
+        WebClientServicesConfig.ServletWebClientServicesConfig.class})
 public class WebClientServicesConfig {
 
-	@Configuration
-	@ConditionalOnWebApplication(type = REACTIVE)
-	@ConditionalOnClass(OAuth2AuthorizedClientManager.class)
-	static class ReactiveWebClientServicesConfig {
+    private static final String S2S_CLIENT_REGISTRATION_ID = "s2s";
 
-		@Bean
-		public AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager(
-				ReactiveClientRegistrationRepository clientRegistrationRepository,
-				ReactiveOAuth2AuthorizedClientService authorizedClientService) {
+    @Configuration
+    @ConditionalOnWebApplication(type = REACTIVE)
+    @ConditionalOnClass(OAuth2AuthorizedClientManager.class)
+    static class ReactiveWebClientServicesConfig {
 
-			AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
-					clientRegistrationRepository, authorizedClientService);
-			manager.setAuthorizedClientProvider(
-					ReactiveOAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+        @Bean
+        public AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+                ReactiveClientRegistrationRepository clientRegistrationRepository,
+                ReactiveOAuth2AuthorizedClientService authorizedClientService) {
 
-			return manager;
-		}
+            AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager =
+                    new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+                            clientRegistrationRepository, authorizedClientService);
+            manager.setAuthorizedClientProvider(
+                    ReactiveOAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
 
-		@Bean("microServiceWebClientBuilder")
-		@LoadBalanced
-		public WebClient.Builder microServiceWebClientBuilder(
-				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
-			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					authorizedClientManager);
-			oauth2Filter.setDefaultClientRegistrationId("s2s");
+            return manager;
+        }
 
-			return WebClient.builder().filter(oauth2Filter);
-		}
+        @Bean("microServiceWebClientBuilder")
+        @LoadBalanced
+        public WebClient.Builder microServiceWebClientBuilder(
+                AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+            ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+                    authorizedClientManager);
+            oauth2Filter.setDefaultClientRegistrationId(S2S_CLIENT_REGISTRATION_ID);
 
-		@Bean("microServiceWebClient")
-		public WebClient microServiceWebClient(
-				@Qualifier("microServiceWebClientBuilder") WebClient.Builder microServiceWebClientBuilder) {
-			return microServiceWebClientBuilder.build();
-		}
+            return WebClient.builder().filter(oauth2Filter);
+        }
 
-		@Bean("defaultWebClientBuilder")
-		public WebClient.Builder defaultWebClientBuilder(
-				AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
-			ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-					authorizedClientManager);
-			oauth2Filter.setDefaultClientRegistrationId("s2s");
+        @Bean("microServiceWebClient")
+        public WebClient microServiceWebClient(
+                @Qualifier("microServiceWebClientBuilder") WebClient.Builder microServiceWebClientBuilder) {
+            return microServiceWebClientBuilder.build();
+        }
 
-			return WebClient.builder().filter(oauth2Filter);
-		}
+        @Bean("defaultWebClientBuilder")
+        public WebClient.Builder defaultWebClientBuilder(
+                AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+            ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+                    authorizedClientManager);
+            oauth2Filter.setDefaultClientRegistrationId(S2S_CLIENT_REGISTRATION_ID);
 
-		@Bean("defaultWebClient")
-		public WebClient defaultWebClient(
-				@Qualifier("defaultWebClientBuilder") WebClient.Builder defaultWebClientBuilder) {
-			return defaultWebClientBuilder.build();
-		}
+            return WebClient.builder().filter(oauth2Filter);
+        }
 
-		@Bean
-		public WebClientBuilder webClientBuilder(Environment environment,
-				@Qualifier("microServiceWebClient") WebClient microServiceWebClient,
-				ServiceDomainProperties serviceDomainProperties) {
-			return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties);
-		}
+        @Bean("defaultWebClient")
+        public WebClient defaultWebClient(
+                @Qualifier("defaultWebClientBuilder") WebClient.Builder defaultWebClientBuilder) {
+            return defaultWebClientBuilder.build();
+        }
 
-	}
+        @Bean
+        public WebClientBuilder webClientBuilder(Environment environment,
+                                                 @Qualifier("microServiceWebClient") WebClient microServiceWebClient,
+                                                 ServiceDomainProperties serviceDomainProperties) {
+            return new WebClientBuilder(environment, microServiceWebClient.mutate(), serviceDomainProperties);
+        }
 
-	@Configuration
-	@ConditionalOnWebApplication(type = SERVLET)
-	@ConditionalOnClass(OAuth2AuthorizedClientManager.class)
-	static class ServletWebClientServicesConfig {
+    }
 
-		@Bean
-		public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceOAuth2AuthorizedClientManager(
-				ClientRegistrationRepository clientRegistrationRepository,
-				OAuth2AuthorizedClientService authorizedClientService) {
+    @Configuration
+    @ConditionalOnWebApplication(type = SERVLET)
+    @ConditionalOnClass(OAuth2AuthorizedClientManager.class)
+    static class ServletWebClientServicesConfig {
 
-			AuthorizedClientServiceOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-					clientRegistrationRepository, authorizedClientService);
-			manager.setAuthorizedClientProvider(
-					OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
+        @Bean
+        public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceOAuth2AuthorizedClientManager(
+                ClientRegistrationRepository clientRegistrationRepository,
+                OAuth2AuthorizedClientService authorizedClientService) {
 
-			return manager;
-		}
+            AuthorizedClientServiceOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                    clientRegistrationRepository, authorizedClientService);
+            manager.setAuthorizedClientProvider(
+                    OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().refreshToken().build());
 
-		@Bean("microServiceRestClientBuilder")
-		@LoadBalanced
-		public RestClient.Builder microServiceRestClientBuilder(
-				AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
+            return manager;
+        }
 
-			OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
-					authorizedClientManager);
+        @Bean("microServiceRestClientBuilder")
+        @LoadBalanced
+        public RestClient.Builder microServiceRestClientBuilder(
+                AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
 
-			requestInterceptor.setClientRegistrationIdResolver(clientRequest -> "s2s");
+            OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
+                    authorizedClientManager);
 
-			return RestClient.builder().requestInterceptor(requestInterceptor);
-		}
+            requestInterceptor.setClientRegistrationIdResolver(clientRequest -> S2S_CLIENT_REGISTRATION_ID);
 
-		@Bean("microServiceRestClient")
-		public RestClient microServiceRestClient(RestClient.Builder microServiceRestClientBuilder) {
-			return microServiceRestClientBuilder.build();
-		}
+            return RestClient.builder().requestInterceptor(requestInterceptor);
+        }
 
-		@Bean
-		public RestClientBuilder restClientBuilder(Environment environment, RestClient microServiceRestClient,
-				ServiceDomainProperties serviceDomainProperties) {
-			return new RestClientBuilder(environment, microServiceRestClient.mutate(), serviceDomainProperties);
-		}
+        @Bean("microServiceRestClient")
+        public RestClient microServiceRestClient(RestClient.Builder microServiceRestClientBuilder) {
+            return microServiceRestClientBuilder.build();
+        }
 
-	}
+        @Bean
+        public RestClientBuilder restClientBuilder(Environment environment, RestClient microServiceRestClient,
+                                                   ServiceDomainProperties serviceDomainProperties) {
+            return new RestClientBuilder(environment, microServiceRestClient.mutate(), serviceDomainProperties);
+        }
+
+    }
 
 }

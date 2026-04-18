@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.entity.common;
 
 import java.io.Serial;
 import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +10,12 @@ import lombok.Setter;
 @Getter
 public class GenericEntityList<T> extends EntityList {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private List<T> list;
+    private List<T> list;
 
 }

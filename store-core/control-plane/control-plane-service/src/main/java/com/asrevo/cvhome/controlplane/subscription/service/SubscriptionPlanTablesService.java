@@ -1,14 +1,15 @@
 package com.asrevo.cvhome.controlplane.subscription.service;
 
+import java.util.Optional;
+
 import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanOption;
 import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanTables;
-import java.util.Optional;
 
 public interface SubscriptionPlanTablesService {
 
-	SubscriptionPlanTables tables();
+    SubscriptionPlanTables tables();
 
-	Optional<SubscriptionPlanOption> getSubscriptionPlanOption(PriceId priceId);
+    Optional<SubscriptionPlanOption> getSubscriptionPlanOption(PriceId priceId);
 
 }

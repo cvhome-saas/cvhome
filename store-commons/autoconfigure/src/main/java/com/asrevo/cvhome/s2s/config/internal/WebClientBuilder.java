@@ -1,31 +1,33 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
-
-import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static com.asrevo.cvhome.s2s.utils.WebClientsUtils.build;
 
 @Slf4j
 public class WebClientBuilder {
 
-	private final Environment environment;
+    private final Environment environment;
 
-	private final WebClient.Builder defaultMicroServiceBuilder;
+    private final WebClient.Builder defaultMicroServiceBuilder;
 
-	private final ServiceDomainProperties serviceDomainProperties;
+    private final ServiceDomainProperties serviceDomainProperties;
 
-	public WebClientBuilder(Environment environment, WebClient.Builder defaultMicroServiceBuilder,
-			ServiceDomainProperties serviceDomainProperties) {
-		this.environment = environment;
-		this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
-		this.serviceDomainProperties = serviceDomainProperties;
-	}
+    public WebClientBuilder(Environment environment, WebClient.Builder defaultMicroServiceBuilder,
+                            ServiceDomainProperties serviceDomainProperties) {
+        this.environment = environment;
+        this.defaultMicroServiceBuilder = defaultMicroServiceBuilder;
+        this.serviceDomainProperties = serviceDomainProperties;
+    }
 
-	public <T> T buildClient(String serviceName, Class<T> tClass) {
-		String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
-		return build(defaultMicroServiceBuilder, url, tClass);
-	}
+    public <T> T buildClient(String serviceName, Class<T> tClass) {
+        String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
+        return build(defaultMicroServiceBuilder, url, tClass);
+    }
 
 }

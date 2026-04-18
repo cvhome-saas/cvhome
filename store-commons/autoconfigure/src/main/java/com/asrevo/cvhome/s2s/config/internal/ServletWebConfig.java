@@ -2,7 +2,6 @@ package com.asrevo.cvhome.s2s.config.internal;
 
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
@@ -12,34 +11,36 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(WebMvcConfigurer.class)
 @Import(ServletWebConfig.InternalServletWebConfig.class)
 public class ServletWebConfig {
 
-	@Configuration
-	@RequiredArgsConstructor
-	static class InternalServletWebConfig implements WebMvcConfigurer {
+    @Configuration
+    @RequiredArgsConstructor
+    static class InternalServletWebConfig implements WebMvcConfigurer {
 
-		@Override
-		public void addInterceptors(InterceptorRegistry registry) {
-			var lci = new RequestCacheAwareLocaleInterceptor();
-			lci.setParamName("lang");
-			registry.addInterceptor(lci);
-		}
+        @Override
+        public void addInterceptors(InterceptorRegistry registry) {
+            var lci = new RequestCacheAwareLocaleInterceptor();
+            lci.setParamName("lang");
+            registry.addInterceptor(lci);
+        }
 
-		@Override
-		public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-			PageableHandlerMethodArgumentResolver e = new PageableHandlerMethodArgumentResolver();
-			e.setPageParameterName("page");
-			e.setSizeParameterName("count");
-			argumentResolvers.add(e);
-			argumentResolvers.add(new ServletOrgStorePrincipalInfoArgumentResolver());
-			argumentResolvers.add(new ServletStoreMerchantIdArgumentResolver());
-			argumentResolvers.add(new ServletLanguageCodeArgumentResolver());
-		}
+        @Override
+        public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+            PageableHandlerMethodArgumentResolver e = new PageableHandlerMethodArgumentResolver();
+            e.setPageParameterName("page");
+            e.setSizeParameterName("count");
+            argumentResolvers.add(e);
+            argumentResolvers.add(new ServletOrgStorePrincipalInfoArgumentResolver());
+            argumentResolvers.add(new ServletStoreMerchantIdArgumentResolver());
+            argumentResolvers.add(new ServletLanguageCodeArgumentResolver());
+        }
 
-	}
+    }
 
 }

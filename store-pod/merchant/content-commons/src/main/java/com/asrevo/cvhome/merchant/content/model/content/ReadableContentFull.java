@@ -1,9 +1,11 @@
 package com.asrevo.cvhome.merchant.content.model.content;
 
-import com.asrevo.cvhome.commons.domain.Entity;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.asrevo.cvhome.commons.domain.Entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,20 +14,20 @@ import lombok.Setter;
 @Setter
 public class ReadableContentFull extends Entity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String code;
+    private String code;
 
-	private boolean visible;
+    private boolean visible;
 
-	private String contentType;
+    private String contentType;
 
-	private boolean isDisplayedInMenu;
+    private boolean isDisplayedInMenu;
 
-	private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
+    private List<ContentDescriptionEntity> descriptions = new ArrayList<>();
 
 }
