@@ -8,7 +8,7 @@ public enum Roles {
     public static Roles parse(String role) {
         try {
             return Roles.valueOf(role);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return null;
         }
     }

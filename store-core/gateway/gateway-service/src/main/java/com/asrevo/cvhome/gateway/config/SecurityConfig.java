@@ -86,14 +86,14 @@ public class SecurityConfig {
     public WebSessionIdResolver webSessionIdResolver() {
         CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
         resolver.setCookieName("STORE-CORE-GATEWAY-JSESSIONID");
-        resolver.addCookieInitializer((builder) -> builder.path("/"));
+        resolver.addCookieInitializer(builder -> builder.path("/"));
         return resolver;
     }
 
     @Bean
     public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
-        return (userRequest) -> delegate.loadUser(userRequest).flatMap((oidcUser) -> {
+        return userRequest -> delegate.loadUser(userRequest).flatMap(oidcUser -> {
             OAuth2AccessToken accessToken = userRequest.getAccessToken();
             Set<GrantedAuthority> r = extractAuthority(accessToken);
             ClientRegistration.ProviderDetails providerDetails = userRequest.getClientRegistration()

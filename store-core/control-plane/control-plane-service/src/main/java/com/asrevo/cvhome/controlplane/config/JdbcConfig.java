@@ -15,9 +15,6 @@ import com.asrevo.cvhome.commons.domain.PodId;
 @Configuration
 public class JdbcConfig extends AbstractJdbcConfiguration {
 
-    public JdbcConfig() {
-    }
-
     @Override
     protected List<?> userConverters() {
         List<Converter<?, ?>> converters = new ArrayList<>();

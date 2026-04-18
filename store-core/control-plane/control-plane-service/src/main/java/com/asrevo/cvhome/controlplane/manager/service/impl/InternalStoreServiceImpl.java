@@ -44,19 +44,19 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     @Transactional
     @Override
     public void completeProvisioning(ManagerStoreId store) {
-        storeRepository.findById(store).map(it -> storeRepository.save(it.completeProvisioning()));
+        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.completeProvisioning()));
     }
 
     @Transactional
     @Override
     public void failProvisioning(ManagerStoreId store) {
-        storeRepository.findById(store).map(it -> storeRepository.save(it.failProvisioning()));
+        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning()));
     }
 
     @Transactional
     @Override
     public void startProvisioning(ManagerStoreId store) {
-        storeRepository.findById(store).map(it -> storeRepository.save(it.startProvisioning()));
+        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.startProvisioning()));
     }
 
     @Override

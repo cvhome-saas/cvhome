@@ -44,7 +44,7 @@ public class KeyPairService {
                     boolean alreadyHasActive = result.stream().anyMatch(existing -> {
                         try {
                             return KeyUse.SIGNATURE.equals(existing.getKeyUse());
-                        } catch (Exception e) {
+                        } catch (Exception _) {
                             return false;
                         }
                     });
@@ -53,7 +53,7 @@ public class KeyPairService {
                     }
                 }
                 result.add(jwk);
-            } catch (Exception ignored) {
+            } catch (Exception _) {
             }
         });
         return result;

@@ -43,11 +43,10 @@ public class UaaLogoutSuccessHandler {
                     idToken = defaultOidcUser.getIdToken().getTokenValue();
                 }
                 String logoutUrl = extractLogoutUrl(exchange, idToken);
-                URI logoutSuccessUrl = URI.create(logoutUrl);
-                return this.redirectStrategy.sendRedirect(exchange, logoutSuccessUrl);
+                return this.redirectStrategy.sendRedirect(exchange, URI.create(logoutUrl));
             }
 
-        } catch (Exception ignored) {
+        } catch (Exception _) {
         }
         return this.redirectStrategy.sendRedirect(exchange, logoutSuccessUrl);
     }

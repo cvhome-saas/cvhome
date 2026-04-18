@@ -26,10 +26,10 @@ public class StoreProvisioningService {
     public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, Map<Object, Object> payload) {
         Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(payload, managerOrgId, store);
         internalStoreService.startProvisioning(store);
-        podClientFactory.getMerchantStorePodClient(pod).create(newRequest).subscribe((it) -> {
+        podClientFactory.getMerchantStorePodClient(pod).create(newRequest).subscribe(it -> {
             internalStoreService.completeProvisioning(store);
             log.info("Successfully created new Store {} in Pod {}", store, pod);
-        }, (err) -> {
+        }, err -> {
             internalStoreService.failProvisioning(store);
             log.error("Error creating Store in pod {}", pod, err);
         }, () -> {

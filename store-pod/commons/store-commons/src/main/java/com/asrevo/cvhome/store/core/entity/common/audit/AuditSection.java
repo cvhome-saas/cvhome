@@ -31,9 +31,6 @@ public class AuditSection implements Serializable {
     @Column(name = "UPDT_ID", length = 60)
     private String modifiedBy;
 
-    public AuditSection() {
-    }
-
     public Date getDateCreated() {
         return CloneUtils.clone(dateCreated);
     }

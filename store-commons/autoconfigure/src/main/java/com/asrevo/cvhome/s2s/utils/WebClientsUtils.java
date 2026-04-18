@@ -34,7 +34,7 @@ public class WebClientsUtils {
         try {
             Class.forName("org.springframework.data.domain.Pageable");
             proxyBuilder.customArgumentResolver(new PageableSerializeParamArgumentResolver());
-        } catch (Exception ignored) {
+        } catch (Exception _) {
             // Ignore if Pageable is not on the classpath
         }
         return proxyBuilder.build().createClient(tClass);

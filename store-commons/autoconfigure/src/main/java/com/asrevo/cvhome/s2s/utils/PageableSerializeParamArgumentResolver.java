@@ -15,7 +15,8 @@ public class PageableSerializeParamArgumentResolver implements HttpServiceArgume
                 requestValues.addRequestParameter("size", String.valueOf(pageable.getPageSize()));
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
+            return false;
         }
         return false;
     }

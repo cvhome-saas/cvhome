@@ -34,7 +34,6 @@ import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebA
 @Import({WebClientServicesConfig.ReactiveWebClientServicesConfig.class,
         WebClientServicesConfig.ServletWebClientServicesConfig.class})
 public class WebClientServicesConfig {
-
     private static final String S2S_CLIENT_REGISTRATION_ID = "s2s";
 
     @Configuration

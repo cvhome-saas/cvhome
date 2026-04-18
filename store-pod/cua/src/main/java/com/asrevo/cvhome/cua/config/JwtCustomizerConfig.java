@@ -24,25 +24,26 @@ public class JwtCustomizerConfig {
 
             Authentication rawPrincipal = context.getPrincipal();
 
-            if (rawPrincipal.getPrincipal() instanceof SecurityUser principal) {
-                if (Objects.nonNull(principal.getEmail())) {
-                    context.getClaims().claim("email", principal.getEmail());
-                }
-                if (Objects.nonNull(principal.getFirstName())) {
-                    context.getClaims().claim("firstName", principal.getFirstName());
-                }
-                if (Objects.nonNull(principal.getLastName())) {
-                    context.getClaims().claim("lastName", principal.getLastName());
-                }
-                if (Objects.nonNull(principal.getClientId())) {
-                    context.getClaims().claim("clientId", principal.getClientId());
-                }
-                if (Objects.nonNull(principal.getId())) {
-                    context.getClaims().claim("sub", principal.getId().toString());
-                }
-                context.getClaims().claim("username", principal.getUsername());
-                context.getClaims().claim("roles", new String[] {"CUSTOMER"});
+            if (!(rawPrincipal.getPrincipal() instanceof SecurityUser principal)) {
+                return;
             }
+            if (Objects.nonNull(principal.getEmail())) {
+                context.getClaims().claim("email", principal.getEmail());
+            }
+            if (Objects.nonNull(principal.getFirstName())) {
+                context.getClaims().claim("firstName", principal.getFirstName());
+            }
+            if (Objects.nonNull(principal.getLastName())) {
+                context.getClaims().claim("lastName", principal.getLastName());
+            }
+            if (Objects.nonNull(principal.getClientId())) {
+                context.getClaims().claim("clientId", principal.getClientId());
+            }
+            if (Objects.nonNull(principal.getId())) {
+                context.getClaims().claim("sub", principal.getId().toString());
+            }
+            context.getClaims().claim("username", principal.getUsername());
+            context.getClaims().claim("roles", new String[] {"CUSTOMER"});
 
         };
     }

@@ -11,11 +11,12 @@ public class LanguageCodeSerializeParamArgumentResolver implements HttpServiceAr
     @Override
     public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
         try {
-            if (argument instanceof LanguageCode languageCode) {
-                requestValues.addRequestParameter("lang", languageCode.code());
+            if (argument instanceof LanguageCode(String code)) {
+                requestValues.addRequestParameter("lang", code);
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
+            return false;
         }
         return false;
     }

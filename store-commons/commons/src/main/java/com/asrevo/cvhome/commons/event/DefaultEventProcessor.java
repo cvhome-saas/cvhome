@@ -2,7 +2,6 @@ package com.asrevo.cvhome.commons.event;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +29,7 @@ public class DefaultEventProcessor implements EventProcessor {
         return eventsImpl.stream()
                 .filter(it -> it.type().equals(event.eventType()))
                 .sorted(Comparator.comparing(EventImpl::order))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

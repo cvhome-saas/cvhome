@@ -70,7 +70,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 return null;
             }
             return properties.pod();
-        } catch (Exception e) {
+        } catch (Exception _) {
             return null;
         }
     }

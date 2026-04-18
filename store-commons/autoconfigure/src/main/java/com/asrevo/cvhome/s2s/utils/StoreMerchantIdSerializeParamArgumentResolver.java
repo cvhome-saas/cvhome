@@ -15,7 +15,8 @@ public class StoreMerchantIdSerializeParamArgumentResolver implements HttpServic
                 requestValues.addRequestParameter("store", store.getId());
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
+            return false;
         }
         return false;
     }

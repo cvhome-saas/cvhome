@@ -19,9 +19,6 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         String name = "bearer-key";
         String basePath = "/";
-        // if (Set.of(environment.getActiveProfiles()).contains("cloud")) {
-        // basePath = "/uxplore";
-        // }
         Server server = new Server().url(basePath);
         SecurityScheme securitySchemesItem = new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .scheme("Bearer")

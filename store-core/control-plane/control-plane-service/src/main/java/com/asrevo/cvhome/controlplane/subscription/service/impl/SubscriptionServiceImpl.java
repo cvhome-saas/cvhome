@@ -41,7 +41,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     @Override
     public void deActivateSubscription(ManagerOrgId org) {
-        subscriptionRepository.findById(org).map(it -> subscriptionRepository.save(it.deActivate()));
+        subscriptionRepository.findById(org).ifPresent(it -> subscriptionRepository.save(it.deActivate()));
     }
 
     @Transactional
@@ -49,7 +49,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void renew(ManagerOrgId org, SubscriptionPlan subscriptionPlan, Instant startDate, Instant endDate,
                       RecurringPlan recurringPlan) {
         subscriptionRepository.findById(org)
-                .map(it -> subscriptionRepository.save(it.renew(subscriptionPlan, startDate, endDate, recurringPlan)));
+                .ifPresent(it -> subscriptionRepository.save(it.renew(subscriptionPlan, startDate, endDate, recurringPlan)));
     }
 
 }

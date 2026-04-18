@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +55,7 @@ public class PricingTableInitServiceImpl implements PricingTableInitService {
 
         List<RecurringPlan> recurringPlans = Arrays.stream(RecurringPlan.values()).toList();
 
-        Map<SubscriptionPlan, ProductId> productBySubscriptionPlan = new HashMap<>();
+        Map<SubscriptionPlan, ProductId> productBySubscriptionPlan = new EnumMap<>(SubscriptionPlan.class);
 
         List<SubscriptionPricePlanEntity> list = subscriptionPlans.stream()
                 .flatMap(it -> recurringPlans.stream().map(rp -> {

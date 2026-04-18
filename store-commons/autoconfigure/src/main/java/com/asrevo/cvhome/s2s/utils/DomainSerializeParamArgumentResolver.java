@@ -11,11 +11,12 @@ public class DomainSerializeParamArgumentResolver implements HttpServiceArgument
     @Override
     public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
         try {
-            if (argument instanceof Domain domain) {
-                requestValues.addRequestParameter("domain", domain.domain());
+            if (argument instanceof Domain(String domain)) {
+                requestValues.addRequestParameter("domain", domain);
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
+            return false;
         }
         return false;
     }

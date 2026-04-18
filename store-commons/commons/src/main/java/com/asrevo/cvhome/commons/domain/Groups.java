@@ -7,7 +7,7 @@ public enum Groups {
     public static Groups parse(String group) {
         try {
             return Groups.valueOf(group);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return null;
         }
     }

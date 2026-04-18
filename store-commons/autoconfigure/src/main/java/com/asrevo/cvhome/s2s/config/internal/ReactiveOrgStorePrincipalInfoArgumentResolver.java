@@ -28,7 +28,7 @@ public class ReactiveOrgStorePrincipalInfoArgumentResolver implements HandlerMet
                                         ServerWebExchange exchange) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .flatMap((authentication) -> Mono.justOrEmpty(resolvePrincipal(parameter, authentication)));
+                .flatMap(authentication -> Mono.justOrEmpty(resolvePrincipal(parameter, authentication)));
     }
 
     private Object resolvePrincipal(MethodParameter parameter, Authentication authentication) {

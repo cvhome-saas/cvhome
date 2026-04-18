@@ -75,7 +75,7 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 .stream()
                 .filter(it -> Objects.nonNull(it.getKey()) && Objects.nonNull(it.getValue()) && !it.getValue().isEmpty()
                         && !originalQueryParams.containsKey(it.getKey()))
-                .forEach((param) -> componentsBuilder.queryParam(param.getKey(), param.getValue().getFirst()));
+                .forEach(param -> componentsBuilder.queryParam(param.getKey(), param.getValue().getFirst()));
 
         String newRequestUri = componentsBuilder.build(true).toUriString();
 

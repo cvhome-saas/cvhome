@@ -28,16 +28,14 @@ public class AuthorizationServerConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    SecurityFilterChain authorizationServerSecurity(HttpSecurity http) throws Exception {
+    SecurityFilterChain authorizationServerSecurity(HttpSecurity http) {
         OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
         return http.with(serverConfigurer, configurer -> configurer.oidc(Customizer.withDefaults()))
                 .securityMatcher(serverConfigurer.getEndpointsMatcher())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(serverConfigurer.getEndpointsMatcher()).authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> {
-                    ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
-                })
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
                 .build();
     }
 

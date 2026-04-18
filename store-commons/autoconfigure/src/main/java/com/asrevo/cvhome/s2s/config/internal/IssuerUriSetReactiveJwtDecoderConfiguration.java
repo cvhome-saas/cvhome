@@ -45,7 +45,7 @@ public class IssuerUriSetReactiveJwtDecoderConfiguration {
             Function<String, ReactiveJwtDecoder> stringReactiveJwtDecoderFunction = issuer -> {
                 NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builder = NimbusReactiveJwtDecoder
                         .withIssuerLocation(issuer);
-                customizers.orderedStream().forEach((customizer) -> customizer.customize(builder));
+                customizers.orderedStream().forEach(customizer -> customizer.customize(builder));
                 NimbusReactiveJwtDecoder jwtDecoder = builder.build();
                 jwtDecoder.setJwtValidator(getValidators(JwtValidators.createDefaultWithIssuer(issuer)));
                 return jwtDecoder;

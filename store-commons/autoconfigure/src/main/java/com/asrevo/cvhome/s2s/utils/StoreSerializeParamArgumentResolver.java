@@ -17,7 +17,8 @@ public class StoreSerializeParamArgumentResolver implements HttpServiceArgumentR
                 requestValues.addRequestParameter(name, value);
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
+            return false;
         }
         return false;
     }

@@ -16,8 +16,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-//import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-
 @RestController
 @RequestMapping("api/v1/http-events")
 @Slf4j

@@ -46,7 +46,7 @@ public class StripeInitServiceImpl implements StripeInitService {
         try {
             Product.list(ProductListParams.builder().build());
             return true;
-        } catch (StripeException e) {
+        } catch (StripeException _) {
             return false;
         }
     }
@@ -83,9 +83,9 @@ public class StripeInitServiceImpl implements StripeInitService {
     @Override
     public boolean exist(PriceId priceId) {
         try {
-            Price ignored = Price.retrieve(priceId.id());
+            Price _ = Price.retrieve(priceId.id());
             return true;
-        } catch (StripeException e) {
+        } catch (StripeException _) {
             return false;
         }
     }
