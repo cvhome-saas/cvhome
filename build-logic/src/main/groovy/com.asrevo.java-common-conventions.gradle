@@ -30,16 +30,16 @@ checkstyle {
 tasks.named('checkstyleMain') {
     enabled = true
     reports {
-        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.xml")
-        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.html")
+        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}-main.xml")
+        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}-main.html")
     }
 }
 
 tasks.named('checkstyleTest') {
     enabled = true
     reports {
-        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.xml")
-        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.html")
+        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}-test.xml")
+        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}-test.html")
     }
 }
 
