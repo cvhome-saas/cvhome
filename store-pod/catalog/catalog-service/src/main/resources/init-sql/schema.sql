@@ -342,17 +342,6 @@ create table if not exists catalog.product_image_description
         constraint fk9k3u9pf3teymlxchgu9p4jd9e references catalog.product_image,
     constraint UKthpdsawwymj1tnjnsmk84umlp unique (product_image_id, language_code)
 );
-create table if not exists catalog.product_relationship
-(
-    product_relationship_id bigint      not null primary key,
-    active                  boolean,
-    code                    varchar(255),
-    product_id              bigint
-        constraint fk7opqd0ko4gr45r2lpmiyr9sai references catalog.product,
-    related_product_id      bigint
-        constraint fkg6fbs35996omj1d4iw2upkdmn references catalog.product,
-    store_merchant_id       varchar(50) not null
-);
 create table if not exists catalog.product_var_image_description
 (
     description_id       bigint       not null primary key,

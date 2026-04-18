@@ -74,9 +74,6 @@ INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_IMAGE_DESCRIPTION_SEQ_NEXT_VAL', 0)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_RELATIONSHIP_SEQ_NEXT_VAL', 241)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_VAR_IMAGE_DESCRIPTION_SEQ_NEXT_VAL', 0)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
