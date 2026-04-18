@@ -15,7 +15,7 @@ import software.amazon.awssdk.regions.Region;
 @Configuration
 public class MinioS3Config {
 
-    private final String DEFAULT_BUCKET = UUID.randomUUID().toString();
+    private static final String DEFAULT_BUCKET = UUID.randomUUID().toString();
 
     private final Region region = Region.EU_CENTRAL_1;
 
