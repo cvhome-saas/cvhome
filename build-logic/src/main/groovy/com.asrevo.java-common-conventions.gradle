@@ -25,11 +25,21 @@ repositories {
 checkstyle {
     toolVersion = "10.12.4"
     configDirectory = file("$rootDir/config/checkstyle")
-    checkstyleMain {
-        enabled = true
+}
+
+tasks.named('checkstyleMain') {
+    enabled = true
+    reports {
+        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.xml")
+        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.html")
     }
-    checkstyleTest {
-        enabled = false
+}
+
+tasks.named('checkstyleTest') {
+    enabled = true
+    reports {
+        xml.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.xml")
+        html.outputLocation = rootProject.layout.buildDirectory.file("reports/checkstyle/${project.name}.html")
     }
 }
 
