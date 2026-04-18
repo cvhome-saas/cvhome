@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,44 +12,46 @@ export class ProductGroupsService {
   }
 
   getListOfProductGroups(param): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/groups`, param);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups`, param);
   }
 
-
-  createProductGroup( group): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/group`, group);
+  createProductGroup(group): Observable<any> {
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/groups`, group);
   }
 
-  updateGroupActiveValue( group): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/products/group/${group.code}`, group);
+  getProductGroup(code, params?): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/products/groups/${code}`, params);
+  }
+
+  checkCode(code: string): Observable<any> {
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups/unique`, {code});
+  }
+
+  updateGroupActiveValue(group): Observable<any> {
+    return this.getProductGroup(group.code).pipe(
+      switchMap(current => {
+        const updated = {
+          code: current.code,
+          active: group.active,
+          descriptions: (current.descriptions || []).map((d: any) => ({
+            language: d.language,
+            name: d.name,
+          }))
+        };
+        return this.createProductGroup(updated);
+      })
+    );
   }
 
   addProductToGroup(productId, groupCode): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}`, {});
+    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`, {});
   }
 
-  removeProductFromGroup( productId, groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${productId}/group/${groupCode}`);
+  removeProductFromGroup(productId, groupCode) {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`);
   }
 
-  getProductsByGroup(groupCode, params) {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/group/${groupCode}`, params);
-  }
-
-  getRelatedProduct(product, params) {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related`, params);
-  }
-
-  removeProductGroup( groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/group/${groupCode}`);
-  }
-
-  addProductToRelated( product: string, item) {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}`, {});
-  }
-
-  removeProductFromRelated(product: string, item) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/${product}/related/${item}`, {});
-
+  removeProductGroup(groupCode) {
+    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}`);
   }
 }

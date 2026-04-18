@@ -35,10 +35,10 @@ export default async function Page({params}: { params: Promise<ProductPageParams
                     <ProductDetails storeContext={aparams.storeContext} p={p} t={t}/>
                 </div>
                 {
-                    related && related.content && related.productGroup && related.productGroup.active && related.content.length > 0 &&
+                    related && related.products && related.active && related.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
                         <SectionTitle title={t('RELATED_PRODUCTS')}/>
-                        <ProductSwiperGrid storeContext={aparams.storeContext} products={related.content}/>
+                        <ProductSwiperGrid storeContext={aparams.storeContext} products={related.products}/>
                     </div>
                 }
             </>}

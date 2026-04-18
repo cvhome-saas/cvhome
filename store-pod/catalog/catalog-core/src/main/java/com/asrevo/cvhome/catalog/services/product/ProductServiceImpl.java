@@ -5,15 +5,14 @@ import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
-import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship;
 import com.asrevo.cvhome.catalog.model.product.*;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
+import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
-import com.asrevo.cvhome.catalog.services.product.relationship.ProductRelationshipService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
@@ -39,7 +38,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 	private final ProductRepository productRepository;
 
 	@Autowired
-	ProductRelationshipService productRelationshipService;
+	ProductGroupService productGroupService;
 
 	@Autowired
 	ProductImageService productImageService;
@@ -103,10 +102,12 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 		product.setImages(null);
 
 		// related - featured
-		List<ProductRelationship> relationships = productRelationshipService.listByProduct(product);
-		for (ProductRelationship relationship : relationships) {
-			productRelationshipService.deleteRelationship(relationship);
-		}
+		// @todo check delete
+		// List<ProductRelationship> relationships =
+		// productGroupService.listByProduct(product);
+		// for (ProductRelationship relationship : relationships) {
+		// productGroupService.deleteRelationship(relationship);
+		// }
 
 		super.delete(product);
 		// searchService.deleteIndex(product.getMerchantStore(), product);

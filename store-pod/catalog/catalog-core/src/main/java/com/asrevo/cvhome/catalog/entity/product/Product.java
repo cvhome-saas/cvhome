@@ -6,7 +6,6 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
-import com.asrevo.cvhome.catalog.entity.product.relationship.ProductRelationship;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -78,12 +77,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
 	// image first
 	// and then save the image id in the database, cannot be done in cascade
 	private Set<ProductImage> images = new HashSet<>();
-
-	/**
-	 * Related items / product groups
-	 */
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-	private Set<ProductRelationship> relationships = new HashSet<>();
 
 	@Embedded
 	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
