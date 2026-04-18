@@ -25,6 +25,10 @@ public class PriceUtils {
 
     private static final char THOUSANDPOINT = ',';
 
+    private PriceUtils() {
+    }
+
+
     public static String getStringAmount(BigDecimal amount) {
 
         if (amount == null) {

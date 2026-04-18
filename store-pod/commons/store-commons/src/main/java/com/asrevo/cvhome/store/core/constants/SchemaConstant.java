@@ -6,10 +6,6 @@ import java.util.Map;
 
 public class SchemaConstant {
 
-    private SchemaConstant() {
-    }
-
-
 
     public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 0;
 
@@ -195,6 +191,9 @@ public class SchemaConstant {
         CURRENCY_MAP.put("VND", "Dong");
         CURRENCY_MAP.put("YER", "Yemeni Rial");
         CURRENCY_MAP.put("ZMK", "Zambian Kwacha");
+    }
+
+    private SchemaConstant() {
     }
 
 }

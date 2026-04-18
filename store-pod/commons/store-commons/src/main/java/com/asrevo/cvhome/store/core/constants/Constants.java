@@ -7,10 +7,6 @@ import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 
 public class Constants {
 
-    private Constants() {
-    }
-
-
     public static final String ALL_REGIONS = "*";
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
@@ -37,5 +33,10 @@ public class Constants {
     public static final String OT_SUBTOTAL_MODULE_CODE = "subtotal";
 
     public static final String OT_TOTAL_MODULE_CODE = "total";
+
+
+    private Constants() {
+    }
+
 
 }

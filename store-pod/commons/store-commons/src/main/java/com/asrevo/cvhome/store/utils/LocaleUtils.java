@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LocaleUtils {
-    private final static Locale[] locales = Locale.getAvailableLocales();
+    private static final Locale[] locales = Locale.getAvailableLocales();
 
     private LocaleUtils() {
     }
@@ -23,7 +23,7 @@ public class LocaleUtils {
                     defaultLocale = l;
                     break;
                 }
-            } catch (Exception e) {
+            } catch (Exception _) {
                 log.error("An error occurred while getting ISO code for locale {}", l.toString());
             }
         }
