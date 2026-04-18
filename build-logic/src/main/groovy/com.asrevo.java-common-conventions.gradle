@@ -6,7 +6,7 @@
 
 plugins {
     id 'java'
-    id 'io.spring.javaformat'
+    id 'checkstyle'
 }
 
 java {
@@ -20,6 +20,17 @@ repositories {
     maven { url = 'https://repo.spring.io/milestone' }
     mavenCentral()
     gradlePluginPortal()
+}
+
+checkstyle {
+    toolVersion = "10.12.4"
+    configDirectory = file("$rootDir/config/checkstyle")
+    checkstyleMain {
+        enabled = true
+    }
+    checkstyleTest {
+        enabled = false
+    }
 }
 
 dependencies {
