@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
@@ -88,7 +87,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
         // the above get all possible images
         List<ReadableProductVariant> readableInstances = instances.stream()
                 .map(p -> this.productVariant(p, store, language))
-                .collect(Collectors.toList());
+                .toList();
         readableProduct.setVariants(readableInstances);
 
         return readableProduct;
@@ -144,7 +143,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
                 .stream()
                 .map(p -> mapper.convert(p, store, criteria.getLanguage()))
                 .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
-                .collect(Collectors.toList());
+                .toList();
 
         readableProductList.setTotalElements(all.getTotalElements());
         readableProductList.setSize(all.getNumberOfElements());

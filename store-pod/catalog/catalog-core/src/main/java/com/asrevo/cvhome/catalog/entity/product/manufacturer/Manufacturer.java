@@ -71,7 +71,4 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     @Column(name = "CODE", length = 100, nullable = false)
     private String code;
 
-    public Manufacturer() {
-    }
-
 }

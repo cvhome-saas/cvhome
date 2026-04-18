@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -162,7 +161,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
 
             List<ReadableImage> imageList = images.stream()
                     .map(i -> this.convertImage(source, i, store))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setImages(imageList);
             destination.setImage(imageList.getFirst());
         }
@@ -297,7 +296,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
             List<ReadableProductVariant> instances = source.getVariants()
                     .stream()
                     .map(i -> readableProductVariantMapper.convert(i, store, language))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setVariants(instances);
 
             for (ProductVariant instance : source.getVariants()) {
@@ -311,9 +310,6 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         // availability
         ProductAvailability availability = null;
         for (ProductAvailability a : source.getAvailabilities()) {
-            // TODO validate region
-            // if(availability.getRegion().equals(Constants.ALL_REGIONS)) {//TODO REL 3.X
-            // accept a region
 
             availability = a;
             destination.setQuantity(Optional.ofNullable(availability.getProductQuantity()).orElse(1));

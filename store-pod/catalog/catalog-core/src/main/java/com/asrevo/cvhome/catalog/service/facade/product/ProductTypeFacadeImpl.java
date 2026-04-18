@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,7 +46,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         returnList.setContent(types.getContent()
                 .stream()
                 .map(t -> readableProductTypeMapper.convert(t, store, language))
-                .collect(Collectors.toList()));
+                .toList());
         returnList.setTotalPages(types.getTotalPages());
         returnList.setTotalElements(types.getTotalElements());
         returnList.setSize(types.getSize());

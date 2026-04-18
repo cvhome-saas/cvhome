@@ -4,7 +4,6 @@ import java.io.Serial;
 
 import com.asrevo.cvhome.store.core.model.catalog.NamedEntity;
 
-@Deprecated
 public class ContentDescriptionEntity extends NamedEntity {
 
     /**

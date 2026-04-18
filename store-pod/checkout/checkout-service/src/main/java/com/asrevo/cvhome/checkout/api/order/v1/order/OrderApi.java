@@ -40,7 +40,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -75,11 +74,10 @@ public class OrderApi {
      */
     @PostMapping(value = {"/cart/{code}/checkout"})
     @ResponseStatus(HttpStatus.OK)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
@@ -153,11 +151,10 @@ public class OrderApi {
     @GetMapping(value = {"/private/orders/{id}"})
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language) {

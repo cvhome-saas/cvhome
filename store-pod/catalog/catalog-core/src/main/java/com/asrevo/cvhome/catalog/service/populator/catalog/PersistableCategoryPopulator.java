@@ -41,10 +41,6 @@ public class PersistableCategoryPopulator
 
             Assert.notNull(target, "Category target cannot be null");
 
-            /*
-             * Assert.notNull(categoryService, "Requires to set CategoryService");
-             * Assert.notNull(languageService, "Requires to set LanguageService");
-             */
 
             target.setStoreMerchantId(store);
             target.setCode(source.getCode());
@@ -52,13 +48,9 @@ public class PersistableCategoryPopulator
             target.setVisible(source.isVisible());
             target.setFeatured(source.isFeatured());
 
-            // children
             if (CollectionUtils.isEmpty(source.getChildren())) {
                 target.getCategories().clear();
             }
-            // no modifications to children category
-
-            // get parent
 
             if (source.getParent() == null || (StringUtils.isBlank(source.getParent().getCode()))
                     || source.getParent().getId() == null) {
@@ -138,8 +130,6 @@ public class PersistableCategoryPopulator
 
     private com.asrevo.cvhome.catalog.entity.category.CategoryDescription buildDescription(CategoryDescription source,
                                                                                            com.asrevo.cvhome.catalog.entity.category.CategoryDescription target) {
-        // com.salesmanager.core.model.catalog.category.CategoryDescription desc = new
-        // com.salesmanager.core.model.catalog.category.CategoryDescription();
         target.setCategoryHighlight(source.getHighlights());
         target.setDescription(source.getDescription());
         target.setName(source.getName());

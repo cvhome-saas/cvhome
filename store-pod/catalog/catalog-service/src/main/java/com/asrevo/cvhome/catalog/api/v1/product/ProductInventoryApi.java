@@ -26,7 +26,6 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -48,11 +47,11 @@ public class ProductInventoryApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/{productId}/inventory"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableInventory create(@PathVariable Long productId, @Valid @RequestBody PersistableInventory inventory,
                                     StoreMerchantId merchantStore, LanguageCode language) {
@@ -62,11 +61,11 @@ public class ProductInventoryApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/{productId}/inventory/{id}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable Long productId, @PathVariable Long id,
                        @Valid @RequestBody PersistableInventory inventory, StoreMerchantId merchantStore, LanguageCode language) {
@@ -79,11 +78,11 @@ public class ProductInventoryApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/product/{productId}/inventory/{id}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long productId, @PathVariable Long id, StoreMerchantId merchantStore,
                        LanguageCode language) {
@@ -93,11 +92,11 @@ public class ProductInventoryApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{sku}/inventory"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableInventory> getBySku(@PathVariable String sku, StoreMerchantId merchantStore,
                                                           LanguageCode language, Pageable pageable) {
@@ -107,11 +106,11 @@ public class ProductInventoryApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/inventory"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableInventory> getByProductId(@RequestParam Long productId,
                                                                 StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {

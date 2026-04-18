@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +32,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductFull;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
-import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductAttribute;
-import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductAttributeValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductOption;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductProperty;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductPropertyValue;
@@ -133,16 +130,9 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                 target.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
             }
 
-            /*
-             * if(source.getProductReviewAvg()!=null) { double avg =
-             * source.getProductReviewAvg().doubleValue(); double rating = Math.round(avg
-             * * 2) / 2.0f; target.setRating(rating); }
-             */
+
             target.setProductVirtual(source.isProductVirtual());
-            /*
-             * if(source.getProductReviewCount()!=null) {
-             * target.setRatingCount(source.getProductReviewCount().intValue()); }
-             */
+
             if (description != null) {
                 com.asrevo.cvhome.catalog.model.product.ProductDescription tragetDescription = populateDescription(
                         description);
@@ -162,13 +152,6 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                 target.setManufacturer(manufacturerEntity);
             }
 
-            /*
-             * if(source.getType() != null) { ReadableProductType type = new
-             * ReadableProductType(); type.setId(source.getType().getId());
-             * type.setCode(source.getType().getCode());
-             * type.setName(source.getType().getCode());//need name target.setType(type);
-             * }
-             */
 
             Set<ProductImage> images = source.getImages();
             if (images != null && !images.isEmpty()) {
@@ -208,7 +191,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                 }
                 imageList = imageList.stream()
                         .sorted(Comparator.comparingInt(ReadableImage::getOrder))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 target.setImages(imageList);
             }
@@ -232,78 +215,22 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
                 Set<ProductAttribute> attributes = source.getAttributes();
 
-                // split read only and options
-                // Map<Long,ReadableProductAttribute> readOnlyAttributes = null;
-                Map<Long, ReadableProductProperty> properties = null;
                 Map<Long, ReadableProductOption> selectableOptions = null;
 
                 if (!CollectionUtils.isEmpty(attributes)) {
 
                     for (ProductAttribute attribute : attributes) {
                         ReadableProductOption opt;
-                        ReadableProductAttribute attr = null;
                         ReadableProductProperty property;
-                        ReadableProductPropertyValue propertyValue = null;
                         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
-                        ReadableProductAttributeValue attrValue = new ReadableProductAttributeValue();
 
                         ProductOptionValue optionValue = attribute.getProductOptionValue();
 
-                        if (attribute.isAttributeDisplayOnly()) { // read only attribute =
-                            // property
-                            /*
-                             * if(readOnlyAttributes==null) { readOnlyAttributes = new
-                             * TreeMap<Long,ReadableProductAttribute>(); } attr =
-                             * readOnlyAttributes.get(attribute.getProductOption().getId()
-                             * ); if(attr==null) { attr = createAttribute(attribute,
-                             * language); } if(attr!=null) {
-                             * readOnlyAttributes.put(attribute.getProductOption().getId()
-                             * , attr); }
-                             *
-                             *
-                             * attrValue.setDefaultValue(attribute.getAttributeDefault());
-                             * if(attribute.getProductOptionValue()!=null) {
-                             * attrValue.setId(attribute.getProductOptionValue().getId());
-                             * //id of the option value } else {
-                             * attrValue.setId(attribute.getId()); }
-                             * attrValue.setLang(language.getCode());
-                             *
-                             *
-                             * attrValue.setSortOrder(0);
-                             * if(attribute.getProductOptionSortOrder()!=null) {
-                             * attrValue.setSortOrder(attribute.getProductOptionSortOrder(
-                             * ).intValue()); }
-                             *
-                             * List<ProductOptionValueDescription> podescriptions =
-                             * optionValue.getDescriptionsSettoList();
-                             * ProductOptionValueDescription podescription = null;
-                             * if(podescriptions!=null && podescriptions.size()>0) {
-                             * podescription = podescriptions.get(0);
-                             * if(podescriptions.size()>1) {
-                             * for(ProductOptionValueDescription optionValueDescription :
-                             * podescriptions) {
-                             * if(optionValueDescription.getLanguage().getId().intValue()=
-                             * =language.getId().intValue()) { podescription =
-                             * optionValueDescription; break; } } } }
-                             * attrValue.setName(podescription.getName());
-                             * attrValue.setDescription(podescription.getDescription());
-                             *
-                             * if(attr!=null) { attr.getAttributeValues().add(attrValue);
-                             * }
-                             */
+                        if (attribute.isAttributeDisplayOnly()) {
 
-                            // if(properties==null) {
-                            // properties = new TreeMap<Long,ReadableProductProperty>();
-                            // }
-                            // property =
-                            // properties.get(attribute.getProductOption().getId());
-                            // if(property==null) {
                             property = createProperty(attribute, language);
 
                             ReadableProductOption readableOption = new ReadableProductOption(); // that
-                            // is
-                            // the
-                            // property
                             ReadableProductPropertyValue readableOptionValue = new ReadableProductPropertyValue();
 
                             readableOption.setCode(attribute.getProductOption().getCode());
@@ -334,42 +261,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
                             property.setPropertyValue(readableOptionValue);
 
-                            // } else{
-                            // properties.put(attribute.getProductOption().getId(),
-                            // property);
-                            // }
 
-                            /*
-                             * propertyValue.setCode(attribute.getProductOptionValue().
-                             * getCode());
-                             * propertyValue.setId(attribute.getProductOptionValue().getId
-                             * ());
-                             *
-                             *
-                             * propertyValue.setSortOrder(0);
-                             * if(attribute.getProductOptionSortOrder()!=null) {
-                             * propertyValue.setSortOrder(attribute.
-                             * getProductOptionSortOrder().intValue()); }
-                             *
-                             * List<ProductOptionValueDescription> podescriptions =
-                             * optionValue.getDescriptionsSettoList();
-                             * if(podescriptions!=null && podescriptions.size()>0) {
-                             * for(ProductOptionValueDescription optionValueDescription :
-                             * podescriptions) {
-                             * com.asrevo.cvhome.store.model.catalog.product.attribute.
-                             * ProductOptionValueDescription desc = new
-                             * com.asrevo.cvhome.store.model.catalog.product.attribute.
-                             * ProductOptionValueDescription();
-                             * desc.setId(optionValueDescription.getId());
-                             * desc.setName(optionValueDescription.getName());
-                             * propertyValue.getValues().add(desc); } }
-                             *
-                             * property.setPropertyValue(propertyValue);
-                             */
-
-                            // if(attr!=null) {
-                            // attr.getAttributeValues().add(attrValue);
-                            // }
                             target.getProperties().add(property);
 
                         } else { // selectable option
@@ -386,13 +278,11 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                             }
 
                             optValue.setDefaultValue(attribute.isAttributeDefault());
-                            // optValue.setId(attribute.getProductOptionValue().getId());
                             optValue.setId(attribute.getId());
                             optValue.setCode(attribute.getProductOptionValue().getCode());
                             com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription valueDescription =
                                     new com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription();
                             valueDescription.setLanguage(language);
-                            // optValue.setLang(language.getCode());
                             if (attribute.getProductAttributePrice() != null
                                     && attribute.getProductAttributePrice().doubleValue() > 0) {
                                 String formatedPrice = pricingService
@@ -440,24 +330,8 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                     target.setOptions(options);
                 }
             }
-
-            // remove products from invisible category -> set visible = false
-            /*
-             * Set<Category> categories = source.getCategories(); boolean isVisible =
-             * true; if(!CollectionUtils.isEmpty(categories)) { for(Category c :
-             * categories) { if(c.isVisible()) { isVisible = true; break; } else {
-             * isVisible = false; } } }
-             */
-
-            // target.setVisible(isVisible);
-
-            // availability
             ProductAvailability availability = null;
             for (ProductAvailability a : source.getAvailabilities()) {
-                // TODO validate region
-                // if(availability.getRegion().equals(Constants.ALL_REGIONS)) {//TODO REL
-                // 2.1 accept
-                // a region
                 availability = a;
                 target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
                 target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
@@ -467,7 +341,6 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                 if (availability.getProductQuantity() > 0 && target.isAvailable()) {
                     target.setCanBePurchased(true);
                 }
-                // }
             }
 
             target.setSku(source.getSku());

@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.facade.country;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class CountryFacadeImpl implements CountryFacade {
     public List<ReadableCountry> getListCountryZones(LanguageCode language, StoreMerchantId merchantStore) {
         return getListOfCountryZones(language).stream()
                 .map(country -> convertToReadableCountry(country, language, merchantStore))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ReadableCountry convertToReadableCountry(Country country, LanguageCode language,

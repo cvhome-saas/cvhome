@@ -10,7 +10,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Deprecated
 public class ReadableProductList extends ReadableList<ReadableProduct> {
 
     /**

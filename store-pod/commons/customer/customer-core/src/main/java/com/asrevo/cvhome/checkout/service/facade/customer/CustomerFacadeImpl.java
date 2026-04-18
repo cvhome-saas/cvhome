@@ -5,7 +5,6 @@ package com.asrevo.cvhome.checkout.service.facade.customer;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -91,7 +90,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
         List<ReadableCustomer> readableCustomers = listByStore.getContent()
                 .stream()
                 .map(customer -> convertCustomerToReadableCustomer(customer, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         ReadableCustomerList readableCustomerList = new ReadableCustomerList();
         readableCustomerList.setTotalPages(listByStore.getTotalPages());

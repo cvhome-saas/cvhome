@@ -25,7 +25,6 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -52,11 +51,11 @@ public class ProductPriceApi {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity save(@PathVariable String sku, @PathVariable Long inventoryId,
                        @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
@@ -70,11 +69,11 @@ public class ProductPriceApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/{sku}/price"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity save(@PathVariable String sku, @Valid @RequestBody PersistableProductPrice price,
                        StoreMerchantId merchantStore, LanguageCode language) {
@@ -88,11 +87,11 @@ public class ProductPriceApi {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"},
             method = RequestMethod.PUT)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void edit(@PathVariable String sku, @PathVariable Long inventoryId, @PathVariable Long priceId,
                      @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
@@ -105,11 +104,11 @@ public class ProductPriceApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{sku}/price/{priceId}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductPrice get(@PathVariable String sku, @PathVariable Long priceId,
                                     @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore,
@@ -122,11 +121,11 @@ public class ProductPriceApi {
     }
 
     @GetMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public List<ReadableProductPrice> list(@PathVariable String sku, @PathVariable Long inventoryId,
                                            StoreMerchantId merchantStore, LanguageCode language) {
@@ -135,11 +134,11 @@ public class ProductPriceApi {
     }
 
     @GetMapping(value = {"/private/product/{sku}/prices"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public List<ReadableProductPrice> list(@PathVariable String sku, StoreMerchantId merchantStore,
                                            LanguageCode language) {
@@ -149,11 +148,11 @@ public class ProductPriceApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/product/{sku}/price/{priceId}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable String sku, @PathVariable Long priceId, StoreMerchantId merchantStore,
                        LanguageCode language) {

@@ -78,9 +78,4 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     @Transient
     private InputStream image = null;
 
-    // private MultiPartFile image
-
-    public ProductImage() {
-    }
-
 }

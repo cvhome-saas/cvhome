@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -137,7 +136,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
 
             List<ReadableImage> imageList = images.stream()
                     .map(i -> this.convertImage(source, i, store))
-                    .collect(Collectors.toList());
+                    .toList();
             target.setImages(imageList);
         }
 

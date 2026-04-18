@@ -88,12 +88,8 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             }
 
             FinalPrice price;
-            // try {
             price = pricingService.calculateProductPrice(source);
             destination.setPrice(price.getStringPrice());
-            // } catch (ServiceException e) {
-            // throw new ConversionRuntimeException("Unable to get product price", e);
-            // }
 
         } catch (Exception e) {
             throw new ConversionRuntimeException("Error while converting Inventory", e);

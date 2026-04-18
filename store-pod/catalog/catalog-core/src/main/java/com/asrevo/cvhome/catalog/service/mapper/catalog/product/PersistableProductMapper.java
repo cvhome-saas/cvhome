@@ -253,9 +253,9 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
     private ProductVariant variant(Product product, PersistableProductVariant variant, StoreMerchantId store,
                                    LanguageCode language) {
-        ProductVariant var = persistableProductVariantMapper.convert(variant, store, language);
-        var.setProduct(product);
-        return var;
+        ProductVariant productVariant = persistableProductVariantMapper.convert(variant, store, language);
+        productVariant.setProduct(product);
+        return productVariant;
     }
 
     private ProductAvailability defaultAvailability(List<ProductAvailability> availabilityList) {

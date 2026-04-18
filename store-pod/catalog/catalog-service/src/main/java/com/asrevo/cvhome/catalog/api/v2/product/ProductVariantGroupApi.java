@@ -26,7 +26,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,11 +47,11 @@ public class ProductVariantGroupApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/productVariantGroup"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProductVariantGroup instanceGroup,
                          StoreMerchantId merchantStore, LanguageCode language) {

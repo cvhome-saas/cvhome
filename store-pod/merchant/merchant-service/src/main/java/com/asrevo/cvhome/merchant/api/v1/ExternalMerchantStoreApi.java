@@ -11,7 +11,6 @@ import com.asrevo.cvhome.merchant.service.facade.merchant.StoreFacade;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,8 +34,8 @@ public class ExternalMerchantStoreApi implements ExternalMerchantStoreService {
     @Operation(method = "GET", description = "Get merchant store",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @Override
     public ReadableMerchantStore getStore(StoreMerchantId merchantStore) {

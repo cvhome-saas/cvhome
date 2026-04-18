@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -183,7 +182,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         List<ReadableInventory> returnList = availabilities.getContent()
                 .stream()
                 .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         return createReadableList(availabilities, returnList);
     }
@@ -200,7 +199,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         List<ReadableInventory> returnList = availabilities.getContent()
                 .stream()
                 .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         return createReadableList(availabilities, returnList);
     }

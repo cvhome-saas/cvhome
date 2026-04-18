@@ -60,7 +60,6 @@ public class ReadableTinyProductPopulator extends AbstractDataPopulator<Product,
 
     @Override
     protected ReadableProduct createTarget() {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -19,7 +19,6 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -37,11 +36,10 @@ public class CustomerApi {
      * Get all customers
      */
     @GetMapping("/private/customers")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public ReadableCustomerList list(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
         CustomerCriteria customerCriteria = new CustomerCriteria();
@@ -51,11 +49,10 @@ public class CustomerApi {
 
     @GetMapping(value = {"/private/customer/info"})
     @ResponseStatus(HttpStatus.OK)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
     public ReadableCustomer getCustomerInfo(StoreMerchantId merchantStore, LanguageCode language,
                                             JwtAuthenticationToken auth) {

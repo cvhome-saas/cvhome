@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -77,7 +76,6 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
 
         destination.setProductShipeable(baseProduct.isProductShipeable());
 
-        // destination.setStore(null);
         destination.setVariation(readableProductVariationMapper.convert(source.getVariation(), store, language));
         if (source.getVariationValue() != null) {
             destination
@@ -91,7 +89,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
                     .stream()
                     .map(i -> this.image(i, store, language))
                     .filter(e -> nameSet.add(e.getImageUrl()))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setImages(instanceImages);
         }
 
@@ -99,7 +97,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
             List<ReadableInventory> inventories = source.getAvailabilities()
                     .stream()
                     .map(i -> readableInventoryMapper.convert(i, store, language))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setInventory(inventories);
         }
 

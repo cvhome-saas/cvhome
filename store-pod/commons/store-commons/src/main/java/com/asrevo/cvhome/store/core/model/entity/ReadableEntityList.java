@@ -9,7 +9,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Deprecated
 public class ReadableEntityList<T> extends ReadableList<T> {
 
     /**

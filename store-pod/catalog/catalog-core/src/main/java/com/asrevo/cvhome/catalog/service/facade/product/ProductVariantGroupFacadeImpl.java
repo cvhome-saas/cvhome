@@ -2,7 +2,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -109,7 +108,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
         List<ReadableProductVariantGroup> readableInstances = groups.stream()
                 .map(rp -> this.readableProductVariantGroupMapper.convert(rp, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         return createReadableList(groups, readableInstances);
     }
@@ -122,68 +121,5 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
         return group.get();
     }
-
-    /*
-     * @TODO not needed for now
-     *
-     * @Override public void addImage(MultipartFile image, Long instanceGroupId,
-     * StoreMerchantId store, LanguageCode language) {
-     *
-     *
-     * Assert.notNull(instanceGroupId, "productVariantGroupId must not be null");
-     * Assert.notNull(image, "Image must not be null"); Assert.notNull(store,
-     * "store cannot be null"); //get option group
-     *
-     * ProductVariantGroup group = this.group(instanceGroupId, store); ProductVariantImage
-     * instanceImage = new ProductVariantImage();
-     *
-     * try {
-     *
-     * String path = "group" + Constants.SLASH + instanceGroupId;
-     *
-     *
-     * instanceImage.setProductImage(image.getOriginalFilename());
-     * instanceImage.setProductVariantGroup(group); String imageName =
-     * image.getOriginalFilename(); InputStream inputStream = image.getInputStream();
-     * InputContentFile cmsContentImage = new InputContentFile();
-     * cmsContentImage.setFileName(imageName);
-     * cmsContentImage.setMimeType(image.getContentType());
-     * cmsContentImage.setFile(inputStream); cmsContentImage.setPath(path);
-     * cmsContentImage.setFileContentType(FileContentType.VARIANT);
-     *
-     * contentService.addContentFile(store.getId(), cmsContentImage);
-     *
-     * group.getImages().add(instanceImage);
-     *
-     * productVariantGroupService.saveOrUpdate(group); } catch (Exception e) { throw new
-     * ServiceRuntimeException("Exception while adding instance group image", e); }
-     *
-     *
-     * }
-     *
-     * @Override public void removeImage(Long imageId, Long productVariantGroupId,
-     * StoreMerchantId store) {
-     *
-     * Assert.notNull(productVariantGroupId, "productVariantGroupId must not be null");
-     * Assert.notNull(store, "store cannot be null");
-     *
-     * ProductVariantImage image = productVariantImageService.getById(imageId);
-     *
-     * if (image == null) { throw new ResourceNotFoundException("productVariantImage [" +
-     * imageId + "] was not found"); }
-     *
-     * ProductVariantGroup group = this.group(productVariantGroupId, store);
-     *
-     *
-     * try { contentService.removeFile(Constants.SLASH + store + Constants.SLASH +
-     * productVariantGroupId, FileContentType.VARIANT, image.getProductImage());
-     * group.getImages().removeIf(i -> (i.getId().equals(image.getId()))); //update
-     * productVariantroup productVariantGroupService.update(group); } catch
-     * (ServiceException e) { throw new
-     * ServiceRuntimeException("An exception occured while removing instance image [" +
-     * imageId + "]", e); }
-     *
-     * }
-     */
 
 }

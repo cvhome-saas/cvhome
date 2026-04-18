@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product.group;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +80,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
             target.setCode(pg.getCode());
             target.setActive(pg.isActive());
             return target;
-        }).collect(Collectors.toList());
+        }).toList();
 
         ReadableProductGroupListV2 returnList = new ReadableProductGroupListV2();
         returnList.setContent(readableList);

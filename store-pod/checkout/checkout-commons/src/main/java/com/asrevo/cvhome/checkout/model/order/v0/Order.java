@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 import com.asrevo.cvhome.commons.domain.Entity;
 
-@Deprecated
 public class Order extends Entity implements Serializable {
 
     /**

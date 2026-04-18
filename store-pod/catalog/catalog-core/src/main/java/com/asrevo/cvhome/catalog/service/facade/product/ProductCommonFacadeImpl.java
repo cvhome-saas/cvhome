@@ -177,7 +177,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                     if (price.isDefaultPrice()) {
                         try {
                             price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                        } catch (ServiceException e) {
+                        } catch (ServiceException _) {
                             throw new ServiceRuntimeException("Invalid product price format");
                         }
                     }
@@ -266,7 +266,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                 if (price.isDefaultPrice()) {
                     try {
                         price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                    } catch (ServiceException e) {
+                    } catch (ServiceException _) {
                         throw new ServiceRuntimeException("Invalid product price format");
                     }
                 }

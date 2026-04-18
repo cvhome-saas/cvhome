@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -59,7 +58,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         Assert.notNull(language, "LanguageCode cannot be null");
 
         List<ProductOptionSet> optionSets = productOptionSetService.listByStore(store, language);
-        return optionSets.stream().map(opt -> this.convert(opt, store, language)).collect(Collectors.toList());
+        return optionSets.stream().map(opt -> this.convert(opt, store, language)).toList();
     }
 
     private ReadableProductOptionSet convert(ProductOptionSet optionSet, StoreMerchantId store, LanguageCode language) {
@@ -146,7 +145,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         }
 
         List<ProductOptionSet> optionSets = productOptionSetService.getByProductType(readable.getId(), store, language);
-        return optionSets.stream().map(opt -> this.convert(opt, store, language)).collect(Collectors.toList());
+        return optionSets.stream().map(opt -> this.convert(opt, store, language)).toList();
     }
 
 }

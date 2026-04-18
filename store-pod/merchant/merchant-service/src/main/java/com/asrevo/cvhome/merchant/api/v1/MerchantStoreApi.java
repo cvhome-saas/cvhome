@@ -39,7 +39,6 @@ import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -65,8 +64,8 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get merchant store",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameters({@Parameter(name = "lang",
-            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableMerchantStore store(@PathVariable String code,
                                        @RequestParam(value = "lang", required = false) String lang) {
@@ -77,8 +76,8 @@ public class MerchantStoreApi {
     @Operation(method = "GET", description = "Get merchant store full details",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameters({@Parameter(name = "lang",
-            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*') or hasAnyAuthority('SCOPE_STORE_CORE')")
     public ReadableMerchantStore storeFull(StoreMerchantId merchantStore, LanguageCode language) {
@@ -111,8 +110,8 @@ public class MerchantStoreApi {
     @Operation(method = "PUT", description = "Updates a store",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void update(StoreMerchantId merchantStore, @Valid @RequestBody PersistableMerchantStore store) {
         storeFacade.update(store);
@@ -123,8 +122,8 @@ public class MerchantStoreApi {
     @Operation(method = "PUT", description = "Updates store social links",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableMerchantStore.class))))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void updateSocialLinks(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
         storeFacade.updateSocialLinks(merchantStore, store.getSocialLinks());
@@ -133,8 +132,8 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/store/marketing/logo"})
     @Operation(method = "POST", description = "Add store logo")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void addLogo(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
@@ -146,8 +145,8 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/store/marketing/banner"})
     @Operation(method = "POST", description = "Add store banner")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void addBanner(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile uploadfile) {
@@ -159,8 +158,8 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/store/marketing/add-slider-image"})
     @Operation(method = "POST", description = "Add image")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public ReadableSliderImage addSliderImage(StoreMerchantId merchantStore, @RequestParam("file") MultipartFile file) {
@@ -177,8 +176,8 @@ public class MerchantStoreApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping(value = {"/private/store/marketing/slider-images"})
     @Operation(method = "PUT", description = "Save slider images with its order")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void sliderImages(StoreMerchantId merchantStore, @RequestBody PersistableMerchantStore store) {
@@ -209,8 +208,8 @@ public class MerchantStoreApi {
     @DeleteMapping(value = {"/private/store"})
     @Operation(method = "DELETE", description = "Deletes a store",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void delete(StoreMerchantId merchantStore) {

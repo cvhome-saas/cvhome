@@ -29,7 +29,6 @@ import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
-import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
@@ -50,10 +49,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     private final ProductRepository productRepository;
 
     @Autowired
-    ProductGroupService productGroupService;
-
-    @Autowired
-    ProductImageService productImageService;
+    private ProductImageService productImageService;
 
     @Autowired
     private PricingServiceImpl pricingService;
@@ -113,16 +109,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
         product.setImages(null);
 
-        // related - featured
-        // @todo check delete
-        // List<ProductRelationship> relationships =
-        // productGroupService.listByProduct(product);
-        // for (ProductRelationship relationship : relationships) {
-        // productGroupService.deleteRelationship(relationship);
-        // }
-
         super.delete(product);
-        // searchService.deleteIndex(product.getMerchantStore(), product);
 
     }
 

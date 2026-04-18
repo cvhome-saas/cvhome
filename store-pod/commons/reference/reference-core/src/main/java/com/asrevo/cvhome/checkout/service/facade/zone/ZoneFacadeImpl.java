@@ -2,7 +2,6 @@ package com.asrevo.cvhome.checkout.service.facade.zone;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ public class ZoneFacadeImpl implements ZoneFacade {
         }
         return listZones.stream()
                 .map(zone -> convertToReadableZone(zone, language, merchantStore))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ReadableZone convertToReadableZone(Zone zone, LanguageCode language, StoreMerchantId merchantStore) {

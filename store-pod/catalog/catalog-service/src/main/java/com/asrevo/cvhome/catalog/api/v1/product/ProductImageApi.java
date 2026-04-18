@@ -38,7 +38,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -71,13 +70,13 @@ public class ProductImageApi {
      * To be used with MultipartFile
      */
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = {"/private/product/{id}/image", "/auth/product/{id}/image"},
+    @PostMapping(value = "/private/product/{id}/image",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void uploadImage(@PathVariable Long id, @RequestParam(value = "file") MultipartFile[] files,
                             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
@@ -168,11 +167,11 @@ public class ProductImageApi {
     @Operation(method = "GET", description = "Get images for a given product")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "List of ProductImage found")})
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public List<ReadableImage> images(@PathVariable Long productId, StoreMerchantId merchantStore,
                                       LanguageCode language) {
 
@@ -210,12 +209,11 @@ public class ProductImageApi {
      * Patch image (change position)
      */
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping(value = {"/private/product/{id}/image/{imageId}", "/auth/product/{id}/image"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @PatchMapping(value = "/private/product/{id}/image/{imageId}")
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
                              @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,

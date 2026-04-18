@@ -2,7 +2,6 @@ package com.asrevo.cvhome.catalog.service.populator.catalog.product;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -63,7 +62,7 @@ public class ReadableProductGroupPopulator
                     throw new RuntimeException(e);
                 }
                 return readableProduct;
-            }).collect(Collectors.toList()));
+            }).toList());
         }
 
         return target;

@@ -115,7 +115,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
         List<ReadableCategory> categoryList = categories.stream()
                 .map(cat -> readableCategoryMapper.convert(cat, store, language))
-                .collect(Collectors.toList());
+                .toList();
         returnList.setContent(categoryList);
         return returnList;
     }
@@ -182,10 +182,10 @@ public class CategoryFacadeImpl implements CategoryFacade {
         List<Category> children = category.getCategories();
         List<Category> saveAfter = children.stream()
                 .filter(c -> c.getId() == null || c.getId() == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<Category> saveNow = children.stream()
                 .filter(c -> c.getId() != null && c.getId() > 0)
-                .collect(Collectors.toList());
+                .toList();
         category.setCategories(saveNow);
 
         if (parent != null) {
@@ -209,7 +209,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
     @Override
     public ReadableCategory getById(StoreMerchantId store, Long id, LanguageCode language) {
         Category category = categoryService.getById(id, store);
-        ;
 
         if (category == null) {
             throw new ResourceNotFoundException("Category id [" + id + "] not found");
@@ -355,16 +354,12 @@ public class CategoryFacadeImpl implements CategoryFacade {
                         optionValues.add(v);
                     }
 
-                    Comparator<ReadableProductVariantValue> orderComparator = Comparator
-                            .comparingInt(ReadableProductVariantValue::getOrder);
-
-                    // Arrays.sort(employees, employeeSalaryComparator);
 
                     List<ReadableProductVariantValue> readableValues;
 
                     // sort by name
                     // remove duplicates
-                    readableValues = optionValues.stream().distinct().collect(Collectors.toList());
+                    readableValues = optionValues.stream().distinct().toList();
                     readableValues.sort(Comparator.comparing(ReadableProductVariantValue::getName));
 
                     productVariant.setOptions(readableValues);
@@ -458,7 +453,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
         List<ReadableCategory> readableCategories = categories.stream()
                 .map(cat -> readableCategoryMapper.convert(cat, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         ReadableCategoryList readableList = new ReadableCategoryList();
         readableList.setContent(readableCategories);

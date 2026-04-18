@@ -22,7 +22,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -38,11 +37,10 @@ public class OrderStatusHistoryApi {
 
     @GetMapping(value = {"private/orders/{id}/history"})
     @ResponseStatus(HttpStatus.OK)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public List<ReadableOrderStatusHistory> list(@PathVariable final Long id, StoreMerchantId merchantStore,
@@ -55,8 +53,8 @@ public class OrderStatusHistoryApi {
     @ResponseStatus(HttpStatus.CREATED)
 
     @Operation(method = "POST", description = "Add order history", summary = "Adds a new status to an order")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,

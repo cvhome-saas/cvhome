@@ -9,7 +9,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
-@Deprecated
 @Getter
 @Setter
 public class ReadableContentFull extends Entity {

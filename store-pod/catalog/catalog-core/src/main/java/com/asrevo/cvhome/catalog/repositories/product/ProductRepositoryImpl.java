@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 
@@ -52,7 +53,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             }
 
             if (merchantId != null) {
-                // qs.append(" and merch.id=:mid");
                 qs.append(" and p.store in (:mid)");
             }
 
@@ -62,13 +62,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             q.setParameter("pid", productId);
 
             if (merchantId != null) {
-                // q.setParameter("mid", merchant.getId());
                 q.setParameter("mid", ids);
             }
 
             return (Product) q.getSingleResult();
 
-        } catch (jakarta.persistence.NoResultException ers) {
+        } catch (NoResultException _) {
             return null;
         }
     }
@@ -122,9 +121,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             if (products.size() > 1) {
                 log.error("Found multiple products for list of criterias with main criteria [{}]", seUrl);
             }
-            // p = (Product)q.getSingleResult();
             p = products.getFirst();
-        } catch (jakarta.persistence.NoResultException ignore) {
+        } catch (NoResultException _) {
 
         }
 
@@ -135,18 +133,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public List<Product> getProductsListByCategories(Set categoryIds) {
 
-        // List regionList = new ArrayList();
-        // regionList.add("*");
-        // regionList.add(locale.getCountry());
-
-        // TODO Test performance
-
-        // images
-        // options (do not need attributes for listings)
-        // other lefts
-        // RENTAL
-        // qs.append("left join fetch p.owner owner ");
-        // qs.append("where pa.region in (:lid) ");
         String hql = """
                 select distinct p from Product as p
                 join fetch p.availabilities pa
@@ -173,10 +159,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return products;
     }
 
-    /**
-     * This query is used for filtering products based on criterias Main query for getting
-     * product list based on input criteria ze method
-     */
     @Override
     public ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria) {
 
@@ -210,8 +192,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             countBuilderSelect.append(" INNER JOIN p.manufacturer manuf");
             countBuilderWhere.append(" and manuf.id = :manufid");
         }
-
-        // todo type
 
         // sku
         if (!StringUtils.isBlank(criteria.getCode())) {
@@ -348,11 +328,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         qs.append("left join fetch manuf.descriptions manufd ");
         qs.append("left join fetch p.type type ");
 
-        // RENTAL
-        // qs.append("left join fetch p.owner owner ");
 
-        /**/
-        // attributes
         if (criteria.getOrigin().equals(ProductCriteria.ORIGIN_SHOP)
                 && !CollectionUtils.isEmpty(criteria.getAttributeCriteria())) {
             qs.append(" inner join p.attributes pattr");
@@ -388,10 +364,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             qs.append(" left join fetch pinst.productVariantGroup pinstg ");
             qs.append(" left join fetch pinstg.images pinstgimg ");
             qs.append(" left join fetch pinstgimg.descriptions ");
-            // end variants
         }
 
-        // qs.append(" left join fetch p.relationships pr");
 
         qs.append(" where p.store=:mId");
         if (criteria.getLanguage() != null && !criteria.getLanguage().code().equals("_all")) {
@@ -410,12 +384,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             qs.append(" and manuf.id = :manufid");
         }
 
-        if (criteria.getAvailable() != null) {
-            if (criteria.getAvailable()) {
-                qs.append(" and p.available=true and p.dateAvailable<=:dt");
-            } else {
-                qs.append(" and p.available=false and p.dateAvailable>:dt");
-            }
+        if (Boolean.TRUE.equals(criteria.getAvailable())) {
+            qs.append(" and p.available=true and p.dateAvailable<=:dt");
+        } else {
+            qs.append(" and p.available=false and p.dateAvailable>:dt");
         }
 
         if (!StringUtils.isBlank(criteria.getProductName())) {
@@ -526,12 +498,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public List<Product> listByStore(StoreMerchantId store) {
 
-        // images
-        // options (do not need attributes for listings)
-        // other lefts
-        // RENTAL
-        // qs.append("left join fetch p.owner owner ");
-        // qs.append("where pa.region in (:lid) ");
         String hql = """
                 select p from Product as p
                 join fetch p.availabilities pa
@@ -561,11 +527,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private String productQueryV2() {
 
-        // images
-        // options
-        // other lefts
-        // variants
-        // variant availability and price
         String qs = """
                 select distinct p from Product as p
                 join fetch p.descriptions pd
@@ -657,7 +618,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
             return (Product) q.getSingleResult();
 
-        } catch (jakarta.persistence.NoResultException ers) {
+        } catch (NoResultException _) {
             return null;
         }
     }
@@ -686,7 +647,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
             return (Product) q.getSingleResult();
 
-        } catch (jakarta.persistence.NoResultException ers) {
+        } catch (NoResultException _) {
             return null;
         }
     }

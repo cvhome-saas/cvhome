@@ -37,11 +37,9 @@ import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +58,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Product definition resource (Create udtate and delete product definition. Serves"
-        + " api v1 and v2 with backward compatibility)")
+@Tag(name = "Product definition resource (Create udtate and delete product definition. Serves")
 @Slf4j
 public class ProductApi {
 
@@ -74,7 +71,7 @@ public class ProductApi {
     private final ProductCommonFacade productCommonFacade;
 
     public ProductApi(CategoryService categoryService, ProductService productService, ProductFacade productFacade,
-                      ProductCommonFacade productCommonFacade, ImageFilePath imageUtils) {
+                      ProductCommonFacade productCommonFacade) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.productFacade = productFacade;
@@ -88,11 +85,11 @@ public class ProductApi {
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/private/product")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProduct product, StoreMerchantId merchantStore,
@@ -111,11 +108,11 @@ public class ProductApi {
     @PatchMapping(value = "/private/product/{id}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable Long id, @Valid @RequestBody LightPersistableProduct product,
@@ -125,11 +122,11 @@ public class ProductApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = "/private/product/{id}")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
 
@@ -150,14 +147,12 @@ public class ProductApi {
                     + "required otherwise it falls back to DEFAULT")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Single product found")})
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
 
-    // @TODO check if the friendlyUrl is id because frontend use it with id param
-    // @TODO make private api for this
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+
     public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
                                             @RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
                                             LanguageCode language, HttpServletResponse response) throws Exception {
@@ -173,11 +168,11 @@ public class ProductApi {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @Operation(method = "GET", description = "Check if product code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 
@@ -191,11 +186,11 @@ public class ProductApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product/{productId}/category/{categoryId}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToCategory(@PathVariable Long productId, @PathVariable Long categoryId,
@@ -234,11 +229,11 @@ public class ProductApi {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = {"/private/product/{productId}/category/{categoryId}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromCategory(@PathVariable Long productId, @PathVariable Long categoryId,
@@ -279,11 +274,11 @@ public class ProductApi {
      */
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping(value = "/private/product/{id}")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @Operation(method = "POST", description = "Patch product sort order", summary = "Change product sortOrder")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")

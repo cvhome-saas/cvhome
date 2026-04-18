@@ -69,17 +69,4 @@ public class Language extends SalesManagerEntity<LanguageCode, Language> impleme
     public void setId(LanguageCode id) {
         this.code = id;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (null == obj) {
-            return false;
-        }
-        if (!(obj instanceof Language language)) {
-            return false;
-        } else {
-            return (this.getId().equals(language.getId()));
-        }
-    }
-
 }

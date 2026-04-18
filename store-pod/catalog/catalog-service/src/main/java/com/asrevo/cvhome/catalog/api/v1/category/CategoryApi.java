@@ -33,7 +33,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -61,11 +60,11 @@ public class CategoryApi {
     @Operation(method = "GET", description = "Get category list for an given Category id",
             summary = "List current Category and child category")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "List of category found")})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategory get(@PathVariable(name = "id") Long categoryId, StoreMerchantId merchantStore,
@@ -77,24 +76,24 @@ public class CategoryApi {
     @Operation(method = "GET", description = "Get category list for an given Category code",
             summary = "List current Category and child category")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "List of category found")})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableCategory getByFriendlyUrl(@PathVariable(name = "friendlyUrl") String friendlyUrl,
-                                             StoreMerchantId merchantStore, LanguageCode language) throws Exception {
+                                             StoreMerchantId merchantStore, LanguageCode language) {
         return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/category/unique"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @Operation(method = "GET", description = "Check if category code already exists",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
 
@@ -115,11 +114,11 @@ public class CategoryApi {
                     + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
                     + " filter=[featured,visible",
             summary = "Does not return any product attached")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategoryList list(@RequestParam(value = "filter", required = false) List<String> filter,
@@ -142,11 +141,11 @@ public class CategoryApi {
                     + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
                     + " filter=[featured,visible",
             summary = "Does not return any product attached")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategoryList hierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
@@ -165,11 +164,11 @@ public class CategoryApi {
                     + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
                     + " filter=[featured,visible",
             summary = "Does not return any product attached")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableCategoryList getHierarchyList(@RequestParam(value = "filter", required = false) List<String> filter,
                                                  @RequestParam(value = "name", required = false) String name, StoreMerchantId merchantStore,
@@ -183,11 +182,11 @@ public class CategoryApi {
 
     @GetMapping(value = "/private/category/product/{productId}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET", description = "Get category by product")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategoryList list(@PathVariable(name = "productId") Long productId, StoreMerchantId merchantStore,
@@ -198,8 +197,8 @@ public class CategoryApi {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/private/category", produces = {APPLICATION_JSON_VALUE})
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public PersistableCategory create(@Valid @RequestBody PersistableCategory category, StoreMerchantId merchantStore) {
@@ -207,8 +206,8 @@ public class CategoryApi {
     }
 
     @PutMapping(value = "/private/category/{id}", produces = {APPLICATION_JSON_VALUE})
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
@@ -218,8 +217,8 @@ public class CategoryApi {
     }
 
     @PatchMapping(value = "/private/category/{id}/visible", produces = {APPLICATION_JSON_VALUE})
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
@@ -232,8 +231,8 @@ public class CategoryApi {
     @PutMapping(value = "/private/category/{id}/move/{parent}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PUT", description = "Move a category under another category",
             summary = "Move category {id} under category {parent}")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void move(@PathVariable Long id, @PathVariable Long parent, StoreMerchantId merchantStore) {

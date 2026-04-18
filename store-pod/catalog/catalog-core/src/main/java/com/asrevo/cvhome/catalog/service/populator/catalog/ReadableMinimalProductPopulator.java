@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -152,18 +151,13 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 }
                 imageList = imageList.stream()
                         .sorted(Comparator.comparingInt(ReadableImage::getOrder))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 target.setImages(imageList);
             }
 
-            // availability
             ProductAvailability availability = null;
             for (ProductAvailability a : source.getAvailabilities()) {
-                // TODO validate region
-                // if(availability.getRegion().equals(Constants.ALL_REGIONS)) {//TODO REL
-                // 2.1 accept
-                // a region
                 availability = a;
                 target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
                 target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
@@ -173,7 +167,6 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 if (availability.getProductQuantity() > 0 && target.isAvailable()) {
                     target.setCanBePurchased(true);
                 }
-                // }
             }
 
             target.setSku(source.getSku());

@@ -2,7 +2,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -152,7 +151,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         List<ReadableProductOptionValue> values = options.getContent()
                 .stream()
                 .map(option -> readableOptionValueMapper.convert(option, store, null))
-                .collect(Collectors.toList());
+                .toList();
 
         valueList.setContent(values);
 
@@ -174,7 +173,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         List<ReadableProductOptionEntity> values = options.getContent()
                 .stream()
                 .map(option -> readableMapper.convert(option, store, null))
-                .collect(Collectors.toList());
+                .toList();
 
         valueList.setContent(values);
 
@@ -348,9 +347,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ReadableProductAttributeList attrList = new ReadableProductAttributeList();
         Page<ProductAttribute> attr;
 
-        if (language != null) { // all entry
-            // attributes = productAttributeService.getByProductId(store, product,
-            // language);
+        if (language != null) {
             attr = productAttributeService.getByProductId(store, product, language, pageable);
         } else {
             attr = productAttributeService.getByProductId(store, product, pageable);
@@ -363,7 +360,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         List<ReadableProductAttributeEntity> values = attr.getContent()
                 .stream()
                 .map(attribute -> readableProductAttributeMapper.convert(attribute, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         attrList.setContent(values);
 
@@ -451,7 +448,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         List<ProductAttribute> modelAttributes = attributes.stream()
                 .map(attr -> persistableProductAttributeMapper.convert(attr, store, null))
-                .collect(Collectors.toList());
+                .toList();
 
         productAttributeService.saveAll(modelAttributes);
 
@@ -461,7 +458,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
         productService.save(product);
 
-        return modelAttributes.stream().map(this::codeEntity).collect(Collectors.toList());
+        return modelAttributes.stream().map(this::codeEntity).toList();
     }
 
     private CodeEntity codeEntity(ProductAttribute attr) {

@@ -119,7 +119,6 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     // @Override
     public void delete(Category category) throws ServiceException {
 
-        // get category with lineage (subcategories)
         StringBuilder lineage = new StringBuilder();
         lineage.append(category.getLineage()).append(category.getId()).append(Constants.SLASH);
         List<Category> categories = this.getListByLineage(category.getStoreMerchantId(), lineage.toString());

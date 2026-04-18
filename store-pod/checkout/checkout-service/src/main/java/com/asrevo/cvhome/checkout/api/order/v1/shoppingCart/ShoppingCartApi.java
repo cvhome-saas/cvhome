@@ -27,7 +27,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -54,11 +53,10 @@ public class ShoppingCartApi {
             description = "Add product to shopping cart when no cart exists, this will create a new cart" + " id",
             summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
                     + " {\"product\":1232,\"quantity\":1}")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                           StoreMerchantId merchantStore, LanguageCode language) {
@@ -69,11 +67,10 @@ public class ShoppingCartApi {
     @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
             summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
                     + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234" + " from cart")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
                                                            @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
@@ -101,11 +98,10 @@ public class ShoppingCartApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/cart/{code}")
     @Operation(method = "GET", description = "Get a chopping cart by code")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
                                           LanguageCode language, HttpServletResponse response) {
@@ -134,12 +130,11 @@ public class ShoppingCartApi {
     @Operation(method = "DELETE", description = "Remove a product from a specific cart",
             summary = "If body set to true returns remaining cart in body, empty cart gives empty"
                     + " body. If body set to false no body ")
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)),
-            @Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false"))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    @Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false"))
 
     public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
                                                                @PathVariable("sku") String sku, StoreMerchantId merchantStore,

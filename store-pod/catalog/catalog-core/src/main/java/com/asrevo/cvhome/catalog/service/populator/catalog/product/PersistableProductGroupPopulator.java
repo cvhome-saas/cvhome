@@ -2,7 +2,6 @@ package com.asrevo.cvhome.catalog.service.populator.catalog.product;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,7 @@ public class PersistableProductGroupPopulator
 
         if (CollectionUtils.isNotEmpty(source.getProductIds())) {
             target
-                    .setProducts(source.getProductIds().stream().map(productService::getById).collect(Collectors.toList()));
+                    .setProducts(source.getProductIds().stream().map(productService::getById).toList());
         }
 
         if (CollectionUtils.isNotEmpty(source.getDescriptions())) {

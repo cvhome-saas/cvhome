@@ -92,7 +92,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
                     inputImage.getFile().close();
                 }
 
-            } catch (Exception ignore) {
+            } catch (Exception _) {
 
             }
         }
@@ -103,8 +103,6 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         return productImageRepository.save(productImage);
     }
-
-    // TODO get default product image
 
     @Override
     public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException {

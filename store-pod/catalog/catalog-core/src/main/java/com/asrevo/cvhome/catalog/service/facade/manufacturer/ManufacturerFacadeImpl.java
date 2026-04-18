@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,7 +65,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         return manufacturers.stream()
                 .sorted(Comparator.comparing(Manufacturer::getCode))
                 .map(manuf -> readableManufacturerConverter.convert(manuf, store, language))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

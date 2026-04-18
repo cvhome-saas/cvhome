@@ -41,7 +41,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -73,11 +72,11 @@ public class ContentApi {
     @GetMapping(value = "/private/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get page names created for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentPageList pages(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
@@ -90,11 +89,11 @@ public class ContentApi {
     @GetMapping(value = "/content/pages", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get page names created for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentPageList getPages(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
         return contentFacade.getContentPages(merchantStore, language, pageable);
@@ -106,11 +105,11 @@ public class ContentApi {
     @GetMapping(value = "/private/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get boxes for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentBoxList boxes(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
@@ -123,11 +122,11 @@ public class ContentApi {
     @GetMapping(value = "/content/boxes", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get boxes for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentBoxList getBoxes(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
         return contentFacade.getContentBoxes(merchantStore, language, pageable);
@@ -139,11 +138,11 @@ public class ContentApi {
     @GetMapping(value = "/private/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentPage page(@PathVariable("code") String code, StoreMerchantId merchantStore,
@@ -158,11 +157,11 @@ public class ContentApi {
     @GetMapping(value = "/content/pages/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentPage getPage(@PathVariable("code") String code, StoreMerchantId merchantStore,
                                        LanguageCode language) {
@@ -173,11 +172,11 @@ public class ContentApi {
     @GetMapping(value = "/private/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Manage box content by code for a code and a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentBox box(@PathVariable("code") String code, StoreMerchantId merchantStore,
@@ -188,11 +187,11 @@ public class ContentApi {
     @GetMapping(value = "/content/boxes/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get box content by code for a code and a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = List.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentBox getBox(@PathVariable("code") String code, StoreMerchantId merchantStore,
                                      LanguageCode language) {
@@ -205,11 +204,11 @@ public class ContentApi {
     @GetMapping(value = "/content/pages/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get page content by code for a given MerchantStore",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableContentPage.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentPage pageByName(@PathVariable("name") String name, StoreMerchantId merchantStore,
                                           LanguageCode language) {
@@ -224,11 +223,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(method = "POST", description = "Create content box",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public Entity createBox(@RequestBody @Valid PersistableContentBox box, StoreMerchantId merchantStore,
@@ -244,11 +243,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "GET", description = "Check unique content box",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public EntityExists boxExists(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
@@ -261,11 +260,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "GET", description = "Check unique content page",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ResponseEntity.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public EntityExists pageExists(@PathVariable String code, StoreMerchantId merchantStore, LanguageCode language) {
@@ -281,11 +280,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(method = "POST", description = "Create content page",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Entity.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public Entity createPage(@RequestBody @Valid PersistableContentPage page, StoreMerchantId merchantStore,
@@ -301,11 +300,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "PUT", description = "Update content page",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void updatePage(@RequestBody @Valid PersistableContentPage page, @PathVariable Long id,
@@ -318,11 +317,11 @@ public class ContentApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(method = "PUT", description = "Update content box",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void updateBox(@RequestBody @Valid PersistableContentBox box, @PathVariable Long id,
@@ -337,11 +336,11 @@ public class ContentApi {
     @GetMapping(value = "/content/images", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(method = "GET", description = "Get store content images",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ContentFolder.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     // @TODO create another one for private so seller-ui call it in private
     public ContentFolder images(StoreMerchantId merchantStore, LanguageCode language,
@@ -352,11 +351,11 @@ public class ContentApi {
 
     @PostMapping(value = "/private/files", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files, StoreMerchantId merchantStore,
@@ -381,8 +380,8 @@ public class ContentApi {
     @DeleteMapping(value = "/private/content/{id}")
     @Operation(method = "DELETE", description = "Deletes a content from CMS", summary = "Delete a content box or page",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void deleteContent(Long id, StoreMerchantId merchantStore) {
@@ -392,8 +391,8 @@ public class ContentApi {
     @DeleteMapping(value = "/private/content/")
     @Operation(method = "DELETE", description = "Deletes a file from CMS", summary = "Delete a file from server",
             responses = @ApiResponse(content = @Content(schema = @Schema())))
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void deleteFile(@Valid ContentName name, StoreMerchantId merchantStore) {

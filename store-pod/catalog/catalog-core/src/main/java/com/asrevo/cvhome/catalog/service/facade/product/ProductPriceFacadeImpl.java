@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -72,7 +71,7 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
                 throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku
                         + "] and Store [" + store + "]", e);
             }
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
@@ -89,7 +88,7 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
                 throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku
                         + "] and Store [" + store + "]", e);
             }
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override

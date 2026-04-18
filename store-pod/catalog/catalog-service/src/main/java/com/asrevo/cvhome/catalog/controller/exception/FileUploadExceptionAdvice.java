@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FileUploadExceptionAdvice {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ResponseStatus(HttpStatus.CONTENT_TOO_LARGE)
     public @ResponseBody ErrorEntity handleFileException(Exception exception) {
         log.error(exception.getMessage(), exception);
         ErrorEntity errorEntity = new ErrorEntity();

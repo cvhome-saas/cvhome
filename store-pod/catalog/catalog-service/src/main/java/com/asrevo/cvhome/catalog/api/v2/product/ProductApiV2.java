@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +33,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -79,11 +77,11 @@ public class ProductApiV2 {
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = {"/private/product"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity createV2(@Valid @RequestBody PersistableProductDefinition product, StoreMerchantId merchantStore,
@@ -99,11 +97,11 @@ public class ProductApiV2 {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = {"/private/product/{id}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateV2(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
@@ -114,11 +112,11 @@ public class ProductApiV2 {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = {"/private/product/{id}"})
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductDefinition getV2(@PathVariable Long id, StoreMerchantId merchantStore,
@@ -127,26 +125,17 @@ public class ProductApiV2 {
         return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
     }
 
-    /**
-     * API for getting a product
-     *
-     * @param lang ?lang=fr|en
-     * @return ReadableProduct
-     * @throws Exception <p>
-     *                   /api/product/123
-     */
-    @RequestMapping(value = {"/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}"},
-            method = RequestMethod.GET)
+    @GetMapping(value = {"/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}"})
     @Operation(method = "GET", description = "Get a product by friendlyUrl (slug) version 2",
             summary = "For shop purpose. Specifying ?merchant is " + "required otherwise it falls back to DEFAULT")
     @ApiResponse(responseCode = "200", description = "Single product found",
             content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableProduct getByfriendlyUrl(@PathVariable final String friendlyUrl,
                                             @RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
@@ -164,11 +153,11 @@ public class ProductApiV2 {
 
     @GetMapping(value = "/private/tiny-products")
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductList tiny(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
@@ -182,11 +171,11 @@ public class ProductApiV2 {
 
     @GetMapping(value = "/private/base-products")
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductList base(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
@@ -200,11 +189,11 @@ public class ProductApiV2 {
 
     @GetMapping(value = "/products")
 
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableProductList getList(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
                                        LanguageCode language, Pageable pageable) {
@@ -222,13 +211,12 @@ public class ProductApiV2 {
     @PatchMapping(value = "/private/product/{sku}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "PATCH", description = "Update product inventory", summary = "Updates product inventory",
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
 
-    // @TODO check if sku is id or string
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable String sku, @Valid @RequestBody LightPersistableProduct product,
                        StoreMerchantId merchantStore, LanguageCode language) {

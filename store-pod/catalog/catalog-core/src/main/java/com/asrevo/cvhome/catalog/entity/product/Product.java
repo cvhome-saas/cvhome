@@ -198,9 +198,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @Column(name = "RENTAL_PERIOD")
     private Integer rentalPeriod;
 
-    public Product() {
-    }
-
     public ProductDescription getProductDescription() {
         if (this.getDescriptions() != null && !this.getDescriptions().isEmpty()) {
             return this.getDescriptions().iterator().next();

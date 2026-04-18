@@ -109,7 +109,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         if (source.getDateAvailable() != null) {
             try {
                 destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
-            } catch (Exception e) {
+            } catch (Exception _) {
                 throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + "]");
             }
         }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -57,7 +56,7 @@ public class ReadableProductOptionSetMapper implements Mapper<ProductOptionSet, 
             List<ReadableProductOptionValue> values = source.getValues()
                     .stream()
                     .map(val -> optionValue(ids, val, language))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setValues(values);
             destination.getValues().removeAll(Collections.singleton(null));
         }
@@ -66,7 +65,7 @@ public class ReadableProductOptionSetMapper implements Mapper<ProductOptionSet, 
             List<ReadableProductType> types = source.getProductTypes()
                     .stream()
                     .map(t -> this.productType(t, store, language))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setProductTypes(types);
         }
 

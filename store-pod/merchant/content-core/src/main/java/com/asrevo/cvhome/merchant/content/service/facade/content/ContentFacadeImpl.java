@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -129,7 +128,7 @@ public class ContentFacadeImpl implements ContentFacade {
             } catch (ConversionException e) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).filter(Objects::nonNull).toList();
 
         items.setContent(pages);
         return items;
@@ -251,7 +250,7 @@ public class ContentFacadeImpl implements ContentFacade {
             } catch (ConversionException e) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).filter(Objects::nonNull).toList();
         items.setContent(boxes);
 
         return items;

@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -184,7 +183,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         List<ReadableProductVariant> readableInstances = instances.stream()
                 .map(rp -> this.readableProductVariantMapper.convert(rp, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         return createReadableList(instances, readableInstances);
     }

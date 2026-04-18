@@ -70,16 +70,12 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
                                 break;
                             }
                         }
-                    } // else {
+                    }
                     if (description == null) {
                         description = description(desc);
                         description.setProductOptionValue(destination);
                         destination.getDescriptions().add(description);
                     }
-                    // description = description(desc);
-                    // description.setProductOptionValue(destination);
-                    // }
-                    // destination.getDescriptions().add(description);
                 }
             }
 

@@ -2,7 +2,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +61,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         Page<ProductVariation> vars = productVariationService.getByMerchant(store, language, null, pageable);
         List<ReadableProductVariation> variations = vars.stream()
                 .map(opt -> this.convert(opt, store, language))
-                .collect(Collectors.toList());
+                .toList();
         ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<>();
         returnList.setContent(variations);
         returnList.setSize(variations.size());
@@ -72,21 +71,21 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         return returnList;
     }
 
-    private ReadableProductVariation convert(ProductVariation var, StoreMerchantId store, LanguageCode language) {
-        return readableProductVariationMapper.convert(var, store, language);
+    private ReadableProductVariation convert(ProductVariation variation, StoreMerchantId store, LanguageCode language) {
+        return readableProductVariationMapper.convert(variation, store, language);
     }
 
     @Override
-    public Long create(PersistableProductVariation var, StoreMerchantId store, LanguageCode language) {
+    public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language) {
         Assert.notNull(store, "store cannot be null");
         Assert.notNull(language, "LanguageCode cannot be null");
-        Assert.notNull(var, "PersistableProductVariation cannot be null");
+        Assert.notNull(variation, "PersistableProductVariation cannot be null");
 
-        if (this.exists(var.getCode(), store)) {
-            throw new OperationNotAllowedException("Option set with code [" + var.getCode() + "] already exist");
+        if (this.exists(variation.getCode(), store)) {
+            throw new OperationNotAllowedException("Option set with code [" + variation.getCode() + "] already exist");
         }
 
-        ProductVariation p = persistableProductVariationMapper.convert(var, store, language);
+        ProductVariation p = persistableProductVariationMapper.convert(variation, store, language);
         p.setStoreMerchantId(store);
         try {
             productVariationService.saveOrUpdate(p);
@@ -98,11 +97,11 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     }
 
     @Override
-    public void update(Long variationId, PersistableProductVariation var, StoreMerchantId store,
+    public void update(Long variationId, PersistableProductVariation variation, StoreMerchantId store,
                        LanguageCode language) {
         Assert.notNull(store, "store cannot be null");
         Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(var, "PersistableProductVariation cannot be null");
+        Assert.notNull(variation, "PersistableProductVariation cannot be null");
 
         Optional<ProductVariation> p = productVariationService.getById(store, variationId, language);
         if (p.isEmpty()) {
@@ -113,8 +112,8 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         ProductVariation productVariant = p.get();
 
         productVariant.setId(variationId);
-        productVariant.setCode(var.getCode());
-        ProductVariation model = persistableProductVariationMapper.merge(var, productVariant, store, language);
+        productVariant.setCode(variation.getCode());
+        ProductVariation model = persistableProductVariationMapper.merge(variation, productVariant, store, language);
         model.setStoreMerchantId(store);
         productVariationService.save(model);
     }
@@ -143,8 +142,8 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     public boolean exists(String code, StoreMerchantId store) {
         Assert.notNull(store, "store cannot be null");
         Assert.notNull(code, "code cannot be null");
-        Optional<ProductVariation> var = productVariationService.getByCode(store, code);
-        return var.isPresent();
+        Optional<ProductVariation> productVariation = productVariationService.getByCode(store, code);
+        return productVariation.isPresent();
     }
 
 }

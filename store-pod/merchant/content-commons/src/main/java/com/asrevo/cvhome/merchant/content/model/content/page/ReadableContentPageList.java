@@ -9,7 +9,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Deprecated
 public class ReadableContentPageList extends ReadableList<ReadableContentPage> {
 
     /**

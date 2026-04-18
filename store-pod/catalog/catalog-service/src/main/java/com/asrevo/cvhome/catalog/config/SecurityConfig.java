@@ -30,22 +30,4 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    /*
-     * @Bean public CorsConfigurationSource corsConfigurationSource() { final
-     * CorsConfiguration configuration = new CorsConfiguration();
-     *
-     * configuration.setAllowedOrigins(List.of("http://localhost")); // www - obligatory
-     * // configuration.setAllowedOrigins(ImmutableList.of("*")); //set access from all
-     * domains configuration.setAllowedMethods(List.of("OPTIONS","GET", "POST", "PUT",
-     * "DELETE")); configuration.setAllowCredentials(true);
-     * configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control",
-     * "Content-Type"));
-     *
-     * final UrlBasedCorsConfigurationSource source = new
-     * UrlBasedCorsConfigurationSource(); source.registerCorsConfiguration("/**",
-     * configuration);
-     *
-     * return source; }
-     */
-
 }

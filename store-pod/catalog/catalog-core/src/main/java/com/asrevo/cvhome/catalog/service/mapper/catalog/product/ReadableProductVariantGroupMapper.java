@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -58,7 +57,7 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
 
         Set<ProductVariant> instances = source.getProductVariants();
         destination.setProductVariants(
-                instances.stream().map(i -> this.instance(i, store, language)).collect(Collectors.toList()));
+                instances.stream().map(i -> this.instance(i, store, language)).toList());
 
         // image id should be unique in the list
 

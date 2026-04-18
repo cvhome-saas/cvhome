@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Deprecated
 public class ReadableContentEntity extends ContentEntity {
 
     /**

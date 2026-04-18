@@ -68,7 +68,4 @@ public class ProductType extends SalesManagerEntity<Long, ProductType> implement
             column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
     private StoreMerchantId storeMerchantId;
 
-    public ProductType() {
-    }
-
 }

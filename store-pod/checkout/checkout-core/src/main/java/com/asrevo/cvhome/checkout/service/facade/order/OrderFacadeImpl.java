@@ -274,7 +274,7 @@ public class OrderFacadeImpl implements OrderFacade {
         List<ReadableOrderTotal> readableTotals = totals.stream()
                 .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
                 .map(tot -> readableOrderTotalMapper.convert(tot, store, language))
-                .collect(Collectors.toList());
+                .toList();
 
         readableTotal.setTotals(readableTotals);
 
@@ -288,7 +288,7 @@ public class OrderFacadeImpl implements OrderFacade {
         List<ReadableOrderProduct> products = order.getOrderProducts()
                 .stream()
                 .map(pr -> readableOrderProductMapper.convert(pr, store, language))
-                .collect(Collectors.toList());
+                .toList();
         orderConfirmation.setProducts(products);
 
         if (order.getPaymentType() != null) {
@@ -423,7 +423,7 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).collect(Collectors.toList());
+        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).toList();
     }
 
     @Override
@@ -440,7 +440,7 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).collect(Collectors.toList());
+        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).toList();
     }
 
     ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {

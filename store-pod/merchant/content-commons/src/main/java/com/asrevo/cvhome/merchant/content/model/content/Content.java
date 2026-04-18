@@ -10,7 +10,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Deprecated
 public abstract class Content implements Serializable {
 
     /**

@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.mapper.catalog;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -64,7 +63,7 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
             List<ProductOptionValue> values = source.getOptionValues()
                     .stream()
                     .map(id -> value(id, store))
-                    .collect(Collectors.toList());
+                    .toList();
             destination.setValues(values);
         }
 

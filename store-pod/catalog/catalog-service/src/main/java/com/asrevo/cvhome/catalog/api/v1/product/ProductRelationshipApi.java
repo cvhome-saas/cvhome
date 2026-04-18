@@ -18,7 +18,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,11 +45,11 @@ public class ProductRelationshipApi {
     @GetMapping("/products/{id}/relationship")
     @Operation(summary = "Get default relationship group for a product (V2)",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductGroup.class))))
-    @Parameters({
-            @Parameter(name = "store",
-                    schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-            @Parameter(name = "lang",
-                    schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))})
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public ReadableProductGroup getProductRelationships(@PathVariable Long id, StoreMerchantId merchantStore,
                                                         LanguageCode language) {
         return productGroupFacade.getByCodeAndParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, language);
@@ -59,8 +58,8 @@ public class ProductRelationshipApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/private/products/{id}/relationship/{productId}")
     @Operation(summary = "Add a product to the default relationship group of a parent product (V2)")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToRelationship(@PathVariable Long id, @PathVariable Long productId,
                                          StoreMerchantId merchantStore) {
@@ -70,8 +69,8 @@ public class ProductRelationshipApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/private/products/{id}/relationship/{productId}")
     @Operation(summary = "Remove a product from the default relationship group of a parent product (V2)")
-    @Parameters({@Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))})
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromRelationship(@PathVariable Long id, @PathVariable Long productId,
                                               StoreMerchantId merchantStore) {

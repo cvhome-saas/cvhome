@@ -76,9 +76,6 @@ public class ProductOption extends SalesManagerEntity<Long, ProductOption> {
     @Column(name = "PRODUCT_OPTION_CODE")
     private String code;
 
-    public ProductOption() {
-    }
-
     public List<ProductOptionDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.isEmpty()) {
             descriptionsList = new ArrayList<>(this.getDescriptions());
