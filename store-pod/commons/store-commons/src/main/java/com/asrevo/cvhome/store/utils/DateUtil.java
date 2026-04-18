@@ -29,6 +29,9 @@ public class DateUtil {
 
     private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
 
+    private DateUtil() {
+    }
+
     /**
      * yyyy-MM-dd
      */

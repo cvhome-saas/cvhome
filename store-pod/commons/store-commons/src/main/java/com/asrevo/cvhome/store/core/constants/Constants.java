@@ -7,15 +7,15 @@ import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 
 public class Constants {
 
+    private Constants() {
+    }
+
+
     public static final String ALL_REGIONS = "*";
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
     public static final String DEFAULT_LANGUAGE = "en";
-
-    public static final String UNDERSCORE = "_";
-
-    public static final String DEFAULT_MANUFACTURER = "DEFAULT";
 
     public static final String DEFAULT_PRICE_DESCRIPTION = "DEFAULT";
 
@@ -28,15 +28,11 @@ public class Constants {
 
     public static final String SLASH = "/";
 
-    public static final String LANG = "lang";
-
     public static final String FILES_URI = "/files";
 
     public static final String PRODUCTS_URI = "/products";
 
     public static final String SMALL_IMAGE = "SMALL";
-
-    public static final String OT_ITEM_PRICE_MODULE_CODE = "itemprice";
 
     public static final String OT_SUBTOTAL_MODULE_CODE = "subtotal";
 

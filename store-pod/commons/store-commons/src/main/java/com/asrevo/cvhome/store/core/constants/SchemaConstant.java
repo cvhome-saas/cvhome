@@ -2,17 +2,14 @@ package com.asrevo.cvhome.store.core.constants;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class SchemaConstant {
 
-    @Deprecated
-    public static final String[] LANGUAGE_ISO_CODE = {"en", "fr", "es"}; // which
+    private SchemaConstant() {
+    }
 
-    // descriptions
-    // will ve
-    // used for
-    // reference
-    // data
+
 
     public static final int DESCRIPTION_ID_ALLOCATION_SIZE = 0;
 
@@ -26,12 +23,12 @@ public class SchemaConstant {
     /**
      * Locale per country iso codes
      */
-    public static final HashMap<String, Locale> LOCALES = new HashMap<>();
+    public static final Map<String, Locale> LOCALES = new HashMap<>();
 
     /**
      * Currency codes with name
      */
-    public static final HashMap<String, String> CURRENCY_MAP = new HashMap<>();
+    public static final Map<String, String> CURRENCY_MAP = new HashMap<>();
 
     static {
         for (Locale locale : Locale.getAvailableLocales()) {

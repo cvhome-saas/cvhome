@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LocaleUtils {
+    private final static Locale[] locales = Locale.getAvailableLocales();
 
-    static Locale[] locales = Locale.getAvailableLocales();
+    private LocaleUtils() {
+    }
+
 
     public static Locale getLocale(LanguageCode language) {
         Locale defaultLocale = Constants.DEFAULT_LOCALE;

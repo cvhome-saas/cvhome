@@ -12,6 +12,10 @@ import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
  */
 public class RepositoryHelper {
 
+    private RepositoryHelper() {
+    }
+
+
     @SuppressWarnings("rawtypes")
     public static Query paginateQuery(Query q, Number count, GenericEntityList entityList, Criteria criteria) {
 
