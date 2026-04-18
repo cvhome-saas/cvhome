@@ -19,12 +19,12 @@ public class SchemaConstant {
     /**
      * Locale per country iso codes
      */
-    public static final Map<String, Locale> LOCALES = new HashMap<>();
+    protected static final Map<String, Locale> LOCALES = new HashMap<>();
 
     /**
      * Currency codes with name
      */
-    public static final Map<String, String> CURRENCY_MAP = new HashMap<>();
+    protected static final Map<String, String> CURRENCY_MAP = new HashMap<>();
 
     static {
         for (Locale locale : Locale.getAvailableLocales()) {
@@ -137,7 +137,6 @@ public class SchemaConstant {
         CURRENCY_MAP.put("ZAR", "Rand");
         CURRENCY_MAP.put("NPR", "Nepalese Rupee");
         CURRENCY_MAP.put("XPF", "CFP Franc");
-        CURRENCY_MAP.put("NZD", "New Zealand Dollar");
         CURRENCY_MAP.put("NIO", "Cordoba Oro");
         CURRENCY_MAP.put("XOF", "CFA Franc BCEAO");
         CURRENCY_MAP.put("NGN", "Naira");

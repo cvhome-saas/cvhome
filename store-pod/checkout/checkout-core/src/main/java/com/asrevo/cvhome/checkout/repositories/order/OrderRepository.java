@@ -33,7 +33,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     Order findOne(Long id, StoreMerchantId storeMerchantId);
 
     @Query("""
-            select new com.asrevo.cvhome.commons.domain.StatisticEntry(cast(cast(date_trunc('day',o.datePurchased) as date ) as string ) ,cast(o.status as string) ,count(o.id))
+            select new com.asrevo.cvhome.commons.domain.StatisticEntry(
+                        cast(cast(date_trunc('day',o.datePurchased) as date ) as string ) ,cast(o.status as string) ,count(o.id) )
             from Order o
             where o.storeMerchantId=:storeId
             and o.datePurchased between :from and :to
