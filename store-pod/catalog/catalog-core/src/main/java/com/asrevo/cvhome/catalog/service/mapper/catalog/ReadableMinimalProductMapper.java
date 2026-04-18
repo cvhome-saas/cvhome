@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
@@ -48,9 +47,6 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
     @Override
     public ReadableMinimalProduct merge(Product source, ReadableMinimalProduct destination, StoreMerchantId store,
                                         LanguageCode language) {
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "ReadableMinimalProduct cannot be null");
-
         for (ProductDescription desc : source.getDescriptions()) {
             if (Objects.equals(desc.getLanguageCode(), language)) {
                 destination.setDescription(this.description(desc));

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -48,9 +47,6 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
     @Override
     public ProductPrice merge(PersistableProductPrice source, ProductPrice destination, StoreMerchantId store,
                               LanguageCode language) {
-
-        Assert.notNull(source, "PersistableProductPrice cannot be null");
-        Assert.notNull(source.getSku(), "Product sku cannot be null");
 
         try {
             if (destination == null) {

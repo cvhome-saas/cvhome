@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
@@ -38,7 +37,6 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
     @Override
     public ReadableProductTypeList getByMerchant(StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
-        Assert.notNull(store, "store cannot be null");
         ReadableProductTypeList returnList = new ReadableProductTypeList();
 
         Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
@@ -57,9 +55,6 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language) {
-
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(id, "ProductType code cannot be empty");
         try {
 
             ProductType type = productTypeService.getById(id, store);
@@ -80,10 +75,6 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
     @Override
     public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language) {
 
-        Assert.notNull(type, "ProductType cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(type.getCode(), "ProductType code cannot be empty");
-
         try {
 
             if (this.exists(type.getCode(), store, language)) {
@@ -103,9 +94,6 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(type, "ProductType cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(id, "id cannot be empty");
 
         try {
 
@@ -129,9 +117,6 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public void delete(Long id, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(id, "id cannot be empty");
-
         try {
 
             ProductType t = productTypeService.getById(id, store);

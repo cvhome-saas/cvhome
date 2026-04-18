@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,8 +81,6 @@ public class OrderApi {
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language) {
-
-        Assert.notNull(order.getCustomer(), "Customer must not be null");
 
         ShoppingCart cart;
         try {

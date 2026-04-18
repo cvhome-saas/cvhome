@@ -12,7 +12,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -55,8 +54,6 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     @Override
     public ProductAvailability merge(PersistableInventory source, ProductAvailability destination,
                                      StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(destination, "Product availability cannot be null");
-
         try {
             Product product = null;
             if (source.getProductId() != null && source.getProductId() > 0) {

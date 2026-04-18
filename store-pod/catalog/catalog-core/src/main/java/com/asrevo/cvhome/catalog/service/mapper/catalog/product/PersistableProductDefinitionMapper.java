@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -67,8 +66,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     @Override
     public Product merge(PersistableProductDefinition source, Product destination, StoreMerchantId store,
                          LanguageCode language) {
-
-        Assert.notNull(destination, "Product must not be null");
 
         try {
 
@@ -253,7 +250,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                     if (!StringUtils.isBlank(categ.getCode())) {
                         c = categoryService.getByCode(store, categ.getCode());
                     } else {
-                        Assert.notNull(categ.getId(), "Category id nust not be null");
                         c = categoryService.getById(categ.getId(), store);
                     }
 

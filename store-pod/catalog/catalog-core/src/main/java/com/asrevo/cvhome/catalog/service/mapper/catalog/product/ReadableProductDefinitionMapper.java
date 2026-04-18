@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -73,9 +72,6 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
     @Override
     public ReadableProductDefinition merge(Product source, ReadableProductDefinition target, StoreMerchantId store,
                                            LanguageCode language) {
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(target, "Product destination cannot be null");
-
         target.setIdentifier(source.getSku());
         target.setId(source.getId());
         target.setVisible(source.isAvailable());

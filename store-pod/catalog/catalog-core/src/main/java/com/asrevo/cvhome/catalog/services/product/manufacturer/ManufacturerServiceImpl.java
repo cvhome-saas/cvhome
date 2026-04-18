@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
@@ -78,15 +77,11 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
     @Override
     public List<Manufacturer> listByProductsInCategory(StoreMerchantId store, Category category,
                                                        LanguageCode language) {
-        Assert.notNull(store, "Store cannot be null");
-        Assert.notNull(category, "Category cannot be null");
-        Assert.notNull(language, "Language cannot be null");
         return manufacturerRepository.findByProductInCategoryId(store, category.getLineage(), language);
     }
 
     @Override
     public int count(StoreMerchantId store) {
-        Assert.notNull(store, "Merchant must not be null");
         return manufacturerRepository.count(store);
     }
 

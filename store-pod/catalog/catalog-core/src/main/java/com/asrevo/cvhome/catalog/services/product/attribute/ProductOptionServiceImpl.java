@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
@@ -78,7 +77,6 @@ public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long
     @Override
     public Page<ProductOption> getByMerchant(StoreMerchantId store, LanguageCode language, String name,
                                              Pageable pageable) {
-        Assert.notNull(store, "Store cannot be null");
         return pageableProductOptionRepository.listOptions(store, name, pageable);
     }
 

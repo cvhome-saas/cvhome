@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -35,8 +34,6 @@ public class PersistableMerchantStorePopulator
     @Override
     public MerchantStore populate(PersistableMerchantStore source, MerchantStore target, MerchantStore store,
                                   LanguageCode language) throws ConversionException {
-
-        Assert.notNull(source, "PersistableMerchantStore mst not be null");
 
         if (target == null) {
             target = new MerchantStore();

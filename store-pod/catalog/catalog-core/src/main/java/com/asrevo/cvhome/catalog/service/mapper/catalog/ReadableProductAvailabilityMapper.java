@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -25,9 +24,6 @@ public class ReadableProductAvailabilityMapper implements Mapper<Product, Readab
     @Override
     public ReadableProductAvailability merge(Product source, ReadableProductAvailability destination,
                                              StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(source, "Product must not be null");
-        Assert.notNull(destination, "ReadableProductAvailability must not be null");
-        Assert.notNull(store, "StoreMerchantId must not be null");
         destination.setSku(source.getSku());
         destination.setStore(store);
         for (ProductAvailability availability : source.getAvailabilities()) {

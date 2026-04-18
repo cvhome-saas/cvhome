@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionSet;
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.PersistableProductOptionSet;
@@ -41,8 +40,6 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public ReadableProductOptionSet get(Long id, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
         ProductOptionSet optionSet = productOptionSetService.getById(store, id, language);
         if (optionSet == null) {
             throw new ResourceNotFoundException(
@@ -54,9 +51,6 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-
         List<ProductOptionSet> optionSets = productOptionSetService.listByStore(store, language);
         return optionSets.stream().map(opt -> this.convert(opt, store, language)).toList();
     }
@@ -67,10 +61,6 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public void create(PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-        Assert.notNull(optionSet, "PersistableProductOptionSet cannot be null");
-
         if (this.exists(optionSet.getCode(), store)) {
             throw new OperationNotAllowedException("Option set with code [" + optionSet.getCode() + "] already exist");
         }
@@ -86,10 +76,6 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public void update(Long id, PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-        Assert.notNull(optionSet, "PersistableProductOptionSet cannot be null");
-
         ProductOptionSet opt = productOptionSetService.getById(store, id, language);
         if (opt == null) {
             throw new ResourceNotFoundException(
@@ -105,8 +91,6 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public void delete(Long id, StoreMerchantId store) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(id, "id cannot be null");
         ProductOptionSet opt = productOptionSetService.getById(id);
         if (opt == null) {
             throw new ResourceNotFoundException(
@@ -125,19 +109,12 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public boolean exists(String code, StoreMerchantId store) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(code, "code cannot be null");
         ProductOptionSet optionSet = productOptionSetService.getCode(store, code);
         return optionSet != null;
     }
 
     @Override
     public List<ReadableProductOptionSet> list(StoreMerchantId store, LanguageCode language, String type) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-        Assert.notNull(type, "Product type cannot be null");
-
-        // find product type by id
         ReadableProductType readable = productTypeFacade.get(store, type, language);
 
         if (readable == null) {

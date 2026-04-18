@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -98,8 +97,6 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public void delete(StoreMerchantId store, String fileName, String fileType) {
-        Assert.notNull(store, "StoreMerchantId cannot be null");
-        Assert.notNull(fileName, "File name cannot be null");
         try {
             FileContentType t = FileContentType.valueOf(fileType);
             contentService.removeFile(store.getId(), t, fileName);
@@ -111,8 +108,6 @@ public class ContentFacadeImpl implements ContentFacade {
     @SuppressWarnings("unchecked")
     @Override
     public ReadableContentPageList getContentPages(StoreMerchantId store, LanguageCode language, Pageable pageable) {
-        Assert.notNull(store, "store cannot be null");
-
         @SuppressWarnings("rawtypes")
         ReadableContentPageList items = new ReadableContentPageList();
         Page<Content> contentPages = contentService.listByType(ContentType.PAGE, store, language, pageable);
@@ -205,9 +200,6 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     private Content getContent(String code, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(code, "Content code cannot be null");
-        Assert.notNull(store, "StoreMerchantId cannot be null");
-
         Content content;
 
         if (LanguageCode.isLanguage(language)) {
@@ -233,8 +225,6 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public ReadableContentBoxList getContentBoxes(StoreMerchantId store, LanguageCode language, Pageable pageable) {
-
-        Assert.notNull(store, "store cannot be null");
 
         ReadableContentBoxList items = new ReadableContentBoxList();
         Page<Content> contentBoxes = contentService.listByType(ContentType.BOX, store, language, pageable);
@@ -292,9 +282,6 @@ public class ContentFacadeImpl implements ContentFacade {
     @SneakyThrows
     @Override
     public ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(code, "Content code cannot be null");
-        Assert.notNull(store, "StoreMerchantId cannot be null");
-
         Content content = getContent(code, store, language);
         ReadableContentBoxPopulator populator = new ReadableContentBoxPopulator();
         return populator.populate(content, store, language);
@@ -302,10 +289,6 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language) {
-        Assert.notNull(page, "page can't be null");
-        Assert.notNull(page.getCode(), "Content code must not be null");
-        Assert.notNull(merchantStore, "store can't be null");
-
         try {
             Content content;
 
@@ -325,10 +308,6 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language) {
-        Assert.notNull(box, "box can't be null");
-        Assert.notNull(box.getCode(), "Content box must not be null");
-        Assert.notNull(merchantStore, "store can't be null");
-
         try {
             Content content;
 
@@ -348,9 +327,6 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public void delete(StoreMerchantId store, Long id) {
-        Assert.notNull(store, "StoreMerchantId not null");
-        Assert.notNull(id, "Content id must not be null");
-        // select content first
         Content content = contentService.getById(id);
         if (content != null) {
             if (!Objects.equals(content.getStoreMerchantId(), store)) {
@@ -368,10 +344,6 @@ public class ContentFacadeImpl implements ContentFacade {
     @SneakyThrows
     @Override
     public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(name, "Content name cannot be null");
-        Assert.notNull(store, "StoreMerchantId cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-
         Content content = contentService.findBySeUrl(store, name, language)
                 .orElseThrow(() -> new ResourceNotFoundException("No page found : " + name));
 
@@ -382,10 +354,6 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public void updateContentPage(Long id, PersistableContentPage page, StoreMerchantId merchantStore,
                                   LanguageCode language) {
-        Assert.notNull(page, "page can't be null");
-        Assert.notNull(id, "Content id must not be null");
-        Assert.notNull(merchantStore, "store can't be null");
-
         try {
             Content content;
 
@@ -407,10 +375,6 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public void updateContentBox(Long id, PersistableContentBox box, StoreMerchantId merchantStore,
                                  LanguageCode language) {
-        Assert.notNull(box, "bix can't be null");
-        Assert.notNull(id, "Content id must not be null");
-        Assert.notNull(merchantStore, "store can't be null");
-
         try {
             Content content;
 

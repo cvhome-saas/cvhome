@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
@@ -48,9 +47,6 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         try {
             for (ProductImage productImage : productImages) {
-
-                Assert.notNull(productImage.getImage(), "image inputStream can't be null");
-
                 InputStream inputStream = productImage.getImage();
                 ImageContentFile cmsContentImage = new ImageContentFile();
                 cmsContentImage.setFileName(productImage.getProductImage());
@@ -73,7 +69,6 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
         try {
             if (productImage.getImageType() == 0) {
-                Assert.notNull(inputImage.getFile(), "ImageContentFile.file cannot be null");
                 CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
                         productImage.getProduct().getStore(), productImage.getProduct().getSku(),
                         productImage.getProductImage());
@@ -161,8 +156,6 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public void updateProductImage(Product product, ProductImage productImage) {
-        Assert.notNull(product, "Product cannot be null");
-        Assert.notNull(productImage, "ProductImage cannot be null");
         productImage.setProduct(product);
         productImageRepository.save(productImage);
     }

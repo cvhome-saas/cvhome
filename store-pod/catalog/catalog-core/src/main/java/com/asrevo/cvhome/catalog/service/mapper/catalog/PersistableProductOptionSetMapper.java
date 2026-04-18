@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionSet;
@@ -50,8 +49,6 @@ public class PersistableProductOptionSetMapper implements Mapper<PersistableProd
     @Override
     public ProductOptionSet merge(PersistableProductOptionSet source, ProductOptionSet destination,
                                   StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(destination, "ProductOptionSet must not be null");
-
         destination.setId(source.getId());
         destination.setCode(source.getCode());
         destination.setOptionDisplayOnly(source.isReadOnly());

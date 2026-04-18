@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
@@ -96,9 +95,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public void delete(Product product) throws ServiceException {
-        Assert.notNull(product, "Product cannot be null");
-        product = this.getById(product.getId()); // Prevents detached entity
-        // error
+        product = this.getById(product.getId());
         product.setCategories(null);
 
         Set<ProductImage> images = product.getImages();
@@ -124,11 +121,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     private Product saveOrUpdate(Product product) throws ServiceException {
-        Assert.notNull(product, "product cannot be null");
-        Assert.notNull(product.getAvailabilities(), "product must have at least one availability");
-        Assert.notEmpty(product.getAvailabilities(), "product must have at least one availability");
-
-        // take care of product images separately
         Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
 
         if (product.getId() != null && product.getId() > 0) {
@@ -194,8 +186,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public Product findOne(Long id, StoreMerchantId merchant) {
-        Assert.notNull(merchant, "Store must not be null");
-        Assert.notNull(id, "id must not be null");
         return productRepository.getById(id, merchant);
     }
 

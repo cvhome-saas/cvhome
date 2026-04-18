@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
@@ -30,11 +29,6 @@ public class ReadableProductPricePopulator
     @Override
     public ReadableProductPrice populate(ProductPrice source, ReadableProductPrice target, StoreMerchantId store,
                                          LanguageCode language) throws ConversionException {
-        Assert.notNull(pricingService, "pricingService must be set");
-        Assert.notNull(source.getProductAvailability(), "productPrice.availability cannot be null");
-        Assert.notNull(source.getProductAvailability().getProduct(),
-                "productPrice.availability.product cannot be null");
-
         try {
 
             if (language == null) {

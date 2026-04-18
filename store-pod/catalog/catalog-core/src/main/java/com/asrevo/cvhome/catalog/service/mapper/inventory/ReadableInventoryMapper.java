@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
@@ -45,9 +44,6 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
     @Override
     public ReadableInventory merge(ProductAvailability source, ReadableInventory destination, StoreMerchantId store,
                                    LanguageCode language) {
-        Assert.notNull(destination, "Destination Product availability cannot be null");
-        Assert.notNull(source, "Source Product availability cannot be null");
-
         try {
             destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
             destination.setProductQuantityOrderMax(

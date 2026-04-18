@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.model.order.transaction.PersistablePayment;
@@ -33,7 +32,6 @@ public class PersistablePaymentPopulator extends AbstractDataPopulator<Persistab
     public Payment populate(PersistablePayment source, Payment target, StoreMerchantId store, LanguageCode language)
             throws ConversionException {
 
-        Assert.notNull(source, "PersistablePayment cannot be null");
         if (target == null) {
             target = new Payment();
         }

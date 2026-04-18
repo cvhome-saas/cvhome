@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -100,12 +99,6 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     @Override
     public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
                                  LanguageCode language) {
-
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
-
-        // read only product values
-        // will contain options
         TreeMap<Long, ReadableProductOption> selectableOptions = new TreeMap<>();
 
         destination.setSku(source.getSku());

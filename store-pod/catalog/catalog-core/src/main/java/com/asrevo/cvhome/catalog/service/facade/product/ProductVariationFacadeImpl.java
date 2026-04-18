@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
 import com.asrevo.cvhome.catalog.model.product.variation.PersistableProductVariation;
@@ -41,8 +40,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public ReadableProductVariation get(Long variationId, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
         Optional<ProductVariation> variation = productVariationService.getById(store, variationId, language);
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
@@ -55,9 +52,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     @Override
     public ReadableEntityList<ReadableProductVariation> list(StoreMerchantId store, LanguageCode language,
                                                              Pageable pageable) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-
         Page<ProductVariation> vars = productVariationService.getByMerchant(store, language, null, pageable);
         List<ReadableProductVariation> variations = vars.stream()
                 .map(opt -> this.convert(opt, store, language))
@@ -77,9 +71,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-        Assert.notNull(variation, "PersistableProductVariation cannot be null");
 
         if (this.exists(variation.getCode(), store)) {
             throw new OperationNotAllowedException("Option set with code [" + variation.getCode() + "] already exist");
@@ -99,9 +90,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     @Override
     public void update(Long variationId, PersistableProductVariation variation, StoreMerchantId store,
                        LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(variation, "PersistableProductVariation cannot be null");
 
         Optional<ProductVariation> p = productVariationService.getById(store, variationId, language);
         if (p.isEmpty()) {
@@ -120,8 +108,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public void delete(Long variationId, StoreMerchantId store) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(variationId, "variationId cannot be null");
         ProductVariation opt = productVariationService.getById(variationId);
         if (opt == null) {
             throw new ResourceNotFoundException(
@@ -140,8 +126,6 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public boolean exists(String code, StoreMerchantId store) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(code, "code cannot be null");
         Optional<ProductVariation> productVariation = productVariationService.getByCode(store, code);
         return productVariation.isPresent();
     }

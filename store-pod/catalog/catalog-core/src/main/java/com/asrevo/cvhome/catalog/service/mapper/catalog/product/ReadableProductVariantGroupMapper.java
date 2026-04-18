@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
@@ -37,18 +36,12 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
     @Override
     public ReadableProductVariantGroup convert(ProductVariantGroup source, StoreMerchantId store,
                                                LanguageCode language) {
-        Assert.notNull(source, "productVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
         return this.merge(source, new ReadableProductVariantGroup(), store, language);
     }
 
     @Override
     public ReadableProductVariantGroup merge(ProductVariantGroup source, ReadableProductVariantGroup destination,
                                              StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(source, "productVariantGroup cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
         if (destination == null) {
             destination = new ReadableProductVariantGroup();
         }

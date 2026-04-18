@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
@@ -83,9 +82,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, StoreMerchantId store,
                                                   LanguageCode language) {
-        Assert.notNull(option, "ProductOption cannot be null");
-        Assert.notNull(store, "store cannot be null");
-
         ProductOption optionModel = new ProductOption();
         if (option.getId() != null && option.getId() > 0) {
             optionModel = productOptionService.getById(store, option.getId());
@@ -139,8 +135,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionValueList optionValues(StoreMerchantId store, LanguageCode language, String name,
                                                        Pageable pageable) {
-        Assert.notNull(store, "StoreMerchantId should not be null");
-
         Page<ProductOptionValue> options = productOptionValueService.getByMerchant(store, null, name, pageable);
         ReadableProductOptionValueList valueList = new ReadableProductOptionValueList();
         valueList.setTotalPages(options.getTotalPages());
@@ -161,8 +155,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionList options(StoreMerchantId store, LanguageCode language, String name,
                                              Pageable pageable) {
-        Assert.notNull(store, "StoreMerchantId should not be null");
-
         Page<ProductOption> options = productOptionService.getByMerchant(store, null, name, pageable);
         ReadableProductOptionList valueList = new ReadableProductOptionList();
         valueList.setTotalPages(options.getTotalPages());
@@ -182,10 +174,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductOptionEntity getOption(Long optionId, StoreMerchantId store, LanguageCode language) {
-
-        Assert.notNull(optionId, "Option id cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-
         ProductOption option = productOptionService.getById(store, optionId);
 
         if (option == null) {
@@ -197,8 +185,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public boolean optionExists(String code, StoreMerchantId store) {
-        Assert.notNull(code, "Option code must not be null");
-        Assert.notNull(store, "Store code must not be null");
         boolean exists = false;
         ProductOption option = productOptionService.getByCode(store, code);
         if (option != null) {
@@ -209,8 +195,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public boolean optionValueExists(String code, StoreMerchantId store) {
-        Assert.notNull(code, "Option value code must not be null");
-        Assert.notNull(store, "Store code must not be null");
         boolean exists = false;
         ProductOptionValue optionValue = productOptionValueService.getByCode(store, code);
         if (optionValue != null) {
@@ -222,9 +206,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue, StoreMerchantId store,
                                                       LanguageCode language) {
-        Assert.notNull(optionValue, "Option value code must not be null");
-        Assert.notNull(store, "Store code must not be null");
-
         ProductOptionValue value = new ProductOptionValue();
         if (optionValue.getId() != null && optionValue.getId() > 0) {
             value = productOptionValueService.getById(store, optionValue.getId());
@@ -255,9 +236,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionValue getOptionValue(Long optionValueId, StoreMerchantId store, LanguageCode language) {
 
-        Assert.notNull(optionValueId, "OptionValue id cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-
         ProductOptionValue optionValue = productOptionValueService.getById(store, optionValueId);
 
         if (optionValue == null) {
@@ -270,12 +248,6 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductAttributeEntity saveAttribute(Long productId, PersistableProductAttribute attribute,
                                                         StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(productId, "Product id cannot be null");
-        Assert.notNull(attribute, "ProductAttribute cannot be null");
-        Assert.notNull(attribute.getOption(), "ProductAttribute option cannot be null");
-        Assert.notNull(attribute.getOptionValue(), "ProductAttribute option value cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-
         attribute.setProductId(productId);
         ProductAttribute attr = new ProductAttribute();
         if (attribute.getId() != null && attribute.getId() > 0) {
@@ -395,56 +367,10 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         }
     }
 
-    /*
-     * @TODO not needed for now
-     *
-     * @Override public void addOptionValueImage(MultipartFile image, Long optionValueId,
-     * StoreMerchantId store, LanguageCode language) {
-     *
-     *
-     * Assert.notNull(optionValueId, "OptionValueId must not be null");
-     * Assert.notNull(image, "Image must not be null"); //get option value
-     * ProductOptionValue value = productOptionValueService.getById(store, optionValueId);
-     * if (value == null) { throw new ResourceNotFoundException("Product option value [" +
-     * optionValueId + "] not found"); }
-     *
-     * try { String imageName = image.getOriginalFilename(); InputStream inputStream =
-     * image.getInputStream(); InputContentFile cmsContentImage = new InputContentFile();
-     * cmsContentImage.setFileName(imageName);
-     * cmsContentImage.setMimeType(image.getContentType());
-     * cmsContentImage.setFile(inputStream);
-     *
-     * contentService.addOptionImage(store.getId(), cmsContentImage);
-     * value.setProductOptionValueImage(imageName);
-     * productOptionValueService.saveOrUpdate(value); } catch (Exception e) { throw new
-     * ServiceRuntimeException("Exception while adding option value image", e); }
-     *
-     *
-     * }
-     *
-     * @Override public void removeOptionValueImage(Long optionValueId, StoreMerchantId
-     * store, LanguageCode language) { Assert.notNull(optionValueId,
-     * "OptionValueId must not be null"); ProductOptionValue value =
-     * productOptionValueService.getById(store, optionValueId); if (value == null) { throw
-     * new ResourceNotFoundException("Product option value [" + optionValueId +
-     * "] not found"); }
-     *
-     * try {
-     *
-     * contentService.removeFile(store.getId(), FileContentType.PROPERTY,
-     * value.getProductOptionValueImage()); value.setProductOptionValueImage(null);
-     * productOptionValueService.saveOrUpdate(value); } catch (Exception e) { throw new
-     * ServiceRuntimeException("Exception while removing option value image", e); }
-     *
-     * }
-     */
+
     @Override
     public List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
                                              StoreMerchantId store) {
-        Assert.notNull(productId, "Product id must not be null");
-        Assert.notNull(store, "Merchant cannot be null");
-
-        // convert to model
 
         List<ProductAttribute> modelAttributes = attributes.stream()
                 .map(attr -> persistableProductAttributeMapper.convert(attr, store, null))

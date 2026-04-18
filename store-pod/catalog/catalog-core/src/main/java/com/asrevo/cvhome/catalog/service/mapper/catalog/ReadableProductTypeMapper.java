@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
@@ -24,9 +23,6 @@ public class ReadableProductTypeMapper implements Mapper<ProductType, ReadablePr
     @Override
     public ReadableProductType merge(ProductType source, ReadableProductType target, StoreMerchantId store,
                                      LanguageCode language) {
-        Assert.notNull(source, "ProductType cannot be null");
-        Assert.notNull(target, "ReadableProductType cannot be null");
-
         target = new ReadableProductType();
 
         target.setCode(source.getCode());

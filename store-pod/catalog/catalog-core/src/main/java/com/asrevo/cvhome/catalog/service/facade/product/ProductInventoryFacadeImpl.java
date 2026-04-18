@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -90,7 +89,6 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     @Override
     public ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
         ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
 
         // add inventory to the product
@@ -122,10 +120,6 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     @Override
     public void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
-
-        Assert.notNull(inventory, "Inventory cannot be null");
-        Assert.notNull(store, "store cannot be null");
-
         Set<ProductAvailability> originAvailability = null;
         Product product = null;
 
@@ -161,10 +155,6 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     @Override
     public ReadableEntityList<ReadableInventory> get(String sku, StoreMerchantId store, LanguageCode language,
                                                      Pageable pageable) {
-        Assert.notNull(sku, "Product sku cannot be null");
-        Assert.notNull(store, "StoreMerchantId code cannot be null");
-        Assert.notNull(language, "LanguageCode cannot be null");
-
         Page<ProductAvailability> availabilities = productAvailabilityService.getBySku(sku, pageable);
 
         if (availabilities.isEmpty()) {
@@ -190,10 +180,6 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     @Override
     public ReadableEntityList<ReadableInventory> get(Long productId, StoreMerchantId store, LanguageCode language,
                                                      Pageable pageable) {
-
-        Assert.notNull(productId, "Product id cannot be null");
-        Assert.notNull(store, "StoreMerchantId code cannot be null");
-
         Page<ProductAvailability> availabilities = productAvailabilityService.listByProduct(productId, store, pageable);
 
         List<ReadableInventory> returnList = availabilities.getContent()

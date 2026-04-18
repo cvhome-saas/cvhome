@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
@@ -49,9 +48,6 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
     @Override
     public ReadableProductVariant merge(ProductVariant source, ReadableProductVariant destination,
                                         StoreMerchantId store, LanguageCode language) {
-
-        Assert.notNull(source, "Product instance cannot be null");
-        Assert.notNull(source.getProduct(), "Product cannot be null");
 
         if (destination == null) {
             destination = new ReadableProductVariant();

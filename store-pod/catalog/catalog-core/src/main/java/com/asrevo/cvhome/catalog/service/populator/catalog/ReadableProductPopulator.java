@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -66,9 +65,6 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     @Override
     public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
                                     LanguageCode language) throws ConversionException {
-        Assert.notNull(pricingService, "Requires to set PricingService");
-        Assert.notNull(imageUtils, "Requires to set imageUtils");
-
         try {
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions = new ArrayList<>();

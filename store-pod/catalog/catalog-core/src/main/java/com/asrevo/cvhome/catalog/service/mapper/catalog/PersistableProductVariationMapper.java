@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
@@ -37,8 +36,6 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
     @Override
     public ProductVariation merge(PersistableProductVariation source, ProductVariation destination,
                                   StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(destination, "ProductVariation cannot be null");
-
         destination.setId(source.getId());
         destination.setCode(source.getCode());
         destination.setStoreMerchantId(store);

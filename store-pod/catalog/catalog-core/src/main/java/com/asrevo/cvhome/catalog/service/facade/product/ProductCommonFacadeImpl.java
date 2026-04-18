@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -106,11 +105,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     @Override
     public ReadableProduct addProductToCategory(Category category, Product product, LanguageCode language) {
-
-        Assert.notNull(category, "Category cannot be null");
-        Assert.notNull(product, "Product cannot be null");
-
-        // not alloweed if category already attached
         List<Category> assigned = product.getCategories()
                 .stream()
                 .filter(cat -> cat.getId().longValue() == category.getId().longValue())
@@ -144,10 +138,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     @Override
     public ReadableProduct removeProductFromCategory(Category category, Product product, LanguageCode language)
             throws Exception {
-
-        Assert.notNull(category, "Category cannot be null");
-        Assert.notNull(product, "Product cannot be null");
-
         product.getCategories().remove(category);
         productService.saveProduct(product);
 
@@ -196,10 +186,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     @Override
     public void deleteProduct(Long id, StoreMerchantId store) {
-
-        Assert.notNull(id, "Product id cannot be null");
-        Assert.notNull(store, "store cannot be null");
-
         Product p = productService.getById(id);
 
         if (p == null) {

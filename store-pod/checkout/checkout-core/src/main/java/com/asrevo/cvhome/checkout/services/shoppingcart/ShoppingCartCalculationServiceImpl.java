@@ -4,7 +4,6 @@
 package com.asrevo.cvhome.checkout.services.shoppingcart;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
@@ -54,10 +53,6 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
     public OrderTotalSummary calculate(final ShoppingCart cartModel, final Customer customer,
                                        final StoreMerchantId store, final LanguageCode language) throws ServiceException {
 
-        Assert.notNull(cartModel, "cart cannot be null");
-        Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
-        Assert.notNull(store, "Store cannot be null");
-        Assert.notNull(customer, "Customer cannot be null");
         OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, customer, store,
                 language);
         updateCartModel(cartModel);
@@ -79,9 +74,6 @@ public class ShoppingCartCalculationServiceImpl implements ShoppingCartCalculati
     public OrderTotalSummary calculate(final ShoppingCart cartModel, final StoreMerchantId store,
                                        final LanguageCode language) throws ServiceException {
 
-        Assert.notNull(cartModel, "cart cannot be null");
-        Assert.notNull(cartModel.getLineItems(), "Cart should have line items.");
-        Assert.notNull(store, "Store cannot be null");
         OrderTotalSummary orderTotalSummary = orderService.calculateShoppingCartTotal(cartModel, store, language);
         updateCartModel(cartModel);
         return orderTotalSummary;

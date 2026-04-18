@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
@@ -70,11 +69,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
     @Override
     public ReadableCategoryList getCategoryHierarchy(StoreMerchantId store, ListCriteria criteria, int depth,
                                                      LanguageCode language, List<String> filter, Pageable pageable) {
-
-        Assert.notNull(store, "Store can not be null");
-
-        // get parent store
-
         ReadableCategoryList returnList = getReadableCategoryList(store, criteria, depth, language, filter, pageable);
 
         Map<Long, ReadableCategory> readableCategoryMap = returnList.getContent()
@@ -243,8 +237,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public ReadableCategory getCategoryByFriendlyUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language) {
-        Assert.notNull(friendlyUrl, "Category search friendly URL must not be null");
-
         Category category = categoryService.getBySeUrl(store, friendlyUrl, language);
 
         if (category == null) {
@@ -260,8 +252,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
     }
 
     private Category getById(StoreMerchantId store, Long id) {
-        Assert.notNull(id, "category id must not be null");
-        Assert.notNull(store, "store cannot be null");
         Category category = categoryService.getById(id, store);
         if (category == null) {
             throw new ResourceNotFoundException("Category with id [" + id + "] not found");
@@ -375,11 +365,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public void move(Long child, Long parent, StoreMerchantId store) {
-
-        Assert.notNull(child, "Child category must not be null");
-        Assert.notNull(parent, "Parent category must not be null");
-        Assert.notNull(store, "Merhant must not be null");
-
         try {
 
             Category c = categoryService.getById(child, store);
@@ -433,8 +418,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public void setVisible(PersistableCategory category, StoreMerchantId store) {
-        Assert.notNull(category, "Category must not be null");
-        Assert.notNull(store, "Store must not be null");
         try {
             Category c = this.getById(store, category.getId());
             c.setVisible(category.isVisible());
@@ -446,9 +429,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public ReadableCategoryList listByProduct(StoreMerchantId store, Long product, LanguageCode language) {
-        Assert.notNull(product, "Product id must not be null");
-        Assert.notNull(store, "Store must not be null");
-
         List<Category> categories = categoryService.getByProductId(product, store);
 
         List<ReadableCategory> readableCategories = categories.stream()

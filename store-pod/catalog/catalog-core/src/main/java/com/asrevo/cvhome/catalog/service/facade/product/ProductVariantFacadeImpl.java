@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
@@ -90,11 +89,6 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     @Override
     public Long create(PersistableProductVariant productVariant, Long productId, StoreMerchantId store,
                        LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(productVariant, "productVariant cannot be null");
-        Assert.notNull(productId, "Product id cannot be null");
-
-        // variation and variation value should not be of same product option code
         if (productVariant.getVariation() != null && productVariant.getVariation() > 0
                 && productVariant.getVariationValue() != null && productVariant.getVariationValue() > 0) {
 
@@ -124,11 +118,6 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     @Override
     public void update(Long instanceId, PersistableProductVariant productVariant, Long productId, StoreMerchantId store,
                        LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(productVariant, "productVariant cannot be null");
-        Assert.notNull(productId, "Product id cannot be null");
-        Assert.notNull(instanceId, "Product instance id cannot be null");
-
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
             throw new ResourceNotFoundException("productVariant with id [" + instanceId + "] not found for store ["
@@ -148,10 +137,6 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
     @Override
     public void delete(Long productVariant, Long productId, StoreMerchantId store) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(productVariant, "productVariant id cannot be null");
-        Assert.notNull(productId, "Product id cannot be null");
-
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
             throw new ResourceNotFoundException("productVariant with id [" + productVariant + "] not found for store ["
@@ -169,9 +154,6 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     @Override
     public ReadableEntityList<ReadableProductVariant> list(Long productId, StoreMerchantId store, LanguageCode language,
                                                            Pageable pageable) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(productId, "Product id cannot be null");
-
         Product product = productFacade.getProduct(productId, store);
 
         if (product == null) {

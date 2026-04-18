@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
@@ -58,10 +57,6 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     @Override
     public List<ReadableProductPrice> list(String sku, Long inventoryId, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(sku, "Product sku cannot be null");
-        Assert.notNull(inventoryId, "Product inventory cannot be null");
-
         List<ProductPrice> prices = productPriceService.findByInventoryId(inventoryId, sku, store);
 
         return prices.stream().map(p -> {
@@ -76,9 +71,6 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     @Override
     public List<ReadableProductPrice> list(String sku, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(sku, "Product sku cannot be null");
-
         List<ProductPrice> prices = productPriceService.findByProductSku(sku, store);
 
         return prices.stream().map(p -> {
@@ -93,9 +85,6 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     @Override
     public void delete(Long priceId, String sku, StoreMerchantId store) {
-        Assert.notNull(priceId, "Product Price id cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(sku, "Product sku cannot be null");
         ProductPrice productPrice = productPriceService.findById(priceId, sku, store);
         if (productPrice == null) {
             throw new ServiceRuntimeException("An exception occured while getting product price [" + priceId
@@ -119,9 +108,6 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     @Override
     public ReadableProductPrice get(String sku, Long productPriceId, StoreMerchantId store, LanguageCode language) {
-        Assert.notNull(productPriceId, "Product Price id cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(sku, "Product sku cannot be null");
         ProductPrice price = productPriceService.findById(productPriceId, sku, store);
 
         if (price == null) {

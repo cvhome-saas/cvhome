@@ -7,7 +7,6 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.model.category.CategoryDescription;
@@ -38,9 +37,6 @@ public class PersistableCategoryPopulator
             throws ConversionException {
 
         try {
-
-            Assert.notNull(target, "Category target cannot be null");
-
 
             target.setStoreMerchantId(store);
             target.setCode(source.getCode());

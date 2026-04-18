@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
@@ -34,8 +33,6 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
     @Override
     public OrderProduct populate(ShoppingCartItem source, OrderProduct target, StoreMerchantId store,
                                  LanguageCode language) throws ConversionException {
-
-        Assert.notNull(externalProductService, "productService must be set");
 
         try {
 

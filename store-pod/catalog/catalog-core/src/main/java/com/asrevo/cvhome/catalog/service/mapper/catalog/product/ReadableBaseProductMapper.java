@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -41,11 +40,6 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
     public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
                                  LanguageCode language) {
 
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
-
-        // read only product values
-        // will contain options
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());
         destination.setId(source.getId());

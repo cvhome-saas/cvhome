@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.repositories.product.availability.PageableProductAvailabilityRepository;
@@ -55,14 +54,11 @@ public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImp
 
     @Override
     public Page<ProductAvailability> listByProduct(Long productId, StoreMerchantId store, Pageable pageable) {
-        Assert.notNull(productId, "Product cannot be null");
-        Assert.notNull(store, "MercantStore cannot be null");
         return pageableProductAvailabilityRepository.getByProductId(productId, store, pageable);
     }
 
     @Override
     public Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store) {
-        Assert.notNull(store, "Merchant must not be null");
         return Optional.ofNullable(productAvailabilityRepository.getById(availabilityId));
     }
 
@@ -73,7 +69,6 @@ public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImp
 
     @Override
     public List<ProductAvailability> getBySku(String sku, StoreMerchantId store) {
-        Assert.notNull(store, "Store cannot be null");
         return productAvailabilityRepository.getBySku(sku, store);
     }
 

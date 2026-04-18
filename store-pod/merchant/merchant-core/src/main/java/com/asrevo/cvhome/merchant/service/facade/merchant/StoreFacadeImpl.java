@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
@@ -92,11 +91,6 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @Override
     public void create(PersistableMerchantStore store) {
-
-        Assert.notNull(store, "PersistableMerchantStore must not be null");
-        Assert.notNull(store.getId(), "PersistableMerchantStore.id must not be null");
-
-        // check if store code exists
         MerchantStore storeForCheck = get(new StoreMerchantId(store.getId()));
         if (storeForCheck != null) {
             throw new ServiceRuntimeException("MerhantStore " + store.getId() + " already exists");
@@ -125,9 +119,6 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @Override
     public void update(PersistableMerchantStore store) {
-
-        Assert.notNull(store, "store can't be null");
-
         MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, new StoreMerchantId(store.getId()),
                 LanguageCode.defaultLanguage());
 
@@ -221,30 +212,18 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @Override
     public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
-
-        Assert.notNull(merchantStoreCode, MERCHANT_STORE_ID_REQUIRED_VALIDATION);
-        Assert.notNull(cmsContentImage, CMS_IMAGE_REQUIRED_VALIDATION);
-
         cmsContentImage.setFileContentType(FileContentType.LOGO);
         addImageToAssets(merchantStoreCode, cmsContentImage);
     }
 
     @Override
     public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
-
-        Assert.notNull(merchantStoreCode, MERCHANT_STORE_ID_REQUIRED_VALIDATION);
-        Assert.notNull(cmsContentImage, CMS_IMAGE_REQUIRED_VALIDATION);
-
         cmsContentImage.setFileContentType(FileContentType.BANNER);
         addImageToAssets(merchantStoreCode, cmsContentImage);
     }
 
     @Override
     public void addSlider(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
-
-        Assert.notNull(merchantStoreCode, MERCHANT_STORE_ID_REQUIRED_VALIDATION);
-        Assert.notNull(cmsContentImage, CMS_IMAGE_REQUIRED_VALIDATION);
-
         cmsContentImage.setFileContentType(FileContentType.SLIDER);
         addImageToAssets(merchantStoreCode, cmsContentImage);
     }

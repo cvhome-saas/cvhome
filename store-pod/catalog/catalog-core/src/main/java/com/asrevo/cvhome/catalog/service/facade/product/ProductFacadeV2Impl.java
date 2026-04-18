@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -100,7 +99,6 @@ public class ProductFacadeV2Impl implements ProductFacade {
     @Override
     public ReadableProductList getProductListsByCriteria(StoreMerchantId merchantStore,
                                                          ProductCriteria searchCriteria) {
-        Assert.notNull(searchCriteria, "ProductCriteria must be set for this product");
         return listProducts(readableProductMapper, merchantStore, searchCriteria);
     }
 

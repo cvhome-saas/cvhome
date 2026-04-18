@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
@@ -74,9 +73,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
     @Override
     public Product merge(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language) {
-
-        Assert.notNull(destination, "Product must not be null");
-
         try {
 
             // core properties
@@ -176,7 +172,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                     if (!StringUtils.isBlank(categ.getCode())) {
                         c = categoryService.getByCode(store, categ.getCode());
                     } else {
-                        Assert.notNull(categ.getId(), "Category id nust not be null");
                         c = categoryService.getById(categ.getId(), store);
                     }
 

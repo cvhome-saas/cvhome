@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
 import com.asrevo.cvhome.checkout.repositories.reference.zone.ZoneRepository;
@@ -39,10 +38,6 @@ public class ZoneServiceImpl extends SalesManagerEntityServiceImpl<ZoneCode, Zon
     @SuppressWarnings("unchecked")
     @Override
     public List<Zone> getZones(CountryIsoCode countryCode, LanguageCode language) {
-
-        Assert.notNull(countryCode, "countryCode cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-
         return zoneRepository.listByLanguageAndCountry(countryCode, language);
     }
 

@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
@@ -57,7 +56,6 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
         if (!StringUtils.isBlank(source.getOption().getCode())) {
             productOption = productOptionService.getByCode(store, source.getOption().getCode());
         } else {
-            Assert.notNull(source.getOption().getId(), "Product option id is null");
             productOption = productOptionService.getById(source.getOption().getId());
         }
 

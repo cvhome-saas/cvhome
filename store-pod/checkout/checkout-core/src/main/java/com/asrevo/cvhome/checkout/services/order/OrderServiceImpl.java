@@ -17,7 +17,6 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -70,11 +69,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     @Override
     public OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary, Customer customer, StoreMerchantId store,
                                                 LanguageCode language) throws ServiceException {
-        Assert.notNull(orderSummary, "Order summary cannot be null");
-        Assert.notNull(orderSummary.getProducts(), "Order summary.products cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-        Assert.notNull(customer, "Customer cannot be null");
-
         try {
             return calculateOrder(orderSummary, customer, store, language);
         } catch (Exception e) {
@@ -85,9 +79,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     @Override
     public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final Customer customer,
                                                         final StoreMerchantId store, final LanguageCode language) throws ServiceException {
-        Assert.notNull(shoppingCart, "Order summary cannot be null");
-        Assert.notNull(customer, "Customery cannot be null");
-        Assert.notNull(store, "Store cannot be null.");
         try {
             return caculateshoppingcart(shoppingCart, customer, store, language);
         } catch (Exception e) {
@@ -128,9 +119,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     @Override
     public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final StoreMerchantId store,
                                                         final LanguageCode language) throws ServiceException {
-        Assert.notNull(shoppingCart, "Order summary cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-
         try {
             return caculateshoppingcart(shoppingCart, null, store, language);
         } catch (Exception e) {
@@ -168,13 +156,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
                           Payment payment, Transaction transaction, StoreMerchantId store) throws ServiceException {
-
-        Assert.notNull(order, "Order cannot be null");
-        Assert.notNull(customer, "Customer cannot be null (even if anonymous order)");
-        Assert.notEmpty(items, "ShoppingCart items cannot be null");
-        Assert.notNull(payment, "Payment cannot be null");
-        Assert.notNull(store, "Store cannot be null");
-        Assert.notNull(summary, "Order total Summary cannot be null");
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();

@@ -15,7 +15,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
@@ -66,11 +65,6 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
     @Override
     public ReadableShoppingCart merge(ShoppingCart source, ReadableShoppingCart destination, StoreMerchantId store,
                                       LanguageCode language) {
-        Assert.notNull(source, "ShoppingCart cannot be null");
-        Assert.notNull(destination, "ReadableShoppingCart cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-
         destination.setCode(source.getShoppingCartCode());
         int cartQuantity = 0;
 

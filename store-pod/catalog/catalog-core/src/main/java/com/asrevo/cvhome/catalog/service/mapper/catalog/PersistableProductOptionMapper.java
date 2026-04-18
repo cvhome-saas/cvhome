@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.service.mapper.catalog;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionDescription;
@@ -18,7 +17,6 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
 
     ProductOptionDescription description(
             com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription description) {
-        Assert.notNull(description.getLanguage(), "description.language should not be null");
         ProductOptionDescription desc = new ProductOptionDescription();
         desc.setId(null);
         desc.setDescription(description.getDescription());

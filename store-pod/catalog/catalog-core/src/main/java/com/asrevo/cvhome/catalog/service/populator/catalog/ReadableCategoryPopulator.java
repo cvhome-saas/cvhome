@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.catalog.service.populator.catalog;
 
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.category.CategoryDescription;
@@ -14,8 +13,6 @@ public class ReadableCategoryPopulator extends AbstractDataPopulator<Category, S
     @Override
     public ReadableCategory populate(final Category source, final ReadableCategory target, final StoreMerchantId store,
                                      final LanguageCode language) {
-
-        Assert.notNull(source, "Category must not be null");
 
         target.setLineage(source.getLineage());
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {

@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
@@ -27,7 +26,6 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
     @Override
     public ProductType merge(PersistableProductType source, ProductType destination, StoreMerchantId store,
                              LanguageCode language) {
-        Assert.notNull(destination, "ReadableProductType cannot be null");
         return type(source, destination);
     }
 

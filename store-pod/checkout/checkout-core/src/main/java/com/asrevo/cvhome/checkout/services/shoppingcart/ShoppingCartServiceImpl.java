@@ -7,7 +7,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
@@ -49,11 +48,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     @Override
     public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
 
-        Assert.notNull(shoppingCart, "ShoppingCart must not be null");
-        Assert.notNull(shoppingCart.getStoreMerchantId(), "ShoppingCart.merchantStore must not be null");
-
-        // @TODO check if we can store ip address
-        // shoppingCart.setIpAddress(userContext.getIpAddress());
         if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
             super.create(shoppingCart);
         } else {
@@ -172,11 +166,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
-            throws ServiceException {
-        Assert.notNull(sku, "Product should not be null");
-        Assert.notNull(store, "Store should not be null");
-
+    public ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store) {
         ShoppingCartItem item = new ShoppingCartItem(sku);
         item.setItemPrice(price);
         return item;

@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
@@ -27,9 +26,6 @@ public class ReadableTinyProductMapper implements Mapper<Product, ReadableProduc
     @Override
     public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
                                  LanguageCode language) {
-
-        Assert.notNull(source, "Product cannot be null");
-        Assert.notNull(destination, "Product destination cannot be null");
 
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());

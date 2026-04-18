@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.catalog.service.populator.catalog;
 
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
@@ -23,8 +22,6 @@ public class ReadableFinalPricePopulator
     @Override
     public ReadableProductPrice populate(FinalPrice source, ReadableProductPrice target, StoreMerchantId store,
                                          LanguageCode language) throws ConversionException {
-        Assert.notNull(pricingService, "pricingService must be set");
-
         try {
 
             target.setOriginalPrice(pricingService.getDisplayAmount(source.getOriginalPrice(), store));

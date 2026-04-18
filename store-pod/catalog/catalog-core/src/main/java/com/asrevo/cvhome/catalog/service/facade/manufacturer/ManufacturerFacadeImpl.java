@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
@@ -46,10 +45,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     @Override
     public List<ReadableManufacturer> getByProductInCategory(StoreMerchantId store, LanguageCode language,
                                                              Long categoryId) {
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(categoryId, "Category id cannot be null");
-
         Category category = categoryService.getById(categoryId, store);
 
         if (category == null) {
@@ -122,8 +117,6 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
     @Override
     public boolean manufacturerExist(StoreMerchantId store, String manufacturerCode) {
-        Assert.notNull(store, "Store must not be null");
-        Assert.notNull(manufacturerCode, "Manufacturer code must not be null");
         boolean exists = false;
         Manufacturer manufacturer = manufacturerService.getByCode(store, manufacturerCode);
         if (manufacturer != null) {

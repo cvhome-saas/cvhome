@@ -16,7 +16,6 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
@@ -140,12 +139,6 @@ public class OrderFacadeImpl implements OrderFacade {
     @Transactional(rollbackFor = Exception.class)
     public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                               Locale locale) throws ServiceException {
-
-        Assert.notNull(order, "Order cannot be null");
-        Assert.notNull(customer, "Customer cannot be null");
-        Assert.notNull(store, "store cannot be null");
-        Assert.notNull(language, "Language cannot be null");
-        Assert.notNull(locale, "Locale cannot be null");
 
         try {
 
