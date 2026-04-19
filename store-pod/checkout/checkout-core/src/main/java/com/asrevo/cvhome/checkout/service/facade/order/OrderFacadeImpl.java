@@ -65,7 +65,6 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
@@ -439,7 +438,7 @@ public class OrderFacadeImpl implements OrderFacade {
     ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {
         ReadableOrderStatusHistory readable = new ReadableOrderStatusHistory();
         readable.setComments(source.getComments());
-        readable.setDate(DateUtil.formatLongDate(source.getDateAdded()));
+        readable.setDate(source.getDateAdded());
         readable.setId(source.getId());
         readable.setOrderId(source.getOrder().getId());
         readable.setOrderStatus(source.getStatus());
@@ -463,7 +462,7 @@ public class OrderFacadeImpl implements OrderFacade {
         try {
             OrderStatusHistory history = new OrderStatusHistory();
             history.setComments(status.getComments());
-            history.setDateAdded(DateUtil.getDate(status.getDate()));
+            history.setDateAdded(status.getDate());
             history.setOrder(order);
             history.setStatus(status.getOrderStatus());
 

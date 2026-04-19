@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.merchant.entity.merchant;
 
 import java.io.Serial;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,8 +21,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -120,9 +118,8 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     @Column(name = "SEIZEUNITCODE", length = 5)
     private String seizeunitcode = MeasureUnit.IN.name();
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "IN_BUSINESS_SINCE")
-    private Date inBusinessSince = new Date();
+    private LocalDate inBusinessSince = LocalDate.now();
 
     @Transient
     private String dateBusinessSince;

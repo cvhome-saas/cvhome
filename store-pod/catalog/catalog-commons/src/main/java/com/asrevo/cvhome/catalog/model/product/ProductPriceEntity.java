@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.model.product;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,9 +29,9 @@ public class ProductPriceEntity extends ProductPrice implements Serializable {
 
     private boolean discounted = false;
 
-    private String discountStartDate;
+    private LocalDate discountStartDate;
 
-    private String discountEndDate;
+    private LocalDate discountEndDate;
 
     private boolean defaultPrice = true;
 

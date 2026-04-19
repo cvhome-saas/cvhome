@@ -2,7 +2,7 @@ package com.asrevo.cvhome.checkout.entity.order.orderstatus;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,13 +15,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -53,9 +50,8 @@ public class OrderStatusHistory implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE_ADDED", nullable = false)
-    private Date dateAdded;
+    private Instant dateAdded;
 
     @Column(name = "CUSTOMER_NOTIFIED")
     private java.lang.Integer customerNotified;
@@ -66,12 +62,5 @@ public class OrderStatusHistory implements Serializable {
     public OrderStatusHistory() {
     }
 
-    public Date getDateAdded() {
-        return CloneUtils.clone(dateAdded);
-    }
-
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = CloneUtils.clone(dateAdded);
-    }
-
 }
+

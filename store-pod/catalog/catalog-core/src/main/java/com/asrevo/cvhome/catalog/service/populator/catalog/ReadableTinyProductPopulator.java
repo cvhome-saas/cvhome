@@ -7,7 +7,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,11 +41,11 @@ public class ReadableTinyProductPopulator extends AbstractDataPopulator<Product,
             target.setSortOrder(source.getSortOrder());
 
             if (source.getDateAvailable() != null) {
-                target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+                target.setDateAvailable(source.getDateAvailable());
             }
 
             if (source.getAuditSection() != null) {
-                target.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                target.setCreationDate(source.getAuditSection().getDateCreated());
             }
 
             target.setProductVirtual(source.isProductVirtual());

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +34,6 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 @Component
 public class PersistableProductDefinitionMapper implements Mapper<PersistableProductDefinition, Product> {
@@ -77,7 +76,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 destination.setSku(source.getIdentifier());
             }
             destination.setAvailable(source.isVisible());
-            destination.setDateAvailable(new Date());
+            destination.setDateAvailable(Instant.now());
 
             destination.setRefSku(source.getIdentifier());
 
@@ -106,8 +105,8 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 destination.setType(type);
             }
 
-            if (!StringUtils.isBlank(source.getDateAvailable())) {
-                destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
+            if (Objects.nonNull(source.getDateAvailable())) {
+                destination.setDateAvailable(source.getDateAvailable());
             }
 
             destination.setStore(store);

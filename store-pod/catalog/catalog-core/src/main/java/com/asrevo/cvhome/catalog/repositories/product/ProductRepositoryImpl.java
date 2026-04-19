@@ -192,7 +192,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 left join fetch po.descriptions pod
                 left join fetch pattr.productOptionValue pov
                 left join fetch pov.descriptions povd
-                left join fetch p.relationships pr
                 left join fetch p.manufacturer manuf
                 left join fetch manuf.descriptions manufd
                 left join fetch p.variants pinst
@@ -212,7 +211,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 left join fetch pinstg.images pinstgimg
                 left join fetch pinstgimg.descriptions
                 """;
-        // end variants
 
         return qs;
     }

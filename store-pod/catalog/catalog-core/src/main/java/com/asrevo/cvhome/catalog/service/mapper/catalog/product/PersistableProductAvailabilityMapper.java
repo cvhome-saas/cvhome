@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import lombok.AllArgsConstructor;
 
@@ -54,14 +53,14 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
                 price.setCode(source.getPrice().getCode());
                 price.setProductPriceSpecialAmount(source.getPrice().getDiscountedPrice());
                 if (source.getPrice().getDiscountStartDate() != null) {
-                    Date startDate;
+                    LocalDate startDate;
 
-                    startDate = DateUtil.getDate(source.getPrice().getDiscountStartDate());
+                    startDate = source.getPrice().getDiscountStartDate();
 
                     price.setProductPriceSpecialStartDate(startDate);
                 }
                 if (source.getPrice().getDiscountEndDate() != null) {
-                    Date endDate = DateUtil.getDate(source.getPrice().getDiscountEndDate());
+                    LocalDate endDate = source.getPrice().getDiscountEndDate();
                     price.setProductPriceSpecialEndDate(endDate);
                 }
 

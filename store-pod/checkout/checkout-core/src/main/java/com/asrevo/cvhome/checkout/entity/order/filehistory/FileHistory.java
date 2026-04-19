@@ -2,7 +2,7 @@ package com.asrevo.cvhome.checkout.entity.order.filehistory;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -13,8 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -53,17 +51,14 @@ public class FileHistory implements Serializable {
     @Column(name = "FILESIZE", nullable = false)
     private Integer filesize;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE_ADDED", length = 0, nullable = false)
-    private Date dateAdded;
+    private Instant dateAdded;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE_DELETED", length = 0)
-    private Date dateDeleted;
+    private Instant dateDeleted;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ACCOUNTED_DATE", length = 0)
-    private Date accountedDate;
+    private Instant accountedDate;
 
     @Column(name = "DOWNLOAD_COUNT", nullable = false)
     private Integer downloadCount;

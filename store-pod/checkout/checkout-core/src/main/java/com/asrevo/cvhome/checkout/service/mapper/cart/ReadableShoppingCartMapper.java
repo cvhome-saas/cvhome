@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,12 +72,11 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         try {
 
             if (!StringUtils.isBlank(source.getPromoCode())) {
-                Date promoDateAdded = source.getPromoAdded(); // promo valid 1 day
+                Instant promoDateAdded = source.getPromoAdded(); // promo valid 1 day
                 if (promoDateAdded == null) {
-                    promoDateAdded = new Date();
+                    promoDateAdded = Instant.now();
                 }
-                Instant instant = promoDateAdded.toInstant();
-                ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+                ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
                 LocalDate date = zdt.toLocalDate();
                 // date added < date + 1 day
                 LocalDate tomorrow = LocalDate.now().plusDays(1);

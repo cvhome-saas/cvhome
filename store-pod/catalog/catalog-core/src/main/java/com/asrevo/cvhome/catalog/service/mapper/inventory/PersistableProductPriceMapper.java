@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.catalog.service.mapper.inventory;
 
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,6 @@ import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 
@@ -115,12 +114,12 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
             destination.setCode(source.getCode());
             destination.setProductPriceSpecialAmount(source.getDiscountedPrice());
             if (source.getDiscountStartDate() != null) {
-                Date startDate = DateUtil.getDate(source.getDiscountStartDate());
+                LocalDate startDate = source.getDiscountStartDate();
 
                 destination.setProductPriceSpecialStartDate(startDate);
             }
             if (source.getDiscountEndDate() != null) {
-                Date endDate = DateUtil.getDate(source.getDiscountEndDate());
+                LocalDate endDate = source.getDiscountEndDate();
 
                 destination.setProductPriceSpecialEndDate(endDate);
             }

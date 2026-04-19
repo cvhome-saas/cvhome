@@ -21,7 +21,6 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.entity.ReadableDescription;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Component
@@ -71,7 +70,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         destination.setSku(source.getSku());
 
         if (source.getDateAvailable() != null) {
-            destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+            destination.setDateAvailable(source.getDateAvailable());
         }
 
         if (source.getProductReviewAvg() != null) {

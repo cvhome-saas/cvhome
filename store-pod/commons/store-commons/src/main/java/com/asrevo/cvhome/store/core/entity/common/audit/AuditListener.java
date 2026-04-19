@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.store.core.entity.common.audit;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -12,9 +12,9 @@ public class AuditListener {
         if (o instanceof Auditable audit) {
             AuditSection auditSection = audit.getAuditSection();
 
-            auditSection.setDateModified(new Date());
+            auditSection.setDateModified(Instant.now());
             if (auditSection.getDateCreated() == null) {
-                auditSection.setDateCreated(new Date());
+                auditSection.setDateCreated(Instant.now());
             }
             audit.setAuditSection(auditSection);
         }
@@ -25,9 +25,9 @@ public class AuditListener {
         if (o instanceof Auditable audit) {
             AuditSection auditSection = audit.getAuditSection();
 
-            auditSection.setDateModified(new Date());
+            auditSection.setDateModified(Instant.now());
             if (auditSection.getDateCreated() == null) {
-                auditSection.setDateCreated(new Date());
+                auditSection.setDateCreated(Instant.now());
             }
             audit.setAuditSection(auditSection);
         }

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.catalog.services.pricing;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -169,15 +169,15 @@ public class ProductPriceUtils {
         BigDecimal fPrice = price.getProductPriceAmount();
         BigDecimal oPrice = price.getProductPriceAmount();
 
-        Date today = new Date();
+        LocalDate today = LocalDate.now();
         // calculate discount price
         boolean hasDiscount = false;
         if (price.getProductPriceSpecialStartDate() != null || price.getProductPriceSpecialEndDate() != null) {
 
             if (price.getProductPriceSpecialStartDate() != null) {
-                if (price.getProductPriceSpecialStartDate().before(today)) {
+                if (price.getProductPriceSpecialStartDate().isBefore(today)) {
                     if (price.getProductPriceSpecialEndDate() != null) {
-                        if (price.getProductPriceSpecialEndDate().after(today)) {
+                        if (price.getProductPriceSpecialEndDate().isAfter(today)) {
                             hasDiscount = true;
                             fPrice = price.getProductPriceSpecialAmount();
                             finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
@@ -188,7 +188,7 @@ public class ProductPriceUtils {
 
             if (!hasDiscount && price.getProductPriceSpecialStartDate() == null
                     && price.getProductPriceSpecialEndDate() != null) {
-                if (price.getProductPriceSpecialEndDate().after(today)) {
+                if (price.getProductPriceSpecialEndDate().isAfter(today)) {
                     hasDiscount = true;
                     fPrice = price.getProductPriceSpecialAmount();
                     finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());

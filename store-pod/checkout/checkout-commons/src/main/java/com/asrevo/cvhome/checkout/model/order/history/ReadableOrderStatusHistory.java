@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.checkout.model.order.history;
 
 import java.io.Serial;
+import java.time.Instant;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,6 @@ public class ReadableOrderStatusHistory extends OrderStatusHistory {
     /**
      * YYYY-mm-DD:HH mm SSS
      */
-    private String date;
+    private Instant date;
 
 }

@@ -2,8 +2,8 @@ package com.asrevo.cvhome.checkout.model.order;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.asrevo.cvhome.checkout.model.order.total.OrderTotal;
@@ -47,7 +47,7 @@ public class OrderEntity extends Order implements Serializable {
 
     private CreditCard creditCard;
 
-    private Date datePurchased;
+    private LocalDate datePurchased;
 
     @JsonSerialize(using = CurrencyCodeSerializer.class)
     @JsonDeserialize(using = CurrencyCodeDeSerializer.class)

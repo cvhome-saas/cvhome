@@ -11,7 +11,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 @Component
 public class ReadableProductAvailabilityMapper implements Mapper<Product, ReadableProductAvailability> {
@@ -37,7 +36,7 @@ public class ReadableProductAvailabilityMapper implements Mapper<Product, Readab
                 destination.setCanBePurchased(true);
             }
             if (source.getDateAvailable() != null) {
-                destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+                destination.setDateAvailable(source.getDateAvailable());
             }
 
             if (availability.getProductVariant() == null && StringUtils.isEmpty(availability.getRegionVariant())) {

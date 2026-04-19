@@ -2,6 +2,7 @@ package com.asrevo.cvhome.merchant.model.merchant;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -36,7 +37,7 @@ public class MerchantStoreEntity extends MerchantStorePricingBase implements Ser
 
     private ColorTheme colorTheme;
 
-    private String inBusinessSince;
+    private LocalDate inBusinessSince;
 
     @NotNull
     private String email;

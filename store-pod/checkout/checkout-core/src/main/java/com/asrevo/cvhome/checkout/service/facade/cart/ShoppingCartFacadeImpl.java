@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,7 +35,6 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +70,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                     + " is not available or is not properly configured. It contains no" + " inventory");
         }
 
-        if (!DateUtil.dateBeforeEqualsDate(DateUtil.getDate(availability.getDateAvailable()), new Date())) {
+        if (Objects.nonNull(availability.getDateAvailable()) && Instant.now().isAfter(availability.getDateAvailable())) {
             throw new Exception("Item with sku " + availability.getSku() + " is not available");
         }
 
@@ -135,7 +134,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         if (!StringUtils.isBlank(item.getPromoCode())) {
             cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(new Date());
+            cartModel.setPromoAdded(Instant.now());
         }
 
         try {
@@ -270,7 +269,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         // promo code added to the cart but no promo cart exists
         if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
             cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(new Date());
+            cartModel.setPromoAdded(Instant.now());
         }
 
         saveShoppingCart(cartModel);
@@ -321,12 +320,11 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
 
             if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Date promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
+                Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
                 if (promoDateAdded == null) {
-                    promoDateAdded = new Date();
+                    promoDateAdded = Instant.now();
                 }
-                Instant instant = promoDateAdded.toInstant();
-                ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+                ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
                 LocalDate date = zdt.toLocalDate();
                 // date added < date + 1 day
                 LocalDate tomorrow = LocalDate.now().plusDays(1);
