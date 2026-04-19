@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.store.core.model.entity;
 
 import java.io.Serial;
+import java.io.Serializable;
 
 import com.asrevo.cvhome.commons.domain.ReadableList;
 
@@ -9,7 +10,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ReadableEntityList<T> extends ReadableList<T> {
+public class ReadableEntityList<T extends Serializable> extends ReadableList<T> {
 
     /**
      *
