@@ -20,7 +20,7 @@ export class ProductGroupsService {
   }
 
   getProductGroup(code, params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/products/groups/${code}`, params);
+    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups/${code}`, params);
   }
 
   checkCode(code: string): Observable<any> {

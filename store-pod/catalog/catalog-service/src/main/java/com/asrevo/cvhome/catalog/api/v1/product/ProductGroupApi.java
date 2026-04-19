@@ -49,7 +49,7 @@ public class ProductGroupApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/products/groups/{code}")
+    @GetMapping("/private/products/groups/{code}")
     @Operation(summary = "Get product group by code",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductGroup.class))))
 
@@ -60,6 +60,20 @@ public class ProductGroupApi {
     public ReadableProductGroup getProductGroup(@PathVariable String code, StoreMerchantId merchantStore,
                                                 LanguageCode language) {
         return productGroupFacade.getByCode(merchantStore, code, LanguageCode.allLanguage());
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/products/groups/{code}")
+    @Operation(summary = "Get product group by code",
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProductGroup.class))))
+
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    public ReadableProductGroup getPublicProductGroup(@PathVariable String code, StoreMerchantId merchantStore,
+                                                      LanguageCode language) {
+        return productGroupFacade.getByCode(merchantStore, code, language);
     }
 
     @ResponseStatus(HttpStatus.OK)
