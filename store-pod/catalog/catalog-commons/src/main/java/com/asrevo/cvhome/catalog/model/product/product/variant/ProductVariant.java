@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.product.variant;
 
 import java.io.Serial;
+import java.time.Instant;
 
 import com.asrevo.cvhome.catalog.model.product.Product;
 
@@ -28,7 +29,7 @@ public class ProductVariant extends Product {
      **/
     private boolean available;
 
-    private String dateAvailable;
+    private Instant dateAvailable;
 
     private int sortOrder;
 

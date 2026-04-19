@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.catalog.entity.product.variant;
 
 import java.io.Serial;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +20,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -62,8 +60,7 @@ public class ProductVariant extends SalesManagerEntity<Long, ProductVariant> imp
     private AuditSection auditSection = new AuditSection();
 
     @Column(name = "DATE_AVAILABLE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateAvailable = new Date();
+    private Instant dateAvailable = Instant.now();
 
     @Column(name = "AVAILABLE")
     private boolean available = true;

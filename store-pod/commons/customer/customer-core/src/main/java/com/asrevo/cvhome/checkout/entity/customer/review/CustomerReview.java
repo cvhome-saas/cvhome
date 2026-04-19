@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.checkout.entity.customer.review;
 
 import java.io.Serial;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +20,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
@@ -63,9 +61,8 @@ public class CustomerReview extends SalesManagerEntity<Long, CustomerReview> imp
     @Column(name = "REVIEWS_READ")
     private Long reviewRead;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "REVIEW_DATE")
-    private Date reviewDate;
+    private Instant reviewDate;
 
     @Column(name = "STATUS")
     private Integer status;

@@ -2,7 +2,8 @@ package com.asrevo.cvhome.checkout.entity.order;
 
 import java.io.Serial;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -21,8 +22,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.Valid;
 
 import org.hibernate.annotations.SQLOrder;
@@ -70,22 +69,19 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_MODIFIED")
-    private Date lastModified;
+    private Instant lastModified;
 
     // the customer object can be detached. An order can exist and the customer deleted
     @Column(name = "CUSTOMER_ID")
     private Long customerId;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "DATE_PURCHASED")
-    private Date datePurchased;
+    private LocalDate datePurchased;
 
     // used for an order payable on multiple installment
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ORDER_DATE_FINISHED")
-    private Date orderDateFinished;
+    private Instant orderDateFinished;
 
     // What was the exchange rate
     @Column(name = "CURRENCY_VALUE")

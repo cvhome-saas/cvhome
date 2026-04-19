@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.checkout.entity.order.orderaccount;
 
 import java.io.Serial;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,13 +16,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.utils.CloneUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,13 +46,11 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
     @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "ORDER_ACCOUNT_START_DATE", nullable = false, length = 0)
-    private Date orderAccountStartDate;
+    private LocalDate orderAccountStartDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "ORDER_ACCOUNT_END_DATE", length = 0)
-    private Date orderAccountEndDate;
+    private LocalDate orderAccountEndDate;
 
     @Column(name = "ORDER_ACCOUNT_BILL_DAY", nullable = false)
     private Integer orderAccountBillDay;
@@ -66,20 +61,5 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
     public OrderAccount() {
     }
 
-    public Date getOrderAccountStartDate() {
-        return CloneUtils.clone(orderAccountStartDate);
-    }
-
-    public void setOrderAccountStartDate(Date orderAccountStartDate) {
-        this.orderAccountStartDate = CloneUtils.clone(orderAccountStartDate);
-    }
-
-    public Date getOrderAccountEndDate() {
-        return CloneUtils.clone(orderAccountEndDate);
-    }
-
-    public void setOrderAccountEndDate(Date orderAccountEndDate) {
-        this.orderAccountEndDate = CloneUtils.clone(orderAccountEndDate);
-    }
 
 }

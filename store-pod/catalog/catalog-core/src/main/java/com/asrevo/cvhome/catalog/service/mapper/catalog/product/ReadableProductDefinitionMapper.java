@@ -32,7 +32,6 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.model.references.DimensionUnitOfMeasure;
 import com.asrevo.cvhome.store.model.references.WeightUnitOfMeasure;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Component
@@ -75,7 +74,7 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
         target.setIdentifier(source.getSku());
         target.setId(source.getId());
         target.setVisible(source.isAvailable());
-        target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        target.setDateAvailable(source.getDateAvailable());
         target.setSku(source.getSku());
 
         if (LanguageCode.isAllLanguage(language)) {

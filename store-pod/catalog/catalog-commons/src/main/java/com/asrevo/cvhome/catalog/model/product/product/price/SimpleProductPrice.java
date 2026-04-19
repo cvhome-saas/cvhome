@@ -3,7 +3,7 @@ package com.asrevo.cvhome.catalog.model.product.product.price;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,8 +24,8 @@ public class SimpleProductPrice implements Serializable {
 
     private boolean defaultPrice;
 
-    private Date productPriceSpecialStartDate;
+    private LocalDate productPriceSpecialStartDate;
 
-    private Date productPriceSpecialEndDate;
+    private LocalDate productPriceSpecialEndDate;
 
 }

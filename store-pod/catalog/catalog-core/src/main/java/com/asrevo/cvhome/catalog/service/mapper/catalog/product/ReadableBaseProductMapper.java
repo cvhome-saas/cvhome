@@ -14,7 +14,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 /**
  * Works for product v2 model
@@ -43,7 +42,7 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());
         destination.setId(source.getId());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        destination.setDateAvailable(source.getDateAvailable());
 
         destination.setId(source.getId());
         destination.setAvailable(source.isAvailable());
@@ -54,11 +53,11 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
         destination.setSortOrder(source.getSortOrder());
 
         if (source.getDateAvailable() != null) {
-            destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+            destination.setDateAvailable(source.getDateAvailable());
         }
 
         if (source.getAuditSection() != null) {
-            destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+            destination.setCreationDate(source.getAuditSection().getDateCreated());
         }
 
         destination.setProductVirtual(source.isProductVirtual());

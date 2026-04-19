@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.product;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 
 import com.asrevo.cvhome.commons.domain.Entity;
 
@@ -26,8 +27,8 @@ public class Product extends Entity implements Serializable {
 
     private int sortOrder;
 
-    private String dateAvailable;
+    private Instant dateAvailable;
 
-    private String creationDate;
+    private Instant creationDate;
 
 }

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.inventory;
 
 import java.io.Serial;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ReadableInventory extends InventoryEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String creationDate;
+    private Instant creationDate;
 
     private ReadableMerchantStore store;
 

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.inventory;
 
 import java.io.Serial;
+import java.time.LocalDate;
 
 import com.asrevo.cvhome.commons.domain.Entity;
 
@@ -25,7 +26,7 @@ public class InventoryEntity extends Entity {
 
     private String owner;
 
-    private String dateAvailable;
+    private LocalDate dateAvailable;
 
     private boolean available;
 

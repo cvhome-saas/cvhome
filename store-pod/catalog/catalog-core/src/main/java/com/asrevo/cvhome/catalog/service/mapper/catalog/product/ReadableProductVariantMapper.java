@@ -20,7 +20,6 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Component
@@ -55,7 +54,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
 
         destination.setSortOrder(source.getSortOrder() != null ? source.getSortOrder() : 0);
         destination.setAvailable(source.isAvailable());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        destination.setDateAvailable(source.getDateAvailable());
         destination.setId(source.getId());
         destination.setDefaultSelection(source.isDefaultSelection());
         destination.setProductId(source.getProduct().getId());

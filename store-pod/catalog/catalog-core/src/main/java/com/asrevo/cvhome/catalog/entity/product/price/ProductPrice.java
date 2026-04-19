@@ -2,7 +2,7 @@ package com.asrevo.cvhome.catalog.entity.product.price;
 
 import java.io.Serial;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +20,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 
@@ -29,7 +27,6 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.model.product.product.price.ProductPriceType;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -73,13 +70,11 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     @Column(name = "DEFAULT_PRICE")
     private boolean defaultPrice = false;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "PRODUCT_PRICE_SPECIAL_ST_DATE")
-    private Date productPriceSpecialStartDate;
+    private LocalDate productPriceSpecialStartDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "PRODUCT_PRICE_SPECIAL_END_DATE")
-    private Date productPriceSpecialEndDate;
+    private LocalDate productPriceSpecialEndDate;
 
     @Column(name = "PRODUCT_PRICE_SPECIAL_AMOUNT")
     private BigDecimal productPriceSpecialAmount;
@@ -95,20 +90,5 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     public ProductPrice() {
     }
 
-    public Date getProductPriceSpecialStartDate() {
-        return CloneUtils.clone(productPriceSpecialStartDate);
-    }
-
-    public void setProductPriceSpecialStartDate(Date productPriceSpecialStartDate) {
-        this.productPriceSpecialStartDate = CloneUtils.clone(productPriceSpecialStartDate);
-    }
-
-    public Date getProductPriceSpecialEndDate() {
-        return CloneUtils.clone(productPriceSpecialEndDate);
-    }
-
-    public void setProductPriceSpecialEndDate(Date productPriceSpecialEndDate) {
-        this.productPriceSpecialEndDate = CloneUtils.clone(productPriceSpecialEndDate);
-    }
 
 }

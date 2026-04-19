@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.catalog.service.mapper.inventory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +28,6 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 
@@ -104,8 +103,8 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             destination.setRegion(region);
 
             destination.setRegionVariant(source.getRegionVariant());
-            if (StringUtils.isNotBlank(source.getDateAvailable())) {
-                destination.setProductDateAvailable(DateUtil.getDate(source.getDateAvailable()));
+            if (Objects.nonNull(source.getDateAvailable())) {
+                destination.setProductDateAvailable(source.getDateAvailable());
             }
 
             if (source.getVariant() != null && source.getVariant() > 0) {
@@ -156,11 +155,11 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 price.setProductPriceSpecialAmount(priceEntity.getDiscountedPrice());
 
                 if (Objects.nonNull(priceEntity.getDiscountStartDate())) {
-                    Date startDate = DateUtil.getDate(priceEntity.getDiscountStartDate());
+                    LocalDate startDate = priceEntity.getDiscountStartDate();
                     price.setProductPriceSpecialStartDate(startDate);
                 }
                 if (Objects.nonNull(priceEntity.getDiscountEndDate())) {
-                    Date endDate = DateUtil.getDate(priceEntity.getDiscountEndDate());
+                    LocalDate endDate = priceEntity.getDiscountEndDate();
                     price.setProductPriceSpecialEndDate(endDate);
                 }
 

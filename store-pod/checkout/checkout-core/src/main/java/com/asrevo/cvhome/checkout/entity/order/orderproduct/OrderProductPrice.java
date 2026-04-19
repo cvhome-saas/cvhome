@@ -3,7 +3,7 @@ package com.asrevo.cvhome.checkout.entity.order.orderproduct;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,8 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,13 +53,11 @@ public class OrderProductPrice implements Serializable {
     @Column(name = "PRODUCT_PRICE_SPECIAL")
     private BigDecimal productPriceSpecial;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "PRD_PRICE_SPECIAL_ST_DT", length = 0)
-    private Date productPriceSpecialStartDate;
+    private LocalDate productPriceSpecialStartDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "PRD_PRICE_SPECIAL_END_DT", length = 0)
-    private Date productPriceSpecialEndDate;
+    private LocalDate productPriceSpecialEndDate;
 
     @Column(name = "DEFAULT_PRICE", nullable = false)
     private Boolean defaultPrice;

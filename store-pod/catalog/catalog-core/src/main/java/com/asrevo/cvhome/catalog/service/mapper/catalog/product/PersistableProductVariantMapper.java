@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
-import java.util.Date;
+import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,6 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 @Component
 public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
@@ -102,13 +102,13 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         destination.setDefaultSelection(source.isDefaultSelection());
         destination.setSku(source.getSku());
 
-        if (StringUtils.isBlank(source.getDateAvailable())) {
-            source.setDateAvailable(DateUtil.formatDate(new Date()));
+        if (Objects.nonNull(source.getDateAvailable())) {
+            source.setDateAvailable(Instant.now());
         }
 
         if (source.getDateAvailable() != null) {
             try {
-                destination.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
+                destination.setDateAvailable(source.getDateAvailable());
             } catch (Exception _) {
                 throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + "]");
             }

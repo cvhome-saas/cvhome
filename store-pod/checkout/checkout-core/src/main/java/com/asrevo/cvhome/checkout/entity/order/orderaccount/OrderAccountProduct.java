@@ -2,7 +2,8 @@ package com.asrevo.cvhome.checkout.entity.order.orderaccount;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
-import com.asrevo.cvhome.store.core.utils.CloneUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -50,25 +48,20 @@ public class OrderAccountProduct implements Serializable {
     @JoinColumn(name = "ORDER_PRODUCT_ID", nullable = false)
     private OrderProduct orderProduct;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "ORDER_ACCOUNT_PRODUCT_ST_DT", length = 0, nullable = false)
-    private Date orderAccountProductStartDate;
+    private LocalDate orderAccountProductStartDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "ORDER_ACCOUNT_PRODUCT_END_DT", length = 0)
-    private Date orderAccountProductEndDate;
+    private LocalDate orderAccountProductEndDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ORDER_ACCOUNT_PRODUCT_EOT", length = 0)
-    private Date orderAccountProductEot;
+    private Instant orderAccountProductEot;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "ORDER_ACCOUNT_PRODUCT_ACCNT_DT", length = 0)
-    private Date orderAccountProductAccountedDate;
+    private LocalDate orderAccountProductAccountedDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ORDER_ACCOUNT_PRODUCT_L_ST_DT", length = 0)
-    private Date orderAccountProductLastStatusDate;
+    private Instant orderAccountProductLastStatusDate;
 
     @Column(name = "ORDER_ACCOUNT_PRODUCT_L_TRX_ST", nullable = false)
     private Integer orderAccountProductLastTransactionStatus;
@@ -80,46 +73,6 @@ public class OrderAccountProduct implements Serializable {
     private Integer orderAccountProductStatus;
 
     public OrderAccountProduct() {
-    }
-
-    public Date getOrderAccountProductStartDate() {
-        return CloneUtils.clone(orderAccountProductStartDate);
-    }
-
-    public void setOrderAccountProductStartDate(Date orderAccountProductStartDate) {
-        this.orderAccountProductStartDate = CloneUtils.clone(orderAccountProductStartDate);
-    }
-
-    public Date getOrderAccountProductEndDate() {
-        return CloneUtils.clone(orderAccountProductEndDate);
-    }
-
-    public void setOrderAccountProductEndDate(Date orderAccountProductEndDate) {
-        this.orderAccountProductEndDate = CloneUtils.clone(orderAccountProductEndDate);
-    }
-
-    public Date getOrderAccountProductEot() {
-        return CloneUtils.clone(orderAccountProductEot);
-    }
-
-    public void setOrderAccountProductEot(Date orderAccountProductEot) {
-        this.orderAccountProductEot = CloneUtils.clone(orderAccountProductEot);
-    }
-
-    public Date getOrderAccountProductAccountedDate() {
-        return CloneUtils.clone(orderAccountProductAccountedDate);
-    }
-
-    public void setOrderAccountProductAccountedDate(Date orderAccountProductAccountedDate) {
-        this.orderAccountProductAccountedDate = CloneUtils.clone(orderAccountProductAccountedDate);
-    }
-
-    public Date getOrderAccountProductLastStatusDate() {
-        return CloneUtils.clone(orderAccountProductLastStatusDate);
-    }
-
-    public void setOrderAccountProductLastStatusDate(Date orderAccountProductLastStatusDate) {
-        this.orderAccountProductLastStatusDate = CloneUtils.clone(orderAccountProductLastStatusDate);
     }
 
 }

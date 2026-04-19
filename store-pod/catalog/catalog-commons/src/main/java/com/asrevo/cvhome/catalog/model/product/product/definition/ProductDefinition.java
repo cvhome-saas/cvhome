@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.product.definition;
 
 import java.io.Serial;
+import java.time.Instant;
 
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
 import com.asrevo.cvhome.commons.domain.Entity;
@@ -31,7 +32,7 @@ public class ProductDefinition extends Entity {
 
     private boolean canBePurchased = true;
 
-    private String dateAvailable;
+    private Instant dateAvailable;
 
     private String identifier;
 

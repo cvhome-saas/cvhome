@@ -20,7 +20,6 @@ import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 @Component
 public class ReadableInventoryMapper implements Mapper<ProductAvailability, ReadableInventory> {
@@ -57,12 +56,12 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             destination.setStore(externalMerchantStoreService.getStore(store));
             if (source.getAvailable() != null) {
                 if (source.getProductDateAvailable() != null) {
-                    boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())
-                            .isAfter(LocalDate.parse(DateUtil.formatDate(source.getProductDateAvailable())));
+                    boolean isAfter = LocalDate.now()
+                            .isAfter(source.getProductDateAvailable());
                     if (isAfter && source.getAvailable()) {
                         destination.setAvailable(true);
                     }
-                    destination.setDateAvailable(DateUtil.formatDate(source.getProductDateAvailable()));
+                    destination.setDateAvailable(source.getProductDateAvailable());
                 } else {
                     destination.setAvailable(source.getAvailable());
                 }
@@ -70,7 +69,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
 
             if (source.getAuditSection() != null) {
                 if (source.getAuditSection().getDateCreated() != null) {
-                    destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                    destination.setCreationDate(source.getAuditSection().getDateCreated());
                 }
             }
 

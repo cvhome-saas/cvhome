@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.model.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +14,9 @@ public class ReadableAudit implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String created;
+    private Instant created;
 
-    private String modified;
+    private Instant modified;
 
     private String user;
 

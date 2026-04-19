@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.catalog.entity.product.availability;
 
 import java.io.Serial;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +20,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -35,7 +33,6 @@ import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.utils.CloneUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -97,9 +94,8 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     @Column(name = "QUANTITY")
     private Integer productQuantity = 0;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "DATE_AVAILABLE")
-    private Date productDateAvailable;
+    private LocalDate productDateAvailable;
 
     @Column(name = "REGION")
     private String region = SchemaConstant.ALL_REGIONS;
@@ -136,14 +132,6 @@ public class ProductAvailability extends SalesManagerEntity<Long, ProductAvailab
     public ProductAvailability(Product product, StoreMerchantId store) {
         this.product = product;
         this.storeMerchantId = store;
-    }
-
-    public Date getProductDateAvailable() {
-        return CloneUtils.clone(productDateAvailable);
-    }
-
-    public void setProductDateAvailable(Date productDateAvailable) {
-        this.productDateAvailable = CloneUtils.clone(productDateAvailable);
     }
 
 }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.product;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
@@ -27,6 +28,6 @@ public class ReadableProductAvailability implements Serializable {
 
     private int quantityOrderMinimum = 1; // default 1
 
-    private String dateAvailable;
+    private Instant dateAvailable;
 
 }

@@ -46,7 +46,6 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import lombok.AllArgsConstructor;
@@ -119,11 +118,11 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
             }
 
             if (source.getDateAvailable() != null) {
-                target.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+                target.setDateAvailable(source.getDateAvailable());
             }
 
             if (source.getAuditSection() != null) {
-                target.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                target.setCreationDate(source.getAuditSection().getDateCreated());
             }
 
 

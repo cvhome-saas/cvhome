@@ -18,7 +18,6 @@ import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.ReadableAddress;
 import com.asrevo.cvhome.store.model.references.ReadableLanguage;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 /**
@@ -99,7 +98,7 @@ public class ReadableMerchantStorePopulator
         target.setTheme(source.getTheme());
         target.setColorTheme(source.getColorTheme());
         target.setId(source.getId().getId());
-        target.setInBusinessSince(DateUtil.formatDate(source.getInBusinessSince()));
+        target.setInBusinessSince(source.getInBusinessSince());
         target.setUseCache(source.isUseCache());
         target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
 
@@ -132,10 +131,10 @@ public class ReadableMerchantStorePopulator
         if (source.getAuditSection() != null) {
             ReadableAudit audit = new ReadableAudit();
             if (source.getAuditSection().getDateCreated() != null) {
-                audit.setCreated(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                audit.setCreated(source.getAuditSection().getDateCreated());
             }
             if (source.getAuditSection().getDateModified() != null) {
-                audit.setModified(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                audit.setModified(source.getAuditSection().getDateCreated());
             }
             audit.setUser(source.getAuditSection().getModifiedBy());
             target.setReadableAudit(audit);

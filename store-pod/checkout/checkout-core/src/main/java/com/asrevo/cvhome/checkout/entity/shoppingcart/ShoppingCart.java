@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.checkout.entity.shoppingcart;
 
 import java.io.Serial;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,8 +19,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -93,9 +91,8 @@ public class ShoppingCart extends SalesManagerEntity<Long, ShoppingCart> impleme
     @Column(name = "PROMO_CODE")
     private String promoCode;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "PROMO_ADDED")
-    private Date promoAdded;
+    private Instant promoAdded;
 
     @Transient
     private boolean obsolete = false; // when all items are obsolete

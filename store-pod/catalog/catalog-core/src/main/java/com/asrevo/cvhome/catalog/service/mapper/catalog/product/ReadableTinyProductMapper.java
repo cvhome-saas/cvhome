@@ -7,7 +7,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 /**
  * Works for product v2 model
@@ -30,7 +29,7 @@ public class ReadableTinyProductMapper implements Mapper<Product, ReadableProduc
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());
         destination.setId(source.getId());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        destination.setDateAvailable(source.getDateAvailable());
 
         destination.setId(source.getId());
         destination.setAvailable(source.isAvailable());

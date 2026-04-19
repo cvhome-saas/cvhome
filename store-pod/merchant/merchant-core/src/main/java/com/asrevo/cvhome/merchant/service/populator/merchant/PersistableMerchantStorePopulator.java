@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.merchant.service.populator.merchant;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.PersistableAddress;
-import com.asrevo.cvhome.store.utils.DateUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,14 +49,7 @@ public class PersistableMerchantStorePopulator
             target.setStoreBanner(store.getStoreBanner());
         }
 
-        if (source.getInBusinessSince() != null && !source.getInBusinessSince().trim().isEmpty()) {
-            try {
-                Date dt = DateUtil.getDate(source.getInBusinessSince());
-                target.setInBusinessSince(dt);
-            } catch (Exception e) {
-                throw new ConversionException("Cannot parse date [" + source.getInBusinessSince() + "]", e);
-            }
-        }
+        target.setInBusinessSince(source.getInBusinessSince());
 
         if (source.getDimension() != null) {
             target.setSeizeunitcode(source.getDimension().name());

@@ -50,7 +50,6 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.model.references.DimensionUnitOfMeasure;
 import com.asrevo.cvhome.store.model.references.WeightUnitOfMeasure;
-import com.asrevo.cvhome.store.utils.DateUtil;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 /**
@@ -104,7 +103,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());
         destination.setId(source.getId());
-        destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+        destination.setDateAvailable(source.getDateAvailable());
 
         ProductDescription description = null;
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
@@ -129,11 +128,11 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         }
 
         if (source.getDateAvailable() != null) {
-            destination.setDateAvailable(DateUtil.formatDate(source.getDateAvailable()));
+            destination.setDateAvailable(source.getDateAvailable());
         }
 
         if (source.getAuditSection() != null) {
-            destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+            destination.setCreationDate(source.getAuditSection().getDateCreated());
         }
 
         destination.setProductVirtual(source.isProductVirtual());

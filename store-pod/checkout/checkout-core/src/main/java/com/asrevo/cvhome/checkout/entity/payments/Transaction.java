@@ -3,7 +3,7 @@ package com.asrevo.cvhome.checkout.entity.payments;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +21,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -72,8 +70,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     private BigDecimal amount;
 
     @Column(name = "TRANSACTION_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date transactionDate;
+    private Instant transactionDate;
 
     @Column(name = "TRANSACTION_TYPE")
     @Enumerated(value = EnumType.STRING)

@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -94,12 +93,11 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         orderSummary.setOrderSummaryType(OrderSummaryType.SHOPPINGCART);
 
         if (!StringUtils.isBlank(shoppingCart.getPromoCode())) {
-            Date promoDateAdded = shoppingCart.getPromoAdded();
+            Instant promoDateAdded = shoppingCart.getPromoAdded();
             if (promoDateAdded == null) {
-                promoDateAdded = new Date();
+                promoDateAdded = Instant.now();
             }
-            Instant instant = promoDateAdded.toInstant();
-            ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+            ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
             LocalDate date = zdt.toLocalDate();
             LocalDate tomorrow = LocalDate.now().plusDays(1);
             if (date.isBefore(tomorrow)) {
@@ -166,7 +164,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             Set<OrderStatusHistory> statusHistorySet = new HashSet<>();
             OrderStatusHistory statusHistory = new OrderStatusHistory();
             statusHistory.setStatus(status);
-            statusHistory.setDateAdded(new Date());
+            statusHistory.setDateAdded(Instant.now());
             statusHistory.setOrder(order);
             statusHistorySet.add(statusHistory);
             order.setOrderHistory(statusHistorySet);
