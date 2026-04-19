@@ -1,21 +1,14 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
-import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantImage;
-import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.product.variantGroup.ReadableProductVariantGroup;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -52,16 +45,6 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
         destination.setProductVariants(
                 instances.stream().map(i -> this.instance(i, store, language)).toList());
 
-        // image id should be unique in the list
-
-        Map<Long, ReadableImage> finalList = new HashMap<>();
-
-        List<ReadableImage> originalList = source.getImages()
-                .stream()
-                .map(i -> this.image(finalList, i, store, language))
-                .toList();
-
-        destination.setImages(new ArrayList<>(finalList.values()));
 
         return destination;
     }
@@ -69,21 +52,6 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
     private ReadableProductVariant instance(ProductVariant instance, StoreMerchantId store, LanguageCode language) {
 
         return readableProductVariantMapper.convert(instance, store, language);
-    }
-
-    private ReadableImage image(Map<Long, ReadableImage> finalList, ProductVariantImage img, StoreMerchantId store,
-                                LanguageCode language) {
-        ReadableImage readable = null;
-        if (!finalList.containsKey(img.getId())) {
-            readable = new ReadableImage();
-            readable.setId(img.getId());
-            readable.setImageName(img.getProductImage());
-            readable.setImageUrl(
-                    imageUtils.buildCustomTypeImageUtils(store, img.getProductImage(), FileContentType.VARIANT));
-            readable.setDefaultImage(img.isDefaultImage());
-            finalList.put(img.getId(), readable);
-        }
-        return readable;
     }
 
 }

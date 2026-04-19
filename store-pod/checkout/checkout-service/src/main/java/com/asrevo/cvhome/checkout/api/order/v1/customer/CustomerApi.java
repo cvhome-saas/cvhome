@@ -29,8 +29,11 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 @Tag(name = "Customer management resource", description = "Manage customers")
 public class CustomerApi {
 
-    @Autowired
-    private CustomerFacade customerFacade;
+    private final CustomerFacade customerFacade;
+
+    public CustomerApi(CustomerFacade customerFacade) {
+        this.customerFacade = customerFacade;
+    }
 
     /**
      * Get all customers

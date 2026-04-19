@@ -32,8 +32,11 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 @Tag(name = "Order status history resource", description = "Related to OrderManagement api")
 public class OrderStatusHistoryApi {
 
-    @Autowired
-    private OrderFacade orderFacade;
+    private final OrderFacade orderFacade;
+
+    public OrderStatusHistoryApi(OrderFacade orderFacade) {
+        this.orderFacade = orderFacade;
+    }
 
     @GetMapping(value = {"private/orders/{id}/history"})
     @ResponseStatus(HttpStatus.OK)

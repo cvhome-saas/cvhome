@@ -47,22 +47,24 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductImageService productImageService;
+    private final ProductImageService productImageService;
+
+    private final PricingServiceImpl pricingService;
+
+    private final ReadableMinimalProductMapper readableMinimalProductMapper;
+
+    private final ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
     @Autowired
-    private PricingServiceImpl pricingService;
-
-    @Autowired
-    private ReadableMinimalProductMapper readableMinimalProductMapper;
-
-    @Autowired
-    private ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
-
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
+                              PricingServiceImpl pricingService, ReadableMinimalProductMapper readableMinimalProductMapper,
+                              ReadableProductAvailabilityMapper readableProductAvailabilityMapper) {
         super(productRepository);
         this.productRepository = productRepository;
+        this.productImageService = productImageService;
+        this.pricingService = pricingService;
+        this.readableMinimalProductMapper = readableMinimalProductMapper;
+        this.readableProductAvailabilityMapper = readableProductAvailabilityMapper;
     }
 
     @Override

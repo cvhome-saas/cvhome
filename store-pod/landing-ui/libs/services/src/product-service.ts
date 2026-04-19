@@ -1,4 +1,4 @@
-import {Product, ProductGroupPage} from "@store-front/types/product-groups";
+import {Product} from "@store-front/types/product-groups";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {get, handleResponse} from "./http-utils";
 import {ProductGroup} from "@store-front/types";

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -85,9 +86,7 @@ public class ProductPriceApi {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"},
-            method = RequestMethod.PUT)
-
+    @PutMapping(value = {"/private/product/{sku}/inventory/{inventoryId}/price/{priceId}"})
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",

@@ -8,10 +8,9 @@ import {useTranslations} from "next-intl";
 import {Dialog, DialogContent} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {ExternalLink, Eye, ShoppingCart} from "lucide-react";
+import {Eye, ShoppingCart} from "lucide-react";
 import Image from 'next/image';
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {useCart} from "@store-front/hooks/use-cart";
 
 export default function ProductItem({storeContext, product}: { storeContext: StoreContext, product: Product }) {

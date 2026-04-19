@@ -7,7 +7,6 @@ import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
 import {Facebook, Instagram, Twitter, Github} from "lucide-react";
 import {isRtl} from "@/services/direction-utils";
-import {Button} from "@/components/ui/button";
 
 export const Footer = ({params}: { params: LayoutParams }) => {
     const t = useTranslations('COMPONENTS.FOOTER');

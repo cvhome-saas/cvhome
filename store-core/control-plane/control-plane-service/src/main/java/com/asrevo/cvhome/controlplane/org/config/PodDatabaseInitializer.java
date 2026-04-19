@@ -46,13 +46,5 @@ public class PodDatabaseInitializer {
         }
     }
 
-    private void updateEntity(PodEntity entity, Pod pod) {
-        entity.setName(pod.name());
-        if (pod.endpoint() != null) {
-            entity.setEndpoint(pod.endpoint().endpoint());
-            entity.setEndpointType(pod.endpoint().type());
-        }
-        entity.setOrgId(pod.orgId());
-    }
 
 }

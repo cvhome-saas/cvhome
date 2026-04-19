@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {DomSanitizer} from '@angular/platform-browser';
 
 import {CategoryService} from '../services/category.service';
 import {NbDialogService, NbToastrService} from '@nebular/theme';

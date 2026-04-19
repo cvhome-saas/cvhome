@@ -3,7 +3,6 @@ import {ProductDetailedActionBox} from "@/shared/ProductDetails/ProductDetailedA
 import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/shared/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
-import {Separator} from "@/components/ui/separator";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
 
 export const ProductDetails = ({storeContext, p, t}: {

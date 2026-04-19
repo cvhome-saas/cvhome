@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {PodService} from '../../store-management/services/pod.service';
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {ErrorService} from "../../shared/services/error.service";
-import {BaseTable, PageRequest, PageT, StorePageRequest} from "../../common/BaseTable";
+import {BaseTable, PageRequest, PageT} from "../../common/BaseTable";
 import {Observable, of} from "rxjs";
 
 @Component({

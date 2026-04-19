@@ -1,5 +1,5 @@
 'use client'
-import React, {useMemo} from "react";
+import React from "react";
 import {StoreContext} from "@/types/store-context";
 import {Category} from "@/types/category";
 import {useTranslations} from "next-intl";
