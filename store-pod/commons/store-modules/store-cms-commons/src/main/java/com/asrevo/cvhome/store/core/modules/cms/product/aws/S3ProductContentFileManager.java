@@ -185,7 +185,6 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
                     .key(nodePath + contentImage.getFileName())
                     .metadata(Map.of("content-type", contentImage.getMimeType()))
                     .build();
-            // putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 
             s3.putObject(putObjectRequest, RequestBody.fromBytes(IOUtils.toByteArray(contentImage.getFile())));
 

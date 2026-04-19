@@ -50,7 +50,4 @@ public class ContentDescription extends Description implements Serializable {
     @Column(name = "META_DESCRIPTION")
     private String metatagDescription;
 
-    public ContentDescription() {
-    }
-
 }

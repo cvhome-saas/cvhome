@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -41,7 +40,7 @@ public class Zone extends SalesManagerEntity<ZoneCode, Zone> {
     @EmbeddedId
     @JsonSerialize(using = ZoneCodeSerializer.class)
     @JsonDeserialize(using = ZoneCodeDeSerializer.class)
-    @AttributeOverrides({@AttributeOverride(name = "code", column = @Column(name = "zone_code", length = 100))})
+    @AttributeOverride(name = "code", column = @Column(name = "zone_code", length = 100))
     private ZoneCode code;
 
     @JsonIgnore

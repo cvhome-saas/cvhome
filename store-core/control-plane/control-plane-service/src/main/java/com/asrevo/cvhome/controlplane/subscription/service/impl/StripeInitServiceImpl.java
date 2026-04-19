@@ -83,7 +83,7 @@ public class StripeInitServiceImpl implements StripeInitService {
     @Override
     public boolean exist(PriceId priceId) {
         try {
-            Price _ = Price.retrieve(priceId.id());
+            Price.retrieve(priceId.id());
             return true;
         } catch (StripeException _) {
             return false;

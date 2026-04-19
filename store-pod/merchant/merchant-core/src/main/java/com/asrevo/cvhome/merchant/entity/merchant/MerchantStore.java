@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -61,8 +60,7 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    @AttributeOverrides(value = {
-            @AttributeOverride(name = "storeMerchantId", column = @Column(name = "STORE_MERCHANT_ID", length = 50))})
+    @AttributeOverride(name = "storeMerchantId", column = @Column(name = "STORE_MERCHANT_ID", length = 50))
     private StoreMerchantId id;
 
     @Embedded
@@ -137,34 +135,30 @@ public class MerchantStore extends SalesManagerEntity<StoreMerchantId, MerchantS
     @NotEmpty
     @ElementCollection(targetClass = LanguageCode.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "MERCHANT_LANGUAGE", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverrides(
-            value = {@AttributeOverride(name = "code", column = @Column(name = "LANGUAGE_CODE", length = 6))})
+    @AttributeOverride(name = "code", column = @Column(name = "LANGUAGE_CODE", length = 6))
     private List<LanguageCode> languages = new ArrayList<>();
 
     @JsonIgnore
     @ElementCollection(targetClass = SliderImage.class, fetch = FetchType.LAZY)
     @OrderColumn(name = "PRIORITY")
     @CollectionTable(name = "MERCHANT_SLIDER_IMAGES", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverrides(value = {
-            @AttributeOverride(name = "priority",
-                    column = @Column(name = "PRIORITY", insertable = false, updatable = false)),
-            @AttributeOverride(name = "name", column = @Column(name = "NAME", length = 100))})
+    @AttributeOverride(name = "priority",
+            column = @Column(name = "PRIORITY", insertable = false, updatable = false))
+    @AttributeOverride(name = "name", column = @Column(name = "NAME", length = 100))
     private List<SliderImage> sliderImages = new ArrayList<>();
 
     @JsonIgnore
     @ElementCollection(targetClass = SocialLink.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "SOCIAL_LINKS", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverrides(
-            value = {@AttributeOverride(name = "provider", column = @Column(name = "PROVIDER", length = 10)),
-                    @AttributeOverride(name = "url", column = @Column(name = "URL", length = 100))})
+    @AttributeOverride(name = "provider", column = @Column(name = "PROVIDER", length = 10))
+    @AttributeOverride(name = "url", column = @Column(name = "URL", length = 100))
     private Set<SocialLink> socialLinks = new HashSet<>();
 
     @JsonIgnore
     @ElementCollection(targetClass = ManagerStoreDomain.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "STORE_DOMAINS", joinColumns = {@JoinColumn(name = "STORE_MERCHANT_ID")})
-    @AttributeOverrides(value = {
-            @AttributeOverride(name = "domain", column = @Column(name = "DOMAIN", length = 100, unique = true)),
-            @AttributeOverride(name = "domainType", column = @Column(name = "DOMAIN_TYPE", length = 15))})
+    @AttributeOverride(name = "domain", column = @Column(name = "DOMAIN", length = 100, unique = true))
+    @AttributeOverride(name = "domainType", column = @Column(name = "DOMAIN_TYPE", length = 15))
     @Convert(attributeName = "domainType", converter = DomainTypeConverter.class)
     private Set<ManagerStoreDomain> storeDomains = new HashSet<>();
 

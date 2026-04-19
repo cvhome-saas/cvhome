@@ -36,8 +36,8 @@ public class StorePodClientFactory {
     }
 
     private ProxyClient createPodProxy(PodId podId) {
-        // @TODO check if private or public pod and a way to resolve .get
-        Pod pod = serviceDomainProperties.getPodByPodId(podId).get();
+        Pod pod = serviceDomainProperties.getPodByPodId(podId)
+                .orElseThrow(() -> new IllegalArgumentException("Pod not found for id: " + podId));
         String podGateway = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(pod);
         return new ProxyClient(defaultWebClient.mutate().baseUrl(podGateway).build());
     }

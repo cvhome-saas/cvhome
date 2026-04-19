@@ -29,15 +29,10 @@ public class ProductImageCropUtils {
 
             this.originalFile = file;
 
-            // get original image size
-
             int width = originalFile.getWidth();
             int height = originalFile.getHeight();
 
             determineCropeable(width, largeImageWidth, height, largeImageHeight);
-
-            // this.determineBaseline(width, height);
-
             determineCropArea(width, largeImageWidth, height, largeImageHeight);
 
         } catch (Exception e) {
@@ -69,19 +64,10 @@ public class ProductImageCropUtils {
         cropAreaWidth = specificationsWidth;
         cropAreaHeight = specificationsHeight;
 
-        double factorWidth = Integer.valueOf(width).doubleValue() / Integer.valueOf(specificationsWidth).doubleValue();
-        double factorHeight = Integer.valueOf(height).doubleValue()
-                / Integer.valueOf(specificationsHeight).doubleValue();
+        double factorWidth = (double) width / specificationsWidth;
+        double factorHeight = (double) height / specificationsHeight;
 
         double factor = Math.min(factorWidth, factorHeight);
-
-        // crop factor
-        /*
-         * double factor = 1; if (this.getCropeBaseline() == 0) {// width factor = new
-         * Integer(width).doubleValue() / new Integer(specificationsWidth).doubleValue();
-         * } else {// height factor = new Integer(height).doubleValue() / new
-         * Integer(specificationsHeight).doubleValue(); }
-         */
 
         double w = factor * specificationsWidth;
         double h = factor * specificationsHeight;
@@ -102,31 +88,12 @@ public class ProductImageCropUtils {
             cropAreaHeight = height;
         }
 
-        /*
-         * if(factor>1) { //determine croping section for(double i=factor;i>1;i--) {
-         * //multiply specifications by factor int newWidth = (int)(i *
-         * specificationsWidth); int newHeight = (int)(i * specificationsHeight); //check
-         * if new size >= original image if(width>=newWidth && height>=newHeight) {
-         * cropAreaWidth = newWidth; cropAreaHeight = newHeight; break; } } }
-         */
-
     }
 
     public BufferedImage getCroppedImage() {
-
-        // out if croppedArea == 0 or file is null
-
         Rectangle goal = new Rectangle((int) this.getCropAreaWidth(), (int) this.getCropAreaHeight());
-
-        // Then intersect it with the dimensions of your image:
-
         Rectangle clip = goal.intersection(new Rectangle(originalFile.getWidth(), originalFile.getHeight()));
 
-        // Now, clip corresponds to the portion of bi that will fit within your goal. In
-        // this case
-        // 100 x50.
-
-        // Now get the subImage using the value of clip.
 
         return originalFile.getSubimage(clip.x, clip.y, clip.width, clip.height);
     }

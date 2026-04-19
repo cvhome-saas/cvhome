@@ -5,15 +5,6 @@ import java.io.Serializable;
 import java.text.Collator;
 import java.util.Locale;
 
-// import org.hibernate.Hibernate;
-
-/**
- * <p>
- * Entité racine pour la persistence des objets via JPA.
- * </p>
- *
- * @param <E> type de l'entité
- */
 public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
         implements Serializable, Comparable<E> {
 
@@ -26,25 +17,11 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
         DEFAULT_STRING_COLLATOR.setStrength(Collator.PRIMARY);
     }
 
-    /**
-     * Retourne la valeur de l'identifiant unique.
-     *
-     * @return id
-     */
     public abstract K getId();
 
-    /**
-     * Définit la valeur de l'identifiant unique.
-     *
-     * @param id id
-     */
     public abstract void setId(K id);
 
-    /**
-     * Indique si l'objet a déjà été persisté ou non
-     *
-     * @return vrai si l'objet n'a pas encore été persisté
-     */
+
     public boolean isNew() {
         return getId() == null;
     }
@@ -59,19 +36,8 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
             return true;
         }
 
-        // l'objet peut être proxyfié donc on utilise Hibernate.getClass() pour sortir la
-        // vraie
-        // classe
-        // if (Hibernate.getClass(object) != Hibernate.getClass(this)) {
-        // return false;
-        // }
+        SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object;
 
-        SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object; // NOSONAR :
-        // traité
-        // au-dessus
-        // mais
-        // wrapper
-        // Hibernate
         K id = getId();
 
         if (id == null) {

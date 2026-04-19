@@ -194,7 +194,6 @@ public class ContentFacadeImpl implements ContentFacade {
             contentDescription.setContent(contentModel);
             contentDescription.setLanguageCode(objectContent.getLanguage());
             descriptions.add(contentDescription);
-            // contentDescription.setId(objectContent.getId());
         }
         return descriptions;
     }

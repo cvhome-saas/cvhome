@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -145,8 +144,8 @@ public class Order extends SalesManagerEntity<Long, Order> {
     private Locale locale;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)

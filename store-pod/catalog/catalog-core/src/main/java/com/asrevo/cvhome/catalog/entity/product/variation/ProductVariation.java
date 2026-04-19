@@ -3,7 +3,6 @@ package com.asrevo.cvhome.catalog.entity.product.variation;
 import java.io.Serial;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -67,8 +66,8 @@ public class ProductVariation extends SalesManagerEntity<Long, ProductVariation>
     private Long id;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @ManyToOne(fetch = FetchType.LAZY)

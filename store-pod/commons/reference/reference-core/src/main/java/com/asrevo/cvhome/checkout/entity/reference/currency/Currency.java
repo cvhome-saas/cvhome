@@ -4,7 +4,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -35,7 +34,7 @@ public class Currency extends SalesManagerEntity<CurrencyCode, Currency> impleme
     @EmbeddedId
     @JsonSerialize(using = LanguageCodeSerializer.class)
     @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    @AttributeOverrides({@AttributeOverride(name = "code", column = @Column(name = "CURRENCY_CODE", length = 6))})
+    @AttributeOverride(name = "code", column = @Column(name = "CURRENCY_CODE", length = 6))
     private CurrencyCode code;
 
     @Column(name = "CURRENCY_SUPPORTED")

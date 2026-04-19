@@ -236,6 +236,9 @@ public class StoreFacadeImpl implements StoreFacade {
 
     private void addImageToAssets(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
 
+        if (contentImage.getFile() == null) {
+            throw new IllegalArgumentException("File is null");
+        }
         try {
             log.info("Adding content image for merchant id {}", merchantStoreCode);
 
@@ -248,11 +251,8 @@ public class StoreFacadeImpl implements StoreFacade {
             throw new ServiceException(e);
 
         } finally {
-
             try {
-                if (contentImage.getFile() != null) {
-                    contentImage.getFile().close();
-                }
+                contentImage.getFile().close();
             } catch (Exception _) {
             }
         }

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -63,8 +62,8 @@ public class Manufacturer extends SalesManagerEntity<Long, Manufacturer> impleme
     private Integer order = 0;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @NotEmpty

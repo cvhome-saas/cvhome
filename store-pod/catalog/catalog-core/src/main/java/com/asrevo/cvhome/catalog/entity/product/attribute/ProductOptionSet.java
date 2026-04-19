@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -79,8 +78,8 @@ public class ProductOptionSet extends SalesManagerEntity<Long, ProductOptionSet>
     private Set<ProductType> productTypes = new HashSet<>();
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @Column(name = "PRODUCT_OPTION_SET_DISP")

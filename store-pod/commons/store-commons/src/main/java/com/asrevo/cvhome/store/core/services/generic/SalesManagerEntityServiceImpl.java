@@ -15,9 +15,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
         implements SalesManagerEntityService<K, E> {
 
-    /**
-     * Classe de l'entité, déterminé à partir des paramètres generics.
-     */
+
     private final Class<E> objectClass;
 
     private final JpaRepository<E, K> repository;
@@ -30,7 +28,7 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
     }
 
     public E getById(K id) {
-        return repository.getOne(id);
+        return repository.getReferenceById(id);
     }
 
     public void save(E entity) {

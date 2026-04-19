@@ -13,6 +13,6 @@ public record PricePlanCost(String currency, Long price) {
     }
 
     public static PricePlanCost from(String currency, SubscriptionPlan subscriptionPlan, RecurringPlan recurringPlan) {
-        return new PricePlanCost(currency, (long) Math.ceil(subscriptionPlan.getCost() * recurringPlan.getTimes()));
+        return new PricePlanCost(currency, subscriptionPlan.getCost() * recurringPlan.getTimes());
     }
 }

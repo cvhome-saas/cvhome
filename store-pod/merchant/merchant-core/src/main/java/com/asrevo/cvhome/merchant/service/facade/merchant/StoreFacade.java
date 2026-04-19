@@ -31,7 +31,6 @@ public interface StoreFacade {
     /**
      * Creates a brand new MerchantStore
      */
-    // ReadableMerchantStore create(PersistableMerchantStore store);
     void create(PersistableMerchantStore store);
 
     /**

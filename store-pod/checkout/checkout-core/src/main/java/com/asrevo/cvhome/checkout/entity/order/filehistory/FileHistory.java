@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -44,8 +43,8 @@ public class FileHistory implements Serializable {
     private Long id;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @Column(name = "FILE_ID")

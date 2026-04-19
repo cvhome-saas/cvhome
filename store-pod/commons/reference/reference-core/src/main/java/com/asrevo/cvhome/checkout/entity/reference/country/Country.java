@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -42,8 +41,7 @@ public class Country extends SalesManagerEntity<CountryIsoCode, Country> {
     @EmbeddedId
     @JsonSerialize(using = CountryIsoCodeSerializer.class)
     @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    @AttributeOverrides({
-            @AttributeOverride(name = "isoCode", column = @Column(name = "COUNTRY_ISOCODE", length = 6))})
+    @AttributeOverride(name = "isoCode", column = @Column(name = "COUNTRY_ISOCODE", length = 6))
     private CountryIsoCode isoCode;
 
     @JsonIgnore

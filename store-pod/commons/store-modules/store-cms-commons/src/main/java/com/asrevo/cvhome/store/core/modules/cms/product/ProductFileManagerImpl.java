@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -145,7 +146,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
                     uploadImage.addProductImage(productImage, largeContentImage);
 
 
-                    tempLarge.delete();
+                    Files.delete(tempLarge.toPath());
 
                 }
             } else {
@@ -180,23 +181,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
     @Override
     public void removeProductImage(CmsProductImage productImage) throws ServiceException {
-
         this.removeImage.removeProductImage(productImage);
-
-        /*
-         * ProductImage large = new ProductImage();
-         * large.setProduct(productImage.getProduct()); large.setProductImage("L" +
-         * productImage.getProductImage());
-         *
-         * this.removeImage.removeProductImage(large);
-         *
-         * ProductImage small = new ProductImage();
-         * small.setProduct(productImage.getProduct()); small.setProductImage("S" +
-         * productImage.getProductImage());
-         *
-         * this.removeImage.removeProductImage(small);
-         */
-
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -78,8 +77,8 @@ public class ShoppingCart extends SalesManagerEntity<Long, ShoppingCart> impleme
     private Set<ShoppingCartItem> lineItems = new HashSet<>();
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
     @Column(name = "CUSTOMER_ID")

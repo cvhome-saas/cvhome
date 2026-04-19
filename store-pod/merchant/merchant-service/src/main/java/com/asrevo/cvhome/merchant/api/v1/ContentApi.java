@@ -344,7 +344,7 @@ public class ContentApi {
 
     // @TODO create another one for private so seller-ui call it in private
     public ContentFolder images(StoreMerchantId merchantStore, LanguageCode language,
-                                @RequestParam(value = "path", required = false) String path) throws Exception {
+                                @RequestParam(value = "path", required = false) String path) {
 
         return contentFacade.getContentFolder(path, merchantStore);
     }
@@ -384,7 +384,7 @@ public class ContentApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
-    public void deleteContent(Long id, StoreMerchantId merchantStore) {
+    public void deleteContent(@PathVariable Long id, StoreMerchantId merchantStore) {
         contentFacade.delete(merchantStore, id);
     }
 

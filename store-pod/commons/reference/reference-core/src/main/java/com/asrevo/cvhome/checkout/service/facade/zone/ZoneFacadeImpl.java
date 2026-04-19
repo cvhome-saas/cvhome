@@ -28,7 +28,6 @@ public class ZoneFacadeImpl implements ZoneFacade {
         List<Zone> listZones = getListZones(countryCode, language);
         if (listZones.isEmpty()) {
             return Collections.emptyList();
-            // throw new ResourceNotFoundException("No zones found");
         }
         return listZones.stream()
                 .map(zone -> convertToReadableZone(zone, language, merchantStore))

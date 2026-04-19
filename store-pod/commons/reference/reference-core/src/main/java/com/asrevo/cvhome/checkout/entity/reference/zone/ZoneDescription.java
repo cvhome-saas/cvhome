@@ -37,7 +37,4 @@ public class ZoneDescription extends Description {
     @Convert(converter = ZoneCodeConverter.class)
     private ZoneCode zone;
 
-    public ZoneDescription() {
-    }
-
 }

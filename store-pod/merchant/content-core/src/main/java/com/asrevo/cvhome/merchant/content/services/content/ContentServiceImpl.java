@@ -167,9 +167,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         try {
             log.info("Adding content file for merchant id {}", merchantStoreCode);
-            // staticassetsManager.addFile(merchantStoreCode,
-            // contentImage);
-
             Optional<String> path = Optional.empty();
 
             assetsManager.addFile(merchantStoreCode, path, contentImage);
@@ -189,13 +186,6 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         }
     }
 
-    /**
-     * Method responsible for adding list of content images for given merchant store in
-     * underlying Infinispan tree cache. It will take list of
-     *
-     * @param merchantStoreCode Merchant store
-     * @throws ServiceException service exception
-     */
     @Override
     public void addContentFiles(String merchantStoreCode, List<InputContentFile> contentFilesList)
             throws ServiceException {

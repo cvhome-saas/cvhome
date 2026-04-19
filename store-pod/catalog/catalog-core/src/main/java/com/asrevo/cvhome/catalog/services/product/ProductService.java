@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -27,8 +26,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      * The method to be used
      */
     Product saveProduct(Product product) throws ServiceException;
-
-    ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria);
 
     boolean exists(String sku, StoreMerchantId store);
 

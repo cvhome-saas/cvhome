@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
@@ -81,12 +80,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
         return productRepository.getByFriendlyUrl(store, seUrl, locale);
-    }
-
-    @Override
-    public ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria) {
-
-        return productRepository.listByStore(store, language, criteria);
     }
 
     @Override

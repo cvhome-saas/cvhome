@@ -8,10 +8,10 @@ public enum PaymentType {
     CREDITCARD("creditcard"), FREE("free"), COD("cod"), MONEYORDER("moneyorder"), PAYPAL("paypal"), INVOICE("invoice"),
     DIRECTBANK("directbank"), PAYMENTPLAN("paymentplan"), ACCOUNTCREDIT("accountcredit");
 
-    private final String paymentType;
+    private final String type;
 
     PaymentType(String type) {
-        paymentType = type;
+        this.type = type;
     }
 
 }

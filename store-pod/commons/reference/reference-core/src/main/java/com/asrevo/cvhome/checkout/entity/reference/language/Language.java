@@ -3,7 +3,6 @@ package com.asrevo.cvhome.checkout.entity.reference.language;
 import java.io.Serial;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -42,7 +41,7 @@ public class Language extends SalesManagerEntity<LanguageCode, Language> impleme
     @EmbeddedId
     @JsonSerialize(using = LanguageCodeSerializer.class)
     @JsonDeserialize(using = LanguageCodeDeSerializer.class)
-    @AttributeOverrides({@AttributeOverride(name = "code", column = @Column(name = "CODE", length = 6))})
+    @AttributeOverride(name = "code", column = @Column(name = "CODE", length = 6))
     private LanguageCode code;
 
     @JsonIgnore

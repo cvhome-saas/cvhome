@@ -49,7 +49,7 @@ public class PodServiceImpl implements PodService {
     public Pod save(Pod pod) {
         podRepository.findByName(pod.name()).ifPresent(p -> {
             if (!p.getId().equals(pod.id())) {
-                throw new RuntimeException("Pod name must be unique");
+                throw new IllegalArgumentException("Pod name must be unique");
             }
         });
         PodEntity entity = PodEntity.newEntity(pod);
