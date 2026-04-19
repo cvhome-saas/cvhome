@@ -23,14 +23,14 @@ public abstract class Content implements Serializable {
 
     private String contentType;
 
-    public Content() {
+    protected Content() {
     }
 
-    public Content(String name) {
+    protected Content(String name) {
         this.name = name;
     }
 
-    public Content(String name, String contentType) {
+    protected Content(String name, String contentType) {
         this.name = name;
         this.contentType = contentType;
     }

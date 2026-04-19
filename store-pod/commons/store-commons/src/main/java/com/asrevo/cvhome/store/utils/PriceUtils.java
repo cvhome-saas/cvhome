@@ -59,7 +59,7 @@ public class PriceUtils {
         try {
             currency = store.getCurrency().getCurrencyInstance();
             locale = ofLocal(store.getDefaultLanguage(), store.getCountryIsoCode());
-        } catch (Exception e) {
+        } catch (Exception _) {
             currency = Constants.DEFAULT_CURRENCY.getCurrencyInstance();
             locale = Constants.DEFAULT_LOCALE;
         }

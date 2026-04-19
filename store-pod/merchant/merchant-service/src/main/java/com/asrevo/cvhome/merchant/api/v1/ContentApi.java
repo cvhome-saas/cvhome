@@ -368,7 +368,7 @@ public class ContentApi {
             try {
                 cf.setFile(f.getBytes());
                 contentFacade.addContentFile(cf, merchantStore.getId());
-            } catch (IOException e) {
+            } catch (IOException _) {
                 throw new ServiceRuntimeException("Error while getting file bytes");
             }
         }

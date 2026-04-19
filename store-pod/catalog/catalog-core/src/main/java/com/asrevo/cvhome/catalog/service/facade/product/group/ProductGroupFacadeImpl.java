@@ -161,7 +161,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     public boolean existByCode(StoreMerchantId store, String code) {
         try {
             return productGroupService.getByCode(store, code).isPresent();
-        } catch (ServiceException e) {
+        } catch (ServiceException _) {
             return false;
         }
     }

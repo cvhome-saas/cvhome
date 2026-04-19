@@ -76,6 +76,6 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     private Integer sortOrder = 0;
 
     @Transient
-    private InputStream image = null;
+    private transient InputStream image;
 
 }

@@ -39,10 +39,6 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 @Slf4j
 public class StoreFacadeImpl implements StoreFacade {
 
-    private static final String MERCHANT_STORE_ID_REQUIRED_VALIDATION = "Merchant store Id can not be null";
-
-    private static final String CMS_IMAGE_REQUIRED_VALIDATION = "CMSContent image can not be null";
-
     private final MerchantStoreService merchantStoreService;
 
     private final PersistableMerchantStorePopulator persistableMerchantStorePopulator;
@@ -257,7 +253,7 @@ public class StoreFacadeImpl implements StoreFacade {
                 if (contentImage.getFile() != null) {
                     contentImage.getFile().close();
                 }
-            } catch (Exception ignore) {
+            } catch (Exception _) {
             }
         }
     }

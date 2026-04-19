@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -125,7 +124,7 @@ public class OrderApi {
 
     @GetMapping(value = {"/private/orders"})
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
+
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public ReadableOrderList list(@RequestParam(value = "name", required = false) String name,
                                   @RequestParam(value = "id", required = false) Long id,
@@ -147,7 +146,7 @@ public class OrderApi {
 
     @GetMapping(value = {"/private/orders/{id}"})
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
+
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",

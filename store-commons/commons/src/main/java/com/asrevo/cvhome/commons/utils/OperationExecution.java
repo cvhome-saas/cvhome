@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class OperationExecution extends RuntimeException {
 
-    private final ErrorCode errorCode;
+    private final transient ErrorCode errorCode;
 
     public OperationExecution(ErrorCode errorCode) {
         super(errorCode.message());

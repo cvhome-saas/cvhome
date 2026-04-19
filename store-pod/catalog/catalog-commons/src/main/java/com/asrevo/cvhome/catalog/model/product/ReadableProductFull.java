@@ -17,6 +17,6 @@ public class ReadableProductFull extends ReadableProduct {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    List<ProductDescription> descriptions = new ArrayList<>();
+    private List<ProductDescription> descriptions = new ArrayList<>();
 
 }

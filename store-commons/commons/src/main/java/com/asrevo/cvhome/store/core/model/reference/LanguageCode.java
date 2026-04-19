@@ -42,22 +42,16 @@ public record LanguageCode(String code) implements Serializable, Comparable<Lang
     public boolean isLanguage() {
         if (Objects.isNull(code)) {
             return false;
-        }
-        if (code.trim().isEmpty()) {
+        } else if (code.trim().isEmpty()) {
             return false;
-        }
-        if (code.trim().length() < 2) {
+        } else if (code.trim().length() < 2) {
             return false;
-        }
-        if (code.trim().length() > 3) {
+        } else if (code.trim().length() > 3) {
             return false;
-        }
-        if (this.equals(nonLanguage())) {
+        } else if (this.equals(nonLanguage())) {
             return false;
+        } else {
+            return !this.equals(allLanguage());
         }
-        if (this.equals(allLanguage())) {
-            return false;
-        }
-        return true;
     }
 }

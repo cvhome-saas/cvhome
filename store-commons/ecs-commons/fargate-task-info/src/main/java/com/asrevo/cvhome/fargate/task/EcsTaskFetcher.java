@@ -41,11 +41,7 @@ public class EcsTaskFetcher {
     }
 
     private static EcsTask getEcsTask(String body) {
-        try {
-            return objectMapper.readValue(body, EcsTask.class);
-        } catch (Exception _) {
-            return new EcsTask();
-        }
+        return objectMapper.readValue(body, EcsTask.class);
     }
 
 }

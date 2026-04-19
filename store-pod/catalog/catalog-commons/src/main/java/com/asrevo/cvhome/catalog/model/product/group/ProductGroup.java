@@ -1,11 +1,17 @@
 package com.asrevo.cvhome.catalog.model.product.group;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class ProductGroup {
+public class ProductGroup implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String code;
 

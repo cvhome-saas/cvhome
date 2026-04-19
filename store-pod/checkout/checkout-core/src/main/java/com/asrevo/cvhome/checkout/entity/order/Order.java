@@ -126,14 +126,14 @@ public class Order extends SalesManagerEntity<Long, Order> {
     private Boolean confirmedAddress = false;
 
     @Embedded
-    private Delivery delivery = null;
+    private Delivery delivery;
 
     @Valid
     @Embedded
-    private Billing billing = null;
+    private Billing billing;
 
     @Embedded
-    private CreditCard creditCard = null;
+    private CreditCard creditCard;
 
     @JsonIgnore
     @Column(name = "CURRENCY_ID", length = 6, nullable = false)

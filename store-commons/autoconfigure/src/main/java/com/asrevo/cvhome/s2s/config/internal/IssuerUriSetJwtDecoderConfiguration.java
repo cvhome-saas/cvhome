@@ -24,6 +24,7 @@ import com.asrevo.cvhome.s2s.jwt.MultiIssuerJwtDecoder;
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @Import(IssuerUriSetJwtDecoderConfiguration.IssuerUriSetJwtDecoderConfigurationImpl.class)
+@SuppressWarnings("java:S1118")
 public class IssuerUriSetJwtDecoderConfiguration {
 
     @Configuration

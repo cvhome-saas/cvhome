@@ -33,6 +33,7 @@ import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebA
 @Slf4j
 @Import({WebClientServicesConfig.ReactiveWebClientServicesConfig.class,
         WebClientServicesConfig.ServletWebClientServicesConfig.class})
+@SuppressWarnings("java:S1118")
 public class WebClientServicesConfig {
     private static final String S2S_CLIENT_REGISTRATION_ID = "s2s";
 

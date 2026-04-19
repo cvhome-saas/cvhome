@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.catalog.entity.product;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
@@ -11,7 +13,10 @@ import lombok.Setter;
 @Embeddable
 @Getter
 @Setter
-public class ProductDimensions {
+public class ProductDimensions implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Column(name = "LENGTH")
     private BigDecimal length;

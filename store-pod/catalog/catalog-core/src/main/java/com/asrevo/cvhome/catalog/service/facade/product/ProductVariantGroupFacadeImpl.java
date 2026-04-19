@@ -93,7 +93,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
             // now delete
             productVariantGroupService.delete(group);
-        } catch (ServiceException e) {
+        } catch (ServiceException _) {
             throw new ServiceRuntimeException(
                     "Cannot remove product instance group [" + productVariantGroup + "] for store [" + store + "]");
         }

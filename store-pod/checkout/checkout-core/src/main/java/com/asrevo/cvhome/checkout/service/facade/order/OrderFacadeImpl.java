@@ -357,7 +357,7 @@ public class OrderFacadeImpl implements OrderFacade {
             }
 
             readableOrder.setProducts(orderProducts);
-        } catch (Exception e) {
+        } catch (Exception _) {
             throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
         }
 
@@ -399,7 +399,7 @@ public class OrderFacadeImpl implements OrderFacade {
             }
 
             readableOrder.setProducts(orderProducts);
-        } catch (Exception e) {
+        } catch (Exception _) {
             throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
         }
 

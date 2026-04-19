@@ -44,7 +44,7 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final S3Client s3;
+    private final transient S3Client s3;
 
     private final String bucket;
 

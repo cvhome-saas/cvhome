@@ -158,7 +158,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
                 if (contentImage.getFile() != null) {
                     contentImage.getFile().close();
                 }
-            } catch (Exception ignore) {
+            } catch (Exception _) {
             }
         }
     }
@@ -184,7 +184,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
                 if (contentImage.getFile() != null) {
                     contentImage.getFile().close();
                 }
-            } catch (Exception ignore) {
+            } catch (Exception _) {
             }
         }
     }

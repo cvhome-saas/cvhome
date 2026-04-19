@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.cua.security;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +21,10 @@ import com.asrevo.cvhome.cua.domain.User;
 import lombok.Getter;
 
 @Getter
-public class SecurityUser implements UserDetails, OAuth2User, OidcUser {
+public class SecurityUser implements UserDetails, OAuth2User, OidcUser, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
 

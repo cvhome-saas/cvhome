@@ -9,6 +9,7 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.event.EventId;
 
 @Configuration
+@SuppressWarnings("java:S1118")
 public class SwaggerConfig {
 
     static {

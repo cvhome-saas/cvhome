@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
+@SuppressWarnings("java:S1118")
 public class EcsConfig {
 
     @ConditionalOnEcsDiscoveryEnabled

@@ -120,7 +120,7 @@ public class ContentFacadeImpl implements ContentFacade {
         List<ReadableContentPage> pages = contentPages.getContent().stream().map(content -> {
             try {
                 return populator.populate(content, store, language);
-            } catch (ConversionException e) {
+            } catch (ConversionException _) {
                 return null;
             }
         }).filter(Objects::nonNull).toList();
@@ -237,7 +237,7 @@ public class ContentFacadeImpl implements ContentFacade {
         List<ReadableContentBox> boxes = contentBoxes.getContent().stream().map(content -> {
             try {
                 return readableContentBoxPopulator.populate(content, store, language);
-            } catch (ConversionException e) {
+            } catch (ConversionException _) {
                 return null;
             }
         }).filter(Objects::nonNull).toList();

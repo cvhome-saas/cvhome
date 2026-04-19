@@ -24,6 +24,7 @@ import com.asrevo.cvhome.s2s.jwt.MultiIssuerReactiveJwtDecoder;
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @Import(IssuerUriSetReactiveJwtDecoderConfiguration.IssuerUriSetReactiveJwtDecoderConfigurationImpl.class)
+@SuppressWarnings("java:S1118")
 public class IssuerUriSetReactiveJwtDecoderConfiguration {
 
     static class IssuerUriSetReactiveJwtDecoderConfigurationImpl {

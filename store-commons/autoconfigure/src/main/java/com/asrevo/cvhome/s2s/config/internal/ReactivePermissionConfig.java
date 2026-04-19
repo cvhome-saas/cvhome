@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnBean(PermissionEvaluator.class)
 @Import(ReactivePermissionConfig.PermissionConfig.class)
+@SuppressWarnings("java:S1118")
 public class ReactivePermissionConfig {
 
     @EnableReactiveMethodSecurity

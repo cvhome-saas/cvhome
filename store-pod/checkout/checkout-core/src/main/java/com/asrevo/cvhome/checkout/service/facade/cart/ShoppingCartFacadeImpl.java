@@ -108,7 +108,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                 log.error("unable to find any cart asscoiated with this Id: {}", cartId);
                 log.error("error while fetching cart model...", e);
                 return null;
-            } catch (NoResultException nre) {
+            } catch (NoResultException _) {
                 // nothing
             }
         }

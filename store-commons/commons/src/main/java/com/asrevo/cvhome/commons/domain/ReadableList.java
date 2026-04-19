@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public abstract class ReadableList<T> implements Serializable {
+public abstract class ReadableList<T extends Serializable> implements Serializable {
 
     /**
      *

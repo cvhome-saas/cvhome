@@ -1,5 +1,8 @@
 package com.asrevo.cvhome.store.core.entity.common;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
@@ -17,7 +20,10 @@ import lombok.Setter;
 @Setter
 @Getter
 @Embeddable
-public class Billing {
+public class Billing implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @NotEmpty
     @Column(name = "BILLING_LAST_NAME", length = 64, nullable = false)

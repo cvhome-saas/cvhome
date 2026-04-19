@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(WebMvcConfigurer.class)
 @Import(ServletWebConfig.InternalServletWebConfig.class)
+@SuppressWarnings("java:S1118")
 public class ServletWebConfig {
 
     @Configuration

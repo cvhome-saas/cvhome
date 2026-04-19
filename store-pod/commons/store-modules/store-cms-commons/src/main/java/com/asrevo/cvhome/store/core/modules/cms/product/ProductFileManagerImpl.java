@@ -161,7 +161,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
         } finally {
             try {
                 productImage.close();
-            } catch (Exception ignore) {
+            } catch (Exception _) {
             }
         }
     }

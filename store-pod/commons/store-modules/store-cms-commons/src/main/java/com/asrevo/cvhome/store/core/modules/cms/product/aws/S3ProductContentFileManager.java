@@ -58,7 +58,7 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
 
     private static final String LARGE = "LARGE";
 
-    private final S3Client s3;
+    private final transient S3Client s3;
 
     private final String bucket;
 

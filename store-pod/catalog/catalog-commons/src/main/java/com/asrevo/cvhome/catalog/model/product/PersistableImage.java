@@ -24,7 +24,7 @@ public class PersistableImage extends Entity {
 
     private String path = null;
 
-    private MultipartFile[] files;
+    private transient MultipartFile[] files;
 
     private byte[] bytes = null;
 

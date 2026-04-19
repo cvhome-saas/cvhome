@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.checkout.entity.customer;
 
 import java.io.Serial;
+import java.io.Serializable;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -35,7 +36,7 @@ import lombok.Setter;
 @Table(name = "CUSTOMER")
 @Getter
 @Setter
-public class Customer extends SalesManagerEntity<Long, Customer> implements Auditable {
+public class Customer extends SalesManagerEntity<Long, Customer> implements Auditable, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -74,11 +75,11 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     private StoreMerchantId storeMerchantId;
 
     @Embedded
-    private Delivery delivery = null;
+    private Delivery delivery;
 
     @Valid
     @Embedded
-    private Billing billing = null;
+    private Billing billing;
 
     public Customer() {
     }

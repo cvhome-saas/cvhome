@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnBean(PermissionEvaluator.class)
 @Import(ServletPermissionConfig.PermissionConfig.class)
+@SuppressWarnings("java:S1118")
 public class ServletPermissionConfig {
 
     @EnableMethodSecurity

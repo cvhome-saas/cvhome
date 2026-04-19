@@ -14,7 +14,7 @@ public class InputContentFile extends StaticContentFile implements Serializable 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private InputStream file;
+    private transient InputStream file;
 
     private String path;
 

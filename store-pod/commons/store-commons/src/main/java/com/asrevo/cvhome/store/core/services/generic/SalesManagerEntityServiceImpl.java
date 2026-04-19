@@ -23,7 +23,7 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
     private final JpaRepository<E, K> repository;
 
     @SuppressWarnings("unchecked")
-    public SalesManagerEntityServiceImpl(JpaRepository<E, K> repository) {
+    protected SalesManagerEntityServiceImpl(JpaRepository<E, K> repository) {
         ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
         this.objectClass = (Class<E>) genericSuperclass.getActualTypeArguments()[1];
         this.repository = repository;

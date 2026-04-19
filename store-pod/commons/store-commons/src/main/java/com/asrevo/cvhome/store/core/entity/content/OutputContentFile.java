@@ -21,6 +21,6 @@ public class OutputContentFile extends StaticContentFile implements Serializable
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private ByteArrayOutputStream file;
+    private transient ByteArrayOutputStream file;
 
 }

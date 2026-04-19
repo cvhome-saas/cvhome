@@ -10,6 +10,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @Import(ReactiveWebConfig.InternalReactiveWebConfig.class)
+@SuppressWarnings("java:S1118")
 public class ReactiveWebConfig {
 
     @Configuration
