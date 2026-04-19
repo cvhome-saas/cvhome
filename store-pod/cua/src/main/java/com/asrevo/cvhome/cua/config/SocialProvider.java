@@ -28,6 +28,7 @@ public enum SocialProvider {
                     .userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture")
                     .userNameAttributeName(Constants.USER_NAME_ATTR_ID)
                     .clientName("FacebookClient")
+                    .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                     .scope(Constants.EMAIL_KEY, Constants.PUBLIC_PROFILE_KEY)),
 
     GITHUB("github", "GitHub",
@@ -39,6 +40,7 @@ public enum SocialProvider {
                     .userInfoUri("https://api.github.com/user")
                     .userNameAttributeName(Constants.USER_NAME_ATTR_ID)
                     .clientName("GitHubClient")
+                    .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                     .scope(Constants.READ_USER_KEY, Constants.USER_EMAIL_KEY));
 
     private static final String SPACE_SEPARATOR = " ";
