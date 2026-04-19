@@ -58,7 +58,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
                 """;
         String finalPolicy = policy.replace("${BUCKET}", cdnStorageProperties.bucket());
         try {
-            =s3Client.putBucketPolicy(
+            s3Client.putBucketPolicy(
                     PutBucketPolicyRequest.builder().bucket(cdnStorageProperties.bucket()).policy(finalPolicy).build());
         } catch (Exception e) {
             log.error("error putting policy", e);
