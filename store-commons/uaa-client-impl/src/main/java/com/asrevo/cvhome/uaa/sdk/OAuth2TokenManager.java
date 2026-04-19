@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 
+import com.asrevo.cvhome.uaa.exception.ApiException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import tools.jackson.databind.ObjectMapper;
@@ -93,12 +94,15 @@ public class OAuth2TokenManager {
             }
 
             if (response.statusCode() != 200) {
-                throw new RuntimeException("Failed to get token: " + response.body());
+                throw new ApiException("Failed to get token: " + response.body());
             }
             currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
             expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error during token request", e);
+        } catch (IOException e) {
+            throw new ApiException("Error during token request", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ApiException("Error during token request", e);
         }
     }
 
