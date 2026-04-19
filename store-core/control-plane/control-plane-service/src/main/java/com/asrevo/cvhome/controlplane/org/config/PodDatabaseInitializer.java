@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.Pod;
-import com.asrevo.cvhome.controlplane.org.entity.PodEntity;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 

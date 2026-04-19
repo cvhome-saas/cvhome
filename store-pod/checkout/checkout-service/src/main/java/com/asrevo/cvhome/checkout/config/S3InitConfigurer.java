@@ -10,7 +10,6 @@ import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
-import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class S3InitConfigurer implements ApplicationListener<ApplicationReadyEve
                 """;
         String finalPolicy = policy.replace("${BUCKET}", cdnStorageProperties.bucket());
         try {
-            = s3Client.putBucketPolicy(
+            =s3Client.putBucketPolicy(
                     PutBucketPolicyRequest.builder().bucket(cdnStorageProperties.bucket()).policy(finalPolicy).build());
         } catch (Exception e) {
             log.error("error putting policy", e);

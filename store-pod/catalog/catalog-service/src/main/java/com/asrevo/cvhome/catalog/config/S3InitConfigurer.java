@@ -10,7 +10,6 @@ import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutBucketPolicyRequest;
-import software.amazon.awssdk.services.s3.model.PutBucketPolicyResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
