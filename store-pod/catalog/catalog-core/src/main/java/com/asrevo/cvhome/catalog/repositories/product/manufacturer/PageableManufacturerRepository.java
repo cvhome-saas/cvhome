@@ -13,6 +13,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface PageableManufacturerRepository
@@ -27,7 +28,7 @@ public interface PageableManufacturerRepository
                 predicates.add(cb.equal(root.get("descriptions").get("languageCode"), languageCode));
             }
             if (name != null && !name.trim().isEmpty()) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+                predicates.add(cb.like(root.get("name"), Constants.PERCENT_SYMBOL + name + Constants.PERCENT_SYMBOL));
             }
             return cb.and(predicates.toArray(Predicate[]::new));
         };

@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface ProductRepository
@@ -46,7 +47,7 @@ public interface ProductRepository
                 predicates.add(cb.equal(root.get("available"), productCriteria.getAvailable()));
             }
             if (Objects.nonNull(productCriteria.getSku()) && !productCriteria.getSku().isEmpty()) {
-                predicates.add(cb.like(root.get("sku"), "%" + productCriteria.getSku() + "%"));
+                predicates.add(cb.like(root.get("sku"), Constants.PERCENT_SYMBOL + productCriteria.getSku() + Constants.PERCENT_SYMBOL));
             }
             if (Objects.nonNull(productCriteria.getManufacturerId())) {
                 predicates.add(cb.equal(root.get("manufacturer").get("id"), productCriteria.getManufacturerId()));

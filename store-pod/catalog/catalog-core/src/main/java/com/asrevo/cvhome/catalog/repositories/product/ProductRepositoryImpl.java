@@ -19,6 +19,7 @@ import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.attribute.AttributeCriteria;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.common.GenericEntityList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.utils.RepositoryHelper;
@@ -262,7 +263,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         if (!StringUtils.isBlank(criteria.getCode())) {
             countQ.setParameter("sku",
-                    new StringBuilder().append("%").append(criteria.getCode().toLowerCase()).append("%").toString());
+                    new StringBuilder().append(Constants.PERCENT_SYMBOL).append(criteria.getCode().toLowerCase())
+                            .append(Constants.PERCENT_SYMBOL).toString());
         }
 
         if (criteria.getManufacturerId() != null) {
@@ -276,7 +278,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             for (AttributeCriteria attributeCriteria : criteria.getAttributeCriteria()) {
                 countQ.setParameter(attributeCriteria.getAttributeCode(), attributeCriteria.getAttributeCode());
                 countQ.setParameter("val" + count + attributeCriteria.getAttributeCode(),
-                        "%" + attributeCriteria.getAttributeValue() + "%");
+                        Constants.PERCENT_SYMBOL + attributeCriteria.getAttributeValue() + Constants.PERCENT_SYMBOL);
                 count++;
             }
         }
@@ -287,9 +289,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         if (!StringUtils.isBlank(criteria.getProductName())) {
             countQ.setParameter("nm",
-                    new StringBuilder().append("%")
+                    new StringBuilder().append(Constants.PERCENT_SYMBOL)
                             .append(criteria.getProductName().toLowerCase())
-                            .append("%")
+                            .append(Constants.PERCENT_SYMBOL)
                             .toString());
         }
 
@@ -457,7 +459,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         if (!StringUtils.isBlank(criteria.getCode())) {
             q.setParameter("sku",
-                    new StringBuilder().append("%").append(criteria.getCode().toLowerCase()).append("%").toString());
+                    new StringBuilder().append(Constants.PERCENT_SYMBOL).append(criteria.getCode().toLowerCase())
+                            .append(Constants.PERCENT_SYMBOL).toString());
         }
 
         /**/
@@ -467,7 +470,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             for (AttributeCriteria attributeCriteria : criteria.getAttributeCriteria()) {
                 q.setParameter(attributeCriteria.getAttributeCode(), attributeCriteria.getAttributeCode());
                 q.setParameter("val" + cnt + attributeCriteria.getAttributeCode(),
-                        "%" + attributeCriteria.getAttributeValue() + "%");
+                        Constants.PERCENT_SYMBOL + attributeCriteria.getAttributeValue() + Constants.PERCENT_SYMBOL);
                 cnt++;
             }
         }
@@ -476,9 +479,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         if (!StringUtils.isBlank(criteria.getProductName())) {
             q.setParameter("nm",
-                    new StringBuilder().append("%")
+                    new StringBuilder().append(Constants.PERCENT_SYMBOL)
                             .append(criteria.getProductName().toLowerCase())
-                            .append("%")
+                            .append(Constants.PERCENT_SYMBOL)
                             .toString());
         }
 

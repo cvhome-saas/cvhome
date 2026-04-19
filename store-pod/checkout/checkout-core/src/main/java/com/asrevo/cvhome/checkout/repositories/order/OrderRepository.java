@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.constants.Constants;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
@@ -64,27 +66,30 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
                 predicates.add(cb.equal(root.get("customerId"), criteria.getCustomerId()));
             }
 
+            Path<Object> billing = root.get("billing");
             if (criteria.getCustomerName() != null && !criteria.getCustomerName().isEmpty()) {
-                String likeValue = "%" + criteria.getCustomerName() + "%";
+                String likeValue = Constants.PERCENT_SYMBOL + criteria.getCustomerName() + Constants.PERCENT_SYMBOL;
 
-                Predicate firstName = cb.like(root.get("billing").get("firstName"), likeValue);
-                Predicate lastName = cb.like(root.get("billing").get("lastName"), likeValue);
+                Predicate firstName = cb.like(billing.get("firstName"), likeValue);
+                Predicate lastName = cb.like(billing.get("lastName"), likeValue);
 
                 predicates.add(cb.or(firstName, lastName));
             }
 
             if (criteria.getEmail() != null && !criteria.getEmail().isEmpty()) {
-                predicates.add(cb.like(root.get("customerEmailAddress"), "%" + criteria.getEmail() + "%"));
+                predicates.add(cb.like(root.get("customerEmailAddress"),
+                        Constants.PERCENT_SYMBOL + criteria.getEmail() + Constants.PERCENT_SYMBOL));
             }
 
             if (criteria.getId() != null) {
-                predicates.add(cb.like(cb.function("str", String.class, root.get("id")), "%" + criteria.getId() + "%"));
+                predicates.add(cb.like(cb.function("str", String.class, root.get("id")),
+                        Constants.PERCENT_SYMBOL + criteria.getId() + Constants.PERCENT_SYMBOL));
             }
 
             if (criteria.getCustomerPhone() != null && !criteria.getCustomerPhone().isEmpty()) {
-                String likeValue = "%" + criteria.getCustomerPhone() + "%";
+                String likeValue = Constants.PERCENT_SYMBOL + criteria.getCustomerPhone() + Constants.PERCENT_SYMBOL;
 
-                Predicate billingPhone = cb.like(root.get("billing").get("telephone"), likeValue);
+                Predicate billingPhone = cb.like(billing.get("telephone"), likeValue);
                 Predicate deliveryPhone = cb.like(root.get("delivery").get("telephone"), likeValue);
 
                 predicates.add(cb.or(billingPhone, deliveryPhone));

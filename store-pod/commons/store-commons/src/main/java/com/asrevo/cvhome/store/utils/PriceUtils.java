@@ -88,7 +88,7 @@ public class PriceUtils {
         try {
             Integer.parseInt(newAmount.toString());
         } catch (Exception e) {
-            throw new ServiceException("Cannot parse " + amount);
+            throw new ServiceException("Cannot parse " + amount, e);
         }
 
         if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
@@ -107,7 +107,7 @@ public class PriceUtils {
             }
 
         } else {
-            // TODO should not go this path in this current release
+
             StringBuilder pat = new StringBuilder();
 
             if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {

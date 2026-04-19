@@ -98,9 +98,9 @@ public interface ImageFilePath {
                 .append(Constants.FILES_URI)
                 .append(Constants.SLASH)
                 .append(store.getId())
-                .append("/")
+                .append(Constants.SLASH)
                 .append(FileContentType.PROPERTY)
-                .append("/")
+                .append(Constants.SLASH)
                 .append(imageName)
                 .toString();
     }
@@ -110,9 +110,9 @@ public interface ImageFilePath {
                 .append(Constants.FILES_URI)
                 .append(Constants.SLASH)
                 .append(store.getId())
-                .append("/")
+                .append(Constants.SLASH)
                 .append(type)
-                .append("/")
+                .append(Constants.SLASH)
                 .append(imageName)
                 .toString();
     }
