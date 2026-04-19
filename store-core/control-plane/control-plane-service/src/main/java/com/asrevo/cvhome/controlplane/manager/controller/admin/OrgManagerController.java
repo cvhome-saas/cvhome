@@ -1,21 +1,29 @@
 package com.asrevo.cvhome.controlplane.manager.controller.admin;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
-import com.asrevo.cvhome.uaa.domain.user.UserPassword;
-import com.asrevo.cvhome.uaa.service.UserAccountService;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.InternalOrgService;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
+import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
+import com.asrevo.cvhome.uaa.domain.user.UserPassword;
+import com.asrevo.cvhome.uaa.service.UserAccountService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -24,48 +32,48 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class OrgManagerController {
 
-	private final InternalOrgService internalOrgService;
+    private final InternalOrgService internalOrgService;
 
-	private final SignupService signupService;
+    private final SignupService signupService;
 
-	private final UserAccountService userAccountService;
+    private final UserAccountService userAccountService;
 
-	private final InternalStoreService internalStoreService;
+    private final InternalStoreService internalStoreService;
 
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-	@GetMapping("find-all")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @GetMapping("find-all")
 
-	public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
-		log.info("findAllOrg {}", pageable);
-		return Mono.just(internalOrgService.findAll(pageable));
-	}
+    public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
+        log.info("findAllOrg {}", pageable);
+        return Mono.just(internalOrgService.findAll(pageable));
+    }
 
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-	@GetMapping("find-one")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @GetMapping("find-one")
 
-	public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
-		return Mono.just(internalOrgService.findOne(id));
-	}
+    public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
+        return Mono.just(internalOrgService.findOne(id));
+    }
 
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-	@PostMapping("create")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PostMapping("create")
 
-	public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-		return Mono.just(signupService.createOrgUser(request));
-	}
+    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
+        return Mono.just(signupService.createOrgUser(request));
+    }
 
-	@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
-	@PostMapping("change-password")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PostMapping("change-password")
 
-	public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
-		userAccountService.changePassword(id.toString(), request);
-		return Mono.empty();
-	}
+    public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
+        userAccountService.changePassword(id.toString(), request);
+        return Mono.empty();
+    }
 
-	@GetMapping("stores")
+    @GetMapping("stores")
 
-	public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
-		return Mono.just(internalStoreService.findAll(id, pageable));
-	}
+    public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
+        return Mono.just(internalStoreService.findAll(id, pageable));
+    }
 
 }

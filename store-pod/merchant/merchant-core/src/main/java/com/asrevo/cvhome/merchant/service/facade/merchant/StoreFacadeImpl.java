@@ -1,8 +1,19 @@
 package com.asrevo.cvhome.merchant.service.facade.merchant;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import com.asrevo.cvhome.commons.domain.*;
+import org.springframework.stereotype.Service;
+
+import com.asrevo.cvhome.commons.domain.DomainType;
+import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
+import com.asrevo.cvhome.commons.domain.SliderImage;
+import com.asrevo.cvhome.commons.domain.SocialLink;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -18,283 +29,254 @@ import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
-import com.asrevo.cvhome.store.model.references.MeasureUnit;
-import java.util.*;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
 
 @Service("storeFacade")
 @Slf4j
 public class StoreFacadeImpl implements StoreFacade {
 
-	private final MerchantStoreService merchantStoreService;
+    private final MerchantStoreService merchantStoreService;
 
-	private final PersistableMerchantStorePopulator persistableMerchantStorePopulator;
+    private final PersistableMerchantStorePopulator persistableMerchantStorePopulator;
 
-	private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
+    private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
-	private final ContentAssetsManager assetsManager;
+    private final ContentAssetsManager assetsManager;
 
-	public StoreFacadeImpl(MerchantStoreService merchantStoreService,
-			PersistableMerchantStorePopulator persistableMerchantStorePopulator,
-			ReadableMerchantStorePopulator readableMerchantStorePopulator, ContentAssetsManager assetsManager) {
-		this.merchantStoreService = merchantStoreService;
-		this.persistableMerchantStorePopulator = persistableMerchantStorePopulator;
-		this.readableMerchantStorePopulator = readableMerchantStorePopulator;
-		this.assetsManager = assetsManager;
-	}
+    public StoreFacadeImpl(MerchantStoreService merchantStoreService,
+                           PersistableMerchantStorePopulator persistableMerchantStorePopulator,
+                           ReadableMerchantStorePopulator readableMerchantStorePopulator, ContentAssetsManager assetsManager) {
+        this.merchantStoreService = merchantStoreService;
+        this.persistableMerchantStorePopulator = persistableMerchantStorePopulator;
+        this.readableMerchantStorePopulator = readableMerchantStorePopulator;
+        this.assetsManager = assetsManager;
+    }
 
-	@Override
-	public MerchantStore get(StoreMerchantId storeMerchantId) {
-		return merchantStoreService.getByMerchantStoreId(storeMerchantId);
-	}
+    @Override
+    public MerchantStore get(StoreMerchantId storeMerchantId) {
+        return merchantStoreService.getByMerchantStoreId(storeMerchantId);
+    }
 
-	@Override
-	public ReadableMerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId, LanguageCode lang) {
-		MerchantStore store = getMerchantStoreByMerchantStoreId(storeMerchantId);
-		return convertMerchantStoreToReadableMerchantStore(store, lang);
-	}
+    @Override
+    public ReadableMerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId, LanguageCode lang) {
+        MerchantStore store = getMerchantStoreByMerchantStoreId(storeMerchantId);
+        return convertMerchantStoreToReadableMerchantStore(store, lang);
+    }
 
-	private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(MerchantStore store,
-			LanguageCode language) {
-		ReadableMerchantStore readable = new ReadableMerchantStore();
+    private ReadableMerchantStore convertMerchantStoreToReadableMerchantStore(MerchantStore store,
+                                                                              LanguageCode language) {
+        ReadableMerchantStore readable = new ReadableMerchantStore();
 
-		try {
-			readableMerchantStorePopulator.populate(store, readable, store, language);
-		}
-		catch (Exception e) {
-			throw new ConversionRuntimeException("Error while populating Store " + e.getMessage());
-		}
-		return readable;
-	}
+        try {
+            readableMerchantStorePopulator.populate(store, readable, store, language);
+        } catch (Exception e) {
+            throw new ConversionRuntimeException("Error while populating Store " + e.getMessage());
+        }
+        return readable;
+    }
 
-	private MerchantStore getMerchantStoreByMerchantStoreId(StoreMerchantId storeMerchantId) {
-		return Optional.ofNullable(get(storeMerchantId))
-			.orElseThrow(
-					() -> new ResourceNotFoundException("Merchant store code [" + storeMerchantId + "] not found"));
-	}
+    private MerchantStore getMerchantStoreByMerchantStoreId(StoreMerchantId storeMerchantId) {
+        return Optional.ofNullable(get(storeMerchantId))
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Merchant store code [" + storeMerchantId + "] not found"));
+    }
 
-	@Override
-	public void create(PersistableMerchantStore store) {
+    @Override
+    public void create(PersistableMerchantStore store) {
+        MerchantStore storeForCheck = get(new StoreMerchantId(store.getId()));
+        if (storeForCheck != null) {
+            throw new ServiceRuntimeException("MerhantStore " + store.getId() + " already exists");
+        }
 
-		Assert.notNull(store, "PersistableMerchantStore must not be null");
-		Assert.notNull(store.getId(), "PersistableMerchantStore.id must not be null");
+        MerchantStore mStore = convertPersistableMerchantStoreToMerchantStore(store, LanguageCode.defaultLanguage());
+        createMerchantStore(mStore);
+    }
 
-		// check if store code exists
-		MerchantStore storeForCheck = get(new StoreMerchantId(store.getId()));
-		if (storeForCheck != null) {
-			throw new ServiceRuntimeException("MerhantStore " + store.getId() + " already exists");
-		}
+    private void createMerchantStore(MerchantStore mStore) {
+        merchantStoreService.saveOrUpdate(mStore);
+    }
 
-		MerchantStore mStore = convertPersistableMerchantStoreToMerchantStore(store, LanguageCode.defaultLanguage());
-		createMerchantStore(mStore);
-	}
+    private MerchantStore convertPersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
+                                                                         LanguageCode language) {
+        MerchantStore mStore = new MerchantStore();
+        store.setStoreDomains(Set.of(new ManagerStoreDomain(store.getName(), DomainType.SUB_DOMAIN)));
 
-	private void createMerchantStore(MerchantStore mStore) {
-		merchantStoreService.saveOrUpdate(mStore);
-	}
+        try {
+            mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
+        } catch (ConversionException e) {
+            throw new ConversionRuntimeException(e);
+        }
+        return mStore;
+    }
 
-	private MerchantStore convertPersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
-			LanguageCode language) {
-		MerchantStore mStore = new MerchantStore();
-		store.setStoreDomains(Set.of(new ManagerStoreDomain(store.getName(), DomainType.SUB_DOMAIN)));
+    @Override
+    public void update(PersistableMerchantStore store) {
+        MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, new StoreMerchantId(store.getId()),
+                LanguageCode.defaultLanguage());
 
-		try {
-			mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
-		}
-		catch (ConversionException e) {
-			throw new ConversionRuntimeException(e);
-		}
-		return mStore;
-	}
+        updateMerchantStore(mStore);
+    }
 
-	@Override
-	public void update(PersistableMerchantStore store) {
+    private void updateMerchantStore(MerchantStore mStore) {
+        try {
+            merchantStoreService.update(mStore);
+        } catch (ServiceException e) {
+            throw new ServiceRuntimeException(e);
+        }
+    }
 
-		Assert.notNull(store, "store can't be null");
+    private MerchantStore mergePersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
+                                                                       StoreMerchantId storeMerchantId, LanguageCode language) {
 
-		MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, new StoreMerchantId(store.getId()),
-				LanguageCode.defaultLanguage());
+        MerchantStore mStore = getMerchantStoreByMerchantStoreId(storeMerchantId);
 
-		updateMerchantStore(mStore);
-	}
+        store.setId(mStore.getId().getId());
+        store.setOrg(mStore.getOrg());
 
-	private void updateMerchantStore(MerchantStore mStore) {
-		try {
-			merchantStoreService.update(mStore);
-		}
-		catch (ServiceException e) {
-			throw new ServiceRuntimeException(e);
-		}
-	}
+        store.setSocialLinks(mStore.getSocialLinks());
+        store.setSliderImages(mStore.getSliderImages());
+        store.setStoreDomains(mStore.getStoreDomains());
 
-	private MerchantStore mergePersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
-			StoreMerchantId storeMerchantId, LanguageCode language) {
+        try {
+            mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
+        } catch (ConversionException e) {
+            throw new ConversionRuntimeException(e);
+        }
+        return mStore;
+    }
 
-		MerchantStore mStore = getMerchantStoreByMerchantStoreId(storeMerchantId);
+    @Override
+    public void delete(StoreMerchantId storeMerchantId) {
 
-		store.setId(mStore.getId().getId());
-		store.setOrg(mStore.getOrg());
+        if (DEFAULT_ORG1_STORE1.equals(storeMerchantId)) {
+            throw new ServiceRuntimeException("Cannot remove default store");
+        }
 
-		store.setSocialLinks(mStore.getSocialLinks());
-		store.setSliderImages(mStore.getSliderImages());
-		store.setStoreDomains(mStore.getStoreDomains());
+        MerchantStore mStore = getMerchantStoreByMerchantStoreId(storeMerchantId);
 
-		try {
-			mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
-		}
-		catch (ConversionException e) {
-			throw new ConversionRuntimeException(e);
-		}
-		return mStore;
-	}
+        try {
+            merchantStoreService.delete(mStore);
+        } catch (Exception e) {
+            log.error("Error while deleting MerchantStore", e);
+            throw new ServiceRuntimeException("Error while deleting MerchantStore " + e.getMessage());
+        }
+    }
 
-	@Override
-	public void delete(StoreMerchantId storeMerchantId) {
+    private MerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId) {
+        return getMerchantStoreByMerchantStoreId(storeMerchantId);
+    }
 
-		if (DEFAULT_ORG1_STORE1.equals(storeMerchantId)) {
-			throw new ServiceRuntimeException("Cannot remove default store");
-		}
+    @SneakyThrows
+    @Override
+    public void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
+        MerchantStore store = getByMerchantStoreId(storeMerchantId);
+        store.setStoreLogo(cmsContentImage.getFileName());
+        saveMerchantStore(store);
+        addLogo(storeMerchantId.getId(), cmsContentImage);
+    }
 
-		MerchantStore mStore = getMerchantStoreByMerchantStoreId(storeMerchantId);
+    @SneakyThrows
+    @Override
+    public void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
+        MerchantStore store = getByMerchantStoreId(storeMerchantId);
+        store.setStoreBanner(cmsContentImage.getFileName());
+        saveMerchantStore(store);
+        addBanner(storeMerchantId.getId(), cmsContentImage);
+    }
 
-		try {
-			merchantStoreService.delete(mStore);
-		}
-		catch (Exception e) {
-			log.error("Error while deleting MerchantStore", e);
-			throw new ServiceRuntimeException("Error while deleting MerchantStore " + e.getMessage());
-		}
-	}
+    @SneakyThrows
+    @Override
+    public SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
+        MerchantStore store = getByMerchantStoreId(storeMerchantId);
+        List<SliderImage> sliderImages = new ArrayList<>(store.getSliderImages());
+        Integer nextPriority = sliderImages.stream()
+                .map(SliderImage::priority)
+                .max(Comparator.naturalOrder())
+                .map(it -> it + 1)
+                .orElse(0);
+        SliderImage sliderImage = new SliderImage(nextPriority, cmsContentImage.getFileName());
+        sliderImages.add(sliderImage);
+        store.setSliderImages(sliderImages);
+        saveMerchantStore(store);
+        addSlider(storeMerchantId.getId(), cmsContentImage);
+        return sliderImage;
+    }
 
-	private MerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId) {
-		return getMerchantStoreByMerchantStoreId(storeMerchantId);
-	}
+    @Override
+    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+        cmsContentImage.setFileContentType(FileContentType.LOGO);
+        addImageToAssets(merchantStoreCode, cmsContentImage);
+    }
 
-	@SneakyThrows
-	@Override
-	public void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-		MerchantStore store = getByMerchantStoreId(storeMerchantId);
-		store.setStoreLogo(cmsContentImage.getFileName());
-		saveMerchantStore(store);
-		addLogo(storeMerchantId.getId(), cmsContentImage);
-	}
+    @Override
+    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+        cmsContentImage.setFileContentType(FileContentType.BANNER);
+        addImageToAssets(merchantStoreCode, cmsContentImage);
+    }
 
-	@SneakyThrows
-	@Override
-	public void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-		MerchantStore store = getByMerchantStoreId(storeMerchantId);
-		store.setStoreBanner(cmsContentImage.getFileName());
-		saveMerchantStore(store);
-		addBanner(storeMerchantId.getId(), cmsContentImage);
-	}
+    @Override
+    public void addSlider(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+        cmsContentImage.setFileContentType(FileContentType.SLIDER);
+        addImageToAssets(merchantStoreCode, cmsContentImage);
+    }
 
-	@SneakyThrows
-	@Override
-	public SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-		MerchantStore store = getByMerchantStoreId(storeMerchantId);
-		List<SliderImage> sliderImages = new ArrayList<>(store.getSliderImages());
-		Integer nextPriority = sliderImages.stream()
-			.map(SliderImage::priority)
-			.max(Comparator.naturalOrder())
-			.map(it -> it + 1)
-			.orElse(0);
-		SliderImage sliderImage = new SliderImage(nextPriority, cmsContentImage.getFileName());
-		sliderImages.add(sliderImage);
-		store.setSliderImages(sliderImages);
-		saveMerchantStore(store);
-		addSlider(storeMerchantId.getId(), cmsContentImage);
-		return sliderImage;
-	}
+    @Override
+    public void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks) {
+        merchantStoreService.updateSocialLinks(id, socialLinks);
+    }
 
-	@Override
-	public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    @Override
+    public void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages) {
+        merchantStoreService.updateSliderImages(id, sliderImages);
+    }
 
-		Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
-		Assert.notNull(cmsContentImage, "CMSContent image can not be null");
+    private void addImageToAssets(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
 
-		cmsContentImage.setFileContentType(FileContentType.LOGO);
-		addImageToAssets(merchantStoreCode, cmsContentImage);
-	}
+        if (contentImage.getFile() == null) {
+            throw new IllegalArgumentException("File is null");
+        }
+        try {
+            log.info("Adding content image for merchant id {}", merchantStoreCode);
 
-	@Override
-	public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+            String p = contentImage.getPath();
+            Optional<String> path = Optional.ofNullable(p);
+            assetsManager.addFile(merchantStoreCode, path, contentImage);
 
-		Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
-		Assert.notNull(cmsContentImage, "CMSContent image can not be null");
+        } catch (Exception e) {
+            log.error("Error while trying to convert input stream to buffered image", e);
+            throw new ServiceException(e);
 
-		cmsContentImage.setFileContentType(FileContentType.BANNER);
-		addImageToAssets(merchantStoreCode, cmsContentImage);
-	}
+        } finally {
+            try {
+                contentImage.getFile().close();
+            } catch (Exception _) {
+            }
+        }
+    }
 
-	@Override
-	public void addSlider(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    private void saveMerchantStore(MerchantStore store) {
+        merchantStoreService.save(store);
+    }
 
-		Assert.notNull(merchantStoreCode, "Merchant store Id can not be null");
-		Assert.notNull(cmsContentImage, "CMSContent image can not be null");
+    @Override
+    public List<LanguageCode> supportedLanguages(StoreMerchantId storeMerchantId) {
+        MerchantStore store = merchantStoreService.getByMerchantStoreId(storeMerchantId);
 
-		cmsContentImage.setFileContentType(FileContentType.SLIDER);
-		addImageToAssets(merchantStoreCode, cmsContentImage);
-	}
+        if (store != null) {
+            return store.getLanguages();
+        }
 
-	@Override
-	public void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks) {
-		merchantStoreService.updateSocialLinks(id, socialLinks);
-	}
+        return Collections.emptyList();
+    }
 
-	@Override
-	public void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages) {
-		merchantStoreService.updateSliderImages(id, sliderImages);
-	}
-
-	private void addImageToAssets(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
-
-		try {
-			log.info("Adding content image for merchant id {}", merchantStoreCode);
-
-			String p = contentImage.getPath();
-			Optional<String> path = Optional.ofNullable(p);
-			assetsManager.addFile(merchantStoreCode, path, contentImage);
-
-		}
-		catch (Exception e) {
-			log.error("Error while trying to convert input stream to buffered image", e);
-			throw new ServiceException(e);
-
-		}
-		finally {
-
-			try {
-				if (contentImage.getFile() != null) {
-					contentImage.getFile().close();
-				}
-			}
-			catch (Exception ignore) {
-			}
-		}
-	}
-
-	private void saveMerchantStore(MerchantStore store) {
-		merchantStoreService.save(store);
-	}
-
-	@Override
-	public List<LanguageCode> supportedLanguages(StoreMerchantId storeMerchantId) {
-		MerchantStore store = merchantStoreService.getByMerchantStoreId(storeMerchantId);
-
-		if (store != null) {
-			return store.getLanguages();
-		}
-
-		return Collections.emptyList();
-	}
-
-	@Override
-	public ReadableMerchantStore getReadableMerchantStoreId(StoreMerchantId storeMerchantId) {
-		MerchantStore merchantStore = get(storeMerchantId);
-		return convertMerchantStoreToReadableMerchantStore(merchantStore, merchantStore.getDefaultLanguageCode());
-	}
+    @Override
+    public ReadableMerchantStore getReadableMerchantStoreId(StoreMerchantId storeMerchantId) {
+        MerchantStore merchantStore = get(storeMerchantId);
+        return convertMerchantStoreToReadableMerchantStore(merchantStore, merchantStore.getDefaultLanguageCode());
+    }
 
 }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.entity.common;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,19 +10,19 @@ import lombok.Setter;
 @Getter
 public class EntityList implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	// private int totalCount;
-	private long totalCount;
+    // private int totalCount;
+    private long totalCount;
 
-	private int totalPages;
+    private int totalPages;
 
-	public int getTotalPages() {
-		return totalPages == 0 ? totalPages + 1 : totalPages;
-	}
+    public int getTotalPages() {
+        return totalPages == 0 ? totalPages + 1 : totalPages;
+    }
 
 }

@@ -3,7 +3,6 @@ import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from
 import {routes} from './app.routes';
 import {provideHttpClient, withFetch} from '@angular/common/http';
 import {
-  NbChatModule,
   NbDatepickerModule,
   NbDialogModule,
   NbMenuModule,

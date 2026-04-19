@@ -10,19 +10,19 @@ import java.io.Serial;
  */
 public class ConversionException extends Exception {
 
-	@Serial
-	private static final long serialVersionUID = 687400310032876603L;
+    @Serial
+    private static final long serialVersionUID = 687400310032876603L;
 
-	public ConversionException(final String msg, final Throwable cause) {
-		super(msg, cause);
-	}
+    public ConversionException(final String msg, final Throwable cause) {
+        super(msg, cause);
+    }
 
-	public ConversionException(final String msg) {
-		super(msg);
-	}
+    public ConversionException(final String msg) {
+        super(msg);
+    }
 
-	public ConversionException(Throwable t) {
-		super(t);
-	}
+    public ConversionException(Throwable t) {
+        super(t);
+    }
 
 }

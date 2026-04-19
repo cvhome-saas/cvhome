@@ -1,26 +1,33 @@
 package com.asrevo.cvhome.catalog.entity.product;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import java.math.BigDecimal;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Embeddable
 @Getter
 @Setter
-public class ProductDimensions {
+public class ProductDimensions implements Serializable {
 
-	@Column(name = "LENGTH")
-	private BigDecimal length;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "WIDTH")
-	private BigDecimal width;
+    @Column(name = "LENGTH")
+    private BigDecimal length;
 
-	@Column(name = "HEIGHT")
-	private BigDecimal height;
+    @Column(name = "WIDTH")
+    private BigDecimal width;
 
-	@Column(name = "WEIGHT")
-	private BigDecimal weight;
+    @Column(name = "HEIGHT")
+    private BigDecimal height;
+
+    @Column(name = "WEIGHT")
+    private BigDecimal weight;
 
 }

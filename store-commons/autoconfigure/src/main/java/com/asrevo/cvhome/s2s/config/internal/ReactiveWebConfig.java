@@ -10,20 +10,21 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @Import(ReactiveWebConfig.InternalReactiveWebConfig.class)
+@SuppressWarnings("java:S1118")
 public class ReactiveWebConfig {
 
-	@Configuration
-	static class InternalReactiveWebConfig implements WebFluxConfigurer {
+    @Configuration
+    static class InternalReactiveWebConfig implements WebFluxConfigurer {
 
-		@Override
-		public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
-			ReactivePageableHandlerMethodArgumentResolver e = new ReactivePageableHandlerMethodArgumentResolver();
-			e.setPageParameterName("page");
-			e.setSizeParameterName("count");
-			configurer.addCustomResolver(e);
-			configurer.addCustomResolver(new ReactiveOrgStorePrincipalInfoArgumentResolver());
-		}
+        @Override
+        public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
+            ReactivePageableHandlerMethodArgumentResolver e = new ReactivePageableHandlerMethodArgumentResolver();
+            e.setPageParameterName("page");
+            e.setSizeParameterName("count");
+            configurer.addCustomResolver(e);
+            configurer.addCustomResolver(new ReactiveOrgStorePrincipalInfoArgumentResolver());
+        }
 
-	}
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product.variation;
 
 import java.io.Serial;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,14 +14,14 @@ import lombok.Setter;
 @Getter
 public class PersistableProductVariation extends ProductVariationEntity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Long option = null;
+    private Long option = null;
 
-	private Long optionValue = null;
+    private Long optionValue = null;
 
 }

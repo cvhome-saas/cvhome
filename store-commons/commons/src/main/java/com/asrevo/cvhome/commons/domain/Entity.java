@@ -2,6 +2,7 @@ package com.asrevo.cvhome.commons.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,19 +10,19 @@ import lombok.Setter;
 @Getter
 public class Entity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Long id;
+    private Long id;
 
-	public Entity() {
-	}
+    public Entity() {
+    }
 
-	public Entity(Long id) {
-		this.id = id;
-	}
+    public Entity(Long id) {
+        this.id = id;
+    }
 
 }

@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.cua.web;
 
-import com.asrevo.cvhome.cua.dto.ReadableUser;
-import com.asrevo.cvhome.cua.service.UserService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,7 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
+import com.asrevo.cvhome.cua.dto.ReadableUser;
+import com.asrevo.cvhome.cua.service.UserService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -21,17 +23,17 @@ import java.util.UUID;
 @Slf4j
 public class AuthController {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	@GetMapping("me")
-	public ResponseEntity<Object> me() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (!(authentication instanceof JwtAuthenticationToken auth)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-		UUID id = UUID.fromString((String) auth.getTokenAttributes().get("sub"));
-		ReadableUser user = userService.getById(id).orElseThrow();
-		return ResponseEntity.ok(user);
-	}
+    @GetMapping("me")
+    public ResponseEntity<Object> me() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof JwtAuthenticationToken auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        UUID id = UUID.fromString((String) auth.getTokenAttributes().get("sub"));
+        ReadableUser user = userService.getById(id).orElseThrow();
+        return ResponseEntity.ok(user);
+    }
 
 }

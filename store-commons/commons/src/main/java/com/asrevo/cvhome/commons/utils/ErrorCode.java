@@ -1,4 +1,4 @@
 package com.asrevo.cvhome.commons.utils;
 
-public record ErrorCode(String code, String message) {
+public record ErrorCode(String code, String message) implements java.io.Serializable {
 }

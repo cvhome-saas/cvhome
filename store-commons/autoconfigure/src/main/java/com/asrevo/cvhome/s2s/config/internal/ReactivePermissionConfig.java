@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,19 +13,20 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnBean(PermissionEvaluator.class)
 @Import(ReactivePermissionConfig.PermissionConfig.class)
+@SuppressWarnings("java:S1118")
 public class ReactivePermissionConfig {
 
-	@EnableReactiveMethodSecurity
-	public static class PermissionConfig {
+    @EnableReactiveMethodSecurity
+    public static class PermissionConfig {
 
-		@Bean
-		public DefaultMethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler(
-				PermissionEvaluator permissionEvaluator) {
-			DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-			handler.setPermissionEvaluator(permissionEvaluator);
-			return handler;
-		}
+        @Bean
+        public DefaultMethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler(
+                PermissionEvaluator permissionEvaluator) {
+            DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+            handler.setPermissionEvaluator(permissionEvaluator);
+            return handler;
+        }
 
-	}
+    }
 
 }

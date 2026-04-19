@@ -5,6 +5,6 @@ import com.asrevo.cvhome.commons.domain.PodId;
 
 public interface PodSelection {
 
-	PodId next(ManagerOrgId orgId, PodId prefaredPodId);
+    PodId next(ManagerOrgId orgId, PodId prefaredPodId);
 
 }

@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.catalog.model.product;
 
-import com.asrevo.cvhome.store.core.model.catalog.NamedEntity;
 import java.io.Serial;
+
+import com.asrevo.cvhome.store.core.model.catalog.NamedEntity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +11,12 @@ import lombok.Setter;
 @Getter
 public class ProductPriceDescription extends NamedEntity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String priceAppender;
+    private String priceAppender;
 
 }

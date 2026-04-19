@@ -1,11 +1,12 @@
 package com.asrevo.cvhome.catalog.model.product.group;
 
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,15 +14,15 @@ import lombok.Setter;
 @Setter
 public class ReadableProductGroup extends ProductGroup implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ReadableProductGroupDescription description;
+    private ReadableProductGroupDescription description;
 
-	private List<ReadableProductGroupDescription> descriptions = new ArrayList<>();
+    private List<ReadableProductGroupDescription> descriptions = new ArrayList<>();
 
-	private ReadableProduct parentProduct;
+    private ReadableProduct parentProduct;
 
-	private List<ReadableProduct> products = new ArrayList<>();
+    private List<ReadableProduct> products = new ArrayList<>();
 
 }

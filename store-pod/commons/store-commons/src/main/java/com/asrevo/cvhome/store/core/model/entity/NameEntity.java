@@ -1,8 +1,11 @@
 package com.asrevo.cvhome.store.core.model.entity;
 
-import com.asrevo.cvhome.commons.domain.Entity;
-import jakarta.validation.constraints.NotEmpty;
 import java.io.Serial;
+
+import jakarta.validation.constraints.NotEmpty;
+
+import com.asrevo.cvhome.commons.domain.Entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,13 +18,13 @@ import lombok.Setter;
 @Getter
 public class NameEntity extends Entity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@NotEmpty
-	private String name;
+    @NotEmpty
+    private String name;
 
 }

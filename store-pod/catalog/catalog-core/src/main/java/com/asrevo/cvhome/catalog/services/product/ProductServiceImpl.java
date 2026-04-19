@@ -1,17 +1,32 @@
 package com.asrevo.cvhome.catalog.services.product;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.ProductList;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
-import com.asrevo.cvhome.catalog.model.product.*;
+import com.asrevo.cvhome.catalog.model.product.ProductDetails;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
-import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
@@ -21,285 +36,246 @@ import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import java.io.InputStream;
-import java.util.*;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 @Service("productService")
 @Slf4j
 public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
 
-	private final ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-	@Autowired
-	ProductGroupService productGroupService;
+    private final ProductImageService productImageService;
 
-	@Autowired
-	ProductImageService productImageService;
+    private final PricingServiceImpl pricingService;
 
-	@Autowired
-	private PricingServiceImpl pricingService;
+    private final ReadableMinimalProductMapper readableMinimalProductMapper;
 
-	@Autowired
-	private ReadableMinimalProductMapper readableMinimalProductMapper;
+    private final ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
-	@Autowired
-	private ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
+    @Autowired
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
+                              PricingServiceImpl pricingService, ReadableMinimalProductMapper readableMinimalProductMapper,
+                              ReadableProductAvailabilityMapper readableProductAvailabilityMapper) {
+        super(productRepository);
+        this.productRepository = productRepository;
+        this.productImageService = productImageService;
+        this.pricingService = pricingService;
+        this.readableMinimalProductMapper = readableMinimalProductMapper;
+        this.readableProductAvailabilityMapper = readableProductAvailabilityMapper;
+    }
 
-	@Autowired
-	public ProductServiceImpl(ProductRepository productRepository) {
-		super(productRepository);
-		this.productRepository = productRepository;
-	}
+    @Override
+    public Optional<Product> retrieveById(Long id, StoreMerchantId store) {
+        return Optional.ofNullable(findOne(id, store));
+    }
 
-	@Override
-	public Optional<Product> retrieveById(Long id, StoreMerchantId store) {
-		return Optional.ofNullable(findOne(id, store));
-	}
+    @Override
+    public List<Product> getProducts(List<Long> categoryIds) {
+        Set<Long> ids = new HashSet<>(categoryIds);
+        return productRepository.getProductsListByCategories(ids);
+    }
 
-	@Override
-	public List<Product> getProducts(List<Long> categoryIds) {
-		Set<Long> ids = new HashSet<>(categoryIds);
-		return productRepository.getProductsListByCategories(ids);
-	}
+    @Override
+    public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
+        return productRepository.getByFriendlyUrl(store, seUrl, locale);
+    }
 
-	@Override
-	public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
-		return productRepository.getByFriendlyUrl(store, seUrl, locale);
-	}
+    @Override
+    public List<Product> listByStore(StoreMerchantId store) {
 
-	@Override
-	public ProductList listByStore(StoreMerchantId store, LanguageCode language, ProductCriteria criteria) {
+        return productRepository.listByStore(store);
+    }
 
-		return productRepository.listByStore(store, language, criteria);
-	}
+    @Override
+    public void delete(Product product) throws ServiceException {
+        product = this.getById(product.getId());
+        product.setCategories(null);
 
-	@Override
-	public List<Product> listByStore(StoreMerchantId store) {
+        Set<ProductImage> images = product.getImages();
 
-		return productRepository.listByStore(store);
-	}
+        for (ProductImage image : images) {
+            productImageService.removeProductImage(image);
+        }
 
-	@Override
-	public void delete(Product product) throws ServiceException {
-		Assert.notNull(product, "Product cannot be null");
-		product = this.getById(product.getId()); // Prevents detached entity
-		// error
-		product.setCategories(null);
+        product.setImages(null);
 
-		Set<ProductImage> images = product.getImages();
+        super.delete(product);
 
-		for (ProductImage image : images) {
-			productImageService.removeProductImage(image);
-		}
+    }
 
-		product.setImages(null);
+    @Override
+    public void create(Product product) throws ServiceException {
+        saveOrUpdate(product);
+    }
 
-		// related - featured
-		// @todo check delete
-		// List<ProductRelationship> relationships =
-		// productGroupService.listByProduct(product);
-		// for (ProductRelationship relationship : relationships) {
-		// productGroupService.deleteRelationship(relationship);
-		// }
+    @Override
+    public void update(Product product) throws ServiceException {
+        saveOrUpdate(product);
+    }
 
-		super.delete(product);
-		// searchService.deleteIndex(product.getMerchantStore(), product);
+    private Product saveOrUpdate(Product product) throws ServiceException {
+        Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
 
-	}
+        if (product.getId() != null && product.getId() > 0) {
+            super.update(product);
+        } else {
+            super.create(product);
+        }
 
-	@Override
-	public void create(Product product) throws ServiceException {
-		saveOrUpdate(product);
-	}
+        List<Long> newImageIds = new ArrayList<>();
+        Set<ProductImage> images = product.getImages();
 
-	@Override
-	public void update(Product product) throws ServiceException {
-		saveOrUpdate(product);
-	}
+        try {
 
-	private Product saveOrUpdate(Product product) throws ServiceException {
-		Assert.notNull(product, "product cannot be null");
-		Assert.notNull(product.getAvailabilities(), "product must have at least one availability");
-		Assert.notEmpty(product.getAvailabilities(), "product must have at least one availability");
+            if (images != null && !images.isEmpty()) {
+                for (ProductImage image : images) {
+                    if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
+                        image.setProduct(product);
 
-		// take care of product images separately
-		Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
+                        InputStream inputStream = image.getImage();
+                        ImageContentFile cmsContentImage = new ImageContentFile();
+                        cmsContentImage.setFileName(image.getProductImage());
+                        cmsContentImage.setFile(inputStream);
+                        cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
-		if (product.getId() != null && product.getId() > 0) {
-			super.update(product);
-		}
-		else {
-			super.create(product);
-		}
+                        productImageService.addProductImage(product, image, cmsContentImage);
+                        newImageIds.add(image.getId());
+                    } else {
+                        if (image.getId() != null) {
+                            productImageService.save(image);
+                            newImageIds.add(image.getId());
+                        }
+                    }
+                }
+            }
 
-		List<Long> newImageIds = new ArrayList<>();
-		Set<ProductImage> images = product.getImages();
+            // cleanup old and new images
+            for (ProductImage image : originalProductImages) {
 
-		try {
+                if (image.getImage() != null && image.getId() == null) {
+                    image.setProduct(product);
 
-			if (images != null && !images.isEmpty()) {
-				for (ProductImage image : images) {
-					if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
-						image.setProduct(product);
+                    InputStream inputStream = image.getImage();
+                    ImageContentFile cmsContentImage = new ImageContentFile();
+                    cmsContentImage.setFileName(image.getProductImage());
+                    cmsContentImage.setFile(inputStream);
+                    cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
-						InputStream inputStream = image.getImage();
-						ImageContentFile cmsContentImage = new ImageContentFile();
-						cmsContentImage.setFileName(image.getProductImage());
-						cmsContentImage.setFile(inputStream);
-						cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+                    productImageService.addProductImage(product, image, cmsContentImage);
+                    newImageIds.add(image.getId());
+                } else {
+                    if (!newImageIds.contains(image.getId())) {
+                        productImageService.delete(image);
+                    }
+                }
+            }
 
-						productImageService.addProductImage(product, image, cmsContentImage);
-						newImageIds.add(image.getId());
-					}
-					else {
-						if (image.getId() != null) {
-							productImageService.save(image);
-							newImageIds.add(image.getId());
-						}
-					}
-				}
-			}
+        } catch (Exception e) {
+            log.error("Cannot save images {}", e.getMessage());
+        }
 
-			// cleanup old and new images
-			for (ProductImage image : originalProductImages) {
+        return product;
+    }
 
-				if (image.getImage() != null && image.getId() == null) {
-					image.setProduct(product);
+    @Override
+    public Product findOne(Long id, StoreMerchantId merchant) {
+        return productRepository.getById(id, merchant);
+    }
 
-					InputStream inputStream = image.getImage();
-					ImageContentFile cmsContentImage = new ImageContentFile();
-					cmsContentImage.setFileName(image.getProductImage());
-					cmsContentImage.setFile(inputStream);
-					cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+    @Transactional
+    @Override
+    public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
+            throws ServiceException {
+        if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
+            throw new ServiceException("Cannot update product availability because no new availabilities exists");
+        }
 
-					productImageService.addProductImage(product, image, cmsContentImage);
-					newImageIds.add(image.getId());
-				}
-				else {
-					if (!newImageIds.contains(image.getId())) {
-						productImageService.delete(image);
-					}
-				}
-			}
+        for (ReserveProductEntry entry : productReservation.entries()) {
+            Product product = productRepository
+                    .getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
+            for (ProductAvailability availability : product.getAvailabilities()) {
+                int qty = availability.getProductQuantity();
+                if (qty < entry.reserveQty()) {
+                    throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+                }
+                qty = qty - entry.reserveQty();
+                availability.setProductQuantity(qty);
+            }
+            productRepository.save(product);
+        }
+        return new ProductReservationStatus(true);
+    }
 
-		}
-		catch (Exception e) {
-			log.error("Cannot save images {}", e.getMessage());
-		}
+    @Override
+    public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
+        return productRepository.findAll(criteria, store);
+    }
 
-		return product;
-	}
+    @SneakyThrows
+    @Override
+    public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
+        Product p = getMinimalProductBySku(sku, store, language);
+        ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
+        FinalPrice price = pricingService.calculateProductPrice(p);
+        ReadableProductAvailability availability = readableProductAvailabilityMapper.convert(p, store, null);
+        return new ProductDetails(product, price, availability);
+    }
 
-	@Override
-	public Product findOne(Long id, StoreMerchantId merchant) {
-		Assert.notNull(merchant, "Store must not be null");
-		Assert.notNull(id, "id must not be null");
-		return productRepository.getById(id, merchant);
-	}
+    @Override
+    public Product saveProduct(Product product) throws ServiceException {
+        try {
+            return this.saveOrUpdate(product);
+        } catch (ServiceException e) {
+            throw new ServiceException("Cannot create product [" + product.getId() + "]", e);
+        }
+    }
 
-	@Transactional
-	@Override
-	public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
-			throws ServiceException {
-		if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
-			throw new ServiceException("Cannot update product availability because no new availabilities exists");
-		}
+    public Product getMinimalProductBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+            throws ServiceException {
 
-		for (ReserveProductEntry entry : productReservation.entries()) {
-			Product product = productRepository
-				.getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
-			for (ProductAvailability availability : product.getAvailabilities()) {
-				int qty = availability.getProductQuantity();
-				if (qty < entry.reserveQty()) {
-					throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-				}
-				qty = qty - entry.reserveQty();
-				availability.setProductQuantity(qty);
-			}
-			productRepository.save(product);
-		}
-		return new ProductReservationStatus(true);
-	}
+        try {
+            Long productId = findProductIdByCode(productCode, merchant);
+            return productRepository.getMinimalProductById(productId, merchant, language);
+        } catch (Exception e) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+        }
+    }
 
-	@Override
-	public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
-		return productRepository.findAll(criteria, store);
-	}
+    @Override
+    public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+            throws ServiceException {
 
-	@SneakyThrows
-	@Override
-	public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
-		Product p = getMinimalProductBySku(sku, store, language);
-		ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
-		FinalPrice price = pricingService.calculateProductPrice(p);
-		ReadableProductAvailability availability = readableProductAvailabilityMapper.convert(p, store, null);
-		return new ProductDetails(product, price, availability);
-	}
+        try {
+            Long productId = findProductIdByCode(productCode, merchant);
+            return productRepository.getById(productId, merchant, language);
+        } catch (Exception e) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+        }
+    }
 
-	@Override
-	public Product saveProduct(Product product) throws ServiceException {
-		try {
-			return this.saveOrUpdate(product);
-		}
-		catch (ServiceException e) {
-			throw new ServiceException("Cannot create product [" + product.getId() + "]", e);
-		}
-	}
+    public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
 
-	public Product getMinimalProductBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
-			throws ServiceException {
+        try {
+            Long productId = findProductIdByCode(productCode, merchant);
+            return this.findOne(productId, merchant);
+        } catch (Exception e) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
+        }
+    }
 
-		try {
-			Long productId = findProductIdByCode(productCode, merchant);
-			return productRepository.getMinimalProductById(productId, merchant, language);
-		}
-		catch (Exception e) {
-			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-		}
-	}
+    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
+        List<Long> products = productRepository.findBySku(productCode, merchant);
+        if (products.isEmpty()) {
+            throw new ServiceException("Cannot get product with sku [" + productCode + "]");
+        }
+        return products.getFirst();
+    }
 
-	@Override
-	public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
-			throws ServiceException {
-
-		try {
-			Long productId = findProductIdByCode(productCode, merchant);
-			return productRepository.getById(productId, merchant, language);
-		}
-		catch (Exception e) {
-			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-		}
-	}
-
-	public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
-
-		try {
-			Long productId = findProductIdByCode(productCode, merchant);
-			return this.findOne(productId, merchant);
-		}
-		catch (Exception e) {
-			throw new ServiceException("Cannot get product with sku [" + productCode + "]", e);
-		}
-	}
-
-	private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
-		List<Long> products = productRepository.findBySku(productCode, merchant);
-		if (products.isEmpty()) {
-			throw new ServiceException("Cannot get product with sku [" + productCode + "]");
-		}
-		return products.getFirst();
-	}
-
-	@Override
-	public boolean exists(String sku, StoreMerchantId store) {
-		return productRepository.existsBySku(sku, store);
-	}
+    @Override
+    public boolean exists(String sku, StoreMerchantId store) {
+        return productRepository.existsBySku(sku, store);
+    }
 
 }

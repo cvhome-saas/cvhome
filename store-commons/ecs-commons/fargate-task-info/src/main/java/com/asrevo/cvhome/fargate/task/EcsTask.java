@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.fargate.task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,46 +11,46 @@ import lombok.Setter;
 @Setter
 public class EcsTask {
 
-	@JsonProperty("Cluster")
-	private String cluster;
+    @JsonProperty("Cluster")
+    private String cluster;
 
-	@JsonProperty("TaskARN")
-	private String taskARN;
+    @JsonProperty("TaskARN")
+    private String taskARN;
 
-	@JsonProperty("Family")
-	private String family;
+    @JsonProperty("Family")
+    private String family;
 
-	@JsonProperty("Revision")
-	private String revision;
+    @JsonProperty("Revision")
+    private String revision;
 
-	@JsonProperty("DesiredStatus")
-	private String desiredStatus;
+    @JsonProperty("DesiredStatus")
+    private String desiredStatus;
 
-	@JsonProperty("KnownStatus")
-	private String knownStatus;
+    @JsonProperty("KnownStatus")
+    private String knownStatus;
 
-	@JsonProperty("Limits")
-	private Limits limits;
+    @JsonProperty("Limits")
+    private Limits limits;
 
-	@JsonProperty("PullStartedAt")
-	private String pullStartedAt;
+    @JsonProperty("PullStartedAt")
+    private String pullStartedAt;
 
-	@JsonProperty("PullStoppedAt")
-	private String pullStoppedAt;
+    @JsonProperty("PullStoppedAt")
+    private String pullStoppedAt;
 
-	@JsonProperty("AvailabilityZone")
-	private String availabilityZone;
+    @JsonProperty("AvailabilityZone")
+    private String availabilityZone;
 
-	@JsonProperty("LaunchType")
-	private String launchType;
+    @JsonProperty("LaunchType")
+    private String launchType;
 
-	@JsonProperty("Containers")
-	private ArrayList<Container> containers;
+    @JsonProperty("Containers")
+    private ArrayList<Container> containers;
 
-	@JsonProperty("ClockDrift")
-	private ClockDrift clockDrift;
+    @JsonProperty("ClockDrift")
+    private ClockDrift clockDrift;
 
-	@JsonProperty("EphemeralStorageMetrics")
-	private EphemeralStorageMetrics ephemeralStorageMetrics;
+    @JsonProperty("EphemeralStorageMetrics")
+    private EphemeralStorageMetrics ephemeralStorageMetrics;
 
 }

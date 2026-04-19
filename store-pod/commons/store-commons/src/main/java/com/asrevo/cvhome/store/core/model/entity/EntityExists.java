@@ -2,6 +2,7 @@ package com.asrevo.cvhome.store.core.model.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,19 +10,19 @@ import lombok.Setter;
 @Getter
 public class EntityExists implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private boolean exists = false;
+    private boolean exists = false;
 
-	public EntityExists() {
-	}
+    public EntityExists() {
+    }
 
-	public EntityExists(boolean exists) {
-		this.exists = exists;
-	}
+    public EntityExists(boolean exists) {
+        this.exists = exists;
+    }
 
 }

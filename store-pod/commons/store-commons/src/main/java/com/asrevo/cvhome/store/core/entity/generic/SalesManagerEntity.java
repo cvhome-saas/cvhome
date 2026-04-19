@@ -5,108 +5,77 @@ import java.io.Serializable;
 import java.text.Collator;
 import java.util.Locale;
 
-// import org.hibernate.Hibernate;
-
-/**
- * <p>
- * Entité racine pour la persistence des objets via JPA.
- * </p>
- *
- * @param <E> type de l'entité
- */
 public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
-		implements Serializable, Comparable<E> {
+        implements Serializable, Comparable<E> {
 
-	public static final Collator DEFAULT_STRING_COLLATOR = Collator.getInstance(Locale.FRENCH);
+    public static final Collator DEFAULT_STRING_COLLATOR = Collator.getInstance(Locale.FRENCH);
 
-	@Serial
-	private static final long serialVersionUID = -3988499137919577054L;
+    @Serial
+    private static final long serialVersionUID = -3988499137919577054L;
 
-	static {
-		DEFAULT_STRING_COLLATOR.setStrength(Collator.PRIMARY);
-	}
+    static {
+        DEFAULT_STRING_COLLATOR.setStrength(Collator.PRIMARY);
+    }
 
-	/**
-	 * Retourne la valeur de l'identifiant unique.
-	 * @return id
-	 */
-	public abstract K getId();
+    public abstract K getId();
 
-	/**
-	 * Définit la valeur de l'identifiant unique.
-	 * @param id id
-	 */
-	public abstract void setId(K id);
+    public abstract void setId(K id);
 
-	/**
-	 * Indique si l'objet a déjà été persisté ou non
-	 * @return vrai si l'objet n'a pas encore été persisté
-	 */
-	public boolean isNew() {
-		return getId() == null;
-	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(Object object) {
-		if (object == null) {
-			return false;
-		}
-		if (object == this) {
-			return true;
-		}
+    public boolean isNew() {
+        return getId() == null;
+    }
 
-		// l'objet peut être proxyfié donc on utilise Hibernate.getClass() pour sortir la
-		// vraie
-		// classe
-		// if (Hibernate.getClass(object) != Hibernate.getClass(this)) {
-		// return false;
-		// }
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
 
-		SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object; // NOSONAR :
-																				// traité
-																				// au-dessus
-																				// mais
-																				// wrapper
-																				// Hibernate
-		K id = getId();
+        SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object;
 
-		if (id == null) {
-			return false;
-		}
+        K id = getId();
 
-		return id.equals(entity.getId());
-	}
+        if (id == null) {
+            return false;
+        }
 
-	@Override
-	public int hashCode() {
-		int hash = 7;
+        return id.equals(entity.getId());
+    }
 
-		K id = getId();
-		hash = 31 * hash + ((id == null) ? 0 : id.hashCode());
+    @Override
+    public int hashCode() {
+        int hash = 7;
 
-		return hash;
-	}
+        K id = getId();
+        hash = 31 * hash + ((id == null) ? 0 : id.hashCode());
 
-	public int compareTo(E o) {
-		if (this == o) {
-			return 0;
-		}
-		return this.getId().compareTo(o.getId());
-	}
+        return hash;
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("entity.");
-		builder.append(getClass().getSimpleName());
-		builder.append("<");
-		builder.append(getId());
-		builder.append("-");
-		builder.append(super.toString());
-		builder.append(">");
+    public int compareTo(E o) {
+        if (this == o) {
+            return 0;
+        }
+        return this.getId().compareTo(o.getId());
+    }
 
-		return builder.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("entity.");
+        builder.append(getClass().getSimpleName());
+        builder.append("<");
+        builder.append(getId());
+        builder.append("-");
+        builder.append(super.toString());
+        builder.append(">");
+
+        return builder.toString();
+    }
 
 }

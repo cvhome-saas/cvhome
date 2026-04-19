@@ -1,14 +1,16 @@
 package com.asrevo.cvhome.catalog.model.product.product;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.asrevo.cvhome.catalog.model.category.Category;
 import com.asrevo.cvhome.catalog.model.product.PersistableImage;
 import com.asrevo.cvhome.catalog.model.product.ProductDescription;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,28 +18,29 @@ import lombok.Setter;
 @Getter
 public class PersistableProduct extends ProductEntity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private List<ProductDescription> descriptions = new ArrayList<>();
+    private List<ProductDescription> descriptions = new ArrayList<>();
 
-	private List<PersistableProductAttribute> attributes = new ArrayList<>(); // persist
-																				// attribute
-																				// and
-																				// save
-																				// reference
+    private List<PersistableProductAttribute> attributes = new ArrayList<>(); // persist
 
-	private List<PersistableImage> images; // persist images and save reference
+    // attribute
+    // and
+    // save
+    // reference
 
-	private List<Category> categories = new ArrayList<>();
+    private List<PersistableImage> images; // persist images and save reference
 
-	private PersistableProductInventory inventory;
+    private List<Category> categories = new ArrayList<>();
 
-	private List<PersistableProductVariant> variants = new ArrayList<>();
+    private PersistableProductInventory inventory;
 
-	private String type;
+    private List<PersistableProductVariant> variants = new ArrayList<>();
+
+    private String type;
 
 }

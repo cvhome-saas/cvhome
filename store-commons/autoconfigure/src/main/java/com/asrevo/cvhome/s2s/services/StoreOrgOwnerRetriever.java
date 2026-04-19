@@ -5,6 +5,6 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 
 public interface StoreOrgOwnerRetriever {
 
-	ManagerOrgId owner(ManagerStoreId store);
+    ManagerOrgId owner(ManagerStoreId store);
 
 }

@@ -1,5 +1,12 @@
 package com.asrevo.cvhome.catalog.service.mapper.inventory;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
@@ -14,109 +21,93 @@ import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.utils.DateUtil;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 @Component
 public class ReadableInventoryMapper implements Mapper<ProductAvailability, ReadableInventory> {
 
-	private final PricingService pricingService;
+    private final PricingService pricingService;
 
-	private final ExternalMerchantStoreService externalMerchantStoreService;
+    private final ExternalMerchantStoreService externalMerchantStoreService;
 
-	public ReadableInventoryMapper(PricingService pricingService,
-			ExternalMerchantStoreService externalMerchantStoreService) {
-		this.pricingService = pricingService;
-		this.externalMerchantStoreService = externalMerchantStoreService;
-	}
+    public ReadableInventoryMapper(PricingService pricingService,
+                                   ExternalMerchantStoreService externalMerchantStoreService) {
+        this.pricingService = pricingService;
+        this.externalMerchantStoreService = externalMerchantStoreService;
+    }
 
-	@Override
-	public ReadableInventory convert(ProductAvailability source, StoreMerchantId store, LanguageCode language) {
-		ReadableInventory availability = new ReadableInventory();
-		return merge(source, availability, store, language);
-	}
+    @Override
+    public ReadableInventory convert(ProductAvailability source, StoreMerchantId store, LanguageCode language) {
+        ReadableInventory availability = new ReadableInventory();
+        return merge(source, availability, store, language);
+    }
 
-	@Override
-	public ReadableInventory merge(ProductAvailability source, ReadableInventory destination, StoreMerchantId store,
-			LanguageCode language) {
-		Assert.notNull(destination, "Destination Product availability cannot be null");
-		Assert.notNull(source, "Source Product availability cannot be null");
+    @Override
+    public ReadableInventory merge(ProductAvailability source, ReadableInventory destination, StoreMerchantId store,
+                                   LanguageCode language) {
+        try {
+            destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
+            destination.setProductQuantityOrderMax(
+                    source.getProductQuantityOrderMax() != null ? source.getProductQuantityOrderMax() : 0);
+            destination.setProductQuantityOrderMin(
+                    source.getProductQuantityOrderMin() != null ? source.getProductQuantityOrderMin() : 0);
+            destination.setOwner(source.getOwner());
+            destination.setId(source.getId());
+            destination.setRegion(source.getRegion());
+            destination.setRegionVariant(source.getRegionVariant());
+            destination.setStore(externalMerchantStoreService.getStore(store));
+            if (source.getAvailable() != null) {
+                if (source.getProductDateAvailable() != null) {
+                    boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())
+                            .isAfter(LocalDate.parse(DateUtil.formatDate(source.getProductDateAvailable())));
+                    if (isAfter && source.getAvailable()) {
+                        destination.setAvailable(true);
+                    }
+                    destination.setDateAvailable(DateUtil.formatDate(source.getProductDateAvailable()));
+                } else {
+                    destination.setAvailable(source.getAvailable());
+                }
+            }
 
-		try {
-			destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
-			destination.setProductQuantityOrderMax(
-					source.getProductQuantityOrderMax() != null ? source.getProductQuantityOrderMax() : 0);
-			destination.setProductQuantityOrderMin(
-					source.getProductQuantityOrderMin() != null ? source.getProductQuantityOrderMin() : 0);
-			destination.setOwner(source.getOwner());
-			destination.setId(source.getId());
-			destination.setRegion(source.getRegion());
-			destination.setRegionVariant(source.getRegionVariant());
-			destination.setStore(externalMerchantStoreService.getStore(store));
-			if (source.getAvailable() != null) {
-				if (source.getProductDateAvailable() != null) {
-					boolean isAfter = LocalDate.parse(DateUtil.getPresentDate())
-						.isAfter(LocalDate.parse(DateUtil.formatDate(source.getProductDateAvailable())));
-					if (isAfter && source.getAvailable()) {
-						destination.setAvailable(true);
-					}
-					destination.setDateAvailable(DateUtil.formatDate(source.getProductDateAvailable()));
-				}
-				else {
-					destination.setAvailable(source.getAvailable());
-				}
-			}
+            if (source.getAuditSection() != null) {
+                if (source.getAuditSection().getDateCreated() != null) {
+                    destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
+                }
+            }
 
-			if (source.getAuditSection() != null) {
-				if (source.getAuditSection().getDateCreated() != null) {
-					destination.setCreationDate(DateUtil.formatDate(source.getAuditSection().getDateCreated()));
-				}
-			}
+            List<ReadableProductPrice> prices = prices(source, store, language);
+            destination.setPrices(prices);
 
-			List<ReadableProductPrice> prices = prices(source, store, language);
-			destination.setPrices(prices);
+            if (!StringUtils.isEmpty(source.getSku())) {
+                destination.setSku(source.getSku());
+            } else {
+                destination.setSku(source.getProduct().getSku());
+            }
 
-			if (!StringUtils.isEmpty(source.getSku())) {
-				destination.setSku(source.getSku());
-			}
-			else {
-				destination.setSku(source.getProduct().getSku());
-			}
+            FinalPrice price;
+            price = pricingService.calculateProductPrice(source);
+            destination.setPrice(price.getStringPrice());
 
-			FinalPrice price;
-			// try {
-			price = pricingService.calculateProductPrice(source);
-			destination.setPrice(price.getStringPrice());
-			// } catch (ServiceException e) {
-			// throw new ConversionRuntimeException("Unable to get product price", e);
-			// }
+        } catch (Exception e) {
+            throw new ConversionRuntimeException("Error while converting Inventory", e);
+        }
 
-		}
-		catch (Exception e) {
-			throw new ConversionRuntimeException("Error while converting Inventory", e);
-		}
+        return destination;
+    }
 
-		return destination;
-	}
+    private List<ReadableProductPrice> prices(ProductAvailability source, StoreMerchantId store, LanguageCode language)
+            throws ConversionException {
 
-	private List<ReadableProductPrice> prices(ProductAvailability source, StoreMerchantId store, LanguageCode language)
-			throws ConversionException {
+        ReadableProductPricePopulator populator;
+        List<ReadableProductPrice> prices = new ArrayList<>();
 
-		ReadableProductPricePopulator populator;
-		List<ReadableProductPrice> prices = new ArrayList<>();
+        for (ProductPrice price : source.getPrices()) {
 
-		for (ProductPrice price : source.getPrices()) {
-
-			populator = new ReadableProductPricePopulator();
-			populator.setPricingService(pricingService);
-			ReadableProductPrice p = populator.populate(price, new ReadableProductPrice(), store, language);
-			prices.add(p);
-		}
-		return prices;
-	}
+            populator = new ReadableProductPricePopulator();
+            populator.setPricingService(pricingService);
+            ReadableProductPrice p = populator.populate(price, new ReadableProductPrice(), store, language);
+            prices.add(p);
+        }
+        return prices;
+    }
 
 }

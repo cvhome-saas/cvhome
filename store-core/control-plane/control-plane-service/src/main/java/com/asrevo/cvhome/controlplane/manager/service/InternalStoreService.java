@@ -1,34 +1,38 @@
 package com.asrevo.cvhome.controlplane.manager.service;
 
-import com.asrevo.cvhome.commons.domain.*;
-import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
-import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
+import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
+
 public interface InternalStoreService {
 
-	ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
+    ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
 
-	void completeProvisioning(ManagerStoreId store);
+    void completeProvisioning(ManagerStoreId store);
 
-	void failProvisioning(ManagerStoreId store);
+    void failProvisioning(ManagerStoreId store);
 
-	void startProvisioning(ManagerStoreId store);
+    void startProvisioning(ManagerStoreId store);
 
-	Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
-			Pageable pageable);
+    Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
+                                  Pageable pageable);
 
-	Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
+    Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
 
-	ManagerOrgId getStoreOwner(ManagerStoreId store);
+    ManagerOrgId getStoreOwner(ManagerStoreId store);
 
-	ManagerStoreDto findStore(ManagerStoreId store);
+    ManagerStoreDto findStore(ManagerStoreId store);
 
-	Boolean checkNameExists(String name);
+    Boolean checkNameExists(String name);
 
-	PodId getStorePod(ManagerStoreId managerStoreId);
+    PodId getStorePod(ManagerStoreId managerStoreId);
 
 }

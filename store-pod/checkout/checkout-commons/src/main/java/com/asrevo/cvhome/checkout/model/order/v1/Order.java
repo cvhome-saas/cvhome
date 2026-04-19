@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.checkout.model.order.v1;
 
-import com.asrevo.cvhome.commons.domain.Entity;
 import java.io.Serial;
+
+import com.asrevo.cvhome.commons.domain.Entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,16 +11,16 @@ import lombok.Setter;
 @Getter
 public class Order extends Entity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private boolean customerAgreement;
+    private boolean customerAgreement;
 
-	private String comments;
+    private String comments;
 
-	private String currency;
+    private String currency;
 
 }

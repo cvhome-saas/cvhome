@@ -4,8 +4,8 @@ import com.stripe.model.Event;
 
 public interface WebhookHandler {
 
-	void handle(Event event);
+    void handle(Event event);
 
-	String type();
+    String type();
 
 }

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.merchant.content.model.content;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,8 +15,8 @@ import lombok.Setter;
 @Getter
 public class ContentFolder {
 
-	List<Content> content = new ArrayList<>();
+    List<Content> content = new ArrayList<>();
 
-	private String path;
+    private String path;
 
 }

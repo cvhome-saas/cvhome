@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.fargate.task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,61 +12,61 @@ import lombok.Setter;
 @Setter
 public class Container {
 
-	@JsonProperty("DockerId")
-	private String dockerId;
+    @JsonProperty("DockerId")
+    private String dockerId;
 
-	@JsonProperty("Name")
-	private String name;
+    @JsonProperty("Name")
+    private String name;
 
-	@JsonProperty("DockerName")
-	private String dockerName;
+    @JsonProperty("DockerName")
+    private String dockerName;
 
-	@JsonProperty("Image")
-	private String image;
+    @JsonProperty("Image")
+    private String image;
 
-	@JsonProperty("ImageID")
-	private String imageID;
+    @JsonProperty("ImageID")
+    private String imageID;
 
-	@JsonProperty("Labels")
-	private Map<String, String> labels;
+    @JsonProperty("Labels")
+    private Map<String, String> labels;
 
-	@JsonProperty("DesiredStatus")
-	private String desiredStatus;
+    @JsonProperty("DesiredStatus")
+    private String desiredStatus;
 
-	@JsonProperty("KnownStatus")
-	private String knownStatus;
+    @JsonProperty("KnownStatus")
+    private String knownStatus;
 
-	@JsonProperty("Limits")
-	private Limits limits;
+    @JsonProperty("Limits")
+    private Limits limits;
 
-	@JsonProperty("CreatedAt")
-	private String createdAt;
+    @JsonProperty("CreatedAt")
+    private String createdAt;
 
-	@JsonProperty("StartedAt")
-	private String startedAt;
+    @JsonProperty("StartedAt")
+    private String startedAt;
 
-	@JsonProperty("LastRestartAt")
-	private String lastRestartAt;
+    @JsonProperty("LastRestartAt")
+    private String lastRestartAt;
 
-	@JsonProperty("Type")
-	private String type;
+    @JsonProperty("Type")
+    private String type;
 
-	@JsonProperty("LogDriver")
-	private String logDriver;
+    @JsonProperty("LogDriver")
+    private String logDriver;
 
-	@JsonProperty("LogOptions")
-	private Map<String, String> logOptions;
+    @JsonProperty("LogOptions")
+    private Map<String, String> logOptions;
 
-	@JsonProperty("ContainerARN")
-	private String containerARN;
+    @JsonProperty("ContainerARN")
+    private String containerARN;
 
-	@JsonProperty("Networks")
-	private ArrayList<Network> networks;
+    @JsonProperty("Networks")
+    private ArrayList<Network> networks;
 
-	@JsonProperty("Snapshotter")
-	private String snapshotter;
+    @JsonProperty("Snapshotter")
+    private String snapshotter;
 
-	@JsonProperty("Health")
-	private Health health;
+    @JsonProperty("Health")
+    private Health health;
 
 }

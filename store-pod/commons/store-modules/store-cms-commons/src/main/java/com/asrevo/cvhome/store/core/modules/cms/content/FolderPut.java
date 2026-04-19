@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface FolderPut {
 
-	/**
-	 * Create folder on root or on specific path
-	 */
-	void addFolder(final String merchantStoreCode, String folderName, Optional<String> path);
+    /**
+     * Create folder on root or on specific path
+     */
+    void addFolder(final String merchantStoreCode, String folderName, Optional<String> path);
 
 }

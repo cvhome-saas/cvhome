@@ -2,8 +2,7 @@ package com.asrevo.cvhome.controlplane.controller;
 
 import java.security.Principal;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +12,10 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,20 +24,20 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class AuthController {
 
-	@GetMapping("current")
+    @GetMapping("current")
 
-	public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
-		return Optional.ofNullable(principal)
-			.map(ResponseEntity::ok)
-			.orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
-	}
+    public ResponseEntity<Principal> current(@AuthenticationPrincipal Principal principal) {
+        return Optional.ofNullable(principal)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
+    }
 
-	@GetMapping("me")
+    @GetMapping("me")
 
-	public Mono<JwtAuthenticationToken> me() {
-		return ReactiveSecurityContextHolder.getContext()
-			.map(SecurityContext::getAuthentication)
-			.cast(JwtAuthenticationToken.class);
-	}
+    public Mono<JwtAuthenticationToken> me() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .cast(JwtAuthenticationToken.class);
+    }
 
 }

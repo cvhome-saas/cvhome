@@ -9,22 +9,22 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface ProductFacade {
 
-	/**
-	 *
-	 */
-	Product getProduct(Long id, StoreMerchantId store);
+    /**
+     *
+     */
+    Product getProduct(Long id, StoreMerchantId store);
 
-	/**
-	 * Get a Product by friendlyUrl (slug), store and language
-	 */
-	ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
-			throws Exception;
+    /**
+     * Get a Product by friendlyUrl (slug), store and language
+     */
+    ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
+            throws Exception;
 
-	/**
-	 * Filters a list of product based on criteria
-	 */
-	ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria);
+    /**
+     * Filters a list of product based on criteria
+     */
+    ReadableProductList getProductListsByCriteria(StoreMerchantId store, ProductCriteria criteria);
 
-	ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore, ProductCriteria searchCriteria);
+    ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore, ProductCriteria searchCriteria);
 
 }

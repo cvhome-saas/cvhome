@@ -1,24 +1,26 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
-import com.asrevo.cvhome.fargate.task.EcsTask;
-import com.asrevo.cvhome.fargate.task.EcsTaskFetcher;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.asrevo.cvhome.fargate.task.EcsTask;
+import com.asrevo.cvhome.fargate.task.EcsTaskFetcher;
+
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @ConditionalOnProperty(name = "AWS_EXECUTION_ENV", havingValue = "AWS_ECS_FARGATE")
 public class EcsInfoConfig {
 
-	@Bean
-	public EcsTask ecsTask() {
-		return EcsTaskFetcher.fetch();
-	}
+    @Bean
+    public EcsTask ecsTask() {
+        return EcsTaskFetcher.fetch();
+    }
 
-	@Bean
-	public EcsTaskHealthIndicator ecsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
-		return new EcsTaskHealthIndicator(ecsTask, objectMapper);
-	}
+    @Bean
+    public EcsTaskHealthIndicator ecsTaskHealthIndicator(EcsTask ecsTask, ObjectMapper objectMapper) {
+        return new EcsTaskHealthIndicator(ecsTask, objectMapper);
+    }
 
 }

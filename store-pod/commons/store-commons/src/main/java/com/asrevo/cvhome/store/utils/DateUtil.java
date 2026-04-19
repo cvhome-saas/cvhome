@@ -14,10 +14,12 @@
  */
 package com.asrevo.cvhome.store.utils;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.asrevo.cvhome.store.core.constants.Constants;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,54 +27,58 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DateUtil {
 
-	private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
+    private static final String LONGDATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
 
-	/**
-	 * yyyy-MM-dd
-	 */
-	public static String formatDate(Date dt) {
+    private DateUtil() {
+    }
 
-		if (dt == null)
-			dt = new Date();
-		SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-		return format.format(dt);
-	}
+    /**
+     * yyyy-MM-dd
+     */
+    public static String formatDate(Date dt) {
 
-	public static String formatLongDate(Date date) {
+        if (dt == null) {
+            dt = new Date();
+        }
+        SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+        return format.format(dt);
+    }
 
-		if (date == null)
-			return null;
-		SimpleDateFormat format = new SimpleDateFormat(LONGDATE_FORMAT);
-		return format.format(date);
-	}
+    public static String formatLongDate(Date date) {
 
-	public static Date getDate(String date) throws Exception {
-		DateFormat myDateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-		return myDateFormat.parse(date);
-	}
+        if (date == null) {
+            return null;
+        }
+        SimpleDateFormat format = new SimpleDateFormat(LONGDATE_FORMAT);
+        return format.format(date);
+    }
 
-	public static String getPresentDate() {
+    public static Date getDate(String date) throws Exception {
+        DateFormat myDateFormat = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+        return myDateFormat.parse(date);
+    }
 
-		Date dt = new Date();
+    public static String getPresentDate() {
 
-		SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
-		return format.format(new Date(dt.getTime()));
-	}
+        Date dt = new Date();
 
-	public static boolean dateBeforeEqualsDate(Date firstDate, Date compareDate) {
+        SimpleDateFormat format = new SimpleDateFormat(Constants.DEFAULT_DATE_FORMAT);
+        return format.format(new Date(dt.getTime()));
+    }
 
-		if (firstDate == null || compareDate == null) {
-			return true;
-		}
+    public static boolean dateBeforeEqualsDate(Date firstDate, Date compareDate) {
 
-		if (firstDate.compareTo(compareDate) > 0) {
-			return false;
-		}
-		else if (firstDate.compareTo(compareDate) < 0) {
-			return true;
-		}
-		else
-			return firstDate.compareTo(compareDate) == 0;
-	}
+        if (firstDate == null || compareDate == null) {
+            return true;
+        }
+
+        if (firstDate.compareTo(compareDate) > 0) {
+            return false;
+        } else if (firstDate.compareTo(compareDate) < 0) {
+            return true;
+        } else {
+            return firstDate.compareTo(compareDate) == 0;
+        }
+    }
 
 }
