@@ -6,7 +6,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.asrevo.cvhome.checkout.entity.reference.country.Country;
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
-import com.asrevo.cvhome.checkout.entity.reference.zone.ZoneDescription;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
@@ -35,11 +34,8 @@ public class ReadableCountryPopulator extends AbstractDataPopulator<Country, Sto
                 readableZone.setCountryCode(target.getCode());
                 readableZone.setCode(z.getCode());
                 if (!CollectionUtils.isEmpty(z.getDescriptions())) {
-                    for (ZoneDescription d : z.getDescriptions()) {
-                        if (Objects.equals(d.getLanguageCode(), language)) {
-                            readableZone.setName(d.getName());
-                        }
-                    }
+                    z.getDescriptions().stream().filter(it -> Objects.equals(it.getLanguageCode(), language))
+                            .forEach(it -> readableZone.setName(it.getName()));
                 }
                 target.getZones().add(readableZone);
             }

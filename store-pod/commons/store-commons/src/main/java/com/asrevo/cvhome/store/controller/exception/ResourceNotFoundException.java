@@ -15,7 +15,7 @@ public class ResourceNotFoundException extends ServiceRuntimeException {
     private static final long serialVersionUID = 1L;
 
     public ResourceNotFoundException(String errorCode, String message) {
-        super(StringUtils.isBlank(errorCode) ? "404" : errorCode, message);
+        super(StringUtils.isBlank(errorCode) ? ERROR_CODE : errorCode, message);
     }
 
     public ResourceNotFoundException(String message) {
