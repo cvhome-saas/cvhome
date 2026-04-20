@@ -3,8 +3,6 @@
  */
 package com.asrevo.cvhome.checkout.service.facade.cart;
 
-import org.springframework.lang.Nullable;
-
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
@@ -60,7 +58,6 @@ public interface ShoppingCartFacade {
      * @return ReadableShoppingCart or NULL
      * @throws Exception
      */
-    @Nullable
     ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
                                                 LanguageCode language, boolean returnCart) throws Exception;
 

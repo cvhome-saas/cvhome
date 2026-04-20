@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
-import com.asrevo.cvhome.customer.model.customer.address.Address;
+import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +27,9 @@ public class CustomerEntity extends Customer implements Serializable {
     private String emailAddress;
 
     @Valid
-    private Address billing;
+    private CustomerAddress billing;
 
-    private Address delivery;
+    private CustomerAddress delivery;
 
     private String firstName;
 

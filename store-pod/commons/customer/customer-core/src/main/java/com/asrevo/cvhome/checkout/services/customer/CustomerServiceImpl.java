@@ -34,7 +34,7 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
 
     @Override
     public Page<Customer> getListByStore(StoreMerchantId store, CustomerCriteria criteria) {
-        return customerRepository.findByStoreMerchantId(store, criteria);
+        return customerRepository.findByStoreMerchantId(store, criteria, criteria.getPageable());
     }
 
     @Override

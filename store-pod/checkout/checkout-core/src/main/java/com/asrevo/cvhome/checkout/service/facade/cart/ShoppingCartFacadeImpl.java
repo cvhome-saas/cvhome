@@ -17,7 +17,6 @@ import jakarta.persistence.NoResultException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
@@ -149,8 +148,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public @Nullable ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
-                                                                 LanguageCode language, boolean returnCart) throws Exception {
+    public ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
+                                                       LanguageCode language, boolean returnCart) throws Exception {
         Validate.notNull(cartCode, "Shopping cart code must not be null");
         Validate.notNull(sku, "product sku must not be null");
         Validate.notNull(merchant, "store cannot be null");

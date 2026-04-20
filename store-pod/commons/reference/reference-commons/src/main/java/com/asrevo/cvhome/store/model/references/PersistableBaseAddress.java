@@ -2,7 +2,7 @@ package com.asrevo.cvhome.store.model.references;
 
 import java.io.Serial;
 
-public class ReadableAddress extends Address {
+public class PersistableBaseAddress extends BaseAddress {
 
     /**
      *

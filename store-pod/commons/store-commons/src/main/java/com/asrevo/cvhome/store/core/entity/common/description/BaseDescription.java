@@ -32,7 +32,7 @@ import lombok.Setter;
 @EntityListeners(value = AuditListener.class)
 @Getter
 @Setter
-public class Description implements Auditable, Serializable {
+public class BaseDescription implements Auditable, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

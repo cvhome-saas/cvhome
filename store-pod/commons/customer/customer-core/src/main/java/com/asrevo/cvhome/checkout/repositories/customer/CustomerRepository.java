@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +29,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
 
     Optional<Customer> findByCuaExternalId(String cuaExternalId);
 
-    default Page<Customer> findByStoreMerchantId(StoreMerchantId store, CustomerCriteria criteria) {
+    default Page<Customer> findByStoreMerchantId(StoreMerchantId store, CustomerCriteria criteria, Pageable pageable) {
 
         return findAll((root, cq, cb) -> {
 
@@ -57,7 +58,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
             }
 
             return cb.and(predicates);
-        }, criteria.getPageable());
+        }, pageable);
     }
 
 }

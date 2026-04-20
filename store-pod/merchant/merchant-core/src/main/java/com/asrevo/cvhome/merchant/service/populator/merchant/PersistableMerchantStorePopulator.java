@@ -12,7 +12,7 @@ import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import com.asrevo.cvhome.store.model.references.PersistableAddress;
+import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -102,7 +102,7 @@ public class PersistableMerchantStorePopulator
         }
 
         // address population
-        PersistableAddress address = source.getAddress();
+        PersistableBaseAddress address = source.getAddress();
         if (address != null) {
             target.setZone(address.getStateProvince());
             target.setStorestateprovince(address.getStateProvince());

@@ -18,7 +18,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class Address implements Serializable {
+public class BaseAddress implements Serializable {
 
     /**
      *
@@ -28,11 +28,11 @@ public class Address implements Serializable {
 
     @JsonSerialize(using = ZoneCodeSerializer.class)
     @JsonDeserialize(using = ZoneCodeDeSerializer.class)
-    private ZoneCode stateProvince; // code
+    private ZoneCode stateProvince;
 
     @JsonSerialize(using = CountryIsoCodeSerializer.class)
     @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
-    private CountryIsoCode country; // code
+    private CountryIsoCode country;
 
     private String address;
 

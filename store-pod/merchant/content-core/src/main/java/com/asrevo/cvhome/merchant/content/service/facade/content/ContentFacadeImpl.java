@@ -199,19 +199,16 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     private Content getContent(String code, StoreMerchantId store, LanguageCode language) {
-        Content content;
+        Optional<Content> content;
 
         if (LanguageCode.isLanguage(language)) {
-            content = Optional.ofNullable(contentService.getByCode(code, store, language))
-                    .orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+            content = Optional.ofNullable(contentService.getByCode(code, store, language));
         } else if (LanguageCode.isAllLanguage(language)) {
-            content = Optional.ofNullable(contentService.getByCodeFetchAllLanguages(code, store))
-                    .orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+            content = Optional.ofNullable(contentService.getByCodeFetchAllLanguages(code, store));
         } else {
-            content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store))
-                    .orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+            content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store));
         }
-        return content;
+        return content.orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
     }
 
     @SneakyThrows

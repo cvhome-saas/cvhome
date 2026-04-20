@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.store.core.services.generic;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;

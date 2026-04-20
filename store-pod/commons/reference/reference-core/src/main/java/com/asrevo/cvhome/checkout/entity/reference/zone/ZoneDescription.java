@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
-import com.asrevo.cvhome.store.core.entity.common.description.Description;
+import com.asrevo.cvhome.store.core.entity.common.description.BaseDescription;
 import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,7 +27,7 @@ import lombok.Setter;
         initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
-public class ZoneDescription extends Description {
+public class ZoneDescription extends BaseDescription {
 
     @Serial
     private static final long serialVersionUID = 1L;

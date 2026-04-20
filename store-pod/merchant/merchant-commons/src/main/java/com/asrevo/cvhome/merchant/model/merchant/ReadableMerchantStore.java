@@ -11,7 +11,7 @@ import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAuditable;
-import com.asrevo.cvhome.store.model.references.ReadableAddress;
+import com.asrevo.cvhome.store.model.references.ReadableBaseAddress;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class ReadableMerchantStore extends MerchantStoreEntity implements Readab
 
     private String currentUserLanguage;
 
-    private ReadableAddress address;
+    private ReadableBaseAddress address;
 
     private ReadableImage logo;
 

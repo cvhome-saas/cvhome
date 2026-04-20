@@ -21,12 +21,5 @@ public interface ProductVariantGroupFacade {
 
     ReadableEntityList<ReadableProductVariantGroup> list(Long productId, StoreMerchantId store, LanguageCode language,
                                                          Pageable pageable);
-    /*
-     *
-     * @TODO not needed for now void addImage(MultipartFile image, Long instanceGroupId,
-     * StoreMerchantId store, LanguageCode language);
-     *
-     * void removeImage(Long imageId, Long instanceGroupId, StoreMerchantId store);
-     */
 
 }

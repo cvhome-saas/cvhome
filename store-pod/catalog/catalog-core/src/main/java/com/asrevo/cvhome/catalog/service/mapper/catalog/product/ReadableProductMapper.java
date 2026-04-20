@@ -223,14 +223,12 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
                         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
 
                         optValue.setDefaultValue(attribute.isAttributeDefault());
-                        // optValue.setId(attribute.getProductOptionValue().getId());
                         optValue.setId(attribute.getId());
                         optValue.setCode(attribute.getProductOptionValue().getCode());
 
                         com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription valueDescription =
                                 new com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription();
                         valueDescription.setLanguage(language);
-                        // optValue.setLang(language.getCode());
                         if (attribute.getProductAttributePrice() != null
                                 && attribute.getProductAttributePrice().doubleValue() > 0) {
                             String formatedPrice;
@@ -419,7 +417,6 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         prdImage.setImageName(image.getProductImage());
         prdImage.setDefaultImage(image.isDefaultImage());
 
-        // TODO product variant image
         StringBuilder imgPath = new StringBuilder();
         imgPath.append(imageUtils.getContextPath())
                 .append(imageUtils.buildProductImageUtils(store, product.getSku(), image.getProductImage()));

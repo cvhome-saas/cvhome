@@ -301,10 +301,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         Content content = contentRepository.findOne(id);
 
-        if (content != null) {
-            if (!Objects.equals(content.getStoreMerchantId(), store)) {
-                return null;
-            }
+        if (content != null && !Objects.equals(content.getStoreMerchantId(), store)) {
+            return null;
         }
 
         return content;
@@ -312,10 +310,8 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
     @Override
     public void addFolder(StoreMerchantId store, Optional<String> path, String folderName) throws ServiceException {
-        if (path.isPresent()) {
-            if (!this.isValidLinuxDirectory(path.get())) {
-                throw new ServiceException("Path format [" + path.get() + "] not a valid directory format");
-            }
+        if (path.isPresent() && !this.isValidLinuxDirectory(path.get())) {
+            throw new ServiceException("Path format [" + path.get() + "] not a valid directory format");
         }
         assetsManager.addFolder(store.getId(), folderName, path);
     }
@@ -331,7 +327,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     public boolean isValidLinuxDirectory(String path) {
-        Pattern linuxDirectoryPattern = Pattern.compile("^/|(/[a-zA-Z0-9_-]+)+$");
+        Pattern linuxDirectoryPattern = Pattern.compile("^(?:/|(?:/[a-zA-Z0-9_-]+)+)$");
         return path != null && !path.trim().isEmpty() && linuxDirectoryPattern.matcher(path).matches();
     }
 

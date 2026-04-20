@@ -6,10 +6,10 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 /**
  * @author Umesh A
  */
-public interface DataPopulator<Source, Store, Target> {
+public interface DataPopulator<S, M, T> {
 
-    Target populate(Source source, Target target, Store store, LanguageCode language) throws ConversionException;
+    T populate(S source, T target, M store, LanguageCode language) throws ConversionException;
 
-    Target populate(Source source, Store store, LanguageCode language) throws ConversionException;
+    T populate(S source, M store, LanguageCode language) throws ConversionException;
 
 }

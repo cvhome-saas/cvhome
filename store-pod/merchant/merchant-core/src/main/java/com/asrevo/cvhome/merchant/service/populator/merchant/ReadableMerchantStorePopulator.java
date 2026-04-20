@@ -15,7 +15,7 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
-import com.asrevo.cvhome.store.model.references.ReadableAddress;
+import com.asrevo.cvhome.store.model.references.ReadableBaseAddress;
 import com.asrevo.cvhome.store.model.references.ReadableLanguage;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -50,7 +50,7 @@ public class ReadableMerchantStorePopulator
         target.setCurrency(source.getCurrency());
         target.setPhone(source.getStorephone());
 
-        ReadableAddress address = new ReadableAddress();
+        ReadableBaseAddress address = new ReadableBaseAddress();
         address.setAddress(source.getStoreaddress());
         address.setCity(source.getStorecity());
         if (source.getCountry() != null) {

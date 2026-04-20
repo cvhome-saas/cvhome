@@ -116,7 +116,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
         return category;
     }
 
-    // @Override
+    @Override
     public void delete(Category category) throws ServiceException {
 
         StringBuilder lineage = new StringBuilder();

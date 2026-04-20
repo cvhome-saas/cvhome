@@ -23,7 +23,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class Address extends AddressLocation implements Serializable {
+public class CustomerAddress extends AddressLocation implements Serializable {
 
     /**
      *
@@ -31,13 +31,9 @@ public class Address extends AddressLocation implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // @NotEmpty(message="{NotEmpty.customer.firstName}")
     private String firstName;
 
-    // @NotEmpty(message="{NotEmpty.customer.lastName}")
     private String lastName;
-
-    private String bilstateOther;
 
     private String company;
 
@@ -49,17 +45,10 @@ public class Address extends AddressLocation implements Serializable {
 
     private String stateProvince;
 
-    private boolean billingAddress;
-
-    private String latitude;
-
-    private String longitude;
-
     @JsonSerialize(using = ZoneCodeSerializer.class)
     @JsonDeserialize(using = ZoneCodeDeSerializer.class)
     private ZoneCode zone; // code
 
-    // @NotEmpty(message="{NotEmpty.customer.billing.country}")
     @JsonSerialize(using = CountryIsoCodeSerializer.class)
     @JsonDeserialize(using = CountryIsoCodeDeSerializer.class)
     private CountryIsoCode country;

@@ -13,7 +13,7 @@ import com.asrevo.cvhome.checkout.services.reference.country.CountryService;
 import com.asrevo.cvhome.checkout.services.reference.zone.ZoneService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
-import com.asrevo.cvhome.customer.model.customer.address.Address;
+import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -72,7 +72,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
 
             target.setStoreMerchantId(store);
 
-            Address sourceBilling = source.getBilling();
+            CustomerAddress sourceBilling = source.getBilling();
             if (sourceBilling != null) {
                 Billing billing = target.getBilling();
                 billing.setAddress(sourceBilling.getAddress());
@@ -119,7 +119,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                     target.setBilling(billing);
                 }
             }
-            Address sourceShipping = source.getDelivery();
+            CustomerAddress sourceShipping = source.getDelivery();
             if (sourceShipping != null) {
                 Delivery delivery = new Delivery();
                 delivery.setAddress(sourceShipping.getAddress());
@@ -158,7 +158,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                     deliveryCountry = countries.get(source.getDelivery().getCountry());
                     if (deliveryCountry == null) {
                         CountryIsoCode countryIsoCode = Optional.ofNullable(sourceShipping)
-                                .map(Address::getCountry)
+                                .map(CustomerAddress::getCountry)
                                 .orElse(null);
                         throw new ConversionException("Unsupported country code " + countryIsoCode);
                     }

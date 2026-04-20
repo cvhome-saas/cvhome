@@ -10,7 +10,7 @@ import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
-import com.asrevo.cvhome.store.core.entity.common.description.Description;
+import com.asrevo.cvhome.store.core.entity.common.description.BaseDescription;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,7 @@ import lombok.Setter;
         initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
-public class ProductTypeDescription extends Description {
+public class ProductTypeDescription extends BaseDescription {
 
     /**
      *

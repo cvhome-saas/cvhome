@@ -49,7 +49,7 @@ public class KeyPairService {
                         }
                     });
                     if (alreadyHasActive) {
-                        return; // Skip subsequent active keys
+                        return;
                     }
                 }
                 result.add(jwk);

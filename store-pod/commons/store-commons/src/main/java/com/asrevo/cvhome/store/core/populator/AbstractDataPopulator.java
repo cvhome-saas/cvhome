@@ -10,15 +10,15 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public abstract class AbstractDataPopulator<Source, Store, Target> implements DataPopulator<Source, Store, Target> {
+public abstract class AbstractDataPopulator<S, M, T> implements DataPopulator<S, M, T> {
 
     private Locale locale;
 
     @Override
-    public Target populate(Source source, Store store, LanguageCode language) throws ConversionException {
+    public T populate(S source, M store, LanguageCode language) throws ConversionException {
         return populate(source, createTarget(), store, language);
     }
 
-    protected abstract Target createTarget();
+    protected abstract T createTarget();
 
 }

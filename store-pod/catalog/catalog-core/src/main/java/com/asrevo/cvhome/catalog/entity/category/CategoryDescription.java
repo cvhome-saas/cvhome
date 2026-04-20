@@ -11,7 +11,7 @@ import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
-import com.asrevo.cvhome.store.core.entity.common.description.Description;
+import com.asrevo.cvhome.store.core.entity.common.description.BaseDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -26,7 +26,7 @@ import lombok.Setter;
         initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
 @Getter
 @Setter
-public class CategoryDescription extends Description {
+public class CategoryDescription extends BaseDescription {
 
     @Serial
     private static final long serialVersionUID = 1L;

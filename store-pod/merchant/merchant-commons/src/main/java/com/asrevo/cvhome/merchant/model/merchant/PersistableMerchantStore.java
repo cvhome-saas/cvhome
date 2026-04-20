@@ -7,7 +7,7 @@ import java.util.Set;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.SocialLink;
-import com.asrevo.cvhome.store.model.references.PersistableAddress;
+import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class PersistableMerchantStore extends MerchantStoreEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private PersistableAddress address;
+    private PersistableBaseAddress address;
 
     // code of parent store (can be null if retailer)
     private String retailerStore;

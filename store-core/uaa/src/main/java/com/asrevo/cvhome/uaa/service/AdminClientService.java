@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.service;
 
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -39,11 +40,16 @@ public class AdminClientService {
             Base64.getUrlEncoder().withoutPadding(), 32);
 
     public Page<ClientSummary> listClients(Pageable pageable) {
-        Long total = jdbc.queryForObject("select count(*) from oauth2_registered_client", Long.class);
+        long total = Optional.ofNullable(
+                jdbc.queryForObject("select count(*) from oauth2_registered_client", Long.class)
+        ).orElse(0L);
+
         var items = jdbc.query(
                 "select id, client_id, client_name from oauth2_registered_client order by id limit ? offset ?",
                 (rs, rowNum) -> new ClientSummary(rs.getString(1), rs.getString(2), rs.getString(3)),
-                pageable.getPageSize(), pageable.getOffset());
+                pageable.getPageSize(), pageable.getOffset()
+        );
+
         return new PageImpl<>(items, pageable, total);
     }
 
