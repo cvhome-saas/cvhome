@@ -407,8 +407,8 @@
     "REBATE_PRICE": "Rebate price"
   },
   "PRODUCT_GROUP": {
-    "ADD_PRODUCTS": "Ajouter un produit",
-    "SEARCH_PRODUCT": "Rechercher un produit",
+    "ADD_PRODUCTS": "Add Product",
+    "SEARCH_PRODUCT": "Search for Product",
     "CREATE_PRODUCT_GROUP": "Create group",
     "SELECT_PRODUCT_GROUP": "Select group",
     "GROUP_ACTIVATION": "Product Group Activation updated",

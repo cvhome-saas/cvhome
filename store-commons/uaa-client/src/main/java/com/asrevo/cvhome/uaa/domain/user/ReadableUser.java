@@ -12,24 +12,24 @@ import lombok.Setter;
 @Setter
 public class ReadableUser extends UserEntity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String lastAccess;
+    private String lastAccess;
 
-	private String loginTime;
+    private String loginTime;
 
-	private String org;
+    private String org;
 
-	private String store;
+    private String store;
 
-	private String userName;
+    private String userName;
 
-	private boolean active;
+    private boolean active;
 
-	private Set<String> roles = new HashSet<>();
+    private Set<String> roles = new HashSet<>();
 
 }

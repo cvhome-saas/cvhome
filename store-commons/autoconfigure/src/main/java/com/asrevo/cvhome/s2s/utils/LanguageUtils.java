@@ -1,26 +1,28 @@
 package com.asrevo.cvhome.s2s.utils;
 
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-
 import java.util.Objects;
+
+import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public class LanguageUtils {
 
-	public static final String LANG = "lang";
+    public static final String LANG = "lang";
 
-	private static final String ALL_LANGUAGES = "_all";
+    private static final String ALL_LANGUAGES = "_all";
 
-	public static LanguageCode getRESTLanguageCode(String lang) {
-		if (Objects.isNull(lang) || lang.isEmpty()) {
-			return LanguageCode.defaultLanguage();
-		}
-		if (!ALL_LANGUAGES.equals(lang)) {
-			return new LanguageCode(lang);
+    private LanguageUtils() {
+    }
 
-		}
-		else {
-			return null;
-		}
-	}
+    public static LanguageCode getRESTLanguageCode(String lang) {
+        if (Objects.isNull(lang) || lang.isEmpty()) {
+            return LanguageCode.defaultLanguage();
+        }
+        if (!ALL_LANGUAGES.equals(lang)) {
+            return new LanguageCode(lang);
+
+        } else {
+            return null;
+        }
+    }
 
 }

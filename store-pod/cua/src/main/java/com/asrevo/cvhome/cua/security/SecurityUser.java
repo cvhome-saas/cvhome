@@ -1,7 +1,13 @@
 package com.asrevo.cvhome.cua.security;
 
-import com.asrevo.cvhome.cua.domain.User;
-import lombok.Getter;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,140 +16,141 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.asrevo.cvhome.cua.domain.User;
+
+import lombok.Getter;
 
 @Getter
-public class SecurityUser implements UserDetails, OAuth2User, OidcUser {
+public class SecurityUser implements UserDetails, OAuth2User, OidcUser, Serializable {
 
-	private final UUID id;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private final String username;
+    private final UUID id;
 
-	private final String password;
+    private final String username;
 
-	private final boolean enabled;
+    private final String password;
 
-	private final String clientId;
+    private final boolean enabled;
 
-	private final String email;
+    private final String clientId;
 
-	private final String firstName;
+    private final String email;
 
-	private final String lastName;
+    private final String firstName;
 
-	private final Map<String, Object> metadata;
+    private final String lastName;
 
-	private final Collection<? extends GrantedAuthority> authorities;
+    private final Map<String, Object> metadata;
 
-	private final Map<String, Object> attributes;
+    private final Collection<? extends GrantedAuthority> authorities;
 
-	private final Map<String, Object> claims;
+    private final Map<String, Object> attributes;
 
-	private final OidcIdToken idToken;
+    private final Map<String, Object> claims;
 
-	private final OidcUserInfo userInfo;
+    private final OidcIdToken idToken;
 
-	public SecurityUser(User user) {
-		this(user, null, null, null);
-	}
+    private final OidcUserInfo userInfo;
 
-	public SecurityUser(User user, Map<String, Object> attributes, OidcIdToken idToken, OidcUserInfo userInfo) {
-		this.id = user.getId();
-		this.username = user.getUsername();
-		this.password = user.getPasswordHash();
-		this.enabled = user.isEnabled();
-		this.clientId = user.getClientId();
-		this.email = user.getEmail();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.metadata = user.getMetadata();
-		// In a real scenario, you might map roles from the user entity.
-		// Defaulting to ROLE_USER for now.
-		this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    public SecurityUser(User user) {
+        this(user, null, null, null);
+    }
 
-		// Map basic info to attributes for OAuth2AuthenticatedPrincipal
-		this.attributes = new HashMap<>();
-		if (this.metadata != null) {
-			this.attributes.putAll(this.metadata);
-		}
-		if (attributes != null) {
-			this.attributes.putAll(attributes);
-		}
-		this.attributes.put("sub", this.id.toString());
-		this.attributes.put("username", this.username);
-		this.attributes.put("email", this.email);
-		this.attributes.put("given_name", this.firstName);
-		this.attributes.put("family_name", this.lastName);
-		this.attributes.put("name", this.firstName + " " + this.lastName);
-		this.attributes.put("client_id", this.clientId);
+    public SecurityUser(User user, Map<String, Object> attributes, OidcIdToken idToken, OidcUserInfo userInfo) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPasswordHash();
+        this.enabled = user.isEnabled();
+        this.clientId = user.getClientId();
+        this.email = user.getEmail();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.metadata = user.getMetadata();
+        // In a real scenario, you might map roles from the user entity.
+        // Defaulting to ROLE_USER for now.
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-		this.idToken = idToken;
-		this.userInfo = userInfo;
-		this.claims = (idToken != null) ? idToken.getClaims() : this.attributes;
-	}
+        // Map basic info to attributes for OAuth2AuthenticatedPrincipal
+        this.attributes = new HashMap<>();
+        if (this.metadata != null) {
+            this.attributes.putAll(this.metadata);
+        }
+        if (attributes != null) {
+            this.attributes.putAll(attributes);
+        }
+        this.attributes.put("sub", this.id.toString());
+        this.attributes.put("username", this.username);
+        this.attributes.put("email", this.email);
+        this.attributes.put("given_name", this.firstName);
+        this.attributes.put("family_name", this.lastName);
+        this.attributes.put("name", this.firstName + " " + this.lastName);
+        this.attributes.put("client_id", this.clientId);
 
-	@Override
-	public Map<String, Object> getClaims() {
-		return claims;
-	}
+        this.idToken = idToken;
+        this.userInfo = userInfo;
+        this.claims = (idToken != null) ? idToken.getClaims() : this.attributes;
+    }
 
-	@Override
-	public OidcIdToken getIdToken() {
-		return idToken;
-	}
+    @Override
+    public Map<String, Object> getClaims() {
+        return claims;
+    }
 
-	@Override
-	public OidcUserInfo getUserInfo() {
-		return userInfo;
-	}
+    @Override
+    public OidcIdToken getIdToken() {
+        return idToken;
+    }
 
-	@Override
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return userInfo;
+    }
 
-	@Override
-	public String getName() {
-		return username;
-	}
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return authorities;
-	}
+    @Override
+    public String getName() {
+        return username;
+    }
 
-	@Override
-	public String getPassword() {
-		return password;
-	}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
 
-	@Override
-	public String getUsername() {
-		return username;
-	}
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 
 }

@@ -11,6 +11,8 @@ export interface ProductGroupPage {
 }
 
 export interface ProductGroup {
+    description: Description | undefined
+    products: Product[] | undefined
     code: string
     active: boolean
     id: number

@@ -1,9 +1,11 @@
 package com.asrevo.cvhome.checkout.model.shoppingcart;
 
-import com.asrevo.cvhome.store.core.model.entity.ShopEntity;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import com.asrevo.cvhome.store.core.model.entity.ShopEntity;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,35 +13,35 @@ import lombok.Setter;
 @Setter
 public class ShoppingCartItem extends ShopEntity implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String name;
+    private String name;
 
-	private String price;
+    private String price;
 
-	private String image;
+    private String image;
 
-	private BigDecimal productPrice;
+    private BigDecimal productPrice;
 
-	private int quantity;
+    private int quantity;
 
-	private String sku; // sku
+    private String sku; // sku
 
-	private String code; // shopping cart code
+    private String code; // shopping cart code
 
-	private boolean productVirtual;
+    private boolean productVirtual;
 
-	private String subTotal;
+    private String subTotal;
 
-	public int getQuantity() {
-		if (quantity <= 0) {
-			quantity = 1;
-		}
-		return quantity;
-	}
+    public int getQuantity() {
+        if (quantity <= 0) {
+            quantity = 1;
+        }
+        return quantity;
+    }
 
 }

@@ -1,13 +1,13 @@
 ###
 
-# curl 'POST {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
-POST {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/products/1/related/2?lang=en&store=65f023632bc46470c104b76f
+# curl 'POST {{SELLER-UI_URL}}/spg/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
+POST {{SELLER-UI_URL}}/spg/catalog/api/v1/private/products/1/related/2?lang=en&store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'DELETE {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
-DELETE {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/products/1/related/3?lang=en&store=65f023632bc46470c104b76f
+# curl 'DELETE {{SELLER-UI_URL}}/spg/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
+DELETE {{SELLER-UI_URL}}/spg/catalog/api/v1/private/products/1/related/3?lang=en&store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

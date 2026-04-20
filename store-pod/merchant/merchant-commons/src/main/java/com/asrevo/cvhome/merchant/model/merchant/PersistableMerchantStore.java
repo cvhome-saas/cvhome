@@ -1,12 +1,14 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
-import com.asrevo.cvhome.store.model.references.PersistableAddress;
 import java.io.Serial;
 import java.util.List;
 import java.util.Set;
+
+import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
+import com.asrevo.cvhome.commons.domain.SliderImage;
+import com.asrevo.cvhome.commons.domain.SocialLink;
+import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,23 +16,23 @@ import lombok.Setter;
 @Getter
 public class PersistableMerchantStore extends MerchantStoreEntity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private PersistableAddress address;
+    private PersistableBaseAddress address;
 
-	// code of parent store (can be null if retailer)
-	private String retailerStore;
+    // code of parent store (can be null if retailer)
+    private String retailerStore;
 
-	private List<String> supportedLanguages;
+    private List<String> supportedLanguages;
 
-	private Set<SocialLink> socialLinks;
+    private Set<SocialLink> socialLinks;
 
-	private List<SliderImage> sliderImages;
+    private List<SliderImage> sliderImages;
 
-	private Set<ManagerStoreDomain> storeDomains;
+    private Set<ManagerStoreDomain> storeDomains;
 
 }

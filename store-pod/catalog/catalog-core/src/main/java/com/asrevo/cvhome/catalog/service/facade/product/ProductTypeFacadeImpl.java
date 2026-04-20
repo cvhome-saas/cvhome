@@ -1,5 +1,9 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
@@ -12,162 +16,139 @@ import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
-	private final ProductTypeService productTypeService;
+    private final ProductTypeService productTypeService;
 
-	private final ReadableProductTypeMapper readableProductTypeMapper;
+    private final ReadableProductTypeMapper readableProductTypeMapper;
 
-	private final PersistableProductTypeMapper persistableProductTypeMapper;
+    private final PersistableProductTypeMapper persistableProductTypeMapper;
 
-	public ProductTypeFacadeImpl(ProductTypeService productTypeService,
-			ReadableProductTypeMapper readableProductTypeMapper,
-			PersistableProductTypeMapper persistableProductTypeMapper) {
-		this.productTypeService = productTypeService;
-		this.readableProductTypeMapper = readableProductTypeMapper;
-		this.persistableProductTypeMapper = persistableProductTypeMapper;
-	}
+    public ProductTypeFacadeImpl(ProductTypeService productTypeService,
+                                 ReadableProductTypeMapper readableProductTypeMapper,
+                                 PersistableProductTypeMapper persistableProductTypeMapper) {
+        this.productTypeService = productTypeService;
+        this.readableProductTypeMapper = readableProductTypeMapper;
+        this.persistableProductTypeMapper = persistableProductTypeMapper;
+    }
 
-	@Override
-	public ReadableProductTypeList getByMerchant(StoreMerchantId store, LanguageCode language, Pageable pageable) {
+    @Override
+    public ReadableProductTypeList getByMerchant(StoreMerchantId store, LanguageCode language, Pageable pageable) {
 
-		Assert.notNull(store, "store cannot be null");
-		ReadableProductTypeList returnList = new ReadableProductTypeList();
+        ReadableProductTypeList returnList = new ReadableProductTypeList();
 
-		Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
+        Page<ProductType> types = productTypeService.getByMerchant(store, language, pageable);
 
-		returnList.setContent(types.getContent()
-			.stream()
-			.map(t -> readableProductTypeMapper.convert(t, store, language))
-			.collect(Collectors.toList()));
-		returnList.setTotalPages(types.getTotalPages());
-		returnList.setTotalElements(types.getTotalElements());
-		returnList.setSize(types.getSize());
-		returnList.setPageNumber(types.getNumber());
+        returnList.setContent(types.getContent()
+                .stream()
+                .map(t -> readableProductTypeMapper.convert(t, store, language))
+                .toList());
+        returnList.setTotalPages(types.getTotalPages());
+        returnList.setTotalElements(types.getTotalElements());
+        returnList.setSize(types.getSize());
+        returnList.setPageNumber(types.getNumber());
 
-		return returnList;
-	}
+        return returnList;
+    }
 
-	@Override
-	public ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language) {
+    @Override
+    public ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language) {
+        try {
 
-		Assert.notNull(store, "store cannot be null");
-		Assert.notNull(id, "ProductType code cannot be empty");
-		try {
+            ProductType type = productTypeService.getById(id, store);
 
-			ProductType type = productTypeService.getById(id, store);
+            if (type == null) {
+                throw new ResourceNotFoundException("Product type [" + id + "] not found for store [" + store + "]");
+            }
 
-			if (type == null) {
-				throw new ResourceNotFoundException("Product type [" + id + "] not found for store [" + store + "]");
-			}
+            return readableProductTypeMapper.convert(type, store, language);
 
-			return readableProductTypeMapper.convert(type, store, language);
+        } catch (Exception e) {
+            throw new ServiceRuntimeException(
+                    "An exception occured while getting product type [" + id + "] not found for store [" + store + "]",
+                    e);
+        }
+    }
 
-		}
-		catch (Exception e) {
-			throw new ServiceRuntimeException(
-					"An exception occured while getting product type [" + id + "] not found for store [" + store + "]",
-					e);
-		}
-	}
+    @Override
+    public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language) {
 
-	@Override
-	public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language) {
+        try {
 
-		Assert.notNull(type, "ProductType cannot be null");
-		Assert.notNull(store, "store cannot be null");
-		Assert.notNull(type.getCode(), "ProductType code cannot be empty");
+            if (this.exists(type.getCode(), store, language)) {
+                throw new OperationNotAllowedException(
+                        "Product type [" + type.getCode() + "] already exist for store [" + store + "]");
+            }
 
-		try {
+            ProductType model = persistableProductTypeMapper.convert(type, store, language);
+            model.setStoreMerchantId(store);
+            ProductType saved = productTypeService.saveOrUpdate(model);
+            return saved.getId();
 
-			if (this.exists(type.getCode(), store, language)) {
-				throw new OperationNotAllowedException(
-						"Product type [" + type.getCode() + "] already exist for store [" + store + "]");
-			}
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+        }
+    }
 
-			ProductType model = persistableProductTypeMapper.convert(type, store, language);
-			model.setStoreMerchantId(store);
-			ProductType saved = productTypeService.saveOrUpdate(model);
-			return saved.getId();
+    @Override
+    public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language) {
 
-		}
-		catch (Exception e) {
-			throw new ServiceRuntimeException("An exception occured while saving product type", e);
-		}
-	}
+        try {
 
-	@Override
-	public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language) {
-		Assert.notNull(type, "ProductType cannot be null");
-		Assert.notNull(store, "store cannot be null");
-		Assert.notNull(id, "id cannot be empty");
+            ProductType t = productTypeService.getById(id, store);
+            if (t == null) {
+                throw new ResourceNotFoundException(
+                        "Product type [" + type.getCode() + "] does not exist for store [" + store + "]");
+            }
 
-		try {
+            type.setId(t.getId());
+            type.setCode(t.getCode());
 
-			ProductType t = productTypeService.getById(id, store);
-			if (t == null) {
-				throw new ResourceNotFoundException(
-						"Product type [" + type.getCode() + "] does not exist for store [" + store + "]");
-			}
+            ProductType model = persistableProductTypeMapper.merge(type, t, store, language);
+            model.setStoreMerchantId(store);
+            productTypeService.saveOrUpdate(model);
 
-			type.setId(t.getId());
-			type.setCode(t.getCode());
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+        }
+    }
 
-			ProductType model = persistableProductTypeMapper.merge(type, t, store, language);
-			model.setStoreMerchantId(store);
-			productTypeService.saveOrUpdate(model);
+    @Override
+    public void delete(Long id, StoreMerchantId store, LanguageCode language) {
+        try {
 
-		}
-		catch (Exception e) {
-			throw new ServiceRuntimeException("An exception occured while saving product type", e);
-		}
-	}
+            ProductType t = productTypeService.getById(id, store);
+            if (t == null) {
+                throw new ResourceNotFoundException(
+                        "Product type [" + id + "] does not exist for store [" + store + "]");
+            }
 
-	@Override
-	public void delete(Long id, StoreMerchantId store, LanguageCode language) {
-		Assert.notNull(store, "store cannot be null");
-		Assert.notNull(id, "id cannot be empty");
+            productTypeService.delete(t);
 
-		try {
+        } catch (Exception e) {
+            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+        }
+    }
 
-			ProductType t = productTypeService.getById(id, store);
-			if (t == null) {
-				throw new ResourceNotFoundException(
-						"Product type [" + id + "] does not exist for store [" + store + "]");
-			}
+    @Override
+    public boolean exists(String code, StoreMerchantId store, LanguageCode language) {
+        ProductType t;
+        t = productTypeService.getByCode(code, store, language);
+        return t != null;
+    }
 
-			productTypeService.delete(t);
+    @Override
+    public ReadableProductType get(StoreMerchantId store, String code, LanguageCode language) {
+        ProductType t;
+        t = productTypeService.getByCode(code, store, language);
 
-		}
-		catch (Exception e) {
-			throw new ServiceRuntimeException("An exception occured while saving product type", e);
-		}
-	}
+        if (t == null) {
+            throw new ResourceNotFoundException("Product type [" + code + "] not found for merchant [" + store + "]");
+        }
 
-	@Override
-	public boolean exists(String code, StoreMerchantId store, LanguageCode language) {
-		ProductType t;
-		t = productTypeService.getByCode(code, store, language);
-		return t != null;
-	}
-
-	@Override
-	public ReadableProductType get(StoreMerchantId store, String code, LanguageCode language) {
-		ProductType t;
-		t = productTypeService.getByCode(code, store, language);
-
-		if (t == null) {
-			throw new ResourceNotFoundException("Product type [" + code + "] not found for merchant [" + store + "]");
-		}
-
-		return readableProductTypeMapper.convert(t, store, language);
-	}
+        return readableProductTypeMapper.convert(t, store, language);
+    }
 
 }

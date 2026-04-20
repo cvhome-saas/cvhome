@@ -20,42 +20,44 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableMethodSecurity
 public class AppSecurityConfig {
 
-	@Bean
-	SecurityFilterChain appSecurity(HttpSecurity http) {
-		http.authorizeHttpRequests(auth -> auth.requestMatchers("/.well-known/**")
-			.permitAll()
-			.requestMatchers(EndpointRequest.toAnyEndpoint())
-			.permitAll()
-			.requestMatchers("/login", "/assets/**", "/media/**", "/img/**", "/webfonts/**", "/js/**", "/css/**",
-					"/*.css", "/*.js", "/favicon.ico", "/api/v1/me")
-			.permitAll()
-			.requestMatchers("/swagger-ui.html")
-			.permitAll()
-			.requestMatchers("/swagger-ui/**")
-			.permitAll()
-			.requestMatchers("/v3/api-docs/**")
-			.permitAll()
-			.requestMatchers("/api/v1/admin/**")
-			.hasAnyAuthority("SCOPE_super_admin", "ROLE_SUPER_ADMIN")
-			.anyRequest()
-			.authenticated())
-			.formLogin(it -> it.loginPage("/login"))
-			.csrf(AbstractHttpConfigurer::disable)
-			.requestCache(cache -> cache.requestCache(requestCache()))
+    private static final String LOGIN_PAGE = "/login";
 
-			.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-		return http.build();
-	}
+    @Bean
+    SecurityFilterChain appSecurity(HttpSecurity http) {
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/.well-known/**")
+                        .permitAll()
+                        .requestMatchers(EndpointRequest.toAnyEndpoint())
+                        .permitAll()
+                        .requestMatchers(LOGIN_PAGE, "/assets/**", "/media/**", "/img/**", "/webfonts/**", "/js/**", "/css/**",
+                                "/*.css", "/*.js", "/favicon.ico", "/api/v1/me")
+                        .permitAll()
+                        .requestMatchers("/swagger-ui.html")
+                        .permitAll()
+                        .requestMatchers("/swagger-ui/**")
+                        .permitAll()
+                        .requestMatchers("/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers("/api/v1/admin/**")
+                        .hasAnyAuthority("SCOPE_super_admin", "ROLE_SUPER_ADMIN")
+                        .anyRequest()
+                        .authenticated())
+                .formLogin(it -> it.loginPage(LOGIN_PAGE))
+                .csrf(AbstractHttpConfigurer::disable)
+                .requestCache(cache -> cache.requestCache(requestCache()))
 
-	public RequestCache requestCache() {
-		HttpSessionRequestCache cache = new HttpSessionRequestCache();
-		RequestMatcher getRequests = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/**");
-		RequestMatcher notFavicon = new NegatedRequestMatcher(
-				PathPatternRequestMatcher.withDefaults().matcher("/favicon.*"));
-		RequestMatcher notError = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/error"));
-		RequestMatcher saveRequestMatcher = new AndRequestMatcher(getRequests, notFavicon, notError);
-		cache.setRequestMatcher(saveRequestMatcher);
-		return cache;
-	}
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        return http.build();
+    }
+
+    public RequestCache requestCache() {
+        HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        RequestMatcher getRequests = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/**");
+        RequestMatcher notFavicon = new NegatedRequestMatcher(
+                PathPatternRequestMatcher.withDefaults().matcher("/favicon.*"));
+        RequestMatcher notError = new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/error"));
+        RequestMatcher saveRequestMatcher = new AndRequestMatcher(getRequests, notFavicon, notError);
+        cache.setRequestMatcher(saveRequestMatcher);
+        return cache;
+    }
 
 }

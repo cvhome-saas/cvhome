@@ -1,8 +1,9 @@
 package com.asrevo.cvhome.store.core.services.generic;
 
+import java.io.Serializable;
+
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import java.io.Serializable;
 
 /**
  * <p>
@@ -11,42 +12,47 @@ import java.io.Serializable;
  */
 public interface SalesManagerEntityService<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>> {
 
-	/**
-	 * Crée l'entité dans la base de données. Mis à part dans les tests pour faire des
-	 * sauvegardes simples, utiliser create() car il est possible qu'il y ait des
-	 * listeners sur la création d'une entité.
-	 * @param entity entité
-	 */
-	void save(E entity);
+    /**
+     * Crée l'entité dans la base de données. Mis à part dans les tests pour faire des
+     * sauvegardes simples, utiliser create() car il est possible qu'il y ait des
+     * listeners sur la création d'une entité.
+     *
+     * @param entity entité
+     */
+    void save(E entity);
 
-	/**
-	 * Save all
-	 */
-	void saveAll(Iterable<E> entities);
+    /**
+     * Save all
+     */
+    void saveAll(Iterable<E> entities);
 
-	/**
-	 * Met à jour l'entité dans la base de données.
-	 * @param entity entité
-	 */
-	void update(E entity) throws ServiceException;
+    /**
+     * Met à jour l'entité dans la base de données.
+     *
+     * @param entity entité
+     */
+    void update(E entity) throws ServiceException;
 
-	/**
-	 * Crée l'entité dans la base de données.
-	 * @param entity entité
-	 */
-	void create(E entity) throws ServiceException;
+    /**
+     * Crée l'entité dans la base de données.
+     *
+     * @param entity entité
+     */
+    void create(E entity) throws ServiceException;
 
-	/**
-	 * Supprime l'entité de la base de données
-	 * @param entity entité
-	 */
-	void delete(E entity) throws ServiceException;
+    /**
+     * Supprime l'entité de la base de données
+     *
+     * @param entity entité
+     */
+    void delete(E entity) throws ServiceException;
 
-	/**
-	 * Retourne une entité à partir de son id.
-	 * @param id identifiant
-	 * @return entité
-	 */
-	E getById(K id);
+    /**
+     * Retourne une entité à partir de son id.
+     *
+     * @param id identifiant
+     * @return entité
+     */
+    E getById(K id);
 
 }

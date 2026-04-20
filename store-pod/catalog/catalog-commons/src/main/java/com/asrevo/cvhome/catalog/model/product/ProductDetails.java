@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.catalog.model.product;
 
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 
-public record ProductDetails(ReadableMinimalProduct product, FinalPrice price,
-		ReadableProductAvailability availability) {
+public record ProductDetails(ReadableMinimalProduct product, FinalPriceCalc price,
+                             ReadableProductAvailability availability) {
 }

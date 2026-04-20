@@ -7,18 +7,18 @@ import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 
 public class PageableSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
 
-	@Override
-	public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
-		try {
-			if (argument instanceof Pageable pageable) {
-				requestValues.addRequestParameter("page", String.valueOf(pageable.getPageNumber()));
-				requestValues.addRequestParameter("size", String.valueOf(pageable.getPageSize()));
-				return true;
-			}
-		}
-		catch (Exception ignored) {
-		}
-		return false;
-	}
+    @Override
+    public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder requestValues) {
+        try {
+            if (argument instanceof Pageable pageable) {
+                requestValues.addRequestParameter("page", String.valueOf(pageable.getPageNumber()));
+                requestValues.addRequestParameter("size", String.valueOf(pageable.getPageSize()));
+                return true;
+            }
+        } catch (Exception _) {
+            return false;
+        }
+        return false;
+    }
 
 }

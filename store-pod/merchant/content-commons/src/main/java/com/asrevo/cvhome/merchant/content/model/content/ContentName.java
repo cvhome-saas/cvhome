@@ -7,17 +7,16 @@ import java.io.Serial;
  *
  * @author carlsamson
  */
-@Deprecated
 public class ContentName extends Content {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	public ContentName() {
-		super();
-	}
+    public ContentName() {
+        super();
+    }
 
 }

@@ -14,47 +14,47 @@ export class CategoryService {
   }
 
   getListOfCategories(params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/category`, params);
   }
 
 
   getCategoryById(id): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/${id}`);
+    return this.crudService.get(`/spg/catalog/api/v1/private/category/${id}`);
   }
 
   getCategoryByProductId(id): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/product/${id}`);
+    return this.crudService.get(`/spg/catalog/api/v1/private/category/product/${id}`);
   }
 
   addCategory(category): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/category`, category);
+    return this.crudService.post(`/spg/catalog/api/v1/private/category`, category);
   }
 
   updateCategory(id, category): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/catalog/api/v1/private/category/${id}`, category);
+    return this.crudService.put(`/spg/catalog/api/v1/private/category/${id}`, category);
   }
 
   updateCategoryVisibility(category): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/category/${category.id}/visible`, category);
+    return this.crudService.patch(`/spg/catalog/api/v1/private/category/${category.id}/visible`, category);
   }
 
   deleteCategory(id): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/category/${id}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/category/${id}`);
   }
 
   checkCategoryCode(code): Observable<any> {
     const params = {
       'code': code,
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category/unique`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/category/unique`, params);
   }
 
   getHierarchyOfCategories(params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/category-hierarchy`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/category-hierarchy`, params);
   }
 
   updateHierarchy(childId, parentId): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/catalog/api/v1/private/category/${childId}/move/${parentId}`, {});
+    return this.crudService.put(`/spg/catalog/api/v1/private/category/${childId}/move/${parentId}`, {});
   }
 
 }

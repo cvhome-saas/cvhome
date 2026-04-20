@@ -1,24 +1,26 @@
 package com.asrevo.cvhome.customer.model.customer;
 
-import com.asrevo.cvhome.customer.model.customer.address.Address;
 import java.io.Serial;
+
+import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class BillingEntity extends Address {
+public class BillingEntity extends CustomerAddress {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String email;
+    private String email;
 
-	private String countryName;
+    private String countryName;
 
-	private String provinceName;
+    private String provinceName;
 
 }

@@ -14,6 +14,6 @@ export class ManufactureService {
   }
 
   getManufacturers(): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/manufacturers`);
+    return this.crudService.get(`/spg/catalog/api/v1/manufacturers`);
   }
 }

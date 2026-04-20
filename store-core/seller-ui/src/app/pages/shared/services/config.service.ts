@@ -4,7 +4,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../../../environments/environment';
 import {HttpClient} from "@angular/common/http";
 import {CrudService} from "./crud.service";
-import {Observable} from "rxjs";
 
 
 @Injectable({
@@ -25,18 +24,17 @@ export class ConfigService {
       'store': store
     };
 
-    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/store/languages`, params)
+    return this.crudService.get(`/spg/merchant/api/v1/store/languages`, params)
   }
 
   getListOfGlobalLanguages(): Language[] {
     let langs: string[] = environment.client.language.array
     let languages: Language[] = [];
     langs.forEach(lang => {
-      var l = new Language(0, lang, this.translate.instant('LANG.' + lang));
+      const l = new Language(0, lang, this.translate.instant('LANG.' + lang));
       languages.push(l);
     });
 
-    //console.log('Global languages -> ' + JSON.stringify(languages));
     return languages;
   }
 

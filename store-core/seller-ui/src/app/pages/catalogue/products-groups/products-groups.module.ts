@@ -6,6 +6,7 @@ import {GroupsListComponent} from './groups-list/groups-list.component';
 import {ProductGroupFormComponent} from './product-group-form/product-group-form.component';
 import {ActiveButtonComponent} from './groups-list/active-button.component';
 import {SharedModule} from "../../shared/shared.module";
+import {NbButtonGroupModule} from "@nebular/theme";
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import {SharedModule} from "../../shared/shared.module";
   imports: [
     ProductsGroupsRoutingModule,
     SharedModule,
+    NbButtonGroupModule,
   ]
 })
 export class ProductsGroupsModule {

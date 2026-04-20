@@ -1,9 +1,10 @@
 package com.asrevo.cvhome.controlplane.subscription.commons;
 
-import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
 import java.time.Instant;
 
+import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
+
 public record SubscriptionPlanDetails(Instant createdDate, Instant lastRenewedDate, Instant endDate,
-		Instant deActivatedDate, SubscriptionPlan subscriptionPlan, RecurringPlan recurringPlan,
-		SubscriptionStatus status) {
+                                      Instant deActivatedDate, SubscriptionPlan subscriptionPlan, RecurringPlan recurringPlan,
+                                      SubscriptionStatus status) {
 }

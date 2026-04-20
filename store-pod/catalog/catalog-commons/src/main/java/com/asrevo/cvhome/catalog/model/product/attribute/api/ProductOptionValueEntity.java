@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.catalog.model.product.attribute.api;
 
-import com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValue;
 import java.io.Serial;
 import java.io.Serializable;
+
+import com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValue;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +12,12 @@ import lombok.Setter;
 @Getter
 public class ProductOptionValueEntity extends ProductOptionValue implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int order;
+    private int order;
 
 }

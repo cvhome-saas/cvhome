@@ -1,11 +1,13 @@
 package com.asrevo.cvhome.checkout.model.order.v1;
 
-import com.asrevo.cvhome.commons.domain.Entity;
-import com.asrevo.cvhome.customer.model.customer.address.Address;
-import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
-import com.asrevo.cvhome.checkout.model.order.total.ReadableTotal;
 import java.io.Serial;
 import java.util.List;
+
+import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
+import com.asrevo.cvhome.checkout.model.order.total.ReadableTotal;
+import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,22 +15,22 @@ import lombok.Setter;
 @Getter
 public class ReadableOrderConfirmation extends Entity {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Address billing;
+    private CustomerAddress billing;
 
-	private Address delivery;
+    private CustomerAddress delivery;
 
-	private String shipping;
+    private String shipping;
 
-	private String payment;
+    private String payment;
 
-	private ReadableTotal total;
+    private ReadableTotal total;
 
-	private List<ReadableOrderProduct> products;
+    private List<ReadableOrderProduct> products;
 
 }

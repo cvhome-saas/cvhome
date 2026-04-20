@@ -1,12 +1,15 @@
 package com.asrevo.cvhome.controlplane.manager.controller;
 
-import com.asrevo.cvhome.controlplane.manager.utils.Defines;
-import com.asrevo.cvhome.s2s.model.AppProperties;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.asrevo.cvhome.controlplane.manager.utils.Defines;
+import com.asrevo.cvhome.s2s.model.AppProperties;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("api/v1/saas")
@@ -14,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SaasController {
 
-	private final AppProperties appProperties;
+    private final AppProperties appProperties;
 
-	@RequestMapping("public/saas-properties")
-	public Map<String, String> saasProperties() {
-		return Map.of("alis", Defines.SAAS_POD_SUFFIX, "domain", appProperties.getDomain());
-	}
+    @RequestMapping("public/saas-properties")
+    public Map<String, String> saasProperties() {
+        return Map.of("alis", Defines.SAAS_POD_SUFFIX, "domain", appProperties.getDomain());
+    }
 
 }

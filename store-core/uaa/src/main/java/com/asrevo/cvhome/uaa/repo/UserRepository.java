@@ -1,14 +1,15 @@
 package com.asrevo.cvhome.uaa.repo;
 
-import com.asrevo.cvhome.uaa.domain.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import com.asrevo.cvhome.uaa.domain.User;
+
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
 
-	Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
 }

@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.checkout.model.order.v1;
 
-import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import java.io.Serial;
+
+import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +11,12 @@ import lombok.Setter;
 @Getter
 public class PersistableAnonymousOrder extends PersistableOrder {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private PersistableCustomer customer;
+    private PersistableCustomer customer;
 
 }

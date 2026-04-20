@@ -17,7 +17,6 @@ fasterxml = "2.19.0"
 swagger = "2.2.8"
 testcontainers = "1.19.7"
 testcontainersjupiter = "2.0.3"
-springJavaFormat = "0.0.47"
 caffeine = "3.2.3"
 mongodbBson = "5.6.2"
 dnsjava = "3.6.3"
@@ -122,7 +121,6 @@ commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.re
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 hibernate-orm = { id = "org.hibernate.orm", version.ref = "hibernate" }
-spring-javaformat = { id = "io.spring.javaformat", version.ref = "springJavaFormat" }
 groovy-gradle-plugin = { id = "groovy-gradle-plugin" }
 java-library-conventions = { id = "com.asrevo.java-library-conventions" }
 java-application-conventions = { id = "com.asrevo.java-application-conventions" }

@@ -1,44 +1,46 @@
 package com.asrevo.cvhome.catalog.services.product.attribute;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionSet;
 import com.asrevo.cvhome.catalog.repositories.product.attribute.ProductOptionSetRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service("productOptionSetService")
 public class ProductOptionSetServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductOptionSet>
-		implements ProductOptionSetService {
+        implements ProductOptionSetService {
 
-	private final ProductOptionSetRepository productOptionSetRepository;
+    private final ProductOptionSetRepository productOptionSetRepository;
 
-	@Autowired
-	public ProductOptionSetServiceImpl(ProductOptionSetRepository productOptionSetRepository) {
-		super(productOptionSetRepository);
-		this.productOptionSetRepository = productOptionSetRepository;
-	}
+    @Autowired
+    public ProductOptionSetServiceImpl(ProductOptionSetRepository productOptionSetRepository) {
+        super(productOptionSetRepository);
+        this.productOptionSetRepository = productOptionSetRepository;
+    }
 
-	@Override
-	public List<ProductOptionSet> listByStore(StoreMerchantId store, LanguageCode language) {
-		return productOptionSetRepository.findByStore(store, language);
-	}
+    @Override
+    public List<ProductOptionSet> listByStore(StoreMerchantId store, LanguageCode language) {
+        return productOptionSetRepository.findByStore(store, language);
+    }
 
-	@Override
-	public ProductOptionSet getById(StoreMerchantId store, Long optionSetId, LanguageCode lang) {
-		return productOptionSetRepository.findOne(store, optionSetId, lang);
-	}
+    @Override
+    public ProductOptionSet getById(StoreMerchantId store, Long optionSetId, LanguageCode lang) {
+        return productOptionSetRepository.findOne(store, optionSetId, lang);
+    }
 
-	@Override
-	public ProductOptionSet getCode(StoreMerchantId store, String code) {
-		return productOptionSetRepository.findByCode(store, code);
-	}
+    @Override
+    public ProductOptionSet getCode(StoreMerchantId store, String code) {
+        return productOptionSetRepository.findByCode(store, code);
+    }
 
-	@Override
-	public List<ProductOptionSet> getByProductType(Long productTypeId, StoreMerchantId store, LanguageCode lang) {
-		return productOptionSetRepository.findByProductType(productTypeId, store, lang);
-	}
+    @Override
+    public List<ProductOptionSet> getByProductType(Long productTypeId, StoreMerchantId store, LanguageCode lang) {
+        return productOptionSetRepository.findByProductType(productTypeId, store, lang);
+    }
 
 }

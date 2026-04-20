@@ -1,28 +1,39 @@
 package com.asrevo.cvhome.checkout.api.order.v1.shoppingCart;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+
+import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -30,118 +41,112 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ShoppingCartApi {
 
-	private final ShoppingCartFacade shoppingCartFacade;
+    private final ShoppingCartFacade shoppingCartFacade;
 
-	public ShoppingCartApi(ShoppingCartFacade shoppingCartFacade) {
-		this.shoppingCartFacade = shoppingCartFacade;
-	}
+    public ShoppingCartApi(ShoppingCartFacade shoppingCartFacade) {
+        this.shoppingCartFacade = shoppingCartFacade;
+    }
 
-	@ResponseStatus(HttpStatus.CREATED)
-	@PostMapping(value = "/cart")
-	@Operation(method = "POST",
-			description = "Add product to shopping cart when no cart exists, this will create a new cart" + " id",
-			summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
-					+ " {\"product\":1232,\"quantity\":1}")
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "/cart")
+    @Operation(method = "POST",
+            description = "Add product to shopping cart when no cart exists, this will create a new cart" + " id",
+            summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
+                    + " {\"product\":1232,\"quantity\":1}")
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-	public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
-			StoreMerchantId merchantStore, LanguageCode language) {
-		return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
-	}
+    public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
+                                          StoreMerchantId merchantStore, LanguageCode language) {
+        return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
+    }
 
-	@PutMapping(value = "/cart/{code}")
-	@Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
-			summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
-					+ " {\"product\":1232,\"quantity\":0} for instance will remove item 1234" + " from cart")
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    @PutMapping(value = "/cart/{code}")
+    @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
+            summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
+                    + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234" + " from cart")
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-	public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
-			@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem, StoreMerchantId merchantStore,
-			LanguageCode language) {
+    public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
+                                                           @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
+                                                           StoreMerchantId merchantStore,
+                                                           LanguageCode language) {
 
-		try {
-			ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
+        try {
+            ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 
-			if (cart == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
+            if (cart == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-			return new ResponseEntity<>(cart, HttpStatus.CREATED);
+            return new ResponseEntity<>(cart, HttpStatus.CREATED);
 
-		}
-		catch (Exception e) {
-			if (e instanceof ResourceNotFoundException) {
-				throw (ResourceNotFoundException) e;
-			}
-			else {
-				throw new ServiceRuntimeException(e);
-			}
-		}
-	}
+        } catch (Exception e) {
+            if (e instanceof ResourceNotFoundException ex) {
+                throw ex;
+            } else {
+                throw new ServiceRuntimeException(e);
+            }
+        }
+    }
 
-	@ResponseStatus(HttpStatus.OK)
-	@RequestMapping(value = "/cart/{code}", method = RequestMethod.GET)
-	@Operation(method = "GET", description = "Get a chopping cart by code")
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)) })
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/cart/{code}")
+    @Operation(method = "GET", description = "Get a chopping cart by code")
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-	public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
-			LanguageCode language, HttpServletResponse response) {
+    public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
+                                          LanguageCode language, HttpServletResponse response) {
 
-		try {
+        try {
 
-			ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
+            ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
 
-			if (cart == null) {
-				response.sendError(404, "No ShoppingCart found for customer code : " + code);
-				return null;
-			}
+            if (cart == null) {
+                response.sendError(404, "No ShoppingCart found for customer code : " + code);
+                return null;
+            }
 
-			return cart;
+            return cart;
 
-		}
-		catch (Exception e) {
-			if (e instanceof ResourceNotFoundException) {
-				throw (ResourceNotFoundException) e;
-			}
-			else {
-				throw new ServiceRuntimeException(e);
-			}
-		}
-	}
+        } catch (Exception e) {
+            if (e instanceof ResourceNotFoundException ex) {
+                throw ex;
+            } else {
+                throw new ServiceRuntimeException(e);
+            }
+        }
+    }
 
-	@DeleteMapping(value = "/cart/{code}/product/{sku}", produces = { APPLICATION_JSON_VALUE })
-	@Operation(method = "DELETE", description = "Remove a product from a specific cart",
-			summary = "If body set to true returns remaining cart in body, empty cart gives empty"
-					+ " body. If body set to false no body ")
-	@Parameters({
-			@Parameter(name = "store",
-					schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR)),
-			@Parameter(name = "lang",
-					schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE)),
-			@Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false")) })
+    @DeleteMapping(value = "/cart/{code}/product/{sku}", produces = {APPLICATION_JSON_VALUE})
+    @Operation(method = "DELETE", description = "Remove a product from a specific cart",
+            summary = "If body set to true returns remaining cart in body, empty cart gives empty"
+                    + " body. If body set to false no body ")
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    @Parameter(name = "body", schema = @Schema(name = "body", type = "boolean", defaultValue = "false"))
 
-	public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
-			@PathVariable("sku") String sku, StoreMerchantId merchantStore, LanguageCode language,
-			@RequestParam(defaultValue = "false") boolean body) throws Exception {
+    public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
+                                                               @PathVariable("sku") String sku, StoreMerchantId merchantStore,
+                                                               LanguageCode language,
+                                                               @RequestParam(defaultValue = "false") boolean body) throws Exception {
 
-		ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
-				language, body);
-		if (body) {
-			return new ResponseEntity<>(updatedCart, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(updatedCart, HttpStatus.NO_CONTENT);
-	}
+        ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
+                language, body);
+        if (body) {
+            return new ResponseEntity<>(updatedCart, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(updatedCart, HttpStatus.NO_CONTENT);
+    }
 
 }

@@ -4,6 +4,6 @@ import java.io.Serializable;
 
 public interface Identifier extends Serializable {
 
-	Object getId();
+    Object getId();
 
 }

@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.java.application.conventions)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
-    alias(libs.plugins.spring.javaformat)
     alias(libs.plugins.node)
 //    alias(libs.plugins.graalvm)
 }
@@ -82,6 +81,7 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
+/*
 
 node {
     version = '23.8.0'
@@ -102,4 +102,4 @@ tasks.named('processResources') {
 
 tasks.named('clean') {
     delete "${project.projectDir}/src/main/resources/static"
-}
+}*/

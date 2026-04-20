@@ -34,31 +34,31 @@ export default async function Page({params}: { params: HomePageParams }) {
                     <CoverFlow store={store}/>
                 }
                 {
-                    featuredItems && featuredItems.content && featuredItems.productGroup && featuredItems.productGroup.active && featuredItems.content.length > 0 &&
+                    featuredItems&& featuredItems.active && featuredItems.products && featuredItems.description  && featuredItems.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <SectionTitle title={t('FEATURED_ITEMS')}/>
-                        <ProductSwiperGrid storeContext={params.storeContext} products={featuredItems.content}/>
+                        <SectionTitle title={featuredItems.description.name}/>
+                        <ProductSwiperGrid storeContext={params.storeContext} products={featuredItems.products}/>
                     </div>
                 }
                 {
-                    newlyAdded && newlyAdded.content && newlyAdded.productGroup && newlyAdded.productGroup.active && newlyAdded.content.length > 0 &&
+                    newlyAdded && newlyAdded.active && newlyAdded.products && newlyAdded.description && newlyAdded.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <SectionTitle title={t('NEWLY_ADDED')}/>
-                        <ProductSwiperGrid storeContext={params.storeContext} products={newlyAdded.content}/>
+                        <SectionTitle title={newlyAdded.description.name}/>
+                        <ProductSwiperGrid storeContext={params.storeContext} products={newlyAdded.products}/>
                     </div>
                 }
                 {
-                    homePageProduct && homePageProduct.content && homePageProduct.productGroup && homePageProduct.productGroup.active && homePageProduct.content.length > 0 &&
+                    homePageProduct && homePageProduct.active && homePageProduct.products && homePageProduct.description && homePageProduct.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <SectionTitle title={t('HOME_PRODUCT')}/>
-                        <ProductGrid storeContext={params.storeContext} products={homePageProduct.content}/>
+                        <SectionTitle title={homePageProduct.description.name}/>
+                        <ProductGrid storeContext={params.storeContext} products={homePageProduct.products}/>
                     </div>
                 }
                 {
-                    recommended && recommended.content && recommended.productGroup && recommended.productGroup.active && recommended.content.length > 0 &&
+                    recommended && recommended.active && recommended.products && recommended.description && recommended.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <SectionTitle title={t('RECOMMENDED')}/>
-                        <ProductSwiperGrid storeContext={params.storeContext} products={recommended.content}/>
+                        <SectionTitle title={recommended.description.name}/>
+                        <ProductSwiperGrid storeContext={params.storeContext} products={recommended.products}/>
                     </div>
                 }
             </div>

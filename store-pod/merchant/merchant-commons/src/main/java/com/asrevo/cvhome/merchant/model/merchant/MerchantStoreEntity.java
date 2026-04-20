@@ -1,12 +1,16 @@
 package com.asrevo.cvhome.merchant.model.merchant;
 
-import com.asrevo.cvhome.commons.domain.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import jakarta.validation.constraints.NotNull;
+
+import com.asrevo.cvhome.commons.domain.ColorTheme;
+import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
-import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,40 +19,40 @@ import lombok.Setter;
 @Getter
 public class MerchantStoreEntity extends MerchantStorePricingBase implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@NotNull
-	private String id;
+    @NotNull
+    private String id;
 
-	@NotNull
-	private String name;
+    @NotNull
+    private String name;
 
-	private String org;
+    private String org;
 
-	private Theme theme;
+    private Theme theme;
 
-	private ColorTheme colorTheme;
+    private ColorTheme colorTheme;
 
-	private String inBusinessSince;
+    private LocalDate inBusinessSince;
 
-	@NotNull
-	private String email;
+    @NotNull
+    private String email;
 
-	@NotNull
-	private String phone;
+    @NotNull
+    private String phone;
 
-	private String template;
+    private String template;
 
-	private boolean useCache;
+    private boolean useCache;
 
-	private boolean requireLoginForOrderPlacement;
+    private boolean requireLoginForOrderPlacement;
 
-	private MeasureUnit dimension;
+    private MeasureUnit dimension;
 
-	private WeightUnit weight;
+    private WeightUnit weight;
 
 }

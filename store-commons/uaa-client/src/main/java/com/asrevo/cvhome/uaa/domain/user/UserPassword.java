@@ -2,6 +2,7 @@ package com.asrevo.cvhome.uaa.domain.user;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,14 +19,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserPassword implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String password = null;
+    private String password = null;
 
-	private String changePassword = null;
+    private String changePassword = null;
 
 }

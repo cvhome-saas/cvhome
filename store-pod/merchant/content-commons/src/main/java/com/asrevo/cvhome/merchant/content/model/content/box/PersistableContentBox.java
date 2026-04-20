@@ -1,8 +1,10 @@
 package com.asrevo.cvhome.merchant.content.model.content.box;
 
-import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
 import java.io.Serial;
 import java.util.List;
+
+import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +12,12 @@ import lombok.Setter;
 @Getter
 public class PersistableContentBox extends ContentBox {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private List<ContentDescription> descriptions;
+    private List<ContentDescription> descriptions;
 
 }

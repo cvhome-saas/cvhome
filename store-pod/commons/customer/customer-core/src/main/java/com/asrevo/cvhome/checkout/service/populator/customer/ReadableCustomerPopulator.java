@@ -1,97 +1,97 @@
 package com.asrevo.cvhome.checkout.service.populator.customer;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
-import com.asrevo.cvhome.customer.model.customer.address.Address;
-import com.asrevo.cvhome.checkout.entity.customer.Customer;
+import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
-import org.apache.commons.lang3.StringUtils;
 
 public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, StoreMerchantId, ReadableCustomer> {
 
-	@Override
-	public ReadableCustomer populate(Customer source, ReadableCustomer target, StoreMerchantId store,
-			LanguageCode language) throws ConversionException {
+    @Override
+    public ReadableCustomer populate(Customer source, ReadableCustomer target, StoreMerchantId store,
+                                     LanguageCode language) throws ConversionException {
 
-		try {
+        try {
 
-			if (target == null) {
-				target = new ReadableCustomer();
-			}
+            if (target == null) {
+                target = new ReadableCustomer();
+            }
 
-			if (source.getId() != null && source.getId() > 0) {
-				target.setId(source.getId());
-			}
-			target.setEmailAddress(source.getEmailAddress());
+            if (source.getId() != null && source.getId() > 0) {
+                target.setId(source.getId());
+            }
+            target.setEmailAddress(source.getEmailAddress());
 
-			if (StringUtils.isNotEmpty(source.getUsername())) {
-				target.setUsername(source.getUsername());
-			}
+            if (StringUtils.isNotEmpty(source.getUsername())) {
+                target.setUsername(source.getUsername());
+            }
 
-			if (StringUtils.isNotEmpty(source.getCuaExternalId())) {
-				target.setCuaExternalId(source.getCuaExternalId());
-			}
+            if (StringUtils.isNotEmpty(source.getCuaExternalId())) {
+                target.setCuaExternalId(source.getCuaExternalId());
+            }
 
-			if (source.getBilling() != null) {
-				Address address = new Address();
-				address.setAddress(source.getBilling().getAddress());
-				address.setCity(source.getBilling().getCity());
-				address.setCompany(source.getBilling().getCompany());
-				address.setFirstName(source.getBilling().getFirstName());
-				address.setLastName(source.getBilling().getLastName());
-				address.setPostalCode(source.getBilling().getPostalCode());
-				address.setPhone(source.getBilling().getTelephone());
-				if (source.getBilling().getCountry() != null) {
-					address.setCountry(source.getBilling().getCountry());
-				}
-				if (source.getBilling().getZone() != null) {
-					address.setZone(source.getBilling().getZone());
-				}
-				if (source.getBilling().getState() != null) {
-					address.setStateProvince(source.getBilling().getState());
-				}
+            if (source.getBilling() != null) {
+                CustomerAddress customerAddress = new CustomerAddress();
+                customerAddress.setAddress(source.getBilling().getAddress());
+                customerAddress.setCity(source.getBilling().getCity());
+                customerAddress.setCompany(source.getBilling().getCompany());
+                customerAddress.setFirstName(source.getBilling().getFirstName());
+                customerAddress.setLastName(source.getBilling().getLastName());
+                customerAddress.setPostalCode(source.getBilling().getPostalCode());
+                customerAddress.setPhone(source.getBilling().getTelephone());
+                if (source.getBilling().getCountry() != null) {
+                    customerAddress.setCountry(source.getBilling().getCountry());
+                }
+                if (source.getBilling().getZone() != null) {
+                    customerAddress.setZone(source.getBilling().getZone());
+                }
+                if (source.getBilling().getState() != null) {
+                    customerAddress.setStateProvince(source.getBilling().getState());
+                }
 
-				target.setFirstName(address.getFirstName());
-				target.setLastName(address.getLastName());
+                target.setFirstName(customerAddress.getFirstName());
+                target.setLastName(customerAddress.getLastName());
 
-				target.setBilling(address);
-			}
+                target.setBilling(customerAddress);
+            }
 
-			if (source.getDelivery() != null) {
-				Address address = new Address();
-				address.setCity(source.getDelivery().getCity());
-				address.setAddress(source.getDelivery().getAddress());
-				address.setCompany(source.getDelivery().getCompany());
-				address.setFirstName(source.getDelivery().getFirstName());
-				address.setLastName(source.getDelivery().getLastName());
-				address.setPostalCode(source.getDelivery().getPostalCode());
-				address.setPhone(source.getDelivery().getTelephone());
-				if (source.getDelivery().getCountry() != null) {
-					address.setCountry(source.getDelivery().getCountry());
-				}
-				if (source.getDelivery().getZone() != null) {
-					address.setZone(source.getDelivery().getZone());
-				}
-				if (source.getDelivery().getState() != null) {
-					address.setStateProvince(source.getDelivery().getState());
-				}
+            if (source.getDelivery() != null) {
+                CustomerAddress customerAddress = new CustomerAddress();
+                customerAddress.setCity(source.getDelivery().getCity());
+                customerAddress.setAddress(source.getDelivery().getAddress());
+                customerAddress.setCompany(source.getDelivery().getCompany());
+                customerAddress.setFirstName(source.getDelivery().getFirstName());
+                customerAddress.setLastName(source.getDelivery().getLastName());
+                customerAddress.setPostalCode(source.getDelivery().getPostalCode());
+                customerAddress.setPhone(source.getDelivery().getTelephone());
+                if (source.getDelivery().getCountry() != null) {
+                    customerAddress.setCountry(source.getDelivery().getCountry());
+                }
+                if (source.getDelivery().getZone() != null) {
+                    customerAddress.setZone(source.getDelivery().getZone());
+                }
+                if (source.getDelivery().getState() != null) {
+                    customerAddress.setStateProvince(source.getDelivery().getState());
+                }
 
-				target.setDelivery(address);
-			}
+                target.setDelivery(customerAddress);
+            }
 
-		}
-		catch (Exception e) {
-			throw new ConversionException(e);
-		}
+        } catch (Exception e) {
+            throw new ConversionException(e);
+        }
 
-		return target;
-	}
+        return target;
+    }
 
-	@Override
-	protected ReadableCustomer createTarget() {
-		return null;
-	}
+    @Override
+    protected ReadableCustomer createTarget() {
+        return null;
+    }
 
 }

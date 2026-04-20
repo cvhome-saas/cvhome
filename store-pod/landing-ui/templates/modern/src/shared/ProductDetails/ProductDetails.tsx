@@ -4,7 +4,6 @@ import {parseDescription} from "@/services/description-view-util";
 import {ProductDetailsImageGallery} from "@/shared/ProductDetails/ProductDetailsImageGallery";
 import {StoreContext} from "@/types/store-context";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import {Badge} from "@/components/ui/badge";
 
 export const ProductDetails = ({storeContext, p, t}: {
     storeContext: StoreContext,

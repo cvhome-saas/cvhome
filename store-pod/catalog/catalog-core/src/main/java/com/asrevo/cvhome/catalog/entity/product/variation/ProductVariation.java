@@ -1,5 +1,23 @@
 package com.asrevo.cvhome.catalog.entity.product.variation;
 
+import java.io.Serial;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotEmpty;
+
 import com.asrevo.cvhome.catalog.entity.product.attribute.Optionable;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
@@ -9,9 +27,7 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import java.io.Serial;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,51 +41,51 @@ import lombok.Setter;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "PRODUCT_VARIATION",
-		uniqueConstraints = @UniqueConstraint(
-				columnNames = { "STORE_MERCHANT_ID", "PRODUCT_OPTION_ID", "OPTION_VALUE_ID" }))
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"STORE_MERCHANT_ID", "PRODUCT_OPTION_ID", "OPTION_VALUE_ID"}))
 @Getter
 @Setter
 public class ProductVariation extends SalesManagerEntity<Long, ProductVariation> implements Optionable, Auditable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@Embedded
-	private AuditSection auditSection = new AuditSection();
+    @Embedded
+    private AuditSection auditSection = new AuditSection();
 
-	@Id
-	@Column(name = "PRODUCT_VARIATION_ID", unique = true, nullable = false)
-	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-			valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_VARIATION_SEQ_NEXT_VAL",
-			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-	private Long id;
+    @Id
+    @Column(name = "PRODUCT_VARIATION_ID", unique = true, nullable = false)
+    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT", pkColumnValue = "PRODUCT_VARIATION_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    private Long id;
 
-	@Embedded
-	@AttributeOverrides(@AttributeOverride(name = "storeMerchantId",
-			column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50)))
-	private StoreMerchantId storeMerchantId;
+    @Embedded
+    @AttributeOverride(name = "storeMerchantId",
+            column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
+    private StoreMerchantId storeMerchantId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "PRODUCT_OPTION_ID", nullable = false)
-	private ProductOption productOption;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_OPTION_ID", nullable = false)
+    private ProductOption productOption;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "OPTION_VALUE_ID", nullable = false)
-	private ProductOptionValue productOptionValue;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OPTION_VALUE_ID", nullable = false)
+    private ProductOptionValue productOptionValue;
 
-	@NotEmpty
-	@Column(name = "CODE", length = 100, nullable = false)
-	private String code;
+    @NotEmpty
+    @Column(name = "CODE", length = 100, nullable = false)
+    private String code;
 
-	@Column(name = "SORT_ORDER")
-	private Integer sortOrder;
+    @Column(name = "SORT_ORDER")
+    private Integer sortOrder;
 
-	@Column(name = "VARIANT_DEFAULT")
-	private boolean variantDefault = false;
+    @Column(name = "VARIANT_DEFAULT")
+    private boolean variantDefault = false;
 
 }

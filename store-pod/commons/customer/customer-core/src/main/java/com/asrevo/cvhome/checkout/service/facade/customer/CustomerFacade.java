@@ -3,16 +3,16 @@
  */
 package com.asrevo.cvhome.checkout.service.facade.customer;
 
+import java.util.Optional;
+
+import com.asrevo.cvhome.checkout.entity.customer.Customer;
+import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
+import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
-import com.asrevo.cvhome.checkout.entity.customer.Customer;
-import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
-import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-
-import java.util.Optional;
 
 /**
  * <p>
@@ -26,16 +26,16 @@ import java.util.Optional;
  */
 public interface CustomerFacade {
 
-	/**
-	 * Creates a ReadableCustomer
-	 */
-	ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language);
+    /**
+     * Creates a ReadableCustomer
+     */
+    ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language);
 
-	Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language)
-			throws Exception;
+    Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language)
+            ;
 
-	ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria, LanguageCode language);
+    ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria, LanguageCode language);
 
-	Optional<ReadableCustomer> getCustomerByCuaExternalId(String cuaExternalId);
+    Optional<ReadableCustomer> getCustomerByCuaExternalId(String cuaExternalId);
 
 }

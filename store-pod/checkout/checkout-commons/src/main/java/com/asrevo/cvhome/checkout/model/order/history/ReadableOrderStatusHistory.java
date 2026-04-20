@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.checkout.model.order.history;
 
 import java.io.Serial;
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,15 +10,15 @@ import lombok.Setter;
 @Getter
 public class ReadableOrderStatusHistory extends OrderStatusHistory {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * YYYY-mm-DD:HH mm SSS
-	 */
-	private String date;
+    /**
+     * YYYY-mm-DD:HH mm SSS
+     */
+    private Instant date;
 
 }

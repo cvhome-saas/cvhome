@@ -14,27 +14,27 @@ export class ProductImageService {
   }
 
   addImageUrl( id) {//post
-    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image`;
+    return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 
   removeImageUrl( id) {//delete
-    return this.crudService.getBaseUrl() + `/store-pod-gateway/catalog/api/v1/private/product/${id}/image`;
+    return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 
   getImages(productId): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/product/${productId}/images`);
+    return this.crudService.get(`/spg/catalog/api/v1/product/${productId}/images`);
   }
 
   removeImage(productId, imageId): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/image/${imageId}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/product/${productId}/image/${imageId}`);
   }
 
   createImage(id, uploadData): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/${id}/images`, uploadData);
+    return this.crudService.post(`/spg/catalog/api/v1/private/product/${id}/images`, uploadData);
   }
 
   updateImage(productId, event): Observable<any> {
-    return this.crudService.patch(`/store-pod-gateway/catalog/api/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
+    return this.crudService.patch(`/spg/catalog/api/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
   }
 
 }

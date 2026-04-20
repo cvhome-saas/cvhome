@@ -1,7 +1,10 @@
 package com.asrevo.cvhome.catalog.model.product.product.variant;
 
-import com.asrevo.cvhome.catalog.model.product.Product;
 import java.io.Serial;
+import java.time.Instant;
+
+import com.asrevo.cvhome.catalog.model.product.Product;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,27 +12,27 @@ import lombok.Setter;
 @Getter
 public class ProductVariant extends Product {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String store;
+    private String store;
 
-	/**
-	 * use product id or sku
-	 **/
-	private Long productId;
+    /**
+     * use product id or sku
+     **/
+    private Long productId;
 
-	private String sku;
+    private String sku;
 
-	/**
-	 *
-	 **/
-	private boolean available;
+    /**
+     *
+     **/
+    private boolean available;
 
-	private String dateAvailable;
+    private Instant dateAvailable;
 
-	private int sortOrder;
+    private int sortOrder;
 
-	private boolean defaultSelection;
+    private boolean defaultSelection;
 
 }

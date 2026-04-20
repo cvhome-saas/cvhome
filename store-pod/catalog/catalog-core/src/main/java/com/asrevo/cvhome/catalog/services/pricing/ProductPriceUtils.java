@@ -1,20 +1,27 @@
 package com.asrevo.cvhome.catalog.services.pricing;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.product.price.SimpleProductPrice;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.PriceUtils;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class determines the price that is displayed in the catalogue for a given item. It
@@ -25,221 +32,212 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class ProductPriceUtils {
 
-	public FinalPrice getFinalPrice(Product product) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(Product product) throws ServiceException {
 
-		FinalPrice finalPrice = calculateFinalPrice(product);
+        FinalPriceCalc finalPrice = calculateFinalPrice(product);
 
-		finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
-		if (finalPrice.isDiscounted()) {
-			finalPrice.setStringDiscountedPrice(PriceUtils.getStringAmount(finalPrice.getDiscountedPrice()));
-		}
-		return finalPrice;
-	}
+        finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
+        if (finalPrice.isDiscounted()) {
+            finalPrice.setStringDiscountedPrice(PriceUtils.getStringAmount(finalPrice.getDiscountedPrice()));
+        }
+        return finalPrice;
+    }
 
-	public FinalPrice getFinalPrice(ProductAvailability availability) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(ProductAvailability availability) throws ServiceException {
 
-		FinalPrice finalPrice = calculateFinalPrice(availability);
+        FinalPriceCalc finalPrice = calculateFinalPrice(availability);
 
-		finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
-		if (finalPrice.isDiscounted()) {
-			finalPrice.setStringDiscountedPrice(PriceUtils.getStringAmount(finalPrice.getDiscountedPrice()));
-		}
-		return finalPrice;
-	}
+        finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
+        if (finalPrice.isDiscounted()) {
+            finalPrice.setStringDiscountedPrice(PriceUtils.getStringAmount(finalPrice.getDiscountedPrice()));
+        }
+        return finalPrice;
+    }
 
-	private Set<ProductAvailability> applicableAvailabilities(Set<ProductAvailability> availabilities)
-			throws ServiceException {
-		if (CollectionUtils.isEmpty(availabilities)) {
-			throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-					"No applicable inventory to calculate the price.");
-		}
+    private Set<ProductAvailability> applicableAvailabilities(Set<ProductAvailability> availabilities)
+            throws ServiceException {
+        if (CollectionUtils.isEmpty(availabilities)) {
+            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
+                    "No applicable inventory to calculate the price.");
+        }
 
-		return availabilities.stream().filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
-	}
+        return availabilities.stream().filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
+    }
 
-	private FinalPrice calculateFinalPrice(Product product) throws ServiceException {
+    private FinalPriceCalc calculateFinalPrice(Product product) throws ServiceException {
 
-		FinalPrice finalPrice = null;
-		List<FinalPrice> otherPrices = null;
+        FinalPriceCalc finalPrice = null;
+        List<FinalPriceCalc> otherPrices = null;
 
-		Set<ProductAvailability> availabilities = null;
-		if (!CollectionUtils.isEmpty(product.getVariants())) {
-			Optional<ProductVariant> variants = product.getVariants()
-				.stream()
-				.filter(ProductVariant::isDefaultSelection)
-				.findFirst();
-			if (variants.isPresent()) {
-				availabilities = variants.get().getAvailabilities();
-				availabilities = this.applicableAvailabilities(availabilities);
-			}
-		}
+        Set<ProductAvailability> availabilities = null;
+        if (!CollectionUtils.isEmpty(product.getVariants())) {
+            Optional<ProductVariant> variants = product.getVariants()
+                    .stream()
+                    .filter(ProductVariant::isDefaultSelection)
+                    .findFirst();
+            if (variants.isPresent()) {
+                availabilities = variants.get().getAvailabilities();
+                availabilities = this.applicableAvailabilities(availabilities);
+            }
+        }
 
-		if (CollectionUtils.isEmpty(availabilities)) {
-			availabilities = product.getAvailabilities();
-			availabilities = this.applicableAvailabilities(availabilities);
-		}
+        if (CollectionUtils.isEmpty(availabilities)) {
+            availabilities = product.getAvailabilities();
+            availabilities = this.applicableAvailabilities(availabilities);
+        }
 
-		for (ProductAvailability availability : availabilities) {
-			if (!StringUtils.isEmpty(availability.getRegion())
-					&& availability.getRegion().equals(Constants.ALL_REGIONS)) { // TODO
-																					// REL
-																					// 2.1
-																					// accept
-																					// a
-																					// region
-				Set<ProductPrice> prices = availability.getPrices();
-				for (ProductPrice price : prices) {
+        for (ProductAvailability availability : availabilities) {
+            if (!StringUtils.isEmpty(availability.getRegion())
+                    && availability.getRegion().equals(Constants.ALL_REGIONS)) { // TODO
 
-					FinalPrice p = finalPrice(price);
-					if (price.isDefaultPrice()) {
-						finalPrice = p;
-					}
-					else {
-						if (otherPrices == null) {
-							otherPrices = new ArrayList<>();
-						}
-						otherPrices.add(p);
-					}
-				}
-			}
-		}
+                Set<ProductPrice> prices = availability.getPrices();
+                for (ProductPrice price : prices) {
 
-		if (finalPrice != null) {
-			finalPrice.setAdditionalPrices(otherPrices);
-		}
-		else {
-			if (otherPrices != null) {
-				finalPrice = otherPrices.getFirst();
-			}
-		}
+                    FinalPriceCalc p = finalPrice(price);
+                    if (price.isDefaultPrice()) {
+                        finalPrice = p;
+                    } else {
+                        if (otherPrices == null) {
+                            otherPrices = new ArrayList<>();
+                        }
+                        otherPrices.add(p);
+                    }
+                }
+            }
+        }
 
-		if (finalPrice == null) {
-			throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-					"No inventory available to calculate the price. Availability should contain at"
-							+ " least a region set to *");
-		}
-		finalPrice.setSku(product.getSku());
-		return finalPrice;
-	}
+        if (finalPrice != null) {
+            finalPrice.setAdditionalPrices(otherPrices);
+        } else {
+            if (otherPrices != null) {
+                finalPrice = otherPrices.getFirst();
+            }
+        }
 
-	private FinalPrice calculateFinalPrice(ProductAvailability availability) throws ServiceException {
+        if (finalPrice == null) {
+            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
+        }
+        finalPrice.setSku(product.getSku());
+        return finalPrice;
+    }
 
-		FinalPrice finalPrice = null;
-		List<FinalPrice> otherPrices = null;
+    private FinalPriceCalc calculateFinalPrice(ProductAvailability availability) throws ServiceException {
 
-		Set<ProductPrice> prices = availability.getPrices();
-		for (ProductPrice price : prices) {
+        FinalPriceCalc finalPrice = null;
+        List<FinalPriceCalc> otherPrices = null;
 
-			FinalPrice p = finalPrice(price);
-			if (price.isDefaultPrice()) {
-				finalPrice = p;
-			}
-			else {
-				if (otherPrices == null) {
-					otherPrices = new ArrayList<>();
-				}
-				otherPrices.add(p);
-			}
-		}
+        Set<ProductPrice> prices = availability.getPrices();
+        for (ProductPrice price : prices) {
 
-		if (finalPrice != null) {
-			finalPrice.setAdditionalPrices(otherPrices);
-		}
-		else {
-			if (otherPrices != null) {
-				finalPrice = otherPrices.getFirst();
-			}
-		}
+            FinalPriceCalc p = finalPrice(price);
+            if (price.isDefaultPrice()) {
+                finalPrice = p;
+            } else {
+                if (otherPrices == null) {
+                    otherPrices = new ArrayList<>();
+                }
+                otherPrices.add(p);
+            }
+        }
 
-		if (finalPrice == null) {
-			throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-					"No inventory available to calculate the price. Availability should contain at"
-							+ " least a region set to *");
-		}
+        if (finalPrice != null) {
+            finalPrice.setAdditionalPrices(otherPrices);
+        } else {
+            if (otherPrices != null) {
+                finalPrice = otherPrices.getFirst();
+            }
+        }
 
-		return finalPrice;
-	}
+        if (finalPrice == null) {
+            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
+                    "No inventory available to calculate the price. Availability should contain at"
+                            + " least a region set to *");
+        }
 
-	private FinalPrice finalPrice(ProductPrice price) {
+        return finalPrice;
+    }
 
-		FinalPrice finalPrice = new FinalPrice();
-		BigDecimal fPrice = price.getProductPriceAmount();
-		BigDecimal oPrice = price.getProductPriceAmount();
+    private FinalPriceCalc finalPrice(ProductPrice price) {
 
-		Date today = new Date();
-		// calculate discount price
-		boolean hasDiscount = false;
-		if (price.getProductPriceSpecialStartDate() != null || price.getProductPriceSpecialEndDate() != null) {
+        FinalPriceCalc finalPrice = new FinalPriceCalc();
+        BigDecimal fPrice = price.getProductPriceAmount();
+        BigDecimal oPrice = price.getProductPriceAmount();
 
-			if (price.getProductPriceSpecialStartDate() != null) {
-				if (price.getProductPriceSpecialStartDate().before(today)) {
-					if (price.getProductPriceSpecialEndDate() != null) {
-						if (price.getProductPriceSpecialEndDate().after(today)) {
-							hasDiscount = true;
-							fPrice = price.getProductPriceSpecialAmount();
-							finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-						}
-					}
-				}
-			}
+        LocalDate today = LocalDate.now();
+        // calculate discount price
+        boolean hasDiscount = false;
+        if (price.getProductPriceSpecialStartDate() != null || price.getProductPriceSpecialEndDate() != null) {
 
-			if (!hasDiscount && price.getProductPriceSpecialStartDate() == null
-					&& price.getProductPriceSpecialEndDate() != null) {
-				if (price.getProductPriceSpecialEndDate().after(today)) {
-					hasDiscount = true;
-					fPrice = price.getProductPriceSpecialAmount();
-					finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-				}
-			}
-		}
-		else {
-			if (price.getProductPriceSpecialAmount() != null
-					&& price.getProductPriceSpecialAmount().doubleValue() > 0) {
-				hasDiscount = true;
-				fPrice = price.getProductPriceSpecialAmount();
-				finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-			}
-		}
+            if (price.getProductPriceSpecialStartDate() != null) {
+                if (price.getProductPriceSpecialStartDate().isBefore(today)) {
+                    if (price.getProductPriceSpecialEndDate() != null) {
+                        if (price.getProductPriceSpecialEndDate().isAfter(today)) {
+                            hasDiscount = true;
+                            fPrice = price.getProductPriceSpecialAmount();
+                            finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
+                        }
+                    }
+                }
+            }
 
-		finalPrice.setProductPrice(toSimpleProductPrice(price));
-		finalPrice.setFinalPrice(fPrice);
-		finalPrice.setOriginalPrice(oPrice);
+            if (!hasDiscount && price.getProductPriceSpecialStartDate() == null
+                    && price.getProductPriceSpecialEndDate() != null) {
+                if (price.getProductPriceSpecialEndDate().isAfter(today)) {
+                    hasDiscount = true;
+                    fPrice = price.getProductPriceSpecialAmount();
+                    finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
+                }
+            }
+        } else {
+            if (price.getProductPriceSpecialAmount() != null
+                    && price.getProductPriceSpecialAmount().doubleValue() > 0) {
+                hasDiscount = true;
+                fPrice = price.getProductPriceSpecialAmount();
+                finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
+            }
+        }
 
-		if (price.isDefaultPrice()) {
-			finalPrice.setDefaultPrice(true);
-		}
-		if (hasDiscount) {
-			discountPrice(finalPrice);
-		}
+        finalPrice.setProductPrice(toSimpleProductPrice(price));
+        finalPrice.setFinalPrice(fPrice);
+        finalPrice.setOriginalPrice(oPrice);
 
-		return finalPrice;
-	}
+        if (price.isDefaultPrice()) {
+            finalPrice.setDefaultPrice(true);
+        }
+        if (hasDiscount) {
+            discountPrice(finalPrice);
+        }
 
-	private SimpleProductPrice toSimpleProductPrice(ProductPrice price) {
-		SimpleProductPrice simpleProductPrice = new SimpleProductPrice();
-		simpleProductPrice.setCode(price.getCode());
-		simpleProductPrice.setDefaultPrice(price.isDefaultPrice());
-		simpleProductPrice.setProductPriceSpecialAmount(price.getProductPriceSpecialAmount());
-		simpleProductPrice.setProductPriceSpecialStartDate(price.getProductPriceSpecialStartDate());
-		simpleProductPrice.setProductPriceSpecialEndDate(price.getProductPriceSpecialEndDate());
-		simpleProductPrice.setProductPriceAmount(price.getProductPriceAmount());
-		simpleProductPrice.setProductPriceType(price.getProductPriceType());
-		return simpleProductPrice;
-	}
+        return finalPrice;
+    }
 
-	private void discountPrice(FinalPrice finalPrice) {
+    private SimpleProductPrice toSimpleProductPrice(ProductPrice price) {
+        SimpleProductPrice simpleProductPrice = new SimpleProductPrice();
+        simpleProductPrice.setCode(price.getCode());
+        simpleProductPrice.setDefaultPrice(price.isDefaultPrice());
+        simpleProductPrice.setProductPriceSpecialAmount(price.getProductPriceSpecialAmount());
+        simpleProductPrice.setProductPriceSpecialStartDate(price.getProductPriceSpecialStartDate());
+        simpleProductPrice.setProductPriceSpecialEndDate(price.getProductPriceSpecialEndDate());
+        simpleProductPrice.setProductPriceAmount(price.getProductPriceAmount());
+        simpleProductPrice.setProductPriceType(price.getProductPriceType());
+        return simpleProductPrice;
+    }
 
-		finalPrice.setDiscounted(true);
+    private void discountPrice(FinalPriceCalc finalPrice) {
 
-		double arith = finalPrice.getProductPrice().getProductPriceSpecialAmount().doubleValue()
-				/ finalPrice.getProductPrice().getProductPriceAmount().doubleValue();
-		double fsdiscount = 100 - (arith * 100);
-		float percentagediscount = Double.valueOf(fsdiscount).floatValue();
-		int percent = (int) percentagediscount;
-		finalPrice.setDiscountPercent(percent);
+        finalPrice.setDiscounted(true);
 
-		// calculate percent
-		finalPrice.setDiscountedPrice(finalPrice.getProductPrice().getProductPriceSpecialAmount());
-	}
+        double arith = finalPrice.getProductPrice().getProductPriceSpecialAmount().doubleValue()
+                / finalPrice.getProductPrice().getProductPriceAmount().doubleValue();
+        double fsdiscount = 100 - (arith * 100);
+        float percentagediscount = Double.valueOf(fsdiscount).floatValue();
+        int percent = (int) percentagediscount;
+        finalPrice.setDiscountPercent(percent);
+
+        // calculate percent
+        finalPrice.setDiscountedPrice(finalPrice.getProductPrice().getProductPriceSpecialAmount());
+    }
 
 }

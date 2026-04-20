@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.product;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,18 +15,18 @@ import lombok.Setter;
 @Setter
 public class LightPersistableProduct implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private String price;
+    private String price;
 
-	private boolean available;
+    private boolean available;
 
-	private boolean productShipeable;
+    private boolean productShipeable;
 
-	private int quantity;
+    private int quantity;
 
 }

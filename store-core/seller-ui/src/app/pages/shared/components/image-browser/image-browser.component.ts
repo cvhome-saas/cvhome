@@ -28,7 +28,7 @@ export class ImageBrowserComponent implements OnInit {
 
   getImages() {
     this.loadingList = true;
-    this.crudService.get('/store-pod-gateway/merchant/api/v1/content/images')
+    this.crudService.get('/spg/merchant/api/v1/content/images')
       .subscribe({
         next: (data) => {
           this.uploadedFiles = data.content;

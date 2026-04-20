@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.category;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,22 +10,22 @@ import lombok.Setter;
 @Getter
 public class CategoryEntity extends Category implements Serializable {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private int sortOrder;
+    private int sortOrder;
 
-	private boolean visible;
+    private boolean visible;
 
-	private boolean featured;
+    private boolean featured;
 
-	private String lineage;
+    private String lineage;
 
-	private int depth;
+    private int depth;
 
-	private Category parent;
+    private Category parent;
 
 }

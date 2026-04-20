@@ -4,14 +4,14 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f02363
 
 ###
 
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f'
-GET {{SELLER-UI_URL}}/store-pod-gateway/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f
+# curl 'GET {{SELLER-UI_URL}}/spg/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f'
+GET {{SELLER-UI_URL}}/spg/merchant/api/v1/store/65f023632bc46470c104b75f?store=65f023632bc46470c104b75f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl '{{SELLER-UI_URL}}/store-pod-gateway/merchant/api/v1/router/private/allocates?store=65f023632bc46470c104b75f'
-GET {{SELLER-UI_URL}}/store-pod-gateway/merchant/api/v1/router/private/allocates?store=65f023632bc46470c104b75f
+# curl '{{SELLER-UI_URL}}/spg/merchant/api/v1/router/private/allocates?store=65f023632bc46470c104b75f'
+GET {{SELLER-UI_URL}}/spg/merchant/api/v1/router/private/allocates?store=65f023632bc46470c104b75f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

@@ -342,17 +342,6 @@ create table if not exists catalog.product_image_description
         constraint fk9k3u9pf3teymlxchgu9p4jd9e references catalog.product_image,
     constraint UKthpdsawwymj1tnjnsmk84umlp unique (product_image_id, language_code)
 );
-create table if not exists catalog.product_relationship
-(
-    product_relationship_id bigint      not null primary key,
-    active                  boolean,
-    code                    varchar(255),
-    product_id              bigint
-        constraint fk7opqd0ko4gr45r2lpmiyr9sai references catalog.product,
-    related_product_id      bigint
-        constraint fkg6fbs35996omj1d4iw2upkdmn references catalog.product,
-    store_merchant_id       varchar(50) not null
-);
 create table if not exists catalog.product_var_image_description
 (
     description_id       bigint       not null primary key,
@@ -465,3 +454,45 @@ create table if not exists catalog.product_price_description
     constraint UKc84xdnuwluljfaeor1cax423p unique (product_price_id, language_code)
 );
 create index if not exists idxv61l549h1wdlqi4chir5muwl on catalog.product_variant (product_id);
+
+create table if not exists catalog.product_group
+(
+    product_group_id  bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    active            boolean,
+    code              varchar(100) not null,
+    store_merchant_id varchar(50)  not null,
+    parent_product_id bigint
+        constraint fk_product_group_parent references catalog.product,
+    constraint UK_product_group_code unique (store_merchant_id, code)
+);
+
+create table if not exists catalog.product_group_description
+(
+    description_id   bigint       not null primary key,
+    date_created     timestamp(6),
+    date_modified    timestamp(6),
+    updt_id          varchar(60),
+    description      text,
+    name             varchar(120) not null,
+    title            varchar(120),
+    meta_description varchar(255),
+    meta_keywords    varchar(255),
+    meta_title       varchar(120),
+    sef_url          varchar(120),
+    language_code    varchar(6)   not null,
+    product_group_id bigint       not null
+        constraint fk_product_group_desc references catalog.product_group,
+    constraint UK_product_group_desc unique (product_group_id, language_code)
+);
+
+create table if not exists catalog.product_group_product
+(
+    product_group_id bigint not null
+        constraint fk_pgp_group references catalog.product_group,
+    product_id       bigint not null
+        constraint fk_pgp_product references catalog.product,
+    primary key (product_group_id, product_id)
+);

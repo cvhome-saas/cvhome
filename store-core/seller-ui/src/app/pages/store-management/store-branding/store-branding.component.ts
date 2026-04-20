@@ -5,8 +5,6 @@ import {StoreService} from '../services/store.service';
 import {NbToastrService} from "@nebular/theme";
 import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from "../../shared/services/error.service";
-import {SelectedStoreService} from "../../shared/services/selected-store.service";
-import {map} from "rxjs";
 
 @Component({
   selector: 'ngx-store-branding',

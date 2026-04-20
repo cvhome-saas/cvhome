@@ -1,5 +1,13 @@
 package com.asrevo.cvhome.catalog.services.product.image;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.repositories.product.image.ProductImageRepository;
@@ -12,163 +20,144 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service("productImage")
 public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long, ProductImage>
-		implements ProductImageService {
+        implements ProductImageService {
 
-	private final ProductImageRepository productImageRepository;
+    private final ProductImageRepository productImageRepository;
 
-	private final ProductFileManager productFileManager;
+    private final ProductFileManager productFileManager;
 
-	@Autowired
-	public ProductImageServiceImpl(ProductImageRepository productImageRepository,
-			ProductFileManager productFileManager) {
-		super(productImageRepository);
-		this.productImageRepository = productImageRepository;
-		this.productFileManager = productFileManager;
-	}
+    @Autowired
+    public ProductImageServiceImpl(ProductImageRepository productImageRepository,
+                                   ProductFileManager productFileManager) {
+        super(productImageRepository);
+        this.productImageRepository = productImageRepository;
+        this.productFileManager = productFileManager;
+    }
 
-	public ProductImage getById(Long id) {
+    public ProductImage getById(Long id) {
 
-		return productImageRepository.findOne(id);
-	}
+        return productImageRepository.findOne(id);
+    }
 
-	@Override
-	public void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException {
+    @Override
+    public void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException {
 
-		try {
-			for (ProductImage productImage : productImages) {
+        try {
+            for (ProductImage productImage : productImages) {
+                InputStream inputStream = productImage.getImage();
+                ImageContentFile cmsContentImage = new ImageContentFile();
+                cmsContentImage.setFileName(productImage.getProductImage());
+                cmsContentImage.setFile(inputStream);
+                cmsContentImage.setFileContentType(FileContentType.PRODUCT);
 
-				Assert.notNull(productImage.getImage(), "image inputStream can't be null");
+                addProductImage(product, productImage, cmsContentImage);
+            }
 
-				InputStream inputStream = productImage.getImage();
-				ImageContentFile cmsContentImage = new ImageContentFile();
-				cmsContentImage.setFileName(productImage.getProductImage());
-				cmsContentImage.setFile(inputStream);
-				cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+        } catch (Exception e) {
+            throw new ServiceException(e);
+        }
+    }
 
-				addProductImage(product, productImage, cmsContentImage);
-			}
+    @Override
+    public void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
+            throws ServiceException {
 
-		}
-		catch (Exception e) {
-			throw new ServiceException(e);
-		}
-	}
+        productImage.setProduct(product);
 
-	@Override
-	public void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
-			throws ServiceException {
+        try {
+            if (productImage.getImageType() == 0) {
+                CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
+                        productImage.getProduct().getStore(), productImage.getProduct().getSku(),
+                        productImage.getProductImage());
+                productFileManager.addProductImage(cmsProductImage, inputImage);
+            }
 
-		productImage.setProduct(product);
+            // insert ProductImage
+            saveOrUpdate(productImage);
 
-		try {
-			if (productImage.getImageType() == 0) {
-				Assert.notNull(inputImage.getFile(), "ImageContentFile.file cannot be null");
-				CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
-						productImage.getProduct().getStore(), productImage.getProduct().getSku(),
-						productImage.getProductImage());
-				productFileManager.addProductImage(cmsProductImage, inputImage);
-			}
+        } catch (Exception e) {
+            throw new ServiceException(e);
+        } finally {
+            try {
 
-			// insert ProductImage
-			saveOrUpdate(productImage);
+                if (inputImage.getFile() != null) {
+                    inputImage.getFile().close();
+                }
 
-		}
-		catch (Exception e) {
-			throw new ServiceException(e);
-		}
-		finally {
-			try {
+            } catch (Exception _) {
 
-				if (inputImage.getFile() != null) {
-					inputImage.getFile().close();
-				}
+            }
+        }
+    }
 
-			}
-			catch (Exception ignore) {
+    @Override
+    public ProductImage saveOrUpdate(ProductImage productImage) {
 
-			}
-		}
-	}
+        return productImageRepository.save(productImage);
+    }
 
-	@Override
-	public ProductImage saveOrUpdate(ProductImage productImage) {
+    @Override
+    public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException {
 
-		return productImageRepository.save(productImage);
-	}
+        ProductImage pi = new ProductImage();
+        String imageName = productImage.getProductImage();
+        if (size == ProductImageSize.LARGE) {
+            imageName = "L-" + imageName;
+        }
 
-	// TODO get default product image
+        if (size == ProductImageSize.SMALL) {
+            imageName = "S-" + imageName;
+        }
 
-	@Override
-	public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException {
+        pi.setProductImage(imageName);
+        pi.setProduct(productImage.getProduct());
+        CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
+                productImage.getProduct().getStore(), productImage.getProduct().getSku(),
+                productImage.getProductImage());
 
-		ProductImage pi = new ProductImage();
-		String imageName = productImage.getProductImage();
-		if (size == ProductImageSize.LARGE) {
-			imageName = "L-" + imageName;
-		}
+        return productFileManager.getProductImage(cmsProductImage);
+    }
 
-		if (size == ProductImageSize.SMALL) {
-			imageName = "S-" + imageName;
-		}
+    @Override
+    public OutputContentFile getProductImage(final String storeCode, final String productCode, final String fileName,
+                                             final ProductImageSize size) throws ServiceException {
+        return productFileManager.getProductImage(storeCode, productCode, fileName, size);
+    }
 
-		pi.setProductImage(imageName);
-		pi.setProduct(productImage.getProduct());
-		CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
-				productImage.getProduct().getStore(), productImage.getProduct().getSku(),
-				productImage.getProductImage());
+    @Override
+    public void removeProductImage(ProductImage productImage) throws ServiceException {
 
-		return productFileManager.getProductImage(cmsProductImage);
-	}
+        if (!StringUtils.isBlank(productImage.getProductImage())) {
+            CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
+                    productImage.getProduct().getStore(), productImage.getProduct().getSku(),
+                    productImage.getProductImage());
+            productFileManager.removeProductImage(cmsProductImage); // managed internally
+        }
+        ProductImage p = getById(productImage.getId());
 
-	@Override
-	public OutputContentFile getProductImage(final String storeCode, final String productCode, final String fileName,
-			final ProductImageSize size) throws ServiceException {
-		return productFileManager.getProductImage(storeCode, productCode, fileName, size);
-	}
+        delete(p);
+    }
 
-	@Override
-	public void removeProductImage(ProductImage productImage) throws ServiceException {
+    @Override
+    public Optional<ProductImage> getProductImage(Long imageId, Long productId, StoreMerchantId store) {
 
-		if (!StringUtils.isBlank(productImage.getProductImage())) {
-			CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),
-					productImage.getProduct().getStore(), productImage.getProduct().getSku(),
-					productImage.getProductImage());
-			productFileManager.removeProductImage(cmsProductImage); // managed internally
-		}
-		ProductImage p = getById(productImage.getId());
+        Optional<ProductImage> image = Optional.empty();
 
-		delete(p);
-	}
+        ProductImage img = productImageRepository.finById(imageId, productId, store);
+        if (img != null) {
+            image = Optional.of(img);
+        }
 
-	@Override
-	public Optional<ProductImage> getProductImage(Long imageId, Long productId, StoreMerchantId store) {
+        return image;
+    }
 
-		Optional<ProductImage> image = Optional.empty();
-
-		ProductImage img = productImageRepository.finById(imageId, productId, store);
-		if (img != null) {
-			image = Optional.of(img);
-		}
-
-		return image;
-	}
-
-	@Override
-	public void updateProductImage(Product product, ProductImage productImage) {
-		Assert.notNull(product, "Product cannot be null");
-		Assert.notNull(productImage, "ProductImage cannot be null");
-		productImage.setProduct(product);
-		productImageRepository.save(productImage);
-	}
+    @Override
+    public void updateProductImage(Product product, ProductImage productImage) {
+        productImage.setProduct(product);
+        productImageRepository.save(productImage);
+    }
 
 }

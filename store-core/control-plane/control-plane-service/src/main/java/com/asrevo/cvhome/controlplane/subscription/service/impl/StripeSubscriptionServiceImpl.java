@@ -1,10 +1,12 @@
 package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
+import org.springframework.stereotype.Service;
+
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.s2s.model.StripeProperties;
-import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
 import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 import com.asrevo.cvhome.controlplane.subscription.service.StripeSubscriptionService;
+import com.asrevo.cvhome.s2s.model.StripeProperties;
+import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
 import com.stripe.Stripe;
 import com.stripe.model.Customer;
 import com.stripe.model.CustomerSearchResult;
@@ -12,64 +14,60 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 import com.stripe.param.checkout.SessionCreateParams;
-import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class StripeSubscriptionServiceImpl implements StripeSubscriptionService {
 
-	private final StripeProperties stripeProperties;
+    private static final String ORG_ID_KEY = "orgId";
 
-	@PostConstruct
-	public void init() {
-		Stripe.apiKey = stripeProperties.key();
-	}
 
-	@SneakyThrows
-	private Customer findOrCreateCustomer(ManagerOrgId managerOrgId) {
-		CustomerSearchParams params = CustomerSearchParams.builder()
-			.setQuery("metadata[\"orgId\"]:\"" + managerOrgId.id().toString() + "\"")
-			.build();
+    public StripeSubscriptionServiceImpl(StripeProperties stripeProperties) {
+        Stripe.apiKey = stripeProperties.key();
+    }
 
-		CustomerSearchResult search = Customer.search(params);
-		Customer customer;
-		if (search.getData().isEmpty()) {
+    @SneakyThrows
+    private Customer findOrCreateCustomer(ManagerOrgId managerOrgId) {
+        CustomerSearchParams params = CustomerSearchParams.builder()
+                .setQuery("metadata[\"orgId\"]:\"" + managerOrgId.id().toString() + "\"")
+                .build();
 
-			CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
-				.putMetadata("orgId", managerOrgId.id().toString())
-				.build();
-			customer = Customer.create(customerCreateParams);
-		}
-		else {
-			customer = search.getData().getFirst();
-		}
+        CustomerSearchResult search = Customer.search(params);
+        Customer customer;
+        if (search.getData().isEmpty()) {
 
-		return customer;
-	}
+            CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
+                    .putMetadata(ORG_ID_KEY, managerOrgId.id().toString())
+                    .build();
+            customer = Customer.create(customerCreateParams);
+        } else {
+            customer = search.getData().getFirst();
+        }
 
-	@Override
-	@SneakyThrows
-	public String createSubscriptionSession(ManagerOrgId managerOrgId, PriceId priceId,
-			RedirectionUrlBuilder redirectionUrl) {
-		Customer customer = findOrCreateCustomer(managerOrgId);
+        return customer;
+    }
 
-		SessionCreateParams.Builder sessionCreateParamsBuilder = SessionCreateParams.builder()
-			.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-			.setCustomer(customer.getId())
-			.setSuccessUrl(redirectionUrl.getRedirectionUrl("/public/subscription/success"))
-			.setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
-			.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(priceId.id()).build())
-			.setSubscriptionData(SessionCreateParams.SubscriptionData.builder()
-				.putMetadata("orgId", managerOrgId.id().toString())
-				.build());
+    @Override
+    @SneakyThrows
+    public String createSubscriptionSession(ManagerOrgId managerOrgId, PriceId priceId,
+                                            RedirectionUrlBuilder redirectionUrl) {
+        Customer customer = findOrCreateCustomer(managerOrgId);
 
-		Session session = Session.create(sessionCreateParamsBuilder.build());
-		return session.getUrl();
-	}
+        SessionCreateParams.Builder sessionCreateParamsBuilder = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .setCustomer(customer.getId())
+                .setSuccessUrl(redirectionUrl.getRedirectionUrl("/public/subscription/success"))
+                .setCancelUrl(redirectionUrl.getRedirectionUrl("/public/subscription/fail"))
+                .addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(priceId.id()).build())
+                .setSubscriptionData(SessionCreateParams.SubscriptionData.builder()
+                        .putMetadata(ORG_ID_KEY, managerOrgId.id().toString())
+                        .build());
+
+        Session session = Session.create(sessionCreateParamsBuilder.build());
+        return session.getUrl();
+    }
 
 }

@@ -1,18 +1,19 @@
 package com.asrevo.cvhome.commons.event;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public interface Event {
 
-	String eventType();
+    String eventType();
 
-	Map<String, String> data();
+    Map<String, String> data();
 
-	@JsonIgnore
-	default List<String> getDestinations() {
-		return List.of();
-	}
+    @JsonIgnore
+    default List<String> getDestinations() {
+        return List.of();
+    }
 
 }

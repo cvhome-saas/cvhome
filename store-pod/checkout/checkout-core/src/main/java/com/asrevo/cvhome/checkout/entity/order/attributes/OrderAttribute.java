@@ -1,10 +1,21 @@
 package com.asrevo.cvhome.checkout.entity.order.attributes;
 
+import java.io.Serial;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
+
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import jakarta.persistence.*;
-import java.io.Serial;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,29 +30,29 @@ import lombok.Setter;
 @Setter
 public class OrderAttribute extends SalesManagerEntity<Long, OrderAttribute> {
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@Column(name = "ORDER_ATTRIBUTE_ID", unique = true, nullable = false)
-	@TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-			valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_ATTRIBUTE_SEQ_NEXT_VAL",
-			allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
-			initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
-	private Long id;
+    @Id
+    @Column(name = "ORDER_ATTRIBUTE_ID", unique = true, nullable = false)
+    @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT", pkColumnValue = "ORDER_ATTRIBUTE_SEQ_NEXT_VAL",
+            allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
+            initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
+    private Long id;
 
-	@Column(name = "IDENTIFIER", nullable = false)
-	private String key;
+    @Column(name = "IDENTIFIER", nullable = false)
+    private String key;
 
-	@Column(name = "VALUE", nullable = false)
-	private String value;
+    @Column(name = "VALUE", nullable = false)
+    private String value;
 
-	@ManyToOne(targetEntity = Order.class)
-	@JoinColumn(name = "ORDER_ID", nullable = false)
-	private Order order;
+    @ManyToOne(targetEntity = Order.class)
+    @JoinColumn(name = "ORDER_ID", nullable = false)
+    private Order order;
 
 }

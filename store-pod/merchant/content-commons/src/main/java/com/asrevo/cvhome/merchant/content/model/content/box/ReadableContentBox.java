@@ -1,9 +1,11 @@
 package com.asrevo.cvhome.merchant.content.model.content.box;
 
-import com.asrevo.cvhome.merchant.content.model.content.common.Content;
-import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
 import java.io.Serial;
 import java.util.List;
+
+import com.asrevo.cvhome.merchant.content.model.content.common.Content;
+import com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,20 +13,20 @@ import lombok.Setter;
 @Getter
 public class ReadableContentBox extends Content {
 
-	private static final String BOX = "BOX";
+    private static final String BOX = "BOX";
 
-	/**
-	 *
-	 */
-	@Serial
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private ContentDescription description;
+    private ContentDescription description;
 
-	private List<ContentDescription> descriptions;
+    private List<ContentDescription> descriptions;
 
-	public ReadableContentBox() {
-		super.setContentType(BOX);
-	}
+    public ReadableContentBox() {
+        super.setContentType(BOX);
+    }
 
 }

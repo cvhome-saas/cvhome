@@ -13,7 +13,7 @@ export class CustomersService {
   }
 
   getCustomers(params): Observable<any> {
-    return this.crudService.get('/store-pod-gateway/checkout/api/v1/private/customers', params);
+    return this.crudService.get('/spg/checkout/api/v1/private/customers', params);
   }
 
 }
