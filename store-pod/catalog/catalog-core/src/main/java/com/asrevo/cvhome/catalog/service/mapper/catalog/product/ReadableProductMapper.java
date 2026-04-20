@@ -34,7 +34,7 @@ import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductProperty
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductPropertyValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableCategoryMapper;
@@ -321,7 +321,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         destination.setSku(source.getSku());
 
         try {
-            FinalPrice price = pricingService.calculateProductPrice(source);
+            FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
 
                 destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));

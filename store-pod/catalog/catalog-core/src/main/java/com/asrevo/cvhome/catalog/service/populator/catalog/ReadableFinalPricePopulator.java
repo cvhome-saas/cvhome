@@ -2,7 +2,7 @@ package com.asrevo.cvhome.catalog.service.populator.catalog;
 
 
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -15,12 +15,12 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ReadableFinalPricePopulator
-        extends AbstractDataPopulator<FinalPrice, StoreMerchantId, ReadableProductPrice> {
+        extends AbstractDataPopulator<FinalPriceCalc, StoreMerchantId, ReadableProductPrice> {
 
     private PricingService pricingService;
 
     @Override
-    public ReadableProductPrice populate(FinalPrice source, ReadableProductPrice target, StoreMerchantId store,
+    public ReadableProductPrice populate(FinalPriceCalc source, ReadableProductPrice target, StoreMerchantId store,
                                          LanguageCode language) throws ConversionException {
         try {
 

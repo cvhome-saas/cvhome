@@ -7,7 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.product.price.SimpleProductPrice;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
@@ -43,7 +43,7 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
 
             ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(),
                     language);
-            FinalPrice finalPrice = detailedProduct.price();
+            FinalPriceCalc finalPrice = detailedProduct.price();
             if (finalPrice == null) {
                 throw new ConversionException("Object final price not populated in shoppingCartItem (source)");
             }
@@ -55,9 +55,9 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
             prices.add(orderProductPrice);
 
             // Other prices
-            List<FinalPrice> otherPrices = finalPrice.getAdditionalPrices();
+            List<FinalPriceCalc> otherPrices = finalPrice.getAdditionalPrices();
             if (otherPrices != null) {
-                for (FinalPrice otherPrice : otherPrices) {
+                for (FinalPriceCalc otherPrice : otherPrices) {
                     OrderProductPrice other = orderProductPrice(otherPrice);
                     other.setOrderProduct(target);
                     prices.add(other);
@@ -78,7 +78,7 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
         return null;
     }
 
-    private OrderProductPrice orderProductPrice(FinalPrice price) {
+    private OrderProductPrice orderProductPrice(FinalPriceCalc price) {
 
         OrderProductPrice orderProductPrice = new OrderProductPrice();
 

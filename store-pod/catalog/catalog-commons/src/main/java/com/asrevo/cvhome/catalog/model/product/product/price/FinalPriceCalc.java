@@ -16,7 +16,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class FinalPrice implements Serializable {
+public class FinalPriceCalc implements Serializable {
 
     /**
      *
@@ -26,7 +26,7 @@ public class FinalPrice implements Serializable {
 
     private String sku;
 
-    private List<FinalPrice> additionalPrices;
+    private List<FinalPriceCalc> additionalPrices;
 
     private BigDecimal discountedPrice = null; // final price if a discount is applied
 

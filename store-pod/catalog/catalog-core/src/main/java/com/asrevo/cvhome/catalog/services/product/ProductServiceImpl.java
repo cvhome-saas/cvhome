@@ -22,7 +22,7 @@ import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
@@ -218,7 +218,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
         Product p = getMinimalProductBySku(sku, store, language);
         ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
-        FinalPrice price = pricingService.calculateProductPrice(p);
+        FinalPriceCalc price = pricingService.calculateProductPrice(p);
         ReadableProductAvailability availability = readableProductAvailabilityMapper.convert(p, store, null);
         return new ProductDetails(product, price, availability);
     }

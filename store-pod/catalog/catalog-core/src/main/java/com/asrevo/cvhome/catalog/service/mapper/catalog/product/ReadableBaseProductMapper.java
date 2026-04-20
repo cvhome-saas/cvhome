@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
@@ -85,7 +85,7 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
         destination.setSku(source.getSku());
 
         try {
-            FinalPrice price = pricingService.calculateProductPrice(source);
+            FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
 
                 destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));

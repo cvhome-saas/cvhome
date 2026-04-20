@@ -20,7 +20,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductFull;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -166,7 +166,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
             target.setSku(source.getSku());
 
-            FinalPrice price = pricingService.calculateProductPrice(source);
+            FinalPriceCalc price = pricingService.calculateProductPrice(source);
 
             if (price != null) {
 

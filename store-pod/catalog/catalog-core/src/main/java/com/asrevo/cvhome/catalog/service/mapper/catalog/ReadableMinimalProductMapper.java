@@ -13,7 +13,7 @@ import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
@@ -87,7 +87,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         // price
 
         try {
-            FinalPrice price = pricingService.calculateProductPrice(source);
+            FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
 
                 destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));

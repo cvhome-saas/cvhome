@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
@@ -73,7 +73,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             throw new ServiceException("Item with sku " + availability.getSku() + " is not available");
         }
 
-        FinalPrice price = detailedProduct.price();
+        FinalPriceCalc price = detailedProduct.price();
 
         ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(availability.getSku(),
                 price.getFinalPrice(), store);

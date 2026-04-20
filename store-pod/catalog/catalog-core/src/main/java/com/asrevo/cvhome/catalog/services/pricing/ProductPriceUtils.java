@@ -15,7 +15,7 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.product.price.SimpleProductPrice;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -32,9 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductPriceUtils {
 
-    public FinalPrice getFinalPrice(Product product) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(Product product) throws ServiceException {
 
-        FinalPrice finalPrice = calculateFinalPrice(product);
+        FinalPriceCalc finalPrice = calculateFinalPrice(product);
 
         finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
         if (finalPrice.isDiscounted()) {
@@ -43,9 +43,9 @@ public class ProductPriceUtils {
         return finalPrice;
     }
 
-    public FinalPrice getFinalPrice(ProductAvailability availability) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(ProductAvailability availability) throws ServiceException {
 
-        FinalPrice finalPrice = calculateFinalPrice(availability);
+        FinalPriceCalc finalPrice = calculateFinalPrice(availability);
 
         finalPrice.setStringPrice(PriceUtils.getStringAmount(finalPrice.getFinalPrice()));
         if (finalPrice.isDiscounted()) {
@@ -64,10 +64,10 @@ public class ProductPriceUtils {
         return availabilities.stream().filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
     }
 
-    private FinalPrice calculateFinalPrice(Product product) throws ServiceException {
+    private FinalPriceCalc calculateFinalPrice(Product product) throws ServiceException {
 
-        FinalPrice finalPrice = null;
-        List<FinalPrice> otherPrices = null;
+        FinalPriceCalc finalPrice = null;
+        List<FinalPriceCalc> otherPrices = null;
 
         Set<ProductAvailability> availabilities = null;
         if (!CollectionUtils.isEmpty(product.getVariants())) {
@@ -93,7 +93,7 @@ public class ProductPriceUtils {
                 Set<ProductPrice> prices = availability.getPrices();
                 for (ProductPrice price : prices) {
 
-                    FinalPrice p = finalPrice(price);
+                    FinalPriceCalc p = finalPrice(price);
                     if (price.isDefaultPrice()) {
                         finalPrice = p;
                     } else {
@@ -123,15 +123,15 @@ public class ProductPriceUtils {
         return finalPrice;
     }
 
-    private FinalPrice calculateFinalPrice(ProductAvailability availability) throws ServiceException {
+    private FinalPriceCalc calculateFinalPrice(ProductAvailability availability) throws ServiceException {
 
-        FinalPrice finalPrice = null;
-        List<FinalPrice> otherPrices = null;
+        FinalPriceCalc finalPrice = null;
+        List<FinalPriceCalc> otherPrices = null;
 
         Set<ProductPrice> prices = availability.getPrices();
         for (ProductPrice price : prices) {
 
-            FinalPrice p = finalPrice(price);
+            FinalPriceCalc p = finalPrice(price);
             if (price.isDefaultPrice()) {
                 finalPrice = p;
             } else {
@@ -159,9 +159,9 @@ public class ProductPriceUtils {
         return finalPrice;
     }
 
-    private FinalPrice finalPrice(ProductPrice price) {
+    private FinalPriceCalc finalPrice(ProductPrice price) {
 
-        FinalPrice finalPrice = new FinalPrice();
+        FinalPriceCalc finalPrice = new FinalPriceCalc();
         BigDecimal fPrice = price.getProductPriceAmount();
         BigDecimal oPrice = price.getProductPriceAmount();
 
@@ -225,7 +225,7 @@ public class ProductPriceUtils {
         return simpleProductPrice;
     }
 
-    private void discountPrice(FinalPrice finalPrice) {
+    private void discountPrice(FinalPriceCalc finalPrice) {
 
         finalPrice.setDiscounted(true);
 

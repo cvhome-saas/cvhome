@@ -9,7 +9,7 @@ import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPriceFull;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -41,7 +41,7 @@ public class ReadableProductPricePopulator
 
             target.setDefaultPrice(source.isDefaultPrice());
 
-            FinalPrice finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
+            FinalPriceCalc finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
 
             target.setOriginalPrice(pricingService.getDisplayAmount(source.getProductPriceAmount(), store));
             if (finalPrice.isDiscounted()) {

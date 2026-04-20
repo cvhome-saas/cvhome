@@ -27,7 +27,7 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariantValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableSelectedProductVariant;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPrice;
+import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.variation.PersistableProductVariation;
 import com.asrevo.cvhome.catalog.model.product.variation.ReadableProductVariation;
 import com.asrevo.cvhome.catalog.service.facade.category.CategoryFacade;
@@ -117,7 +117,7 @@ public class ProductVariationApi {
             return null;
         }
 
-        FinalPrice price = pricingService.calculateProductPrice(product);
+        FinalPriceCalc price = pricingService.calculateProductPrice(product);
         ReadableProductPrice readablePrice = new ReadableProductPrice();
         ReadableFinalPricePopulator populator = new ReadableFinalPricePopulator();
         populator.setPricingService(pricingService);
