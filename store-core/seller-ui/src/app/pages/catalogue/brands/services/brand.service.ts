@@ -14,31 +14,31 @@ export class BrandService {
   }
 
   getListOfBrands(params): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/manufacturers`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/manufacturers`, params);
   }
 
   updateBrand(id, brand): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/catalog/api/v1/private/manufacturer/${id}`, brand);
+    return this.crudService.put(`/spg/catalog/api/v1/private/manufacturer/${id}`, brand);
   }
 
   getBrandById(id): Observable<any> {
 
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/manufacturer/${id}`);
+    return this.crudService.get(`/spg/catalog/api/v1/private/manufacturer/${id}`);
   }
 
   createBrand(brand): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/manufacturer`, brand);
+    return this.crudService.post(`/spg/catalog/api/v1/private/manufacturer`, brand);
   }
 
   deleteBrand(id): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/manufacturer/${id}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/manufacturer/${id}`);
   }
 
   checkBrandCode(code:string): Observable<any> {
     const params = {
       code
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/manufacturer/unique`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/manufacturer/unique`, params);
   }
 
 }

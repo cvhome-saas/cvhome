@@ -1,13 +1,13 @@
 ###
 
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
-GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f
+# curl 'GET {{SELLER-UI_URL}}/spg/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f'
+GET {{SELLER-UI_URL}}/spg/catalog/api/v1/private/product/groups?lang=en&store=65f023632bc46470c104b76f
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###
 
-# curl 'GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en&count=50&page=0'
-GET {{SELLER-UI_URL}}/store-pod-gateway/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en&count=50&page=0
+# curl 'GET {{SELLER-UI_URL}}/spg/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en&count=50&page=0'
+GET {{SELLER-UI_URL}}/spg/catalog/api/v1/products/group/FEATURED_ITEMS?store=65f023632bc46470c104b76f&lang=en&count=50&page=0
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
 
 ###

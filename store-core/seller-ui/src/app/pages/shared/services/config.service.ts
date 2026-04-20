@@ -24,7 +24,7 @@ export class ConfigService {
       'store': store
     };
 
-    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/store/languages`, params)
+    return this.crudService.get(`/spg/merchant/api/v1/store/languages`, params)
   }
 
   getListOfGlobalLanguages(): Language[] {

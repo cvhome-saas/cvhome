@@ -20,7 +20,7 @@ export class StoreService {
   }
 
   getAllocations(store:string): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/router/private/allocates`,{store});
+    return this.crudService.get(`/spg/merchant/api/v1/router/private/allocates`,{store});
   }
 
   storePodByStoreId(store:string): Observable<Pod> {
@@ -32,11 +32,11 @@ export class StoreService {
   }
 
   allocateDomain(store:string ,domain:string): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/router/private/allocate?domain=${domain}`, {store});
+    return this.crudService.post(`/spg/merchant/api/v1/router/private/allocate?domain=${domain}`, {store});
   }
 
   removeDomain( domain:string,store:string): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/merchant/api/v1/router/private/remove?domain=${domain}`,{store});
+    return this.crudService.delete(`/spg/merchant/api/v1/router/private/remove?domain=${domain}`,{store});
   }
 
   getListOfStores(params): Observable<any> {
@@ -55,26 +55,26 @@ export class StoreService {
   }
 
   deleteStore(store:string): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/merchant/api/v1/private/store`,{store});
+    return this.crudService.delete(`/spg/merchant/api/v1/private/store`,{store});
   }
 
   updateStore(store: any): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/store`, store);
+    return this.crudService.put(`/spg/merchant/api/v1/private/store`, store);
   }
 
   // PAGE CONTENT
 
   getPageContent(store:string,pageCode: string): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/merchant/api/v1/private/content/any/${pageCode}`,{store});
+    return this.crudService.get(`/spg/merchant/api/v1/private/content/any/${pageCode}`,{store});
   }
 
   updatePageContent(store:string, code:string, content: any): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/content/${code}`, content,{store});
+    return this.crudService.put(`/spg/merchant/api/v1/private/content/${code}`, content,{store});
   }
 
   createPageContent(content: any, store: string): Observable<any> {
 
-    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/content`, content, {store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/content`, content, {store});
   }
 
   updateSocialNetworks(store: string, body: any): Observable<any> {
@@ -84,7 +84,7 @@ export class StoreService {
   addStoreLogo(store: string, file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/store/marketing/logo`, uploadData, {store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/logo`, uploadData, {store});
   }
 
   removeStoreLogo(store: string): Observable<any> {
@@ -94,17 +94,17 @@ export class StoreService {
   addStoreBanner(store:string,file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/store/marketing/banner`, uploadData,{store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/banner`, uploadData,{store});
   }
 
   addStoreSliderImage(store: string, file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/store-pod-gateway/merchant/api/v1/private/store/marketing/add-slider-image`, uploadData,{store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/add-slider-image`, uploadData,{store});
   }
 
   saveStoreImageSliders(store:string, sliderImages: SliderImage[]) {
-    return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/store/marketing/slider-images`, {
+    return this.crudService.put(`/spg/merchant/api/v1/private/store/marketing/slider-images`, {
       sliderImages
     }, {store});
   }
@@ -126,18 +126,18 @@ export class StoreService {
   }
 
   updateStoreSocialLinks(storeId,request) {
-    return this.crudService.put(`/store-pod-gateway/merchant/api/v1/private/store/social-links`, request);
+    return this.crudService.put(`/spg/merchant/api/v1/private/store/social-links`, request);
   }
 
   getSupportedSocialLoginProviders(): Observable<string[]> {
-    return this.crudService.get(`/store-pod-gateway/cua/api/v1/private/social-login-config/supported-social-providers`);
+    return this.crudService.get(`/spg/cua/api/v1/private/social-login-config/supported-social-providers`);
   }
 
   getSocialLoginConfigs(store: string): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/cua/api/v1/private/social-login-config`, {store});
+    return this.crudService.get(`/spg/cua/api/v1/private/social-login-config`, {store});
   }
 
   updateSocialLoginConfigs(store: string, configs: any[]): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/cua/api/v1/private/social-login-config`, configs, {store});
+    return this.crudService.post(`/spg/cua/api/v1/private/social-login-config`, configs, {store});
   }
 }

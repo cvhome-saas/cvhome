@@ -12,19 +12,19 @@ export class ProductGroupsService {
   }
 
   getListOfProductGroups(param): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups`, param);
+    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups`, param);
   }
 
   createProductGroup(group): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/groups`, group);
+    return this.crudService.post(`/spg/catalog/api/v1/private/products/groups`, group);
   }
 
   getProductGroup(code, params?): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups/${code}`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/${code}`, params);
   }
 
   checkCode(code: string): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/products/groups/unique`, {code});
+    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/unique`, {code});
   }
 
   updateGroupActiveValue(group): Observable<any> {
@@ -44,14 +44,14 @@ export class ProductGroupsService {
   }
 
   addProductToGroup(productId, groupCode): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`, {});
+    return this.crudService.post(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`, {});
   }
 
   removeProductFromGroup(productId, groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`);
   }
 
   removeProductGroup(groupCode) {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/products/groups/${groupCode}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}`);
   }
 }

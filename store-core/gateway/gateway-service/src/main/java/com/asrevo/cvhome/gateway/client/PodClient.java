@@ -36,7 +36,7 @@ public class PodClient implements RouteDefinitionRepository {
             new FilterDefinition("TokenRelay"));
 
     private static final List<PredicateDefinition> commonPredicates = List
-            .of(new PredicateDefinition("Path=/store-pod-gateway/**"), new PredicateDefinition("Query=store"));
+            .of(new PredicateDefinition("Path=/spg/**"), new PredicateDefinition("Query=store"));
 
     private final ServiceDomainProperties serviceDomainProperties;
 

@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class GatewayRouteLocatorImpl implements RouteLocator {
 
-    private static final String[] backendServices = {"control-plane", "uaa", "store-pod-gateway"};
+    private static final String[] backendServices = {"control-plane", "uaa", "spg"};
 
     private static final String[] backendServicesPattern = Arrays.stream(backendServices)
             .map(it -> "/" + it + "/**")

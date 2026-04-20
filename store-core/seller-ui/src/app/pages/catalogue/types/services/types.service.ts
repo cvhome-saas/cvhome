@@ -17,30 +17,30 @@ export class TypesService {
 
 
   getListOfTypes(params): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/types`, params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/product/types`, params);
   }
 
   getType(id): Observable<any> {
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/${id}`);
+    return this.crudService.get(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
   createType(req): Observable<any> {
-    return this.crudService.post(`/store-pod-gateway/catalog/api/v1/private/product/type`, req);
+    return this.crudService.post(`/spg/catalog/api/v1/private/product/type`, req);
   }
 
   updateType( id, req): Observable<any> {
-    return this.crudService.put(`/store-pod-gateway/catalog/api/v1/private/product/type/${id}`, req);
+    return this.crudService.put(`/spg/catalog/api/v1/private/product/type/${id}`, req);
   }
 
   deleteType( id): Observable<any> {
-    return this.crudService.delete(`/store-pod-gateway/catalog/api/v1/private/product/type/${id}`);
+    return this.crudService.delete(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
   checkCode( code): Observable<any> {
     const params = {
       code
     };
-    return this.crudService.get(`/store-pod-gateway/catalog/api/v1/private/product/type/unique`,params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/product/type/unique`,params);
   }
 
 
