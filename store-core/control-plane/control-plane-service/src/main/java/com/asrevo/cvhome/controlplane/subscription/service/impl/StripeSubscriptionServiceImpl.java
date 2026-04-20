@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.controlplane.subscription.service.impl;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
@@ -17,21 +15,17 @@ import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 import com.stripe.param.checkout.SessionCreateParams;
 
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class StripeSubscriptionServiceImpl implements StripeSubscriptionService {
 
     private static final String ORG_ID_KEY = "orgId";
 
-    private final StripeProperties stripeProperties;
 
-    @PostConstruct
-    public void init() {
+    public StripeSubscriptionServiceImpl(StripeProperties stripeProperties) {
         Stripe.apiKey = stripeProperties.key();
     }
 

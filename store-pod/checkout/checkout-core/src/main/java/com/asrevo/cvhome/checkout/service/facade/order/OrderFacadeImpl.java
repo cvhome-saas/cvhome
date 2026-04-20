@@ -12,14 +12,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
@@ -55,7 +53,6 @@ import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationS
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
@@ -65,7 +62,6 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -79,8 +75,6 @@ public class OrderFacadeImpl implements OrderFacade {
     private final ShoppingCartFacade shoppingCartFacade;
 
     private final OrderService orderService;
-
-    private final ExternalProductService externalProductService;
 
     private final ExternalProductReservationService externalProductReservationService;
 
@@ -96,11 +90,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final ReadableOrderPopulator readableOrderPopulator;
 
-    private final ImageFilePath imageUtils;
-
     private final ShoppingCartCalculationService shoppingCartCalculationService;
-
-    private final ExternalMerchantStoreService externalMerchantStoreService;
 
     private final PersistablePaymentPopulator paymentPopulator;
 
@@ -108,19 +98,18 @@ public class OrderFacadeImpl implements OrderFacade {
     private final ReadableOrderProductPopulator readableOrderProductPopulator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
-                           OrderService orderService, ExternalProductService externalProductService,
+                           OrderService orderService,
                            ExternalProductReservationService externalProductReservationService,
                            PersistableOrderApiPopulator persistableOrderApiPopulator,
                            ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
                            ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
-                           ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils,
+                           ReadableOrderPopulator readableOrderPopulator,
                            ShoppingCartCalculationService shoppingCartCalculationService,
-                           ExternalMerchantStoreService externalMerchantStoreService, PersistablePaymentPopulator paymentPopulator,
+                           PersistablePaymentPopulator paymentPopulator,
                            OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
-        this.externalProductService = externalProductService;
         this.externalProductReservationService = externalProductReservationService;
         this.persistableOrderApiPopulator = persistableOrderApiPopulator;
         this.readableOrderProductMapper = readableOrderProductMapper;
@@ -128,9 +117,7 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableCustomerMapper = readableCustomerMapper;
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.readableOrderPopulator = readableOrderPopulator;
-        this.imageUtils = imageUtils;
         this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.externalMerchantStoreService = externalMerchantStoreService;
         this.paymentPopulator = paymentPopulator;
         this.orderProductPopulator = orderProductPopulator;
         this.readableOrderProductPopulator = readableOrderProductPopulator;
@@ -322,7 +309,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language) {
-        Validate.notNull(store, "store cannot be null");
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
             throw new ResourceNotFoundException("Order not found with id " + orderId);
@@ -362,7 +348,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language) {
-        Validate.notNull(store, "store cannot be null");
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
             throw new ResourceNotFoundException("Order not found with id " + orderId);
@@ -386,11 +371,9 @@ public class OrderFacadeImpl implements OrderFacade {
             // order products
             List<ReadableOrderProduct> orderProducts = new ArrayList<>();
             for (OrderProduct p : modelOrder.getOrderProducts()) {
-                ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator(
-                        externalProductService, imageUtils, externalMerchantStoreService);
 
                 ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-                orderProductPopulator.populate(p, orderProduct, store, language);
+                readableOrderProductPopulator.populate(p, orderProduct, store, language);
                 orderProducts.add(orderProduct);
             }
 
@@ -445,11 +428,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store) {
-        Validate.notNull(status, "OrderStatusHistory must not be null");
-        Validate.notNull(id, "Order id must not be null");
-        Validate.notNull(store, "store cannot be null");
-
-        // retrieve original order
         Order order = orderService.getOrder(id, store);
         if (order == null) {
             throw new ResourceNotFoundException(
@@ -468,11 +446,6 @@ public class OrderFacadeImpl implements OrderFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);
         }
-    }
-
-    private void notify(Order modelOrder, Customer customer, StoreMerchantId store, LanguageCode language,
-                        Locale locale) {
-        // @TODO ASHRAF
     }
 
 }

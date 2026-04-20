@@ -223,7 +223,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
                         if (attribute.isAttributeDisplayOnly()) {
 
-                            property = createProperty(attribute, language);
+                            property = createProperty(attribute);
 
                             ReadableProductOption readableOption = new ReadableProductOption(); // that
                             ReadableProductPropertyValue readableOptionValue = new ReadableProductPropertyValue();
@@ -457,7 +457,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
         return desc;
     }
 
-    private ReadableProductProperty createProperty(ProductAttribute productAttribute, LanguageCode language) {
+    private ReadableProductProperty createProperty(ProductAttribute productAttribute) {
 
         ReadableProductProperty attr = new ReadableProductProperty();
         attr.setId(productAttribute.getProductOption().getId()); // attribute of the

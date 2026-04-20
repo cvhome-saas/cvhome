@@ -31,6 +31,7 @@ public class ReactiveOrgStorePrincipalInfoArgumentResolver implements HandlerMet
                 .flatMap(authentication -> Mono.justOrEmpty(resolvePrincipal(parameter, authentication)));
     }
 
+    @SuppressWarnings("java:S1172")
     private Object resolvePrincipal(MethodParameter parameter, Authentication authentication) {
         return SecurityUtils.getOrgStoreIdentity(authentication);
     }

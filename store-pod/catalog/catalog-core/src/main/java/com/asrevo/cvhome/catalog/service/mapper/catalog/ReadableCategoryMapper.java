@@ -30,7 +30,7 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
         target.setVisible(source.isVisible());
         target.setFeatured(source.isFeatured());
         target.setDepth(source.getDepth());
-        target.setParent(createParentCategory(source, language).orElse(null));
+        target.setParent(createParentCategory(source).orElse(null));
 
         if (LanguageCode.isAllLanguage(language)) {
             var descriptionSet = Optional.ofNullable(source.getDescriptions()).orElse(Set.of());
@@ -63,9 +63,7 @@ public class ReadableCategoryMapper implements Mapper<Category, ReadableCategory
         return d;
     }
 
-    private Optional<com.asrevo.cvhome.catalog.model.category.Category> createParentCategory(Category source,
-                                                                                             LanguageCode language) {
-
+    private Optional<com.asrevo.cvhome.catalog.model.category.Category> createParentCategory(Category source) {
         return Optional.ofNullable(source.getParent()).map(p -> {
             var parent = new com.asrevo.cvhome.catalog.model.category.Category();
             parent.setCode(p.getCode());

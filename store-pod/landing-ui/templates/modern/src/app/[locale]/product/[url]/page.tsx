@@ -3,11 +3,10 @@ import {ProductService} from "@/services/product-service";
 import {Breadcrumb} from "@/shared/Common/Breadcrumb";
 import {ProductDetails} from "@/shared/ProductDetails/ProductDetails";
 import {getTranslations} from "next-intl/server";
-import {SectionTitle} from "@/shared/Common/SectionTitle";
-import ProductSwiperGrid from "@/shared/ProductGrid/ProductSwiperGrid";
 import React from "react";
 import {BreadcrumbItem} from "@/types/bread-crumb";
 import {extractSsrContext} from "@/services/store-context-ssr-utils";
+import {RelatedProducts} from "@/shared/ProductDetails/RelatedProducts";
 
 
 export default async function Page({params}: { params: Promise<ProductPageParams> }) {
@@ -15,7 +14,6 @@ export default async function Page({params}: { params: Promise<ProductPageParams
     aparams.storeContext = await extractSsrContext();
     const t = await getTranslations('PAGE.PRODUCT');
     const p = await ProductService.getProductByUrl(aparams.url, aparams.storeContext);
-    const related = p ? await ProductService.getRelatedProductGroup(aparams.storeContext, p.id) : undefined;
 
     const current: BreadcrumbItem | undefined = p && p.description ? {
         id: "0",
@@ -34,13 +32,7 @@ export default async function Page({params}: { params: Promise<ProductPageParams
                 <div className="lg:max-w-6xl max-w-xl mx-auto pt-10">
                     <ProductDetails storeContext={aparams.storeContext} p={p} t={t}/>
                 </div>
-                {
-                    related && related.products  && related.active && related.products.length > 0 &&
-                    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <SectionTitle title={t('RELATED_PRODUCTS')}/>
-                        <ProductSwiperGrid storeContext={aparams.storeContext} products={related.products}/>
-                    </div>
-                }
+                <RelatedProducts storeContext={aparams.storeContext} productId={p.id}/>
             </>}
         </div>
 

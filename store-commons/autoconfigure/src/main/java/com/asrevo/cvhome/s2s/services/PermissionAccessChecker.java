@@ -61,10 +61,13 @@ public class PermissionAccessChecker {
         return true;
     }
 
+    @SuppressWarnings("java:S1172")
     public boolean isSameStorePod(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
         if (storeRoleAccessChecker.isScopeStorePod(authentication, pod)) {
             return true;
         }
+        log.info("User {} does not have store scope with roles {}", authentication.getName(),
+                SecurityUtils.getRoles(authentication));
         return false;
     }
 
@@ -74,6 +77,8 @@ public class PermissionAccessChecker {
         } else if (storeRoleAccessChecker.isStoreAdmin(authentication, requestedStoreId, pod)) {
             return true;
         }
+
+        log.info("User {} does not have manage access on store {}", authentication.getName(), requestedStoreId);
         return false;
     }
 
@@ -97,6 +102,7 @@ public class PermissionAccessChecker {
         }
     }
 
+    @SuppressWarnings("java:S1144")
     private boolean hasReadAccessOnStore(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
         if (storeRoleAccessChecker.isOrgAdmin(authentication, requestedStoreId, pod)) {
             return true;

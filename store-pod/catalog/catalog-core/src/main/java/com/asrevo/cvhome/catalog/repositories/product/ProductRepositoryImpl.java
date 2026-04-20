@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.repositories.product;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -90,13 +89,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 where p.store=:store
                 and pa.region in (:lid)
                 and pd.seUrl=:seUrl
-                and p.available=true and p.dateAvailable<=:dt
+                and p.available=true
                 order by pattr.productOptionSortOrder""";
         Query q = this.em.createQuery(hql);
 
         q.setParameter("store", store);
         q.setParameter("lid", regionList);
-        q.setParameter("dt", new Date());
         q.setParameter("seUrl", seUrl);
 
         Product p = null;

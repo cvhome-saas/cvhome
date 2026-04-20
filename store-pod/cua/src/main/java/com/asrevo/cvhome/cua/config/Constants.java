@@ -16,6 +16,8 @@ public class Constants {
 
     public static final String USER_NAME_ATTR_ID = "id";
 
+    public static final String DEFAULT_REDIRECT_URI = "{baseUrl}/login/oauth2/code/{registrationId}";
+
     private Constants() {
 
     }

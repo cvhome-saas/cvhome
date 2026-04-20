@@ -32,11 +32,13 @@ public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>,
         if (object == null) {
             return false;
         }
+        if (!(object instanceof SalesManagerEntity<?, ?> entity)) {
+            return false;
+        }
+
         if (object == this) {
             return true;
         }
-
-        SalesManagerEntity<K, E> entity = (SalesManagerEntity<K, E>) object;
 
         K id = getId();
 

@@ -3,8 +3,6 @@ package com.asrevo.cvhome.controlplane.subscription.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.SubscriptionPlan;
@@ -25,19 +23,14 @@ import com.stripe.param.PriceListParams;
 import com.stripe.param.ProductCreateParams;
 import com.stripe.param.ProductListParams;
 
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class StripeInitServiceImpl implements StripeInitService {
 
-    private final StripeProperties stripeProperties;
-
-    @PostConstruct
-    public void init() {
+    public StripeInitServiceImpl(StripeProperties stripeProperties) {
         Stripe.apiKey = stripeProperties.key();
     }
 

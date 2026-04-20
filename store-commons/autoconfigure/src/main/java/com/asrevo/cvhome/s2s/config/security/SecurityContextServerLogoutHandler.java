@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 public class SecurityContextServerLogoutHandler {
 
+    @SuppressWarnings("java:S1172")
     public Mono<Void> logout(ServerWebExchange exchange, Authentication authentication) {
         return exchange.getSession().flatMap(WebSession::invalidate);
     }

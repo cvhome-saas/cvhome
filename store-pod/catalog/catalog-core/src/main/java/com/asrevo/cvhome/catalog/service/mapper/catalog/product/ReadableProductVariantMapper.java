@@ -82,7 +82,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
             List<ReadableImage> instanceImages = source.getProductVariantGroup()
                     .getImages()
                     .stream()
-                    .map(i -> this.image(i, store, language))
+                    .map(i -> this.image(i, store))
                     .filter(e -> nameSet.add(e.getImageUrl()))
                     .toList();
             destination.setImages(instanceImages);
@@ -99,7 +99,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
         return destination;
     }
 
-    private ReadableImage image(ProductVariantImage instanceImage, StoreMerchantId store, LanguageCode language) {
+    private ReadableImage image(ProductVariantImage instanceImage, StoreMerchantId store) {
         ReadableImage img = new ReadableImage();
         img.setDefaultImage(instanceImage.isDefaultImage());
         img.setId(instanceImage.getId());

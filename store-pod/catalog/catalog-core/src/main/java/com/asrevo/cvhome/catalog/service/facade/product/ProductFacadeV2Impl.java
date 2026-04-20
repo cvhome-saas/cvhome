@@ -111,28 +111,26 @@ public class ProductFacadeV2Impl implements ProductFacade {
     @SneakyThrows
     ReadableProductList listProducts(Mapper<Product, ReadableProduct> mapper, StoreMerchantId store,
                                      ProductCriteria criteria) {
-        if (CollectionUtils.isNotEmpty(criteria.getCategoryIds())) {
+        if (CollectionUtils.isNotEmpty(criteria.getCategoryIds()) && criteria.getCategoryIds().size() == 1) {
 
-            if (criteria.getCategoryIds().size() == 1) {
+            Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
 
-                Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
+            if (category != null) {
+                String lineage = category.getLineage();
 
-                if (category != null) {
-                    String lineage = category.getLineage();
+                List<Category> categories = categoryService.getListByLineage(store, lineage);
 
-                    List<Category> categories = categoryService.getListByLineage(store, lineage);
-
-                    List<Long> ids = new ArrayList<>();
-                    if (categories != null && !categories.isEmpty()) {
-                        for (Category c : categories) {
-                            ids.add(c.getId());
-                        }
+                List<Long> ids = new ArrayList<>();
+                if (categories != null && !categories.isEmpty()) {
+                    for (Category c : categories) {
+                        ids.add(c.getId());
                     }
-                    ids.add(category.getId());
-                    criteria.setCategoryIds(ids);
                 }
+                ids.add(category.getId());
+                criteria.setCategoryIds(ids);
             }
         }
+
 
         Page<Product> all = productService.findAll(criteria, store);
 

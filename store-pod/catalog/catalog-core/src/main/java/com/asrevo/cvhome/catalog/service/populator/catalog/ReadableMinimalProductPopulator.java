@@ -23,8 +23,6 @@ import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
@@ -41,13 +39,11 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
     private ImageFilePath imageUtils;
 
-    private ExternalMerchantStoreService externalMerchantStoreService;
-
     @Override
     public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
                                     LanguageCode language) throws ConversionException {
         try {
-            ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
+
             List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions = new ArrayList<>();
             if (language == null) {
                 target = new ReadableProductFull();
@@ -72,10 +68,6 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
             if (target instanceof ReadableProductFull it) {
                 it.setDescriptions(fulldescriptions);
-            }
-
-            if (language == null) {
-                language = baseStore.getDefaultLanguage();
             }
 
             target.setId(source.getId());

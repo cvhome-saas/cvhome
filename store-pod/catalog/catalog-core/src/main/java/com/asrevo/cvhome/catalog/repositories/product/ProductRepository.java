@@ -7,6 +7,7 @@ import java.util.Objects;
 import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,7 +37,7 @@ public interface ProductRepository
             + " pv.sku=?1) and p.store=?2")
     List<Long> findBySku(String sku, StoreMerchantId merchantStoreId);
 
-    default Page<Product> findAll(ProductCriteria productCriteria, StoreMerchantId storeMerchantId) {
+    default Page<Product> findAll(ProductCriteria productCriteria, StoreMerchantId storeMerchantId, Pageable pageable) {
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("store"), storeMerchantId));
@@ -59,7 +60,7 @@ public interface ProductRepository
 
             return cb.and(predicates.toArray(Predicate[]::new));
         };
-        return findAll(spec, productCriteria.getPageable());
+        return findAll(spec, pageable);
     }
 
     @EntityGraph(attributePaths = {"availabilities"})

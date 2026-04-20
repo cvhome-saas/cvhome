@@ -254,8 +254,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     private ProductAvailability defaultAvailability(List<ProductAvailability> availabilityList) {
         return availabilityList.stream()
                 .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
-                .findFirst()
-                .get();
+                .findFirst().orElse(null);
     }
 
 }

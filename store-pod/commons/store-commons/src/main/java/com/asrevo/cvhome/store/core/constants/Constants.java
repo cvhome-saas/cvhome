@@ -16,6 +16,8 @@ public class Constants {
 
     public static final String DEFAULT_PRICE_DESCRIPTION = "DEFAULT";
 
+    public static final String DEFAULT_PRICE_CODE = "base";
+
     public static final String OT_DISCOUNT_TITLE = "order.total.discount";
 
     public static final Locale DEFAULT_LOCALE = Locale.US;

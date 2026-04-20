@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,14 +133,12 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Override
     public Order getOrder(final Long orderId, StoreMerchantId store) {
-        Validate.notNull(orderId, "Order id cannot be null");
-        Validate.notNull(store, "Store cannot be null");
         return orderRepository.findOne(orderId, store);
     }
 
     @Override
     public Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store) {
-        return orderRepository.listOrders(store, criteria);
+        return orderRepository.listOrders(store, criteria, criteria.getPageable());
     }
 
     @Transactional

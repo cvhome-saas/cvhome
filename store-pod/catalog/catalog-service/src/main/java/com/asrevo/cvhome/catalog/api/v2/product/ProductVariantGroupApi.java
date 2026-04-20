@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.model.product.product.variantGroup.PersistableProductVariantGroup;
-import com.asrevo.cvhome.catalog.model.product.product.variantGroup.ReadableProductVariantGroup;
+import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariantGroup;
+import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductVariantGroupFacade;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;

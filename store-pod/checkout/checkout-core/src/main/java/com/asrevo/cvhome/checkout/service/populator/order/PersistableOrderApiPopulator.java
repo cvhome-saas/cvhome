@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -33,8 +32,6 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
     @Override
     public Order populate(PersistableOrder source, Order target, StoreMerchantId store, LanguageCode language)
             throws ConversionException {
-
-        Validate.notNull(source.getPayment(), "Payment cannot be null");
 
         try {
 

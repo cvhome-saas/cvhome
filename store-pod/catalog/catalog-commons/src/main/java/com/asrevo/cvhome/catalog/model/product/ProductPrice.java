@@ -6,8 +6,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 
 public class ProductPrice extends Entity {
 
-    public static final String DEFAULT_PRICE_CODE = "base";
-
     /**
      *
      */

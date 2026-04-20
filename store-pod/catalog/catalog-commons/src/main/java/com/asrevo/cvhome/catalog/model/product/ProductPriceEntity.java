@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.asrevo.cvhome.store.core.constants.Constants.DEFAULT_PRICE_CODE;
+
 /**
  * A product entity is used by services API to populate or retrieve a Product price entity
  *

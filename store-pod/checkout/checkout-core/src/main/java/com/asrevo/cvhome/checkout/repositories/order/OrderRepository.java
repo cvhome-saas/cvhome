@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -55,7 +56,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     List<StatisticEntry> customerStatistic(@Param("from") Date from, @Param("to") Date to,
                                            @Param("storeId") StoreMerchantId storeMerchantId);
 
-    default Page<Order> listOrders(StoreMerchantId store, OrderCriteria criteria) {
+    default Page<Order> listOrders(StoreMerchantId store, OrderCriteria criteria, Pageable pageable) {
         return findAll((root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
@@ -114,7 +115,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
             return cb.and(predicates);
 
-        }, criteria.getPageable());
+        }, pageable);
     }
 
 }

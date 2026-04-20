@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.s2s.config.internal;
 
+import java.util.Optional;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.core.MethodParameter;
@@ -22,7 +24,9 @@ public class ServletLanguageCodeArgumentResolver implements HandlerMethodArgumen
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        return LanguageUtils.getRESTLanguageCode(request.getParameter(LanguageUtils.LANG));
+        return Optional.ofNullable(request).map(req -> req.getParameter(LanguageUtils.LANG))
+                .map(LanguageUtils::getRESTLanguageCode)
+                .orElseGet(() -> LanguageUtils.getRESTLanguageCode(null));
     }
 
 }

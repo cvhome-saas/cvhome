@@ -210,7 +210,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Override
     public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
-        return productRepository.findAll(criteria, store);
+        return productRepository.findAll(criteria, store, criteria.getPageable());
     }
 
     @SneakyThrows

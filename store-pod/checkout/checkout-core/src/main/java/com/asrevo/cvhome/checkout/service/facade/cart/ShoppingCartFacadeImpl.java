@@ -16,7 +16,6 @@ import jakarta.persistence.NoResultException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
@@ -55,11 +54,9 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ExternalProductService externalProductService;
 
-    // KEEP -- ENTRY
     private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
                                             StoreMerchantId store, LanguageCode language) throws Exception {
 
-        // @TODO we need to merge availability+price in one call
         ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, shoppingCartItem.getProduct(),
                 language);
         ReadableProductAvailability availability = detailedProduct.availability();
@@ -123,10 +120,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store,
                                           LanguageCode language) {
 
-        Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
-
-        // if cart does not exist create a new one
-
         ShoppingCart cartModel = new ShoppingCart();
         cartModel.setStoreMerchantId(store);
         cartModel.setShoppingCartCode(uniqueShoppingCartCode());
@@ -150,11 +143,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     @Override
     public ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
                                                        LanguageCode language, boolean returnCart) throws Exception {
-        Validate.notNull(cartCode, "Shopping cart code must not be null");
-        Validate.notNull(sku, "product sku must not be null");
-        Validate.notNull(merchant, "store cannot be null");
-
-        // get cart
         ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
@@ -277,9 +265,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     // KEEP
     public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
                                            LanguageCode language) throws Exception {
-
-        Validate.notNull(cartCode, "String cart code cannot be null");
-        Validate.notNull(item, "PersistableShoppingCartItem cannot be null");
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {

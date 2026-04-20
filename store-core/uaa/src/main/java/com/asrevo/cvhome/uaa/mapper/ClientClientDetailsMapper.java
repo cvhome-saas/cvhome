@@ -81,58 +81,8 @@ public class ClientClientDetailsMapper {
     }
 
     public static RegisteredClient toRegisteredClient(ClientDetails details, RegisteredClient existingClient) {
-        var tokenSettingsBuilder = TokenSettings.builder();
-        ClientDetailsTokens clientDetailsTokens = details.tokenSettings();
-        if (clientDetailsTokens != null) {
-            if (Objects.nonNull(clientDetailsTokens.authorizationCodeTimeToLive())) {
-                tokenSettingsBuilder.authorizationCodeTimeToLive(clientDetailsTokens.authorizationCodeTimeToLive());
-            }
-            if (Objects.nonNull(clientDetailsTokens.accessTokenTimeToLive())) {
-                tokenSettingsBuilder.accessTokenTimeToLive(clientDetailsTokens.accessTokenTimeToLive());
-            }
-            if (Objects.nonNull(clientDetailsTokens.accessTokenFormat())) {
-                tokenSettingsBuilder.accessTokenFormat(clientDetailsTokens.accessTokenFormat());
-            }
-            if (Objects.nonNull(clientDetailsTokens.deviceCodeTimeToLive())) {
-                tokenSettingsBuilder.deviceCodeTimeToLive(clientDetailsTokens.deviceCodeTimeToLive());
-            }
-            if (Objects.nonNull(clientDetailsTokens.refreshTokenTimeToLive())) {
-                tokenSettingsBuilder.refreshTokenTimeToLive(clientDetailsTokens.refreshTokenTimeToLive());
-            }
-            if (Objects.nonNull(clientDetailsTokens.idTokenSignatureAlgorithm())) {
-                tokenSettingsBuilder.idTokenSignatureAlgorithm(clientDetailsTokens.idTokenSignatureAlgorithm());
-            }
-            tokenSettingsBuilder.reuseRefreshTokens(clientDetailsTokens.reuseRefreshTokens());
-            tokenSettingsBuilder
-                    .x509CertificateBoundAccessTokens(clientDetailsTokens.x509CertificateBoundAccessTokens());
-
-            if (clientDetailsTokens.customSettings() != null) {
-                tokenSettingsBuilder.settings(settings -> settings.putAll(clientDetailsTokens.customSettings()));
-            }
-        }
-        var clientSettingsBuilder = ClientSettings.builder();
-        ClientDetailsSettings clientDetailsSettings = details.clientSettings();
-        if (clientDetailsSettings != null) {
-
-            clientSettingsBuilder.requireProofKey(clientDetailsSettings.requireProofKey());
-
-            clientSettingsBuilder.requireAuthorizationConsent(clientDetailsSettings.requireAuthorizationConsent());
-            if (Objects.nonNull(clientDetailsSettings.jwkSetUrl())) {
-                clientSettingsBuilder.jwkSetUrl(clientDetailsSettings.jwkSetUrl());
-            }
-            if (Objects.nonNull(clientDetailsSettings.tokenEndpointAuthenticationSigningAlgorithm())) {
-                clientSettingsBuilder.tokenEndpointAuthenticationSigningAlgorithm(
-                        clientDetailsSettings.tokenEndpointAuthenticationSigningAlgorithm());
-            }
-            if (Objects.nonNull(clientDetailsSettings.x509CertificateSubjectDN())) {
-                clientSettingsBuilder.x509CertificateSubjectDN(clientDetailsSettings.x509CertificateSubjectDN());
-            }
-
-            if (clientDetailsSettings.customSettings() != null) {
-                clientSettingsBuilder.settings(settings -> settings.putAll(clientDetailsSettings.customSettings()));
-            }
-
-        }
+        final var tokenSettingsBuilder = fillTokenSettingsBuilder(details);
+        final var clientSettingsBuilder = fillClientSettingsBuilder(details);
         RegisteredClient.Builder builder = RegisteredClient.withId(details.id())
                 .clientId(details.clientId())
                 .clientName(details.clientName());
@@ -174,6 +124,66 @@ public class ClientClientDetailsMapper {
         }).tokenSettings(tokenSettingsBuilder.build()).clientSettings(clientSettingsBuilder.build());
 
         return builder.build();
+    }
+
+    private static TokenSettings.Builder fillTokenSettingsBuilder(ClientDetails details) {
+        var tokenSettingsBuilder = TokenSettings.builder();
+        ClientDetailsTokens clientDetailsTokens = details.tokenSettings();
+        if (clientDetailsTokens != null) {
+            if (Objects.nonNull(clientDetailsTokens.authorizationCodeTimeToLive())) {
+                tokenSettingsBuilder.authorizationCodeTimeToLive(clientDetailsTokens.authorizationCodeTimeToLive());
+            }
+            if (Objects.nonNull(clientDetailsTokens.accessTokenTimeToLive())) {
+                tokenSettingsBuilder.accessTokenTimeToLive(clientDetailsTokens.accessTokenTimeToLive());
+            }
+            if (Objects.nonNull(clientDetailsTokens.accessTokenFormat())) {
+                tokenSettingsBuilder.accessTokenFormat(clientDetailsTokens.accessTokenFormat());
+            }
+            if (Objects.nonNull(clientDetailsTokens.deviceCodeTimeToLive())) {
+                tokenSettingsBuilder.deviceCodeTimeToLive(clientDetailsTokens.deviceCodeTimeToLive());
+            }
+            if (Objects.nonNull(clientDetailsTokens.refreshTokenTimeToLive())) {
+                tokenSettingsBuilder.refreshTokenTimeToLive(clientDetailsTokens.refreshTokenTimeToLive());
+            }
+            if (Objects.nonNull(clientDetailsTokens.idTokenSignatureAlgorithm())) {
+                tokenSettingsBuilder.idTokenSignatureAlgorithm(clientDetailsTokens.idTokenSignatureAlgorithm());
+            }
+            tokenSettingsBuilder.reuseRefreshTokens(clientDetailsTokens.reuseRefreshTokens());
+            tokenSettingsBuilder
+                    .x509CertificateBoundAccessTokens(clientDetailsTokens.x509CertificateBoundAccessTokens());
+
+            if (clientDetailsTokens.customSettings() != null) {
+                tokenSettingsBuilder.settings(settings -> settings.putAll(clientDetailsTokens.customSettings()));
+            }
+        }
+        return tokenSettingsBuilder;
+    }
+
+    private static ClientSettings.Builder fillClientSettingsBuilder(ClientDetails details) {
+        var clientSettingsBuilder = ClientSettings.builder();
+        ClientDetailsSettings clientDetailsSettings = details.clientSettings();
+        if (clientDetailsSettings != null) {
+
+            clientSettingsBuilder.requireProofKey(clientDetailsSettings.requireProofKey());
+
+            clientSettingsBuilder.requireAuthorizationConsent(clientDetailsSettings.requireAuthorizationConsent());
+            if (Objects.nonNull(clientDetailsSettings.jwkSetUrl())) {
+                clientSettingsBuilder.jwkSetUrl(clientDetailsSettings.jwkSetUrl());
+            }
+            if (Objects.nonNull(clientDetailsSettings.tokenEndpointAuthenticationSigningAlgorithm())) {
+                clientSettingsBuilder.tokenEndpointAuthenticationSigningAlgorithm(
+                        clientDetailsSettings.tokenEndpointAuthenticationSigningAlgorithm());
+            }
+            if (Objects.nonNull(clientDetailsSettings.x509CertificateSubjectDN())) {
+                clientSettingsBuilder.x509CertificateSubjectDN(clientDetailsSettings.x509CertificateSubjectDN());
+            }
+
+            if (clientDetailsSettings.customSettings() != null) {
+                clientSettingsBuilder.settings(settings -> settings.putAll(clientDetailsSettings.customSettings()));
+            }
+
+        }
+        return clientSettingsBuilder;
     }
 
 }

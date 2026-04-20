@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
@@ -47,8 +46,6 @@ public class ReadableOrderProductPopulator
     public ReadableOrderProduct populate(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
                                          LanguageCode language) throws ConversionException {
 
-        Validate.notNull(externalProductService, "Requires ProductService");
-        Validate.notNull(imageUtils, "Requires imageUtils");
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
         target.setPrice(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),

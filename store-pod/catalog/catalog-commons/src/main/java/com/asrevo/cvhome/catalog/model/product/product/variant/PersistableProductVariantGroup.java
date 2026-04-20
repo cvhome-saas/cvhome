@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.catalog.model.product.product.variantGroup;
+package com.asrevo.cvhome.catalog.model.product.product.variant;
 
 import java.io.Serial;
 import java.util.List;

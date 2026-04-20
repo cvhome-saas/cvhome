@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.mapper.order;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
@@ -33,11 +32,6 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
     public ReadableOrderTotal merge(OrderTotal source, ReadableOrderTotal target, StoreMerchantId store,
                                     LanguageCode language) {
 
-        Validate.notNull(source, "OrderTotal must not be null");
-        Validate.notNull(target, "ReadableTotal must not be null");
-        Validate.notNull(store, "MerchantStore must not be null");
-        Validate.notNull(language, "Language must not be null");
-
         try {
 
             target.setCode(source.getOrderTotalCode());
@@ -52,11 +46,10 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
             target.setTotal(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),
                     source.getValue()));
 
-            if (!StringUtils.isBlank(source.getOrderTotalCode())) {
-                if (Constants.OT_DISCOUNT_TITLE.equals(source.getOrderTotalCode())) {
-                    target.setDiscounted(true);
-                }
+            if (!StringUtils.isBlank(source.getOrderTotalCode()) && Constants.OT_DISCOUNT_TITLE.equals(source.getOrderTotalCode())) {
+                target.setDiscounted(true);
             }
+
 
         } catch (Exception e) {
             throw new ConversionRuntimeException(e);

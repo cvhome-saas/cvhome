@@ -1,11 +1,10 @@
-package com.asrevo.cvhome.catalog.model.product.product.variantGroup;
+package com.asrevo.cvhome.catalog.model.product.product.variant;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
-import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -19,7 +19,6 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
@@ -43,11 +42,11 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
     public ProductGroupFacadeImpl(ProductGroupService productGroupService, ProductService productService,
                                   PersistableProductGroupPopulator persistableProductGroupPopulator, PricingService pricingService,
-                                  ImageFilePath imageUtils, ExternalMerchantStoreService externalMerchantStoreService) {
+                                  ImageFilePath imageUtils) {
         this.productGroupService = productGroupService;
         this.productService = productService;
         this.readableProductGroupPopulator = new ReadableProductGroupPopulator(
-                new ReadableMinimalProductPopulator(pricingService, imageUtils, externalMerchantStoreService));
+                new ReadableMinimalProductPopulator(pricingService, imageUtils));
         this.persistableProductGroupPopulator = persistableProductGroupPopulator;
     }
 
@@ -58,7 +57,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
                     .map(pg -> populateReadable(pg, store, language))
                     .orElseThrow(() -> new ResourceNotFoundException("ProductGroup not found for code: " + code));
         } catch (ServiceException e) {
-            log.error("Error while fetching ProductGroup by code: " + code, e);
+            log.error("Error while fetching ProductGroup by code: {}", code, e);
             throw new ServiceRuntimeException(e);
         }
     }

@@ -31,14 +31,14 @@ public class ReadableManufacturerMapper implements Mapper<Manufacturer, Readable
         ReadableManufacturer target = new ReadableManufacturer();
 
         Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> description = getDescription(
-                source, language, target);
+                source, language);
         description.ifPresent(target::setDescription);
 
         target.setCode(source.getCode());
         target.setId(source.getId());
         target.setOrder(source.getOrder());
         Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> desc = this
-                .getDescription(source, language, target);
+                .getDescription(source, language);
         if (description.isPresent()) {
             target.setDescription(desc.orElse(null));
         }
@@ -47,11 +47,11 @@ public class ReadableManufacturerMapper implements Mapper<Manufacturer, Readable
     }
 
     private Optional<com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription> getDescription(
-            Manufacturer source, LanguageCode language, ReadableManufacturer target) {
+            Manufacturer source, LanguageCode language) {
 
         Optional<ManufacturerDescription> description = getDescription(source.getDescriptions(), language);
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty() && description.isPresent()) {
-            return Optional.of(convertDescription(description.get(), source));
+            return Optional.of(convertDescription(description.get()));
         } else {
             return Optional.empty();
         }
@@ -63,7 +63,7 @@ public class ReadableManufacturerMapper implements Mapper<Manufacturer, Readable
     }
 
     private com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription convertDescription(
-            ManufacturerDescription description, Manufacturer source) {
+            ManufacturerDescription description) {
         final com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription desc =
                 new com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription();
 

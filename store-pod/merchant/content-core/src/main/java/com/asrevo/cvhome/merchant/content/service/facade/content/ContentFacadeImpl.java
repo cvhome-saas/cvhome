@@ -324,10 +324,8 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public void delete(StoreMerchantId store, Long id) {
         Content content = contentService.getById(id);
-        if (content != null) {
-            if (!Objects.equals(content.getStoreMerchantId(), store)) {
-                throw new ResourceNotFoundException("No content found with id [" + id + "] for store [" + store + "]");
-            }
+        if (content != null && !Objects.equals(content.getStoreMerchantId(), store)) {
+            throw new ResourceNotFoundException("No content found with id [" + id + "] for store [" + store + "]");
         }
 
         try {

@@ -173,7 +173,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
                     if (attribute.isAttributeDisplayOnly()) { // read only attribute =
                         // property
 
-                        property = createProperty(attribute, language);
+                        property = createProperty(attribute);
 
                         ReadableProductOption readableOption = new ReadableProductOption(); // that
                         // is
@@ -466,7 +466,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         return tragetDescription;
     }
 
-    private ReadableProductProperty createProperty(ProductAttribute productAttribute, LanguageCode language) {
+    private ReadableProductProperty createProperty(ProductAttribute productAttribute) {
 
         ReadableProductProperty attr = new ReadableProductProperty();
         attr.setId(productAttribute.getProductOption().getId()); // attribute of the

@@ -21,7 +21,6 @@ import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
-import com.asrevo.cvhome.catalog.model.product.ProductPriceEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
 import com.asrevo.cvhome.catalog.model.product.product.definition.PersistableProductDefinition;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.PersistableProductAttributeMapper;
@@ -155,15 +154,13 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 for (ProductAvailability avail : destination.getAvailabilities()) {
                     Set<ProductPrice> prices = avail.getPrices();
                     for (ProductPrice p : prices) {
-                        if (p.isDefaultPrice()) {
-                            if (productAvailability == null) {
-                                productAvailability = avail;
-                                defaultPrice = p;
-                                productAvailability.setProductQuantity(source.getQuantity());
-                                productAvailability.setProductStatus(source.isCanBePurchased());
-                                p.setProductPriceAmount(source.getPrice());
-                                break;
-                            }
+                        if (p.isDefaultPrice() && productAvailability == null) {
+                            productAvailability = avail;
+                            defaultPrice = p;
+                            productAvailability.setProductQuantity(source.getQuantity());
+                            productAvailability.setProductStatus(source.isCanBePurchased());
+                            p.setProductPriceAmount(source.getPrice());
+                            break;
                         }
                     }
                 }
@@ -191,7 +188,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 defaultPrice = new ProductPrice();
                 defaultPrice.setDefaultPrice(true);
                 defaultPrice.setProductPriceAmount(defaultPriceAmount);
-                defaultPrice.setCode(ProductPriceEntity.DEFAULT_PRICE_CODE);
+                defaultPrice.setCode(Constants.DEFAULT_PRICE_CODE);
                 defaultPrice.setProductAvailability(productAvailability);
                 productAvailability.getPrices().add(defaultPrice);
                 for (LanguageCode lang : languages) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
-import com.asrevo.cvhome.catalog.model.product.product.variantGroup.ReadableProductVariantGroup;
+import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;

@@ -265,8 +265,7 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
     @Override
     public List<String> listFolders(String merchantStoreCode, Optional<String> path) {
-
-        return null;
+        return List.of();
     }
 
     private String bucketName() {

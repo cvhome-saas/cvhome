@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantImage;
-import com.asrevo.cvhome.catalog.model.product.product.variantGroup.PersistableProductVariantGroup;
+import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariantGroup;
 import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantImageService;
 import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;

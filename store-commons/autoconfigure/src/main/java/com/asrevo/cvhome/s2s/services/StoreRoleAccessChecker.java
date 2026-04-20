@@ -45,6 +45,7 @@ public class StoreRoleAccessChecker {
         return isStoreModerator(authentication, requestedStoreId, null);
     }
 
+    @SuppressWarnings("java:S1172")
     public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
         if (!hasOrgAdminRole(authentication)) {
             return false;

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
@@ -46,11 +45,6 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
     @Override
     public ReadableOrderProduct merge(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
                                       LanguageCode language) {
-
-        Validate.notNull(source, "OrderProduct cannot be null");
-        Validate.notNull(target, "ReadableOrderProduct cannot be null");
-        Validate.notNull(store, "store cannot be null");
-        Validate.notNull(language, "Language cannot be null");
 
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
