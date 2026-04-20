@@ -51,7 +51,4 @@ public class CategoryDescription extends Description {
     @Column(name = "META_DESCRIPTION")
     private String metatagDescription;
 
-    public CategoryDescription() {
-    }
-
 }

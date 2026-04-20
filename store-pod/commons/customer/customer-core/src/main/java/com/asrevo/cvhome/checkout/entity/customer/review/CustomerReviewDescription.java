@@ -23,9 +23,6 @@ import lombok.Setter;
         valueColumnName = "SEQ_COUNT", pkColumnValue = "CUSTOMER_REVIEW_DESCRIPTION_SEQ_NEXT_VAL",
         allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
         initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
-// @SequenceGenerator(name = "description_gen", sequenceName =
-// "custome_review_description_seq",
-// allocationSize = SchemaConstant.DESCRIPTION_ID_SEQUENCE_START)
 @Getter
 @Setter
 public class CustomerReviewDescription extends Description {
@@ -36,8 +33,5 @@ public class CustomerReviewDescription extends Description {
     @ManyToOne(targetEntity = CustomerReview.class)
     @JoinColumn(name = "CUSTOMER_REVIEW_ID")
     private CustomerReview customerReview;
-
-    public CustomerReviewDescription() {
-    }
 
 }

@@ -70,21 +70,6 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
         return shoppingCartRepository.findByCode(store, code);
     }
 
-    /*
-     * @Override
-     *
-     * @Transactional public ShoppingCart getById(final Long id, MerchantStore store)
-     * throws {
-     *
-     * try { ShoppingCart shoppingCart = shoppingCartRepository.findOne(id); if
-     * (shoppingCart == null) { return null; } getPopulatedShoppingCart(shoppingCart);
-     *
-     * if (shoppingCart.isObsolete()) { delete(shoppingCart); return null; } else { return
-     * shoppingCart; } } catch (Exception e) { // TODO Auto-generated catch block
-     * e.printStackTrace(); } return null;
-     *
-     * }
-     */
 
     /**
      * Get a {@link ShoppingCart} for a given code. Will update the shopping cart prices

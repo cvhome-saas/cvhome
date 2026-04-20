@@ -57,9 +57,4 @@ public class OrderAccount extends SalesManagerEntity<Long, OrderAccount> {
 
     @OneToMany(mappedBy = "orderAccount", cascade = CascadeType.ALL)
     private Set<OrderAccountProduct> orderAccountProducts = new HashSet<>();
-
-    public OrderAccount() {
-    }
-
-
 }

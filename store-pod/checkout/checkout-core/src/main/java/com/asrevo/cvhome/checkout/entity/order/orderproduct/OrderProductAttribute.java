@@ -64,7 +64,4 @@ public class OrderProductAttribute implements Serializable {
     @Column(name = "PRODUCT_ATTRIBUTE_VAL_NAME")
     private String productAttributeValueName;
 
-    public OrderProductAttribute() {
-    }
-
 }

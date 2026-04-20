@@ -35,7 +35,10 @@ public class EcsTaskFetcher {
                     .send(req, responseInfo -> HttpResponse.BodySubscribers
                             .mapping(HttpResponse.BodySubscribers.ofString(StandardCharsets.UTF_8), EcsTaskFetcher::getEcsTask))
                     .body();
-        } catch (IOException | InterruptedException | URISyntaxException _) {
+        } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+            return new EcsTask();
+        } catch (IOException | URISyntaxException _) {
             return new EcsTask();
         }
     }

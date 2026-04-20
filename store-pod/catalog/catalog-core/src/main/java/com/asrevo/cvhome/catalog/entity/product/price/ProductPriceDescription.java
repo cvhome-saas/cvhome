@@ -42,7 +42,4 @@ public class ProductPriceDescription extends Description {
     @Column(name = "PRICE_APPENDER")
     private String priceAppender;
 
-    public ProductPriceDescription() {
-    }
-
 }

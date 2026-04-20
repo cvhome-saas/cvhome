@@ -153,20 +153,20 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
 
     @Override
     public OutputContentFile getProductImage(String merchantStoreCode, String productCode, String imageName) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public OutputContentFile getProductImage(String merchantStoreCode, String productCode, String imageName,
                                              ProductImageSize size) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public OutputContentFile getProductImage(CmsProductImage productImage) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

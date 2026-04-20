@@ -59,8 +59,5 @@ public class OrderStatusHistory implements Serializable {
     @Column(name = "COMMENTS", columnDefinition = "text")
     private String comments;
 
-    public OrderStatusHistory() {
-    }
-
 }
 

@@ -15,9 +15,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 @Component
 public class PersistableProductOptionValueMapper implements Mapper<PersistableProductOptionValue, ProductOptionValue> {
 
-    public PersistableProductOptionValueMapper() {
-    }
-
     ProductOptionValueDescription description(
             com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription description) {
         ProductOptionValueDescription desc = new ProductOptionValueDescription();
@@ -43,10 +40,8 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
 
         try {
 
-            if (StringUtils.isBlank(source.getCode())) {
-                if (!StringUtils.isBlank(destination.getCode())) {
-                    source.setCode(destination.getCode());
-                }
+            if (StringUtils.isBlank(source.getCode()) && !StringUtils.isBlank(destination.getCode())) {
+                source.setCode(destination.getCode());
             }
 
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {

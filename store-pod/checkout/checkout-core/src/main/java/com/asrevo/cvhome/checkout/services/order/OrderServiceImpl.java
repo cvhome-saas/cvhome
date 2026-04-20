@@ -127,14 +127,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Override
     @Transactional
-    public Order processOrder(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
-                              Payment payment, StoreMerchantId store) throws ServiceException {
-
-        return process(order, customer, items, summary, payment, null, store);
-    }
-
-    @Override
-    @Transactional
     public void delete(final Order order) throws ServiceException {
 
         super.delete(order);
@@ -152,8 +144,10 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return orderRepository.listOrders(store, criteria);
     }
 
-    private Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
-                          Payment payment, Transaction transaction, StoreMerchantId store) throws ServiceException {
+    @Transactional
+    @Override
+    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
+                         Payment payment, Transaction transaction, StoreMerchantId store) throws ServiceException {
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
@@ -183,11 +177,9 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         OrderTotalSummary totalSummary = new OrderTotalSummary();
         List<OrderTotal> orderTotals = new ArrayList<>();
 
-        BigDecimal grandTotal = new BigDecimal(0);
-        grandTotal.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal grandTotal = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal subTotal = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal subTotal = new BigDecimal(0);
-        subTotal.setScale(2, RoundingMode.HALF_UP);
         for (ShoppingCartItem item : summary.getProducts()) {
 
             BigDecimal st = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));

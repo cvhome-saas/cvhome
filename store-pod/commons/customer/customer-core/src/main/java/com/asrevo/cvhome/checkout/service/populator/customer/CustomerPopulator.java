@@ -78,7 +78,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                 billing.setAddress(sourceBilling.getAddress());
                 billing.setCity(sourceBilling.getCity());
                 billing.setCompany(sourceBilling.getCompany());
-                // billing.setCountry(country);
                 if (!StringUtils.isEmpty(sourceBilling.getFirstName())) {
                     billing.setFirstName(sourceBilling.getFirstName());
                 }
@@ -105,7 +104,6 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                     Zone zoneDescription = zones.get(zone.getCode());
                     billing.setZone(zoneDescription.getId());
                 }
-                // target.setBilling(billing);
 
             }
             if (target.getBilling() == null && source.getBilling() != null) {

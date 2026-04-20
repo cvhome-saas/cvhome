@@ -69,7 +69,7 @@ public class PersistableManufacturerPopulator
 
     @Override
     protected Manufacturer createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

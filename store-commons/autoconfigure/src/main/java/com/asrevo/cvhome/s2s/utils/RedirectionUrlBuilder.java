@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.s2s.utils;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,11 +17,13 @@ public record RedirectionUrlBuilder(String schema, Integer port, ServiceDomain s
     private static final String URL_SPLITTER = "/";
 
     public static Optional<String> getHeaderValue(ServerHttpRequest request, String headerKey) {
-        return Optional.ofNullable(request.getHeaders().get(headerKey))
-                .orElse(List.of())
-                .stream()
-                .map(it -> it.split(",")[0])
-                .findFirst();
+        if (request == null || headerKey == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(request.getHeaders().getFirst(headerKey))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty());
     }
 
     public static Integer getPort(ServerHttpRequest request) {

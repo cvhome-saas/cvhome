@@ -35,8 +35,7 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Long
             where m.code=?1 and m.storeMerchantId=?2""")
     Manufacturer findByCodeAndMerchandStore(String code, StoreMerchantId storeMerchantId);
 
-    @Query("""
-            select count(distinct m) from Manufacturer as m where m.storeMerchantId=?1""")
+    @Query("select count(distinct m) from Manufacturer as m where m.storeMerchantId=?1")
     int count(StoreMerchantId storeMerchantId);
 
     @Query(value = """

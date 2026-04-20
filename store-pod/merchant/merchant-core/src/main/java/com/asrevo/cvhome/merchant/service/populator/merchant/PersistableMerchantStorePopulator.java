@@ -121,7 +121,7 @@ public class PersistableMerchantStorePopulator
 
     @Override
     protected MerchantStore createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

@@ -66,12 +66,12 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ReadableProductAvailability availability = detailedProduct.availability();
 
         if (!availability.isCanBePurchased()) {
-            throw new Exception("Product with sku " + availability.getSku()
+            throw new ServiceException("Product with sku " + availability.getSku()
                     + " is not available or is not properly configured. It contains no" + " inventory");
         }
 
         if (Objects.nonNull(availability.getDateAvailable()) && Instant.now().isAfter(availability.getDateAvailable())) {
-            throw new Exception("Item with sku " + availability.getSku() + " is not available");
+            throw new ServiceException("Item with sku " + availability.getSku() + " is not available");
         }
 
         FinalPrice price = detailedProduct.price();
@@ -149,7 +149,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    // KEEP
     public @Nullable ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
                                                                  LanguageCode language, boolean returnCart) throws Exception {
         Validate.notNull(cartCode, "Shopping cart code must not be null");
@@ -305,7 +304,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     private String uniqueShoppingCartCode() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     @Override

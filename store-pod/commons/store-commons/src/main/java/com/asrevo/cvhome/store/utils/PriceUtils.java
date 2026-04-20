@@ -77,7 +77,6 @@ public class PriceUtils {
 
     public static BigDecimal getAmount(String amount) throws ServiceException {
 
-        // validations
         StringBuilder newAmount = new StringBuilder();
         for (int i = 0; i < amount.length(); i++) {
             if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {

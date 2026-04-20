@@ -48,7 +48,4 @@ public class ProductGroupDescription extends Description {
     @Column(name = "META_DESCRIPTION")
     private String metatagDescription;
 
-    public ProductGroupDescription() {
-    }
-
 }

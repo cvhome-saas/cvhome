@@ -180,11 +180,8 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
 
             if (parent == null) {
 
-                // assign to root
                 child.setParent(null);
                 child.setDepth(0);
-                // child.setLineage(new
-                // StringBuilder().append("/").append(child.getId()).append("/").toString());
                 child.setLineage(new StringBuilder().append("/").append(child.getId()).append("/").toString());
 
             } else {

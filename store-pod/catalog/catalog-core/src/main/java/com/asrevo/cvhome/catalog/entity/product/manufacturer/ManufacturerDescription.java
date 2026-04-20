@@ -46,7 +46,4 @@ public class ManufacturerDescription extends Description {
     @Column(name = "DATE_LAST_CLICK")
     private Date dateLastClick;
 
-    public ManufacturerDescription() {
-    }
-
 }

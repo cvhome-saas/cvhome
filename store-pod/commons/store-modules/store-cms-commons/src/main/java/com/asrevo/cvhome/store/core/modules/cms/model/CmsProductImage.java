@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.store.core.modules.cms.model;
 
-import java.io.Closeable;
-
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.AllArgsConstructor;
@@ -9,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CmsProductImage implements Closeable {
+public class CmsProductImage {
 
     private Long id;
 
@@ -18,9 +16,5 @@ public class CmsProductImage implements Closeable {
     private String sku;
 
     private String productImage;
-
-    @Override
-    public void close() {
-    }
 
 }

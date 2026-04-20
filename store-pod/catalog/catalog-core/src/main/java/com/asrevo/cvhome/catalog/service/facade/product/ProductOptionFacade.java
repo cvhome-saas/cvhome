@@ -35,13 +35,6 @@ public interface ProductOptionFacade {
     List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
                                       StoreMerchantId store);
 
-    /*
-     * void addOptionValueImage(MultipartFile image, Long optionValueId, StoreMerchantId
-     * store, LanguageCode language);
-     *
-     * void removeOptionValueImage(Long optionValueId, StoreMerchantId store, LanguageCode
-     * language);
-     */
     boolean optionExists(String code, StoreMerchantId store);
 
     boolean optionValueExists(String code, StoreMerchantId store);

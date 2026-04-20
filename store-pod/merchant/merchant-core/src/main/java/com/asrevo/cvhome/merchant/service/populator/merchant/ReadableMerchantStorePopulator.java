@@ -145,7 +145,7 @@ public class ReadableMerchantStorePopulator
 
     @Override
     protected ReadableMerchantStore createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

@@ -37,7 +37,4 @@ public class CountryDescription extends Description {
     @Convert(converter = CountryIsoCodeConverter.class)
     private CountryIsoCode country;
 
-    public CountryDescription() {
-    }
-
 }

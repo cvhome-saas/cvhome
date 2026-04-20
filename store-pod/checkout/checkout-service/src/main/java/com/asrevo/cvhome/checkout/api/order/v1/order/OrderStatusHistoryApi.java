@@ -61,9 +61,6 @@ public class OrderStatusHistoryApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
                        StoreMerchantId merchantStore) {
-
-        // TODO validate date format
-
         orderFacade.createOrderStatus(history, id, merchantStore);
     }
 

@@ -63,7 +63,4 @@ public class FileHistory implements Serializable {
     @Column(name = "DOWNLOAD_COUNT", nullable = false)
     private Integer downloadCount;
 
-    public FileHistory() {
-    }
-
 }

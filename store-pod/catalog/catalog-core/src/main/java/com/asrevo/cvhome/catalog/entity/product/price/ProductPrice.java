@@ -87,8 +87,4 @@ public class ProductPrice extends SalesManagerEntity<Long, ProductPrice> {
     @Column(name = "PRODUCT_IDENTIFIER_ID")
     private Long productIdentifierId;
 
-    public ProductPrice() {
-    }
-
-
 }

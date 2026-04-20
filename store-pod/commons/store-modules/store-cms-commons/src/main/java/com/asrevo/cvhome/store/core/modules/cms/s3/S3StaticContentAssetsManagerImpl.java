@@ -253,19 +253,19 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
     @Override
     public void addFolder(String merchantStoreCode, String folderName, Optional<String> folderPath) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public void removeFolder(String merchantStoreCode, String folderName, Optional<String> folderPath) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public List<String> listFolders(String merchantStoreCode, Optional<String> path) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

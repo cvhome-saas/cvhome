@@ -33,7 +33,7 @@ public class ReadableZonePopulator extends AbstractDataPopulator<Zone, StoreMerc
 
     @Override
     protected ReadableZone createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

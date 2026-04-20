@@ -100,7 +100,4 @@ public class ProductAttribute extends SalesManagerEntity<Long, ProductAttribute>
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private Product product;
 
-    public ProductAttribute() {
-    }
-
 }

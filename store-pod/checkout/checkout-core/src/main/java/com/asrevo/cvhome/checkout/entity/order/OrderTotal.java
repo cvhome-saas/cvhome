@@ -75,8 +75,4 @@ public class OrderTotal extends SalesManagerEntity<Long, OrderTotal> {
     @ManyToOne(targetEntity = Order.class)
     @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
-
-    public OrderTotal() {
-    }
-
 }

@@ -21,41 +21,50 @@ public class ServiceException extends Exception {
     @Serial
     private static final long serialVersionUID = -6854945379036729034L;
 
-    private int exceptionType = 0; // regular error
+    private final int exceptionType; // regular error
 
-    private String messageCode = null;
+    private final String messageCode;
 
     public ServiceException() {
         super();
+        this.exceptionType = 0;
+        this.messageCode = null;
     }
 
     public ServiceException(String messageCode) {
         super();
+        this.exceptionType = 0;
         this.messageCode = messageCode;
     }
 
     public ServiceException(String message, Throwable cause) {
         super(message, cause);
+        this.exceptionType = 0;
+        this.messageCode = null;
     }
 
     public ServiceException(Throwable cause) {
         super(cause.getMessage(), cause);
+        this.exceptionType = 0;
+        this.messageCode = null;
     }
 
     public ServiceException(int exceptionType) {
         super();
         this.exceptionType = exceptionType;
+        this.messageCode = null;
     }
 
     public ServiceException(int exceptionType, String message) {
         super(message);
         this.exceptionType = exceptionType;
+        this.messageCode = null;
     }
 
     public ServiceException(int exceptionType, String message, String messageCode) {
         super(message);
-        this.messageCode = messageCode;
         this.exceptionType = exceptionType;
+        this.messageCode = messageCode;
     }
 
 }

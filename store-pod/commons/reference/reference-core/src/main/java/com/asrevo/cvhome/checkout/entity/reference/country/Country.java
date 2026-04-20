@@ -58,8 +58,6 @@ public class Country extends SalesManagerEntity<CountryIsoCode, Country> {
     @Transient
     private String name;
 
-    public Country() {
-    }
 
     @Override
     public CountryIsoCode getId() {

@@ -68,8 +68,4 @@ public class OrderProduct extends SalesManagerEntity<Long, OrderProduct> {
 
     @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
     private Set<OrderProductDownload> downloads = new HashSet<>();
-
-    public OrderProduct() {
-    }
-
 }

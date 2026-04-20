@@ -105,6 +105,7 @@ public class OrderFacadeImpl implements OrderFacade {
     private final PersistablePaymentPopulator paymentPopulator;
 
     private final OrderProductPopulator orderProductPopulator;
+    private final ReadableOrderProductPopulator readableOrderProductPopulator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
                            OrderService orderService, ExternalProductService externalProductService,
@@ -115,7 +116,7 @@ public class OrderFacadeImpl implements OrderFacade {
                            ReadableOrderPopulator readableOrderPopulator, ImageFilePath imageUtils,
                            ShoppingCartCalculationService shoppingCartCalculationService,
                            ExternalMerchantStoreService externalMerchantStoreService, PersistablePaymentPopulator paymentPopulator,
-                           OrderProductPopulator orderProductPopulator) {
+                           OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -132,6 +133,7 @@ public class OrderFacadeImpl implements OrderFacade {
         this.externalMerchantStoreService = externalMerchantStoreService;
         this.paymentPopulator = paymentPopulator;
         this.orderProductPopulator = orderProductPopulator;
+        this.readableOrderProductPopulator = readableOrderProductPopulator;
     }
 
     @Override
@@ -219,7 +221,7 @@ public class OrderFacadeImpl implements OrderFacade {
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
 
             // order service
-            modelOrder = orderService.processOrder(modelOrder, customer, items, orderTotalSummary, paymentModel, store);
+            modelOrder = orderService.process(modelOrder, customer, items, orderTotalSummary, paymentModel, null, store);
 
             // Reserve inventory
             log.debug("Update inventory");
@@ -250,9 +252,6 @@ public class OrderFacadeImpl implements OrderFacade {
     @Override
     public ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
                                                        LanguageCode language) {
-        Validate.notNull(order, "Order cannot be null");
-        Validate.notNull(customer, "Customer cannot be null");
-        Validate.notNull(store, "store cannot be null");
 
         ReadableOrderConfirmation orderConfirmation = new ReadableOrderConfirmation();
 
@@ -347,11 +346,9 @@ public class OrderFacadeImpl implements OrderFacade {
             // order products
             List<ReadableOrderProduct> orderProducts = new ArrayList<>();
             for (OrderProduct p : modelOrder.getOrderProducts()) {
-                ReadableOrderProductPopulator orderProductPopulator = new ReadableOrderProductPopulator(
-                        externalProductService, imageUtils, externalMerchantStoreService);
 
                 ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-                orderProductPopulator.populate(p, orderProduct, store, language);
+                readableOrderProductPopulator.populate(p, orderProduct, store, language);
                 orderProducts.add(orderProduct);
             }
 

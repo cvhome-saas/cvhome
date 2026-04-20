@@ -43,9 +43,6 @@ public class Currency extends SalesManagerEntity<CurrencyCode, Currency> impleme
     @Column(name = "CURRENCY_NAME", unique = true)
     private String name;
 
-    public Currency() {
-    }
-
     @Override
     public CurrencyCode getId() {
         return this.code;

@@ -35,7 +35,4 @@ public class ProductOptionValueDescription extends Description {
     @JoinColumn(name = "PRODUCT_OPTION_VALUE_ID")
     private ProductOptionValue productOptionValue;
 
-    public ProductOptionValueDescription() {
-    }
-
 }

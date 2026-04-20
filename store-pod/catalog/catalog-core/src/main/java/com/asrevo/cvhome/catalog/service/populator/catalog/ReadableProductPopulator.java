@@ -485,7 +485,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
     @Override
     protected ReadableProduct createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

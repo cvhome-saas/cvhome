@@ -25,15 +25,6 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Customer Facade work as an abstraction layer between Controller and Service layer. It
- * work as an entry point to service layer.
- *
- * @author Umesh Awasthi
- * @version 2.2.1, 2.8.0
- */
-// @TODO ASHRAF
-
 @Service("customerFacade")
 @Slf4j
 public class CustomerFacadeImpl implements CustomerFacade {

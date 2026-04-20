@@ -35,18 +35,14 @@ public class UaaLogoutSuccessHandler {
     }
 
     public Mono<Void> onLogoutSuccess(ServerWebExchange exchange, Authentication authentication) {
-        try {
-            if (authentication instanceof OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+        if (authentication instanceof OAuth2AuthenticationToken oAuth2AuthenticationToken) {
 
-                String idToken = null;
-                if (oAuth2AuthenticationToken.getPrincipal() instanceof DefaultOidcUser defaultOidcUser) {
-                    idToken = defaultOidcUser.getIdToken().getTokenValue();
-                }
-                String logoutUrl = extractLogoutUrl(exchange, idToken);
-                return this.redirectStrategy.sendRedirect(exchange, URI.create(logoutUrl));
+            String idToken = null;
+            if (oAuth2AuthenticationToken.getPrincipal() instanceof DefaultOidcUser defaultOidcUser) {
+                idToken = defaultOidcUser.getIdToken().getTokenValue();
             }
-
-        } catch (Exception _) {
+            String logoutUrl = extractLogoutUrl(exchange, idToken);
+            return this.redirectStrategy.sendRedirect(exchange, URI.create(logoutUrl));
         }
         return this.redirectStrategy.sendRedirect(exchange, logoutSuccessUrl);
     }

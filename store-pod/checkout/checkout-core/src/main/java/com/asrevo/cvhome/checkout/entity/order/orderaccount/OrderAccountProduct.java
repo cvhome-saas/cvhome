@@ -72,7 +72,4 @@ public class OrderAccountProduct implements Serializable {
     @Column(name = "ORDER_ACCOUNT_PRODUCT_STATUS", nullable = false)
     private Integer orderAccountProductStatus;
 
-    public OrderAccountProduct() {
-    }
-
 }

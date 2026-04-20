@@ -37,7 +37,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
 
     @Override
     public ReadableMinimalProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
-        // TODO Auto-generated method stub
+
         ReadableMinimalProduct minimal = new ReadableMinimalProduct();
         this.merge(source, minimal, store, language);
         return minimal;

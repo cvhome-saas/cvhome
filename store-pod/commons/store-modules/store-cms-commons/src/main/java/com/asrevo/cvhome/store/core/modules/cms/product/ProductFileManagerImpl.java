@@ -135,8 +135,6 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
                 try (FileInputStream isLarge = new FileInputStream(tempLarge)) {
 
-                    // IOUtils.copy(isLarge, output);
-
                     ImageContentFile largeContentImage = new ImageContentFile();
                     largeContentImage.setFileContentType(FileContentType.PRODUCT);
                     largeContentImage.setFileName(productImage.getProductImage());
@@ -150,7 +148,6 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
                 }
             } else {
-                // small will be the same as the original
                 contentImage.setFileContentType(FileContentType.PRODUCT);
                 InputStream is2 = new ByteArrayInputStream(byteArray);
                 contentImage.setFile(is2);
@@ -159,16 +156,10 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
         } catch (Exception e) {
             throw new ServiceException(e);
-        } finally {
-            try {
-                productImage.close();
-            } catch (Exception _) {
-            }
         }
     }
 
     public OutputContentFile getProductImage(CmsProductImage productImage) throws ServiceException {
-        // will return original
         return getImage.getProductImage(productImage);
     }
 

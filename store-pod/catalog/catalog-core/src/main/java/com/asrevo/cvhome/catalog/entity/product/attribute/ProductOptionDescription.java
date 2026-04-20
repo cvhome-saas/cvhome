@@ -39,7 +39,4 @@ public class ProductOptionDescription extends Description {
     @Column(name = "PRODUCT_OPTION_COMMENT", length = 4000)
     private String productOptionComment;
 
-    public ProductOptionDescription() {
-    }
-
 }

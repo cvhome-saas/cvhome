@@ -76,9 +76,6 @@ public class ProductOptionValue extends SalesManagerEntity<Long, ProductOptionVa
             column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
-    public ProductOptionValue() {
-    }
-
     public List<ProductOptionValueDescription> getDescriptionsSettoList() {
         if (descriptionsList == null || descriptionsList.isEmpty()) {
             descriptionsList = new ArrayList<>(this.getDescriptions());

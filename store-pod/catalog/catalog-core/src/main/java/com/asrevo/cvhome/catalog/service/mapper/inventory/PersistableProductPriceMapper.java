@@ -67,27 +67,21 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 
             } else {
 
-                // get an existing product availability
                 List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
 
                 if (!CollectionUtils.isEmpty(existing)) {
-                    // find default availability
                     Optional<ProductAvailability> avail = existing.stream()
                             .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
                             .findAny();
                     if (avail.isPresent()) {
                         availability = avail.get();
 
-                        // if default price exist for sku exit
                         if (source.isDefaultPrice()) {
                             Optional<ProductPrice> defaultPrice = availability.getPrices()
                                     .stream()
                                     .filter(ProductPrice::isDefaultPrice)
                                     .findAny();
                             if (defaultPrice.isPresent()) {
-                                // throw new ConversionRuntimeException(
-                                // "Default Price already exist for product with sku [" +
-                                // source.getSku() + "]");
                                 destination = defaultPrice.get();
                             }
                         }

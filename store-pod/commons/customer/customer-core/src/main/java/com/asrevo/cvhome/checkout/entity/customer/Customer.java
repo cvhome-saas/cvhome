@@ -80,7 +80,4 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
     @Embedded
     private Billing billing;
 
-    public Customer() {
-    }
-
 }

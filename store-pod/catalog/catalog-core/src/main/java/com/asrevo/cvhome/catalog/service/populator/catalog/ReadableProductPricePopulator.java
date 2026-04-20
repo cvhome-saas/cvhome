@@ -85,7 +85,7 @@ public class ReadableProductPricePopulator
 
     @Override
     protected ReadableProductPrice createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

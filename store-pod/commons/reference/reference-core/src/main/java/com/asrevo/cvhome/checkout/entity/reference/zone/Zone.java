@@ -55,9 +55,6 @@ public class Zone extends SalesManagerEntity<ZoneCode, Zone> {
     @Transient
     private String name;
 
-    public Zone() {
-    }
-
     @Override
     public ZoneCode getId() {
         return code;

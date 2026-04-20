@@ -211,7 +211,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
     @Override
     protected ReadableProduct createTarget() {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

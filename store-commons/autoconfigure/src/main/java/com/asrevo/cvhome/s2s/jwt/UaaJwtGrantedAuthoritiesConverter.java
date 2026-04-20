@@ -26,7 +26,7 @@ public final class UaaJwtGrantedAuthoritiesConverter implements Converter<Jwt, C
     private static final String DEFAULT_AUTHORITIES_CLAIM_DELIMITER = " ";
 
     @SuppressWarnings("unchecked")
-    public static Collection<String> castAuthoritiesToCollection(Object authorities) {
+    public static Collection<String> castAuthoritiesToCollection(Collection<?> authorities) {
         return (Collection<String>) authorities;
     }
 
@@ -51,14 +51,14 @@ public final class UaaJwtGrantedAuthoritiesConverter implements Converter<Jwt, C
     }
 
     private static Collection<String> getClaimAsList(Object claim) {
-        if (claim instanceof String) {
-            if (StringUtils.hasText((String) claim)) {
-                return Arrays.asList(((String) claim).split(DEFAULT_AUTHORITIES_CLAIM_DELIMITER));
+        if (claim instanceof String sc) {
+            if (StringUtils.hasText(sc)) {
+                return Arrays.asList((sc).split(DEFAULT_AUTHORITIES_CLAIM_DELIMITER));
             }
             return Collections.emptyList();
         }
-        if (claim instanceof Collection) {
-            return castAuthoritiesToCollection(claim);
+        if (claim instanceof Collection<?> c) {
+            return castAuthoritiesToCollection(c);
         }
         return Collections.emptyList();
     }
