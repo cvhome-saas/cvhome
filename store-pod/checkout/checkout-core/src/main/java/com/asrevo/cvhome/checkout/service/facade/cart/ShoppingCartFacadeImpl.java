@@ -140,8 +140,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         try {
             return readableShoppingCart(cartModel, item, store, language);
         } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException) {
-                throw (ResourceNotFoundException) e;
+            if (e instanceof ResourceNotFoundException ex) {
+                throw ex;
             } else {
                 throw new ServiceRuntimeException(e.getMessage(), e);
             }
@@ -166,11 +166,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ShoppingCartItem itemToDelete = null;
         for (ShoppingCartItem shoppingCartItem : cart.getLineItems()) {
             if (shoppingCartItem.getSku().equals(sku)) {
-                // get cart item
                 itemToDelete = getEntryToUpdate(shoppingCartItem.getId(), cart);
-
-                // break;
-
             } else {
                 items.add(shoppingCartItem);
             }
@@ -188,7 +184,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         }
 
         shoppingCartService.saveOrUpdate(cart); // update cart with remaining items
-        if (!items.isEmpty() & returnCart) {
+        if (!items.isEmpty() && returnCart) {
             return this.getByCode(cartCode, merchant, language);
         }
         return null;
@@ -200,12 +196,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-        // need to check if the item is already in the cart
-        boolean duplicateFound = false;
-
-        if (!duplicateFound) {
-            cartModel.getLineItems().add(itemModel);
-        }
+        cartModel.getLineItems().add(itemModel);
 
         saveShoppingCart(cartModel);
 

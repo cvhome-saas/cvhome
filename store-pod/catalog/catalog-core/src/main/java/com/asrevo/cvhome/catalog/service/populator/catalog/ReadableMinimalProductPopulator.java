@@ -70,8 +70,8 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 }
             }
 
-            if (target instanceof ReadableProductFull) {
-                ((ReadableProductFull) target).setDescriptions(fulldescriptions);
+            if (target instanceof ReadableProductFull it) {
+                it.setDescriptions(fulldescriptions);
             }
 
             if (language == null) {
@@ -198,8 +198,8 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 }
             }
 
-            if (target instanceof ReadableProductFull) {
-                ((ReadableProductFull) target).setDescriptions(fulldescriptions);
+            if (target instanceof ReadableProductFull it) {
+                it.setDescriptions(fulldescriptions);
             }
 
             return target;

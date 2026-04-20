@@ -19,7 +19,6 @@ public class ProductImageSizeUtils {
 
         int type = image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType();
 
-        // *Special* if the width or height is 0 use image src dimensions
         if (destinationWidth == 0) {
             destinationWidth = image.getWidth();
         }
@@ -30,18 +29,14 @@ public class ProductImageSizeUtils {
         int fHeight = destinationHeight;
         int fWidth = destinationWidth;
 
-        // Work out the resized width/height
         if (image.getHeight() > destinationHeight || image.getWidth() > destinationWidth) {
             if (image.getHeight() > image.getWidth()) {
-                fHeight = destinationHeight;
                 float sum = (float) image.getWidth() / (float) image.getHeight();
                 fWidth = Math.round(destinationWidth * sum);
             } else if (image.getWidth() > image.getHeight()) {
-                fWidth = destinationWidth;
                 float sum = (float) image.getHeight() / (float) image.getWidth();
                 fHeight = Math.round(destinationHeight * sum);
             }
-            // else sides are equal and is set to destination size at initialization of
         }
 
         BufferedImage resizedImage = new BufferedImage(fWidth, fHeight, type);

@@ -87,8 +87,8 @@ public class ShoppingCartApi {
             return new ResponseEntity<>(cart, HttpStatus.CREATED);
 
         } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException) {
-                throw (ResourceNotFoundException) e;
+            if (e instanceof ResourceNotFoundException ex) {
+                throw ex;
             } else {
                 throw new ServiceRuntimeException(e);
             }
@@ -118,8 +118,8 @@ public class ShoppingCartApi {
             return cart;
 
         } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException) {
-                throw (ResourceNotFoundException) e;
+            if (e instanceof ResourceNotFoundException ex) {
+                throw ex;
             } else {
                 throw new ServiceRuntimeException(e);
             }

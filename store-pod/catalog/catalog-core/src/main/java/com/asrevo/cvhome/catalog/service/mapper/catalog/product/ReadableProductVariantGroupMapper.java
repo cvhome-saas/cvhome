@@ -11,19 +11,14 @@ import com.asrevo.cvhome.catalog.model.product.product.variantGroup.ReadableProd
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Component
 public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantGroup, ReadableProductVariantGroup> {
 
     private final ReadableProductVariantMapper readableProductVariantMapper;
 
-    private final ImageFilePath imageUtils;
-
-    public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper,
-                                             ImageFilePath imageUtils) {
+    public ReadableProductVariantGroupMapper(ReadableProductVariantMapper readableProductVariantMapper) {
         this.readableProductVariantMapper = readableProductVariantMapper;
-        this.imageUtils = imageUtils;
     }
 
     @Override
