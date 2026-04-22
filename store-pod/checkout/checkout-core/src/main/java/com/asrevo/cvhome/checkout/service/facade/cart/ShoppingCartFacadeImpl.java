@@ -66,10 +66,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
                     + " is not available or is not properly configured. It contains no" + " inventory");
         }
 
-        if (Objects.nonNull(availability.getDateAvailable()) && Instant.now().isAfter(availability.getDateAvailable())) {
-            throw new ServiceException("Item with sku " + availability.getSku() + " is not available");
-        }
-
         FinalPriceCalc price = detailedProduct.price();
 
         ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(availability.getSku(),
