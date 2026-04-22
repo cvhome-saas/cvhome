@@ -66,7 +66,7 @@ public class PermissionAccessChecker {
         if (storeRoleAccessChecker.isScopeStorePod(authentication, pod)) {
             return true;
         }
-        log.info("User {} does not have store scope with roles {}", authentication.getName(),
+        log.info("User {} does not have store pod scope with roles {}", authentication.getName(),
                 SecurityUtils.getRoles(authentication));
         return false;
     }
