@@ -81,7 +81,6 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
-/*
 
 node {
     version = '23.8.0'
@@ -102,4 +101,4 @@ tasks.named('processResources') {
 
 tasks.named('clean') {
     delete "${project.projectDir}/src/main/resources/static"
-}*/
+}
