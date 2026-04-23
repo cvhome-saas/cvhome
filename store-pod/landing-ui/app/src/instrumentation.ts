@@ -14,6 +14,7 @@ const metricExporter = new OTLPMetricExporter({});
 // Create the OpenTelemetry SDK
 const sdk = new NodeSDK({
     traceExporter,
+    serviceName: "landing-ui",
     metricReader: new PeriodicExportingMetricReader({
         exporter: metricExporter,
         exportIntervalMillis: 60000, // Export metrics every 60 seconds
