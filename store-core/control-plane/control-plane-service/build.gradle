@@ -48,6 +48,8 @@ dependencies {
 
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
+	runtimeOnly libs.micrometer.registry.otlp
+
     implementation libs.stripe.java
     implementation libs.gson
 
@@ -85,6 +87,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
-        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.23.0")
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.27.0")
     }
 }

@@ -58,6 +58,7 @@ spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-te
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache", version.ref = "springBoot" }
 
 io-opentelemetry-instrumentation-opentelemetry-spring-boot-starter = { module = "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"}
+micrometer-registry-otlp = { module = "io.micrometer:micrometer-registry-otlp" }
 
 spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "springCloudCommons" }
 spring-cloud-starter-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux", version.ref = "springCloudCommons" }
