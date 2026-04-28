@@ -47,6 +47,7 @@ dependencies {
 	runtimeOnly libs.postgresql
 
     implementation libs.spring.boot.starter.opentelemetry
+    implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
 
     implementation libs.stripe.java
@@ -86,5 +87,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
+		mavenBom "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.27.0"
     }
 }
