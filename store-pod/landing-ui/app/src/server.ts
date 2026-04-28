@@ -23,10 +23,31 @@ function getTheme(req: Request) {
     return themeName.toLowerCase();
 }
 
+function getLocaleFromCookie(req: Request): string | undefined {
+    const cookieHeader = req.headers.cookie;
+    if (!cookieHeader) return undefined;
+
+    const cookies = cookieHeader.split(';').reduce((acc: Record<string, string>, cookie) => {
+        const [name, ...rest] = cookie.split('=');
+        acc[name.trim()] = rest.join('=').trim();
+        return acc;
+    }, {});
+
+    return cookies['NEXT_LOCALE'];
+}
+
 app.get(/(.*)/, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const storeId = req.headers['store-id'];
         if (storeId) {
+            const defaultLanguage = req.headers['default-language'];
+            const localeFromCookie = getLocaleFromCookie(req);
+            const targetLanguage = localeFromCookie || defaultLanguage;
+
+            if ((req.path === '/' || req.path === '') && targetLanguage) {
+                res.redirect(`/${targetLanguage}`);
+                return;
+            }
             const theme = getTheme(req);
             const nextApp = await templateManager.getApp(theme);
             const handle = nextApp.getRequestHandler();
