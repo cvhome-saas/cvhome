@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 
+import com.asrevo.cvhome.commons.http.HttpClientCustomizer;
 import com.asrevo.cvhome.uaa.exception.ApiException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -41,10 +42,15 @@ public class OAuth2TokenManager {
     private Instant expiryTime;
 
     public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret) {
+        this(baseUrl, clientId, clientSecret, null);
+    }
+
+    public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret, HttpClientCustomizer customizer) {
         this.tokenEndpoint = baseUrl + "/oauth2/token";
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.httpClient = HttpClient.newBuilder().build();
+        HttpClient.Builder builder = HttpClient.newBuilder();
+        this.httpClient = (customizer != null) ? customizer.customize(builder) : builder.build();
         this.objectMapper = new ObjectMapper();
     }
 

@@ -4,6 +4,7 @@ springDataCommons = "4.0.1"
 springDependencyManagement = "1.1.7"
 springWeb = "7.0.2"
 springCloudCommons = "5.0.0"
+opentelemetry="2.27.0-alpha"
 springdoc = "3.0.1"
 hibernate = "7.2.0.Final"
 postgresql = "42.7.8"
@@ -62,6 +63,8 @@ spring-boot-starter-restclient-test = { module = "org.springframework.boot:sprin
 
 io-opentelemetry-instrumentation-opentelemetry-spring-boot-starter = { module = "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"}
 spring-boot-starter-opentelemetry = { module = "org.springframework.boot:spring-boot-starter-opentelemetry"}
+io-opentelemetry-java-http-client = { module = "io.opentelemetry.instrumentation:opentelemetry-java-http-client", version.ref="opentelemetry" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref="opentelemetry" }
 
 spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "springCloudCommons" }
 spring-cloud-starter-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux", version.ref = "springCloudCommons" }

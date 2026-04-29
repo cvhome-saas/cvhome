@@ -3,6 +3,7 @@ package com.asrevo.cvhome.uaa.sdk;
 import java.net.http.HttpRequest;
 import java.util.Map;
 
+import com.asrevo.cvhome.commons.http.HttpClientCustomizer;
 import com.asrevo.cvhome.uaa.sdk.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.sdk.dto.ClientSummary;
 import com.asrevo.cvhome.uaa.sdk.dto.PageRequest;
@@ -22,6 +23,11 @@ public class AdminClientClient extends AbstractAdminClient {
 
     public AdminClientClient(String baseUrl, String clientId, String clientSecret) {
         super(baseUrl, clientId, clientSecret);
+        this.clientsApiUrl = baseUrl + "/api/v1/admin/clients";
+    }
+
+    public AdminClientClient(String baseUrl, String clientId, String clientSecret, HttpClientCustomizer customizer) {
+        super(baseUrl, clientId, clientSecret, customizer);
         this.clientsApiUrl = baseUrl + "/api/v1/admin/clients";
     }
 

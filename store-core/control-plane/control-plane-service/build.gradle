@@ -48,6 +48,7 @@ dependencies {
 
     implementation libs.spring.boot.starter.opentelemetry
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
+    implementation libs.io.opentelemetry.java.http.client
 
 
     implementation libs.stripe.java

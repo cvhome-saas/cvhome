@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import com.asrevo.cvhome.commons.http.HttpClientCustomizer;
 import com.asrevo.cvhome.uaa.sdk.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageRequest;
 import com.asrevo.cvhome.uaa.sdk.dto.PageResponse;
@@ -29,6 +30,11 @@ public class AdminUserClient extends AbstractAdminClient {
 
     public AdminUserClient(String baseUrl, String clientId, String clientSecret) {
         super(baseUrl, clientId, clientSecret);
+        this.usersApiUrl = baseUrl + "/api/v1/admin/users";
+    }
+
+    public AdminUserClient(String baseUrl, String clientId, String clientSecret, HttpClientCustomizer customizer) {
+        super(baseUrl, clientId, clientSecret, customizer);
         this.usersApiUrl = baseUrl + "/api/v1/admin/users";
     }
 

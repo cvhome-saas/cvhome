@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import com.asrevo.cvhome.commons.http.HttpClientCustomizer;
 import com.asrevo.cvhome.uaa.exception.ApiException;
 import com.asrevo.cvhome.uaa.sdk.dto.PageResponse;
 
@@ -22,8 +23,13 @@ public abstract class AbstractAdminClient {
     protected final ObjectMapper objectMapper;
 
     protected AbstractAdminClient(String baseUrl, String clientId, String clientSecret) {
-        this.tokenManager = new OAuth2TokenManager(baseUrl, clientId, clientSecret);
-        this.httpClient = HttpClient.newBuilder().build();
+        this(baseUrl, clientId, clientSecret, null);
+    }
+
+    protected AbstractAdminClient(String baseUrl, String clientId, String clientSecret, HttpClientCustomizer customizer) {
+        this.tokenManager = new OAuth2TokenManager(baseUrl, clientId, clientSecret, customizer);
+        HttpClient.Builder builder = HttpClient.newBuilder();
+        this.httpClient = (customizer != null) ? customizer.customize(builder) : builder.build();
         this.objectMapper = new ObjectMapper()/* .registerModule(new JavaTimeModule()) */;
     }
 

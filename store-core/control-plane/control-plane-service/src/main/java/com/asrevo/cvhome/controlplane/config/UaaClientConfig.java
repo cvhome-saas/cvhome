@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.uaa.sdk.AdminUserClient;
+import com.asrevo.cvhome.commons.http.HttpClientCustomizer;
 import com.asrevo.cvhome.uaa.service.UserAccountService;
 import com.asrevo.cvhome.uaa.service.impl.UserAccountServiceImpl;
 
@@ -17,8 +18,8 @@ public class UaaClientConfig {
 
     @SneakyThrows
     @Bean
-    public UserAccountService userAccountService(UaaClientConfigProperties properties) {
-        var client = new AdminUserClient(properties.baseUrl(), properties.clientId(), properties.clientSecret());
+    public UserAccountService userAccountService(UaaClientConfigProperties properties, HttpClientCustomizer customizer) {
+        var client = new AdminUserClient(properties.baseUrl(), properties.clientId(), properties.clientSecret(), customizer);
         return new UserAccountServiceImpl(client);
     }
 
