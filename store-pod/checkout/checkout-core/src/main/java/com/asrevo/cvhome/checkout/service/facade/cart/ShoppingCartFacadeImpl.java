@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -64,10 +63,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (!availability.isCanBePurchased()) {
             throw new ServiceException("Product with sku " + availability.getSku()
                     + " is not available or is not properly configured. It contains no" + " inventory");
-        }
-
-        if (Objects.nonNull(availability.getDateAvailable()) && Instant.now().isAfter(availability.getDateAvailable())) {
-            throw new ServiceException("Item with sku " + availability.getSku() + " is not available");
         }
 
         FinalPriceCalc price = detailedProduct.price();

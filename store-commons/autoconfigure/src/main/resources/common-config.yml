@@ -151,6 +151,11 @@ springdoc:
   api-docs:
     path: /api-docs
 management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    enable:
+      jvm: false
   observations:
     key-values:
       application: ${spring.application.name}
@@ -179,6 +184,12 @@ otel:
       service:
         name: ${spring.application.name}
   instrumentation:
+    runtime-metrics:
+      enabled: false
+    jvm-metrics:
+      enabled: false
+    micrometer:
+      enabled: true
     spring-webmvc:
       experimental-span-attributes: true
     spring-cloud-gateway:
