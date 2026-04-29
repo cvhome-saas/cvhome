@@ -2,9 +2,6 @@
 	debug
 	admin 0.0.0.0:2019
 
-	tracing {
-	}
-
 	log {
 		format json
 		level ERROR
