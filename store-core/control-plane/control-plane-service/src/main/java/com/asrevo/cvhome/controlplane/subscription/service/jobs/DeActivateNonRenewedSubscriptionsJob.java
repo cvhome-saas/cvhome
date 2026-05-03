@@ -12,6 +12,9 @@ import com.asrevo.cvhome.controlplane.subscription.commons.command.DeActivateNon
 import com.asrevo.cvhome.controlplane.subscription.domain.SubscriptionEntity;
 import com.asrevo.cvhome.controlplane.subscription.repository.SubscriptionRepository;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,15 +27,20 @@ public class DeActivateNonRenewedSubscriptionsJob {
 
     private final EventProcessor eventProcessor;
 
+    private final ObservationRegistry observationRegistry;
+
     @Scheduled(cron = "0 */5 * * * *")
     void execute() {
-        log.info("Running Deactivating non-renewed subscriptions Job at {}", Instant.now());
-        List<SubscriptionEntity> subscriptions = subscriptionRepository
-                .findAllByStatusAndEndDateBefore(SubscriptionStatus.ACTIVE, Instant.now());
-        subscriptions.forEach(subscription -> {
-            log.info("Firing Locking non-renewed subscription {}", subscription.getId());
-            eventProcessor.process(DeActivateNonRenewedSubscriptionCommand.from(subscription.getId()));
-        });
+        Observation.createNotStarted("cvhome.controlplane.deactivate-non-renewed-subscriptions", observationRegistry)
+                .observe(() -> {
+                    log.info("Running Deactivating non-renewed subscriptions Job at {}", Instant.now());
+                    List<SubscriptionEntity> subscriptions = subscriptionRepository
+                            .findAllByStatusAndEndDateBefore(SubscriptionStatus.ACTIVE, Instant.now());
+                    subscriptions.forEach(subscription -> {
+                        log.info("Firing Locking non-renewed subscription {}", subscription.getId());
+                        eventProcessor.process(DeActivateNonRenewedSubscriptionCommand.from(subscription.getId()));
+                    });
+                });
     }
 
 }
