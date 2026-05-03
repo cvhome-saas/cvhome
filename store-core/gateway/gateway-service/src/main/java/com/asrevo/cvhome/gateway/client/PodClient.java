@@ -52,7 +52,7 @@ public class PodClient implements RouteDefinitionRepository {
     private final ObservationRegistry observationRegistry;
 
     @Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
-    public void f() {
+    public void refreshRoutes() {
         Observation.createNotStarted("cvhome.gateway.refresh-routes", observationRegistry)
                 .observe(() -> publisher.publishEvent(new RefreshRoutesEvent(this)));
     }
