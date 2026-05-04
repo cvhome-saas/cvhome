@@ -34,7 +34,7 @@ developer seeking a powerful e-commerce framework, `cvhome` offers the tools to 
 
 ## History
 
-`cvhome` builds upon the foundation laid by the excellent open-source e-commerce project, **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)**.
+`cvhome` builds upon the foundation laid by the excellent open-source e-commerce project, **[Shopizer](https://github.com/cvhome-saas/shopizer)**.
 
 While leveraging core e-commerce concepts and potentially some code structures inspired by Shopizer,
 `cvhome` significantly enhances and refactors the architecture to introduce robust **Software-as-a-Service (SaaS)**
