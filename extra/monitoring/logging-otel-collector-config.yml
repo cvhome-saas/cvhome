@@ -6,6 +6,10 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+connectors:
+  servicegraph:
+  spanmetrics:
+
 processors:
   batch/traces:
     send_batch_size: 40
@@ -75,10 +79,10 @@ service:
     traces:
       receivers: [ otlp ]
       processors: [ memory_limiter, batch/traces ]
-      exporters: [ otlp/tempo ]
+      exporters: [ otlp/tempo, servicegraph, spanmetrics ]
 
     metrics:
-      receivers: [ otlp ]
+      receivers: [ otlp, servicegraph, spanmetrics ]
       processors: [ memory_limiter, filter/drop_metrics, batch/metrics ]
       exporters: [ prometheus ]
 
