@@ -5,6 +5,32 @@ import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-
 import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics';
 import {Context, propagation, TextMapGetter, TextMapPropagator, TextMapSetter} from '@opentelemetry/api';
 import {CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator} from '@opentelemetry/core';
+import {DetectedResource, emptyResource, envDetector, hostDetector, osDetector, ResourceDetector, ResourceDetectionConfig, serviceInstanceIdDetector} from '@opentelemetry/resources';
+
+const EXCLUDED_RESOURCE_KEYS = new Set([
+    'process.command', 'process.command_args', 'process.command_line',
+    'process.executable.name', 'process.executable.path', 'process.owner',
+    'process.parent_pid', 'process.pid',
+    'process.runtime.description', 'process.runtime.name', 'process.runtime.version',
+    'telemetry.distro.name', 'telemetry.distro.version',
+    'telemetry.sdk.language', 'telemetry.sdk.name', 'telemetry.sdk.version',
+    'os.version', 'os.description', 'os.type',
+]);
+
+function withKeyFilter(detector: ResourceDetector): ResourceDetector {
+    return {
+        detect(config?: ResourceDetectionConfig): DetectedResource {
+            const {attributes, ...rest} = detector.detect(config);
+            if (!attributes) return {attributes, ...rest};
+            return {
+                ...rest,
+                attributes: Object.fromEntries(
+                    Object.entries(attributes).filter(([k]) => !EXCLUDED_RESOURCE_KEYS.has(k))
+                ),
+            };
+        },
+    };
+}
 
 class BrowserSourcePropagator implements TextMapPropagator {
     private readonly _baggage = new W3CBaggagePropagator();
@@ -35,6 +61,8 @@ const metricExporter = new OTLPMetricExporter({});
 const sdk = new NodeSDK({
     traceExporter,
     serviceName: "landing-ui",
+    resource: emptyResource(),
+    resourceDetectors: [envDetector, hostDetector, osDetector, serviceInstanceIdDetector].map(withKeyFilter),
     textMapPropagator: new CompositePropagator({
         propagators: [new W3CTraceContextPropagator(), new BrowserSourcePropagator()],
     }),
