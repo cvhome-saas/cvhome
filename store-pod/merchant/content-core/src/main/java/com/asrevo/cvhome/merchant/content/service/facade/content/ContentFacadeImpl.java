@@ -50,7 +50,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ContentFacadeImpl implements ContentFacade {
 
-    public static final String FILE_CONTENT_DELIMETER = "/";
+    public static final String FILE_CONTENT_DELIMITER = "/";
+
+    private static final String NO_PAGE_FOUND = "No page found : ";
+    private static final String ERR_ALREADY_EXIST = "%s with code [%s] already exist for store [%s]";
+    private static final String ERR_DOES_NOT_EXIST = "Page with id [%s] does not exist for store [%s]";
 
     private final ContentService contentService;
 
@@ -167,8 +171,9 @@ public class ContentFacadeImpl implements ContentFacade {
         return contentModel;
     }
 
-    private List<ContentDescription> buildDescriptions(Content contentModel,
-                                                       List<com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription> persistableDescriptions) {
+    private List<ContentDescription> buildDescriptions(
+            Content contentModel,
+            List<com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription> persistableDescriptions) {
         List<ContentDescription> descriptions = new ArrayList<>();
         for (com.asrevo.cvhome.merchant.content.model.content.common.ContentDescription objectContent : persistableDescriptions) {
             ContentDescription contentDescription = null;
@@ -208,7 +213,7 @@ public class ContentFacadeImpl implements ContentFacade {
         } else {
             content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store));
         }
-        return content.orElseThrow(() -> new ResourceNotFoundException("No page found : " + code));
+        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + code));
     }
 
     @SneakyThrows
@@ -250,7 +255,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
             try (InputStream targetStream = new ByteArrayInputStream(payload)) {
 
-                String type = file.getContentType().split(FILE_CONTENT_DELIMETER)[0];
+                String type = file.getContentType().split(FILE_CONTENT_DELIMITER)[0];
                 FileContentType fileType = getFileContentType(type);
 
                 InputContentFile cmsContent = new InputContentFile();
@@ -291,7 +296,7 @@ public class ContentFacadeImpl implements ContentFacade {
             content = contentService.getByCodeFetchAllLanguages(page.getCode(), merchantStore);
             if (content != null) {
                 throw new ConstraintException(
-                        "Page with code [" + page.getCode() + "] already exist for store [" + merchantStore + "]");
+                        String.format(ERR_ALREADY_EXIST, "Page", page.getCode(), merchantStore));
             }
 
             content = convertContentPageToContent(merchantStore, content, page);
@@ -309,8 +314,8 @@ public class ContentFacadeImpl implements ContentFacade {
 
             content = contentService.getByCodeFetchAllLanguages(box.getCode(), merchantStore);
             if (content != null) {
-                throw new ConstraintException("Content box with code [" + box.getCode() + "] already exist for store ["
-                        + merchantStore + "]");
+                throw new ConstraintException(
+                        String.format(ERR_ALREADY_EXIST, "Content box", box.getCode(), merchantStore));
             }
             box.setId(null);
             content = convertContentBoxToContent(merchantStore, content, box);
@@ -339,7 +344,7 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language) {
         Content content = contentService.findBySeUrl(store, name, language)
-                .orElseThrow(() -> new ResourceNotFoundException("No page found : " + name));
+                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + name));
 
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         return populator.populate(content, store, language);
@@ -354,7 +359,7 @@ public class ContentFacadeImpl implements ContentFacade {
             content = contentService.getById(id, merchantStore);
             if (content == null) {
                 throw new ConstraintException(
-                        "Page with id [" + id + "] does not exist for store [" + merchantStore + "]");
+                        String.format(ERR_DOES_NOT_EXIST, id, merchantStore));
             }
 
             page.setId(id);
@@ -375,7 +380,7 @@ public class ContentFacadeImpl implements ContentFacade {
             content = contentService.getById(id, merchantStore);
             if (content == null) {
                 throw new ConstraintException(
-                        "Page with id [" + id + "] does not exist for store [" + merchantStore + "]");
+                        String.format(ERR_DOES_NOT_EXIST, id, merchantStore));
             }
 
             box.setId(id);

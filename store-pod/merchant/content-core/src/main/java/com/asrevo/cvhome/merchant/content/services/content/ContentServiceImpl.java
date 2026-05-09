@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
 
+    private static final String ERR_CONVERT_IMAGE = "Error while trying to convert input stream to buffered image";
+
     private final ContentAssetsManager assetsManager;
 
     private final ContentRepository contentRepository;
@@ -149,7 +151,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
             assetsManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
-            log.error("Error while trying to convert input stream to buffered image", e);
+            log.error(ERR_CONVERT_IMAGE, e);
             throw new ServiceException(e);
 
         } finally {
@@ -172,7 +174,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
             assetsManager.addFile(merchantStoreCode, path, contentImage);
 
         } catch (Exception e) {
-            log.error("Error while trying to convert input stream to buffered image", e);
+            log.error(ERR_CONVERT_IMAGE, e);
             throw new ServiceException(e);
 
         } finally {
@@ -270,7 +272,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * Merchant store or will return empty list if no image is associated with given
      * Merchant Store in Infinispan tree cache.
      *
-     * @return list of {@link List<OutputContentFile>}
+     * @return list of {@link OutputContentFile}
      */
     @Override
     public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)

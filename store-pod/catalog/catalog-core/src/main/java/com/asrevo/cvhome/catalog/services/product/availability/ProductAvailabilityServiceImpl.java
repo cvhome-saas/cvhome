@@ -59,7 +59,7 @@ public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImp
 
     @Override
     public Optional<ProductAvailability> getById(Long availabilityId, StoreMerchantId store) {
-        return Optional.ofNullable(productAvailabilityRepository.getById(availabilityId));
+        return productAvailabilityRepository.findProductAvailabilityById(availabilityId);
     }
 
     @Override

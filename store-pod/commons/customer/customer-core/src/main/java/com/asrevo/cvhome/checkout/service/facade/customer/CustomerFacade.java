@@ -31,8 +31,7 @@ public interface CustomerFacade {
      */
     ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language);
 
-    Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language)
-            ;
+    Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language);
 
     ReadableCustomerList getListByStore(StoreMerchantId store, CustomerCriteria criteria, LanguageCode language);
 

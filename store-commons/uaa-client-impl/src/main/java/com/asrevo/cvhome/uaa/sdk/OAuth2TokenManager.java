@@ -26,6 +26,8 @@ public class OAuth2TokenManager {
 
     private static final String ACCEPT_HEADER = "Accept";
 
+    private static final String ERR_TOKEN_REQUEST = "Error during token request";
+
     private final String tokenEndpoint;
 
     private final String clientId;
@@ -99,10 +101,10 @@ public class OAuth2TokenManager {
             currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
             expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());
         } catch (IOException e) {
-            throw new ApiException("Error during token request", e);
+            throw new ApiException(ERR_TOKEN_REQUEST, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ApiException("Error during token request", e);
+            throw new ApiException(ERR_TOKEN_REQUEST, e);
         }
     }
 
