@@ -70,6 +70,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderFacadeImpl implements OrderFacade {
 
+    private static final String ORDER_NOT_FOUND_BY_ID_MESSAGE = "Order not found with id {}";
+    private static final String CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE = "Customer id {} not found in order {}";
+    private static final String ERROR_WHILE_GETTING_ORDER_MESSAGE = "Error while getting order [{}]";
+    private static final String ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE = "Order id [{}] not found for merchand [{}]";
+    private static final String ORDER_DOES_NOT_EXIST_FOR_MERCHANT_MESSAGE = "Order with id [{}] does not exist for merchant [{}]";
+
     private final ShoppingCartService shoppingCartService;
 
     private final ShoppingCartFacade shoppingCartFacade;
@@ -311,7 +317,7 @@ public class OrderFacadeImpl implements OrderFacade {
     public ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language) {
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
-            throw new ResourceNotFoundException("Order not found with id " + orderId);
+            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace("{}", orderId.toString()));
         }
 
         ReadableOrder readableOrder = new ReadableOrder();
@@ -320,7 +326,7 @@ public class OrderFacadeImpl implements OrderFacade {
         if (customerId != null) {
             ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
             if (readableCustomer == null) {
-                log.warn("Customer id {} not found in order {}", customerId, orderId);
+                log.warn(CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE, customerId, orderId);
             } else {
                 readableOrder.setCustomer(readableCustomer);
             }
@@ -340,7 +346,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
             readableOrder.setProducts(orderProducts);
         } catch (Exception _) {
-            throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
+            throw new ServiceRuntimeException(ERROR_WHILE_GETTING_ORDER_MESSAGE.replace("{}", orderId.toString()));
         }
 
         return readableOrder;
@@ -350,17 +356,18 @@ public class OrderFacadeImpl implements OrderFacade {
     public ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language) {
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
-            throw new ResourceNotFoundException("Order not found with id " + orderId);
+            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace("{}", orderId.toString()));
         }
         if (modelOrder.getCustomerId() == null || !modelOrder.getCustomerId().equals(customerId)) {
-            throw new ResourceNotFoundException("Order not found with id " + orderId + " for customer " + customerId);
+            throw new ResourceNotFoundException(
+                    ORDER_NOT_FOUND_BY_ID_MESSAGE.replace("{}", orderId.toString()) + " for customer " + customerId);
         }
 
         ReadableOrder readableOrder = new ReadableOrder();
 
         ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
         if (readableCustomer == null) {
-            log.warn("Customer id {} not found in order {}", customerId, orderId);
+            log.warn(CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE, customerId, orderId);
         } else {
             readableOrder.setCustomer(readableCustomer);
         }
@@ -379,7 +386,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
             readableOrder.setProducts(orderProducts);
         } catch (Exception _) {
-            throw new ServiceRuntimeException("Error while getting order [" + orderId + "]");
+            throw new ServiceRuntimeException(ERROR_WHILE_GETTING_ORDER_MESSAGE.replace("{}", orderId.toString()));
         }
 
         return readableOrder;
@@ -391,7 +398,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
         Order order = orderService.getOrder(orderId, store);
         if (order == null) {
-            throw new ResourceNotFoundException("Order id [" + orderId + "] not found for merchand [" + store + "]");
+            throw new ResourceNotFoundException(
+                    ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE.replace("{}", orderId.toString()).replace("{}", store.toString()));
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
@@ -404,11 +412,13 @@ public class OrderFacadeImpl implements OrderFacade {
 
         Order order = orderService.getOrder(orderId, store);
         if (order == null) {
-            throw new ResourceNotFoundException("Order id [" + orderId + "] not found for merchand [" + store + "]");
+            throw new ResourceNotFoundException(
+                    ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE.replace("{}", orderId.toString()).replace("{}", store.toString()));
         }
 
         if (order.getCustomerId() == null || !order.getCustomerId().equals(customerId)) {
-            throw new ResourceNotFoundException("Order not found with id " + orderId + " for customer " + customerId);
+            throw new ResourceNotFoundException(
+                    ORDER_NOT_FOUND_BY_ID_MESSAGE.replace("{}", orderId.toString()) + " for customer " + customerId);
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
@@ -431,7 +441,7 @@ public class OrderFacadeImpl implements OrderFacade {
         Order order = orderService.getOrder(id, store);
         if (order == null) {
             throw new ResourceNotFoundException(
-                    "Order with id [" + id + "] does not exist for merchant [" + store + "]");
+                    ORDER_DOES_NOT_EXIST_FOR_MERCHANT_MESSAGE.replace("{}", id.toString()).replace("{}", store.toString()));
         }
 
         try {
