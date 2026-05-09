@@ -20,9 +20,6 @@ import com.asrevo.cvhome.controlplane.pod.api.ExternalPodClient;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,12 +46,9 @@ public class PodClient implements RouteDefinitionRepository {
 
     private final ApplicationEventPublisher publisher;
 
-    private final ObservationRegistry observationRegistry;
-
     @Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
     public void refreshRoutes() {
-        Observation.createNotStarted("cvhome.gateway.refresh-routes", observationRegistry)
-                .observe(() -> publisher.publishEvent(new RefreshRoutesEvent(this)));
+        publisher.publishEvent(new RefreshRoutesEvent(this));
     }
 
     public Flux<Pod> getPods() {
