@@ -1,12 +1,12 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api project(':store-pod:commons:store-commons')
-	implementation libs.aws.sdk.s3
-	implementation libs.commons.io
-	compileOnly libs.apache.commons.lang3
-	compileOnly libs.lombok
-	annotationProcessor libs.lombok
+    api project(':store-pod:commons:store-commons')
+    implementation libs.aws.sdk.s3
+    implementation libs.commons.io
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 }
