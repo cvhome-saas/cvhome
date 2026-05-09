@@ -1,3 +1,4 @@
+import path from 'path';
 import {NextConfig} from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
@@ -6,7 +7,9 @@ const nextConfig: NextConfig = {
     images: {
         unoptimized: true
     },
-
+    turbopack: {
+        root: path.join(__dirname, '../..'),
+    },
 };
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 export default withNextIntl(nextConfig);
