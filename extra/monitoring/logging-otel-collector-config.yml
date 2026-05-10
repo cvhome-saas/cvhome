@@ -6,6 +6,10 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+connectors:
+  servicegraph:
+  spanmetrics:
+
 processors:
   batch/traces:
     send_batch_size: 40
@@ -22,6 +26,33 @@ processors:
     send_batch_max_size: 60
     timeout: 1s
 
+  filter/drop_metrics:
+    error_mode: ignore
+    metrics:
+      metric:
+#        - IsMatch(name, "^http.*")
+#        - IsMatch(name, "^application.*")
+#        - IsMatch(name, "^jvm.*")
+#        - IsMatch(name, "^system.*")
+#        - IsMatch(name, "^process.*")
+#        - IsMatch(name, "^jdbc.*")
+#        - IsMatch(name, "^hikaricp.*")
+
+        - IsMatch(name, "^spring.*")
+        - IsMatch(name, "^processedLogs.*")
+        - IsMatch(name, "^disk.*")
+        - IsMatch(name, "^tomcat.*")
+        - IsMatch(name, "^nodejs.*")
+        - IsMatch(name, "^logback.*")
+        - IsMatch(name, "^executor.*")
+        - IsMatch(name, "^tasks.*")
+        - IsMatch(name, "^v8js.*")
+
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 4000
+    spike_limit_mib: 500
+
 exporters:
   debug:
     verbosity: normal
@@ -37,20 +68,26 @@ exporters:
 
   prometheus:
     endpoint: 0.0.0.0:8889
+    resource_to_telemetry_conversion:
+      enabled: true
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
 
 service:
+  extensions: [health_check]
   pipelines:
     traces:
       receivers: [ otlp ]
-      processors: [ batch/traces ]
-      exporters: [ otlp/tempo ]
+      processors: [ memory_limiter, batch/traces ]
+      exporters: [ otlp/tempo, servicegraph, spanmetrics ]
 
     metrics:
-      receivers: [ otlp ]
-      processors: [ batch/metrics ]
+      receivers: [ otlp, servicegraph, spanmetrics ]
+      processors: [ memory_limiter, filter/drop_metrics, batch/metrics ]
       exporters: [ prometheus ]
 
     logs:
       receivers: [ otlp ]
-      processors: [batch/logs ]
+      processors: [memory_limiter, batch/logs ]
       exporters: [ otlphttp/loki ]

@@ -154,11 +154,18 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+      service.version: ${version}
     enable:
       jvm: false
   observations:
     key-values:
       application: ${spring.application.name}
+      service.version: ${version}
+    enable:
+      spring.security.filterchains: false
+      spring.security.authorizations: false
+      spring.security.authentications: false
+      spring.security.http: false
   info:
     env:
       enabled: true
@@ -181,8 +188,10 @@ otel:
     disabled: true
   resource:
     attributes:
-      service:
-        name: ${spring.application.name}
+      service.name: ${spring.application.name}
+      service.version: ${version}
+    disabled:
+      keys: process.command,process.command_args,process.command_line,process.executable.name,process.executable.path,process.owner,process.parent_pid,process.pid,process.runtime.description,process.runtime.name,process.runtime.version,telemetry.distro.name,telemetry.distro.version,telemetry.sdk.language,telemetry.sdk.name,telemetry.sdk.version,os.version,os.description,os.type
   instrumentation:
     runtime-metrics:
       enabled: false
@@ -190,12 +199,6 @@ otel:
       enabled: false
     micrometer:
       enabled: true
-    spring-webmvc:
-      experimental-span-attributes: true
-    spring-cloud-gateway:
-      experimental-span-attributes: true
-    spring-webflux:
-      experimental-span-attributes: true
 logging:
   level:
     com.asrevo: DEBUG

@@ -33,6 +33,7 @@ public class DeActivateNonRenewedSubscriptionsJob {
             log.info("Firing Locking non-renewed subscription {}", subscription.getId());
             eventProcessor.process(DeActivateNonRenewedSubscriptionCommand.from(subscription.getId()));
         });
+
     }
 
 }
