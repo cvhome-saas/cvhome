@@ -1,0 +1,17 @@
+{
+  "name": "@myproject/lib",
+  "version": "1.0.0",
+  "description": "Shared JavaScript/TypeScript library for myproject",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
