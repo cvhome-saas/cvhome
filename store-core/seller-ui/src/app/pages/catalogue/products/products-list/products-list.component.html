@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.PRODUCTS' | translate }}</h1>
@@ -8,8 +8,8 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="success" [routerLink]="['/pages/catalogue/products/create-product']"
-                [disabled]="params.store==undefined||params.store==''">
+        <button [disabled]="params.store==undefined||params.store==''" [routerLink]="['/pages/catalogue/products/create-product']" nbButton
+                status="success">
           <label>{{ 'COMPONENTS.CREATE_PRODUCT' | translate }}</label>
         </button>
 
@@ -30,7 +30,8 @@
         <div class="col-md-3">
           <nb-form-field>
             <nb-icon icon="bookmark-outline" nbPrefix></nb-icon>
-            <nb-select [(ngModel)]="filter.available" fullWidth placeholder="{{ 'PRODUCT.FILTER_AVAILABLE' | translate }}">
+            <nb-select [(ngModel)]="filter.available" fullWidth
+                       placeholder="{{ 'PRODUCT.FILTER_AVAILABLE' | translate }}">
               <nb-option value="">{{ 'PRODUCT.FILTER_AVAILABLE' | translate }}</nb-option>
               <nb-option value="true">{{ 'PRODUCT.IS_AVAILABLE' | translate }}</nb-option>
               <nb-option value="false">{{ 'PRODUCT.IS_NOT_AVAILABLE' | translate }}</nb-option>
@@ -132,9 +133,11 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary"><nb-icon icon="edit"></nb-icon>
+          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary">
+            <nb-icon icon="edit"></nb-icon>
           </button>
-          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger"><nb-icon icon="trash"></nb-icon>
+          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
+            <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>
       </ngx-datatable-column>

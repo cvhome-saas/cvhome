@@ -34,7 +34,8 @@ const ProductDetailsImageGallery = React.forwardRef<HTMLDivElement, ProductDetai
         return (
             <div ref={ref} className={cn("container mx-auto p-4", className)} {...props}>
                 <div className="mb-4 relative group">
-                    <div className="aspect-[4/5] relative flex items-center justify-center mx-auto overflow-hidden rounded-3xl bg-secondary/30 shadow-xl border border-primary/5">
+                    <div
+                        className="aspect-[4/5] relative flex items-center justify-center mx-auto overflow-hidden rounded-3xl bg-secondary/30 shadow-xl border border-primary/5">
                         <Image
                             src={mainImage.imageUrl}
                             alt={mainImage.imageName}

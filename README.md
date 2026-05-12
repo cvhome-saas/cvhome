@@ -5,9 +5,12 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/cvhome-saas/cvhome)](https://github.com/cvhome-saas/cvhome/releases)
 [![Documentation](https://img.shields.io/badge/docs-cvhome.io-success)](https://cvhome-saas.github.io)
 
-Welcome to **cvhome**, an open-source, multi-tenant e-commerce platform built for scalability and flexibility. It provides a modern foundation of Java/Spring Boot microservices and Next.js/React/Angular frontends to power sophisticated online retail operations.
+Welcome to **cvhome**, an open-source, multi-tenant e-commerce platform built for scalability and flexibility. It
+provides a modern foundation of Java/Spring Boot microservices and Next.js/React/Angular frontends to power
+sophisticated online retail operations.
 
 **Key Features:**
+
 * 🚀 **True Multi-Tenancy:** Manage multiple independent stores with custom domains on shared or isolated infrastructure.
 * 🔧 **Microservices:** Scalable architecture (Auth, Tenant Mgmt, Store Core) for independent development and deployment.
 * ☁️ **Cloud-Native:** Built for AWS (ECS Fargate, RDS) and containerized with Docker.
@@ -15,7 +18,10 @@ Welcome to **cvhome**, an open-source, multi-tenant e-commerce platform built fo
 * 🔓 **Open Source:** Licensed under Apache 2.0 for transparency and easy customization.
 
 ## History
-`cvhome` evolves the single-instance model of **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)** into a scalable, multi-tenant SaaS platform. We've significantly refactored the architecture to introduce robust tenant isolation, cloud-native optimization, and a modernized technology stack.
+
+`cvhome` evolves the single-instance model of **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)** into a
+scalable, multi-tenant SaaS platform. We've significantly refactored the architecture to introduce robust tenant
+isolation, cloud-native optimization, and a modernized technology stack.
 
 ---
 

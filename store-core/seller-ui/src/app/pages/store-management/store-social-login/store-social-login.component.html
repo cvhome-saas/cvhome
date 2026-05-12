@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'STORE.STORE_SOCIAL_LOGIN' | translate }}</h1>
@@ -7,13 +7,13 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="success" (click)="save()"
+        <button (click)="save()" nbButton status="success"
                 type="submit">
           {{ 'COMMON.SAVE'  | translate }}
         </button>
@@ -22,7 +22,7 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="form" [formGroup]="form" (ngSubmit)="save()">
+    <form (ngSubmit)="save()" *ngIf="form" [formGroup]="form">
       <div formArrayName="configs">
         <div *ngFor="let config of configForms.controls; let i=index" [formGroupName]="i" class="provider-config">
           <h6>{{ config.value.providerId }}</h6>
@@ -30,13 +30,13 @@
             <div class="col-sm-4">
               <div class="form-group">
                 <label class="label">{{ 'STORE.SOCIAL_APP_ID' | translate }}</label>
-                <input type="text" nbInput fullWidth formControlName="appId">
+                <input formControlName="appId" fullWidth nbInput type="text">
               </div>
             </div>
             <div class="col-sm-4">
               <div class="form-group">
                 <label class="label">{{ 'STORE.SOCIAL_APP_SECRET' | translate }}</label>
-                <input type="password" nbInput fullWidth formControlName="appSecret">
+                <input formControlName="appSecret" fullWidth nbInput type="password">
               </div>
             </div>
             <div class="col-sm-4">

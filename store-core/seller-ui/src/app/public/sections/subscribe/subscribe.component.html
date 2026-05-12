@@ -7,11 +7,11 @@
           <p class="my-4">{{ message }}</p>
           <form class="subscribe-form">
             <div class="form-group">
-              <input [(ngModel)]="email" name="email" type="email" class="form-control" id="exampleInputEmail1"
-                     aria-describedby="emailHelp"
-                     placeholder="Enter your email">
+              <input [(ngModel)]="email" aria-describedby="emailHelp" class="form-control" id="exampleInputEmail1" name="email"
+                     placeholder="Enter your email"
+                     type="email">
             </div>
-            <button type="button" (click)="sub()" class="btn btn-lg btn-block">Subscribe</button>
+            <button (click)="sub()" class="btn btn-lg btn-block" type="button">Subscribe</button>
           </form>
         </div>
       </div>

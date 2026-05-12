@@ -29,7 +29,8 @@ export const ProductDetailedActionBox = ({storeContext, product}: {
     return (
         <div className="mt-6">
             <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/20 px-4 py-3">
+                <div
+                    className="flex items-center justify-between rounded-xl border border-border bg-secondary/20 px-4 py-3">
                     <div className="min-w-0">
                         <p className="text-xs tracking-[0.22em] uppercase text-muted-foreground">
                             {t('QTY')}

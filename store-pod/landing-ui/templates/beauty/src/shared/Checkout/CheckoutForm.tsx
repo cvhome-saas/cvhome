@@ -72,7 +72,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                 <div className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="firstName"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('FIRST_NAME')}
                             </Label>
                             <Input
@@ -88,7 +89,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="lastName"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('LAST_NAME')}
                             </Label>
                             <Input
@@ -107,7 +109,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="emailAddress" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="emailAddress"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('EMAIL')}
                             </Label>
                             <Input
@@ -123,7 +126,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="phone"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('PHONE')}
                             </Label>
                             <Input
@@ -142,12 +146,15 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="country" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="country"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('COUNTRY')}
                             </Label>
                             <Select onValueChange={(value) => setValue("customer.billing.country", value)}
                                     defaultValue={defaultCheckoutValue.customer.billing.country}>
-                                <SelectTrigger id="country" className="rounded-full border-primary/10 focus:ring-primary/20" aria-invalid={!!errors.customer?.billing?.country}>
+                                <SelectTrigger id="country"
+                                               className="rounded-full border-primary/10 focus:ring-primary/20"
+                                               aria-invalid={!!errors.customer?.billing?.country}>
                                     <SelectValue placeholder={t('SELECT_COUNTRY')}/>
                                 </SelectTrigger>
                                 <SelectContent className="rounded-2xl border-primary/10">
@@ -163,7 +170,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="city" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="city"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('CITY')}
                             </Label>
                             <Input
@@ -179,7 +187,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="postalCode" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                            <Label htmlFor="postalCode"
+                                   className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                                 {t('POSTAL_CODE')}
                             </Label>
                             <Input
@@ -197,7 +206,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="address" className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+                        <Label htmlFor="address"
+                               className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
                             {t('ADDRESS')}
                         </Label>
                         <Textarea
@@ -288,11 +298,13 @@ const CheckoutAgreementDialog = ({box, isOpen, setIsOpen, setIsAgree}: {
                 </AlertDialogHeader>
                 <AlertDialogFooter className="sm:justify-center gap-4">
                     <AlertDialogCancel asChild>
-                        <Button variant="ghost" className="rounded-full px-8 text-muted-foreground hover:bg-secondary/50"
+                        <Button variant="ghost"
+                                className="rounded-full px-8 text-muted-foreground hover:bg-secondary/50"
                                 onClick={handleReject}>{t('REJECT')}</Button>
                     </AlertDialogCancel>
                     <AlertDialogAction asChild>
-                        <Button className="rounded-full px-8 bg-primary hover:bg-primary/90" onClick={handleAgree}>{t('AGREE')}</Button>
+                        <Button className="rounded-full px-8 bg-primary hover:bg-primary/90"
+                                onClick={handleAgree}>{t('AGREE')}</Button>
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -329,8 +341,10 @@ export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
                                 <p className="font-medium text-lg text-primary">
                                     {t('ORDER_PLACED_SUCCESSFULLY')}
                                 </p>
-                                <div className="inline-block px-4 py-2 rounded-full bg-secondary/30 border border-primary/5">
-                                    <strong>{t('ORDER_ID')}:</strong> <span className="font-mono text-primary/80">{order.id}</span>
+                                <div
+                                    className="inline-block px-4 py-2 rounded-full bg-secondary/30 border border-primary/5">
+                                    <strong>{t('ORDER_ID')}:</strong> <span
+                                    className="font-mono text-primary/80">{order.id}</span>
                                 </div>
                             </>
                         ) : (
@@ -339,7 +353,8 @@ export const OrderPlacedSuccessfullyDialog = ({order, isOpen, setIsOpen}: {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="sm:justify-center mt-6">
-                    <AlertDialogAction onClick={handleContinueShopping} className="w-full sm:w-auto rounded-full px-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/10">
+                    <AlertDialogAction onClick={handleContinueShopping}
+                                       className="w-full sm:w-auto rounded-full px-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/10">
                         {t('CONTINUE_SHOPPING')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
@@ -370,8 +385,10 @@ export const LoginRequiredDialog = ({isOpen, setIsOpen, login}: {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="sm:justify-center gap-4 mt-6">
-                    <AlertDialogCancel className="rounded-full px-8 hover:bg-secondary/50 border-primary/10">{t('CANCEL')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={login} className="rounded-full px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/10">
+                    <AlertDialogCancel
+                        className="rounded-full px-8 hover:bg-secondary/50 border-primary/10">{t('CANCEL')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={login}
+                                       className="rounded-full px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/10">
                         {t('LOGIN')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
@@ -385,7 +402,8 @@ export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) 
     const {cart} = useCart(storeContext);
 
     return (
-        <Card className="rounded-3xl border-primary/10 shadow-xl shadow-primary/5 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <Card
+            className="rounded-3xl border-primary/10 shadow-xl shadow-primary/5 bg-card/50 backdrop-blur-sm overflow-hidden">
             <CardHeader className="bg-primary/5 border-b border-primary/5 pb-4">
                 <CardTitle className="font-serif text-xl text-primary">{t('CART_DETAILS')}</CardTitle>
             </CardHeader>

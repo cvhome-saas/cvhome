@@ -34,7 +34,7 @@ export default async function Page({params}: { params: HomePageParams }) {
                     <CoverFlow store={store}/>
                 }
                 {
-                    featuredItems&& featuredItems.active && featuredItems.products && featuredItems.description  && featuredItems.products.length > 0 &&
+                    featuredItems && featuredItems.active && featuredItems.products && featuredItems.description && featuredItems.products.length > 0 &&
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
                         <SectionTitle title={featuredItems.description.name}/>
                         <ProductSwiperGrid storeContext={params.storeContext} products={featuredItems.products}/>

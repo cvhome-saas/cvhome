@@ -22,12 +22,12 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/private/content/box/' + code + '/exists', params);
   }
 
-  updateBox(id,  object: any, param: any) {
-    return this.crudService.put('/spg/merchant/api/v1/private/content/box/' + id , object, param)
+  updateBox(id, object: any, param: any) {
+    return this.crudService.put('/spg/merchant/api/v1/private/content/box/' + id, object, param)
 
   }
 
-  createBox( object: any) {
+  createBox(object: any) {
     return this.crudService.post('/spg/merchant/api/v1/private/content/box', object)
   }
 
@@ -35,7 +35,7 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/content/images')
   }
 
-  deleteImage( e) {
+  deleteImage(e) {
     return this.crudService.delete(`/spg/merchant/api/v1/private/content/?contentType=IMAGE&name=${e}`);
   }
 
@@ -48,17 +48,17 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/private/content/page/' + code + '/exists');
   }
 
-  updatePage(id,  object: any) {
+  updatePage(id, object: any) {
     return this.crudService.put('/spg/merchant/api/v1/private/content/page/' + id, object)
 
   }
 
-  createPage( object: any) {
+  createPage(object: any) {
     return this.crudService.post('/spg/merchant/api/v1/private/content/page', object);
   }
 
   getPage(uniqueCode: string) {
-    return this.crudService.get('/spg/merchant/api/v1/private/content/pages/' + uniqueCode )
+    return this.crudService.get('/spg/merchant/api/v1/private/content/pages/' + uniqueCode)
 
   }
 

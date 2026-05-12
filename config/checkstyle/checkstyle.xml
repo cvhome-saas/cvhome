@@ -4,78 +4,78 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-  <property name="charset" value="UTF-8"/>
-  <property name="severity" value="warning"/>
-  <property name="fileExtensions" value="java, properties, xml"/>
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java, properties, xml"/>
 
-  <module name="LineLength">
-    <property name="max" value="140"/>
-  </module>
-
-  <module name="TreeWalker">
-    <module name="OuterTypeFilename"/>
-    <module name="ArrayTypeStyle"/>
-    <module name="TodoComment"/>
-    <module name="UpperEll"/>
-    <module name="MethodParamPad"/>
-    <module name="ParenPad"/>
-    <module name="ParameterName"/>
-    <module name="ParameterNumber">
-      <property name="max" value="9"/>
-    </module>
-    <module name="TypeName"/>
-    <module name="AvoidStarImport"/>
-    <module name="UnusedImports"/>
-    <module name="NoLineWrap"/>
-    <module name="NeedBraces"/>
-    <module name="LeftCurly"/>
-    <module name="RightCurly"/>
-    <module name="OneStatementPerLine"/>
-    <module name="StringLiteralEquality"/>
-    <module name="EqualsHashCode"/>
-    <module name="DeclarationOrder"/>
-    <module name="MissingSwitchDefault"/>
-    <module name="FallThrough"/>
-    <module name="MissingOverride"/>
-    <module name="PackageDeclaration"/>
-    <module name="HideUtilityClassConstructor"/>
-    <module name="MultipleVariableDeclarations"/>
-
-    <module name="ImportOrder">
-      <property name="groups" value="java,javax,jakarta,org,com,io,software,tools,lombok,reactor"/>
-      <property name="ordered" value="true"/>
-      <property name="separated" value="true"/>
-      <property name="option" value="bottom"/>
+    <module name="LineLength">
+        <property name="max" value="140"/>
     </module>
 
-    <module name="AnnotationLocation">
-      <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
+    <module name="TreeWalker">
+        <module name="OuterTypeFilename"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="TodoComment"/>
+        <module name="UpperEll"/>
+        <module name="MethodParamPad"/>
+        <module name="ParenPad"/>
+        <module name="ParameterName"/>
+        <module name="ParameterNumber">
+            <property name="max" value="9"/>
+        </module>
+        <module name="TypeName"/>
+        <module name="AvoidStarImport"/>
+        <module name="UnusedImports"/>
+        <module name="NoLineWrap"/>
+        <module name="NeedBraces"/>
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+        <module name="OneStatementPerLine"/>
+        <module name="StringLiteralEquality"/>
+        <module name="EqualsHashCode"/>
+        <module name="DeclarationOrder"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="FallThrough"/>
+        <module name="MissingOverride"/>
+        <module name="PackageDeclaration"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="MultipleVariableDeclarations"/>
+
+        <module name="ImportOrder">
+            <property name="groups" value="java,javax,jakarta,org,com,io,software,tools,lombok,reactor"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="bottom"/>
+        </module>
+
+        <module name="AnnotationLocation">
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
+        </module>
+
+        <module name="MissingDeprecated"/>
+        <module name="ModifierOrder"/>
+        <module name="RedundantImport"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="StaticVariableName"/>
+
+        <module name="MethodLength"/>
+        <module name="MultipleStringLiterals"/>
+        <module name="NestedIfDepth"/>
+
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyStatement"/>
+        <module name="GenericWhitespace"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="OperatorWrap"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
     </module>
-
-    <module name="MissingDeprecated"/>
-    <module name="ModifierOrder"/>
-    <module name="RedundantImport"/>
-    <module name="LocalVariableName"/>
-    <module name="MemberName"/>
-    <module name="MethodName"/>
-    <module name="PackageName"/>
-    <module name="StaticVariableName"/>
-
-    <module name="MethodLength"/>
-    <module name="MultipleStringLiterals"/>
-    <module name="NestedIfDepth"/>
-
-    <module name="EmptyForInitializerPad"/>
-    <module name="EmptyStatement"/>
-    <module name="GenericWhitespace"/>
-    <module name="NoWhitespaceAfter"/>
-    <module name="NoWhitespaceBefore"/>
-    <module name="OperatorWrap"/>
-    <module name="TypecastParenPad"/>
-    <module name="WhitespaceAfter"/>
-    <module name="WhitespaceAround"/>
-
-    <module name="AvoidNestedBlocks"/>
-    <module name="EmptyBlock"/>
-  </module>
 </module>

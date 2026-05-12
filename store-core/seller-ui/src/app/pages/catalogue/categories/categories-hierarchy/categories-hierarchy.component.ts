@@ -14,7 +14,7 @@ import {NgcxTreeComponent, NgcxTreeNode} from "@cluetec/ngcx-tree";
 })
 export class CategoriesHierarchyComponent implements OnInit {
   nodes: NgcxTreeNode[] = [];
-  @ViewChild('tree', { static: false })
+  @ViewChild('tree', {static: false})
   ngcxTree: NgcxTreeComponent<NgcxTreeNode>;
 
   loader = false;
@@ -83,11 +83,11 @@ export class CategoriesHierarchyComponent implements OnInit {
   }
 
   onMoveNode(event) {
-    let parentId ;
+    let parentId;
 
     if (event.parent === undefined) {
       parentId = -1;
-    }else {
+    } else {
       parentId = event.parent.id;
     }
 

@@ -9,12 +9,12 @@ CREATE TABLE IF NOT EXISTS manager.manager_org
 );
 CREATE TABLE IF NOT EXISTS manager.manager_store
 (
-    id                 varchar(24)   not null,
-    name               varchar(50)   not null,
-    created_date       timestamp     not null,
-    org_id             varchar(24)   not null,
-    pod_id             varchar(24)   not null,
-    provisioning_state varchar(30)   not null,
+    id                 varchar(24) not null,
+    name               varchar(50) not null,
+    created_date       timestamp   not null,
+    org_id             varchar(24) not null,
+    pod_id             varchar(24) not null,
+    provisioning_state varchar(30) not null,
     version            int,
     constraint manager_store_pk primary key (id),
     constraint manager_store_manager_fk foreign key (org_id) references manager.manager_org (id)
@@ -51,12 +51,12 @@ CREATE TABLE IF NOT EXISTS subscription.subscription_price_plan
 create schema if not exists org;
 CREATE TABLE IF NOT EXISTS org.pod
 (
-    id            varchar(24) not null,
-    name          varchar(50) not null,
+    id            varchar(24)  not null,
+    name          varchar(50)  not null,
     endpoint      varchar(255) not null,
-    endpoint_type varchar(20) not null,
+    endpoint_type varchar(20)  not null,
     org_id        varchar(24),
     version       int,
     constraint pod_pk primary key (id),
     constraint pod_name_uq unique (name)
-    );
+);

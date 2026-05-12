@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'POD.POD_MANAGEMENT' | translate }}</h1>
@@ -8,7 +8,7 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="success" routerLink="/pages/pod-management/create-pod">
+        <button nbButton routerLink="/pages/pod-management/create-pod" status="success">
           <label>{{ 'POD.CREATE_POD' | translate }}</label>
         </button>
 
@@ -63,7 +63,7 @@
           <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary">
             <nb-icon icon="edit"/>
           </button>
-           <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
+          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"/>
           </button>
         </ng-template>

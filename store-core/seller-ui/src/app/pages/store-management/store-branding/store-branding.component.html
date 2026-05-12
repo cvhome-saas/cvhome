@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'STORE.STORE_INFORMATION' | translate }}</h1>
@@ -8,7 +8,7 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
@@ -18,7 +18,7 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <ngx-store-branding-logo [store]="store" *ngIf="store"/>
-    <ngx-store-branding-banner [store]="store" *ngIf="store"/>
+    <ngx-store-branding-logo *ngIf="store" [store]="store"/>
+    <ngx-store-branding-banner *ngIf="store" [store]="store"/>
   </nb-card-body>
 </nb-card>

@@ -1,9 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, Inject, PLATFORM_ID} from '@angular/core';
 import {SignUpService} from "../../service/sign-up.service";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ToastrService} from "ngx-toastr";
-import { isPlatformBrowser } from '@angular/common';
-import { Inject, PLATFORM_ID } from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
 import {Router} from "@angular/router";
 
 @Component({
@@ -20,8 +19,8 @@ export class SignUpFormComponent {
   title: string = 'Sign Up';
   userForm: any;
 
-    constructor(@Inject(PLATFORM_ID) private platformId: Object,private router:Router,
-    private signUpService: SignUpService, private formBuilder: FormBuilder, private toastr: ToastrService) {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private router: Router,
+              private signUpService: SignUpService, private formBuilder: FormBuilder, private toastr: ToastrService) {
     this.userForm = this.formBuilder.group({
       user: this.formBuilder.group({
         firstName: ['', Validators.required],

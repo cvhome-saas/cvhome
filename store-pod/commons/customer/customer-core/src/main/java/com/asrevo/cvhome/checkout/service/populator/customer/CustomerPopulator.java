@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.populator.customer;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -89,18 +88,12 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                 billing.setState(sourceBilling.getStateProvince());
                 Country billingCountry = null;
                 if (sourceBilling.getCountry().isValid()) {
-                    billingCountry = countries.get(sourceBilling.getCountry());
-                    if (billingCountry == null) {
-                        throw new ConversionException("Unsuported country code " + sourceBilling.getCountry());
-                    }
+                    billingCountry = resolveCountry(sourceBilling.getCountry(), countries);
                     billing.setCountry(billingCountry.getIsoCode());
                 }
 
                 if (billingCountry != null && sourceBilling.getZone() != null) {
-                    Zone zone = zoneService.getByCode(sourceBilling.getZone());
-                    if (zone == null) {
-                        throw new ConversionException("Unsuported zone code " + sourceBilling.getZone());
-                    }
+                    Zone zone = resolveZone(sourceBilling.getZone());
                     Zone zoneDescription = zones.get(zone.getCode());
                     billing.setZone(zoneDescription.getId());
                 }
@@ -111,10 +104,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                 Billing billing = new Billing();
                 Country billingCountry;
                 if (source.getBilling().getCountry().isValid()) {
-                    billingCountry = countries.get(source.getBilling().getCountry());
-                    if (billingCountry == null) {
-                        throw new ConversionException("Unsuported country code " + sourceBilling.getCountry());
-                    }
+                    billingCountry = resolveCountry(source.getBilling().getCountry(), countries);
                     billing.setCountry(billingCountry.getId());
                     target.setBilling(billing);
                 }
@@ -133,18 +123,12 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
                 Country deliveryCountry = null;
 
                 if (sourceShipping.getCountry().isValid()) {
-                    deliveryCountry = countries.get(sourceShipping.getCountry());
-                    if (deliveryCountry == null) {
-                        throw new ConversionException("Unsuported country code " + sourceShipping.getCountry());
-                    }
+                    deliveryCountry = resolveCountry(sourceShipping.getCountry(), countries);
                     delivery.setCountry(deliveryCountry.getIsoCode());
                 }
 
                 if (deliveryCountry != null && sourceShipping.getZone() != null) {
-                    Zone zone = zoneService.getByCode(sourceShipping.getZone());
-                    if (zone == null) {
-                        throw new ConversionException("Unsuported zone code " + sourceShipping.getZone());
-                    }
+                    Zone zone = resolveZone(sourceShipping.getZone());
                     delivery.setZone(zone.getCode());
                 }
                 target.setDelivery(delivery);
@@ -153,15 +137,8 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
             if (target.getDelivery() == null && source.getDelivery() != null) {
                 log.info("Setting default value for delivery");
                 Delivery delivery = new Delivery();
-                Country deliveryCountry;
                 if (source.getDelivery().getCountry().isValid()) {
-                    deliveryCountry = countries.get(source.getDelivery().getCountry());
-                    if (deliveryCountry == null) {
-                        CountryIsoCode countryIsoCode = Optional.ofNullable(sourceShipping)
-                                .map(CustomerAddress::getCountry)
-                                .orElse(null);
-                        throw new ConversionException("Unsupported country code " + countryIsoCode);
-                    }
+                    Country deliveryCountry = resolveCountry(source.getDelivery().getCountry(), countries);
                     delivery.setCountry(deliveryCountry.getIsoCode());
                     target.setDelivery(delivery);
                 }
@@ -172,6 +149,22 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
         }
 
         return target;
+    }
+
+    private Country resolveCountry(CountryIsoCode code, Map<CountryIsoCode, Country> countries) throws ConversionException {
+        Country country = countries.get(code);
+        if (country == null) {
+            throw new ConversionException("Unsupported country code " + code);
+        }
+        return country;
+    }
+
+    private Zone resolveZone(ZoneCode code) throws ConversionException {
+        Zone zone = zoneService.getByCode(code);
+        if (zone == null) {
+            throw new ConversionException("Unsupported zone code " + code);
+        }
+        return zone;
     }
 
     @Override

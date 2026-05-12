@@ -1,10 +1,10 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	implementation libs.spring.cloud.starter.loadbalancer
-	implementation libs.aws.sdk.servicediscovery
-	compileOnly libs.lombok
-	annotationProcessor libs.lombok
+    implementation libs.spring.cloud.starter.loadbalancer
+    implementation libs.aws.sdk.servicediscovery
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 }

@@ -42,7 +42,8 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                         priority={false}
                     />
 
-                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/35 via-black/0 to-black/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
+                    <div
+                        className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/35 via-black/0 to-black/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
 
                     <ProductItemActionBox storeContext={storeContext} product={product} href={href}/>
 
@@ -102,8 +103,10 @@ function ProductItemActionBox({storeContext, product, href}: {
 
     return (
         <>
-            <ProductQuickView storeContext={storeContext} product={product} open={showQuickView} setOpen={setShowQuickView}/>
-            <div className="absolute inset-0 flex flex-col justify-between p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <ProductQuickView storeContext={storeContext} product={product} open={showQuickView}
+                              setOpen={setShowQuickView}/>
+            <div
+                className="absolute inset-0 flex flex-col justify-between p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="flex self-end gap-2">
                     <TooltipProvider>
                         <Tooltip>
@@ -123,7 +126,8 @@ function ProductItemActionBox({storeContext, product, href}: {
                         {href && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="outline" size="icon" className="rounded-full bg-background/85 backdrop-blur" asChild>
+                                    <Button variant="outline" size="icon"
+                                            className="rounded-full bg-background/85 backdrop-blur" asChild>
                                         <Link href={href}>
                                             <ExternalLink className="size-5"/>
                                             <span className="sr-only">{t('VIEW_DETAILS')}</span>

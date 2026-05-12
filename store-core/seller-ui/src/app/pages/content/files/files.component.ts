@@ -80,7 +80,7 @@ export class FilesComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.loader = true;
-          this.contentService.deleteImage( e)
+          this.contentService.deleteImage(e)
             .subscribe({
               next: (data) => {
                 this.loader = false;
@@ -143,7 +143,7 @@ export class FilesComponent implements OnInit {
       formData.append("files", item.file);
     });
     if (this.files.length > 0) {
-      this.contentService.saveImage( formData)
+      this.contentService.saveImage(formData)
         .subscribe({
           next: (data) => {
             console.log(data);

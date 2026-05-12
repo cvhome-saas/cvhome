@@ -8,14 +8,14 @@
           <div class="footer-items">
             <!-- Logo -->
             <a class="navbar-brand" href="#">
-              <img class="logo" src="img/logo/logo.png" alt="">
+              <img alt="" class="logo" src="img/logo/logo.png">
             </a>
             <p class="mt-2 mb-3">{{ message }}</p>
             <!-- Social Icons -->
             <div class="social-icons d-flex">
-              <a *ngFor="let l of socialLinks" [ngClass]="l.class" [href]="l.url">
-                <i class="fab" [ngClass]="l.icon"></i>
-                <i class="fab" [ngClass]="l.icon"></i>
+              <a *ngFor="let l of socialLinks" [href]="l.url" [ngClass]="l.class">
+                <i [ngClass]="l.icon" class="fab"></i>
+                <i [ngClass]="l.icon" class="fab"></i>
               </a>
 
             </div>

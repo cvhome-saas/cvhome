@@ -28,19 +28,19 @@ export class TypesService {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/type`, req);
   }
 
-  updateType( id, req): Observable<any> {
+  updateType(id, req): Observable<any> {
     return this.crudService.put(`/spg/catalog/api/v1/private/product/type/${id}`, req);
   }
 
-  deleteType( id): Observable<any> {
+  deleteType(id): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
-  checkCode( code): Observable<any> {
+  checkCode(code): Observable<any> {
     const params = {
       code
     };
-    return this.crudService.get(`/spg/catalog/api/v1/private/product/type/unique`,params);
+    return this.crudService.get(`/spg/catalog/api/v1/private/product/type/unique`, params);
   }
 
 

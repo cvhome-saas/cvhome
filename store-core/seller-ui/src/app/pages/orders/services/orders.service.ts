@@ -16,7 +16,7 @@ export class OrdersService {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders`, params);
   }
 
-  getOrderDetails( orderID): Observable<any> {
+  getOrderDetails(orderID): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}`);
   }
 
@@ -24,23 +24,23 @@ export class OrdersService {
     return this.crudService.get(`/spg/checkout/api/v1/country`)
   }
 
-  getBillingZone( value): Observable<any> {
+  getBillingZone(value): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/zones?code=${value}`)
   }
 
-  getHistory( orderID): Observable<any> {
+  getHistory(orderID): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}/history`)
   }
 
-  addHistory( orderID, param): Observable<any> {
+  addHistory(orderID, param): Observable<any> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/history`, param);
   }
 
-  updateOrder(orderID,  param): Observable<any> {
+  updateOrder(orderID, param): Observable<any> {
     return this.crudService.patch(`/spg/checkout/api/v1/private/orders/${orderID}/customer`, param);
   }
 
-  refundOrder( orderID): Observable<any> {
+  refundOrder(orderID): Observable<any> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/refund`, {});
   }
 

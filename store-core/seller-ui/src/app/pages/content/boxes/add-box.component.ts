@@ -129,78 +129,10 @@ export class AddBoxComponent implements OnInit {
     this.router.navigate(['/pages/content/boxes/list']);
   }
 
-  private loadContent() {
-    const box = this.contentService.getBox(this.uniqueCode, this.params)
-      .subscribe(data => {
-        this.content = data;
-        this.fillForm();
-        this.loader = false;
-      }, err => {
-        this.loader = false;
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
-  }
-
-  private createForm() {
-    this.form = this.fb.group({
-      id: 0,
-      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
-      visible: [false],
-      selectedLanguage: [this.defaultLanguage, [Validators.required]],
-      descriptions: this.fb.array([]),
-    });
-  }
-
-  private addFormArray() {
-    const control = <FormArray>this.form.controls.descriptions;
-    this.languages.forEach(lang => {
-      control.push(
-        this.fb.group({
-          language: [lang.code, [Validators.required]],
-          description: [''],
-          name: [''],
-          title: [''],
-          id: 0
-        })
-      );
-    });
-  }
-
-  private fillForm() {
-    this.form.patchValue({
-      id: this.content.id,
-      code: this.content.code,
-      visible: this.content.visible,
-      selectedLanguage: this.defaultLanguage,
-      descriptions: [],
-    });
-    this.fillFormArray();
-    this.findInvalidControls();
-
-  }
-
-  private fillFormArray() {
-    this.form.value.descriptions.forEach((desc, index) => {
-      if (this.content != null && this.content.descriptions) {
-        this.content.descriptions.forEach((description) => {
-          if (desc.language === description.language) {
-            (<FormArray>this.form.get('descriptions')).at(index).patchValue({
-              id: description.id,
-              language: description.language,
-              description: description.description,
-              name: description.name,
-              title: description.title
-            });
-          }
-        });
-      }
-    });
-  }
-
   checkCode(event) {
     //check if box code already exists
     const code = event.target.value.trim();
-    this.contentService.checkCodeBoxExist( code, this.param())
+    this.contentService.checkCodeBoxExist(code, this.param())
       .subscribe(res => {
         this.isCodeExists = res.exists;
       }, err => {
@@ -289,7 +221,7 @@ export class AddBoxComponent implements OnInit {
         });
 
     } else {
-      this.contentService.createBox( object)
+      this.contentService.createBox(object)
         .subscribe(data => {
           this.loader = false;
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
@@ -301,5 +233,73 @@ export class AddBoxComponent implements OnInit {
 
     }
     this.loader = false;
+  }
+
+  private loadContent() {
+    const box = this.contentService.getBox(this.uniqueCode, this.params)
+      .subscribe(data => {
+        this.content = data;
+        this.fillForm();
+        this.loader = false;
+      }, err => {
+        this.loader = false;
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+      });
+  }
+
+  private createForm() {
+    this.form = this.fb.group({
+      id: 0,
+      code: ['', [Validators.required, Validators.pattern(validators.alphanumeric)]],
+      visible: [false],
+      selectedLanguage: [this.defaultLanguage, [Validators.required]],
+      descriptions: this.fb.array([]),
+    });
+  }
+
+  private addFormArray() {
+    const control = <FormArray>this.form.controls.descriptions;
+    this.languages.forEach(lang => {
+      control.push(
+        this.fb.group({
+          language: [lang.code, [Validators.required]],
+          description: [''],
+          name: [''],
+          title: [''],
+          id: 0
+        })
+      );
+    });
+  }
+
+  private fillForm() {
+    this.form.patchValue({
+      id: this.content.id,
+      code: this.content.code,
+      visible: this.content.visible,
+      selectedLanguage: this.defaultLanguage,
+      descriptions: [],
+    });
+    this.fillFormArray();
+    this.findInvalidControls();
+
+  }
+
+  private fillFormArray() {
+    this.form.value.descriptions.forEach((desc, index) => {
+      if (this.content != null && this.content.descriptions) {
+        this.content.descriptions.forEach((description) => {
+          if (desc.language === description.language) {
+            (<FormArray>this.form.get('descriptions')).at(index).patchValue({
+              id: description.id,
+              language: description.language,
+              description: description.description,
+              name: description.name,
+              title: description.title
+            });
+          }
+        });
+      }
+    });
   }
 }

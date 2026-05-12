@@ -45,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
 
+    private static final String ERROR_CALCULATING_SHOPPING_CART_TOTAL = "Error while calculating shopping cart total";
+
     private final ShoppingCartService shoppingCartService;
 
     private final OrderRepository orderRepository;
@@ -80,7 +82,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateshoppingcart(shoppingCart, customer, store, language);
         } catch (Exception e) {
-            log.error("Error while calculating shopping cart total", e);
+            log.error(ERROR_CALCULATING_SHOPPING_CART_TOTAL, e);
             throw new ServiceException(e);
         }
     }
@@ -119,7 +121,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return caculateshoppingcart(shoppingCart, null, store, language);
         } catch (Exception e) {
-            log.error("Error while calculating shopping cart total", e);
+            log.error(ERROR_CALCULATING_SHOPPING_CART_TOTAL, e);
             throw new ServiceException(e);
         }
     }

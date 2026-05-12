@@ -2,7 +2,7 @@ import {Cart} from "@store-front/types/cart";
 import {CheckoutCart} from "@store-front/types/checkout-cart";
 import {Order} from "@store-front/types/order";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {handleResponse, post, put, del, get} from "./http-utils";
+import {del, get, handleResponse, post, put} from "./http-utils";
 import {ReadableCountryList} from "@store-front/types/country";
 
 export class CartService {

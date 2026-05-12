@@ -11,7 +11,7 @@ import {SelectedStoreService} from "../../../shared/services/selected-store.serv
 
 @Component({
   selector: 'ngx-product-to-category',
-  standalone:false,
+  standalone: false,
   templateUrl: './product-to-category.component.html',
   styleUrls: ['./product-to-category.component.scss']
 })
@@ -24,7 +24,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   categories: any[] = [];
   selectedItems: string[] = [];
 
-  params :any;
+  params: any;
 
   constructor(
     private translate: TranslateService,
@@ -33,8 +33,8 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
     private productService: ProductService,
     private toastr: NbToastrService,
     private activatedRoute: ActivatedRoute,
-    private selectedStoreService:SelectedStoreService
-    ) {
+    private selectedStoreService: SelectedStoreService
+  ) {
     this.params = this.loadParams();
 
   }
@@ -81,7 +81,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   }
 
   addProductToCategory(store, productId, groupCode) {
-    this.productService.addProductToCategory( productId, groupCode)
+    this.productService.addProductToCategory(productId, groupCode)
       .subscribe({
         next: () => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_ADDED'));
@@ -94,7 +94,7 @@ export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   }
 
   removeProductFromCategory(store, productId, groupCode) {
-    this.productService.removeProductFromCategory( productId, groupCode)
+    this.productService.removeProductFromCategory(productId, groupCode)
       .subscribe({
         next: () => {
           this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED'));

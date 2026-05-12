@@ -1,1 +1,10 @@
-{"weights": ["LB", "KG"], "measures": ["CM", "IN"]}
+{
+  "weights": [
+    "LB",
+    "KG"
+  ],
+  "measures": [
+    "CM",
+    "IN"
+  ]
+}

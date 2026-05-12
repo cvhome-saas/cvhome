@@ -41,10 +41,6 @@ export class UpdateOrgDetailsComponent implements OnInit {
     }
   ];
 
-  route(link) {
-    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
-  }
-
   constructor(
     private activatedRoute: ActivatedRoute,
     private orgService: OrgService,
@@ -55,6 +51,10 @@ export class UpdateOrgDetailsComponent implements OnInit {
     private toastr: NbToastrService,
     private translate: TranslateService,
   ) {
+  }
+
+  route(link) {
+    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
   }
 
   ngOnInit() {

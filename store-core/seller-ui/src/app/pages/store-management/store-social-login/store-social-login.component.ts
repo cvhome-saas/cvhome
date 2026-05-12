@@ -76,6 +76,10 @@ export class StoreSocialLoginComponent implements OnInit {
   ) {
   }
 
+  get configForms() {
+    return this.form.get('configs') as FormArray;
+  }
+
   ngOnInit() {
     const storeCode = this.activatedRoute.snapshot.paramMap.get('code');
     zip(
@@ -104,10 +108,10 @@ export class StoreSocialLoginComponent implements OnInit {
       return;
     }
     const configs = this.form.value.configs.map(it => ({
-        id: { providerId: it.providerId },
-        appId: it.appId,
-        appSecret: it.appSecret,
-        enabled: it.enabled
+      id: {providerId: it.providerId},
+      appId: it.appId,
+      appSecret: it.appSecret,
+      enabled: it.enabled
     }));
 
     this.storeService.updateSocialLoginConfigs(this.store.id, configs)
@@ -131,9 +135,5 @@ export class StoreSocialLoginComponent implements OnInit {
     this.form = this.fb.group({
       configs: this.fb.array(configGroups)
     });
-  }
-
-  get configForms() {
-    return this.form.get('configs') as FormArray;
   }
 }

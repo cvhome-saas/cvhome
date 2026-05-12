@@ -34,7 +34,8 @@ export const Footer = ({params}: { params: LayoutParams }) => {
                             </span>
                         </Link>
                         <p className="mt-4 max-w-xs text-muted-foreground text-sm font-light leading-relaxed">
-                            Elevating your beauty journey with curated selections of premium products. Elegance is not just about being noticed, but being remembered.
+                            Elevating your beauty journey with curated selections of premium products. Elegance is not
+                            just about being noticed, but being remembered.
                         </p>
                     </div>
                     {

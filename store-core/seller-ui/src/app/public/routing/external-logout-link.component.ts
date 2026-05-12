@@ -8,7 +8,8 @@ import {environment} from '../../../environments/environment';
 })
 export class ExternalLogoutLinkComponent implements OnInit {
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {

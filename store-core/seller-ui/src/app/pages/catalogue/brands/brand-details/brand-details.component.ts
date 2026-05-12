@@ -32,22 +32,22 @@ export class BrandDetailsComponent implements OnInit {
     this.loadingInfo = true;
     zip([this.selectedStoreService.current(), this.activatedRoute.params])
       .pipe(mergeMap(([selectedStore, params]) => {
-        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.brandService.getBrandById( params["id"]));
+        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.brandService.getBrandById(params["id"]));
       }))
       .subscribe({
-      next: ([selectedStore, params, store, brand]) => {
-        this.store = store;
-        this.brand = brand;
-        this.loadingInfo = false;
-      },
-      error: (err) => {
-        this.loadingInfo = false;
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      },
-      complete: () => {
-        this.loadingInfo = false;
-      },
-    })
+        next: ([selectedStore, params, store, brand]) => {
+          this.store = store;
+          this.brand = brand;
+          this.loadingInfo = false;
+        },
+        error: (err) => {
+          this.loadingInfo = false;
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        },
+        complete: () => {
+          this.loadingInfo = false;
+        },
+      })
 
   }
 

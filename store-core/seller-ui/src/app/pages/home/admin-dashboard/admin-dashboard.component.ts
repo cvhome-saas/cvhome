@@ -4,7 +4,7 @@ import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'ngx-admin-dashboard',
-  standalone:false,
+  standalone: false,
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })

@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
 
   <nb-card-header>
     <div class="row">
@@ -8,11 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large"
-                nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -22,13 +22,13 @@
   </nb-card-header>
   <nb-card-body>
 
-    <form [formGroup]="form" (ngSubmit)="save()">
+    <form (ngSubmit)="save()" [formGroup]="form">
       <div class="form-group row">
-        <label for="name" class="label col-sm-3 col-form-label">{{ 'POD_FORM.NAME' | translate }}</label>
+        <label class="label col-sm-3 col-form-label" for="name">{{ 'POD_FORM.NAME' | translate }}</label>
         <div class="col-sm-9">
-          <input type="text" nbInput fullWidth id="name" formControlName="name"
+          <input [status]="name.invalid && (name.dirty || name.touched) ? 'danger' : 'basic'" formControlName="name" fullWidth id="name" nbInput
                  placeholder="{{ 'POD_FORM.NAME' | translate }}"
-                 [status]="name.invalid && (name.dirty || name.touched) ? 'danger' : 'basic'">
+                 type="text">
           <div *ngIf="name.invalid && (name.dirty || name.touched)" class="caption status-danger mt-1">
             <div *ngIf="name.errors?.['required']">{{ 'POD_FORM.NAME_REQUIRED' | translate }}</div>
             <div *ngIf="name.errors?.['pattern']">{{ 'POD_FORM.NAME_PATTERN' | translate }}</div>
@@ -38,11 +38,11 @@
 
       <div formGroupName="endpoint">
         <div class="form-group row">
-          <label for="endpoint" class="label col-sm-3 col-form-label">{{ 'POD_FORM.ENDPOINT_URL' | translate }}</label>
+          <label class="label col-sm-3 col-form-label" for="endpoint">{{ 'POD_FORM.ENDPOINT_URL' | translate }}</label>
           <div class="col-sm-9">
-            <input type="text" nbInput fullWidth id="endpoint" formControlName="endpoint"
+            <input [status]="endpointUrl.invalid && (endpointUrl.dirty || endpointUrl.touched) ? 'danger' : 'basic'" formControlName="endpoint" fullWidth id="endpoint" nbInput
                    placeholder="{{ 'POD_FORM.ENDPOINT_URL' | translate }}"
-                   [status]="endpointUrl.invalid && (endpointUrl.dirty || endpointUrl.touched) ? 'danger' : 'basic'">
+                   type="text">
             <div *ngIf="endpointUrl.invalid && (endpointUrl.dirty || endpointUrl.touched)"
                  class="caption status-danger mt-1">
               <div *ngIf="endpointUrl.errors?.['required']">{{ 'POD_FORM.ENDPOINT_URL_REQUIRED' | translate }}</div>
@@ -51,9 +51,9 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="type" class="label col-sm-3 col-form-label">{{ 'POD_FORM.TYPE' | translate }}</label>
+          <label class="label col-sm-3 col-form-label" for="type">{{ 'POD_FORM.TYPE' | translate }}</label>
           <div class="col-sm-9">
-            <nb-select fullWidth id="type" formControlName="type"
+            <nb-select formControlName="type" fullWidth id="type"
                        placeholder="{{ 'POD_FORM.SELECT_TYPE' | translate }}">
               <nb-option *ngFor="let type of endpointTypes" [value]="type">{{ type }}</nb-option>
             </nb-select>
@@ -63,10 +63,10 @@
 
       <div formGroupName="orgId">
         <div class="form-group row">
-          <label for="orgId" class="label col-sm-3 col-form-label">{{ 'POD_FORM.ORG_ID' | translate }}</label>
+          <label class="label col-sm-3 col-form-label" for="orgId">{{ 'POD_FORM.ORG_ID' | translate }}</label>
           <div class="col-sm-9">
-            <input type="text" nbInput fullWidth id="orgId" formControlName="id"
-                   placeholder="{{ 'POD_FORM.ORG_ID' | translate }}">
+            <input formControlName="id" fullWidth id="orgId" nbInput placeholder="{{ 'POD_FORM.ORG_ID' | translate }}"
+                   type="text">
           </div>
         </div>
       </div>

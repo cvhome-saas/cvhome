@@ -3,8 +3,8 @@
     <span>OAuth Client Configuration</span>
     <span>{{ form.value.id }}</span>
     <div style="display: flex;gap: 1rem;">
-      <button nbButton ghost status="basic" routerLink="/home/clients">Cancel</button>
-      <button nbButton status="primary" (click)="submit()" [disabled]="form.invalid">
+      <button ghost nbButton routerLink="/home/clients" status="basic">Cancel</button>
+      <button (click)="submit()" [disabled]="form.invalid" nbButton status="primary">
         <nb-icon icon="plus" style="margin-right: 0.5rem"></nb-icon>
         Save
       </button>
@@ -17,13 +17,13 @@
           <!-- Basic Info Panel -->
           <div class="row">
             <div class="col-md-12">
-              <nb-card status="basic" accent="primary" class="mb-3">
+              <nb-card accent="primary" class="mb-3" status="basic">
                 <nb-card-header>Basic Info</nb-card-header>
                 <nb-card-body>
                   <div class="row">
                     <div class="col-md-6">
                       <label>Client ID</label>
-                      <input nbInput fullWidth formControlName="clientId"/>
+                      <input formControlName="clientId" fullWidth nbInput/>
                       <div *ngIf="form.get('clientId')?.invalid && form.get('clientId')?.touched"
                            class="alert alert-danger">
                         Client ID is required.
@@ -32,7 +32,7 @@
 
                     <div class="col-md-6">
                       <label>Client Name</label>
-                      <input nbInput fullWidth formControlName="clientName"/>
+                      <input formControlName="clientName" fullWidth nbInput/>
                     </div>
                   </div>
                 </nb-card-body>
@@ -43,13 +43,13 @@
           <!-- Authentication Panel -->
           <div class="row">
             <div class="col-md-12">
-              <nb-card status="basic" accent="danger" class="mb-3">
+              <nb-card accent="danger" class="mb-3" status="basic">
                 <nb-card-header>Authentication</nb-card-header>
                 <nb-card-body>
                   <div class="row">
                     <div class="col-md-4">
                       <label>Client Authentication Methods</label>
-                      <nb-select fullWidth placeholder="Select" multiple formControlName="clientAuthenticationMethods">
+                      <nb-select formControlName="clientAuthenticationMethods" fullWidth multiple placeholder="Select">
                         <nb-option *ngFor="let method of clientAuthenticationMethodsOptions"
                                    [value]="method">{{ method }}
                         </nb-option>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="col-md-4">
                       <label>Authorization Grant Types</label>
-                      <nb-select fullWidth multiple formControlName="authorizationGrantTypes">
+                      <nb-select formControlName="authorizationGrantTypes" fullWidth multiple>
                         <nb-option *ngFor="let type of authorizationGrantTypesOptions" [value]="type">{{ type }}
                         </nb-option>
                       </nb-select>
@@ -70,7 +70,7 @@
 
                     <div class="col-md-4">
                       <label>Select Scopes</label>
-                      <nb-select multiple fullWidth formControlName="scopes">
+                      <nb-select formControlName="scopes" fullWidth multiple>
                         <nb-option *ngFor="let scope of scopesOptions" [value]="scope">{{ scope }}</nb-option>
                       </nb-select>
                     </div>
@@ -85,12 +85,12 @@
           <!-- Redirects Panel -->
           <div class="row">
             <div class="col-md-12">
-              <nb-card status="basic" accent="success" class="mb-3">
+              <nb-card accent="success" class="mb-3" status="basic">
                 <nb-card-header>Redirects</nb-card-header>
                 <nb-card-body>
                   <div class="d-flex justify-content-between align-items-center">
                     <h4>Redirect URIs</h4>
-                    <button nbButton ghost (click)="addRedirectUri()">
+                    <button (click)="addRedirectUri()" ghost nbButton>
                       <nb-icon icon="plus-outline"></nb-icon>
                     </button>
                   </div>
@@ -100,14 +100,14 @@
                   <div formArrayName="redirectUris">
                     <div *ngFor="let ctrl of redirectUris.controls; let i = index" class="row mb-2">
                       <div class="col-md-11">
-                        <input nbInput fullWidth [formControlName]="i"/>
+                        <input [formControlName]="i" fullWidth nbInput/>
                         <div *ngIf="ctrl.invalid && ctrl.touched" class="alert alert-danger">
                           Invalid URI format.
                         </div>
                       </div>
                       <div class="col-md-1">
-                        <button nbButton ghost status="danger" (click)="removeRedirectUri(i)"
-                                [disabled]="redirectUris.length === 1">
+                        <button (click)="removeRedirectUri(i)" [disabled]="redirectUris.length === 1" ghost nbButton
+                                status="danger">
                           <nb-icon icon="trash-2-outline"></nb-icon>
                         </button>
                       </div>
@@ -116,21 +116,21 @@
 
                   <div class="d-flex justify-content-between align-items-center mt-4">
                     <h4>Post Logout Redirect URIs</h4>
-                    <button nbButton ghost (click)="addPostLogoutUri()">
+                    <button (click)="addPostLogoutUri()" ghost nbButton>
                       <nb-icon icon="plus-outline"></nb-icon>
                     </button>
                   </div>
                   <div formArrayName="postLogoutRedirectUris">
                     <div *ngFor="let ctrl of postLogoutRedirectUris.controls; let i = index" class="row mb-2">
                       <div class="col-md-11">
-                        <input nbInput fullWidth [formControlName]="i"/>
+                        <input [formControlName]="i" fullWidth nbInput/>
                         <div *ngIf="ctrl.invalid && ctrl.touched" class="alert alert-danger">
                           Invalid URI format.
                         </div>
                       </div>
                       <div class="col-md-1">
-                        <button nbButton ghost status="danger" (click)="removePostLogoutUri(i)"
-                                [disabled]="postLogoutRedirectUris.length === 1">
+                        <button (click)="removePostLogoutUri(i)" [disabled]="postLogoutRedirectUris.length === 1" ghost nbButton
+                                status="danger">
                           <nb-icon icon="trash-2-outline"></nb-icon>
                         </button>
                       </div>
@@ -143,7 +143,7 @@
 
           <div class="row">
             <div class="col-md-12">
-              <nb-card status="basic" accent="info" class="mb-3">
+              <nb-card accent="info" class="mb-3" status="basic">
                 <nb-card-header>Client Settings</nb-card-header>
                 <nb-card-body formGroupName="clientSettings">
                   <nb-checkbox formControlName="requireProofKey">Require Proof Key</nb-checkbox>
@@ -154,12 +154,12 @@
                   <div class="row mt-3">
                     <div class="col-md-6">
                       <label>JWK Set URL</label>
-                      <input nbInput fullWidth formControlName="jwkSetUrl"/>
+                      <input formControlName="jwkSetUrl" fullWidth nbInput/>
                     </div>
 
                     <div class="col-md-6">
                       <label>Token Endpoint Auth Signing Algorithm</label>
-                      <nb-select fullWidth formControlName="tokenEndpointAuthenticationSigningAlgorithm">
+                      <nb-select formControlName="tokenEndpointAuthenticationSigningAlgorithm" fullWidth>
                         <nb-option *ngFor="let alg of tokenEndpointAuthenticationSigningAlgorithmOptions" [value]="alg">
                           {{ alg }}
                         </nb-option>
@@ -170,7 +170,7 @@
                   <div class="row mt-3">
                     <div class="col-md-6">
                       <label>X.509 Certificate Subject DN</label>
-                      <input nbInput fullWidth formControlName="x509CertificateSubjectDN"/>
+                      <input formControlName="x509CertificateSubjectDN" fullWidth nbInput/>
                     </div>
                   </div>
 
@@ -178,16 +178,18 @@
                     <h6>Custom Settings</h6>
                     <div class="row mt-2 mb-3">
                       <div class="col-md-4">
-                        <input nbInput fullWidth size="small" placeholder="New Key" #clientCustomKey (keyup.enter)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''">
+                        <input #clientCustomKey (keyup.enter)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''" fullWidth nbInput placeholder="New Key"
+                               size="small">
                       </div>
                       <div class="col-md-2">
-                        <button nbButton fullWidth size="small" status="primary" (click)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''">
+                        <button (click)="addCustomSetting('clientSettings', clientCustomKey.value); clientCustomKey.value = ''" fullWidth nbButton size="small"
+                                status="primary">
                           Add
                         </button>
                       </div>
                     </div>
 
-                    <div formGroupName="customSettings" class="bg-light p-3 rounded">
+                    <div class="bg-light p-3 rounded" formGroupName="customSettings">
                       <div *ngIf="getCustomSettings('clientSettings').length === 0" class="text-hint text-center py-2">
                         No custom settings defined
                       </div>
@@ -196,10 +198,11 @@
                           <label class="mb-0 font-weight-bold">{{ key }}</label>
                         </div>
                         <div class="col-md-7">
-                          <input nbInput fullWidth size="small" [formControlName]="key"/>
+                          <input [formControlName]="key" fullWidth nbInput size="small"/>
                         </div>
                         <div class="col-md-1 text-right">
-                          <button nbButton ghost size="small" status="danger" (click)="removeCustomSetting('clientSettings', key)">
+                          <button (click)="removeCustomSetting('clientSettings', key)" ghost nbButton size="small"
+                                  status="danger">
                             <nb-icon icon="trash-2-outline"></nb-icon>
                           </button>
                         </div>
@@ -213,7 +216,7 @@
 
           <div class="row">
             <div class="col-md-12">
-              <nb-card status="basic" accent="warning">
+              <nb-card accent="warning" status="basic">
                 <nb-card-header>Token Settings</nb-card-header>
                 <nb-card-body formGroupName="tokenSettings">
                   <div class="row">
@@ -254,14 +257,14 @@
                   <div class="row mt-3">
                     <div class="col-md-6">
                       <label>ID Token Algorithm</label>
-                      <nb-select fullWidth formControlName="idTokenSignatureAlgorithm">
+                      <nb-select formControlName="idTokenSignatureAlgorithm" fullWidth>
                         <nb-option *ngFor="let alg of idTokenSignatureAlgorithmOptions" [value]="alg">{{ alg }}
                         </nb-option>
                       </nb-select>
                     </div>
                     <div class="col-md-6" formGroupName="accessTokenFormat">
                       <label>Access Token Format</label>
-                      <nb-select fullWidth formControlName="value">
+                      <nb-select formControlName="value" fullWidth>
                         <nb-option *ngFor="let format of accessTokenFormatOptions" [value]="format">{{ format }}
                         </nb-option>
                       </nb-select>
@@ -272,16 +275,18 @@
                     <h6>Custom Settings</h6>
                     <div class="row mt-2 mb-3">
                       <div class="col-md-4">
-                        <input nbInput fullWidth size="small" placeholder="New Key" #tokenCustomKey (keyup.enter)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''">
+                        <input #tokenCustomKey (keyup.enter)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''" fullWidth nbInput placeholder="New Key"
+                               size="small">
                       </div>
                       <div class="col-md-2">
-                        <button nbButton fullWidth size="small" status="primary" (click)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''">
+                        <button (click)="addCustomSetting('tokenSettings', tokenCustomKey.value); tokenCustomKey.value = ''" fullWidth nbButton size="small"
+                                status="primary">
                           Add
                         </button>
                       </div>
                     </div>
 
-                    <div formGroupName="customSettings" class="bg-light p-3 rounded">
+                    <div class="bg-light p-3 rounded" formGroupName="customSettings">
                       <div *ngIf="getCustomSettings('tokenSettings').length === 0" class="text-hint text-center py-2">
                         No custom settings defined
                       </div>
@@ -290,10 +295,11 @@
                           <label class="mb-0 font-weight-bold">{{ key }}</label>
                         </div>
                         <div class="col-md-7">
-                          <input nbInput fullWidth size="small" [formControlName]="key"/>
+                          <input [formControlName]="key" fullWidth nbInput size="small"/>
                         </div>
                         <div class="col-md-1 text-right">
-                          <button nbButton ghost size="small" status="danger" (click)="removeCustomSetting('tokenSettings', key)">
+                          <button (click)="removeCustomSetting('tokenSettings', key)" ghost nbButton size="small"
+                                  status="danger">
                             <nb-icon icon="trash-2-outline"></nb-icon>
                           </button>
                         </div>
@@ -306,15 +312,18 @@
           </div>
         </div>
       </nb-tab>
-      <nb-tab tabTitle="Reset Secret" *ngIf="form.value.id">
-        <div class="row" [formGroup]="resetSecretForm">
+      <nb-tab *ngIf="form.value.id" tabTitle="Reset Secret">
+        <div [formGroup]="resetSecretForm" class="row">
           <div class="col-md-4">
             <label>New Secret</label>
-            <input nbInput fullWidth formControlName="newSecret" type="password" placeholder="New Secret" autocomplete="new-secret"/>
+            <input autocomplete="new-secret" formControlName="newSecret" fullWidth nbInput placeholder="New Secret"
+                   type="password"/>
           </div>
           <div class="col-md-4">
             <label style="visibility: hidden; display: block">Reset Secret</label>
-            <button nbButton status="warning" (click)="resetSecret()" [disabled]="resetSecretForm.invalid">Reset Secret</button>
+            <button (click)="resetSecret()" [disabled]="resetSecretForm.invalid" nbButton status="warning">Reset
+              Secret
+            </button>
           </div>
         </div>
 

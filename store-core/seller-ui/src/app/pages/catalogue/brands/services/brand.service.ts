@@ -34,7 +34,7 @@ export class BrandService {
     return this.crudService.delete(`/spg/catalog/api/v1/private/manufacturer/${id}`);
   }
 
-  checkBrandCode(code:string): Observable<any> {
+  checkBrandCode(code: string): Observable<any> {
     const params = {
       code
     };

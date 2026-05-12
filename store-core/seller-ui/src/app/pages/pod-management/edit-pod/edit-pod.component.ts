@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {PodService, Pod} from '../../store-management/services/pod.service';
+import {Pod, PodService} from '../../store-management/services/pod.service';
 
 @Component({
   selector: 'app-edit-pod',
@@ -14,7 +14,8 @@ export class EditPodComponent implements OnInit {
   constructor(
     private podService: PodService,
     private route: ActivatedRoute
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     const podId = this.route.snapshot.paramMap.get('id');

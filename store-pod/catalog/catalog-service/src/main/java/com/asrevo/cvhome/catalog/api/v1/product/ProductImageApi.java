@@ -53,6 +53,11 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 @Slf4j
 public class ProductImageApi {
 
+    private static final String ERR_DELETING_IMAGE = "Error while deleting ProductImage";
+    private static final String ERR_IMAGE_NOT_FOUND = "Product image [%s] not found for product id [%s] and merchant [%s]";
+    private static final String ERR_IMAGES_NOT_FOUND = "Product images not found for product id [%s] and merchant [%s]";
+    private static final String ERR_PRODUCT_IMAGE = "ProductImage [%s]";
+
     private final ProductImageService productImageService;
 
     private final ProductService productService;
@@ -150,12 +155,11 @@ public class ProductImageApi {
             try {
                 productImageService.delete(productImage.get());
             } catch (ServiceException e) {
-                log.error("Error while deleting ProductImage", e);
-                throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be deleted", e);
+                log.error(ERR_DELETING_IMAGE, e);
+                throw new ServiceRuntimeException(String.format(ERR_PRODUCT_IMAGE, imageId) + " cannot be deleted", e);
             }
         } else {
-            throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
-                    + "] and merchant [" + merchantStore + "]");
+            throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
         }
     }
 
@@ -178,13 +182,11 @@ public class ProductImageApi {
         Product p = productService.getById(productId);
 
         if (p == null) {
-            throw new ResourceNotFoundException(
-                    "Product images not found for product id [" + productId + "] and merchant [" + merchantStore + "]");
+            throw new ResourceNotFoundException(String.format(ERR_IMAGES_NOT_FOUND, productId, merchantStore));
         }
 
         if (!p.getStore().equals(merchantStore)) {
-            throw new ResourceNotFoundException(
-                    "Product images not found for product id [" + productId + "] and merchant [" + merchantStore + "]");
+            throw new ResourceNotFoundException(String.format(ERR_IMAGES_NOT_FOUND, productId, merchantStore));
         }
 
         List<ReadableImage> target = new ArrayList<>();
@@ -224,13 +226,11 @@ public class ProductImageApi {
             Product p = productService.getById(id);
 
             if (p == null) {
-                throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
-                        + "] and merchant [" + merchantStore + "]");
+                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
             }
 
             if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
-                        + "] and merchant [" + merchantStore + "]");
+                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
             }
 
             Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
@@ -239,13 +239,12 @@ public class ProductImageApi {
                 productImage.get().setSortOrder(position);
                 productImageService.updateProductImage(p, productImage.get());
             } else {
-                throw new ResourceNotFoundException("Product image [" + imageId + "] not found for product id [" + id
-                        + "] and merchant [" + merchantStore + "]");
+                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
             }
 
         } catch (Exception e) {
-            log.error("Error while deleting ProductImage", e);
-            throw new ServiceRuntimeException("ProductImage [" + imageId + "] cannot be edited");
+            log.error(ERR_DELETING_IMAGE, e);
+            throw new ServiceRuntimeException(String.format(ERR_PRODUCT_IMAGE, imageId) + " cannot be edited");
         }
     }
 

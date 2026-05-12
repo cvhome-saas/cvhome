@@ -45,10 +45,6 @@ export class CategoryFormComponent implements AfterViewInit, OnInit {
 
   }
 
-  ngOnInit(): void {
-    this.createForm();
-  }
-
   get code() {
     return this.form.get('code');
   }
@@ -67,6 +63,10 @@ export class CategoryFormComponent implements AfterViewInit, OnInit {
 
   get names(): FormArray {
     return <FormArray>this.form.get('names');
+  }
+
+  ngOnInit(): void {
+    this.createForm();
   }
 
   ngAfterViewInit(): void {

@@ -27,7 +27,7 @@ export const ProductDetails = ({storeContext, p, t}: {
                                 {p.description.name}
                             </h1>
                         )}
-                        <div className="h-1.5 w-20 bg-primary/20 rounded-full" />
+                        <div className="h-1.5 w-20 bg-primary/20 rounded-full"/>
                     </div>
 
                     {p.productPrice && (
@@ -51,7 +51,8 @@ export const ProductDetails = ({storeContext, p, t}: {
                 {p.description && (
                     <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
                         <AccordionItem value="item-1" className="border-b border-primary/10">
-                            <AccordionTrigger className="text-xl font-serif font-semibold hover:text-primary transition-colors">
+                            <AccordionTrigger
+                                className="text-xl font-serif font-semibold hover:text-primary transition-colors">
                                 {t('PRODUCT_DESCRIPTION')}
                             </AccordionTrigger>
                             <AccordionContent>

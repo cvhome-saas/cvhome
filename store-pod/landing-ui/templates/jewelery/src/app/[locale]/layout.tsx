@@ -47,8 +47,8 @@ export default async function LocaleLayout({children, params}: {
     if (!store)
         return null;
 
-    
-    if (!localSupported(urlLocale,store)) {
+
+    if (!localSupported(urlLocale, store)) {
         redirectToSupportedLang(store, await headers(), urlLocale);
     } else {
 
@@ -60,7 +60,7 @@ export default async function LocaleLayout({children, params}: {
             contents: await ContentService.getContents(storeContext),
             cart: undefined
         };
-        
+
         const dir = getDirection(defaultParams.locale);
 
         const headerBox: Box | undefined = await ContentService.getBox(defaultParams.storeContext, "header-message");

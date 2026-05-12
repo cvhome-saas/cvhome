@@ -15,8 +15,6 @@ import {mergeMap, Observable, of} from "rxjs";
   styleUrls: ['./org-stores-list.component.scss']
 })
 export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
-  protected readonly ColumnMode = ColumnMode;
-  private isInitialized: boolean = false;
   org: Org
   selectedItem = '2';
   sidemenuLinks = [
@@ -37,10 +35,8 @@ export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
       link: '/pages/org-management/org/{OrgId}/stores'
     }
   ];
-
-  route(link) {
-    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
-  }
+  protected readonly ColumnMode = ColumnMode;
+  private isInitialized: boolean = false;
 
   constructor(
     private orgService: OrgService,
@@ -48,7 +44,11 @@ export class OrgStoresListComponent extends BaseTable<any> implements OnInit {
     private router: Router,
     errorService: ErrorService
   ) {
-    super(null,  errorService)
+    super(null, errorService)
+  }
+
+  route(link) {
+    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
   }
 
   ngOnInit() {

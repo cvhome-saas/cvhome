@@ -26,10 +26,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0",
-
-
     "@swimlane/ngx-datatable": "^22.0.0",
-
     "@angular-architects/module-federation": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
@@ -63,9 +60,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.0",
-
-
-
     "@angular/localize": "^20.0.0",
     "eslint": "^9.21.0",
     "ngx-build-plus": "^20.0.0",

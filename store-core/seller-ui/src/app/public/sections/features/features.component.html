@@ -1,4 +1,4 @@
-<section id="features" class="section features-area style-two overflow-hidden ptb_100">
+<section class="section features-area style-two overflow-hidden ptb_100" id="features">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 col-lg-8">
@@ -17,10 +17,10 @@
     <div class="row">
       <div *ngFor="let f of features" class="col-12 col-md-6 col-lg-4 res-margin">
         <!-- Image Box -->
-        <div class="image-box text-center icon-1 p-5 wow" [ngClass]="f.fade" data-wow-delay="0.4s">
+        <div [ngClass]="f.fade" class="image-box text-center icon-1 p-5 wow" data-wow-delay="0.4s">
           <!-- Featured Image -->
           <div class="featured-img mb-3">
-            <img class="avatar-sm" [src]="f.img" alt="">
+            <img [src]="f.img" alt="" class="avatar-sm">
           </div>
           <!-- Icon Text -->
           <div class="icon-text">

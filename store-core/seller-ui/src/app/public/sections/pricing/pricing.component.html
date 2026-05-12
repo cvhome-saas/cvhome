@@ -1,4 +1,4 @@
-<section id="pricing" class="section price-plan-area bg-gray overflow-hidden ptb_100">
+<section class="section price-plan-area bg-gray overflow-hidden ptb_100" id="pricing">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 col-lg-8">
@@ -9,25 +9,25 @@
         </div>
       </div>
     </div>
-    <div class="row justify-content-center"  *ngIf="this.table?.tables.YEAR || this.table?.tables.MONTH">
+    <div *ngIf="this.table?.tables.YEAR || this.table?.tables.MONTH" class="row justify-content-center">
       <div class="toggle-btn">
         <span style="margin: 0.8em;">Month</span>
         <label class="switch">
-          <input type="checkbox" id="checkbox" (click)="toggle()"/>
+          <input (click)="toggle()" id="checkbox" type="checkbox"/>
           <span class="slider round"></span>
         </label>
         <span style="margin: 0.8em;">Annual</span>
       </div>
 
       <div class="col-12 col-sm-12 col-lg-12">
-        <div class="row price-plan-wrapper" *ngIf="prices">
-          <div  *ngFor="let p of prices" class="col-md-4">
+        <div *ngIf="prices" class="row price-plan-wrapper">
+          <div *ngFor="let p of prices" class="col-md-4">
             <!-- Single Price Plan -->
             <div class="single-price-plan text-center p-5 wow " data-aos-duration="2s"
                  data-wow-delay="0.4s">
               <!-- Plan Thumb -->
               <div class="plan-thumb">
-                <img class="avatar-lg" [src]="p.icon" alt="">
+                <img [src]="p.icon" alt="" class="avatar-lg">
               </div>
               <!-- Plan Title -->
               <div class="plan-title my-2 my-sm-3">
@@ -78,7 +78,7 @@
                  data-wow-delay="0.4s">
               <!-- Plan Thumb -->
               <div class="plan-thumb">
-                <img class="avatar-lg" [src]="freePricing.icon" alt="">
+                <img [src]="freePricing.icon" alt="" class="avatar-lg">
               </div>
               <!-- Plan Title -->
               <div class="plan-title my-2 my-sm-3">

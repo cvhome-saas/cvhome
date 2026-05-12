@@ -40,7 +40,7 @@ public class ShoppingCartItem extends SalesManagerEntity<Long, ShoppingCartItem>
     @Id
     @Column(name = "SHP_CART_ITEM_ID", unique = true, nullable = false)
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
-            valueColumnName = "SEQ_COUNT", pkColumnValue = "SHP_CRT_ITM_SEQ_NEXT_VAL",
+            valueColumnName = "SEQ_COUNT", pkColumnValue = "SHOPPING_CART_ITEM_SEQ_NEXT_VAL",
             allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,
             initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")

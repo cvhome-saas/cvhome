@@ -5,7 +5,7 @@ import {Link} from "@/i18n/navigation";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
-import {Facebook, Instagram, Twitter, Github} from "lucide-react";
+import {Facebook, Github, Instagram, Twitter} from "lucide-react";
 import {isRtl} from "@/services/direction-utils";
 
 export const Footer = ({params}: { params: LayoutParams }) => {
@@ -32,7 +32,8 @@ export const Footer = ({params}: { params: LayoutParams }) => {
                                     alt={params.store.logo.name}
                                 />
                             ) : null}
-                            <span className="font-['Cormorant_Garamond',serif] text-xl font-light tracking-[0.2em] uppercase text-primary">
+                            <span
+                                className="font-['Cormorant_Garamond',serif] text-xl font-light tracking-[0.2em] uppercase text-primary">
                                 {params.store.name}
                             </span>
                         </Link>

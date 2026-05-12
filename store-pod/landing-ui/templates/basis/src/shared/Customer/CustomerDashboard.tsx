@@ -1,25 +1,25 @@
 'use client'
 
-import { useTranslations } from "next-intl"
-import { useCustomer } from "@store-front/hooks/use-customer"
-import { useUser } from "@store-front/hooks/use-user"
-import { StoreContext } from "@/types/store-context"
-import { useEffect, useState } from "react"
-import { Customer } from "@/types/customer"
-import { OrderPage } from "@/types/order"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Link } from "@/i18n/navigation"
-import { isRtl } from "@/services/direction-utils"
-import { cn } from "@/lib/utils"
+import {useTranslations} from "next-intl"
+import {useCustomer} from "@store-front/hooks/use-customer"
+import {useUser} from "@store-front/hooks/use-user"
+import {StoreContext} from "@/types/store-context"
+import {useEffect, useState} from "react"
+import {Customer} from "@/types/customer"
+import {OrderPage} from "@/types/order"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Label} from "@/components/ui/label"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
+import {Button} from "@/components/ui/button"
+import {Link} from "@/i18n/navigation"
+import {isRtl} from "@/services/direction-utils"
+import {cn} from "@/lib/utils"
 
-export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext }) => {
+export const CustomerDashboard = ({storeContext}: { storeContext: StoreContext }) => {
     const t = useTranslations('PAGE.CUSTOMER')
-    const { getCustomerInfo, listOrders, loading } = useCustomer(storeContext)
-    const { user } = useUser(storeContext)
+    const {getCustomerInfo, listOrders, loading} = useCustomer(storeContext)
+    const {user} = useUser(storeContext)
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [orders, setOrders] = useState<OrderPage | null>(null)
     const isRtlLayout = isRtl(storeContext.locale)
@@ -38,7 +38,7 @@ export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext
     return (
         <div className={cn("max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8", isRtlLayout ? "text-right" : "text-left")}>
             <h1 className="text-3xl font-bold mb-8 text-foreground">{t('TITLE')}</h1>
-            
+
             <Tabs defaultValue="profile" className="w-full" dir={isRtlLayout ? "rtl" : "ltr"}>
                 <TabsList className="grid w-full grid-cols-3 mb-8">
                     <TabsTrigger value="profile">{t('PROFILE')}</TabsTrigger>
@@ -49,7 +49,8 @@ export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext
                 <TabsContent value="profile">
                     <Card>
                         <CardHeader>
-                            <CardTitle className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('PERSONAL_INFO')}</CardTitle>
+                            <CardTitle
+                                className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('PERSONAL_INFO')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
@@ -82,24 +83,26 @@ export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('BILLING_ADDRESS')}</CardTitle>
+                                <CardTitle
+                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('BILLING_ADDRESS')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <p className="font-medium">{customer?.billing?.firstName} {customer?.billing?.lastName}</p>
                                 <p>{customer?.billing?.address}</p>
-                                <p>{customer?.billing?.city}  {customer?.billing?.postalCode}</p>
+                                <p>{customer?.billing?.city} {customer?.billing?.postalCode}</p>
                                 <p>{customer?.billing?.country}</p>
                                 <p>{customer?.billing?.phone}</p>
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader>
-                                <CardTitle className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('SHIPPING_ADDRESS')}</CardTitle>
+                                <CardTitle
+                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('SHIPPING_ADDRESS')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <p className="font-medium">{customer?.delivery?.firstName} {customer?.delivery?.lastName}</p>
                                 <p>{customer?.delivery?.address}</p>
-                                <p>{customer?.delivery?.city}  {customer?.delivery?.postalCode}</p>
+                                <p>{customer?.delivery?.city} {customer?.delivery?.postalCode}</p>
                                 <p>{customer?.delivery?.country}</p>
                                 <p>{customer?.delivery?.phone}</p>
                             </CardContent>
@@ -110,21 +113,27 @@ export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext
                 <TabsContent value="orders">
                     <Card>
                         <CardHeader>
-                            <CardTitle className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('ORDERS')}</CardTitle>
+                            <CardTitle
+                                className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('ORDERS')}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {!orders || ! orders.content || orders.content.length === 0 ? (
+                            {!orders || !orders.content || orders.content.length === 0 ? (
                                 <p className="text-center py-4 text-muted-foreground">{t('NO_ORDERS')}</p>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('ORDER_ID')}</TableHead>
-                                                <TableHead className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('DATE')}</TableHead>
-                                                <TableHead className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('TOTAL')}</TableHead>
-                                                <TableHead className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('STATUS')}</TableHead>
-                                                <TableHead className={cn(isRtlLayout ? "text-left" : "text-right")}>{t('ACTIONS')}</TableHead>
+                                                <TableHead
+                                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('ORDER_ID')}</TableHead>
+                                                <TableHead
+                                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('DATE')}</TableHead>
+                                                <TableHead
+                                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('TOTAL')}</TableHead>
+                                                <TableHead
+                                                    className={cn(isRtlLayout ? "text-right" : "text-left")}>{t('STATUS')}</TableHead>
+                                                <TableHead
+                                                    className={cn(isRtlLayout ? "text-left" : "text-right")}>{t('ACTIONS')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -133,7 +142,7 @@ export const CustomerDashboard = ({ storeContext }: { storeContext: StoreContext
                                                     <TableCell className="font-medium">#{order.id}</TableCell>
                                                     <TableCell>{new Date(order.datePurchased).toLocaleDateString()}</TableCell>
                                                     <TableCell>{order?.total?.value}</TableCell>
-                                                    <TableCell>{t(order?.orderStatus??'UNKNOWN')}</TableCell>
+                                                    <TableCell>{t(order?.orderStatus ?? 'UNKNOWN')}</TableCell>
                                                     <TableCell className={cn(isRtlLayout ? "text-left" : "text-right")}>
                                                         <Button variant="ghost" asChild size="sm">
                                                             <Link href={`/customer/order/${order.id}`}>

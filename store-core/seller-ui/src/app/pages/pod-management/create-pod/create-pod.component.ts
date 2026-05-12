@@ -7,5 +7,6 @@ import {Component} from '@angular/core';
   styleUrls: ['./create-pod.component.scss']
 })
 export class CreatePodComponent {
-  constructor() {}
+  constructor() {
+  }
 }

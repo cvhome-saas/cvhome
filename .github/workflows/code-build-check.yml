@@ -17,7 +17,7 @@ on:
       - '0.*.*'
       - '1.*.*'
       - '2.*.*'
-  push: 
+  push:
     branches:
       - 'develop'
       - 'main'

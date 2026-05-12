@@ -103,7 +103,7 @@ export class TypeDetailsComponent implements OnInit {
   }
 
   fillData() {
-    this.typesService.getType( this.uniqueCode)
+    this.typesService.getType(this.uniqueCode)
       .subscribe({
         next: (types) => {
           this.type.id = types.id;
@@ -171,7 +171,7 @@ export class TypeDetailsComponent implements OnInit {
 
     if (this.type.id) {
 
-      this.typesService.updateType( this.type.id, obj)
+      this.typesService.updateType(this.type.id, obj)
         .subscribe({
           next: (data) => {
             this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_UPDATED'));
@@ -184,7 +184,7 @@ export class TypeDetailsComponent implements OnInit {
         });
 
     } else {
-      this.typesService.createType( obj)
+      this.typesService.createType(obj)
         .subscribe({
           next: (data) => {
             this.toastr.success(this.translate.instant('PRODUCT_TYPE.PRODUCT_TYPE_CREATED'));
@@ -213,7 +213,7 @@ export class TypeDetailsComponent implements OnInit {
   checkCode(event) {
     const code = event.target.value.trim();
     this.isValidCode = true;
-    this.typesService.checkCode( code)
+    this.typesService.checkCode(code)
       .subscribe(res => {
         this.isCodeExist = res.exists;
       }, err => {

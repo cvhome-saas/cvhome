@@ -1,9 +1,9 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api project(':store-pod:merchant:merchant-commons')
-	compileOnly libs.spring.webflux
-	annotationProcessor libs.lombok
+    api project(':store-pod:merchant:merchant-commons')
+    compileOnly libs.spring.webflux
+    annotationProcessor libs.lombok
 }

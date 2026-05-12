@@ -49,6 +49,7 @@ jacocoTestReport {
 static List<String> createImageTags(String repo, String version) {
     return [createImageName(repo, "latest")]
 }
+
 static String createImageName(String repo, String version) {
     String registry = System.getenv("REGISTRY")
     return registry ? "${registry}/${repo}:${version}" : "${repo}:${version}"

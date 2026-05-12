@@ -4,7 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'ngx-user-management',
-  standalone:false,
+  standalone: false,
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
 })

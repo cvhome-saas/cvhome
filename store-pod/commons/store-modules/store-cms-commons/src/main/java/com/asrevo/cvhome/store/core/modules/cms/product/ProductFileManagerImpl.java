@@ -109,14 +109,11 @@ public class ProductFileManagerImpl extends ProductFileManager {
                     throw new Exception("Cannot read image format " + productImage.getProductImage());
                 }
 
-                if (cropUploads) {
-
-                    // crop image
-                    ProductImageCropUtils utils = new ProductImageCropUtils(bufferedImage, largeImageWidth,
-                            largeImageHeight);
-                    if (utils.isCropeable()) {
-                        bufferedImage = utils.getCroppedImage();
-                    }
+                // crop image
+                ProductImageCropUtils utils = new ProductImageCropUtils(bufferedImage, largeImageWidth,
+                        largeImageHeight);
+                if (cropUploads && utils.isCropeable()) {
+                    bufferedImage = utils.getCroppedImage();
                 }
 
 

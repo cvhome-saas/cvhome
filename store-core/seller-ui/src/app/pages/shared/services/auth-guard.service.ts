@@ -1,5 +1,5 @@
 import {inject, PLATFORM_ID} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivateFn,  RouterStateSnapshot} from "@angular/router";
+import {ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot} from "@angular/router";
 import {AuthService} from "./auth.service";
 import {catchError, map, of} from "rxjs";
 import {isPlatformBrowser} from "@angular/common";

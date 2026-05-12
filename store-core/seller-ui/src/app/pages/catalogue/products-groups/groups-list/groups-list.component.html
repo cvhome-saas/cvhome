@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.PRODUCTS_GROUPS_LIST' | translate }}</h1>
@@ -8,8 +8,8 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="success" [routerLink]="['/pages/catalogue/products-groups/create-products-group']"
-                [disabled]="params.store==undefined||params.store==''">
+        <button [disabled]="params.store==undefined||params.store==''" [routerLink]="['/pages/catalogue/products-groups/create-products-group']" nbButton
+                status="success">
           <label>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate }}</label>
         </button>
 
@@ -53,13 +53,13 @@
           {{ 'COMMON.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onCreate(row)" nbButton shape="round" size="small" status="success" *ngIf="!row.id">
+          <button (click)="onCreate(row)" *ngIf="!row.id" nbButton shape="round" size="small" status="success">
             <nb-icon icon="external-link"></nb-icon>
           </button>
-          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary" *ngIf="row.id">
+          <button (click)="onEdit(row)" *ngIf="row.id" nbButton shape="round" size="small" status="primary">
             <nb-icon icon="edit"></nb-icon>
           </button>
-          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger" *ngIf="row.id">
+          <button (click)="onDelete(row)" *ngIf="row.id" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>

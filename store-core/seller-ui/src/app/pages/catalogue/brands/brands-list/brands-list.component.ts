@@ -59,7 +59,7 @@ export class BrandsListComponent extends BaseTable<any> implements OnInit {
     })
       .onClose.subscribe(res => {
       if (res) {
-        this.brandService.deleteBrand( row.id)
+        this.brandService.deleteBrand(row.id)
           .subscribe(data => {
             this.toastr.success(this.translate.instant('BRAND.BRAND_REMOVED'));
             super.trigger();

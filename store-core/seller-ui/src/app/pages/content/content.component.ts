@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 
 @Component({
-  standalone:false,
+  standalone: false,
   selector: 'ngx-content-management',
   templateUrl: './content.component.html',
   // styleUrls: ['./user-management.component.scss']

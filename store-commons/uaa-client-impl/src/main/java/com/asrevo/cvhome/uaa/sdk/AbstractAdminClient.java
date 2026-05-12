@@ -15,6 +15,9 @@ import tools.jackson.databind.ObjectMapper;
 
 public abstract class AbstractAdminClient {
 
+    private static final String ERR_REQUEST_INTERRUPTED = "Request interrupted";
+    private static final String ERR_IO_HTTP = "I/O error during HTTP call";
+
     protected final OAuth2TokenManager tokenManager;
 
     protected final HttpClient httpClient;
@@ -40,9 +43,9 @@ public abstract class AbstractAdminClient {
             return objectMapper.readValue(response.body(), responseType);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("Request interrupted", e);
+            throw new IllegalStateException(ERR_REQUEST_INTERRUPTED, e);
         } catch (IOException e) {
-            throw new UncheckedIOException("I/O error during HTTP call", e);
+            throw new UncheckedIOException(ERR_IO_HTTP, e);
         }
 
     }
@@ -54,9 +57,9 @@ public abstract class AbstractAdminClient {
             return objectMapper.readValue(response.body(), responseType);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("Request interrupted", e);
+            throw new IllegalStateException(ERR_REQUEST_INTERRUPTED, e);
         } catch (IOException e) {
-            throw new UncheckedIOException("I/O error during HTTP call", e);
+            throw new UncheckedIOException(ERR_IO_HTTP, e);
         }
 
     }
@@ -68,9 +71,9 @@ public abstract class AbstractAdminClient {
             return objectMapper.readValue(response.body(), typeReference);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("Request interrupted", e);
+            throw new IllegalStateException(ERR_REQUEST_INTERRUPTED, e);
         } catch (IOException e) {
-            throw new UncheckedIOException("I/O error during HTTP call", e);
+            throw new UncheckedIOException(ERR_IO_HTTP, e);
         }
     }
 
@@ -80,9 +83,9 @@ public abstract class AbstractAdminClient {
             verifyResponse(response);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("Request interrupted", e);
+            throw new IllegalStateException(ERR_REQUEST_INTERRUPTED, e);
         } catch (IOException e) {
-            throw new UncheckedIOException("I/O error during HTTP call", e);
+            throw new UncheckedIOException(ERR_IO_HTTP, e);
         }
 
     }

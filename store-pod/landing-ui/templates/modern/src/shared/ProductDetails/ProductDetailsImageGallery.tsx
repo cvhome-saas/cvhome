@@ -87,7 +87,8 @@ const ProductDetailsImageGallery = React.forwardRef<HTMLDivElement, ProductDetai
                                 />
                             </div>
 
-                            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/10 via-transparent to-transparent"/>
+                            <div
+                                className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/10 via-transparent to-transparent"/>
                         </div>
 
                         {images.length > 1 && (

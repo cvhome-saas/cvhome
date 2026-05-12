@@ -18,7 +18,7 @@ import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} fr
   templateUrl: './store-domain.component.html',
   styleUrls: ['./store-domain.component.scss']
 })
-export class StoreDomainComponent implements OnInit , StoreDomainComponentValidatorContext{
+export class StoreDomainComponent implements OnInit, StoreDomainComponentValidatorContext {
   isSubmited = false;
   store;
   perPageSize = 50;
@@ -71,9 +71,9 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
     }
   ];
   form: FormGroup;
-  protected readonly ColumnMode = ColumnMode;
   saasProperties = {alis: '', domain: ''};
-  shortenPodId :string;
+  shortenPodId: string;
+  protected readonly ColumnMode = ColumnMode;
 
   constructor(
     private storeService: StoreService,
@@ -182,6 +182,18 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
     this.createDomain(object.domain)
   }
 
+  public generateDomain(row: any): string {
+    if (row.domainType === "SUB_DOMAIN") {
+      return row.domain + "." + this.podServerDomain();
+    } else {
+      return row.domain;
+    }
+  }
+
+  public podServerDomain() {
+    return this.saasProperties.alis + "-" + this.shortenPodId + "." + this.saasProperties.domain;
+  }
+
   private createForm() {
     this.form = this.fb.group({
       domain: [
@@ -193,17 +205,5 @@ export class StoreDomainComponent implements OnInit , StoreDomainComponentValida
         }
       ],
     });
-  }
-
-  public generateDomain(row: any): string {
-    if (row.domainType === "SUB_DOMAIN") {
-      return row.domain + "." + this.podServerDomain();
-    } else {
-      return row.domain;
-    }
-  }
-
-  public podServerDomain() {
-    return this.saasProperties.alis + "-" + this.shortenPodId + "." + this.saasProperties.domain;
   }
 }

@@ -7,7 +7,7 @@ import {ProductDetails} from "@/shared/ProductDetails/ProductDetails";
 import {useTranslations} from "next-intl";
 import {Dialog, DialogContent} from "@/components/ui/dialog";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Eye, ShoppingCart, ExternalLink} from "lucide-react";
+import {ExternalLink, Eye, ShoppingCart} from "lucide-react";
 import Image from 'next/image';
 import {useCart} from "@store-front/hooks/use-cart";
 
@@ -33,7 +33,8 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                 {/* Out of stock overlay */}
                 {!isAvailable && (
                     <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
-                        <span className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground border border-border px-3 py-1.5 bg-background">
+                        <span
+                            className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground border border-border px-3 py-1.5 bg-background">
                             {t('OUT_OF_STOCK')}
                         </span>
                     </div>
@@ -85,9 +86,11 @@ function ProductItemButtonGroup({storeContext, product}: {
 
     return (
         <>
-            <ProductQuickView storeContext={storeContext} product={product} open={showQuickView} setOpen={setShowQuickView}/>
+            <ProductQuickView storeContext={storeContext} product={product} open={showQuickView}
+                              setOpen={setShowQuickView}/>
             <TooltipProvider>
-                <div className="absolute bottom-0 start-0 end-0 flex items-center justify-center gap-2 py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-background/90 backdrop-blur-sm">
+                <div
+                    className="absolute bottom-0 start-0 end-0 flex items-center justify-center gap-2 py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-background/90 backdrop-blur-sm">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
@@ -130,7 +133,8 @@ function ProductItemButtonGroup({storeContext, product}: {
                                         <ExternalLink className="size-4"/>
                                     </Link>
                                 </TooltipTrigger>
-                                <TooltipContent><p className="text-xs tracking-wider">{t('VIEW_DETAILS')}</p></TooltipContent>
+                                <TooltipContent><p className="text-xs tracking-wider">{t('VIEW_DETAILS')}</p>
+                                </TooltipContent>
                             </Tooltip>
                         </>
                     )}

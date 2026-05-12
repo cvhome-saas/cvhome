@@ -17,6 +17,7 @@ export class ProductService {
     //release 3.2.1 use V2
     return this.crudService.get(`/spg/catalog/api/v2/private/base-products`, params);
   }
+
   getListOfTinyProducts(params): Observable<any> {
     //release 3.2.1 use V2
     return this.crudService.get(`/spg/catalog/api/v2/private/tiny-products`, params);
@@ -30,11 +31,11 @@ export class ProductService {
     return this.crudService.put(`/spg/catalog/api/v2/private/product/${id}`, product);
   }
 
-  getProductDefinitionById( id): Observable<any> {
+  getProductDefinitionById(id): Observable<any> {
     return this.crudService.get(`/spg/catalog/api/v2/private/product/${id}`);
   }
 
-  createProduct( product): Observable<any> {
+  createProduct(product): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v2/private/product`, product);
   }
 
@@ -46,18 +47,18 @@ export class ProductService {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/types`);
   }
 
-  checkProductSku( code): Observable<any> {
+  checkProductSku(code): Observable<any> {
     const params = {
       'code': code,
     };
     return this.crudService.get(`/spg/catalog/api/v1/private/product/unique`, params);
   }
 
-  addProductToCategory( productId, categoryId): Observable<any> {
+  addProductToCategory(productId, categoryId): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/${productId}/category/${categoryId}}`, {});
   }
 
-  removeProductFromCategory( productId, categoryId): Observable<any> {
+  removeProductFromCategory(productId, categoryId): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/${productId}/category/${categoryId}`);
   }
 

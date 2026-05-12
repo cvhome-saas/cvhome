@@ -56,8 +56,6 @@ export const uriValidator: ValidatorFn = (control: AbstractControl): ValidationE
 export class ClientFormComponent implements OnInit {
   form!: FormGroup;
   resetSecretForm!: FormGroup;
-  private _value: any;
-
   // Options for the select inputs
   clientAuthenticationMethodsOptions: string[] = [];
   authorizationGrantTypesOptions: string[] = [];
@@ -67,6 +65,23 @@ export class ClientFormComponent implements OnInit {
   accessTokenFormatOptions: string[] = [];
 
   constructor(private fb: FormBuilder, private clientsService: ClientsService, private router: Router) {
+  }
+
+  private _value: any;
+
+  @Input() set value(v: any) {
+    this._value = v;
+    if (this.form) {
+      this.patchForm(v);
+    }
+  }
+
+  get redirectUris() {
+    return this.form.get('redirectUris') as FormArray;
+  }
+
+  get postLogoutRedirectUris() {
+    return this.form.get('postLogoutRedirectUris') as FormArray;
   }
 
   ngOnInit(): void {
@@ -125,13 +140,6 @@ export class ClientFormComponent implements OnInit {
     });
   }
 
-  @Input() set value(v: any) {
-    this._value = v;
-    if (this.form) {
-      this.patchForm(v);
-    }
-  }
-
   patchForm(v: any) {
     if (!v) return;
 
@@ -185,14 +193,6 @@ export class ClientFormComponent implements OnInit {
 
   createControl(value: string = ''): FormControl {
     return this.fb.control(value, [uriValidator]);
-  }
-
-  get redirectUris() {
-    return this.form.get('redirectUris') as FormArray;
-  }
-
-  get postLogoutRedirectUris() {
-    return this.form.get('postLogoutRedirectUris') as FormArray;
   }
 
   addRedirectUri() {

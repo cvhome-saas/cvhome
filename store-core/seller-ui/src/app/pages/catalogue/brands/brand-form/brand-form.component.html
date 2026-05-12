@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ title | translate }}</h1>
@@ -8,10 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -24,8 +25,8 @@
       <div class="form-group">
         <label class="col-sm-10 col-form-label" for="code">{{ 'COMMON.CODE' | translate }}</label>
         <div class="col-sm-12">
-          <input fullWidth nbInput (change)="checkCode($event)" [readOnly]="brand.id" class="form-control"
-                 formControlName='code' id="code"
+          <input (change)="checkCode($event)" [readOnly]="brand.id" class="form-control" formControlName='code' fullWidth
+                 id="code" nbInput
                  placeholder="{{ 'COMMON.CODE' | translate}}" required type="text">
           <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
               <span *ngIf="code.errors.required">
@@ -44,7 +45,7 @@
       <div class="form-group">
         <label class="col-sm-10 col-form-label " for="sortOrder">{{ 'COMMON.ORDER' | translate }}</label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='order' id="sortOrder"
+          <input class="form-control " formControlName='order' fullWidth id="sortOrder" nbInput
                  placeholder="{{ 'COMMON.ORDER' | translate }}"
                  required type="text">
         </div>
@@ -53,7 +54,7 @@
       <div class="form-group">
         <label class="col-sm-10 col-form-label ">{{ 'COMMON.LANGUAGE' | translate }} *</label>
         <div class="col-sm-12">
-          <nb-select fullWidth *ngIf="languages.length" class="fullWidth" formControlName='selectedLanguage'
+          <nb-select *ngIf="languages.length" class="fullWidth" formControlName='selectedLanguage' fullWidth
                      outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
             <nb-option *ngFor="let language of languages" [value]="language.code">{{
                 ('LANG.' + language.code) |
@@ -76,8 +77,9 @@
                       translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input nbInput fullWidth (ngModelChange)="changeName($event, j)" class="form-control " formControlName='name'
+                  <input (ngModelChange)="changeName($event, j)" class="form-control " formControlName='name' fullWidth
                          id="name"
+                         nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate}}"
                          type="text">
                   <span *ngIf="(descr.get('name').dirty || descr.get('name').touched)
@@ -92,7 +94,7 @@
                     'DESCRIPTION_FORM.HIGHLIGHT' | translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input nbInput fullWidth class="form-control " formControlName='highlights' id="highlight"
+                  <input class="form-control " formControlName='highlights' fullWidth id="highlight" nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate}}"
                          type="text">
                 </div>
@@ -103,7 +105,7 @@
                     'DESCRIPTION_FORM.FRIENDLY_URL' | translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input nbInput fullWidth class="form-control " formControlName='friendlyUrl' id="friendlyUrl"
+                  <input class="form-control " formControlName='friendlyUrl' fullWidth id="friendlyUrl" nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate}}"
                          type="text">
                   <span *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
@@ -130,7 +132,7 @@
                       translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input nbInput fullWidth class="form-control " formControlName='title' id="title"
+                  <input class="form-control " formControlName='title' fullWidth id="title" nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate}}"
                          type="text">
                 </div>
@@ -142,7 +144,7 @@
                       | translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input nbInput fullWidth class="form-control " formControlName='keyWords' id="keyWords"
+                  <input class="form-control " formControlName='keyWords' fullWidth id="keyWords" nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.KEYWORDS_PLACEHOLDER' | translate}}"
                          type="text">
                 </div>

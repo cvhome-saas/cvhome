@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ title | translate }}</h1>
@@ -7,17 +7,18 @@
       <div class="col">
       </div>
       <div *ngIf="user!=undefined" class="col col-lg-2">
-        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">
             {{ item.title |translate }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -32,7 +33,7 @@
           *
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='userName' id="username"
+          <input class="form-control " formControlName='userName' fullWidth id="username" nbInput
                  placeholder="{{ 'USER_FORM.USER_NAME' | translate }}"
                  required type="text">
           <span *ngIf="(userName.dirty || userName.touched) && userName.invalid && userName.errors.required"
@@ -47,7 +48,7 @@
           {{ 'USER_FORM.FIRST_NAME' | translate }}
           *</label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='firstName' id="firstname"
+          <input class="form-control " formControlName='firstName' fullWidth id="firstname" nbInput
                  placeholder="{{ 'USER_FORM.FIRST_NAME' | translate }}"
                  required type="text">
           <span *ngIf="(firstName.dirty || firstName.touched) && firstName.invalid && firstName.errors.required"
@@ -60,7 +61,7 @@
         <label class="col-sm-3 col-form-label " for="lastname">{{ 'USER_FORM.LAST_NAME' | translate }}
           *</label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='lastName' id="lastname"
+          <input class="form-control " formControlName='lastName' fullWidth id="lastname" nbInput
                  placeholder="{{ 'USER_FORM.LAST_NAME' | translate }}"
                  required type="text">
           <span *ngIf="(lastName.dirty || lastName.touched) && lastName.invalid && lastName.errors.required"
@@ -74,7 +75,7 @@
           {{ 'USER_FORM.EMAIL_ADDRESS' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='emailAddress' id="email"
+          <input class="form-control " formControlName='emailAddress' fullWidth id="email" nbInput
                  placeholder="{{ 'USER_FORM.EMAIL_ADDRESS' | translate }}" required type="email">
           <span *ngIf="(emailAddress.dirty || emailAddress.touched) && emailAddress.invalid && emailAddress"
                 class="err-message">
@@ -93,7 +94,7 @@
           {{ 'COMMON.PASSWORD' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='password' id="password"
+          <input class="form-control " formControlName='password' fullWidth id="password" nbInput
                  placeholder="{{ 'COMMON.PASSWORD' | translate }}"
                  required type="password">
           <span *ngIf="(password.dirty || password.touched) && password.invalid && password" class="err-message">
@@ -112,7 +113,7 @@
           Repeat Password *
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control" formControlName='repeatPassword' id="repeatPassword"
+          <input class="form-control" formControlName='repeatPassword' fullWidth id="repeatPassword" nbInput
                  placeholder="Repeat Password"
                  required type="password">
           <span *ngIf="(repeatPassword.dirty || repeatPassword.touched) && repeatPassword.invalid && repeatPassword"
@@ -140,8 +141,8 @@
           {{ 'USER_FORM.ROLES' | translate }} *
         </label>
         <div class="col-sm-12 group-block">
-          <nb-checkbox [disabled]="action=='VIEW'" *ngFor="let role of roles" [checked]="role.checked"
-                       (change)="checkRole(role.name)">
+          <nb-checkbox (change)="checkRole(role.name)" *ngFor="let role of roles" [checked]="role.checked"
+                       [disabled]="action=='VIEW'">
             {{ role.name }}
           </nb-checkbox>
         </div>

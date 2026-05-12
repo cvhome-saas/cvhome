@@ -19,24 +19,24 @@ export class StoreService {
     return this.crudService.get(`/control-plane/api/v1/store-manager/private/store/${store}`);
   }
 
-  getAllocations(store:string): Observable<any> {
-    return this.crudService.get(`/spg/merchant/api/v1/router/private/allocates`,{store});
+  getAllocations(store: string): Observable<any> {
+    return this.crudService.get(`/spg/merchant/api/v1/router/private/allocates`, {store});
   }
 
-  storePodByStoreId(store:string): Observable<Pod> {
-    return this.crudService.get(`/control-plane/api/v1/router/store-pod-by-store-id`,{store});
+  storePodByStoreId(store: string): Observable<Pod> {
+    return this.crudService.get(`/control-plane/api/v1/router/store-pod-by-store-id`, {store});
   }
 
   saasProperties(): Observable<any> {
     return this.crudService.get(`/control-plane/api/v1/saas/public/saas-properties`);
   }
 
-  allocateDomain(store:string ,domain:string): Observable<any> {
+  allocateDomain(store: string, domain: string): Observable<any> {
     return this.crudService.post(`/spg/merchant/api/v1/router/private/allocate?domain=${domain}`, {store});
   }
 
-  removeDomain( domain:string,store:string): Observable<any> {
-    return this.crudService.delete(`/spg/merchant/api/v1/router/private/remove?domain=${domain}`,{store});
+  removeDomain(domain: string, store: string): Observable<any> {
+    return this.crudService.delete(`/spg/merchant/api/v1/router/private/remove?domain=${domain}`, {store});
   }
 
   getListOfStores(params): Observable<any> {
@@ -54,8 +54,8 @@ export class StoreService {
     return this.crudService.post(`/control-plane/api/v1/store-manager/private/store`, store);
   }
 
-  deleteStore(store:string): Observable<any> {
-    return this.crudService.delete(`/spg/merchant/api/v1/private/store`,{store});
+  deleteStore(store: string): Observable<any> {
+    return this.crudService.delete(`/spg/merchant/api/v1/private/store`, {store});
   }
 
   updateStore(store: any): Observable<any> {
@@ -64,12 +64,12 @@ export class StoreService {
 
   // PAGE CONTENT
 
-  getPageContent(store:string,pageCode: string): Observable<any> {
-    return this.crudService.get(`/spg/merchant/api/v1/private/content/any/${pageCode}`,{store});
+  getPageContent(store: string, pageCode: string): Observable<any> {
+    return this.crudService.get(`/spg/merchant/api/v1/private/content/any/${pageCode}`, {store});
   }
 
-  updatePageContent(store:string, code:string, content: any): Observable<any> {
-    return this.crudService.put(`/spg/merchant/api/v1/private/content/${code}`, content,{store});
+  updatePageContent(store: string, code: string, content: any): Observable<any> {
+    return this.crudService.put(`/spg/merchant/api/v1/private/content/${code}`, content, {store});
   }
 
   createPageContent(content: any, store: string): Observable<any> {
@@ -91,19 +91,19 @@ export class StoreService {
     return this.crudService.delete(`/v1/private/store/${store}/marketing/logo`);
   }
 
-  addStoreBanner(store:string,file: any): Observable<any> {
+  addStoreBanner(store: string, file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/banner`, uploadData,{store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/banner`, uploadData, {store});
   }
 
   addStoreSliderImage(store: string, file: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('file', file, file.name);
-    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/add-slider-image`, uploadData,{store});
+    return this.crudService.post(`/spg/merchant/api/v1/private/store/marketing/add-slider-image`, uploadData, {store});
   }
 
-  saveStoreImageSliders(store:string, sliderImages: SliderImage[]) {
+  saveStoreImageSliders(store: string, sliderImages: SliderImage[]) {
     return this.crudService.put(`/spg/merchant/api/v1/private/store/marketing/slider-images`, {
       sliderImages
     }, {store});
@@ -125,7 +125,7 @@ export class StoreService {
     return this.crudService.get(`/control-plane/api/v1/store-manager/public/social-links-providers`);
   }
 
-  updateStoreSocialLinks(storeId,request) {
+  updateStoreSocialLinks(storeId, request) {
     return this.crudService.put(`/spg/merchant/api/v1/private/store/social-links`, request);
   }
 

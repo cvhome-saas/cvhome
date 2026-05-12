@@ -62,6 +62,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class ProductApi {
 
+    private static final String ERR_PRODUCT_ID_NOT_FOUND = "Product id [%s] is not found";
+    private static final String ERR_PRODUCT_ID_WRONG_STORE = "Product id [%s] does not belong to store [%s]";
+    private static final String ERR_CATEGORY_ID_NOT_FOUND = "Category id [%s] is not found";
+    private static final String ERR_CATEGORY_ID_WRONG_STORE = "Category id [%s] does not belong to store [%s]";
+    private static final String ERR_PRODUCT_NOT_FOUND_MERCHANT = "Product [%s] not found for merchant [%s]";
+
     private final CategoryService categoryService;
 
     private final ProductService productService;
@@ -201,23 +207,21 @@ public class ProductApi {
             Product product = productService.getById(productId);
 
             if (product == null) {
-                throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
+                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_ID_NOT_FOUND, productId));
             }
 
             if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Product id [" + productId + "] does not belong to store [" + merchantStore + "]");
+                throw new UnauthorizedException(String.format(ERR_PRODUCT_ID_WRONG_STORE, productId, merchantStore));
             }
 
             Category category = categoryService.getById(categoryId);
 
             if (category == null) {
-                throw new ResourceNotFoundException("Category id [" + categoryId + "] is not found");
+                throw new ResourceNotFoundException(String.format(ERR_CATEGORY_ID_NOT_FOUND, categoryId));
             }
 
             if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Category id [" + categoryId + "] does not belong to store [" + merchantStore + "]");
+                throw new UnauthorizedException(String.format(ERR_CATEGORY_ID_WRONG_STORE, categoryId, merchantStore));
             }
 
             productCommonFacade.addProductToCategory(category, product, language);
@@ -243,23 +247,21 @@ public class ProductApi {
             Product product = productService.getById(productId);
 
             if (product == null) {
-                throw new ResourceNotFoundException("Product id [" + productId + "] is not found");
+                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_ID_NOT_FOUND, productId));
             }
 
             if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Product id [" + productId + "] does not belong to store [" + merchantStore + "]");
+                throw new UnauthorizedException(String.format(ERR_PRODUCT_ID_WRONG_STORE, productId, merchantStore));
             }
 
             Category category = categoryService.getById(categoryId);
 
             if (category == null) {
-                throw new ResourceNotFoundException("Category id [" + categoryId + "] is not found");
+                throw new ResourceNotFoundException(String.format(ERR_CATEGORY_ID_NOT_FOUND, categoryId));
             }
 
             if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(
-                        "Category id [" + categoryId + "] does not belong to store [" + merchantStore + "]");
+                throw new UnauthorizedException(String.format(ERR_CATEGORY_ID_WRONG_STORE, categoryId, merchantStore));
             }
 
             productCommonFacade.removeProductFromCategory(category, product, language);
@@ -291,20 +293,18 @@ public class ProductApi {
             Product p = productService.getById(id);
 
             if (p == null) {
-                throw new ResourceNotFoundException(
-                        "Product [" + id + "] not found for merchant [" + merchantStore + "]");
+                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_NOT_FOUND_MERCHANT, id, merchantStore));
             }
 
             if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException(
-                        "Product [" + id + "] not found for merchant [" + merchantStore + "]");
+                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_NOT_FOUND_MERCHANT, id, merchantStore));
             }
 
             p.setSortOrder(position);
 
         } catch (Exception e) {
             log.error("Error while updating Product position", e);
-            throw new ServiceRuntimeException("Product [" + id + "] cannot be edited");
+            throw new ServiceRuntimeException(String.format("Product [%s] cannot be edited", id));
         }
     }
 

@@ -17,7 +17,7 @@ const routes: Routes = [{
       path: 'create-pod',
       component: CreatePodComponent,
     },
-     {
+    {
       path: 'pod/:id',
       component: EditPodComponent,
     },

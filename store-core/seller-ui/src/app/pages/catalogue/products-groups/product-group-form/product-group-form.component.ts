@@ -24,7 +24,6 @@ export class ProductGroupFormComponent implements OnInit {
   loader: boolean = false;
   perPageSize = 50;
   isCodeUnique = true;
-  private isLoaded: boolean = false;
   store: string;
   uniqueCode: string;
   action: string;
@@ -33,6 +32,7 @@ export class ProductGroupFormComponent implements OnInit {
   rows: Array<any> = [];
   page: Page = new Page();
   protected readonly ColumnMode = ColumnMode;
+  private isLoaded: boolean = false;
 
   constructor(
     private fb: FormBuilder,

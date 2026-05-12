@@ -42,15 +42,15 @@
               "node_modules/@swimlane/ngx-datatable/themes/dark.scss",
               "node_modules/@swimlane/ngx-datatable/themes/material.scss",
               "node_modules/@swimlane/ngx-datatable/assets/icons.css"
-              ],
-              "allowedCommonJsDependencies": [
-                "file-saver",
-                "moment",
-                "eva-icons",
-                "quill-delta",
-                "quill",
-                "@angular-architects/module-federation"
-              ],
+            ],
+            "allowedCommonJsDependencies": [
+              "file-saver",
+              "moment",
+              "eva-icons",
+              "quill-delta",
+              "quill",
+              "@angular-architects/module-federation"
+            ],
             "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",

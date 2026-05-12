@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.repositories.product.availability;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +17,7 @@ public interface ProductAvailabilityRepository extends JpaRepository<ProductAvai
             left join fetch pp.descriptions ppd
             join fetch p.product ppr
             where p.id=?1""")
-    @Override
-    ProductAvailability getById(Long availabilityId);
+    Optional<ProductAvailability> findProductAvailabilityById(Long availabilityId);
 
     @Query(value = """
             select distinct p from ProductAvailability p
