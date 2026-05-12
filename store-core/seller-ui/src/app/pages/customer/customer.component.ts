@@ -3,7 +3,7 @@ import {Component} from '@angular/core';
 
 @Component({
   selector: 'ngx-customer',
-  standalone:false,
+  standalone: false,
   templateUrl: './customer.component.html',
 })
 

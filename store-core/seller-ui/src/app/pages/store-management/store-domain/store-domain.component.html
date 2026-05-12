@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'STORE.STORE_DOMAIN' | translate }}</h1>
@@ -7,7 +7,7 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
@@ -19,22 +19,22 @@
   </nb-card-header>
   <nb-card-body>
 
-    <form [formGroup]='form' (ngSubmit)="save()" class="mx-auto" style="max-width: 600px;">
+    <form (ngSubmit)="save()" [formGroup]='form' class="mx-auto" style="max-width: 600px;">
       <div class="card border-0 shadow-sm rounded-3 p-4">
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">
-              <label for="domain" class="label required">{{ 'STORE.DOMAIN' | translate }}</label>
-              <input type="text" nbInput fullWidth id="domain" formControlName="domain"
-                     [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate">
+              <label class="label required" for="domain">{{ 'STORE.DOMAIN' | translate }}</label>
+              <input [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate" formControlName="domain" fullWidth id="domain" nbInput
+                     type="text">
               <ng-container *ngIf="(domain.dirty || domain.touched || isSubmited) && domain.invalid">
-                <p class="caption status-danger" *ngIf="domain.errors?.required">
+                <p *ngIf="domain.errors?.required" class="caption status-danger">
                   {{ 'STORE.DOMAIN_REQUIRED' | translate }}
                 </p>
-                <p class="caption status-danger" *ngIf="domain.errors?.pattern">
+                <p *ngIf="domain.errors?.pattern" class="caption status-danger">
                   {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
                 </p>
-                <p class="caption status-danger" *ngIf="domain.errors?.dnsNotPointingToCname">
+                <p *ngIf="domain.errors?.dnsNotPointingToCname" class="caption status-danger">
                   {{
                     'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
                       domain: domain.errors.dnsNotPointingToCname.domainChecked,
@@ -42,14 +42,14 @@
                     }
                   }}
                 </p>
-                <p class="caption status-warning" *ngIf="domain.errors?.dnsCheckServiceError">
+                <p *ngIf="domain.errors?.dnsCheckServiceError" class="caption status-warning">
                   {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
                 </p>
-                <p class="caption text-hint" *ngIf="domain.errors?.waitingForInfraInfo">
+                <p *ngIf="domain.errors?.waitingForInfraInfo" class="caption text-hint">
                   {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
                 </p>
               </ng-container>
-              <p class="caption text-hint" *ngIf="domain.pending">
+              <p *ngIf="domain.pending" class="caption text-hint">
                 {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
               </p>
               <p class="caption">
@@ -60,9 +60,9 @@
         </div>
 
         <div class="d-flex justify-content-center">
-          <button nbButton
-                  status="primary"
-                  class="text-uppercase fw-bold">
+          <button class="text-uppercase fw-bold"
+                  nbButton
+                  status="primary">
             {{ 'STORE.SAVE' | translate }}
           </button>
         </div>
@@ -99,7 +99,8 @@
           <button (click)="onAccess(row)" nbButton shape="round" size="small" status="success">
             <nb-icon icon="external-link"></nb-icon>
           </button>
-          <button (click)="onDelete(row.domain)" nbButton shape="round" size="small" status="danger" *ngIf="row.domainType!='SUB_DOMAIN'">
+          <button (click)="onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round" size="small"
+                  status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>

@@ -269,11 +269,11 @@ create table if not exists checkout.orders
                 )
             ),
     order_total             numeric(38, 2),
-    billing_country_code      varchar(6)  not null,
-    billing_zone_code         varchar(100),
+    billing_country_code    varchar(6)  not null,
+    billing_zone_code       varchar(100),
     currency_id             varchar(6),
     delivery_country_CODE   varchar(6),
-    delivery_zone_code        varchar(100),
+    delivery_zone_code      varchar(100),
     store_merchant_id       varchar(50)
 );
 create table if not exists checkout.order_account

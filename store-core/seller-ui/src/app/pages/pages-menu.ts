@@ -100,7 +100,7 @@ export const MENU_ITEMS: MenuItem[] =
         }
       ],
     },
-     {
+    {
       title: 'Pod Management',
       key: 'Pod Management',
       icon: 'cube',

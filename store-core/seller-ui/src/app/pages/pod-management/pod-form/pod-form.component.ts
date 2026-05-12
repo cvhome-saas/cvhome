@@ -34,6 +34,14 @@ export class PodFormComponent implements OnInit {
     });
   }
 
+  get name() {
+    return this.form.get('name');
+  }
+
+  get endpointUrl() {
+    return this.form.get('endpoint.endpoint');
+  }
+
   ngOnInit(): void {
     if (this.pod) {
       this.form.patchValue(this.pod);
@@ -68,13 +76,5 @@ export class PodFormComponent implements OnInit {
       delete pod.orgId;
     }
     return pod;
-  }
-
-  get name() {
-    return this.form.get('name');
-  }
-
-  get endpointUrl() {
-    return this.form.get('endpoint.endpoint');
   }
 }

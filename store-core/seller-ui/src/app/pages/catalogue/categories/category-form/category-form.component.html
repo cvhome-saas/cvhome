@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.CATEGORY' | translate }}</h1>
@@ -8,11 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" *ngIf="!loader" [disabled]="!form.valid" (click)="save()" [nbSpinner]="loader"
-                nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" *ngIf="!loader" [disabled]="!form.valid" [nbSpinner]="loader" nbButton nbSpinnerSize="large"
+                nbSpinnerStatus="control" status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -26,7 +26,7 @@
       <div [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
         <div class="row">
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-            <nb-card status="control" accent="info">
+            <nb-card accent="info" status="control">
               <nb-card-header>{{ 'CONTENT.BASIC_DETAILS' | translate }}</nb-card-header>
               <nb-card-body>
                 <div class="row">
@@ -42,10 +42,11 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label">{{ 'CATEGORY.PARENT' | translate }}</label>
-                      <nb-select fullWidth *ngIf="roots.length" formControlName='parent' outline
+                      <nb-select *ngIf="roots.length" formControlName='parent' fullWidth outline
                                  placeholder="root"
                                  shape="rectangle">
-                        <nb-option *ngFor="let category of roots" [value]="category.code">{{ category.code }}</nb-option>
+                        <nb-option *ngFor="let category of roots" [value]="category.code">{{ category.code }}
+                        </nb-option>
                       </nb-select>
                     </div>
                   </div>
@@ -55,9 +56,10 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label" for="code">Code *</label>
-                      <input nbInput fullWidth (change)="checkCode($event)" [readOnly]="category.id" class="form-control"
-                             formControlName='code'
-                             id="code" placeholder="{{ 'COMMON.CODE' | translate}}"
+                      <input (change)="checkCode($event)" [readOnly]="category.id" class="form-control" formControlName='code'
+                             fullWidth
+                             id="code"
+                             nbInput placeholder="{{ 'COMMON.CODE' | translate}}"
                              required
                              type="text">
                       <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
@@ -78,7 +80,7 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label" for="order">{{ 'COMMON.ORDER' | translate }}</label>
-                      <input nbInput fullWidth class="form-control" formControlName='sortOrder' id="order"
+                      <input class="form-control" formControlName='sortOrder' fullWidth id="order" nbInput
                              placeholder="{{ 'COMMON.ORDER' | translate}}" required type="text">
                     </div>
                   </div>
@@ -88,7 +90,7 @@
           </div>
 
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-            <nb-card status="control" accent="info">
+            <nb-card accent="info" status="control">
               <nb-card-header>
                 <nb-actions size="small">
                   <nb-action>{{ 'COMMON.SEO_DETAILS' | translate }}</nb-action>
@@ -105,7 +107,7 @@
                 </nb-actions>
               </nb-card-header>
 
-              <nb-card-body >
+              <nb-card-body>
                 <div class="row">
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
@@ -121,7 +123,7 @@
                               <label class="label col-form-label" for="title">
                                 {{ 'DESCRIPTION_FORM.TITLE' |translate }}
                               </label>
-                              <input nbInput fullWidth class="form-control" formControlName='title' id="title"
+                              <input class="form-control" formControlName='title' fullWidth id="title" nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate}}"
                                      type="text">
                             </div>
@@ -130,8 +132,8 @@
                                   'DESCRIPTION_FORM.NAME' |
                                     translate
                                 }} *</label>
-                              <input nbInput fullWidth (ngModelChange)="changeName($event, j)" class="form-control"
-                                     formControlName='name' id="name"
+                              <input (ngModelChange)="changeName($event, j)" class="form-control" formControlName='name' fullWidth
+                                     id="name" nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate}}"
                                      type="text">
                               <span
@@ -145,7 +147,8 @@
                               <label class="label col-form-label" for="friendlyUrl">
                                 {{ 'DESCRIPTION_FORM.FRIENDLY_URL'|translate }} *
                               </label>
-                              <input nbInput fullWidth class="form-control" formControlName='friendlyUrl' id="friendlyUrl"
+                              <input class="form-control" formControlName='friendlyUrl' fullWidth id="friendlyUrl"
+                                     nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate}}"
                                      type="text">
                               <span
@@ -160,7 +163,7 @@
                               <label class="label col-form-label" for="highlight">
                                 {{ 'DESCRIPTION_FORM.HIGHLIGHT' |translate }}
                               </label>
-                              <input nbInput fullWidth class="form-control" formControlName='highlights' id="highlight"
+                              <input class="form-control" formControlName='highlights' fullWidth id="highlight" nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate}}"
                                      type="text">
                             </div>
@@ -169,7 +172,8 @@
                               <label class="label col-form-label" for="metaDescription">{{
                                   'DESCRIPTION_FORM.META_DESCRIPTION' | translate
                                 }}</label>
-                              <input nbInput fullWidth class="form-control" formControlName='metaDescription' id="metaDescription"
+                              <input class="form-control" formControlName='metaDescription' fullWidth id="metaDescription"
+                                     nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.META_DESCRIPTION' | translate}}"
                                      type="text">
                             </div>
@@ -190,9 +194,9 @@
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <nb-card status="control" accent="info">
-              <nb-card-header >{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}</nb-card-header>
-              <nb-card-body >
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}</nb-card-header>
+              <nb-card-body>
                 <div>
                   <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
                     <div *ngFor="let descr of descriptions.controls; let k=index">

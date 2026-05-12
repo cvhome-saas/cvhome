@@ -18,7 +18,7 @@ common:
       store: memberlist   # ✅ more stable than inmemory
 
 memberlist:
-  join_members: []        # single node, fine empty
+  join_members: [ ]        # single node, fine empty
 
 ingester:
   chunk_idle_period: 5m        # ✅ avoids premature flush

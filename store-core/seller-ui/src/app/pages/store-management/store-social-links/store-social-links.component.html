@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'STORE.STORE_SOCIAL_LINKS' | translate }}</h1>
@@ -7,26 +7,26 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select fullWidth [(selected)]="selectedItem" outline shape="rectangle">
+        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
           <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="success" (click)="save()"
+        <button (click)="save()" nbButton status="success"
                 type="submit">
-          {{  'COMMON.SAVE'  | translate }}
+          {{ 'COMMON.SAVE'  | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="store" [formGroup]='form' (ngSubmit)="save()" class="mt-4">
+    <form (ngSubmit)="save()" *ngIf="store" [formGroup]='form' class="mt-4">
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-8">
-            <div class="card shadow-sm mb-3 rounded-3 border-0 hover-shadow" *ngFor="let provider of providers">
+            <div *ngFor="let provider of providers" class="card shadow-sm mb-3 rounded-3 border-0 hover-shadow">
               <div class="card-body py-3 px-4">
                 <div class="form-group">
                   <div class="d-flex align-items-center mb-2">
@@ -35,10 +35,10 @@
                            class="h6 mb-0 text-primary">{{ 'STORE.SOCIAL_LINKS_PROVIDER_' + provider | translate }}</label>
                   </div>
                   <div class="input-group">
-                    <input nbInput fullWidth [id]="'input_' + provider"
-                           [formControlName]="provider"
+                    <input [formControlName]="provider" [id]="'input_' + provider" [placeholder]="'Enter your ' + provider + ' profile link'"
                            class="form-control"
-                           [placeholder]="'Enter your ' + provider + ' profile link'"
+                           fullWidth
+                           nbInput
                            type="text">
                   </div>
                 </div>

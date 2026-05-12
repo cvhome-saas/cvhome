@@ -19,7 +19,7 @@ import {Button} from "@/components/ui/button";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Globe, Menu, ShoppingBag, X, User} from "lucide-react";
+import {Globe, Menu, ShoppingBag, User, X} from "lucide-react";
 import {Box} from "@/types/content";
 import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
@@ -32,7 +32,8 @@ import {useUser} from "@store-front/hooks/use-user";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
-    headerBox: Box | undefined,}) => {
+    headerBox: Box | undefined,
+}) => {
     const t = useTranslations('COMPONENTS.HEADER');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [cartOpen, setCartOpen] = useState(false)
@@ -49,7 +50,8 @@ export const Header = ({params, headerBox}: {
     return (
         <>
             <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
-            <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/20 shadow-sm">
+            <header
+                className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-primary/20 shadow-sm">
                 <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
                     <div className="flex items-center">
                         <Link prefetch={false} href={"/"} className="-m-1.5 p-1.5 group flex items-center gap-2">
@@ -64,7 +66,8 @@ export const Header = ({params, headerBox}: {
                                     className="h-10 w-auto transition-all duration-500 ease-in-out group-hover:rotate-12 group-hover:scale-110"
                                 />
                             }
-                            <span className="text-xl font-serif font-bold tracking-tight text-primary">{params.store.name}</span>
+                            <span
+                                className="text-xl font-serif font-bold tracking-tight text-primary">{params.store.name}</span>
                         </Link>
                     </div>
                     <div className="flex lg:hidden">
@@ -81,60 +84,65 @@ export const Header = ({params, headerBox}: {
                         </Sheet>
                     </div>
                     <div className="flex-1 flex justify-center">
-                    <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList className="flex-wrap">
-                            <NavigationMenuItem>
-                                <Link href="/" legacyBehavior passHref>
-                                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
-                                        {t('HOME_TITLE')}
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-
-                            {params.categories?.content?.filter(it => it.description).map((category) => (
-                                <NavigationMenuItem key={category.code}>
-                                    {category.children && category.children.length > 0 ? (
-                                        <>
-                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
-                                                  passHref>
-                                                <NavigationMenuTrigger className="cursor-pointer bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm">
-                                                    {category.description.name}
-                                                </NavigationMenuTrigger>
-                                            </Link>
-                                            <NavigationMenuContent>
-                                                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                                                    {category.children.filter(child => child.description).map((child) => (
-                                                        <ListItem
-                                                            key={child.code}
-                                                            href={`/category/${child.description.friendlyUrl}`}
-                                                            title={child.description.name}
-                                                        />
-                                                    ))}
-                                                </ul>
-                                            </NavigationMenuContent>
-                                        </>
-                                    ) : (
-                                        <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
-                                              passHref>
-                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
-                                                {category.description.name}
-                                            </NavigationMenuLink>
-                                        </Link>
-                                    )}
-                                </NavigationMenuItem>
-                            ))}
-
-                            {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
-                                <NavigationMenuItem key={it.code}>
-                                    <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
-                                        <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
-                                            {it.description.name}
+                        <NavigationMenu className="hidden lg:flex">
+                            <NavigationMenuList className="flex-wrap">
+                                <NavigationMenuItem>
+                                    <Link href="/" legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
+                                            {t('HOME_TITLE')}
                                         </NavigationMenuLink>
                                     </Link>
                                 </NavigationMenuItem>
-                            ))}
-                        </NavigationMenuList>
-                    </NavigationMenu>
+
+                                {params.categories?.content?.filter(it => it.description).map((category) => (
+                                    <NavigationMenuItem key={category.code}>
+                                        {category.children && category.children.length > 0 ? (
+                                            <>
+                                                <Link href={`/category/${category.description.friendlyUrl}`}
+                                                      legacyBehavior
+                                                      passHref>
+                                                    <NavigationMenuTrigger
+                                                        className="cursor-pointer bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm">
+                                                        {category.description.name}
+                                                    </NavigationMenuTrigger>
+                                                </Link>
+                                                <NavigationMenuContent>
+                                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                                                        {category.children.filter(child => child.description).map((child) => (
+                                                            <ListItem
+                                                                key={child.code}
+                                                                href={`/category/${child.description.friendlyUrl}`}
+                                                                title={child.description.name}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                </NavigationMenuContent>
+                                            </>
+                                        ) : (
+                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
+                                                  passHref>
+                                                <NavigationMenuLink
+                                                    className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
+                                                    {category.description.name}
+                                                </NavigationMenuLink>
+                                            </Link>
+                                        )}
+                                    </NavigationMenuItem>
+                                ))}
+
+                                {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
+                                    <NavigationMenuItem key={it.code}>
+                                        <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
+                                            <NavigationMenuLink
+                                                className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-primary/5 text-foreground hover:text-primary transition-colors font-serif font-medium uppercase tracking-wider text-sm")}>
+                                                {it.description.name}
+                                            </NavigationMenuLink>
+                                        </Link>
+                                    </NavigationMenuItem>
+                                ))}
+                            </NavigationMenuList>
+                        </NavigationMenu>
                     </div>
 
                     <div className="hidden lg:flex items-center gap-2">
@@ -146,7 +154,7 @@ export const Header = ({params, headerBox}: {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon" className="rounded-full">
-                                            <User className="size-6" />
+                                            <User className="size-6"/>
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
@@ -155,14 +163,16 @@ export const Header = ({params, headerBox}: {
                                                 {t('PROFILE')}
                                             </Link>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
+                                        <DropdownMenuItem onClick={logout}
+                                                          className="cursor-pointer text-destructive focus:text-destructive">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         ) : (
-                            <Button variant="ghost" onClick={login} className="text-sm font-semibold leading-6 text-foreground">
+                            <Button variant="ghost" onClick={login}
+                                    className="text-sm font-semibold leading-6 text-foreground">
                                 {t('LOGIN')} <span aria-hidden="true">&rarr;</span>
                             </Button>
                         )}
@@ -194,7 +204,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
-    const { user, login, logout } = useUser(params.storeContext);
+    const {user, login, logout} = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">

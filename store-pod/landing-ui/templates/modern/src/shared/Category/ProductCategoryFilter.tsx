@@ -46,7 +46,7 @@ export const ProductCategoryFilter = ({storeContext, category}: { storeContext: 
         handleManufacturerChange,
         selectedValue
     } = useProductCategoryFilter(storeContext, category);
-    
+
     return (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-3">

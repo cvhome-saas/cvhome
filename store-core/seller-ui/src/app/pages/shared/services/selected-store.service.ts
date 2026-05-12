@@ -50,6 +50,14 @@ export class SelectedStoreService {
     }));
   }
 
+  getStore(store: string): Store | undefined {
+    return this._stores.find(it => it.id.id == store);
+  }
+
+  newStore(store: Store) {
+    this._stores.push(store);
+  }
+
   private getAllStores(): Observable<Store[]> {
     if (this._stores == undefined) {
       return this.storeService.list()
@@ -58,14 +66,5 @@ export class SelectedStoreService {
       return of(this._stores);
     }
 
-  }
-
-
-  getStore(store: string): Store | undefined {
-    return this._stores.find(it => it.id.id == store);
-  }
-
-  newStore(store: Store) {
-    this._stores.push(store);
   }
 }

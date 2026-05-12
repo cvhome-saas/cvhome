@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.ORG' | translate }}</h1>
@@ -8,10 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -26,7 +27,7 @@
           {{ 'ORG_FORM.FIRST_NAME' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth  class="form-control " formControlName='firstName' id="firstName"
+          <input class="form-control " formControlName='firstName' fullWidth id="firstName" nbInput
                  placeholder="{{ 'ORG_FORM.FIRST_NAME' | translate }}" required type="text">
           <span
             *ngIf="(form.controls['user'].get('firstName').dirty || form.controls['user'].get('firstName').touched) && form.controls['user'].get('firstName').invalid &&form.controls['user'].get('firstName')"
@@ -42,7 +43,7 @@
           {{ 'ORG_FORM.LAST_NAME' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='lastName' id="lastName"
+          <input class="form-control " formControlName='lastName' fullWidth id="lastName" nbInput
                  placeholder="{{ 'ORG_FORM.LAST_NAME' | translate }}" required type="text">
           <span
             *ngIf="(form.controls['user'].get('lastName').dirty || form.controls['user'].get('lastName').touched) && form.controls['user'].get('lastName').invalid &&form.controls['user'].get('lastName')"
@@ -58,7 +59,7 @@
           {{ 'ORG_FORM.EMAIL_ADDRESS' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='emailAddress' id="email"
+          <input class="form-control " formControlName='emailAddress' fullWidth id="email" nbInput
                  placeholder="{{ 'ORG_FORM.EMAIL_ADDRESS' | translate }}" required type="email">
           <span
             *ngIf="(form.controls['user'].get('emailAddress').dirty || form.controls['user'].get('emailAddress').touched) && form.controls['user'].get('emailAddress').invalid &&form.controls['user'].get('emailAddress')"
@@ -79,7 +80,7 @@
           {{ 'COMMON.PASSWORD' | translate }}*
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='password' id="password"
+          <input class="form-control " formControlName='password' fullWidth id="password" nbInput
                  placeholder="{{ 'COMMON.PASSWORD' | translate }}"
                  required type="password">
           <span
@@ -100,7 +101,7 @@
           Repeat Password *
         </label>
         <div class="col-sm-12">
-          <input nbInput fullWidth class="form-control " formControlName='repeatPassword' id="repeatPassword"
+          <input class="form-control " formControlName='repeatPassword' fullWidth id="repeatPassword" nbInput
                  placeholder="Repeat Password"
                  required type="password">
           <span
@@ -124,8 +125,8 @@
         </label>
         <div class="col-sm-12">
 
-          <nb-select placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}"
-                     formControlName='subscriptionPlan' id="subscriptionPlan">
+          <nb-select formControlName='subscriptionPlan'
+                     id="subscriptionPlan" placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}">
             <nb-option *ngFor="let i of subscriptionPlans" [value]="i">{{ i }}</nb-option>
           </nb-select>
 

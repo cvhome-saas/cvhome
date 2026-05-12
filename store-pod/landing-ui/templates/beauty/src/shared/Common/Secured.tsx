@@ -1,12 +1,12 @@
 'use client'
 
-import { useUser } from "@store-front/hooks/use-user"
-import { StoreContext } from "@/types/store-context"
-import { ReactNode, useEffect } from "react"
-import { useTranslations } from "next-intl"
+import {useUser} from "@store-front/hooks/use-user"
+import {StoreContext} from "@/types/store-context"
+import {ReactNode, useEffect} from "react"
+import {useTranslations} from "next-intl"
 
-export const Secured = ({ storeContext, children }: { storeContext: StoreContext, children: ReactNode }) => {
-    const { user, loading, login } = useUser(storeContext)
+export const Secured = ({storeContext, children}: { storeContext: StoreContext, children: ReactNode }) => {
+    const {user, loading, login} = useUser(storeContext)
     const t = useTranslations('PAGE.CUSTOMER')
 
     useEffect(() => {

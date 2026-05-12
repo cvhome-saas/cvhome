@@ -33,7 +33,8 @@ export const ProductCategoryFilter = ({storeContext, category}: { storeContext: 
                     >
                         <div className="flex items-center gap-3">
                             <RadioGroupItem value="all" id="manufacturer-all" className="text-primary"/>
-                            <Label htmlFor="manufacturer-all" className="text-xs tracking-wider cursor-pointer text-foreground hover:text-primary transition-colors">
+                            <Label htmlFor="manufacturer-all"
+                                   className="text-xs tracking-wider cursor-pointer text-foreground hover:text-primary transition-colors">
                                 {t('ALL')}
                             </Label>
                         </div>

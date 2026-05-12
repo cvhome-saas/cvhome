@@ -77,7 +77,12 @@ export function dnsPointsToPodValidatorFactory(
         return dnsService.checkCustomDomainPointsTo(currentValue, targetPodDomain).pipe(
           map(isValid => {
             // If not valid, return the error object
-            return isValid ? null : {dnsNotPointingToCname: {requiredTarget: targetPodDomain, domainChecked: currentValue}};
+            return isValid ? null : {
+              dnsNotPointingToCname: {
+                requiredTarget: targetPodDomain,
+                domainChecked: currentValue
+              }
+            };
           }),
           catchError((err) => {
             // Handle errors from the service itself (e.g., network issues)

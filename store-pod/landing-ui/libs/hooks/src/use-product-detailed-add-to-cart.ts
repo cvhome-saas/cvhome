@@ -79,7 +79,7 @@ export const useProductDetailedAddToCart = (storeContext: StoreContext, product:
     const canDecrease = quantity > 1;
     const canIncrease = quantity < maxQty;
 
-    
+
     return {
         quantity,
         incrementQuantity,

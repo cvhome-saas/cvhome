@@ -1,6 +1,6 @@
 'use client'
 import * as React from "react";
-import {Autoplay, Navigation, Pagination, EffectFade} from 'swiper/modules';
+import {Autoplay, EffectFade, Navigation, Pagination} from 'swiper/modules';
 import {Swiper, SwiperSlide} from 'swiper/react';
 import Image from 'next/image';
 
@@ -57,7 +57,8 @@ const CoverFlow = React.forwardRef<HTMLElement, CoverFlowProps>(
                                         />
                                     </div>
 
-                                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/35 via-black/10 to-transparent"/>
+                                    <div
+                                        className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/35 via-black/10 to-transparent"/>
 
                                     <div className="absolute inset-x-6 bottom-6 sm:inset-x-10 sm:bottom-10">
                                         <p className="text-xs tracking-[0.22em] uppercase text-white/85">

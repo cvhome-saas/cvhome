@@ -1,6 +1,3 @@
-
-
-
 INSERT INTO merchant.sm_sequencer (seq_name, seq_count)
 VALUES ('category_description_seq', 8)
 on conflict do nothing;

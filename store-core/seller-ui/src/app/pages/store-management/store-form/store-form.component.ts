@@ -94,7 +94,7 @@ export class StoreFormComponent implements OnInit {
     private toastr: NbToastrService,
     private translate: TranslateService,
     private errorService: ErrorService,
-    private selectedStoreService:SelectedStoreService,
+    private selectedStoreService: SelectedStoreService,
     private podService: PodService) {
   }
 

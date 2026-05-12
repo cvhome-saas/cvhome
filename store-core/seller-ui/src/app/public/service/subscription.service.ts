@@ -67,7 +67,7 @@ export interface FeatureList {
   features: Feature[]
 }
 
-export interface Feature{
+export interface Feature {
   code: string
 }
 

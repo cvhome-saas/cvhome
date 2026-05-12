@@ -33,12 +33,12 @@ export class UserService {
     return this.crudService.get(`/control-plane/api/v1/user-account/current`);
   }
 
-  createUser(user: any,store:string): Observable<any> {
-    return this.crudService.post(`/control-plane/api/v1/user-account/create`, user,{store});
+  createUser(user: any, store: string): Observable<any> {
+    return this.crudService.post(`/control-plane/api/v1/user-account/create`, user, {store});
   }
 
-  updateUser(user: any,store:string): Observable<any> {
-    return this.crudService.put(`/control-plane/api/v1/user-account/update`, user,{store});
+  updateUser(user: any, store: string): Observable<any> {
+    return this.crudService.put(`/control-plane/api/v1/user-account/update`, user, {store});
   }
 
   getUser(userId: any): Observable<any> {

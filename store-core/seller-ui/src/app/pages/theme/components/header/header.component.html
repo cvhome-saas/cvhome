@@ -8,13 +8,14 @@
 </div>
 
 <div class="header-container">
-  <nb-select (selectedChange)="changed({id:$event})" [selected]="selectedStoreId"
-             [disabled]="isStoreSelectDisabled"
-             placeholder="Select Store" class="m-1" size="medium" shape="semi-round">
+  <nb-select (selectedChange)="changed({id:$event})" [disabled]="isStoreSelectDisabled"
+             [selected]="selectedStoreId"
+             class="m-1" placeholder="Select Store" shape="semi-round" size="medium">
     <nb-option *ngFor="let s of stores" [value]="s.id.id">{{ s.name }}</nb-option>
   </nb-select>
-  <nb-select (selectedChange)="changeLanguage($event)" [selected]="currentLanguage" status="primary" class="m-1" size="medium"
-             shape="semi-round">
+  <nb-select (selectedChange)="changeLanguage($event)" [selected]="currentLanguage" class="m-1" shape="semi-round"
+             size="medium"
+             status="primary">
     <nb-option *ngFor="let l of languages" [value]="l"> {{ l }}</nb-option>
   </nb-select>
   <nb-actions size="small">

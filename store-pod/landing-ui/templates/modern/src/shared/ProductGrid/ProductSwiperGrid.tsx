@@ -1,7 +1,7 @@
 'use client'
 import * as React from "react";
 import {Swiper, SwiperSlide} from 'swiper/react';
-import {Navigation, Pagination, A11y} from "swiper/modules";
+import {A11y, Navigation, Pagination} from "swiper/modules";
 
 import {Product} from "@/types/product-groups";
 import {StoreContext} from "@/types/store-context";
@@ -34,8 +34,10 @@ const ProductSwiperGrid = React.forwardRef<HTMLDivElement, ProductSwiperGridProp
                 className={cn("relative", className)}
                 {...props}
             >
-                <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-10 bg-linear-to-r from-background to-transparent"/>
-                <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-10 bg-linear-to-l from-background to-transparent"/>
+                <div
+                    className="pointer-events-none absolute inset-y-0 start-0 z-10 w-10 bg-linear-to-r from-background to-transparent"/>
+                <div
+                    className="pointer-events-none absolute inset-y-0 end-0 z-10 w-10 bg-linear-to-l from-background to-transparent"/>
 
                 <Swiper
                     modules={[Navigation, Pagination, A11y]}

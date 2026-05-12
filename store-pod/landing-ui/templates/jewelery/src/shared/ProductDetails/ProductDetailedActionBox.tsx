@@ -31,7 +31,8 @@ export const ProductDetailedActionBox = ({storeContext, product}: {
                 >
                     <Minus className="size-3"/>
                 </button>
-                <span className="w-12 h-10 flex items-center justify-center text-sm font-medium text-foreground border-x border-border tracking-widest">
+                <span
+                    className="w-12 h-10 flex items-center justify-center text-sm font-medium text-foreground border-x border-border tracking-widest">
                     {quantity}
                 </span>
                 <button

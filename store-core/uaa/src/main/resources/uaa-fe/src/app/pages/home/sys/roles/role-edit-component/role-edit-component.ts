@@ -11,6 +11,7 @@ import {RolesService} from '../services/roles-service';
 })
 export class RoleEditComponent implements OnInit, AfterViewInit {
   role: any;
+
   constructor(private rolesService: RolesService, private activatedRoute: ActivatedRoute) {
   }
 

@@ -1,4 +1,4 @@
-<section id="home" class="section welcome-area bg-overlay d-flex align-items-center">
+<section class="section welcome-area bg-overlay d-flex align-items-center" id="home">
   <div class="container">
     <div class="row align-items-center justify-content-center">
       <div class="col-12 col-lg-7">
@@ -13,15 +13,15 @@
             <div class="login-header">
               <h2>Login</h2>
             </div>
-            <form id="login-form" action="/login" method="post" class="login-form">
+            <form action="/login" class="login-form" id="login-form" method="post">
               <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-wrapper">
                   <span class="input-icon">
                     <i class="bi bi-person"></i>
                   </span>
-                  <input id="username" type="text" class="form-control" name="username"
-                         placeholder="Enter your username" required/>
+                  <input class="form-control" id="username" name="username" placeholder="Enter your username"
+                         required type="text"/>
                 </div>
               </div>
 
@@ -31,17 +31,17 @@
                   <span class="input-icon">
                     <i class="bi bi-lock"></i>
                   </span>
-                  <input id="password" type="password" class="form-control" name="password"
-                         placeholder="Enter your password" required/>
+                  <input class="form-control" id="password" name="password" placeholder="Enter your password"
+                         required type="password"/>
                 </div>
               </div>
               <div class="login-actions">
                 <div class="remember-me">
-                  <input type="checkbox" id="remember-me"/>
+                  <input id="remember-me" type="checkbox"/>
                   <label for="remember-me">Remember me</label>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-lg btn-block login-btn">
+              <button class="btn btn-primary btn-lg btn-block login-btn" type="submit">
                 Login
               </button>
             </form>

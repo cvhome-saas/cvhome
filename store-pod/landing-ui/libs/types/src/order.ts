@@ -38,7 +38,7 @@ export interface OrderAddress {
 }
 
 export interface OrderTotal {
-    value:number
+    value: number
     totals: TotalItem[] | undefined
     grandTotal: any
 }

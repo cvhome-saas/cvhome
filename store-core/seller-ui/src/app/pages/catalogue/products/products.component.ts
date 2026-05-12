@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-products',
-  standalone:false,
+  standalone: false,
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })

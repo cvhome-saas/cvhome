@@ -88,7 +88,7 @@ export class StoreLandingPageComponent implements OnInit {
     this.createForm();
     const store = this.activatedRoute.snapshot.paramMap.get('code');
 
-    forkJoin([this.storeService.getPageContent(store,'LANDING_PAGE'), this.storeService.getStore(store)])
+    forkJoin([this.storeService.getPageContent(store, 'LANDING_PAGE'), this.storeService.getStore(store)])
       .subscribe(([res, st]) => {
         if (!res.status) {//404 should not rais an error
           this.page = res;

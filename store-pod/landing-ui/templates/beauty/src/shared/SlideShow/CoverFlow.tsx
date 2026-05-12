@@ -25,7 +25,8 @@ const CoverFlow = React.forwardRef<HTMLElement, CoverFlowProps>(
         }
 
         return (
-            <section ref={ref} className={cn("py-12 bg-gradient-to-b from-background to-secondary/20 overflow-hidden", className)} {...props}>
+            <section ref={ref}
+                     className={cn("py-12 bg-gradient-to-b from-background to-secondary/20 overflow-hidden", className)} {...props}>
                 <div className="lg:mx-auto max-w-7xl mx-4 sm:mx-6">
                     <div className={`relative ${containerHeightClass} flex items-center justify-center`}>
                         <Swiper
@@ -81,7 +82,8 @@ const CoverFlow = React.forwardRef<HTMLElement, CoverFlowProps>(
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                                             className="block rounded-[2rem] shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]"
                                         />
-                                        <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/10 group-hover:ring-primary/20 transition-all duration-700" />
+                                        <div
+                                            className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/10 group-hover:ring-primary/20 transition-all duration-700"/>
                                     </div>
                                 </SwiperSlide>
                             ))}

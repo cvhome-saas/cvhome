@@ -39,7 +39,8 @@ const CartProductItem = ({product, onRemove}: { product: Product, onRemove: (sku
             {/* Thumbnail */}
             {product.description && (
                 <div className="relative w-20 h-24 shrink-0 overflow-hidden bg-secondary border border-border">
-                    <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`} className="block w-full h-full">
+                    <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}
+                          className="block w-full h-full">
                         {product.images && product.images.length > 0 && (
                             <Image
                                 alt={product.images[0].imageName}

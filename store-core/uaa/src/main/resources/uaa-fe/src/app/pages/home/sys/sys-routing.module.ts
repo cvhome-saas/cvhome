@@ -25,4 +25,5 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SysRoutingModule { }
+export class SysRoutingModule {
+}

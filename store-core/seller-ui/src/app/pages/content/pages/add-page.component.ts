@@ -210,7 +210,7 @@ export class AddPageComponent implements OnInit {
           },
         });
     } else {
-      this.contentService.createPage( object)
+      this.contentService.createPage(object)
         .subscribe({
           next: (data) => {
             this.loadingList = false;

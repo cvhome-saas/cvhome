@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'PRODUCT_GROUP.CREATE_PRODUCT_GROUP' | translate }}</h1>
@@ -8,10 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -25,22 +26,22 @@
       <div class="form-group row mb-3">
         <label class="col-sm-2 col-form-label" for="code">{{ 'COMMON.CODE' | translate }} *</label>
         <div class="col-sm-10">
-          <input nbInput fullWidth
-                 id="code"
+          <input (blur)="checkCode($event)" [status]="(code.dirty || code.touched) ? (code.invalid || !isCodeUnique ? 'danger' : 'success') : 'basic'"
                  formControlName='code'
+                 fullWidth
+                 id="code"
+                 nbInput
                  placeholder="{{ 'COMMON.CODE' | translate}}"
                  required
-                 type="text"
-                 (blur)="checkCode($event)"
-                 [status]="(code.dirty || code.touched) ? (code.invalid || !isCodeUnique ? 'danger' : 'success') : 'basic'">
+                 type="text">
           <ng-container *ngIf="(code.dirty || code.touched) && (code.invalid || !isCodeUnique)">
-            <p class="caption status-danger" *ngIf="code.errors?.required">
+            <p *ngIf="code.errors?.required" class="caption status-danger">
               {{ 'COMMON.CODE_REQUIRED' | translate }}
             </p>
-            <p class="caption status-danger" *ngIf="code.errors?.pattern">
+            <p *ngIf="code.errors?.pattern" class="caption status-danger">
               {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
             </p>
-            <p class="caption status-danger" *ngIf="!isCodeUnique && !code.errors?.required && !code.errors?.pattern">
+            <p *ngIf="!isCodeUnique && !code.errors?.required && !code.errors?.pattern" class="caption status-danger">
               {{ 'COMMON.CODE_EXISTS' | translate }}
             </p>
           </ng-container>
@@ -55,14 +56,14 @@
         </div>
       </div>
 
-      <div class="form-group row mb-3" *ngIf="languages.length > 1">
+      <div *ngIf="languages.length > 1" class="form-group row mb-3">
         <label class="col-sm-2 col-form-label">{{ 'COMMON.LANGUAGE' | translate }}</label>
         <div class="col-sm-10">
           <nb-button-group>
-            <button nbButton *ngFor="let lang of languages"
+            <button (click)="selectLanguage(lang.code)" *ngFor="let lang of languages"
                     [status]="languageTabStatus(lang.code)"
-                    type="button"
-                    (click)="selectLanguage(lang.code)">
+                    nbButton
+                    type="button">
               {{ lang.code | uppercase }}
             </button>
           </nb-button-group>
@@ -71,17 +72,17 @@
 
       <div formArrayName="descriptions">
         <ng-container *ngFor="let desc of descriptions.controls; let i = index">
-          <div [formGroupName]="i" *ngIf="desc.get('language').value === selectedLanguage.value">
+          <div *ngIf="desc.get('language').value === selectedLanguage.value" [formGroupName]="i">
 
             <div class="form-group row mb-3">
               <label class="col-sm-2 col-form-label">{{ 'CONTENT.NAME' | translate }} *</label>
               <div class="col-sm-10">
-                <input nbInput fullWidth
-                       formControlName="name"
+                <input [status]="descriptionNameStatus(desc)" formControlName="name"
+                       fullWidth
+                       nbInput
                        placeholder="{{ 'CONTENT.NAME' | translate }}"
-                       type="text"
-                       [status]="descriptionNameStatus(desc)">
-                <p class="caption status-danger" *ngIf="desc.get('name').touched && desc.get('name').errors?.required">
+                       type="text">
+                <p *ngIf="desc.get('name').touched && desc.get('name').errors?.required" class="caption status-danger">
                   {{ 'COMMON.NAME_REQUIRED' | translate }}
                 </p>
               </div>
@@ -96,9 +97,11 @@
       <h5 class="mb-3">{{ 'PRODUCT_GROUP.ADD_PRODUCTS' | translate }}</h5>
 
       <div class="form-group row mb-3">
-        <label class="col-sm-4 col-form-label" for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
+        <label class="col-sm-4 col-form-label"
+               for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
         <div class="col-sm-6">
-          <ngx-product-auto-complete *ngIf="store" (onProduct)="onItemSelect($event, uniqueCode)" [disabled]="uniqueCode == undefined"
+          <ngx-product-auto-complete (onProduct)="onItemSelect($event, uniqueCode)" *ngIf="store"
+                                     [disabled]="uniqueCode == undefined"
                                      [store]="store"/>
         </div>
       </div>
@@ -130,7 +133,7 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button nbButton (click)="onItemDeSelect(row, uniqueCode)" shape="round" size="small" status="danger">
+          <button (click)="onItemDeSelect(row, uniqueCode)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>

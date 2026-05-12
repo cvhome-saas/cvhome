@@ -5,7 +5,7 @@ import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-subscription',
-  standalone:false,
+  standalone: false,
   templateUrl: './subscription.component.html',
   styleUrls: ['./subscription.component.scss']
 })
@@ -14,7 +14,7 @@ export class SubscriptionComponent implements OnInit {
   BASE_IMG_PATH = `assets/img/pricing/`;
 
   prices: Pricing[] | undefined;
-  accent:("" | "basic" | "primary" | "success" | "warning" | "danger" | "info" | "control")[] = ["success", "primary", "danger", "warning", "basic", "info"];
+  accent: ("" | "basic" | "primary" | "success" | "warning" | "danger" | "info" | "control")[] = ["success", "primary", "danger", "warning", "basic", "info"];
   table: Table | undefined;
   currentSubscriptionDetails: SubscriptionDetails | undefined;
   freePricing: Pricing | undefined;

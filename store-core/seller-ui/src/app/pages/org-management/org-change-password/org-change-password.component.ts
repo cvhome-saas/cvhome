@@ -37,16 +37,6 @@ export class OrgChangePasswordComponent implements OnInit {
     }
   ];
 
-  route(link) {
-    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
-  }
-
-
-  goToBack() {
-    this.router.navigate(['pages/org-management/org-list']);
-  }
-
-
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -57,6 +47,13 @@ export class OrgChangePasswordComponent implements OnInit {
     this.createForm();
   }
 
+  route(link) {
+    this.router.navigate([link.replace("{OrgId}", this.org.id.id)]);
+  }
+
+  goToBack() {
+    this.router.navigate(['pages/org-management/org-list']);
+  }
 
   ngOnInit() {
     this.activatedRoute.params.pipe(map(it => it['id']), mergeMap(it => this.orgService.getOrg(it)))

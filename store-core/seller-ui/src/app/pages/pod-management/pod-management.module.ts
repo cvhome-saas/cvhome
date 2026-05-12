@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {PodManagementRoutingModule} from './pod-management-routing.module';
-import {NbCardModule, NbIconModule, NbInputModule, NbButtonModule, NbSpinnerModule} from '@nebular/theme';
+import {NbButtonModule, NbCardModule, NbIconModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
 import {SharedModule} from "../shared/shared.module";
 import {PodListComponent} from "./pod-list/pod-list.component";
 import {PodManagementComponent} from "./pod-management.component";

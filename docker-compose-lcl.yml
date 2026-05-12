@@ -35,7 +35,7 @@ services:
       OTEL_SERVICE_NAME: spg
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.150.1
-    command: ["--config=/etc/logging-otel-collector-config.yml"]
+    command: [ "--config=/etc/logging-otel-collector-config.yml" ]
     volumes:
       - ./extra/monitoring/logging-otel-collector-config.yml:/etc/logging-otel-collector-config.yml
     ports:
@@ -50,14 +50,14 @@ services:
       - "host.docker.internal:host-gateway"
   loki:
     image: grafana/loki:3.6.10
-    command: ["-config.file=/etc/loki/loki.yml"]
+    command: [ "-config.file=/etc/loki/loki.yml" ]
     volumes:
       - ./extra/monitoring/loki.yml:/etc/loki/loki.yml
     ports:
       - "3100:3100"
   tempo:
     image: grafana/tempo:2.10.5
-    command: ["-config.file=/etc/tempo/tempo.yml"]
+    command: [ "-config.file=/etc/tempo/tempo.yml" ]
     volumes:
       - ./extra/monitoring/tempo.yml:/etc/tempo/tempo.yml
     ports:

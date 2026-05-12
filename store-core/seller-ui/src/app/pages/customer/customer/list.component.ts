@@ -23,7 +23,7 @@ export class ListComponent extends BaseTable<any> implements OnInit {
     errorService: ErrorService,
     selectedStoreService: SelectedStoreService
   ) {
-    super(selectedStoreService,  errorService)
+    super(selectedStoreService, errorService)
   }
 
   ngOnInit(): void {

@@ -19,7 +19,7 @@ import {Button} from "@/components/ui/button";
 import {Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {cn} from "@/lib/utils";
-import {Globe, Menu, ShoppingBag, X, User} from "lucide-react";
+import {Globe, Menu, ShoppingBag, User, X} from "lucide-react";
 import {Box} from "@/types/content";
 import {Store} from "@/types/store";
 import {parseDescription} from "@/services/description-view-util";
@@ -50,8 +50,10 @@ export const Header = ({params, headerBox}: {
     return (
         <>
             <HeaderTop store={params.store} box={headerBox} locale={params.locale}/>
-            <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-                <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <header
+                className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+                <nav aria-label="Global"
+                     className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-3">
                         <Link prefetch={false} href={"/"} className="group inline-flex items-center gap-3">
                             <span className="sr-only">{params.store.name}</span>
@@ -71,7 +73,8 @@ export const Header = ({params, headerBox}: {
                             <NavigationMenuList className="flex-wrap">
                                 <NavigationMenuItem>
                                     <Link href="/" legacyBehavior passHref>
-                                        <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
+                                        <NavigationMenuLink
+                                            className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
                                             {t('HOME_TITLE')}
                                         </NavigationMenuLink>
                                     </Link>
@@ -81,8 +84,10 @@ export const Header = ({params, headerBox}: {
                                     <NavigationMenuItem key={category.code}>
                                         {category.children && category.children.length > 0 ? (
                                             <>
-                                                <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
-                                                    <NavigationMenuTrigger className="cursor-pointer tracking-[0.12em] uppercase text-xs">
+                                                <Link href={`/category/${category.description.friendlyUrl}`}
+                                                      legacyBehavior passHref>
+                                                    <NavigationMenuTrigger
+                                                        className="cursor-pointer tracking-[0.12em] uppercase text-xs">
                                                         {category.description.name}
                                                     </NavigationMenuTrigger>
                                                 </Link>
@@ -99,8 +104,10 @@ export const Header = ({params, headerBox}: {
                                                 </NavigationMenuContent>
                                             </>
                                         ) : (
-                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior passHref>
-                                                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
+                                            <Link href={`/category/${category.description.friendlyUrl}`} legacyBehavior
+                                                  passHref>
+                                                <NavigationMenuLink
+                                                    className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
                                                     {category.description.name}
                                                 </NavigationMenuLink>
                                             </Link>
@@ -111,7 +118,8 @@ export const Header = ({params, headerBox}: {
                                 {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
                                     <NavigationMenuItem key={it.code}>
                                         <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
-                                            <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
+                                            <NavigationMenuLink
+                                                className={cn(navigationMenuTriggerStyle(), "tracking-[0.12em] uppercase text-xs")}>
                                                 {it.description.name}
                                             </NavigationMenuLink>
                                         </Link>
@@ -134,23 +142,26 @@ export const Header = ({params, headerBox}: {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon" className="rounded-full">
-                                            <User className="size-5" />
+                                            <User className="size-5"/>
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem asChild>
-                                            <Link href="/customer" className="cursor-pointer text-xs uppercase tracking-[0.12em]">
+                                            <Link href="/customer"
+                                                  className="cursor-pointer text-xs uppercase tracking-[0.12em]">
                                                 {t('PROFILE')}
                                             </Link>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
+                                        <DropdownMenuItem onClick={logout}
+                                                          className="cursor-pointer text-destructive focus:text-destructive text-xs uppercase tracking-[0.12em]">
                                             {t('LOGOUT')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         ) : (
-                            <Button variant="ghost" size="sm" onClick={login} className="tracking-[0.12em] uppercase text-xs">
+                            <Button variant="ghost" size="sm" onClick={login}
+                                    className="tracking-[0.12em] uppercase text-xs">
                                 {t('LOGIN')}
                             </Button>
                         )}
@@ -187,12 +198,12 @@ export const Header = ({params, headerBox}: {
                     </div>
                 </nav>
 
-                <NavCartDialog storeContext={params.storeContext} cart={cart} cartOpen={cartOpen} setCartOpen={setCartOpen}/>
+                <NavCartDialog storeContext={params.storeContext} cart={cart} cartOpen={cartOpen}
+                               setCartOpen={setCartOpen}/>
             </header>
         </>
     )
 }
-
 
 
 const MobileNavContent = ({params, cart, setCartOpen}: {
@@ -201,7 +212,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
-    const { user, login, logout } = useUser(params.storeContext);
+    const {user, login, logout} = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -265,8 +276,10 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                     {user ? (
                         <>
                             <div className="px-3 flex items-center justify-between">
-                                <span className="text-sm font-semibold tracking-[0.12em] uppercase">{user.username}</span>
-                                <Button variant="ghost" size="sm" onClick={logout} className="text-xs tracking-[0.12em] uppercase">{t('LOGOUT')}</Button>
+                                <span
+                                    className="text-sm font-semibold tracking-[0.12em] uppercase">{user.username}</span>
+                                <Button variant="ghost" size="sm" onClick={logout}
+                                        className="text-xs tracking-[0.12em] uppercase">{t('LOGOUT')}</Button>
                             </div>
                             <Link href="/customer"
                                   className="-mx-3 block rounded-xl px-3 py-3 text-sm font-semibold tracking-[0.12em] uppercase text-foreground hover:bg-accent">
@@ -274,16 +287,19 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                             </Link>
                         </>
                     ) : (
-                        <Button variant="outline" className="w-full rounded-xl tracking-[0.12em] uppercase text-xs" onClick={login}>{t('LOGIN')}</Button>
+                        <Button variant="outline" className="w-full rounded-xl tracking-[0.12em] uppercase text-xs"
+                                onClick={login}>{t('LOGIN')}</Button>
                     )}
                     <LanguageSelector store={params.store} locale={params.locale} className="w-full"/>
                 </div>
                 <div className="py-6">
-                    <Button variant="outline" className="relative w-full rounded-xl justify-center" onClick={() => setCartOpen(true)}>
+                    <Button variant="outline" className="relative w-full rounded-xl justify-center"
+                            onClick={() => setCartOpen(true)}>
                         <ShoppingBag aria-hidden="true" className="me-2 size-5 text-foreground"/>
                         <span className="text-sm font-semibold tracking-[0.12em] uppercase">{t('OPEN_CART')}</span>
                         {cart && cart.quantity > 0 && (
-                            <span className="ms-2 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
+                            <span
+                                className="ms-2 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
                                 {cart.quantity}
                             </span>
                         )}

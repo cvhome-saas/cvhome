@@ -23,14 +23,14 @@ export interface ProductFilterPageRequest extends StorePageRequest {
 })
 export class ProductsListComponent extends BaseTable<any> implements OnInit {
   editing = {};
-  protected readonly ColumnMode = ColumnMode;
-  private isInitialized: boolean = false;
   filter = {
     sku: '',
     available: '',
     categoryIds: '',
     manufacturerId: ''
   };
+  protected readonly ColumnMode = ColumnMode;
+  private isInitialized: boolean = false;
 
   constructor(
     private productService: ProductService,

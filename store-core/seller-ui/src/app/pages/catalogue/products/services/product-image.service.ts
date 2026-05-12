@@ -13,11 +13,11 @@ export class ProductImageService {
   ) {
   }
 
-  addImageUrl( id) {//post
+  addImageUrl(id) {//post
     return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 
-  removeImageUrl( id) {//delete
+  removeImageUrl(id) {//delete
     return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 

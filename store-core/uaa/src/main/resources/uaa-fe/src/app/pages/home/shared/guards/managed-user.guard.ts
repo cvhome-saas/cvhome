@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
-import { CanMatch, Route, UrlSegment, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import {Injectable} from '@angular/core';
+import {CanMatch, Route, Router, UrlSegment} from '@angular/router';
+import {Observable} from 'rxjs';
+import {map, take} from 'rxjs/operators';
+import {AuthService} from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ManagedUserGuard implements CanMatch {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+  }
 
   canMatch(
     route: Route,

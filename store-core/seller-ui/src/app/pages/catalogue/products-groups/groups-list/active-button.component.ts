@@ -8,7 +8,7 @@ import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-product-groups-active',
-  standalone:false,
+  standalone: false,
   template: `<nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
 })
 export class ActiveButtonComponent {
@@ -29,7 +29,7 @@ export class ActiveButtonComponent {
       active: this.value,
       code: this.rowData.code,
     };
-    this.productGroupsService.updateGroupActiveValue( group)
+    this.productGroupsService.updateGroupActiveValue(group)
       .subscribe(res => {
         this.toastr.success(this.translate.instant('PRODUCT_GROUP.GROUP_ACTIVATION'));
       }, err => {

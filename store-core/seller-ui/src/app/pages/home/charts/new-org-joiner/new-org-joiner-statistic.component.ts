@@ -7,7 +7,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 
 @Component({
   selector: 'ngx-new-org-joiner-statistic',
-  standalone:false,
+  standalone: false,
   template: `
     <div echarts [options]="options" class="echart"></div>
   `,

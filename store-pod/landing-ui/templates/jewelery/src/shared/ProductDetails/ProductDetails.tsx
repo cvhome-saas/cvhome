@@ -48,9 +48,11 @@ export const ProductDetails = ({storeContext, p, t}: {
 
                 {/* Description accordion */}
                 {p.description && (
-                    <Accordion type="single" collapsible defaultValue="description" className="w-full border-t border-border">
+                    <Accordion type="single" collapsible defaultValue="description"
+                               className="w-full border-t border-border">
                         <AccordionItem value="description" className="border-b border-border">
-                            <AccordionTrigger className="font-['Jost',sans-serif] text-xs tracking-[0.2em] uppercase font-medium py-4 hover:text-primary hover:no-underline">
+                            <AccordionTrigger
+                                className="font-['Jost',sans-serif] text-xs tracking-[0.2em] uppercase font-medium py-4 hover:text-primary hover:no-underline">
                                 {t('PRODUCT_DESCRIPTION')}
                             </AccordionTrigger>
                             <AccordionContent>

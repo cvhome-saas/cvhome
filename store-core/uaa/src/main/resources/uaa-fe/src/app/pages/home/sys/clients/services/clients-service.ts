@@ -29,11 +29,11 @@ export class ClientsService {
     return new HttpParams({fromObject: {...request}});
   }
 
-  save(value: any):Observable<ClientSummary> {
+  save(value: any): Observable<ClientSummary> {
     return this.httpClient.post<ClientSummary>(`${this.BASE_URL}`, value);
   }
 
-  update(id:string,value: any):Observable<ClientSummary> {
+  update(id: string, value: any): Observable<ClientSummary> {
     return this.httpClient.put<ClientSummary>(`${this.BASE_URL}/${id}`, value);
   }
 

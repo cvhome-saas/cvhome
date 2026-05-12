@@ -57,7 +57,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
     return (
         <>
             <OrderPlacedSuccessfullyDialog order={order} isOpen={successDialogOpen} setIsOpen={setSuccessDialogOpen}/>
-            <CheckoutAgreementDialog box={agreement} isOpen={agreeDialogOpen} setIsOpen={setAgreeDialogOpen} setIsAgree={setIsAgree}/>
+            <CheckoutAgreementDialog box={agreement} isOpen={agreeDialogOpen} setIsOpen={setAgreeDialogOpen}
+                                     setIsAgree={setIsAgree}/>
             <LoginRequiredDialog isOpen={loginRequiredDialogOpen} setIsOpen={setLoginRequiredDialogOpen} login={login}/>
 
             <form
@@ -73,7 +74,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                     {/* Name row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="firstName"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('FIRST_NAME')}
                             </Label>
                             <Input
@@ -89,7 +91,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="lastName"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('LAST_NAME')}
                             </Label>
                             <Input
@@ -109,7 +112,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                     {/* Contact row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-2">
-                            <Label htmlFor="emailAddress" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="emailAddress"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('EMAIL')}
                             </Label>
                             <Input
@@ -125,7 +129,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="phone"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('PHONE')}
                             </Label>
                             <Input
@@ -145,14 +150,16 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                     {/* Location row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div className="space-y-2">
-                            <Label htmlFor="country" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="country"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('COUNTRY')}
                             </Label>
                             <Select
                                 onValueChange={(value) => setValue("customer.billing.country", value)}
                                 defaultValue={defaultCheckoutValue.customer.billing.country}
                             >
-                                <SelectTrigger id="country" aria-invalid={!!errors.customer?.billing?.country} className="rounded-none border-border text-sm">
+                                <SelectTrigger id="country" aria-invalid={!!errors.customer?.billing?.country}
+                                               className="rounded-none border-border text-sm">
                                     <SelectValue placeholder={t('SELECT_COUNTRY')}/>
                                 </SelectTrigger>
                                 <SelectContent className="rounded-none">
@@ -168,7 +175,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="city" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="city"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('CITY')}
                             </Label>
                             <Input
@@ -184,7 +192,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="postalCode" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            <Label htmlFor="postalCode"
+                                   className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                                 {t('POSTAL_CODE')}
                             </Label>
                             <Input
@@ -203,7 +212,8 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
 
                     {/* Address */}
                     <div className="space-y-2">
-                        <Label htmlFor="address" className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                        <Label htmlFor="address"
+                               className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
                             {t('ADDRESS')}
                         </Label>
                         <Textarea
@@ -282,7 +292,8 @@ const CheckoutAgreementDialog = ({box, isOpen, setIsOpen, setIsAgree}: {
                     <div className="flex justify-center mb-2">
                         <HelpCircle className="h-12 w-12 text-primary"/>
                     </div>
-                    <AlertDialogTitle className="text-center font-['Cormorant_Garamond',serif] text-xl font-light tracking-wide">
+                    <AlertDialogTitle
+                        className="text-center font-['Cormorant_Garamond',serif] text-xl font-light tracking-wide">
                         {t('TERMS_AND_CONDITIONS')}
                     </AlertDialogTitle>
                     {box && (
@@ -382,7 +393,8 @@ export const LoginRequiredDialog = ({isOpen, setIsOpen, login}: {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="sm:justify-center">
-                    <AlertDialogCancel className="rounded-none text-xs tracking-widest uppercase">{t('CANCEL')}</AlertDialogCancel>
+                    <AlertDialogCancel
+                        className="rounded-none text-xs tracking-widest uppercase">{t('CANCEL')}</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={login}
                         className="rounded-none text-xs tracking-widest uppercase bg-foreground text-background hover:bg-primary"
@@ -414,8 +426,10 @@ export const CheckoutCartBox = ({storeContext}: { storeContext: StoreContext }) 
             {cart && (
                 <div className="px-6 py-5 border-t border-border">
                     <div className="flex justify-between items-center">
-                        <span className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">{t('SUB_TOTAL')}</span>
-                        <span className="font-['Cormorant_Garamond',serif] text-lg font-light text-foreground">{cart.displaySubTotal}</span>
+                        <span
+                            className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">{t('SUB_TOTAL')}</span>
+                        <span
+                            className="font-['Cormorant_Garamond',serif] text-lg font-light text-foreground">{cart.displaySubTotal}</span>
                     </div>
                 </div>
             )}

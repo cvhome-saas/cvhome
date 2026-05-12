@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-products-groups',
-  standalone:false,
+  standalone: false,
   templateUrl: './products-groups.component.html',
   styleUrls: ['./products-groups.component.scss']
 })

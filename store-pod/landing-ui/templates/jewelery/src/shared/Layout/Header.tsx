@@ -32,7 +32,8 @@ import {useUser} from "@store-front/hooks/use-user";
 
 export const Header = ({params, headerBox}: {
     params: LayoutParams,
-    headerBox: Box | undefined,}) => {
+    headerBox: Box | undefined,
+}) => {
     const t = useTranslations('COMPONENTS.HEADER');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
@@ -94,81 +95,84 @@ export const Header = ({params, headerBox}: {
                     {/* Desktop nav links */}
                     <div className="flex-1 flex justify-center">
                         <NavigationMenu className="hidden lg:flex">
-                        <NavigationMenuList className="flex-wrap">
-                            <NavigationMenuItem>
-                                <Link href="/" legacyBehavior passHref>
-                                    <NavigationMenuLink
-                                        className={cn(navigationMenuTriggerStyle(), "font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium")}>
-                                        {t('HOME_TITLE')}
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-
-                            {params.categories?.content?.filter(it => it.description).map((category) => (
-                                <NavigationMenuItem key={category.code}>
-                                    {category.children && category.children.length > 0 ? (
-                                        <>
-                                            <Link href={`/category/${category.description.friendlyUrl}`}
-                                                  legacyBehavior passHref>
-                                                <NavigationMenuTrigger
-                                                    className="font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium cursor-pointer">
-                                                    {category.description.name}
-                                                </NavigationMenuTrigger>
-                                            </Link>
-                                            <NavigationMenuContent>
-                                                <ul className="grid w-[360px] gap-1 p-3 md:w-[440px] md:grid-cols-2 lg:w-[540px]">
-                                                    {category.children.filter(child => child.description).map((child) => (
-                                                        <ListItem
-                                                            key={child.code}
-                                                            href={`/category/${child.description.friendlyUrl}`}
-                                                            title={child.description.name}
-                                                        />
-                                                    ))}
-                                                </ul>
-                                            </NavigationMenuContent>
-                                        </>
-                                    ) : (
-                                        <Link href={`/category/${category.description.friendlyUrl}`}
-                                              legacyBehavior passHref>
-                                            <NavigationMenuLink
-                                                className={cn(navigationMenuTriggerStyle(), "font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium")}>
-                                                {category.description.name}
-                                            </NavigationMenuLink>
-                                        </Link>
-                                    )}
-                                </NavigationMenuItem>
-                            ))}
-
-                            {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
-                                <NavigationMenuItem key={it.code}>
-                                    <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
+                            <NavigationMenuList className="flex-wrap">
+                                <NavigationMenuItem>
+                                    <Link href="/" legacyBehavior passHref>
                                         <NavigationMenuLink
                                             className={cn(navigationMenuTriggerStyle(), "font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium")}>
-                                            {it.description.name}
+                                            {t('HOME_TITLE')}
                                         </NavigationMenuLink>
                                     </Link>
                                 </NavigationMenuItem>
-                            ))}
-                        </NavigationMenuList>
-                    </NavigationMenu>
+
+                                {params.categories?.content?.filter(it => it.description).map((category) => (
+                                    <NavigationMenuItem key={category.code}>
+                                        {category.children && category.children.length > 0 ? (
+                                            <>
+                                                <Link href={`/category/${category.description.friendlyUrl}`}
+                                                      legacyBehavior passHref>
+                                                    <NavigationMenuTrigger
+                                                        className="font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium cursor-pointer">
+                                                        {category.description.name}
+                                                    </NavigationMenuTrigger>
+                                                </Link>
+                                                <NavigationMenuContent>
+                                                    <ul className="grid w-[360px] gap-1 p-3 md:w-[440px] md:grid-cols-2 lg:w-[540px]">
+                                                        {category.children.filter(child => child.description).map((child) => (
+                                                            <ListItem
+                                                                key={child.code}
+                                                                href={`/category/${child.description.friendlyUrl}`}
+                                                                title={child.description.name}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                </NavigationMenuContent>
+                                            </>
+                                        ) : (
+                                            <Link href={`/category/${category.description.friendlyUrl}`}
+                                                  legacyBehavior passHref>
+                                                <NavigationMenuLink
+                                                    className={cn(navigationMenuTriggerStyle(), "font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium")}>
+                                                    {category.description.name}
+                                                </NavigationMenuLink>
+                                            </Link>
+                                        )}
+                                    </NavigationMenuItem>
+                                ))}
+
+                                {params.contents?.content?.filter(it => it.linkToMenu && it.visible && it.description).map(it => (
+                                    <NavigationMenuItem key={it.code}>
+                                        <Link href={`/content/${it.description.friendlyUrl}`} legacyBehavior passHref>
+                                            <NavigationMenuLink
+                                                className={cn(navigationMenuTriggerStyle(), "font-['Jost',sans-serif] text-xs tracking-widest uppercase font-medium")}>
+                                                {it.description.name}
+                                            </NavigationMenuLink>
+                                        </Link>
+                                    </NavigationMenuItem>
+                                ))}
+                            </NavigationMenuList>
+                        </NavigationMenu>
                     </div>
 
                     {/* Right side: user + cart */}
                     <div className="flex items-center gap-1">
                         {user ? (
                             <div className="flex items-center gap-2">
-                                <span className="text-xs tracking-wider text-muted-foreground hidden sm:inline uppercase">
+                                <span
+                                    className="text-xs tracking-wider text-muted-foreground hidden sm:inline uppercase">
                                     {user?.username}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="rounded-none" aria-label="User menu">
+                                        <Button variant="ghost" size="icon" className="rounded-none"
+                                                aria-label="User menu">
                                             <User className="size-5"/>
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="rounded-none">
                                         <DropdownMenuItem asChild>
-                                            <Link href="/customer" className="cursor-pointer text-xs tracking-widest uppercase">
+                                            <Link href="/customer"
+                                                  className="cursor-pointer text-xs tracking-widest uppercase">
                                                 {t('PROFILE')}
                                             </Link>
                                         </DropdownMenuItem>
@@ -225,7 +229,7 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
     setCartOpen: (open: boolean) => void
 }) => {
     const t = useTranslations('COMPONENTS.HEADER');
-    const { user, login, logout } = useUser(params.storeContext);
+    const {user, login, logout} = useUser(params.storeContext);
     return (
         <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-border">
@@ -285,7 +289,8 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                         <>
                             <div className="px-3 flex items-center justify-between">
                                 <span className="text-xs font-semibold tracking-widest uppercase">{user.username}</span>
-                                <Button variant="ghost" size="sm" onClick={logout} className="text-[10px] tracking-widest uppercase">{t('LOGOUT')}</Button>
+                                <Button variant="ghost" size="sm" onClick={logout}
+                                        className="text-[10px] tracking-widest uppercase">{t('LOGOUT')}</Button>
                             </div>
                             <Link href="/customer"
                                   className="block px-3 py-2 text-xs tracking-widest uppercase font-medium text-foreground hover:text-primary hover:bg-accent rounded-sm transition-colors">
@@ -293,7 +298,8 @@ const MobileNavContent = ({params, cart, setCartOpen}: {
                             </Link>
                         </>
                     ) : (
-                        <Button variant="outline" className="w-full rounded-none tracking-widest uppercase text-[10px]" onClick={login}>{t('LOGIN')}</Button>
+                        <Button variant="outline" className="w-full rounded-none tracking-widest uppercase text-[10px]"
+                                onClick={login}>{t('LOGIN')}</Button>
                     )}
                     <Button
                         variant="ghost"
@@ -387,7 +393,8 @@ export const LanguageSelector = ({store, locale}: { store: Store, locale: string
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80 hover:bg-transparent" aria-label={t('CHANGE_LANGUAGE')}>
+                <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80 hover:bg-transparent"
+                        aria-label={t('CHANGE_LANGUAGE')}>
                     <Globe className="size-4"/>
                 </Button>
             </DropdownMenuTrigger>
@@ -426,7 +433,8 @@ export const NavCartDialog = (
             >
                 <div className="flex-1 overflow-y-auto px-6 py-6">
                     <SheetHeader className="flex flex-row items-start justify-between space-y-0 mb-6">
-                        <SheetTitle className="font-['Cormorant_Garamond',serif] text-xl font-light tracking-widest uppercase text-foreground">
+                        <SheetTitle
+                            className="font-['Cormorant_Garamond',serif] text-xl font-light tracking-widest uppercase text-foreground">
                             {t('CART_DETAILS')}
                         </SheetTitle>
                         <SheetClose
@@ -463,7 +471,8 @@ export const NavCartDialog = (
                     <div className="mt-4 flex justify-center text-center text-xs text-muted-foreground">
                         <p>
                             {t('OR')}{' '}
-                            <SheetClose type="button" className="font-medium text-foreground hover:text-primary underline underline-offset-2">
+                            <SheetClose type="button"
+                                        className="font-medium text-foreground hover:text-primary underline underline-offset-2">
                                 {t('CONTINUE_SHOPPING')}
                             </SheetClose>
                         </p>

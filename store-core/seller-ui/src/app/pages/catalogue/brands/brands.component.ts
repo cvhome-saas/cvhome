@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'ngx-brands',
-  standalone:false,
+  standalone: false,
   templateUrl: './brands.component.html',
   styleUrls: ['./brands.component.scss']
 })

@@ -50,7 +50,8 @@ const CartProductItem = ({product, onRemove}: { product: Product, onRemove: (sku
     return (
         <li className="py-4">
             <div className="flex items-start gap-4">
-                <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary/30">
+                <div
+                    className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary/30">
                     {product.description ? (
                         <Link prefetch={false} href={href} className="block h-full w-full">
                             {image && (

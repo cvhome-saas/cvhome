@@ -38,11 +38,6 @@ export class BrandFormComponent implements AfterViewInit, OnInit {
   ) {
   }
 
-  ngOnInit(): void {
-    this.createForm();
-  }
-
-
   get code() {
     return this.form.get('code');
   }
@@ -53,6 +48,10 @@ export class BrandFormComponent implements AfterViewInit, OnInit {
 
   get descriptions(): FormArray {
     return <FormArray>this.form.get('descriptions');
+  }
+
+  ngOnInit(): void {
+    this.createForm();
   }
 
   ngAfterViewInit(): void {

@@ -3,7 +3,7 @@ import {NbDialogRef} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-order-transaction',
-  standalone:false,
+  standalone: false,
   templateUrl: 'order-transaction.html',
   styleUrls: ['order-transaction.scss'],
 })

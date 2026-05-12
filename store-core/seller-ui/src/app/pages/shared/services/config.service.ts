@@ -38,7 +38,7 @@ export class ConfigService {
     return languages;
   }
 
-  getListOfCountries(){
+  getListOfCountries() {
     return this.httpClient.get<any[]>("assets/data/countries.json");
   }
 

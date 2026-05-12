@@ -197,7 +197,7 @@ export class ProductFormComponent implements OnInit {
 
   checkSku(event) {
     this.loader = true;
-    this.productService.checkProductSku( event.target.value)
+    this.productService.checkProductSku(event.target.value)
       .subscribe(res => {
         this.isCodeUnique = !(res.exists && (this.product.sku !== event.target.value));
         this.loader = false;
@@ -212,8 +212,6 @@ export class ProductFormComponent implements OnInit {
 
     this.loader = true;
     const productObject = this.form.value;
-    productObject.dateAvailable = moment(productObject.dateAvailable).format('yyyy-MM-DD');
-    // productObject.productSpecifications.manufacturer = productObject.manufacturer;
 
     // save important values for filling empty field in result object
     const tmpObj = {
@@ -278,7 +276,7 @@ export class ProductFormComponent implements OnInit {
       });
       delete productObject.selectedLanguage;
       if (this.product.id) {
-        this.productService.updateProduct( this.product.id, productObject)
+        this.productService.updateProduct(this.product.id, productObject)
           .subscribe({
             next: (data) => {
               this.loader = false;
@@ -290,7 +288,7 @@ export class ProductFormComponent implements OnInit {
             }
           });
       } else {
-        this.productService.createProduct( productObject)
+        this.productService.createProduct(productObject)
           .subscribe({
             next: (data) => {
               this.loader = false;

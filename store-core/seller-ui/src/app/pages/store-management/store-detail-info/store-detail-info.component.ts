@@ -5,7 +5,7 @@ import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-detail-info',
-  standalone:false,
+  standalone: false,
   templateUrl: './store-detail-info.component.html',
   styleUrls: ['./store-detail-info.component.scss']
 })

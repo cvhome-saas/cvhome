@@ -49,7 +49,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   loadContent() {
-    this.productService.getProductDefinitionById( this.uniqueCode)
+    this.productService.getProductDefinitionById(this.uniqueCode)
       .subscribe(res => {
         this.product = res;
       }, err => {

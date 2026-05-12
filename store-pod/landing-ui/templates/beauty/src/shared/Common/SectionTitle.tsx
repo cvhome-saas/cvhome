@@ -37,7 +37,7 @@ export const SectionTitle = React.forwardRef<HTMLDivElement, SectionTitleProps>(
                 <div className={cn(
                     "absolute bottom-0 h-1 w-20 bg-primary/30 rounded-full",
                     align === 'center' ? "left-1/2 -translate-x-1/2" : align === 'right' ? "right-0" : "left-0"
-                )} />
+                )}/>
             </div>
         );
     }

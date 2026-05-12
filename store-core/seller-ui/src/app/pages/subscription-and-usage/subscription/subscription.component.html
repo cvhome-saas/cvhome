@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.SUBSCRIPTION' | translate }}</h1>
@@ -10,35 +10,35 @@
     <div class="d-flex justify-content-center">
       <div class="toggle-btn pb-3">
         <span>{{ 'SUBSCRIPTION.RECURRING_MONTH' | translate }}</span>
-        <nb-toggle status="basic" [checked]="flag" (checkedChange)="toggle()"></nb-toggle>
+        <nb-toggle (checkedChange)="toggle()" [checked]="flag" status="basic"></nb-toggle>
         <span>{{ 'SUBSCRIPTION.RECURRING_YEAR' | translate }}</span>
       </div>
 
     </div>
     <div class="d-flex justify-content-center">
-        <nb-alert status="warning" size="tiny"
-                  *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'">
-          <p class="text-center">
-            {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
-            {{ currentSubscriptionDetails.endDate }}
-          </p>
-        </nb-alert>
-        <nb-alert status="warning"
-                  *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'">
-          <p class="text-center">
-            {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
-          </p>
-        </nb-alert>
-        <nb-alert status="warning"
-                  *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'">
-          <p class="text-center">
-            {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
-          </p>
-        </nb-alert>
+      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'" size="tiny"
+                status="warning">
+        <p class="text-center">
+          {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
+          {{ currentSubscriptionDetails.endDate }}
+        </p>
+      </nb-alert>
+      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+                status="warning">
+        <p class="text-center">
+          {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
+        </p>
+      </nb-alert>
+      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+                status="warning">
+        <p class="text-center">
+          {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
+        </p>
+      </nb-alert>
 
     </div>
 
-    <div class="row " *ngIf="prices">
+    <div *ngIf="prices" class="row ">
       <div *ngFor="let p of prices; index as i" class="col-md-4">
         <nb-card [accent]="accent[i]">
           <nb-card-header>
@@ -71,9 +71,9 @@
           </nb-card-body>
           <nb-card-footer>
             <div class="row justify-content-center">
-              <a nbButton size="medium" status="primary"
-                 [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id"
-                 [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan">
+              <a [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan" [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
+                 size="medium"
+                 status="primary">
                 {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}
               </a>
             </div>

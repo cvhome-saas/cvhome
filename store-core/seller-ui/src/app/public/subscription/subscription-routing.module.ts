@@ -6,24 +6,24 @@ import {FailSubscriptionComponent} from "./fail/fail-subscription.component";
 
 
 const routes: Routes = [{
-    path: '',
-    component: SubscriptionComponent,
-    children: [
-        {
-            path: 'success',
-            component: SuccessSubscriptionComponent,
-        },
-        {
-            path: 'fail',
-            component: FailSubscriptionComponent,
-        },
+  path: '',
+  component: SubscriptionComponent,
+  children: [
+    {
+      path: 'success',
+      component: SuccessSubscriptionComponent,
+    },
+    {
+      path: 'fail',
+      component: FailSubscriptionComponent,
+    },
 
-    ],
+  ],
 }];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
 export class SubscriptionRoutingModule {
 }

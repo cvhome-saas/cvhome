@@ -8,7 +8,7 @@ import {ErrorService} from "../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-store-branding-logo',
-  standalone:false,
+  standalone: false,
   template: `
     <form [formGroup]="imageUpload">
       <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">

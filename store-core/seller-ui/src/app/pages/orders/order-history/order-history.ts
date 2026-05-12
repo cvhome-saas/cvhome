@@ -3,7 +3,7 @@ import {NbDialogRef} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-order-history',
-  standalone:false,
+  standalone: false,
   templateUrl: 'order-history.html',
   styleUrls: ['order-history.scss'],
 })

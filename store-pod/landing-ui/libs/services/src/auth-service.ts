@@ -88,7 +88,7 @@ export class AuthService {
         return result;
     }
 
-    static async logout(context:StoreContext): Promise<void> {
+    static async logout(context: StoreContext): Promise<void> {
         // Retrieve the id_token, if any
         const idToken = sessionStorage.getItem('id_token');
 
@@ -101,7 +101,7 @@ export class AuthService {
             // Build the logout URL for the auth server
             const logoutUrl = new URL(`${window.location.origin}/cua/connect/logout`);
             logoutUrl.searchParams.append('id_token_hint', idToken);
-            const post_redirect_uri = window.location.origin+"/"+context.locale
+            const post_redirect_uri = window.location.origin + "/" + context.locale
             logoutUrl.searchParams.append('post_logout_redirect_uri', post_redirect_uri);
             logoutUrl.searchParams.append('lang', context.locale);
 

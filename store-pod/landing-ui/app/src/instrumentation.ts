@@ -5,7 +5,16 @@ import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-
 import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics';
 import {Context, propagation, TextMapGetter, TextMapPropagator, TextMapSetter} from '@opentelemetry/api';
 import {CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator} from '@opentelemetry/core';
-import {DetectedResource, emptyResource, envDetector, hostDetector, osDetector, ResourceDetector, ResourceDetectionConfig, serviceInstanceIdDetector} from '@opentelemetry/resources';
+import {
+    DetectedResource,
+    emptyResource,
+    envDetector,
+    hostDetector,
+    osDetector,
+    ResourceDetectionConfig,
+    ResourceDetector,
+    serviceInstanceIdDetector
+} from '@opentelemetry/resources';
 
 const EXCLUDED_RESOURCE_KEYS = new Set([
     'process.command', 'process.command_args', 'process.command_line',

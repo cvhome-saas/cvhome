@@ -31,7 +31,8 @@ const CartProductItem = ({product, onRemove}: { product: Product, onRemove: (sku
     return (
         <li className="flex py-6 group">
             {product.description && (
-                <div className="relative size-24 shrink-0 overflow-hidden rounded-2xl border border-primary/10 bg-secondary/10">
+                <div
+                    className="relative size-24 shrink-0 overflow-hidden rounded-2xl border border-primary/10 bg-secondary/10">
                     <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}
                           className="block size-full">
                         {product.images && product.images.length > 0 && (
@@ -53,7 +54,8 @@ const CartProductItem = ({product, onRemove}: { product: Product, onRemove: (sku
                     <div className="flex justify-between text-base font-serif font-medium text-foreground/90">
                         {product.description && (
                             <h3>
-                                <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`} className="hover:text-primary transition-colors">
+                                <Link prefetch={false} href={`/product/${product.description.friendlyUrl}`}
+                                      className="hover:text-primary transition-colors">
                                     {product.description.name}
                                 </Link>
                             </h3>
@@ -63,7 +65,8 @@ const CartProductItem = ({product, onRemove}: { product: Product, onRemove: (sku
                 </div>
 
                 <div className="flex items-center mt-2 w-full">
-                    <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('QTY')}: {product.quantity}</span>
+                    <span
+                        className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('QTY')}: {product.quantity}</span>
                     <Button
                         type="button"
                         variant="ghost"

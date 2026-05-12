@@ -76,3 +76,18 @@ on conflict do nothing;
 INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
 VALUES ('ORDER_PRD_PRICE_ID_NEXT_VAL', 8)
 on conflict do nothing;
+INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
+VALUES ('ORDER_SEQ_NEXT_VAL', 0)
+on conflict do nothing;
+INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
+VALUES ('ORDER_PRODUCT_SEQ_NEXT_VAL', 0)
+on conflict do nothing;
+INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
+VALUES ('ORDER_PRODUCT_PRICE_SEQ_NEXT_VAL', 0)
+on conflict do nothing;
+INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
+VALUES ('SHOPPING_CART_SEQ_NEXT_VAL', 0)
+on conflict do nothing;
+INSERT INTO checkout.sm_sequencer (seq_name, seq_count)
+VALUES ('SHOPPING_CART_ITEM_SEQ_NEXT_VAL', 0)
+on conflict do nothing;

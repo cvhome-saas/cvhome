@@ -19,7 +19,8 @@ export const ProductCategoryFilter = ({storeContext, category}: { storeContext: 
 
     return (
         <div className="flex flex-col lg:flex-row gap-8">
-            <Card className="w-full lg:w-1/4 sticky top-24 self-start rounded-3xl border-primary/10 shadow-xl shadow-primary/5 bg-card/50 backdrop-blur-sm overflow-hidden">
+            <Card
+                className="w-full lg:w-1/4 sticky top-24 self-start rounded-3xl border-primary/10 shadow-xl shadow-primary/5 bg-card/50 backdrop-blur-sm overflow-hidden">
                 <CardHeader className="bg-primary/5 border-b border-primary/5">
                     <CardTitle className="font-serif text-xl text-primary">{t('FILTER_BY_MANUFACTURER')}</CardTitle>
                 </CardHeader>
@@ -31,16 +32,21 @@ export const ProductCategoryFilter = ({storeContext, category}: { storeContext: 
                         }}
                         className="space-y-3"
                     >
-                        <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-primary/5 transition-colors">
-                            <RadioGroupItem value="all" id="manufacturer-all" className="border-primary/30 text-primary focus-visible:ring-primary/20"/>
-                            <Label htmlFor="manufacturer-all" className="text-sm font-medium cursor-pointer text-foreground/80">{t('ALL')}</Label>
+                        <div
+                            className="flex items-center space-x-3 p-2 rounded-xl hover:bg-primary/5 transition-colors">
+                            <RadioGroupItem value="all" id="manufacturer-all"
+                                            className="border-primary/30 text-primary focus-visible:ring-primary/20"/>
+                            <Label htmlFor="manufacturer-all"
+                                   className="text-sm font-medium cursor-pointer text-foreground/80">{t('ALL')}</Label>
                         </div>
                         {manufacturers?.map((manufacturer) => (
-                            <div key={manufacturer.id} className="flex items-center space-x-3 p-2 rounded-xl hover:bg-primary/5 transition-colors">
+                            <div key={manufacturer.id}
+                                 className="flex items-center space-x-3 p-2 rounded-xl hover:bg-primary/5 transition-colors">
                                 <RadioGroupItem value={manufacturer.id.toString()}
                                                 id={`manufacturer-${manufacturer.id}`}
                                                 className="border-primary/30 text-primary focus-visible:ring-primary/20"/>
-                                <Label htmlFor={`manufacturer-${manufacturer.id}`} className="text-sm font-medium cursor-pointer text-foreground/80">
+                                <Label htmlFor={`manufacturer-${manufacturer.id}`}
+                                       className="text-sm font-medium cursor-pointer text-foreground/80">
                                     {manufacturer.description.name}
                                 </Label>
                             </div>

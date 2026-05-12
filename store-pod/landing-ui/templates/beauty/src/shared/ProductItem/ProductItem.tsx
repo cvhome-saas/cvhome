@@ -33,7 +33,8 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                         alt={imageAlt}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
-                    <div className="absolute inset-0 z-10 bg-primary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <div
+                        className="absolute inset-0 z-10 bg-primary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
                     <div className="absolute inset-0 z-20">
                         <ProductItemButtonGroup storeContext={storeContext} product={product}/>
                     </div>
@@ -52,7 +53,8 @@ export default function ProductItem({storeContext, product}: { storeContext: Sto
                     <p className="text-xl font-bold text-primary/80">
                         {product.productPrice?.finalPrice || '$?.??'}
                     </p>
-                    <div className="h-1 w-8 bg-accent/30 rounded-full my-1 transition-all duration-500 group-hover:w-16 group-hover:bg-accent/60" />
+                    <div
+                        className="h-1 w-8 bg-accent/30 rounded-full my-1 transition-all duration-500 group-hover:w-16 group-hover:bg-accent/60"/>
                     <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
                         {isAvailable ? t('IN_STOCK') : t('OUT_OF_STOCK')}
                     </span>

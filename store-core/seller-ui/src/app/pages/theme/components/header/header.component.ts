@@ -25,9 +25,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   languages: string[];
   currentLanguage: string;
   userMenu = [{title: 'Profile'}, {title: 'Log out'}];
-  private destroy$: Subject<void> = new Subject<void>();
   selectedStoreId: string | undefined;
   stores: Store[] | undefined;
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
@@ -82,15 +82,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const {xl} = this.breakpointService.getBreakpointsMap();
   }
 
-  private checkStoreSelectDisabledState(currentUrl: string): void {
-    const disablePatterns = [
-      '/pages/store-management',
-      '/pages/subscription-and-usage',
-      '/pages/org-management'
-    ];
-    this.isStoreSelectDisabled = disablePatterns.some(pattern => currentUrl.startsWith(pattern));
-  }
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -118,5 +109,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (item.title == 'Log out') {
       this.authService.logout();
     }
+  }
+
+  private checkStoreSelectDisabledState(currentUrl: string): void {
+    const disablePatterns = [
+      '/pages/store-management',
+      '/pages/subscription-and-usage',
+      '/pages/org-management'
+    ];
+    this.isStoreSelectDisabled = disablePatterns.some(pattern => currentUrl.startsWith(pattern));
   }
 }

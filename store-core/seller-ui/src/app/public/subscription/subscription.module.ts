@@ -6,16 +6,16 @@ import {FailSubscriptionComponent} from "./fail/fail-subscription.component";
 import {SharedModule} from "../../pages/shared/shared.module";
 
 @NgModule({
-    exports: [],
-    imports: [
-        SubscriptionRoutingModule,
-        SharedModule
-    ],
-    declarations: [
-        SubscriptionComponent,
-        SuccessSubscriptionComponent,
-        FailSubscriptionComponent
-    ],
+  exports: [],
+  imports: [
+    SubscriptionRoutingModule,
+    SharedModule
+  ],
+  declarations: [
+    SubscriptionComponent,
+    SuccessSubscriptionComponent,
+    FailSubscriptionComponent
+  ],
 })
 export class SubscriptionModule {
 }

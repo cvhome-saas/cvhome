@@ -1,4 +1,4 @@
-<nb-card status="basic" accent="info">
+<nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.ORG' | translate }}</h1>
@@ -14,10 +14,11 @@
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button nbButton status="warning" (click)="goToBack()" class="m-1" type="button">
+        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button nbButton status="success" (click)="save()" [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+                status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
         </button>
@@ -42,8 +43,8 @@
           {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}*
         </label>
         <div class="col-sm-12">
-          <nb-select fullWidth placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}"
-                     formControlName='subscriptionPlan' id="subscriptionPlan">
+          <nb-select formControlName='subscriptionPlan' fullWidth
+                     id="subscriptionPlan" placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}">
             <nb-option *ngFor="let i of subscriptionPlans" [value]="i">{{ i }}</nb-option>
           </nb-select>
 

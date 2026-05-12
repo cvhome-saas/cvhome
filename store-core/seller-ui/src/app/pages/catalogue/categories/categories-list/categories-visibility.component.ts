@@ -7,7 +7,7 @@ import {ErrorService} from "../../../shared/services/error.service";
 
 @Component({
   selector: 'ngx-categories-visibility',
-  standalone:false,
+  standalone: false,
 
   template: `
     <nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,

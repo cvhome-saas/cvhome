@@ -8,7 +8,7 @@ import {FooterComponent} from "./components/footer/footer.component";
 
 
 @NgModule({
-    declarations: [PublicComponent],
+  declarations: [PublicComponent],
   imports: [
     PublicRoutingModule,
     ThemeModule,

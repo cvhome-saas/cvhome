@@ -15,8 +15,8 @@ export class PodService {
     return this.crudService.get(`/control-plane/api/v1/pod/list`);
   }
 
-  findAllPods(params:PageRequest): Observable<PageT<Pod>> {
-    return this.crudService.get(`/control-plane/api/v1/pod`,params);
+  findAllPods(params: PageRequest): Observable<PageT<Pod>> {
+    return this.crudService.get(`/control-plane/api/v1/pod`, params);
   }
 
   getPod(id: string): Observable<Pod> {
@@ -56,6 +56,7 @@ export interface Endpoint {
   endpoint: string
   type: EndpointType
 }
+
 export enum EndpointType {
   EXTERNAL = 'EXTERNAL',
   INTERNAL = 'INTERNAL'

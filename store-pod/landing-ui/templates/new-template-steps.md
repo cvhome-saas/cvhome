@@ -23,15 +23,15 @@ Copy the folder structure of an existing template (e.g. `basis`). Every file bel
 
 ### Step 2 — Configuration & Static Files
 
-| File | Action |
-|------|--------|
-| `package.json` | Copy from `basis/package.json`. Change `name` to `health` (or keep blank). |
-| `next.config.ts` | Copy as-is — do not change. |
-| `tsconfig.json` | Copy as-is — path aliases must point to `../../libs/*`. |
-| `postcss.config.mjs` | Copy as-is. |
-| `eslint.config.mjs` | Copy as-is. |
-| `components.json` | Copy as-is (shadcn config). |
-| `public/` | Copy entire directory. contains `placeholder.png` and SVG assets. |
+| File                   | Action                                                                                 |
+|------------------------|----------------------------------------------------------------------------------------|
+| `package.json`         | Copy from `basis/package.json`. Change `name` to `health` (or keep blank).             |
+| `next.config.ts`       | Copy as-is — do not change.                                                            |
+| `tsconfig.json`        | Copy as-is — path aliases must point to `../../libs/*`.                                |
+| `postcss.config.mjs`   | Copy as-is.                                                                            |
+| `eslint.config.mjs`    | Copy as-is.                                                                            |
+| `components.json`      | Copy as-is (shadcn config).                                                            |
+| `public/`              | Copy entire directory. contains `placeholder.png` and SVG assets.                      |
 | `public/css/login.css` | **CUSTOMIZE** — Update with your new template's brand styles for the login/auth pages. |
 
 ---
@@ -45,11 +45,14 @@ src/i18n/navigation.ts   ← do not change
 src/proxy.ts             ← middleware, do not change
 ```
 
-**Locales are SHARED** across all templates. They live at `landing-ui/locales/` (the monorepo root), not inside your template folder. The `request.ts` file imports them via `../../../../locales/${locale}.json`.
+**Locales are SHARED** across all templates. They live at `landing-ui/locales/` (the monorepo root), not inside your
+template folder. The `request.ts` file imports them via `../../../../locales/${locale}.json`.
 
 There are **5** locale files: `en.json`, `ar.json`, `es.json`, `fr.json`, `ru.json`.
 
-**IMPORTANT:** If you add any new literal text in your components (e.g., "Exclusive Offer", "Sign up now"), **DO NOT hardcode it**. Add the key/value pairs to `landing-ui/locales/*.json` (all 5 files) and use the `t('key')` function from `next-intl`.
+**IMPORTANT:** If you add any new literal text in your components (e.g., "Exclusive Offer", "Sign up now"), **DO NOT
+hardcode it**. Add the key/value pairs to `landing-ui/locales/*.json` (all 5 files) and use the `t('key')` function from
+`next-intl`.
 
 ---
 
@@ -86,7 +89,8 @@ src/app/[locale]/customer/order/[id]/page.tsx ← copy, no changes
 src/app/[locale]/favicon.ico              ← copy or replace with your own
 ```
 
-> `layout.tsx` injects the store's runtime color template via `<style>` tag using `toRootStyle()` from `@store-front/services`. Do not change this.
+> `layout.tsx` injects the store's runtime color template via `<style>` tag using `toRootStyle()` from
+`@store-front/services`. Do not change this.
 
 ---
 
@@ -108,7 +112,9 @@ You can regenerate any of these via `npx shadcn add <component>` if you want a d
 
 ### Step 7 — Shared Components (THE BRAND NEW DESIGN — 18 files)
 
-These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a **completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and Tailwind classes differ.
+These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a
+**completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and
+Tailwind classes differ.
 
 ```
 src/shared/
@@ -155,19 +161,19 @@ src/shared/
 
 Each component receives typed props from the page server components. The hooks used are:
 
-| Component | Hook / Service |
-|-----------|---------------|
-| `Header` | `useCart`, `useUser` |
-| `CartProductList` | `useCart` |
-| `ProductCategoryFilter` | `useProductCategoryFilter` |
-| `CheckoutForm` | `useCheckoutForm` |
-| `CheckoutCartBox` | `useCart` |
-| `ProductDetailedActionBox` | `useProductDetailedAddToCart` |
-| `CustomerDashboard` | `useUser`, `useCustomer` |
-| `OrderDetails` | `useUser`, `useCustomer` |
-| `ProductGrid` / `ProductItem` | Props only (no hooks) |
-| `ProductSwiperGrid` | Props only (Swiper.js) |
-| `CoverFlow` | Props only (Swiper.js) |
+| Component                     | Hook / Service                |
+|-------------------------------|-------------------------------|
+| `Header`                      | `useCart`, `useUser`          |
+| `CartProductList`             | `useCart`                     |
+| `ProductCategoryFilter`       | `useProductCategoryFilter`    |
+| `CheckoutForm`                | `useCheckoutForm`             |
+| `CheckoutCartBox`             | `useCart`                     |
+| `ProductDetailedActionBox`    | `useProductDetailedAddToCart` |
+| `CustomerDashboard`           | `useUser`, `useCustomer`      |
+| `OrderDetails`                | `useUser`, `useCustomer`      |
+| `ProductGrid` / `ProductItem` | Props only (no hooks)         |
+| `ProductSwiperGrid`           | Props only (Swiper.js)        |
+| `CoverFlow`                   | Props only (Swiper.js)        |
 
 ---
 
@@ -199,6 +205,7 @@ export enum Theme {
 ```
 
 **How it works end-to-end:**
+
 1. Store admin assigns a `Theme` enum value (e.g., `BEAUTY`) to a store
 2. The Express server reads the `theme` HTTP header from each request
 3. `getTheme()` lowercases it → `"beauty"`
@@ -207,7 +214,9 @@ export enum Theme {
 **Your template folder name MUST be the lowercase version of the Theme enum value.**
 For example: `BEAUTY` → `templates/beauty/`, `HEALTH` → `templates/health/`.
 
-**No other registration is needed.** The npm workspace glob (`templates/*` in root `package.json`) auto-discovers new folders. The Express `TemplateManager` auto-discovers templates by folder existence. The Dockerfile copies the entire `templates/` directory. No env vars are needed per template.
+**No other registration is needed.** The npm workspace glob (`templates/*` in root `package.json`) auto-discovers new
+folders. The Express `TemplateManager` auto-discovers templates by folder existence. The Dockerfile copies the entire
+`templates/` directory. No env vars are needed per template.
 
 ---
 
@@ -328,27 +337,36 @@ import { useProductDetailedAddToCart } from '@store-front/hooks/use-product-deta
 When designing the 14 shared components for your new template, follow these rules:
 
 ### RTL Support
-- Use logical properties: `start`/`end` instead of `left`/`right` in Tailwind (`ps-4`, `pe-4`, `ms-auto`, `me-2`, `text-start`, `text-end`, `rounded-s-lg`, `rounded-e-lg`).
+
+- Use logical properties: `start`/`end` instead of `left`/`right` in Tailwind (`ps-4`, `pe-4`, `ms-auto`, `me-2`,
+  `text-start`, `text-end`, `rounded-s-lg`, `rounded-e-lg`).
 - Use `gap-*` and flexbox instead of directional margins where possible.
 - Always test with Arabic locale (`/ar/`) to verify RTL layout flips correctly.
 
 ### Colors — Use CSS Variables Only
-- Always use Tailwind classes that reference CSS variables: `bg-primary`, `text-foreground`, `border-border`, `bg-accent`, `text-muted-foreground`, etc.
-- **Never** hardcode colors like `bg-blue-500` or `text-red-600` — the store's color theme is injected at runtime via `toRootStyle()` and will override CSS variables.
+
+- Always use Tailwind classes that reference CSS variables: `bg-primary`, `text-foreground`, `border-border`,
+  `bg-accent`, `text-muted-foreground`, etc.
+- **Never** hardcode colors like `bg-blue-500` or `text-red-600` — the store's color theme is injected at runtime via
+  `toRootStyle()` and will override CSS variables.
 - For hover/focus states use the corresponding variables: `hover:bg-primary-hover`, `focus:ring-ring`, etc.
 
 ### Translations — No Hardcoded Text
+
 - Use `useTranslations('NAMESPACE')` in client components and `getTranslations('NAMESPACE')` in server components.
-- Add new keys to **all 5** locale files in `landing-ui/locales/` (`en.json`, `ar.json`, `es.json`, `fr.json`, `ru.json`).
+- Add new keys to **all 5** locale files in `landing-ui/locales/` (`en.json`, `ar.json`, `es.json`, `fr.json`,
+  `ru.json`).
 - Existing translation keys cover most common text (see `en.json` for full structure: `PAGE.*`, `COMPONENTS.*`).
 
 ### Responsive Design
+
 - Follow Tailwind's breakpoints: `sm` (640px) → `md` (768px) → `lg` (1024px) → `xl` (1280px).
 - Design mobile-first. Test: mobile viewport, tablet, and desktop.
 - Header must include a hamburger/drawer menu for mobile.
 - Product grids should adapt columns: 1 col on mobile, 2–3 on tablet, 3–4 on desktop.
 
 ### Product Data Edge Cases
+
 - **Varying image ratios**: Use `object-cover` with a fixed aspect ratio container.
 - **Long product names**: Allow 2–3 lines with `line-clamp-2` or `truncate`.
 - **Missing images**: Fallback to `placeholder.png` from the `public/` directory.
@@ -356,13 +374,16 @@ When designing the 14 shared components for your new template, follow these rule
 - **Currencies**: Prices come pre-formatted from the API — display as-is, don't format manually.
 
 ### Libraries Available (already in dependencies)
+
 - **Icons**: `lucide-react` — use this for all icons. Don't import other icon libraries.
-- **Carousel/Slider**: `swiper` (Swiper.js) — used by CoverFlow and ProductSwiperGrid. Keep custom CSS in `swiper-custom.css`.
+- **Carousel/Slider**: `swiper` (Swiper.js) — used by CoverFlow and ProductSwiperGrid. Keep custom CSS in
+  `swiper-custom.css`.
 - **Toast/Notifications**: `nextjs-toast-notify` — for add-to-cart success, error messages, etc.
 - **Form validation**: `react-hook-form` + `yup` — used by CheckoutForm via `useCheckoutForm` hook.
 - **UI primitives**: shadcn/ui (Radix UI) — all available in `components/ui/`.
 
 ### Accessibility
+
 - Use semantic HTML: `<nav>`, `<main>`, `<article>`, `<header>`, `<footer>`.
 - Add `aria-label` to icon-only buttons (e.g., cart icon, close button).
 - Ensure color contrast meets WCAG AA standards.
