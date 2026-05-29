@@ -17,8 +17,6 @@ public class OrderCriteria extends Criteria {
 
     private Long id = null;
 
-    private String paymentMethod;
-
     private Long customerId;
 
     private String email;

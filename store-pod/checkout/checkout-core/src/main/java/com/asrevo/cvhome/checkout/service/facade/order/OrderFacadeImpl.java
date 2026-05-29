@@ -150,7 +150,6 @@ public class OrderFacadeImpl implements OrderFacade {
                 throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
             }
             OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
-            order.getPayment().setAmount(calculate.getTotal().toString());
             Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
 
             List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);
@@ -173,11 +172,7 @@ public class OrderFacadeImpl implements OrderFacade {
             OrderTotalSummary orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store,
                     language);
 
-            if (order.getPayment().getAmount() == null) {
-                throw new ConversionException("Requires Payment.amount");
-            }
-
-            String submitedAmount = order.getPayment().getAmount();
+            String submitedAmount = calculate.getTotal().toString();
 
             BigDecimal formattedSubmittedAmount = PriceUtils.getAmount(submitedAmount);
 
@@ -282,10 +277,6 @@ public class OrderFacadeImpl implements OrderFacade {
                 .map(pr -> readableOrderProductMapper.convert(pr, store, language))
                 .toList();
         orderConfirmation.setProducts(products);
-
-        if (order.getPaymentType() != null) {
-            orderConfirmation.setPayment(order.getPaymentType().name());
-        }
 
         orderConfirmation.setId(order.getId());
 
