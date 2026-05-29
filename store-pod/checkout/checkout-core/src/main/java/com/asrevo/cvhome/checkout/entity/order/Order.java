@@ -37,7 +37,6 @@ import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -103,13 +102,6 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "ORDER_TYPE")
     @Enumerated(value = EnumType.STRING)
     private OrderType orderType = OrderType.ORDER;
-
-    @Column(name = "PAYMENT_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private PaymentType paymentType;
-
-    @Column(name = "PAYMENT_MODULE_CODE")
-    private String paymentModuleCode;
 
     @Column(name = "SHIPPING_MODULE_CODE")
     private String shippingModuleCode;

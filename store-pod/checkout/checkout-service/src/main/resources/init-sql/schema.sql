@@ -240,21 +240,6 @@ create table if not exists checkout.orders
                     ):: text[]
                 )
             ),
-    payment_module_code     varchar(255),
-    payment_type            varchar(255)
-        constraint orders_payment_type_check check (
-            (payment_type):: text = ANY (
-                (
-                    ARRAY [ 'CREDITCARD' :: character varying,
-                        'FREE' :: character varying, 'COD' :: character varying,
-                        'MONEYORDER' :: character varying,
-                        'PAYPAL' :: character varying, 'INVOICE' :: character varying,
-                        'DIRECTBANK' :: character varying,
-                        'PAYMENTPLAN' :: character varying,
-                        'ACCOUNTCREDIT' :: character varying]
-                    ):: text[]
-                )
-            ),
     shipping_module_code    varchar(255),
     cart_code               varchar(255),
     order_status            varchar(255)
