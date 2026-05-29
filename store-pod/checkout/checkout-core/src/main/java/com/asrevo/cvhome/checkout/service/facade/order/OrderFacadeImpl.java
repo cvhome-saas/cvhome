@@ -37,7 +37,6 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
-import com.asrevo.cvhome.checkout.model.payments.Payment;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.mapper.customer.ReadableCustomerMapper;
@@ -47,7 +46,6 @@ import com.asrevo.cvhome.checkout.service.populator.order.OrderProductPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.PersistableOrderApiPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
-import com.asrevo.cvhome.checkout.service.populator.order.transaction.PersistablePaymentPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
@@ -98,9 +96,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final ShoppingCartCalculationService shoppingCartCalculationService;
 
-    private final PersistablePaymentPopulator paymentPopulator;
-
     private final OrderProductPopulator orderProductPopulator;
+
     private final ReadableOrderProductPopulator readableOrderProductPopulator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
@@ -111,7 +108,6 @@ public class OrderFacadeImpl implements OrderFacade {
                            ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
                            ReadableOrderPopulator readableOrderPopulator,
                            ShoppingCartCalculationService shoppingCartCalculationService,
-                           PersistablePaymentPopulator paymentPopulator,
                            OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
@@ -124,7 +120,6 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.readableOrderPopulator = readableOrderPopulator;
         this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.paymentPopulator = paymentPopulator;
         this.orderProductPopulator = orderProductPopulator;
         this.readableOrderProductPopulator = readableOrderProductPopulator;
     }
@@ -209,13 +204,10 @@ public class OrderFacadeImpl implements OrderFacade {
             }
             modelOrder.setOrderTotal(set);
 
-            Payment paymentModel = new Payment();
-            paymentPopulator.populate(order.getPayment(), paymentModel, store, language);
-
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
 
             // order service
-            modelOrder = orderService.process(modelOrder, customer, items, orderTotalSummary, paymentModel, null, store);
+            modelOrder = orderService.process(modelOrder, customer, items, orderTotalSummary, store);
 
             // Reserve inventory
             log.debug("Update inventory");
