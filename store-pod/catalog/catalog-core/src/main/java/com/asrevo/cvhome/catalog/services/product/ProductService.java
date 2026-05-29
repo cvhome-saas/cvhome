@@ -45,8 +45,12 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      */
     Product findOne(Long id, StoreMerchantId merchant);
 
-    ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
+    ProductReservationStatus reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
             throws ServiceException;
+
+    void commit(StoreMerchantId store, Long orderId) throws ServiceException;
+
+    void unreserve(StoreMerchantId store, Long orderId) throws ServiceException;
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 

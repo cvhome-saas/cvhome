@@ -496,3 +496,22 @@ create table if not exists catalog.product_group_product
         constraint fk_pgp_product references catalog.product,
     primary key (product_group_id, product_id)
 );
+
+create table if not exists catalog.product_reservation
+(
+    id                bigint       not null primary key,
+    date_created      timestamp(6),
+    date_modified     timestamp(6),
+    updt_id           varchar(60),
+    sku               varchar(255) not null,
+    quantity          integer      not null,
+    order_id          bigint       not null,
+    expire_at         timestamp(6) not null,
+    status            varchar(20)  not null,
+    store_merchant_id varchar(50)  not null,
+    product_avail_id  bigint
+        constraint fk_product_reservation_avail references catalog.product_availability
+);
+
+create index if not exists idx_prd_res_order_id on catalog.product_reservation (order_id);
+create index if not exists idx_prd_res_expire_at on catalog.product_reservation (expire_at);

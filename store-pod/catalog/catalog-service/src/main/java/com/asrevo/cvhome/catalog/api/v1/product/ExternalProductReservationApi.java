@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +37,9 @@ public class ExternalProductReservationApi implements ExternalProductReservation
 
     private final ProductService productService;
 
-    @PostMapping(value = "/private/reserve")
-    @Operation(method = "GET", description = "Update product quantity",
+    @Override
+    @PostMapping(value = "/private/reserve/{orderId}")
+    @Operation(method = "POST", description = "Update product quantity",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ProductReservationStatus.class))))
     @Parameter(name = "store",
@@ -45,12 +47,25 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-
-    @Override
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     public ProductReservationStatus reserve(StoreMerchantId merchantStore,
+                                            @PathVariable Long orderId,
                                             @RequestBody ProductReservationList productReservation) throws ServiceException {
-        return productService.reserve(merchantStore, productReservation);
+        return productService.reserve(merchantStore, orderId, productReservation);
+    }
+
+    @Override
+    @PostMapping("/private/commit/{orderId}")
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
+    public void commit(StoreMerchantId merchantStore, @PathVariable Long orderId) throws ServiceException {
+        productService.commit(merchantStore, orderId);
+    }
+
+    @Override
+    @PostMapping("/private/unreserve/{orderId}")
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
+    public void unreserve(StoreMerchantId merchantStore, @PathVariable Long orderId) throws ServiceException {
+        productService.unreserve(merchantStore, orderId);
     }
 
 }

@@ -134,9 +134,10 @@ public class OrderFacadeImpl implements OrderFacade {
     public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                               Locale locale) throws ServiceException {
 
+        Order modelOrder = null;
         try {
 
-            Order modelOrder = new Order();
+            modelOrder = new Order();
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
             modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
@@ -224,7 +225,7 @@ public class OrderFacadeImpl implements OrderFacade {
                     .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
 
             ProductReservationStatus reservationStatus = externalProductReservationService.reserve(store,
-                    productReservation);
+                    modelOrder.getId(), productReservation);
             if (!reservationStatus.status()) {
                 throw new ServiceException("error updating inventory with new qty");
             }
@@ -233,12 +234,27 @@ public class OrderFacadeImpl implements OrderFacade {
             cart.setOrderId(modelOrder.getId());
             shoppingCartFacade.saveOrUpdateShoppingCart(cart);
 
+            log.debug("Commit inventory reservation for order {}", modelOrder.getId());
+            externalProductReservationService.commit(store, modelOrder.getId());
+
+            log.debug("Commit inventory reservation for order {}", modelOrder.getId());
+            externalProductReservationService.commit(store, modelOrder.getId());
+
             return modelOrder;
 
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
+            if (modelOrder != null && modelOrder.getId() != null) {
+                unreserve(store, modelOrder.getId());
+            }
             throw new ServiceException(e);
+        }
+    }
+
+    private void unreserve(StoreMerchantId store, Long orderId) {
+        try {
+            externalProductReservationService.unreserve(store, orderId);
+        } catch (Exception e) {
+            log.error("Error while unreserving for order {}", orderId, e);
         }
     }
 

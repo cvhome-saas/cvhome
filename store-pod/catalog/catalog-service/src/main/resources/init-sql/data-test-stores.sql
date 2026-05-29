@@ -94,3 +94,6 @@ on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_GROUP_DESC_SEQ_NEXT_VAL', 33)
 on conflict do nothing;
+insert into sm_sequencer (seq_name, seq_count)
+values ('PRODUCT_RESERVATION_SEQ_NEXT_VAL', 0)
+on conflict (seq_name) do nothing;
