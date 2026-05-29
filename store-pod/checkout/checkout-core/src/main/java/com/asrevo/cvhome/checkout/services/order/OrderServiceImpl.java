@@ -23,12 +23,10 @@ import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalType;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.payments.Transaction;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.OrderSummaryType;
-import com.asrevo.cvhome.checkout.model.payments.Payment;
 import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -145,8 +143,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Transactional
     @Override
-    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
-                         Payment payment, Transaction transaction, StoreMerchantId store) throws ServiceException {
+    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) throws ServiceException {
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
