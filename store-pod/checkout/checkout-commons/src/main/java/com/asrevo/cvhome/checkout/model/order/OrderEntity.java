@@ -9,7 +9,6 @@ import java.util.List;
 import com.asrevo.cvhome.checkout.model.order.total.OrderTotal;
 import com.asrevo.cvhome.checkout.model.order.v0.Order;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;
@@ -44,8 +43,6 @@ public class OrderEntity extends Order implements Serializable {
     private List<OrderStatus> previousOrderStatus;
 
     private OrderStatus orderStatus;
-
-    private CreditCard creditCard;
 
     private LocalDate datePurchased;
 

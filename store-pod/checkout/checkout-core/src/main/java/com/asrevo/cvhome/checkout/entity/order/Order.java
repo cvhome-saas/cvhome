@@ -36,7 +36,6 @@ import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -118,9 +117,6 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Valid
     @Embedded
     private Billing billing;
-
-    @Embedded
-    private CreditCard creditCard;
 
     @JsonIgnore
     @Column(name = "CURRENCY_ID", length = 6, nullable = false)

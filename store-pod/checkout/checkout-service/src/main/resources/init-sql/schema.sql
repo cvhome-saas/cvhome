@@ -200,20 +200,6 @@ create table if not exists checkout.orders
                 )
             ),
     confirmed_address       boolean,
-    card_type               varchar(255)
-        constraint orders_card_type_check check (
-            (card_type):: text = ANY (
-                (
-                    ARRAY [ 'AMEX' :: character varying,
-                        'VISA' :: character varying, 'MASTERCARD' :: character varying,
-                        'DINERS' :: character varying, 'DISCOVERY' :: character varying]
-                    ):: text[]
-                )
-            ),
-    cc_cvv                  varchar(255),
-    cc_expires              varchar(255),
-    cc_number               varchar(255),
-    cc_owner                varchar(255),
     currency_value          numeric(38, 2),
     customer_agreed         boolean,
     customer_email_address  varchar(50) not null,
