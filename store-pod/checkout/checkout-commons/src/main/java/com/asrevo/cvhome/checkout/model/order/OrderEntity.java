@@ -9,7 +9,6 @@ import java.util.List;
 import com.asrevo.cvhome.checkout.model.order.total.OrderTotal;
 import com.asrevo.cvhome.checkout.model.order.v0.Order;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeSerializer;
@@ -33,10 +32,6 @@ public class OrderEntity extends Order implements Serializable {
     private List<OrderTotal> totals;
 
     private List<OrderAttribute> attributes = new ArrayList<>();
-
-    private PaymentType paymentType;
-
-    private String paymentModule;
 
     private String shippingModule;
 

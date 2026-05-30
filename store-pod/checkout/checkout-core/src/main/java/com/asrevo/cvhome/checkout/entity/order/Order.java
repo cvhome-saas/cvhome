@@ -102,9 +102,6 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Enumerated(value = EnumType.STRING)
     private OrderType orderType = OrderType.ORDER;
 
-    @Column(name = "SHIPPING_MODULE_CODE")
-    private String shippingModuleCode;
-
     @Column(name = "CUSTOMER_AGREED")
     private Boolean customerAgreement = false;
 

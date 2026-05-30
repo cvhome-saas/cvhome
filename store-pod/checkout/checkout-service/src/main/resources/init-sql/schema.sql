@@ -226,7 +226,6 @@ create table if not exists checkout.orders
                     ):: text[]
                 )
             ),
-    shipping_module_code    varchar(255),
     cart_code               varchar(255),
     order_status            varchar(255)
         constraint orders_order_status_check check (
