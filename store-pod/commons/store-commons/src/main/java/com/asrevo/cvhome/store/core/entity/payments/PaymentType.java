@@ -5,8 +5,7 @@ import lombok.Getter;
 @Getter
 public enum PaymentType {
 
-    CREDITCARD("creditcard"), FREE("free"), COD("cod"), MONEYORDER("moneyorder"), PAYPAL("paypal"), INVOICE("invoice"),
-    DIRECTBANK("directbank"), PAYMENTPLAN("paymentplan"), ACCOUNTCREDIT("accountcredit");
+    COD("COD"), PAYPAL("PAYPAL"), STRIPE("STRIPE");
 
     private final String type;
 
