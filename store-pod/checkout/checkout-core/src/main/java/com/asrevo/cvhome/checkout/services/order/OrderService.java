@@ -30,7 +30,8 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
     OrderTotalSummary calculateShoppingCartTotal(ShoppingCart cartModel, StoreMerchantId store, LanguageCode language)
             throws ServiceException;
 
-    Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) throws ServiceException;
+    Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
+            throws ServiceException;
 
     Order getOrder(final Long orderId, StoreMerchantId store);
 

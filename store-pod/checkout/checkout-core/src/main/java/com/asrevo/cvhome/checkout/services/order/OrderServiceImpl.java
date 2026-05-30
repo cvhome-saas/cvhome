@@ -143,7 +143,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Transactional
     @Override
-    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) throws ServiceException {
+    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
+            throws ServiceException {
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
