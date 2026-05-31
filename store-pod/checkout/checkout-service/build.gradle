@@ -57,6 +57,7 @@ dependencies {
     implementation project(':store-pod:checkout:checkout-core')
     implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:catalog:catalog-external-api')
+    implementation project(':store-pod:payment:payment-external-api')
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 

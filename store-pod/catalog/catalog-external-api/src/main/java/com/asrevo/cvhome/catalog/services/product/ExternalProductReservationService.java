@@ -7,21 +7,23 @@ import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 
 @HttpExchange("/api/v1/private")
 public interface ExternalProductReservationService {
 
     @PostExchange("/reserve/{orderId}")
-    ProductReservationStatus reserve(StoreMerchantId store, @PathVariable Long orderId,
-                                     @RequestBody ProductReservationList productReservation)
-            throws ServiceException;
+    ProductReservationStatus reserve(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+                                     @RequestBody ProductReservationList productReservation);
+
+    @PostExchange("/auto-commit/{orderId}")
+    ProductReservationStatus autoCommit(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+                                        @RequestBody ProductReservationList productReservation);
 
     @PostExchange("/commit/{orderId}")
-    void commit(StoreMerchantId store, @PathVariable Long orderId) throws ServiceException;
+    void commit(StoreMerchantId store, @PathVariable("orderId") Long orderId);
 
-    @PostExchange("/unreserve/{orderId}")
-    void unreserve(StoreMerchantId store, @PathVariable Long orderId) throws ServiceException;
+    @PostExchange("/release/{orderId}")
+    void release(StoreMerchantId store, @PathVariable("orderId") Long orderId);
 
 }

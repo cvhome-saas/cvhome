@@ -1,23 +1,18 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
@@ -47,7 +42,6 @@ import com.asrevo.cvhome.checkout.service.populator.order.PersistableOrderApiPop
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
-import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -55,12 +49,10 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,8 +72,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final OrderService orderService;
 
-    private final ExternalProductReservationService externalProductReservationService;
-
     private final PersistableOrderApiPopulator persistableOrderApiPopulator;
 
     private final CustomerFacade customerFacade;
@@ -94,45 +84,38 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final ReadableOrderPopulator readableOrderPopulator;
 
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
-
     private final OrderProductPopulator orderProductPopulator;
 
     private final ReadableOrderProductPopulator readableOrderProductPopulator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
                            OrderService orderService,
-                           ExternalProductReservationService externalProductReservationService,
                            PersistableOrderApiPopulator persistableOrderApiPopulator,
                            ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
                            ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
                            ReadableOrderPopulator readableOrderPopulator,
-                           ShoppingCartCalculationService shoppingCartCalculationService,
                            OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
-        this.externalProductReservationService = externalProductReservationService;
         this.persistableOrderApiPopulator = persistableOrderApiPopulator;
         this.readableOrderProductMapper = readableOrderProductMapper;
         this.customerFacade = customerFacade;
         this.readableCustomerMapper = readableCustomerMapper;
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.readableOrderPopulator = readableOrderPopulator;
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
         this.orderProductPopulator = orderProductPopulator;
         this.readableOrderProductPopulator = readableOrderProductPopulator;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                              Locale locale) throws ServiceException {
-
-        Order modelOrder = null;
+    public Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language)
+            throws ServiceException {
         try {
 
-            modelOrder = new Order();
+            Order modelOrder = new Order();
+
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
             modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
@@ -149,10 +132,8 @@ public class OrderFacadeImpl implements OrderFacade {
             if (cart == null) {
                 throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
             }
-            OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
-            Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
 
-            List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);
+            List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
 
             Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 
@@ -166,28 +147,12 @@ public class OrderFacadeImpl implements OrderFacade {
             modelOrder.setOrderProducts(orderProducts);
 
             OrderSummary orderSummary = new OrderSummary();
-            List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
-            orderSummary.setProducts(itemsSet);
 
-            OrderTotalSummary orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store,
-                    language);
+            orderSummary.setProducts(shoppingCartItems);
 
-            String submitedAmount = calculate.getTotal().toString();
+            OrderTotalSummary orderTotalSummary = orderService.calculateOrderTotal(orderSummary, store);
 
-            BigDecimal formattedSubmittedAmount = PriceUtils.getAmount(submitedAmount);
-
-            BigDecimal calculatedAmount = orderTotalSummary.getTotal();
-            String strCalculatedTotal = calculatedAmount.toPlainString();
-
-            // compare both prices
-            if (calculatedAmount.compareTo(formattedSubmittedAmount) != 0) {
-
-                throw new ConversionException(
-                        "Payment.amount does not match what the system has calculated " + strCalculatedTotal
-                                + " (received " + submitedAmount + ") please recalculate the order and submit again");
-            }
-
-            modelOrder.setTotal(calculatedAmount);
+            modelOrder.setTotal(orderTotalSummary.getTotal());
             List<OrderTotal> totals = orderTotalSummary.getTotals();
             Set<OrderTotal> set = new HashSet<>();
 
@@ -200,48 +165,19 @@ public class OrderFacadeImpl implements OrderFacade {
             modelOrder.setOrderTotal(set);
 
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
+            modelOrder = orderService.process(modelOrder, customer, shoppingCartItems, orderTotalSummary, store);
 
-            // order service
-            modelOrder = orderService.process(modelOrder, customer, items, orderTotalSummary, store);
-
-            // Reserve inventory
-            log.debug("Update inventory");
-            ProductReservationList productReservation = modelOrder.getOrderProducts()
-                    .stream()
-                    .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
-                    .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
-
-            ProductReservationStatus reservationStatus = externalProductReservationService.reserve(store,
-                    modelOrder.getId(), productReservation);
-            if (!reservationStatus.status()) {
-                throw new ServiceException("error updating inventory with new qty");
+            modelOrder.setStatus(OrderStatus.PENDING_PAYMENT);
+            if (PaymentType.COD.equals(order.getPaymentType())) {
+                modelOrder.setStatus(OrderStatus.ORDERED);
             }
-
-            // update cart
+            orderService.save(modelOrder);
             cart.setOrderId(modelOrder.getId());
             shoppingCartFacade.saveOrUpdateShoppingCart(cart);
 
-            log.debug("Commit inventory reservation for order {}", modelOrder.getId());
-            externalProductReservationService.commit(store, modelOrder.getId());
-
-            log.debug("Commit inventory reservation for order {}", modelOrder.getId());
-            externalProductReservationService.commit(store, modelOrder.getId());
-
             return modelOrder;
-
         } catch (Exception e) {
-            if (modelOrder != null && modelOrder.getId() != null) {
-                unreserve(store, modelOrder.getId());
-            }
             throw new ServiceException(e);
-        }
-    }
-
-    private void unreserve(StoreMerchantId store, Long orderId) {
-        try {
-            externalProductReservationService.unreserve(store, orderId);
-        } catch (Exception e) {
-            log.error("Error while unreserving for order {}", orderId, e);
         }
     }
 

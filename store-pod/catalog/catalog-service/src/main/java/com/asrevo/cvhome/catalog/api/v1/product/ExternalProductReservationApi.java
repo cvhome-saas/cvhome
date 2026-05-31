@@ -12,7 +12,6 @@ import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationServ
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
@@ -48,23 +48,44 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
+    @SneakyThrows
     public ProductReservationStatus reserve(StoreMerchantId merchantStore,
                                             @PathVariable Long orderId,
-                                            @RequestBody ProductReservationList productReservation) throws ServiceException {
+                                            @RequestBody ProductReservationList productReservation) {
         return productService.reserve(merchantStore, orderId, productReservation);
+    }
+
+    @Override
+    @PostMapping(value = "/private/auto-commit/{orderId}")
+    @Operation(method = "POST", description = "Update product quantity",
+            responses = @ApiResponse(
+                    content = @Content(schema = @Schema(implementation = ProductReservationStatus.class))))
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
+    @Parameter(name = "lang",
+            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
+    @SneakyThrows
+    public ProductReservationStatus autoCommit(StoreMerchantId merchantStore,
+                                               @PathVariable Long orderId,
+                                               @RequestBody ProductReservationList productReservation) {
+        return productService.autoCommit(merchantStore, orderId, productReservation);
     }
 
     @Override
     @PostMapping("/private/commit/{orderId}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    public void commit(StoreMerchantId merchantStore, @PathVariable Long orderId) throws ServiceException {
+    @SneakyThrows
+    public void commit(StoreMerchantId merchantStore, @PathVariable Long orderId) {
         productService.commit(merchantStore, orderId);
     }
 
     @Override
-    @PostMapping("/private/unreserve/{orderId}")
+    @PostMapping("/private/release/{orderId}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    public void unreserve(StoreMerchantId merchantStore, @PathVariable Long orderId) throws ServiceException {
+    @SneakyThrows
+    public void release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
         productService.unreserve(merchantStore, orderId);
     }
 

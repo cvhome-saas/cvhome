@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -18,8 +17,7 @@ import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface OrderFacade {
 
-    Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                       Locale locale) throws ServiceException;
+    Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language) throws ServiceException;
 
     ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
                                                 LanguageCode language);

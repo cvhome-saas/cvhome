@@ -201,6 +201,20 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public ProductReservationStatus reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
             throws ServiceException {
+        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.RESERVED);
+        return new ProductReservationStatus(true);
+    }
+
+    @Transactional
+    @Override
+    public ProductReservationStatus autoCommit(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
+            throws ServiceException {
+        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.COMPLETED);
+        return new ProductReservationStatus(true);
+    }
+
+    private void doReserveWithStatus(StoreMerchantId store, Long orderId, ProductReservationList productReservation,
+                                     ProductReservationStatusEnum status) throws ServiceException {
         if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
             throw new ServiceException("No entries to reserve");
         }
@@ -225,18 +239,17 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
                 reservation.setExpireAt(Instant.now().plus(Duration.ofMinutes(reservationExpiryMinutes)));
                 reservation.setStoreMerchantId(store);
                 reservation.setProductAvailability(availability);
-                reservation.setStatus(ProductReservationStatusEnum.RESERVED);
+                reservation.setStatus(status);
 
                 productReservationRepository.save(reservation);
             }
             productRepository.save(product);
         }
-        return new ProductReservationStatus(true);
     }
 
     @Transactional
     @Override
-    public void commit(StoreMerchantId store, Long orderId) throws ServiceException {
+    public void commit(StoreMerchantId store, Long orderId) {
         List<ProductReservation> reservations =
                 productReservationRepository.findAllByOrderIdAndStatus(orderId, ProductReservationStatusEnum.RESERVED);
         for (ProductReservation res : reservations) {
@@ -247,7 +260,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Transactional
     @Override
-    public void unreserve(StoreMerchantId store, Long orderId) throws ServiceException {
+    public void unreserve(StoreMerchantId store, Long orderId) {
         List<ProductReservation> reservations =
                 productReservationRepository.findAllByOrderIdAndStatus(orderId, ProductReservationStatusEnum.RESERVED);
         for (ProductReservation res : reservations) {

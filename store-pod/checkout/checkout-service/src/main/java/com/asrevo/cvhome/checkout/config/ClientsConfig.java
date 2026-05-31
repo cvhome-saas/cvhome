@@ -3,8 +3,11 @@ package com.asrevo.cvhome.checkout.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
+import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
+import com.asrevo.cvhome.catalog.services.product.model.PaymentStatus;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
@@ -32,6 +35,14 @@ public class ClientsConfig {
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class);
+    }
+
+    @Bean
+    public ExternalPaymentGatewayService externalPaymentGatewayService() {
+        return r -> {
+            return new PaymentResponse(PaymentStatus.REDIRECT_REQUIRED,
+                    "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount());
+        };
     }
 
 }
