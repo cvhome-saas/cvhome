@@ -12,6 +12,7 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
@@ -36,4 +37,8 @@ public interface OrderFacade {
 
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
 
+    // New methods for PaymentJobQueryService
+    List<Order> findPendingOnlinePaymentOrders();
+
+    void updateOrderStatus(Long orderId, OrderStatus newStatus);
 }

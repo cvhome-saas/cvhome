@@ -25,10 +25,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
 
     const getSchema = useCallback(() => {
         return Yup.object().shape({
-            payment: Yup.object().shape({
-                paymentType: Yup.string().required(t('PAYMENT_TYPE_REQUIRED')),
-                transactionType: Yup.string().required(t('TRANSACTION_TYPE_REQUIRED')),
-            }),
+            paymentType: Yup.string().required(t('PAYMENT_TYPE_REQUIRED')),
             customer: Yup.object().shape({
                 emailAddress: Yup.string()
                     .required(t('EMAIL_REQUIRED'))

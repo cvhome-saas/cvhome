@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -195,4 +196,29 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return totalSummary;
     }
 
+    @Override
+    public List<Order> findPendingOnlinePaymentOrders() {
+        OrderCriteria criteria = new OrderCriteria();
+        criteria.setStatus(OrderStatus.PENDING_PAYMENT.name());
+        return orderRepository.listOrders(null, criteria, Pageable.unpaged()).getContent();
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order != null) {
+            order.setStatus(newStatus);
+            // Add to history
+            OrderStatusHistory statusHistory = new OrderStatusHistory();
+            statusHistory.setStatus(newStatus);
+            statusHistory.setDateAdded(Instant.now());
+            statusHistory.setOrder(order);
+            order.getOrderHistory().add(statusHistory);
+            orderRepository.save(order);
+            log.info("Order {} status updated to {}", orderId, newStatus);
+        } else {
+            log.warn("Attempted to update status for non-existent order {}", orderId);
+        }
+    }
 }

@@ -236,7 +236,9 @@ create table if not exists checkout.orders
                         'DELIVERED' :: character varying,
                         'REFUNDED' :: character varying,
                         'CANCELED' :: character varying,
-                        'PENDING_PAYMENT' :: character varying
+                        'PENDING_PAYMENT' :: character varying,
+                        'PAID' :: character varying,
+                        'FAILD' :: character varying
                         ]
                     ):: text[]
                 )
@@ -340,7 +342,12 @@ create table if not exists checkout.order_status_history
                     ARRAY [ 'ORDERED' :: character varying,
                         'PROCESSED' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying, 'CANCELED' :: character varying]
+                        'REFUNDED' :: character varying,
+                        'CANCELED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying,
+                        'PAID' :: character varying,
+                        'FAILD' :: character varying
+                        ]
                     ):: text[]
                 )
             ),

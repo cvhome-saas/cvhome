@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
+import com.asrevo.cvhome.catalog.services.product.model.PaymentRequest;
 import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
 import com.asrevo.cvhome.catalog.services.product.model.PaymentStatus;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -39,9 +40,17 @@ public class ClientsConfig {
 
     @Bean
     public ExternalPaymentGatewayService externalPaymentGatewayService() {
-        return r -> {
-            return new PaymentResponse(PaymentStatus.REDIRECT_REQUIRED,
-                    "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount());
+        return new ExternalPaymentGatewayService() {
+            @Override
+            public PaymentResponse initiatePayment(PaymentRequest r) {
+                return new PaymentResponse(PaymentStatus.REDIRECT_REQUIRED,
+                        "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount());
+            }
+
+            @Override
+            public PaymentResponse status(Long orderId) {
+                return new PaymentResponse(PaymentStatus.SUCCESS, null);
+            }
         };
     }
 

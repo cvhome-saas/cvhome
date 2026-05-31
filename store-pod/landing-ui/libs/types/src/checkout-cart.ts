@@ -1,11 +1,13 @@
 import {Customer} from "./customer";
 
-export interface payment {
-    paymentType: string
-    transactionType: string
-}
 
 export interface CheckoutCart {
-    payment: payment
+    paymentType: PaymentType
     customer: Customer
+}
+
+export enum PaymentType {
+    COD = 'COD',
+    STRIPE = 'STRIPE',
+    PAYPAL = 'PAYPAL',
 }

@@ -393,4 +393,13 @@ public class OrderFacadeImpl implements OrderFacade {
         }
     }
 
+    @Override
+    public List<Order> findPendingOnlinePaymentOrders() {
+        return orderService.findPendingOnlinePaymentOrders();
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        orderService.updateOrderStatus(orderId, newStatus);
+    }
 }
