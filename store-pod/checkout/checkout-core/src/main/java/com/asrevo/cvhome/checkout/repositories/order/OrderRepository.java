@@ -61,7 +61,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get("storeMerchantId"), store));
+            if (store != null) {
+                predicates.add(cb.equal(root.get("storeMerchantId"), store));
+            }
 
             if (criteria.getCustomerId() != null) {
                 predicates.add(cb.equal(root.get("customerId"), criteria.getCustomerId()));

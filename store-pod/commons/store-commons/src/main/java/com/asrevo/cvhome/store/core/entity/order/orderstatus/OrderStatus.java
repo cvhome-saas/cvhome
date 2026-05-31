@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum OrderStatus {
 
     ORDERED("ordered"), PROCESSED("processed"), DELIVERED("delivered"), REFUNDED("refunded"), CANCELED("canceled"),
-    PENDING_PAYMENT("pending_payment");
+    PENDING_PAYMENT("pending_payment"), PAID("paid"), FAILED("failed"); // Added PAID and FAILED
 
     private final String value;
 
