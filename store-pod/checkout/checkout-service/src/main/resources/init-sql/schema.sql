@@ -234,7 +234,10 @@ create table if not exists checkout.orders
                     ARRAY [ 'ORDERED' :: character varying,
                         'PROCESSED' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying, 'CANCELED' :: character varying]
+                        'REFUNDED' :: character varying,
+                        'CANCELED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying
+                        ]
                     ):: text[]
                 )
             ),

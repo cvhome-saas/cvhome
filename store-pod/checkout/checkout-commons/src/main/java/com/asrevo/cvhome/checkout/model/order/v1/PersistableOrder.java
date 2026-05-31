@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.model.order.v1;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -33,5 +34,7 @@ public class PersistableOrder extends Order {
 
     @JsonIgnore
     private String cuaExternalId;
+
+    private PaymentType paymentType;
 
 }

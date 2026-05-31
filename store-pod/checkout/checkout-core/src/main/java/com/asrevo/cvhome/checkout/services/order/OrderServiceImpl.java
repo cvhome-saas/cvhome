@@ -33,7 +33,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.SneakyThrows;
@@ -65,28 +64,15 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary, Customer customer, StoreMerchantId store,
-                                                LanguageCode language) throws ServiceException {
+    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) throws ServiceException {
         try {
-            return calculateOrder(orderSummary, customer, store, language);
+            return calculateOrder(orderSummary, store);
         } catch (Exception e) {
             throw new ServiceException(e);
         }
     }
 
-    @Override
-    public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final Customer customer,
-                                                        final StoreMerchantId store, final LanguageCode language) throws ServiceException {
-        try {
-            return caculateshoppingcart(shoppingCart, customer, store, language);
-        } catch (Exception e) {
-            log.error(ERROR_CALCULATING_SHOPPING_CART_TOTAL, e);
-            throw new ServiceException(e);
-        }
-    }
-
-    private OrderTotalSummary caculateshoppingcart(ShoppingCart shoppingCart, final Customer customer,
-                                                   final StoreMerchantId store, final LanguageCode language) throws Exception {
+    private OrderTotalSummary caculateshoppingcart(ShoppingCart shoppingCart, StoreMerchantId store) throws Exception {
 
         OrderSummary orderSummary = new OrderSummary();
         orderSummary.setOrderSummaryType(OrderSummaryType.SHOPPINGCART);
@@ -110,14 +96,13 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
         orderSummary.setProducts(itemList);
 
-        return calculateOrder(orderSummary, customer, store, language);
+        return calculateOrder(orderSummary, store);
     }
 
     @Override
-    public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final StoreMerchantId store,
-                                                        final LanguageCode language) throws ServiceException {
+    public OrderTotalSummary calculateShoppingCartTotal(ShoppingCart shoppingCart, StoreMerchantId store) throws ServiceException {
         try {
-            return caculateshoppingcart(shoppingCart, null, store, language);
+            return caculateshoppingcart(shoppingCart, store);
         } catch (Exception e) {
             log.error(ERROR_CALCULATING_SHOPPING_CART_TOTAL, e);
             throw new ServiceException(e);
@@ -168,8 +153,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @SneakyThrows
-    private OrderTotalSummary calculateOrder(OrderSummary summary, Customer customer, final StoreMerchantId store,
-                                             final LanguageCode language) {
+    private OrderTotalSummary calculateOrder(OrderSummary summary, StoreMerchantId store) {
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();
         List<OrderTotal> orderTotals = new ArrayList<>();

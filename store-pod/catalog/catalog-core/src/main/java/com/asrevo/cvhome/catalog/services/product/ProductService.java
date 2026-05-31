@@ -48,6 +48,9 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
     ProductReservationStatus reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
             throws ServiceException;
 
+    ProductReservationStatus autoCommit(StoreMerchantId merchantStore, Long orderId, ProductReservationList productReservation)
+            throws ServiceException;
+
     void commit(StoreMerchantId store, Long orderId) throws ServiceException;
 
     void unreserve(StoreMerchantId store, Long orderId) throws ServiceException;
