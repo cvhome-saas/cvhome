@@ -16,6 +16,8 @@ public class ClientsConfig {
 
     private static final String MERCHANT_SERVICE_NAME = "merchant";
 
+    private static final String PAYMENT_SERVICE_NAME = "payment";
+
     @Bean
     public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
         ExternalMerchantStoreService externalMerchantStoreService = restClientBuilder.buildClient(MERCHANT_SERVICE_NAME,
@@ -37,7 +39,7 @@ public class ClientsConfig {
 
     @Bean
     public ExternalPaymentGatewayService externalPaymentGatewayService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient("payment", ExternalPaymentGatewayService.class);
+        return restClientBuilder.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class);
     }
 
 }
