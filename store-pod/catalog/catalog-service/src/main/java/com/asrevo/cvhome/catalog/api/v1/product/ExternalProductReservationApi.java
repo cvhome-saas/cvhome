@@ -86,7 +86,7 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
     public void release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        productService.unreserve(merchantStore, orderId);
+        productService.release(merchantStore, orderId);
     }
 
 }
