@@ -3,7 +3,6 @@ package com.asrevo.cvhome.checkout.entity.order;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -75,7 +74,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     private Long customerId;
 
     @Column(name = "DATE_PURCHASED")
-    private LocalDate datePurchased;
+    private Instant datePurchased;
 
     // used for an order payable on multiple installment
     @Column(name = "ORDER_DATE_FINISHED")

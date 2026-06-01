@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.service.job;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,8 +37,6 @@ public class PaymentJobQueryService {
     public void processPendingOnlinePayments() {
         log.info("Starting job to process pending online payments.");
 
-        // Assuming OrderFacade has a method to find orders pending online payment
-        // This method needs to be implemented in OrderFacade
         List<Order> pendingOrders = orderFacade.findPendingOnlinePaymentOrders();
 
         if (pendingOrders.isEmpty()) {
@@ -46,6 +46,12 @@ public class PaymentJobQueryService {
 
         for (Order order : pendingOrders) {
             try {
+                if (isOrderExpired(order)) {
+                    log.info("Order {} has expired. Releasing inventory.", order.getId());
+                    release(order.getStoreMerchantId(), order.getId());
+                    orderFacade.updateOrderStatus(order.getId(), OrderStatus.EXPIRED);
+                    continue;
+                }
 
                 log.debug("Checking payment status for order {} with orderId {}", order.getId(), order.getId());
                 PaymentResponse response = externalPaymentGatewayService.status(order.getId());
@@ -97,5 +103,13 @@ public class PaymentJobQueryService {
         } catch (Exception e) {
             log.error("Error while commit inventory for order {}", orderId, e);
         }
+    }
+
+    private boolean isOrderExpired(Order order) {
+        Instant referenceTime = order.getDatePurchased();
+        if (order.getStatus() == OrderStatus.EXPIRED) {
+            return true;
+        }
+        return referenceTime.isBefore(Instant.now().minus(Duration.ofMinutes(30)));
     }
 }

@@ -2,7 +2,7 @@ package com.asrevo.cvhome.checkout.model.order;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class OrderEntity extends Order implements Serializable {
 
     private OrderStatus orderStatus;
 
-    private LocalDate datePurchased;
+    private Instant datePurchased;
 
     @JsonSerialize(using = CurrencyCodeSerializer.class)
     @JsonDeserialize(using = CurrencyCodeDeSerializer.class)

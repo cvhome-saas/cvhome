@@ -238,7 +238,8 @@ create table if not exists checkout.orders
                         'CANCELED' :: character varying,
                         'PENDING_PAYMENT' :: character varying,
                         'PAID' :: character varying,
-                        'FAILD' :: character varying
+                        'FAILD' :: character varying,
+                        'EXPIRED' :: character varying
                         ]
                     ):: text[]
                 )
@@ -346,7 +347,8 @@ create table if not exists checkout.order_status_history
                         'CANCELED' :: character varying,
                         'PENDING_PAYMENT' :: character varying,
                         'PAID' :: character varying,
-                        'FAILD' :: character varying
+                        'FAILD' :: character varying,
+                        'EXPIRED' :: character varying
                         ]
                     ):: text[]
                 )
