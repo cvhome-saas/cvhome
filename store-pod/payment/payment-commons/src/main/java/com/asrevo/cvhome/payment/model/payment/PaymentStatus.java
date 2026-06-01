@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.catalog.services.product.model;
+package com.asrevo.cvhome.payment.model.payment;
 
 public enum PaymentStatus {
     PENDING,

@@ -5,7 +5,7 @@ plugins {
 dependencies {
     compileOnly libs.spring.web
     api project(':store-pod:commons:store-commons')
-    api project(':store-pod:payment:payment-commons')
+    api project(':store-pod:merchant:merchant-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.jakarta.validation.api
     compileOnly libs.apache.commons.lang3

@@ -7,12 +7,12 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
@@ -55,7 +55,7 @@ public class PaymentJobQueryService {
                 }
 
                 log.debug("Checking payment status for order {} with orderId {}", order.getId(), order.getId());
-                PaymentResponse response = externalPaymentGatewayService.status(order.getId());
+                PaymentResponse response = externalPaymentGatewayService.status(order.getStoreMerchantId(), order.getId());
 
                 switch (response.status()) {
                     case PAID:

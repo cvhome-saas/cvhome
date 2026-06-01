@@ -3,13 +3,10 @@ package com.asrevo.cvhome.checkout.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentRequest;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentStatus;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
+import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
 @Configuration
@@ -39,20 +36,8 @@ public class ClientsConfig {
     }
 
     @Bean
-    public ExternalPaymentGatewayService externalPaymentGatewayService() {
-        return new ExternalPaymentGatewayService() {
-            @Override
-            public PaymentResponse initiatePayment(PaymentRequest r) {
-                return new PaymentResponse(PaymentStatus.PENDING,
-                        "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount(),
-                        true);
-            }
-
-            @Override
-            public PaymentResponse status(Long orderId) {
-                return new PaymentResponse(PaymentStatus.PAID, null, false);
-            }
-        };
+    public ExternalPaymentGatewayService externalPaymentGatewayService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient("payment", ExternalPaymentGatewayService.class);
     }
 
 }
