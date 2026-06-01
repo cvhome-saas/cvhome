@@ -21,9 +21,3 @@ spring:
     properties:
       hibernate:
         default_schema: ${spring.application.name}
-
-reservation:
-  expiry:
-    minutes: 15
-  cleanup:
-    interval: 60000
