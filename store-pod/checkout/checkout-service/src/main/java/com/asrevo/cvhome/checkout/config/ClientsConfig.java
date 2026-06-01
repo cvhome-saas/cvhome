@@ -43,13 +43,14 @@ public class ClientsConfig {
         return new ExternalPaymentGatewayService() {
             @Override
             public PaymentResponse initiatePayment(PaymentRequest r) {
-                return new PaymentResponse(PaymentStatus.REDIRECT_REQUIRED,
-                        "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount());
+                return new PaymentResponse(PaymentStatus.PENDING,
+                        "https://google.com/" + r.orderId() + "?currency=" + r.currency().code() + "&amount=" + r.amount(),
+                        true);
             }
 
             @Override
             public PaymentResponse status(Long orderId) {
-                return new PaymentResponse(PaymentStatus.SUCCESS, null);
+                return new PaymentResponse(PaymentStatus.PAID, null, false);
             }
         };
     }

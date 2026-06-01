@@ -9,13 +9,13 @@ import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.model.PaymentRequest;
 import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentStatus;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
@@ -39,23 +39,55 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         this.externalProductReservationService = externalProductReservationService;
     }
 
-    private static ProductReservationList toProductReservationList(Order modelOrder) {
-        return modelOrder.getOrderProducts()
-                .stream()
-                .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
-                .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
-    }
-
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                                             Locale locale) throws ServiceException {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        return handleGatewayPaymentOrders(store, modelOrder);
+        PaymentResponse paymentResponse = initiatePayment(modelOrder);
+
+        switch (paymentResponse.status()) {
+            case PAID:
+                log.info("Payment PAID for order {}. Marking as PAID.", modelOrder.getId());
+                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PAID);
+                break;
+
+            case PAY_LATER:
+                log.info("Payment PAY_LATER (COD) for order {}. Marking as ORDERED.", modelOrder.getId());
+                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.ORDERED);
+                break;
+
+            case PENDING:
+                log.debug("Reserving inventory for order {} (Status: PENDING, Redirect: {})",
+                        modelOrder.getId(), paymentResponse.isRedirect());
+                externalProductReservationService.reserve(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                break;
+
+            case FAILED:
+                log.warn("Payment failed for order {}. Updating status.", modelOrder.getId());
+                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.FAILED);
+                break;
+        }
+
+        if (paymentResponse.isRedirect()) {
+            return new OrderProcessingResult(modelOrder, paymentResponse.redirectUrl());
+        }
+
+        return new OrderProcessingResult(modelOrder);
     }
 
-    private OrderProcessingResult handleGatewayPaymentOrders(StoreMerchantId store, Order modelOrder) {
+
+    private ProductReservationList toProductReservationList(Order modelOrder) {
+        return modelOrder.getOrderProducts()
+                .stream()
+                .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
+                .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
+    }
+
+    private PaymentResponse initiatePayment(Order modelOrder) {
         PaymentRequest paymentRequest = new PaymentRequest(
                 modelOrder.getId(),
                 modelOrder.getTotal(),
@@ -64,29 +96,7 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         );
 
         log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        PaymentResponse paymentResponse = externalPaymentGatewayService.initiatePayment(paymentRequest);
-
-        switch (paymentResponse.status()) {
-            case SUCCESS:
-                log.debug("Auto Committing inventory for order {} (Status: {})", modelOrder.getId(), paymentResponse.status());
-                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
-                break;
-
-            case PENDING, REDIRECT_REQUIRED:
-                log.debug("Reserving inventory for order {} (Status: {})", modelOrder.getId(), paymentResponse.status());
-                externalProductReservationService.reserve(store, modelOrder.getId(), toProductReservationList(modelOrder));
-                break;
-
-            case FAILED:
-                log.warn("Payment failed for order {}. No inventory reserved.", modelOrder.getId());
-                break;
-        }
-
-        if (paymentResponse.status() == PaymentStatus.REDIRECT_REQUIRED) {
-            return new OrderProcessingResult(modelOrder, paymentResponse.redirectUrl());
-        }
-
-        return new OrderProcessingResult(modelOrder);
+        return externalPaymentGatewayService.initiatePayment(paymentRequest);
     }
 
 
