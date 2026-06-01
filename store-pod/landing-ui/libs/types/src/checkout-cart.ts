@@ -10,4 +10,5 @@ export enum PaymentType {
     COD = 'COD',
     STRIPE = 'STRIPE',
     PAYPAL = 'PAYPAL',
+    MANUAL_TRANSFER = 'MANUAL_TRANSFER',
 }
