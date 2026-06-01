@@ -220,6 +220,13 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
 
         for (ReserveProductEntry entry : productReservation.entries()) {
+            // Idempotency check: if reservation already exists for this order and SKU, skip
+            Optional<ProductReservation> existingReservation = productReservationRepository.findByOrderIdAndSku(orderId, entry.sku());
+            if (existingReservation.isPresent()) {
+                log.info("Reservation for order {} and sku {} already exists. Skipping.", orderId, entry.sku());
+                continue;
+            }
+
             Product product = productRepository
                     .getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
 
@@ -251,10 +258,13 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public void commit(StoreMerchantId store, Long orderId) {
         List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderIdAndStatus(orderId, ProductReservationStatusEnum.RESERVED);
+                productReservationRepository.findAllByOrderId(orderId);
         for (ProductReservation res : reservations) {
-            res.setStatus(ProductReservationStatusEnum.COMPLETED);
-            productReservationRepository.save(res);
+            if (res.getStatus() == ProductReservationStatusEnum.RESERVED) {
+                res.setStatus(ProductReservationStatusEnum.COMPLETED);
+                productReservationRepository.save(res);
+                log.info("Committed reservation for order {} and sku {}", orderId, res.getSku());
+            }
         }
     }
 
@@ -262,15 +272,18 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public void release(StoreMerchantId store, Long orderId) {
         List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderIdAndStatus(orderId, ProductReservationStatusEnum.RESERVED);
+                productReservationRepository.findAllByOrderId(orderId);
         for (ProductReservation res : reservations) {
-            // Restore quantity
-            var availability = res.getProductAvailability();
-            availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
+            // Restore quantity for RESERVED and COMPLETED status
+            if (res.getStatus() == ProductReservationStatusEnum.RESERVED || res.getStatus() == ProductReservationStatusEnum.COMPLETED) {
+                var availability = res.getProductAvailability();
+                availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
 
-            // Mark as expired/cancelled
-            res.setStatus(ProductReservationStatusEnum.EXPIRED);
-            productReservationRepository.save(res);
+                // Mark as expired/cancelled
+                res.setStatus(ProductReservationStatusEnum.EXPIRED);
+                productReservationRepository.save(res);
+                log.info("Released reservation for order {} and sku {}. Status was {}", orderId, res.getSku(), res.getStatus());
+            }
         }
     }
 
