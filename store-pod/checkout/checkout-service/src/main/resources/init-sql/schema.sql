@@ -238,12 +238,26 @@ create table if not exists checkout.orders
                         'CANCELED' :: character varying,
                         'PENDING_PAYMENT' :: character varying,
                         'PAID' :: character varying,
-                        'FAILD' :: character varying,
+                        'FAILED' :: character varying,
                         'EXPIRED' :: character varying
                         ]
                     ):: text[]
                 )
             ),
+    payment_type            varchar(255)
+        constraint orders_payment_type_check check (
+            (payment_type):: text = ANY (
+                (
+                    ARRAY [
+                        'COD' :: character varying,
+                        'MANUAL_TRANSFER' :: character varying,
+                        'PAYPAL' :: character varying,
+                        'STRIPE' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+
     order_total             numeric(38, 2),
     billing_country_code    varchar(6)  not null,
     billing_zone_code       varchar(100),
@@ -347,7 +361,7 @@ create table if not exists checkout.order_status_history
                         'CANCELED' :: character varying,
                         'PENDING_PAYMENT' :: character varying,
                         'PAID' :: character varying,
-                        'FAILD' :: character varying,
+                        'FAILED' :: character varying,
                         'EXPIRED' :: character varying
                         ]
                     ):: text[]
@@ -440,13 +454,12 @@ create table if not exists checkout.sm_transaction
         constraint sm_transaction_payment_type_check check (
             (payment_type):: text = ANY (
                 (
-                    ARRAY [ 'CREDITCARD' :: character varying,
-                        'FREE' :: character varying, 'COD' :: character varying,
-                        'MONEYORDER' :: character varying,
-                        'PAYPAL' :: character varying, 'INVOICE' :: character varying,
-                        'DIRECTBANK' :: character varying,
-                        'PAYMENTPLAN' :: character varying,
-                        'ACCOUNTCREDIT' :: character varying]
+                    ARRAY [
+                        'COD' :: character varying,
+                        'PAYPAL' :: character varying,
+                        'STRIPE' :: character varying,
+                        'MANUAL_TRANSFER' :: character varying
+                        ]
                     ):: text[]
                 )
             ),

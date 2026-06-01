@@ -14,6 +14,7 @@ import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,10 +107,15 @@ public class PaymentJobQueryService {
     }
 
     private boolean isOrderExpired(Order order) {
-        Instant referenceTime = order.getDatePurchased();
         if (order.getStatus() == OrderStatus.EXPIRED) {
             return true;
         }
-        return referenceTime.isBefore(Instant.now().minus(Duration.ofMinutes(30)));
+
+        Instant referenceTime = order.getDatePurchased();
+        Duration expirationDuration = PaymentType.MANUAL_TRANSFER.equals(order.getPaymentType())
+                ? Duration.ofDays(15)
+                : Duration.ofMinutes(30);
+
+        return referenceTime.isBefore(Instant.now().minus(expirationDuration));
     }
 }

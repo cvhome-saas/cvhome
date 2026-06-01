@@ -16,7 +16,6 @@ import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
@@ -53,46 +52,42 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        if (PaymentType.COD.equals(order.getPaymentType())) {
-            return handleCashOnDeliveryOrders(store, modelOrder);
-        } else {
-            return handlePrePaidOnlinePaymentOrders(store, modelOrder);
-        }
-
-
+        return handleGatewayPaymentOrders(store, modelOrder);
     }
 
-    private OrderProcessingResult handlePrePaidOnlinePaymentOrders(StoreMerchantId store, Order modelOrder) {
+    private OrderProcessingResult handleGatewayPaymentOrders(StoreMerchantId store, Order modelOrder) {
         PaymentRequest paymentRequest = new PaymentRequest(
                 modelOrder.getId(),
                 modelOrder.getTotal(),
-                modelOrder.getCurrency()
+                modelOrder.getCurrency(),
+                modelOrder.getPaymentType()
         );
 
-        log.debug("Initiating payment for order {} with amount {}", modelOrder.getId(), modelOrder.getTotal());
+        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
         PaymentResponse paymentResponse = externalPaymentGatewayService.initiatePayment(paymentRequest);
-        if (paymentResponse.status() == PaymentStatus.REDIRECT_REQUIRED) {
-            log.debug("Payment requires redirect for order {} to: {}", modelOrder.getId(), paymentResponse.redirectUrl());
 
-            // External call (Inventory)
-            log.debug("Reserving inventory for order {}", modelOrder.getId());
-            externalProductReservationService.reserve(store, modelOrder.getId(), toProductReservationList(modelOrder));
+        switch (paymentResponse.status()) {
+            case SUCCESS:
+                log.debug("Auto Committing inventory for order {} (Status: {})", modelOrder.getId(), paymentResponse.status());
+                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                break;
 
-            return new OrderProcessingResult(modelOrder, paymentResponse.redirectUrl());
-        } else {
-            throw new IllegalStateException("Unexpected payment status " + paymentResponse.status() + " for order " + modelOrder.getId());
+            case PENDING, REDIRECT_REQUIRED:
+                log.debug("Reserving inventory for order {} (Status: {})", modelOrder.getId(), paymentResponse.status());
+                externalProductReservationService.reserve(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                break;
+
+            case FAILED:
+                log.warn("Payment failed for order {}. No inventory reserved.", modelOrder.getId());
+                break;
         }
-    }
 
-    private OrderProcessingResult handleCashOnDeliveryOrders(StoreMerchantId store, Order modelOrder) {
-        // Handle Cash On Delivery (COD)
-        log.debug("COD order {} processed successfully.", modelOrder.getId());
-
-        // External call (Inventory)
-        log.debug("Auto Reserving inventory for order {}", modelOrder.getId());
-        externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+        if (paymentResponse.status() == PaymentStatus.REDIRECT_REQUIRED) {
+            return new OrderProcessingResult(modelOrder, paymentResponse.redirectUrl());
+        }
 
         return new OrderProcessingResult(modelOrder);
     }
+
 
 }
