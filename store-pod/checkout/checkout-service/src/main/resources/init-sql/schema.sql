@@ -231,7 +231,8 @@ create table if not exists checkout.orders
         constraint orders_order_status_check check (
             (order_status):: text = ANY (
                 (
-                    ARRAY [ 'ORDERED' :: character varying,
+                    ARRAY [
+                        'ORDERED' :: character varying,
                         'PROCESSED' :: character varying,
                         'DELIVERED' :: character varying,
                         'REFUNDED' :: character varying,
@@ -354,7 +355,8 @@ create table if not exists checkout.order_status_history
         constraint order_status_history_status_check check (
             (status):: text = ANY (
                 (
-                    ARRAY [ 'ORDERED' :: character varying,
+                    ARRAY [
+                        'ORDERED' :: character varying,
                         'PROCESSED' :: character varying,
                         'DELIVERED' :: character varying,
                         'REFUNDED' :: character varying,

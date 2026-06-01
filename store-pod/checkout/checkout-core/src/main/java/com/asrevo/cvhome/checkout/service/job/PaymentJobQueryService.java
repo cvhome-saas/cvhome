@@ -58,8 +58,8 @@ public class PaymentJobQueryService {
                 PaymentResponse response = externalPaymentGatewayService.status(order.getId());
 
                 switch (response.status()) {
-                    case SUCCESS:
-                        log.info("Payment for order {} is SUCCESS. Committing inventory.", order.getId());
+                    case PAID:
+                        log.info("Payment for order {} is PAID. Committing inventory.", order.getId());
                         // Commit inventory
                         commit(order.getStoreMerchantId(), order.getId());
                         // Update order status to PAID
@@ -74,8 +74,8 @@ public class PaymentJobQueryService {
                         orderFacade.updateOrderStatus(order.getId(), OrderStatus.FAILED);
                         log.warn("Order {} marked as FAILED and inventory released.", order.getId());
                         break;
-                    case PENDING, REDIRECT_REQUIRED:
-                        log.debug("Payment for order {} is still {}. Will recheck later.", order.getId(), response.status());
+                    case PENDING:
+                        log.debug("Payment for order {} is still PENDING. Will recheck later.", order.getId());
                         break;
                     default:
                         log.warn("Unknown payment status {} for order {}. Skipping.", response.status(), order.getId());
