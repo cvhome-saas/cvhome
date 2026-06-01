@@ -9,7 +9,6 @@ import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -22,9 +21,6 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
     void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException;
 
     OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) throws ServiceException;
-
-    OrderTotalSummary calculateShoppingCartTotal(ShoppingCart cartModel, StoreMerchantId store)
-            throws ServiceException;
 
     Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
             throws ServiceException;

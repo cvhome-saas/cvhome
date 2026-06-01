@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.checkout.service.populator.order;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             target.setLocale(LocaleUtils.getLocale(baseStore.getDefaultLanguage()));
 
-            target.setDatePurchased(LocalDate.now());
+            target.setDatePurchased(Instant.now());
             target.setCurrency(baseStore.getCurrency());
             target.setCurrencyValue(new BigDecimal(0));
             target.setStoreMerchantId(store);

@@ -37,7 +37,6 @@ public interface OrderFacade {
 
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
 
-    // New methods for PaymentJobQueryService
     List<Order> findPendingOnlinePaymentOrders();
 
     void updateOrderStatus(Long orderId, OrderStatus newStatus);

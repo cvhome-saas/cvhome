@@ -3,15 +3,11 @@ package com.asrevo.cvhome.checkout.services.order;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,12 +20,9 @@ import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalType;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
-import com.asrevo.cvhome.checkout.model.order.OrderSummaryType;
 import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
-import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -43,15 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
 
-    private static final String ERROR_CALCULATING_SHOPPING_CART_TOTAL = "Error while calculating shopping cart total";
-
-    private final ShoppingCartService shoppingCartService;
-
     private final OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService) {
+    public OrderServiceImpl(OrderRepository orderRepository) {
         super(orderRepository);
-        this.shoppingCartService = shoppingCartService;
         this.orderRepository = orderRepository;
     }
 
@@ -69,43 +57,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         try {
             return calculateOrder(orderSummary, store);
         } catch (Exception e) {
-            throw new ServiceException(e);
-        }
-    }
-
-    private OrderTotalSummary caculateshoppingcart(ShoppingCart shoppingCart, StoreMerchantId store) throws Exception {
-
-        OrderSummary orderSummary = new OrderSummary();
-        orderSummary.setOrderSummaryType(OrderSummaryType.SHOPPINGCART);
-
-        if (!StringUtils.isBlank(shoppingCart.getPromoCode())) {
-            Instant promoDateAdded = shoppingCart.getPromoAdded();
-            if (promoDateAdded == null) {
-                promoDateAdded = Instant.now();
-            }
-            ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
-            LocalDate date = zdt.toLocalDate();
-            LocalDate tomorrow = LocalDate.now().plusDays(1);
-            if (date.isBefore(tomorrow)) {
-                orderSummary.setPromoCode(shoppingCart.getPromoCode());
-            } else {
-                shoppingCart.setPromoCode(null);
-                shoppingCartService.saveOrUpdate(shoppingCart);
-            }
-        }
-
-        List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
-        orderSummary.setProducts(itemList);
-
-        return calculateOrder(orderSummary, store);
-    }
-
-    @Override
-    public OrderTotalSummary calculateShoppingCartTotal(ShoppingCart shoppingCart, StoreMerchantId store) throws ServiceException {
-        try {
-            return caculateshoppingcart(shoppingCart, store);
-        } catch (Exception e) {
-            log.error(ERROR_CALCULATING_SHOPPING_CART_TOTAL, e);
             throw new ServiceException(e);
         }
     }

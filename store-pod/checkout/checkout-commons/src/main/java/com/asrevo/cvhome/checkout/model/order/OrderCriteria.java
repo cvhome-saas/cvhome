@@ -9,13 +9,13 @@ import lombok.Setter;
 @Getter
 public class OrderCriteria extends Criteria {
 
-    private String customerName = null;
+    private String customerName;
 
-    private String customerPhone = null;
+    private String customerPhone;
 
-    private String status = null;
+    private String status;
 
-    private Long id = null;
+    private Long id;
 
     private Long customerId;
 
