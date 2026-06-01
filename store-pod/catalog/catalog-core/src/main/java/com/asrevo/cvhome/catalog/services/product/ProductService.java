@@ -53,7 +53,7 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
 
     void commit(StoreMerchantId store, Long orderId) throws ServiceException;
 
-    void unreserve(StoreMerchantId store, Long orderId) throws ServiceException;
+    void release(StoreMerchantId store, Long orderId) throws ServiceException;
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 

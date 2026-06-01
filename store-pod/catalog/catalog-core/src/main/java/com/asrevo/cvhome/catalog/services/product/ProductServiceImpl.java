@@ -260,7 +260,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @Transactional
     @Override
-    public void unreserve(StoreMerchantId store, Long orderId) {
+    public void release(StoreMerchantId store, Long orderId) {
         List<ProductReservation> reservations =
                 productReservationRepository.findAllByOrderIdAndStatus(orderId, ProductReservationStatusEnum.RESERVED);
         for (ProductReservation res : reservations) {
