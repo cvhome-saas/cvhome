@@ -5,16 +5,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.services.product.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentRequest;
-import com.asrevo.cvhome.catalog.services.product.model.PaymentResponse;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
+import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
@@ -96,7 +96,7 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         );
 
         log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        return externalPaymentGatewayService.initiatePayment(paymentRequest);
+        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
     }
 
 
