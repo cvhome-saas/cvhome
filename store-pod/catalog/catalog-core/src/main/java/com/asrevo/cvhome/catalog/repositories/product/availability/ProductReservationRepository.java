@@ -3,6 +3,8 @@ package com.asrevo.cvhome.catalog.repositories.product.availability;
 import java.time.Instant;
 import java.util.List;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
@@ -12,4 +14,8 @@ public interface ProductReservationRepository extends JpaRepository<ProductReser
     List<ProductReservation> findAllByStatusAndExpireAtBefore(ProductReservationStatusEnum status, Instant now);
 
     List<ProductReservation> findAllByOrderIdAndStatus(Long orderId, ProductReservationStatusEnum status);
+
+    Optional<ProductReservation> findByOrderIdAndSku(Long orderId, String sku);
+
+    List<ProductReservation> findAllByOrderId(Long orderId);
 }
