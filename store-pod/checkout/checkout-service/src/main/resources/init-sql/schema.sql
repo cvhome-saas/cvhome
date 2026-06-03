@@ -444,39 +444,3 @@ create table if not exists checkout.shopping_cart_attr_item
     shp_cart_item_id      bigint not null
         constraint fkt3iw5nxx7h55j5vta1tyrvgv3 references checkout.shopping_cart_item
 );
-create table if not exists checkout.sm_transaction
-(
-    transaction_id   bigint not null primary key,
-    amount           numeric(38, 2),
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    details          text,
-    payment_type     varchar(255)
-        constraint sm_transaction_payment_type_check check (
-            (payment_type):: text = ANY (
-                (
-                    ARRAY [
-                        'COD' :: character varying,
-                        'PAYPAL' :: character varying,
-                        'STRIPE' :: character varying,
-                        'MANUAL_TRANSFER' :: character varying
-                        ]
-                    ):: text[]
-                )
-            ),
-    transaction_date timestamp(6),
-    transaction_type varchar(255)
-        constraint sm_transaction_transaction_type_check check (
-            (transaction_type):: text = ANY (
-                (
-                    ARRAY [ 'INIT' :: character varying,
-                        'AUTHORIZE' :: character varying,
-                        'CAPTURE' :: character varying, 'AUTHORIZECAPTURE' :: character varying,
-                        'REFUND' :: character varying, 'OK' :: character varying]
-                    ):: text[]
-                )
-            ),
-    order_id         bigint
-        constraint fkdgyct8065xy9kp7entj7lcgsj references checkout.orders
-);
