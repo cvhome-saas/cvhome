@@ -1,8 +1,6 @@
 package com.asrevo.cvhome.catalog.services.product;
 
 import java.io.InputStream;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +58,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     private final ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
     private final ProductReservationRepository productReservationRepository;
-
-    @Value("${reservation.expiry.minutes:15}")
-    private int reservationExpiryMinutes;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
@@ -243,7 +237,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
                 reservation.setSku(entry.sku());
                 reservation.setQuantity(entry.reserveQty());
                 reservation.setOrderId(orderId);
-                reservation.setExpireAt(Instant.now().plus(Duration.ofMinutes(reservationExpiryMinutes)));
                 reservation.setStoreMerchantId(store);
                 reservation.setProductAvailability(availability);
                 reservation.setStatus(status);

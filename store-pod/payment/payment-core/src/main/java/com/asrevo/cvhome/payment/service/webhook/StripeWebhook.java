@@ -19,6 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class StripeWebhook implements PaymentWebhook {
 
+    private static Event getEvent(String payload, Map<String, Object> headers, PaymentConfiguration configuration)
+            throws SignatureVerificationException {
+        String sigHeader = headers.get("Stripe-Signature").toString();
+        return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
+    }
+
     @Override
     public void handleFailedWebhook(Long orderId, StoreMerchantId store, String payload, Map<String, Object> headers,
                                     PaymentConfiguration configuration) {
@@ -52,11 +58,5 @@ public class StripeWebhook implements PaymentWebhook {
             log.error("Error processing Stripe webhook for store {}", store, e);
         }
 
-    }
-
-    private static Event getEvent(String payload, Map<String, Object> headers, PaymentConfiguration configuration)
-            throws SignatureVerificationException {
-        String sigHeader = headers.get("Stripe-Signature").toString();
-        return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
     }
 }

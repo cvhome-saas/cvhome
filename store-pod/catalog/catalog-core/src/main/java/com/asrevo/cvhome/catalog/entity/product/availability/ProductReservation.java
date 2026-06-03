@@ -1,7 +1,5 @@
 package com.asrevo.cvhome.catalog.entity.product.availability;
 
-import java.time.Instant;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -46,9 +44,6 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
 
     @Column(name = "ORDER_ID", nullable = false)
     private Long orderId;
-
-    @Column(name = "EXPIRE_AT", nullable = false)
-    private Instant expireAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)

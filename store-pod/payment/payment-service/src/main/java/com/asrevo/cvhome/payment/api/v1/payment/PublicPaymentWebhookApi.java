@@ -32,16 +32,16 @@ public class PublicPaymentWebhookApi {
     public void successHandler(@PathVariable("orderId") Long orderId,
                                @RequestBody String payload,
                                @RequestHeader Map<String, Object> headers) {
-        paymentGatewayService.handleSuccessWebhook(orderId,  payload, headers);
+        paymentGatewayService.handleSuccessWebhook(orderId, payload, headers);
     }
 
     @PostMapping("/public/{paymentType}/{orderId}/webhook/fail")
     @Operation(method = "GET", description = "Webhook success")
     public void failHandler(
-                            @PathVariable("orderId") Long orderId,
-                            @RequestBody String payload,
-                            @RequestHeader Map<String, Object> headers) {
-        paymentGatewayService.handleFailedWebhook(orderId,  payload, headers);
+            @PathVariable("orderId") Long orderId,
+            @RequestBody String payload,
+            @RequestHeader Map<String, Object> headers) {
+        paymentGatewayService.handleFailedWebhook(orderId, payload, headers);
     }
 
 

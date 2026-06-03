@@ -69,7 +69,7 @@ public class PaymentGatewayService {
         }
 
         switch (config.getPaymentType()) {
-            case STRIPE -> stripeWebhook.handleFailedWebhook(orderId,config.getStoreMerchantId(), payload, headers, config);
+            case STRIPE -> stripeWebhook.handleFailedWebhook(orderId, config.getStoreMerchantId(), payload, headers, config);
             default -> throw new IllegalArgumentException("Unsupported payment type for webhook: " + config.getPaymentType());
         }
     }
@@ -84,7 +84,7 @@ public class PaymentGatewayService {
         }
 
         switch (config.getPaymentType()) {
-            case STRIPE -> stripeWebhook.handleSuccessWebhook(orderId,config.getStoreMerchantId(), payload, headers, config);
+            case STRIPE -> stripeWebhook.handleSuccessWebhook(orderId, config.getStoreMerchantId(), payload, headers, config);
             default -> throw new IllegalArgumentException("Unsupported payment type for webhook: " + config.getPaymentType());
         }
 
