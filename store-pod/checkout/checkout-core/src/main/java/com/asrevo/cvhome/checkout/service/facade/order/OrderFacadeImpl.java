@@ -114,6 +114,22 @@ public class OrderFacadeImpl implements OrderFacade {
             throws ServiceException {
         try {
 
+            Long shoppingCartId = order.getShoppingCartId();
+
+            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
+
+            if (cart == null) {
+                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
+            }
+
+            Optional<Order> previousOrder =
+                    orderService.findOrderByShoppingCartCodeAndStoreMerchantId(cart.getShoppingCartCode(), store);
+
+            if (previousOrder.isPresent()) {
+                log.info("Returning existing order {} for shopping cart code {}", previousOrder.get().getId(), cart.getShoppingCartCode());
+                return previousOrder.get();
+            }
+
             Order modelOrder = new Order();
 
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
@@ -125,13 +141,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
             Billing billing = customer.getBilling();
             modelOrder.setBilling(billing);
-
-            Long shoppingCartId = order.getShoppingCartId();
-            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
-
-            if (cart == null) {
-                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
-            }
 
             List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
 

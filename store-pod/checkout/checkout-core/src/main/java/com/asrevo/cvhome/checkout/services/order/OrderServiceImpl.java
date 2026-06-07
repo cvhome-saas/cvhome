@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -63,13 +64,13 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Override
     @Transactional
-    public void delete(final Order order) throws ServiceException {
+    public void delete(Order order) throws ServiceException {
 
         super.delete(order);
     }
 
     @Override
-    public Order getOrder(final Long orderId, StoreMerchantId store) {
+    public Order getOrder(Long orderId, StoreMerchantId store) {
         return orderRepository.findOne(orderId, store);
     }
 
@@ -171,5 +172,10 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         } else {
             log.warn("Attempted to update status for non-existent order {}", orderId);
         }
+    }
+
+    @Override
+    public Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId) {
+        return orderRepository.findOrderByShoppingCartCodeAndStoreMerchantId(shoppingCartCode, storeMerchantId);
     }
 }

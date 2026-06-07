@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.checkout.services.order;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 
@@ -25,11 +26,13 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
     Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
             throws ServiceException;
 
-    Order getOrder(final Long orderId, StoreMerchantId store);
+    Order getOrder(Long orderId, StoreMerchantId store);
 
-    Page<Order> getOrders(final OrderCriteria criteria, StoreMerchantId store);
+    Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store);
 
     List<Order> findPendingOnlinePaymentOrders();
 
     void updateOrderStatus(Long orderId, OrderStatus newStatus);
+
+    Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
 }

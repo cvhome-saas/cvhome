@@ -47,7 +47,7 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
-    private ProductReservationStatusEnum status = ProductReservationStatusEnum.RESERVED;
+    private ProductReservationStatusEnum status = ProductReservationStatusEnum.TEMPORARY_RESERVED;
 
     @Embedded
     @AttributeOverride(name = "storeMerchantId",

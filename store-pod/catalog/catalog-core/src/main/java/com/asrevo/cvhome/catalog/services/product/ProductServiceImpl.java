@@ -195,7 +195,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     @Override
     public ProductReservationStatus reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
             throws ServiceException {
-        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.RESERVED);
+        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.TEMPORARY_RESERVED);
         return new ProductReservationStatus(true);
     }
 
@@ -253,7 +253,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         List<ProductReservation> reservations =
                 productReservationRepository.findAllByOrderId(orderId);
         for (ProductReservation res : reservations) {
-            if (res.getStatus() == ProductReservationStatusEnum.RESERVED) {
+            if (res.getStatus() == ProductReservationStatusEnum.TEMPORARY_RESERVED) {
                 res.setStatus(ProductReservationStatusEnum.COMPLETED);
                 productReservationRepository.save(res);
                 log.info("Committed reservation for order {} and sku {}", orderId, res.getSku());
@@ -268,7 +268,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
                 productReservationRepository.findAllByOrderId(orderId);
         for (ProductReservation res : reservations) {
             // Restore quantity for RESERVED and COMPLETED status
-            if (res.getStatus() == ProductReservationStatusEnum.RESERVED || res.getStatus() == ProductReservationStatusEnum.COMPLETED) {
+            if (res.getStatus() == ProductReservationStatusEnum.TEMPORARY_RESERVED || res.getStatus() == ProductReservationStatusEnum.COMPLETED) {
                 var availability = res.getProductAvailability();
                 availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
 

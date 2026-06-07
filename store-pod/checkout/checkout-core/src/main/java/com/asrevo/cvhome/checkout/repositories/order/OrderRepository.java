@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.repositories.order;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
@@ -120,4 +121,5 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
         }, pageable);
     }
 
+    Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
 }
