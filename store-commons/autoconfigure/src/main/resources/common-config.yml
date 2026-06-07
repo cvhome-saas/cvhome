@@ -69,6 +69,13 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
+        payment:
+          name: payment
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8125
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
         landing-ui:
           name: landing-ui
           domain: ${com.asrevo.cvhome.pod.domain}

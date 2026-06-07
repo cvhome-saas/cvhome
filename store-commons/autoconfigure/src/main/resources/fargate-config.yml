@@ -14,6 +14,7 @@ spring:
           - "catalog"
           - "checkout"
           - "cua"
+          - "payment"
           - "landing-ui"
     ecs:
       discovery:
@@ -31,3 +32,4 @@ spring:
           "catalog": 8122
           "checkout": 8123
           "cua": 8124
+          "payment": 8125

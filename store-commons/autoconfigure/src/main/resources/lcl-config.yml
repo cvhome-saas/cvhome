@@ -56,6 +56,12 @@ spring:
                 metadata:
                   service-name: cua
                   instance: cua-1
+            payment:
+              - uri: "http://localhost:8125"
+                instance-id: payment-1
+                metadata:
+                  service-name: payment
+                  instance: payment-1
             landing-ui:
               - uri: "http://localhost:8110"
                 instance-id: landing-ui-1
