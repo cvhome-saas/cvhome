@@ -1,11 +1,9 @@
-package com.asrevo.cvhome.checkout.entity.payments;
+package com.asrevo.cvhome.payment.entity.payment;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -13,17 +11,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
-import jakarta.persistence.Transient;
 
-import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -38,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "SM_TRANSACTION")
+@Table(name = "TRANSACTION")
 @Getter
 @Setter
 @Slf4j
@@ -62,9 +55,8 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORDER_ID")
-    private Order order;
+    @Column(name = "ORDER_ID")
+    private Long orderId;
 
     @Column(name = "AMOUNT")
     private BigDecimal amount;
@@ -82,8 +74,5 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
 
     @Column(name = "DETAILS", columnDefinition = "text")
     private String details;
-
-    @Transient
-    private Map<String, String> transactionDetails = new HashMap<>();
 
 }
