@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductReservationServiceImpl implements ProductReservationService {
 
     private final ProductReservationRepository productReservationRepository;
-    private final ProductService productService;
     private final ProductRepository productRepository;
 
     @Value("${reservation.expiry.minutes:15}")
@@ -67,8 +66,7 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 continue;
             }
 
-            Product product = productRepository
-                    .getByProductIdFetchAvailabilities(productService.findProductIdByCode(entry.sku(), store), store);
+            Product product = productRepository.getByProductSkuFetchAvailabilities(entry.sku(), store);
 
             for (ProductAvailability availability : product.getAvailabilities()) {
                 if (availability.getProductQuantity() < entry.reserveQty()) {

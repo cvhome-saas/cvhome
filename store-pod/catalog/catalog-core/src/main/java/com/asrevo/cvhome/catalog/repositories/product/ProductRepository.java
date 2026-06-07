@@ -64,8 +64,8 @@ public interface ProductRepository
     }
 
     @EntityGraph(attributePaths = {"availabilities"})
-    @Query("SELECT p FROM Product p WHERE p.id = :id AND p.store = :store")
-    Product getByProductIdFetchAvailabilities(@Param("id") Long productId,
-                                              @Param("store") StoreMerchantId storeMerchantId);
+    @Query("SELECT p FROM Product p WHERE p.sku = :sku AND p.store = :store")
+    Product getByProductSkuFetchAvailabilities(@Param("sku") String sku,
+                                               @Param("store") StoreMerchantId storeMerchantId);
 
 }
