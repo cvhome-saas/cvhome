@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
-import com.asrevo.cvhome.catalog.services.product.ProductService;
+import com.asrevo.cvhome.catalog.services.product.ProductReservationService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
@@ -35,13 +35,13 @@ import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
 @AllArgsConstructor
 public class ExternalProductReservationApi implements ExternalProductReservationService {
 
-    private final ProductService productService;
+    private final ProductReservationService productReservationService;
 
     @Override
     @PostMapping(value = "/private/reserve/{orderId}")
     @Operation(method = "POST", description = "Update product quantity",
             responses = @ApiResponse(
-                    content = @Content(schema = @Schema(implementation = ProductReservationStatus.class))))
+                    content = @Content(schema = @Schema(implementation = ProductReservationResult.class))))
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
@@ -49,17 +49,17 @@ public class ExternalProductReservationApi implements ExternalProductReservation
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
-    public ProductReservationStatus reserve(StoreMerchantId merchantStore,
+    public ProductReservationResult reserve(StoreMerchantId merchantStore,
                                             @PathVariable Long orderId,
                                             @RequestBody ProductReservationList productReservation) {
-        return productService.reserve(merchantStore, orderId, productReservation);
+        return productReservationService.reserve(merchantStore, orderId, productReservation);
     }
 
     @Override
     @PostMapping(value = "/private/auto-commit/{orderId}")
     @Operation(method = "POST", description = "Update product quantity",
             responses = @ApiResponse(
-                    content = @Content(schema = @Schema(implementation = ProductReservationStatus.class))))
+                    content = @Content(schema = @Schema(implementation = ProductReservationResult.class))))
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
@@ -67,10 +67,10 @@ public class ExternalProductReservationApi implements ExternalProductReservation
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
-    public ProductReservationStatus autoCommit(StoreMerchantId merchantStore,
+    public ProductReservationResult autoCommit(StoreMerchantId merchantStore,
                                                @PathVariable Long orderId,
                                                @RequestBody ProductReservationList productReservation) {
-        return productService.autoCommit(merchantStore, orderId, productReservation);
+        return productReservationService.autoCommit(merchantStore, orderId, productReservation);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
     public void commit(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        productService.commit(merchantStore, orderId);
+        productReservationService.commit(merchantStore, orderId);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
     public void release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        productService.release(merchantStore, orderId);
+        productReservationService.release(merchantStore, orderId);
     }
 
 }

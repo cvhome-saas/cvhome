@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 
@@ -13,11 +13,11 @@ import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 public interface ExternalProductReservationService {
 
     @PostExchange("/reserve/{orderId}")
-    ProductReservationStatus reserve(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+    ProductReservationResult reserve(StoreMerchantId store, @PathVariable("orderId") Long orderId,
                                      @RequestBody ProductReservationList productReservation);
 
     @PostExchange("/auto-commit/{orderId}")
-    ProductReservationStatus autoCommit(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+    ProductReservationResult autoCommit(StoreMerchantId store, @PathVariable("orderId") Long orderId,
                                         @RequestBody ProductReservationList productReservation);
 
     @PostExchange("/commit/{orderId}")
