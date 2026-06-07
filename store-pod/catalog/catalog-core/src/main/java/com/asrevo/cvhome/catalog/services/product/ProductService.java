@@ -47,6 +47,4 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
 
     ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang);
 
-    Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException;
-
 }

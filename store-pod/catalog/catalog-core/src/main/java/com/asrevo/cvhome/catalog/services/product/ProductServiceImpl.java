@@ -236,8 +236,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
     }
 
-    @Override
-    public Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
+    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
         List<Long> products = productRepository.findBySku(productCode, merchant);
         if (products.isEmpty()) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]");
