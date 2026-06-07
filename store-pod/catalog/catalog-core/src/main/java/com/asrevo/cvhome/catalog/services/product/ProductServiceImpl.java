@@ -5,28 +5,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatusEnum;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
-import com.asrevo.cvhome.catalog.repositories.product.availability.ProductReservationRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
 import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
@@ -35,8 +28,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
@@ -57,20 +48,16 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     private final ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
-    private final ProductReservationRepository productReservationRepository;
-
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
                               PricingServiceImpl pricingService, ReadableMinimalProductMapper readableMinimalProductMapper,
-                              ReadableProductAvailabilityMapper readableProductAvailabilityMapper,
-                              ProductReservationRepository productReservationRepository) {
+                              ReadableProductAvailabilityMapper readableProductAvailabilityMapper) {
         super(productRepository);
         this.productRepository = productRepository;
         this.productImageService = productImageService;
         this.pricingService = pricingService;
         this.readableMinimalProductMapper = readableMinimalProductMapper;
         this.readableProductAvailabilityMapper = readableProductAvailabilityMapper;
-        this.productReservationRepository = productReservationRepository;
     }
 
     @Override
@@ -191,94 +178,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return productRepository.getById(id, merchant);
     }
 
-    @Transactional
-    @Override
-    public ProductReservationStatus reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
-            throws ServiceException {
-        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.TEMPORARY_RESERVED);
-        return new ProductReservationStatus(true);
-    }
-
-    @Transactional
-    @Override
-    public ProductReservationStatus autoCommit(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
-            throws ServiceException {
-        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatusEnum.COMPLETED);
-        return new ProductReservationStatus(true);
-    }
-
-    private void doReserveWithStatus(StoreMerchantId store, Long orderId, ProductReservationList productReservation,
-                                     ProductReservationStatusEnum status) throws ServiceException {
-        if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
-            throw new ServiceException("No entries to reserve");
-        }
-
-        for (ReserveProductEntry entry : productReservation.entries()) {
-            // Idempotency check: if reservation already exists for this order and SKU, skip
-            Optional<ProductReservation> existingReservation = productReservationRepository.findByOrderIdAndSku(orderId, entry.sku());
-            if (existingReservation.isPresent()) {
-                log.info("Reservation for order {} and sku {} already exists. Skipping.", orderId, entry.sku());
-                continue;
-            }
-
-            Product product = productRepository
-                    .getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
-
-            for (ProductAvailability availability : product.getAvailabilities()) {
-                if (availability.getProductQuantity() < entry.reserveQty()) {
-                    throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-                }
-
-                // Deduct quantity
-                availability.setProductQuantity(availability.getProductQuantity() - entry.reserveQty());
-
-                // Create Reservation
-                ProductReservation reservation = new ProductReservation();
-                reservation.setSku(entry.sku());
-                reservation.setQuantity(entry.reserveQty());
-                reservation.setOrderId(orderId);
-                reservation.setStoreMerchantId(store);
-                reservation.setProductAvailability(availability);
-                reservation.setStatus(status);
-
-                productReservationRepository.save(reservation);
-            }
-            productRepository.save(product);
-        }
-    }
-
-    @Transactional
-    @Override
-    public void commit(StoreMerchantId store, Long orderId) {
-        List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderId(orderId);
-        for (ProductReservation res : reservations) {
-            if (res.getStatus() == ProductReservationStatusEnum.TEMPORARY_RESERVED) {
-                res.setStatus(ProductReservationStatusEnum.COMPLETED);
-                productReservationRepository.save(res);
-                log.info("Committed reservation for order {} and sku {}", orderId, res.getSku());
-            }
-        }
-    }
-
-    @Transactional
-    @Override
-    public void release(StoreMerchantId store, Long orderId) {
-        List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderId(orderId);
-        for (ProductReservation res : reservations) {
-            // Restore quantity for RESERVED and COMPLETED status
-            if (res.getStatus() == ProductReservationStatusEnum.TEMPORARY_RESERVED || res.getStatus() == ProductReservationStatusEnum.COMPLETED) {
-                var availability = res.getProductAvailability();
-                availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
-
-                // Mark as expired/cancelled
-                res.setStatus(ProductReservationStatusEnum.EXPIRED);
-                productReservationRepository.save(res);
-                log.info("Released reservation for order {} and sku {}. Status was {}", orderId, res.getSku(), res.getStatus());
-            }
-        }
-    }
 
     @Override
     public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
@@ -337,7 +236,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
     }
 
-    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
+    @Override
+    public Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
         List<Long> products = productRepository.findBySku(productCode, merchant);
         if (products.isEmpty()) {
             throw new ServiceException("Cannot get product with sku [" + productCode + "]");

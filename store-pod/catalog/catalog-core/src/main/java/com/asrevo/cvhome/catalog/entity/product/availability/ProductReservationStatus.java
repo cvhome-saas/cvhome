@@ -1,5 +1,5 @@
 package com.asrevo.cvhome.catalog.entity.product.availability;
 
-public enum ProductReservationStatusEnum {
+public enum ProductReservationStatus {
     TEMPORARY_RESERVED, EXPIRED, ROLLBACK, COMPLETED
 }

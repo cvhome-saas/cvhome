@@ -506,6 +506,7 @@ create table if not exists catalog.product_reservation
     sku               varchar(255) not null,
     quantity          integer      not null,
     order_id          bigint       not null,
+    expire_at         timestamp(6) not null,
     status            varchar(20)  not null,
     store_merchant_id varchar(50)  not null,
     product_avail_id  bigint
@@ -513,3 +514,4 @@ create table if not exists catalog.product_reservation
 );
 
 create index if not exists idx_prd_res_order_id on catalog.product_reservation (order_id);
+create index if not exists idx_prd_res_expire_at on catalog.product_reservation (expire_at);
