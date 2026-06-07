@@ -179,12 +179,12 @@ create table if not exists checkout.optin
 );
 create table if not exists checkout.orders
 (
-    order_id                bigint      not null primary key,
+    order_id                bigint       not null primary key,
     billing_street_address  varchar(256),
     billing_city            varchar(100),
     billing_company         varchar(100),
-    billing_first_name      varchar(64) not null,
-    billing_last_name       varchar(64) not null,
+    billing_first_name      varchar(64)  not null,
+    billing_last_name       varchar(64)  not null,
     latitude                varchar(100),
     longitude               varchar(100),
     billing_postcode        varchar(20),
@@ -202,7 +202,7 @@ create table if not exists checkout.orders
     confirmed_address       boolean,
     currency_value          numeric(38, 2),
     customer_agreed         boolean,
-    customer_email_address  varchar(50) not null,
+    customer_email_address  varchar(50)  not null,
     customer_id             bigint,
     date_purchased          date,
     delivery_street_address varchar(256),
@@ -226,7 +226,8 @@ create table if not exists checkout.orders
                     ):: text[]
                 )
             ),
-    cart_code               varchar(255),
+    cart_code               varchar(255) not null
+        constraint uk_g6b5qebd5yvy3msjrut230w91 unique,
     order_status            varchar(255)
         constraint orders_order_status_check check (
             (order_status):: text = ANY (
@@ -260,13 +261,14 @@ create table if not exists checkout.orders
             ),
 
     order_total             numeric(38, 2),
-    billing_country_code    varchar(6)  not null,
+    billing_country_code    varchar(6)   not null,
     billing_zone_code       varchar(100),
     currency_id             varchar(6),
     delivery_country_CODE   varchar(6),
     delivery_zone_code      varchar(100),
     store_merchant_id       varchar(50)
 );
+create index if not exists orders_cart_code_idx on checkout.orders (cart_code);
 create table if not exists checkout.order_account
 (
     order_account_id         bigint  not null primary key,
