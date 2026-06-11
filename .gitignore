@@ -42,3 +42,4 @@ bin/
 *.tsbuildinfo
 /store-core/uaa/src/main/resources/static/*
 /store-core/uaa/src/main/resources/uaa-fe/.angular/
+**/.DS_Store
