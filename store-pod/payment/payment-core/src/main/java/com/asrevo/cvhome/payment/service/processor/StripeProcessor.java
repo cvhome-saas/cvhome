@@ -1,8 +1,11 @@
 package com.asrevo.cvhome.payment.service.processor;
 
+import java.time.Instant;
+
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
+import com.asrevo.cvhome.payment.model.payment.DefaultPaymentConfig;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
@@ -19,16 +22,20 @@ import lombok.extern.slf4j.Slf4j;
 public class StripeProcessor implements PaymentProcessor {
 
     @Override
-    public PaymentResponse initiatePayment(PaymentConfiguration config, PaymentRequest request) {
+    public PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request) {
         RequestOptions requestOptions =
                 RequestOptions.builder()
-                        .setApiKey(config.getSecretKey())
+                        .setApiKey(secret.getSecretKey())
                         .build();
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("https://example.com/success?orderId=" + request.orderId())
                 .setCancelUrl("https://example.com/cancel?orderId=" + request.orderId())
+                .setExpiresAt(Instant.now()
+                        .plusSeconds(paymentConfig.expireIn().toSeconds())
+                        .getEpochSecond()
+                )
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity(1L)

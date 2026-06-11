@@ -23,7 +23,7 @@ import lombok.Setter;
 @Table(name = "PAYMENT_CONFIGURATION")
 @Getter
 @Setter
-public class PaymentConfiguration {
+public class PaymentConfiguration implements PaymentSecret {
 
     @Id
     @Column(name = "PAYMENT_CONFIGURATION_ID")
@@ -54,6 +54,4 @@ public class PaymentConfiguration {
     @Column(name = "ENABLED")
     private boolean enabled;
 }
-
-
 

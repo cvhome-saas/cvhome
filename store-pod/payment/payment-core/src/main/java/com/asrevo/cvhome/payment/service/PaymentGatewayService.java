@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.model.payment.DefaultPaymentConfig;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
@@ -25,6 +26,7 @@ public class PaymentGatewayService {
     private final PaymentConfigurationRepository configRepository;
     private final StripeProcessor stripeProcessor;
     private final StripeWebhook stripeWebhook;
+    private final DefaultPaymentConfig paymentConfig;
 
     public PaymentResponse initiatePayment(StoreMerchantId store, PaymentRequest request) {
         log.info("Initiating payment for store {} and order {}", store, request.orderId());
@@ -43,7 +45,7 @@ public class PaymentGatewayService {
         }
 
         return switch (request.paymentType()) {
-            case STRIPE -> stripeProcessor.initiatePayment(config, request);
+            case STRIPE -> stripeProcessor.initiatePayment(paymentConfig, config, request);
             default -> new PaymentResponse(PaymentStatus.FAILED);
         };
     }
