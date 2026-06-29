@@ -2,45 +2,45 @@ package com.asrevo.cvhome.controlplane.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
 
 import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
-
-import reactor.core.publisher.Flux;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeExchange(it -> it.pathMatchers("/actuator", "/actuator/*/**")
+                .authorizeHttpRequests(it -> it.requestMatchers("/actuator", "/actuator/*/**")
                         .permitAll()
-                        .pathMatchers("swagger-ui.html", "webjars/swagger-ui/**", "api-docs", "api-docs/**")
+                        .requestMatchers("/swagger-ui.html", "/webjars/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**")
                         .permitAll()
-                        .pathMatchers("api/v1/*/public/**")
+                        .requestMatchers("/api/v1/*/public/**")
                         .permitAll()
-                        .pathMatchers("api/v1/test/sign")
+                        .requestMatchers("/api/v1/test/sign")
                         .permitAll()
-                        .anyExchange()
+                        .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(it -> it.jwt(withDefaults()))
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 
     @Bean
-    public ReactiveJwtAuthenticationConverter converter() {
-        ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
+    public JwtAuthenticationConverter converter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
-        converter.setJwtGrantedAuthoritiesConverter(
-                source -> Flux.fromIterable(uaaJwtGrantedAuthoritiesConverter.convert(source)));
+        converter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
         return converter;
     }
 

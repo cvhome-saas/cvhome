@@ -28,8 +28,6 @@ import com.asrevo.cvhome.controlplane.manager.service.StoreManagerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/store-manager")
 @AllArgsConstructor
@@ -42,45 +40,45 @@ public class StoreManagerController {
 
     @PostMapping("list")
 
-    public Mono<Page<ManagerStoreDto>> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                                     @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
-        return Mono.just(internalStoreService.findAll(identity, listManagerStoreQuery, pageable));
+    public Page<ManagerStoreDto> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                               @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
+        return internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
     }
 
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
 
-    public Mono<ManagerStoreDto> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                        @RequestBody Map<Object, Object> request) {
-        return Mono.just(this.managerService.createStore(identity.org(), request));
+    public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                  @RequestBody Map<Object, Object> request) {
+        return this.managerService.createStore(identity.org(), request);
     }
 
     @GetMapping(value = "private/store/unique", params = "name")
 
-    public Mono<Map<String, Boolean>> checkExist(@RequestParam("name") String name) {
-        return Mono.just(Map.of("exists", internalStoreService.checkNameExists(name)));
+    public Map<String, Boolean> checkExist(@RequestParam("name") String name) {
+        return Map.of("exists", internalStoreService.checkNameExists(name));
     }
 
     @GetMapping("private/store")
     // @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
 
-    public Mono<Page<ManagerStoreDto>> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                                             Pageable pageable) {
-        return Mono.just(internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable));
+    public Page<ManagerStoreDto> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                                       Pageable pageable) {
+        return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
     }
 
     @GetMapping("private/store/{code}")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
-    public Mono<Object> getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                         @PathVariable("code") ManagerStoreId store) {
+    public Object getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                   @PathVariable("code") ManagerStoreId store) {
         return managerService.getStore(store);
     }
 
     @GetMapping("store-info")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
-    public Mono<ManagerStoreDto> storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                           @RequestParam ManagerStoreId store) {
-        return Mono.just(internalStoreService.findStore(store));
+    public ManagerStoreDto storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                     @RequestParam ManagerStoreId store) {
+        return internalStoreService.findStore(store);
     }
 
     @GetMapping("public/themes")

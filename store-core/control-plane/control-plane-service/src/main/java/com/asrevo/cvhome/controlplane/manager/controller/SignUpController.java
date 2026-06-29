@@ -12,8 +12,6 @@ import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/user-account")
 @AllArgsConstructor
@@ -24,8 +22,8 @@ public class SignUpController {
 
     @PostMapping("public/create")
 
-    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-        return Mono.just(signupService.createOrgUser(request));
+    public ReadableUser create(@RequestBody CreateOrgRequest request) {
+        return signupService.createOrgUser(request);
     }
 
 }

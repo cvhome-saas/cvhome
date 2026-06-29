@@ -20,8 +20,6 @@ import com.asrevo.cvhome.uaa.service.UserAccountService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -35,83 +33,69 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public Mono<ReadableUserList> list(UserOrgStoreIdentity identity, ManagerStoreId store, Pageable pageable) {
-        return Mono.fromCallable(() -> userAccountService.list(
+    public ReadableUserList list(UserOrgStoreIdentity identity, ManagerStoreId store, Pageable pageable) {
+        return userAccountService.list(
                 Map.of("org", identity.org().id().toString(), "store", store.id().toString()), pageable.getPageNumber(),
-                pageable.getPageSize()));
+                pageable.getPageSize());
     }
 
     @Override
-    public Mono<ReadableUser> findOne(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
-        return Mono.fromCallable(() -> {
-            ReadableUser user = findOne(userId);
-            validateUserAccess(identity, store, user);
-            return user;
-        });
+    public ReadableUser findOne(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
+        ReadableUser user = findOne(userId);
+        validateUserAccess(identity, store, user);
+        return user;
     }
 
     @Override
-    public Mono<ReadableUser> createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
-        return Mono.fromCallable(() -> {
-            user.setActive(true);
-            user.setOrg(identity.org().id().toString());
-            user.setStore(store.id().toString());
-            return userAccountService.createUser(user);
-        });
+    public ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
+        user.setActive(true);
+        user.setOrg(identity.org().id().toString());
+        user.setStore(store.id().toString());
+        return userAccountService.createUser(user);
     }
 
     @Override
-    public Mono<ReadableUser> updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
-        return Mono.fromCallable(() -> {
-            ReadableUser existingUser = findOne(user.getId());
-            validateUserAccess(identity, store, existingUser);
-            // Ensure the user is not moved to another org/store via update
-            user.setOrg(identity.org().id().toString());
-            user.setStore(store.id().toString());
-            return userAccountService.updateUser(user);
-        });
+    public ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user) {
+        ReadableUser existingUser = findOne(user.getId());
+        validateUserAccess(identity, store, existingUser);
+        // Ensure the user is not moved to another org/store via update
+        user.setOrg(identity.org().id().toString());
+        user.setStore(store.id().toString());
+        return userAccountService.updateUser(user);
     }
 
     @Override
-    public Mono<Void> resetPassword(UserOrgStoreIdentity identity, ManagerStoreId store, String userId,
-                                    UserPassword passwordRequestDto) {
-        return Mono.fromRunnable(() -> {
-            ReadableUser user = findOne(userId);
-            validateUserAccess(identity, store, user);
-            userAccountService.changePassword(userId, passwordRequestDto);
-        });
+    public void resetPassword(UserOrgStoreIdentity identity, ManagerStoreId store, String userId,
+                              UserPassword passwordRequestDto) {
+        ReadableUser user = findOne(userId);
+        validateUserAccess(identity, store, user);
+        userAccountService.changePassword(userId, passwordRequestDto);
     }
 
     @Override
-    public Mono<Void> deleteUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
-        return Mono.fromRunnable(() -> {
-            ReadableUser user = findOne(userId);
-            validateUserAccess(identity, store, user);
-            userAccountService.deleteUser(userId);
-        });
+    public void deleteUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
+        ReadableUser user = findOne(userId);
+        validateUserAccess(identity, store, user);
+        userAccountService.deleteUser(userId);
     }
 
     @Override
-    public Mono<Void> enableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
-        return Mono.fromRunnable(() -> {
-            ReadableUser user = findOne(userId);
-            validateUserAccess(identity, store, user);
-            userAccountService.enableUser(userId);
-        });
+    public void enableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
+        ReadableUser user = findOne(userId);
+        validateUserAccess(identity, store, user);
+        userAccountService.enableUser(userId);
     }
 
     @Override
-    public Mono<Void> disableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
-        return Mono.fromRunnable(() -> {
-            ReadableUser user = findOne(userId);
-            validateUserAccess(identity, store, user);
-            userAccountService.disableUser(userId);
-        });
+    public void disableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId) {
+        ReadableUser user = findOne(userId);
+        validateUserAccess(identity, store, user);
+        userAccountService.disableUser(userId);
     }
 
     @Override
-    public Mono<Set<String>> getAssignableRoles() {
-        return Mono.fromCallable(userAccountService::getAssignableRoles);
+    public Set<String> getAssignableRoles() {
+        return userAccountService.getAssignableRoles();
     }
 
     private void validateUserAccess(UserOrgStoreIdentity identity, ManagerStoreId store, ReadableUser user) {

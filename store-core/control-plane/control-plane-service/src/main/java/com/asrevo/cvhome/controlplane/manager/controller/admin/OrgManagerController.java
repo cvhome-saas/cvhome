@@ -24,8 +24,6 @@ import com.asrevo.cvhome.uaa.service.UserAccountService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/org-manager")
 @AllArgsConstructor
@@ -43,37 +41,36 @@ public class OrgManagerController {
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @GetMapping("find-all")
 
-    public Mono<Page<ManagerOrgDto>> findAllOrg(Pageable pageable) {
+    public Page<ManagerOrgDto> findAllOrg(Pageable pageable) {
         log.info("findAllOrg {}", pageable);
-        return Mono.just(internalOrgService.findAll(pageable));
+        return internalOrgService.findAll(pageable);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @GetMapping("find-one")
 
-    public Mono<ManagerOrgDto> findOne(@RequestParam ManagerOrgId id) {
-        return Mono.just(internalOrgService.findOne(id));
+    public ManagerOrgDto findOne(@RequestParam ManagerOrgId id) {
+        return internalOrgService.findOne(id);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("create")
 
-    public Mono<ReadableUser> create(@RequestBody CreateOrgRequest request) {
-        return Mono.just(signupService.createOrgUser(request));
+    public ReadableUser create(@RequestBody CreateOrgRequest request) {
+        return signupService.createOrgUser(request);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("change-password")
 
-    public Mono<Void> changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
+    public void changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
         userAccountService.changePassword(id.toString(), request);
-        return Mono.empty();
     }
 
     @GetMapping("stores")
 
-    public Mono<Page<ManagerStoreDto>> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
-        return Mono.just(internalStoreService.findAll(id, pageable));
+    public Page<ManagerStoreDto> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
+        return internalStoreService.findAll(id, pageable);
     }
 
 }

@@ -116,6 +116,18 @@ public class WebClientServicesConfig {
             return manager;
         }
 
+        @Bean("defaultRestClientBuilder")
+        public RestClient.Builder defaultRestClientBuilder(
+                AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager) {
+
+            OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(
+                    authorizedClientManager);
+
+            requestInterceptor.setClientRegistrationIdResolver(clientRequest -> S2S_CLIENT_REGISTRATION_ID);
+
+            return RestClient.builder().requestInterceptor(requestInterceptor);
+        }
+
         @Bean("microServiceRestClientBuilder")
         @LoadBalanced
         public RestClient.Builder microServiceRestClientBuilder(
@@ -130,14 +142,22 @@ public class WebClientServicesConfig {
         }
 
         @Bean("microServiceRestClient")
-        public RestClient microServiceRestClient(RestClient.Builder microServiceRestClientBuilder) {
+        public RestClient microServiceRestClient(
+                @Qualifier("microServiceRestClientBuilder") RestClient.Builder microServiceRestClientBuilder) {
             return microServiceRestClientBuilder.build();
         }
 
+        @Bean("defaultRestClient")
+        public RestClient defaultRestClient(@Qualifier("defaultRestClientBuilder") RestClient.Builder defaultRestClientBuilder) {
+            return defaultRestClientBuilder.build();
+        }
+
         @Bean
-        public RestClientBuilder restClientBuilder(Environment environment, RestClient microServiceRestClient,
+        public RestClientBuilder restClientBuilder(Environment environment,
+                                                   @Qualifier("microServiceRestClient") RestClient microServiceRestClient,
+                                                   @Qualifier("defaultRestClient") RestClient defaultRestClient,
                                                    ServiceDomainProperties serviceDomainProperties) {
-            return new RestClientBuilder(environment, microServiceRestClient.mutate(), serviceDomainProperties);
+            return new RestClientBuilder(environment, microServiceRestClient.mutate(), defaultRestClient.mutate(), serviceDomainProperties);
         }
 
     }

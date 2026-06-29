@@ -3,6 +3,7 @@ package com.asrevo.cvhome.controlplane.manager.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -22,9 +23,6 @@ import com.asrevo.cvhome.controlplane.manager.service.PodSelection;
 import com.asrevo.cvhome.controlplane.manager.service.StoreManagerService;
 import com.asrevo.cvhome.controlplane.manager.service.StorePodClientFactory;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 public class StoreManagerServiceImpl implements StoreManagerService {
@@ -63,31 +61,30 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     }
 
     @Override
-    public Mono<PageImpl<Object>> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
-                                          Pageable pageable) {
+    public PageImpl<Object> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
+                                    Pageable pageable) {
         Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
-        Mono<List<Object>> listMono = Flux.fromIterable(internalStores.getContent())
-                .flatMap(it -> getStore(it.id()).onErrorResume(e -> Mono.empty()))
-                .collectList();
-        return listMono.map(it -> managerStoreMappers.toPage(it, internalStores));
+        List<Object> list = internalStores.getContent().stream()
+                .map(it -> {
+                    try {
+                        return getStore(it.id());
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+        return managerStoreMappers.toPage(list, internalStores);
     }
 
     @Override
-    public Mono<Object> getStore(ManagerStoreId managerStoreId) {
+    public Object getStore(ManagerStoreId managerStoreId) {
         PodId podId = internalStoreService.getStorePod(managerStoreId);
         MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(podId);
-        return client.getStore(managerStoreId.getId().toString()).flatMap(response -> {
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                HashMap<String, Object> newIt = new HashMap<>(response.getBody());
-                newIt.put(POD_KEY, Map.of(ID_KEY, podId.id()));
-                return Mono.just((Object) newIt);
-            }
-            String errorMessage = "Failed to fetch store from pod: " + response.getStatusCode();
-            if (response.getBody() != null) {
-                errorMessage += " - Details: " + response.getBody();
-            }
-            return Mono.error(new RuntimeException(errorMessage));
-        });
+        Map<String, Object> response = client.getStore(managerStoreId.getId().toString());
+        HashMap<String, Object> newIt = new HashMap<>(response);
+        newIt.put(POD_KEY, Map.of(ID_KEY, podId.id()));
+        return newIt;
     }
 
 }
