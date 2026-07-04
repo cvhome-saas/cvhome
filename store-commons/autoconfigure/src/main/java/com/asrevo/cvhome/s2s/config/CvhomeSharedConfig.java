@@ -9,7 +9,6 @@ import com.asrevo.cvhome.s2s.config.internal.EcsInfoConfig;
 import com.asrevo.cvhome.s2s.config.internal.IssuerUriSetJwtDecoderConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.IssuerUriSetReactiveJwtDecoderConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.ReactiveGatewayConfig;
-import com.asrevo.cvhome.s2s.config.internal.ReactivePermissionConfig;
 import com.asrevo.cvhome.s2s.config.internal.ServletPermissionConfig;
 import com.asrevo.cvhome.s2s.config.internal.SwaggerConfig;
 import com.asrevo.cvhome.s2s.config.internal.WebClientServicesConfig;
@@ -28,7 +27,7 @@ import com.asrevo.cvhome.s2s.model.StripeProperties;
 @Import({EcsInfoConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
         ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
         IssuerUriSetReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
-        ReactivePermissionConfig.class, ServletPermissionConfig.class})
+        ServletPermissionConfig.class})
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
         PodProperties.class, CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class,
         CdnStorageProperties.class, IssuerUriSetConfigrationProperties.class})

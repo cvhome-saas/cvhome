@@ -86,7 +86,6 @@ jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref
 jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "fasterxml" }
 
-springdoc-openapi-starter-webflux-ui = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 
 swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "swagger" }

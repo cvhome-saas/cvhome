@@ -32,7 +32,7 @@ bootBuildImage {
 dependencies {
 
     implementation libs.spring.cloud.starter.loadbalancer
-    implementation libs.spring.boot.starter.webflux
+    implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation
     implementation libs.spring.boot.starter.actuator
 
@@ -60,7 +60,7 @@ dependencies {
 
     implementation libs.mapstruct
     annotationProcessor libs.mapstruct.processor
-    implementation libs.springdoc.openapi.starter.webflux.ui
+    implementation libs.springdoc.openapi.starter.webmvc.ui
 
     implementation project(":store-commons:uaa-client")
     implementation project(":store-commons:uaa-client-impl")
@@ -78,7 +78,6 @@ dependencies {
     testImplementation libs.spring.security.test
     testImplementation libs.spring.boot.testcontainers
 //    testImplementation libs.spring.cloud.stream.test.binder
-    testImplementation libs.reactor.test
     testImplementation libs.testcontainers.junit.jupiter
     testImplementation libs.testcontainers.postgresql
     testRuntimeOnly libs.junit.platform.launcher

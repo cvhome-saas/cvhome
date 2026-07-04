@@ -4,6 +4,6 @@ plugins {
 
 dependencies {
     api project(':store-pod:merchant:merchant-commons')
-    compileOnly libs.spring.webflux
+    compileOnly libs.spring.web
     annotationProcessor libs.lombok
 }

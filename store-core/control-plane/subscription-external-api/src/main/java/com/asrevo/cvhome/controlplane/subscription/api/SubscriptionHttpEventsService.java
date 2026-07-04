@@ -6,12 +6,10 @@ import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.commons.event.Event;
 
-import reactor.core.publisher.Mono;
-
 @HttpExchange("api/v1/http-events")
 public interface SubscriptionHttpEventsService {
 
     @PostExchange("on")
-    Mono<Void> on(@RequestBody Event event);
+    void on(@RequestBody Event event);
 
 }

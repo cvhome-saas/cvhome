@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import com.asrevo.cvhome.s2s.config.ReactiveTestCustomSecurityConfig;
+import com.asrevo.cvhome.s2s.config.ServletTestCustomSecurityConfig;
 
 @TestConfiguration(proxyBeanMethods = false)
-@Import(ReactiveTestCustomSecurityConfig.class)
+@Import(ServletTestCustomSecurityConfig.class)
 public class TestcontainersConfiguration {
 
     @Bean

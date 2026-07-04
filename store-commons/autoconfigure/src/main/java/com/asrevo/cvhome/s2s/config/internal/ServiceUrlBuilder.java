@@ -34,4 +34,8 @@ public record ServiceUrlBuilder(ServiceDomainProperties serviceDomainProperties,
             case null -> pod.endpoint().endpoint();
         };
     }
+
+    public String getServiceUrl(Pod pod, String sub) {
+        return getServiceUrl(pod) + "/" + sub;
+    }
 }

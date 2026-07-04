@@ -27,8 +27,6 @@ import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/user-account")
 @Slf4j
@@ -39,80 +37,80 @@ public class UserAccountController {
 
     @GetMapping("current")
 
-    public Mono<ReadableUser> current(@AuthenticationPrincipal Principal principal) {
-        return Mono.just(managedUserAccountService.findOne(principal.getName()));
+    public ReadableUser current(@AuthenticationPrincipal Principal principal) {
+        return managedUserAccountService.findOne(principal.getName());
     }
 
     @GetMapping("list")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
 
-    public Mono<ReadableUserList> list(@AuthenticationPrincipal Principal principal,
-                                       @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                                       Pageable pageable) {
+    public ReadableUserList list(@AuthenticationPrincipal Principal principal,
+                                 @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                                 Pageable pageable) {
         return managedUserAccountService.list(identity, store, pageable);
     }
 
     @GetMapping("find-one")
     // @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
 
-    public Mono<ReadableUser> findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                      @RequestParam ManagerStoreId store, @RequestParam String userId) {
+    public ReadableUser findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                @RequestParam ManagerStoreId store, @RequestParam String userId) {
         return managedUserAccountService.findOne(identity, store, userId);
     }
 
     @GetMapping("assignable-roles")
 
-    public Mono<Set<String>> assignableRoles() {
+    public Set<String> assignableRoles() {
         return managedUserAccountService.getAssignableRoles();
     }
 
     @PostMapping("create")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.CREATE')")
 
-    public Mono<ReadableUser> create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                     @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+    public ReadableUser create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
         return managedUserAccountService.createUser(identity, store, user);
     }
 
     @PutMapping("update")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.UPDATE')")
 
-    public Mono<ReadableUser> update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                     @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+    public ReadableUser update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
         return managedUserAccountService.updateUser(identity, store, user);
     }
 
     @PostMapping("reset")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.RESET_PASSWORD')")
 
-    public Mono<Void> resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                    @RequestParam ManagerStoreId store, @RequestParam String userId,
-                                    @RequestBody UserPassword passwordRequestDto) {
-        return managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
+    public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                              @RequestParam ManagerStoreId store, @RequestParam String userId,
+                              @RequestBody UserPassword passwordRequestDto) {
+        managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
     }
 
     @DeleteMapping("delete")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DELETE')")
 
-    public Mono<Void> delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                             @RequestParam String userId) {
-        return managedUserAccountService.deleteUser(identity, store, userId);
+    public void delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                       @RequestParam String userId) {
+        managedUserAccountService.deleteUser(identity, store, userId);
     }
 
     @PostMapping("enable")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.ENABLE')")
 
-    public Mono<Void> enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                             @RequestParam String userId) {
-        return managedUserAccountService.enableUser(identity, store, userId);
+    public void enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                       @RequestParam String userId) {
+        managedUserAccountService.enableUser(identity, store, userId);
     }
 
     @PostMapping("disable")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DISABLE')")
 
-    public Mono<Void> disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                              @RequestParam String userId) {
-        return managedUserAccountService.disableUser(identity, store, userId);
+    public void disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                        @RequestParam String userId) {
+        managedUserAccountService.disableUser(identity, store, userId);
     }
 
 }

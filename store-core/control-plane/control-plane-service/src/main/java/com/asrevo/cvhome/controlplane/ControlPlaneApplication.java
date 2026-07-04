@@ -3,11 +3,13 @@ package com.asrevo.cvhome.controlplane;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.asrevo.cvhome.s2s.config.CvhomeSharedConfig;
 
 @SpringBootApplication
 @Import(CvhomeSharedConfig.class)
+@EnableAsync
 public class ControlPlaneApplication {
 
     private ControlPlaneApplication() {

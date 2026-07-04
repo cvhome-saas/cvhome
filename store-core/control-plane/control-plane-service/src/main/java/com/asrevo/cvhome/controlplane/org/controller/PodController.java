@@ -23,8 +23,6 @@ import com.asrevo.cvhome.controlplane.org.service.PodService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/pod")
 @AllArgsConstructor
@@ -35,40 +33,40 @@ public class PodController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_STORE_CORE')")
-    public Mono<Page<Pod>> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
-        return Mono.fromCallable(() -> identity.isSuperAdmin() ? podService.listAllPods(pageable)
-                : podService.listAllPods(identity.org(), pageable));
+    public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
+        return identity.isSuperAdmin() ? podService.listAllPods(pageable)
+                : podService.listAllPods(identity.org(), pageable);
     }
 
     @GetMapping("list")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_STORE_CORE')")
-    public Mono<List<Pod>> listPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
+    public List<Pod> listPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
         Pageable pageable = Pageable.unpaged();
-        return Mono.fromCallable(() -> identity.isSuperAdmin() ? podService.listAllPods(pageable).toList()
-                : podService.listAllPods(identity.org(), pageable).toList());
+        return identity.isSuperAdmin() ? podService.listAllPods(pageable).toList()
+                : podService.listAllPods(identity.org(), pageable).toList();
     }
 
     @GetMapping("{id}")
-    public Mono<Pod> find(@PathVariable PodId id) {
-        return Mono.fromCallable(() -> podService.pod(id));
+    public Pod find(@PathVariable PodId id) {
+        return podService.pod(id);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
-    public Mono<Pod> create(@RequestBody Pod pod) {
-        return Mono.fromCallable(() -> podService.save(pod));
+    public Pod create(@RequestBody Pod pod) {
+        return podService.save(pod);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
-    public Mono<Pod> update(@PathVariable PodId id, @RequestBody Pod pod) {
-        return Mono.fromCallable(() -> podService.update(id, pod));
+    public Pod update(@PathVariable PodId id, @RequestBody Pod pod) {
+        return podService.update(id, pod);
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
-    public Mono<Void> delete(@PathVariable PodId id) {
-        return Mono.fromRunnable(() -> podService.delete(id));
+    public void delete(@PathVariable PodId id) {
+        podService.delete(id);
     }
 
 }
