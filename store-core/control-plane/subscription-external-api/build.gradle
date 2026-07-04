@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api project(':store-core:control-plane:manager-commons')
-    compileOnly libs.spring.webflux
+    compileOnly libs.spring.web
     compileOnly libs.lombok
     annotationProcessor libs.lombok
 }

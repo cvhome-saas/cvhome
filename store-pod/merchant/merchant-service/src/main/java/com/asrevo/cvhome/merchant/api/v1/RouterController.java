@@ -21,8 +21,6 @@ import com.asrevo.cvhome.merchant.service.RoutingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("api/v1/router")
 @AllArgsConstructor
@@ -56,24 +54,22 @@ public class RouterController {
     @GetMapping("private/allocates")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public Mono<Set<ManagerStoreDomain>> allocatedDomains(StoreMerchantId merchantStore) {
-        return Mono.just(routingService.domains(merchantStore));
+    public Set<ManagerStoreDomain> allocatedDomains(StoreMerchantId merchantStore) {
+        return routingService.domains(merchantStore);
     }
 
     @PostMapping("private/allocate")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public Mono<Void> allocate(StoreMerchantId merchantStore, Domain domain) {
+    public void allocate(StoreMerchantId merchantStore, Domain domain) {
         routingService.addDomain(merchantStore, domain);
-        return Mono.empty();
     }
 
     @DeleteMapping("private/remove")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public Mono<Void> remove(StoreMerchantId merchantStore, Domain domain) {
+    public void remove(StoreMerchantId merchantStore, Domain domain) {
         routingService.removeDomain(merchantStore, domain);
-        return Mono.empty();
     }
 
 }
