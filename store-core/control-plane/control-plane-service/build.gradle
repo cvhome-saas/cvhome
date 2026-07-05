@@ -35,11 +35,6 @@ dependencies {
     implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation
     implementation libs.spring.boot.starter.actuator
-
-//    implementation libs.spring.amqp.spring.rabbit.stream
-//    implementation libs.spring.cloud.stream
-//    implementation libs.spring.cloud.stream.binder.rabbit
-
     implementation libs.spring.boot.starter.security
     implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.security.oauth2.resource.server
@@ -78,7 +73,6 @@ dependencies {
     testImplementation libs.spring.boot.starter.test
     testImplementation libs.spring.security.test
     testImplementation libs.spring.boot.testcontainers
-//    testImplementation libs.spring.cloud.stream.test.binder
     testImplementation libs.testcontainers.junit.jupiter
     testImplementation libs.testcontainers.postgresql
     testRuntimeOnly libs.junit.platform.launcher
