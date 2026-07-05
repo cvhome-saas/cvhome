@@ -44,6 +44,7 @@ dependencies {
     implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.security.oauth2.resource.server
     implementation libs.spring.boot.starter.data.jdbc
+    implementation libs.namastack.outbox.starter.jdbc
     runtimeOnly libs.postgresql
 
     implementation libs.spring.boot.starter.opentelemetry

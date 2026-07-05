@@ -21,3 +21,15 @@ com:
           client-id: admin-sdk
           client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
           base-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jdbc:
+      schema-initialization:
+        enabled: false
+      schema-name: control
