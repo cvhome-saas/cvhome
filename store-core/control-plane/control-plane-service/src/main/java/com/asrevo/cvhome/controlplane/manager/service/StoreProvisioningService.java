@@ -2,7 +2,6 @@ package com.asrevo.cvhome.controlplane.manager.service;
 
 import java.util.Map;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
@@ -24,7 +23,6 @@ public class StoreProvisioningService {
 
     private final InternalStoreService internalStoreService;
 
-    @Async
     public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, Map<Object, Object> payload) {
         Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(payload, managerOrgId, store);
         internalStoreService.startProvisioning(store);
@@ -35,6 +33,7 @@ public class StoreProvisioningService {
         } catch (Exception err) {
             internalStoreService.failProvisioning(store);
             log.error("Error creating Store in pod {}", pod, err);
+            throw err;
         }
     }
 

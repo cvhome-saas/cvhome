@@ -30,6 +30,7 @@ commonsValidator = "1.10.1"
 hamcrestRecord = "1.0.0"
 commonsBeanutils = "1.10.1"
 nodeGradle = "7.0.2"
+namastack-outbox = "1.7.1"
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
@@ -57,6 +58,9 @@ spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-bo
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "springBoot" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache", version.ref = "springBoot" }
 
+namastack-outbox-starter-jdbc = { module = "io.namastack:namastack-outbox-starter-jdbc", version.ref = "namastack-outbox" }
+namastack-outbox-api = { module = "io.namastack:namastack-outbox-api", version.ref = "namastack-outbox" }
+
 spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient", version.ref = "springBoot" }
 spring-boot-starter-restclient-test = { module = "org.springframework.boot:spring-boot-starter-restclient-test", version.ref = "springBoot" }
 
@@ -66,7 +70,6 @@ spring-boot-starter-opentelemetry = { module = "org.springframework.boot:spring-
 spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "springCloudCommons" }
 spring-cloud-starter-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux", version.ref = "springCloudCommons" }
 spring-cloud-starter-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer", version.ref = "springCloudCommons" }
-spring-cloud-stream = { module = "org.springframework.cloud:spring-cloud-stream", version.ref = "springCloudCommons" }
 spring-cloud-commons = { module = "org.springframework.cloud:spring-cloud-commons", version.ref = "springCloudCommons" }
 spring-cloud-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-gateway-server-webflux", version.ref = "springCloudCommons" }
 

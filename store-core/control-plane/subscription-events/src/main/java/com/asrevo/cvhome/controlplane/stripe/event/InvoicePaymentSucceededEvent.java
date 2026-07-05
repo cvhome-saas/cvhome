@@ -6,6 +6,9 @@ import java.util.Map;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 
+import io.namastack.outbox.annotation.OutboxEvent;
+
+@OutboxEvent(key = "#this.org().id().toString()")
 public record InvoicePaymentSucceededEvent(ManagerOrgId org, PriceId priceId, Instant startDate, Instant endDate,
                                            Map<String, String> data) implements StripeEvent {
 

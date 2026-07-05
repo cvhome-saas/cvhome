@@ -14,7 +14,6 @@ dependencies {
     compileOnly libs.spring.boot.starter.security.oauth2.resource.server
     compileOnly libs.spring.cloud.gateway.server.webflux
     compileOnly libs.spring.cloud.commons
-    compileOnly libs.spring.cloud.stream
     compileOnly libs.spring.boot.starter.actuator
     compileOnly libs.jackson.databind
     compileOnly libs.jackson.core

@@ -5,7 +5,6 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentSucceededEvent;
 import com.asrevo.cvhome.controlplane.subscription.commons.PriceId;
 import com.asrevo.cvhome.controlplane.subscription.service.WebhookHandler;
@@ -13,6 +12,8 @@ import com.asrevo.cvhome.controlplane.subscription.utils.ToJsonObj;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stripe.model.Event;
+
+import io.namastack.outbox.Outbox;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class InvoicePaymentSucceeded implements WebhookHandler {
 
     private final ToJsonObj toJsonObj = new ToJsonObj();
 
-    private final EventProcessor eventProcessor;
+    private final Outbox outbox;
 
     @Override
     public void handle(Event event) {
@@ -45,7 +46,8 @@ public class InvoicePaymentSucceeded implements WebhookHandler {
         PriceId priceId = new PriceId(priceIdElement.getAsString());
         Instant startDate = Instant.ofEpochSecond(startElement.getAsLong());
         Instant endDate = Instant.ofEpochSecond(endElement.getAsLong());
-        eventProcessor.process(InvoicePaymentSucceededEvent.from(orgId, priceId, startDate, endDate));
+        var e = InvoicePaymentSucceededEvent.from(orgId, priceId, startDate, endDate);
+        outbox.schedule(e, e.org().getId().toString());
         log.info("Invoice payment succeeded for {}  {} start {} end {}", orgId, priceId, startDate, endDate);
     }
 

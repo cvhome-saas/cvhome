@@ -4,6 +4,9 @@ import java.util.Map;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 
+import io.namastack.outbox.annotation.OutboxEvent;
+
+@OutboxEvent(key = "#this.org().id().toString()")
 public record DeActivateNonRenewedSubscriptionCommand(ManagerOrgId org,
                                                       Map<String, String> data) implements SubscriptionCommand {
     public static DeActivateNonRenewedSubscriptionCommand from(final ManagerOrgId org) {

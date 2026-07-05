@@ -6,6 +6,8 @@ import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentFailedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 
+import io.namastack.outbox.annotation.OutboxHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +18,10 @@ public class InvoicePaymentFailedEventImpl implements EventImpl<InvoicePaymentFa
 
     private final SubscriptionService subscriptionService;
 
-    @Override
+    @OutboxHandler
     public void process(InvoicePaymentFailedEvent event) {
-        log.info("Invoice payment failed event received: {}", event);
+        log.info("Invoice payment failed event received: {} from outbox", event);
         subscriptionService.deActivateSubscription(event.org());
-    }
-
-    @Override
-    public String type() {
-        return InvoicePaymentFailedEvent.class.getSimpleName();
     }
 
 }

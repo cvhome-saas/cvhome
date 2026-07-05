@@ -6,6 +6,8 @@ import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.stripe.event.CustomerSubscriptionDeletedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 
+import io.namastack.outbox.annotation.OutboxHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +18,10 @@ public class CustomerSubscriptionDeletedEventImpl implements EventImpl<CustomerS
 
     private final SubscriptionService subscriptionService;
 
-    @Override
+    @OutboxHandler
     public void process(CustomerSubscriptionDeletedEvent event) {
-        log.info("Received CustomerSubscriptionDeletedEvent from CustomerSubscriptionService {}", event);
+        log.info("Received CustomerSubscriptionDeletedEvent from CustomerSubscriptionService {} from outbox", event);
         subscriptionService.deActivateSubscription(event.org());
-    }
-
-    @Override
-    public String type() {
-        return CustomerSubscriptionDeletedEvent.class.getSimpleName();
     }
 
 }
