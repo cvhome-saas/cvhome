@@ -70,7 +70,6 @@ spring-boot-starter-opentelemetry = { module = "org.springframework.boot:spring-
 spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "springCloudCommons" }
 spring-cloud-starter-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux", version.ref = "springCloudCommons" }
 spring-cloud-starter-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer", version.ref = "springCloudCommons" }
-spring-cloud-stream = { module = "org.springframework.cloud:spring-cloud-stream", version.ref = "springCloudCommons" }
 spring-cloud-commons = { module = "org.springframework.cloud:spring-cloud-commons", version.ref = "springCloudCommons" }
 spring-cloud-gateway-server-webflux = { module = "org.springframework.cloud:spring-cloud-gateway-server-webflux", version.ref = "springCloudCommons" }
 

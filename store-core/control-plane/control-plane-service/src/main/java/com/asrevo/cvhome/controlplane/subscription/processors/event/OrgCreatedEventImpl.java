@@ -2,6 +2,7 @@ package com.asrevo.cvhome.controlplane.subscription.processors.event;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.manager.commons.event.store.OrgCreatedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 
@@ -13,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OrgCreatedEventImpl {
+public class OrgCreatedEventImpl implements EventImpl<OrgCreatedEvent> {
 
     private final SubscriptionService subscriptionService;
 

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.controlplane.manager.processors.event;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.manager.commons.event.store.StoreCreatedEvent;
 import com.asrevo.cvhome.controlplane.manager.service.StoreProvisioningService;
 
@@ -13,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class ManagerStoreCreatedEventImpl {
+public class ManagerStoreCreatedEventImpl implements EventImpl<StoreCreatedEvent> {
 
     private final StoreProvisioningService storeProvisioningService;
 

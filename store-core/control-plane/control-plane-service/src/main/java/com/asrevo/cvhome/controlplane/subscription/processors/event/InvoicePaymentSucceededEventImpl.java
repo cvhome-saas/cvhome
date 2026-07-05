@@ -2,6 +2,7 @@ package com.asrevo.cvhome.controlplane.subscription.processors.event;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.stripe.event.InvoicePaymentSucceededEvent;
 import com.asrevo.cvhome.controlplane.subscription.commons.SubscriptionPlanOption;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionPlanTablesService;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class InvoicePaymentSucceededEventImpl {
+public class InvoicePaymentSucceededEventImpl implements EventImpl<InvoicePaymentSucceededEvent> {
 
     private final SubscriptionService subscriptionService;
 

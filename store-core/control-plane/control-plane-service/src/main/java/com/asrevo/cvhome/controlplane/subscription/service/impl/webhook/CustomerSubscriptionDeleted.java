@@ -3,13 +3,14 @@ package com.asrevo.cvhome.controlplane.subscription.service.impl.webhook;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.event.EventProcessor;
 import com.asrevo.cvhome.controlplane.stripe.event.CustomerSubscriptionDeletedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.WebhookHandler;
 import com.asrevo.cvhome.controlplane.subscription.utils.ToJsonObj;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stripe.model.Event;
+
+import io.namastack.outbox.Outbox;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class CustomerSubscriptionDeleted implements WebhookHandler {
 
     private final ToJsonObj toJsonObj = new ToJsonObj();
 
-    private final EventProcessor eventProcessor;
+    private final Outbox outbox;
 
     @Override
     public void handle(Event event) {
@@ -32,7 +33,8 @@ public class CustomerSubscriptionDeleted implements WebhookHandler {
 
         ManagerOrgId orgId = new ManagerOrgId(orgIdElement.getAsString());
 
-        eventProcessor.process(CustomerSubscriptionDeletedEvent.from(orgId));
+        var e = CustomerSubscriptionDeletedEvent.from(orgId);
+        outbox.schedule(e, e.org().getId().toString());
         log.info("Customer subscription deleted for {}", orgId);
     }
 

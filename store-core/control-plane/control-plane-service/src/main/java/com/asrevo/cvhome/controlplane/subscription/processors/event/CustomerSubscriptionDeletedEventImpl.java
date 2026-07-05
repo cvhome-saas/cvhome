@@ -2,6 +2,7 @@ package com.asrevo.cvhome.controlplane.subscription.processors.event;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.controlplane.stripe.event.CustomerSubscriptionDeletedEvent;
 import com.asrevo.cvhome.controlplane.subscription.service.SubscriptionService;
 
@@ -13,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerSubscriptionDeletedEventImpl {
+public class CustomerSubscriptionDeletedEventImpl implements EventImpl<CustomerSubscriptionDeletedEvent> {
 
     private final SubscriptionService subscriptionService;
 
