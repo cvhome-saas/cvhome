@@ -4,6 +4,9 @@ import java.util.Map;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 
+import io.namastack.outbox.annotation.OutboxEvent;
+
+@OutboxEvent(key = "#this.org().id().toString()")
 public record CustomerSubscriptionDeletedEvent(ManagerOrgId org, Map<String, String> data) implements StripeEvent {
 
     public static CustomerSubscriptionDeletedEvent from(ManagerOrgId org) {
