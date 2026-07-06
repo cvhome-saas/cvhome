@@ -1,19 +1,20 @@
 package com.asrevo.cvhome.catalog.entity.product.availability;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 
@@ -38,12 +39,6 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
             initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     private Long id;
 
-    @Column(name = "SKU", nullable = false)
-    private String sku;
-
-    @Column(name = "QUANTITY", nullable = false)
-    private Integer quantity;
-
     @Column(name = "ORDER_ID", nullable = false)
     private Long orderId;
 
@@ -59,7 +54,6 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
             column = @Column(name = "STORE_MERCHANT_ID", nullable = false, length = 50))
     private StoreMerchantId storeMerchantId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_AVAIL_ID")
-    private ProductAvailability productAvailability;
+    @OneToMany(mappedBy = "productReservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductReservationLine> lines = new ArrayList<>();
 }

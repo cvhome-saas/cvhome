@@ -503,15 +503,26 @@ create table if not exists catalog.product_reservation
     date_created      timestamp(6),
     date_modified     timestamp(6),
     updt_id           varchar(60),
-    sku               varchar(255) not null,
-    quantity          integer      not null,
     order_id          bigint       not null,
     expire_at         timestamp(6) not null,
     status            varchar(20)  not null,
-    store_merchant_id varchar(50)  not null,
-    product_avail_id  bigint
-        constraint fk_product_reservation_avail references catalog.product_availability
+    store_merchant_id varchar(50)  not null
+);
+
+create table if not exists catalog.product_reservation_line
+(
+    id                     bigint       not null primary key,
+    date_created           timestamp(6),
+    date_modified          timestamp(6),
+    updt_id                varchar(60),
+    product_reservation_id bigint       not null,
+    sku                    varchar(255) not null,
+    quantity               integer      not null,
+    product_avail_id       bigint,
+    constraint fk_prd_res_line_res foreign key (product_reservation_id) references catalog.product_reservation (id),
+    constraint fk_prd_res_line_avail foreign key (product_avail_id) references catalog.product_availability (product_avail_id)
 );
 
 create index if not exists idx_prd_res_order_id on catalog.product_reservation (order_id);
 create index if not exists idx_prd_res_expire_at on catalog.product_reservation (expire_at);
+create index if not exists idx_prd_res_line_res_id on catalog.product_reservation_line (product_reservation_id);

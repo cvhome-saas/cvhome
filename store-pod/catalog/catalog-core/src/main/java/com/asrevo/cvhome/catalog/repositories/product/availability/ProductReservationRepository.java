@@ -16,7 +16,7 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationS
 
 public interface ProductReservationRepository extends JpaRepository<ProductReservation, Long> {
 
-    Optional<ProductReservation> findByOrderIdAndSku(Long orderId, String sku);
+    Optional<ProductReservation> findByOrderId(Long orderId);
 
     List<ProductReservation> findAllByOrderId(Long orderId);
 

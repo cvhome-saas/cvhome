@@ -76,17 +76,15 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @Override
     @PostMapping("/private/commit/{orderId}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    @SneakyThrows
-    public void commit(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        productReservationService.commit(merchantStore, orderId);
+    public ProductReservationResult commit(StoreMerchantId merchantStore, @PathVariable Long orderId) {
+        return productReservationService.commit(merchantStore, orderId);
     }
 
     @Override
     @PostMapping("/private/release/{orderId}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    @SneakyThrows
-    public void release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        productReservationService.release(merchantStore, orderId);
+    public ProductReservationResult release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
+        return productReservationService.release(merchantStore, orderId);
     }
 
 }

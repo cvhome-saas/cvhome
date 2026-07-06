@@ -21,9 +21,9 @@ public interface ExternalProductReservationService {
                                         @RequestBody ProductReservationList productReservation);
 
     @PostExchange("/commit/{orderId}")
-    void commit(StoreMerchantId store, @PathVariable("orderId") Long orderId);
+    ProductReservationResult commit(StoreMerchantId store, @PathVariable("orderId") Long orderId);
 
     @PostExchange("/release/{orderId}")
-    void release(StoreMerchantId store, @PathVariable("orderId") Long orderId);
+    ProductReservationResult release(StoreMerchantId store, @PathVariable("orderId") Long orderId);
 
 }

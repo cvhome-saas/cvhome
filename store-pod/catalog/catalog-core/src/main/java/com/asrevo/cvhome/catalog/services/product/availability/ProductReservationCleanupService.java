@@ -11,7 +11,6 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductReservationRepository;
 import com.asrevo.cvhome.catalog.services.product.ProductReservationService;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +39,9 @@ public class ProductReservationCleanupService {
         log.info("Found {} expired product reservations.", expiredReservations.size());
 
         for (ProductReservation reservation : expiredReservations) {
-            try {
-                productReservationService.expire(reservation.getStoreMerchantId(), reservation.getOrderId());
-            } catch (ServiceException e) {
-                log.error("Error while expiring reservation: {}", e.getMessage());
+            var result = productReservationService.release(reservation.getStoreMerchantId(), reservation.getOrderId());
+            if (!result.status()) {
+                log.error("Error while expiring reservation for order {}", reservation.getOrderId());
             }
         }
         log.info("Finished cleanup of expired product reservations.");

@@ -4,18 +4,17 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
+import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationLine;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
-import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
+import com.asrevo.cvhome.catalog.repositories.product.availability.ProductAvailabilityRepository;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductReservationRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
@@ -31,116 +30,156 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductReservationServiceImpl implements ProductReservationService {
 
     private final ProductReservationRepository productReservationRepository;
-    private final ProductRepository productRepository;
+    private final ProductAvailabilityRepository productAvailabilityRepository;
 
     @Value("${reservation.expiry.minutes:15}")
     private int reservationExpiryMinutes;
 
     @Transactional
     @Override
-    public ProductReservationResult reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
-            throws ServiceException {
-        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
-        return new ProductReservationResult(true);
+    public ProductReservationResult reserve(StoreMerchantId store, Long orderId, ProductReservationList productReservation) {
+        return getProductReservationResult(store, orderId, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
     }
 
     @Transactional
     @Override
-    public ProductReservationResult autoCommit(StoreMerchantId store, Long orderId, ProductReservationList productReservation)
-            throws ServiceException {
-        doReserveWithStatus(store, orderId, productReservation, ProductReservationStatus.COMPLETED);
-        return new ProductReservationResult(true);
+    public ProductReservationResult autoCommit(StoreMerchantId store, Long orderId, ProductReservationList productReservation) {
+        return getProductReservationResult(store, orderId, productReservation, ProductReservationStatus.COMPLETED);
     }
 
-    private void doReserveWithStatus(StoreMerchantId store, Long orderId, ProductReservationList productReservation,
-                                     ProductReservationStatus status) throws ServiceException {
+    private ProductReservationResult getProductReservationResult(StoreMerchantId store, Long orderId,
+                                                                 ProductReservationList productReservation,
+                                                                 ProductReservationStatus status) {
+        try {
+            ProductReservation reservation = doReserveWithStatus(store, orderId, productReservation, status);
+            return new ProductReservationResult(true, reservation.getId(), reservation.getExpireAt());
+        } catch (ServiceException _) {
+            return new ProductReservationResult(false);
+        }
+    }
+
+    private ProductReservation doReserveWithStatus(StoreMerchantId store, Long orderId, ProductReservationList productReservation,
+                                                   ProductReservationStatus status) throws ServiceException {
         if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
             throw new ServiceException("No entries to reserve");
         }
 
+        ProductReservation reservation = productReservationRepository.findByOrderId(orderId)
+                .orElseGet(() -> {
+                    ProductReservation res = new ProductReservation();
+                    res.setOrderId(orderId);
+                    res.setStoreMerchantId(store);
+                    res.setStatus(status);
+                    res.setExpireAt(Instant.now().plus(Duration.ofMinutes(reservationExpiryMinutes)));
+                    return res;
+                });
+
+        // Update status and expiry for the existing or new reservation
+        reservation.setStatus(status);
+        reservation.setExpireAt(Instant.now().plus(Duration.ofMinutes(reservationExpiryMinutes)));
+
         for (ReserveProductEntry entry : productReservation.entries()) {
-            // Idempotency check: if reservation already exists for this order and SKU, skip
-            Optional<ProductReservation> existingReservation = productReservationRepository.findByOrderIdAndSku(orderId, entry.sku());
-            if (existingReservation.isPresent()) {
-                log.info("Reservation for order {} and sku {} already exists. Skipping.", orderId, entry.sku());
+            // Idempotency check: if line already exists for this SKU, skip
+            boolean exists = reservation.getLines().stream()
+                    .anyMatch(l -> Objects.equals(l.getSku(), entry.sku()));
+
+            if (exists) {
+                log.info("Active reservation line for order {} and sku {} already exists. Skipping.", orderId, entry.sku());
                 continue;
             }
 
-            Product product = productRepository.getByProductSkuFetchAvailabilities(entry.sku(), store);
+            List<ProductAvailability> availabilities = productAvailabilityRepository.getBySku(entry.sku(), store);
+            if (availabilities.isEmpty()) {
+                throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+            }
 
-            for (ProductAvailability availability : product.getAvailabilities()) {
-                if (availability.getProductQuantity() < entry.reserveQty()) {
-                    throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+            // Pick the first availability for the store
+            ProductAvailability availability = availabilities.getFirst();
+
+            if (availability.getProductQuantity() < entry.reserveQty()) {
+                throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+            }
+
+            // Deduct quantity
+            availability.setProductQuantity(availability.getProductQuantity() - entry.reserveQty());
+
+            // Create Reservation Line
+            ProductReservationLine line = new ProductReservationLine();
+            line.setSku(entry.sku());
+            line.setQuantity(entry.reserveQty());
+            line.setProductAvailability(availability);
+            line.setProductReservation(reservation);
+
+            reservation.getLines().add(line);
+
+            productAvailabilityRepository.save(availability);
+        }
+        return productReservationRepository.save(reservation);
+    }
+
+    @Transactional
+    @Override
+    public ProductReservationResult commit(StoreMerchantId store, Long orderId) {
+        try {
+            List<ProductReservation> reservations =
+                    productReservationRepository.findAllByOrderId(orderId);
+            ProductReservation committedRes = null;
+            for (ProductReservation res : reservations) {
+                if (Objects.equals(res.getStoreMerchantId(), store) &&
+                        res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+
+                    if (res.getExpireAt().isBefore(Instant.now())) {
+                        log.error("Cannot commit reservation for order {} because it has expired at {}", orderId, res.getExpireAt());
+                        return new ProductReservationResult(false, res.getId(), res.getExpireAt());
+                    }
+
+                    res.setStatus(ProductReservationStatus.COMPLETED);
+                    committedRes = productReservationRepository.save(res);
+                    log.info("Committed reservation for order {}", orderId);
                 }
-
-                // Deduct quantity
-                availability.setProductQuantity(availability.getProductQuantity() - entry.reserveQty());
-
-                // Create Reservation
-                ProductReservation reservation = new ProductReservation();
-                reservation.setSku(entry.sku());
-                reservation.setQuantity(entry.reserveQty());
-                reservation.setOrderId(orderId);
-                reservation.setExpireAt(Instant.now().plus(Duration.ofMinutes(reservationExpiryMinutes)));
-                reservation.setStoreMerchantId(store);
-                reservation.setProductAvailability(availability);
-                reservation.setStatus(status);
-
-                productReservationRepository.save(reservation);
             }
-            productRepository.save(product);
+            if (committedRes != null) {
+                return new ProductReservationResult(true, committedRes.getId(), committedRes.getExpireAt());
+            }
+            return new ProductReservationResult(false, null, null);
+        } catch (Exception e) {
+            log.error("Error committing reservation for order {}", orderId, e);
+            return new ProductReservationResult(false, null, null);
         }
     }
 
     @Transactional
     @Override
-    public void commit(StoreMerchantId store, Long orderId) {
-        List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderId(orderId);
-        for (ProductReservation res : reservations) {
-            if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                res.setStatus(ProductReservationStatus.COMPLETED);
-                productReservationRepository.save(res);
-                log.info("Committed reservation for order {} and sku {}", orderId, res.getSku());
+    public ProductReservationResult release(StoreMerchantId store, Long orderId) {
+        try {
+            List<ProductReservation> reservations =
+                    productReservationRepository.findAllByOrderId(orderId);
+            ProductReservation releasedRes = null;
+            for (ProductReservation res : reservations) {
+                // Restore quantity for TEMPORARY_RESERVED status
+                if (Objects.equals(res.getStoreMerchantId(), store) &&
+                        res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+                    for (ProductReservationLine line : res.getLines()) {
+                        var availability = line.getProductAvailability();
+                        if (availability != null) {
+                            availability.setProductQuantity(availability.getProductQuantity() + line.getQuantity());
+                            productAvailabilityRepository.save(availability);
+                        }
+                    }
+
+                    // Mark as rollback
+                    res.setStatus(ProductReservationStatus.ROLLBACK);
+                    releasedRes = productReservationRepository.save(res);
+                    log.info("Released reservation for order {}. Status was {}", orderId, res.getStatus());
+                }
             }
-        }
-    }
-
-    @Transactional
-    @Override
-    public void release(StoreMerchantId store, Long orderId) {
-        List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderId(orderId);
-        for (ProductReservation res : reservations) {
-            // Restore quantity for TEMPORARY_RESERVED status
-            if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                var availability = res.getProductAvailability();
-                availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
-
-                // Mark as rollback
-                res.setStatus(ProductReservationStatus.ROLLBACK);
-                productReservationRepository.save(res);
-                log.info("Released reservation for order {} and sku {}. Status was {}", orderId, res.getSku(), res.getStatus());
+            if (releasedRes != null) {
+                return new ProductReservationResult(true, releasedRes.getId(), releasedRes.getExpireAt());
             }
-        }
-    }
-
-    @Transactional
-    @Override
-    public void expire(StoreMerchantId store, Long orderId) {
-        List<ProductReservation> reservations =
-                productReservationRepository.findAllByOrderId(orderId);
-        for (ProductReservation res : reservations) {
-            // Restore quantity for TEMPORARY_RESERVED status
-            if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                var availability = res.getProductAvailability();
-                availability.setProductQuantity(availability.getProductQuantity() + res.getQuantity());
-
-                // Mark as rollback
-                res.setStatus(ProductReservationStatus.EXPIRED);
-                productReservationRepository.save(res);
-                log.info("Released reservation for order {} and sku {}. Status was {}", orderId, res.getSku(), res.getStatus());
-            }
+            return new ProductReservationResult(false, null, null);
+        } catch (Exception e) {
+            log.error("Error releasing reservation for order {}", orderId, e);
+            return new ProductReservationResult(false, null, null);
         }
     }
 

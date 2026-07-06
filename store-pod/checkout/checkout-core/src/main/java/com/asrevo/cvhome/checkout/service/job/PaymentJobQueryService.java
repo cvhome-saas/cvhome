@@ -89,20 +89,18 @@ public class PaymentJobQueryService {
     }
 
     private void release(StoreMerchantId store, Long orderId) {
-        try {
-            log.debug("Un-reserving inventory for order {}", orderId);
-            externalProductReservationService.release(store, orderId);
-        } catch (Exception e) {
-            log.error("Error while un-reserving inventory for order {}", orderId, e);
+        log.debug("Un-reserving inventory for order {}", orderId);
+        var result = externalProductReservationService.release(store, orderId);
+        if (!result.status()) {
+            log.error("Error while un-reserving inventory for order {}", orderId);
         }
     }
 
     private void commit(StoreMerchantId store, Long orderId) {
-        try {
-            log.debug("Commit inventory reservation for order {}", orderId);
-            externalProductReservationService.commit(store, orderId);
-        } catch (Exception e) {
-            log.error("Error while commit inventory for order {}", orderId, e);
+        log.debug("Commit inventory reservation for order {}", orderId);
+        var result = externalProductReservationService.commit(store, orderId);
+        if (!result.status()) {
+            log.error("Error while commit inventory for order {}", orderId);
         }
     }
 
