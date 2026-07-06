@@ -16,9 +16,9 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationS
 
 public interface ProductReservationRepository extends JpaRepository<ProductReservation, Long> {
 
-    Optional<ProductReservation> findByOrderId(Long orderId);
+    Optional<ProductReservation> findByRef(String ref);
 
-    List<ProductReservation> findAllByOrderId(Long orderId);
+    List<ProductReservation> findAllByRef(String ref);
 
     @Query(value = "SELECT pr FROM ProductReservation pr WHERE pr.status = :status AND pr.expireAt < :expireAt ORDER BY pr.id")
     @Lock(LockModeType.PESSIMISTIC_WRITE)

@@ -39,9 +39,9 @@ public class ProductReservationCleanupService {
         log.info("Found {} expired product reservations.", expiredReservations.size());
 
         for (ProductReservation reservation : expiredReservations) {
-            var result = productReservationService.release(reservation.getStoreMerchantId(), reservation.getOrderId());
+            var result = productReservationService.release(reservation.getStoreMerchantId(), reservation.getRef());
             if (!result.status()) {
-                log.error("Error while expiring reservation for order {}", reservation.getOrderId());
+                log.error("Error while expiring reservation for ref {}", reservation.getRef());
             }
         }
         log.info("Finished cleanup of expired product reservations.");

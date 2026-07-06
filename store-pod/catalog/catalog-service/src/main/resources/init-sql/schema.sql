@@ -503,7 +503,7 @@ create table if not exists catalog.product_reservation
     date_created      timestamp(6),
     date_modified     timestamp(6),
     updt_id           varchar(60),
-    order_id          bigint       not null,
+    ref               varchar(60)  not null,
     expire_at         timestamp(6) not null,
     status            varchar(20)  not null,
     store_merchant_id varchar(50)  not null
@@ -523,6 +523,6 @@ create table if not exists catalog.product_reservation_line
     constraint fk_prd_res_line_avail foreign key (product_avail_id) references catalog.product_availability (product_avail_id)
 );
 
-create index if not exists idx_prd_res_order_id on catalog.product_reservation (order_id);
+create index if not exists idx_prd_res_ref on catalog.product_reservation (ref);
 create index if not exists idx_prd_res_expire_at on catalog.product_reservation (expire_at);
 create index if not exists idx_prd_res_line_res_id on catalog.product_reservation_line (product_reservation_id);

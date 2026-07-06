@@ -12,18 +12,18 @@ import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 @HttpExchange("/api/v1/private")
 public interface ExternalProductReservationService {
 
-    @PostExchange("/reserve/{orderId}")
-    ProductReservationResult reserve(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+    @PostExchange("/reserve/{ref}")
+    ProductReservationResult reserve(StoreMerchantId store, @PathVariable("ref") String ref,
                                      @RequestBody ProductReservationList productReservation);
 
-    @PostExchange("/auto-commit/{orderId}")
-    ProductReservationResult autoCommit(StoreMerchantId store, @PathVariable("orderId") Long orderId,
+    @PostExchange("/auto-commit/{ref}")
+    ProductReservationResult autoCommit(StoreMerchantId store, @PathVariable("ref") String ref,
                                         @RequestBody ProductReservationList productReservation);
 
-    @PostExchange("/commit/{orderId}")
-    ProductReservationResult commit(StoreMerchantId store, @PathVariable("orderId") Long orderId);
+    @PostExchange("/commit/{ref}")
+    ProductReservationResult commit(StoreMerchantId store, @PathVariable("ref") String ref);
 
-    @PostExchange("/release/{orderId}")
-    ProductReservationResult release(StoreMerchantId store, @PathVariable("orderId") Long orderId);
+    @PostExchange("/release/{ref}")
+    ProductReservationResult release(StoreMerchantId store, @PathVariable("ref") String ref);
 
 }

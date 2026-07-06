@@ -39,8 +39,8 @@ public class ProductReservation extends SalesManagerEntity<Long, ProductReservat
             initialValue = SchemaConstant.DESCRIPTION_ID_START_VALUE)
     private Long id;
 
-    @Column(name = "ORDER_ID", nullable = false)
-    private Long orderId;
+    @Column(name = "REF", nullable = false)
+    private String ref;
 
     @Column(name = "EXPIRE_AT", nullable = false)
     private Instant expireAt;

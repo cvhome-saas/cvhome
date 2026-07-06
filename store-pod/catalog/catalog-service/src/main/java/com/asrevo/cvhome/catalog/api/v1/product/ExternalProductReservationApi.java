@@ -38,7 +38,7 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     private final ProductReservationService productReservationService;
 
     @Override
-    @PostMapping(value = "/private/reserve/{orderId}")
+    @PostMapping(value = "/private/reserve/{ref}")
     @Operation(method = "POST", description = "Update product quantity",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ProductReservationResult.class))))
@@ -50,13 +50,13 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
     public ProductReservationResult reserve(StoreMerchantId merchantStore,
-                                            @PathVariable Long orderId,
+                                            @PathVariable String ref,
                                             @RequestBody ProductReservationList productReservation) {
-        return productReservationService.reserve(merchantStore, orderId, productReservation);
+        return productReservationService.reserve(merchantStore, ref, productReservation);
     }
 
     @Override
-    @PostMapping(value = "/private/auto-commit/{orderId}")
+    @PostMapping(value = "/private/auto-commit/{ref}")
     @Operation(method = "POST", description = "Update product quantity",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ProductReservationResult.class))))
@@ -68,23 +68,23 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     @SneakyThrows
     public ProductReservationResult autoCommit(StoreMerchantId merchantStore,
-                                               @PathVariable Long orderId,
+                                               @PathVariable String ref,
                                                @RequestBody ProductReservationList productReservation) {
-        return productReservationService.autoCommit(merchantStore, orderId, productReservation);
+        return productReservationService.autoCommit(merchantStore, ref, productReservation);
     }
 
     @Override
-    @PostMapping("/private/commit/{orderId}")
+    @PostMapping("/private/commit/{ref}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    public ProductReservationResult commit(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        return productReservationService.commit(merchantStore, orderId);
+    public ProductReservationResult commit(StoreMerchantId merchantStore, @PathVariable String ref) {
+        return productReservationService.commit(merchantStore, ref);
     }
 
     @Override
-    @PostMapping("/private/release/{orderId}")
+    @PostMapping("/private/release/{ref}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    public ProductReservationResult release(StoreMerchantId merchantStore, @PathVariable Long orderId) {
-        return productReservationService.release(merchantStore, orderId);
+    public ProductReservationResult release(StoreMerchantId merchantStore, @PathVariable String ref) {
+        return productReservationService.release(merchantStore, ref);
     }
 
 }
