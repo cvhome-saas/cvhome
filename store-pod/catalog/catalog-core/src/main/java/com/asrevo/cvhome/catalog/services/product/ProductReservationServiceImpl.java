@@ -41,12 +41,6 @@ public class ProductReservationServiceImpl implements ProductReservationService 
         return getProductReservationResult(store, ref, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
     }
 
-    @Transactional
-    @Override
-    public ProductReservationResult autoCommit(StoreMerchantId store, String ref, ProductReservationList productReservation) {
-        return getProductReservationResult(store, ref, productReservation, ProductReservationStatus.COMPLETED);
-    }
-
     private ProductReservationResult getProductReservationResult(StoreMerchantId store, String ref,
                                                                  ProductReservationList productReservation,
                                                                  ProductReservationStatus status) {

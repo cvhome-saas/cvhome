@@ -56,24 +56,6 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     }
 
     @Override
-    @PostMapping(value = "/private/auto-commit/{ref}")
-    @Operation(method = "POST", description = "Update product quantity",
-            responses = @ApiResponse(
-                    content = @Content(schema = @Schema(implementation = ProductReservationResult.class))))
-    @Parameter(name = "store",
-            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
-    @Parameter(name = "lang",
-            schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    @SneakyThrows
-    public ProductReservationResult autoCommit(StoreMerchantId merchantStore,
-                                               @PathVariable String ref,
-                                               @RequestBody ProductReservationList productReservation) {
-        return productReservationService.autoCommit(merchantStore, ref, productReservation);
-    }
-
-    @Override
     @PostMapping("/private/commit/{ref}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
     public ProductReservationResult commit(StoreMerchantId merchantStore, @PathVariable String ref) {

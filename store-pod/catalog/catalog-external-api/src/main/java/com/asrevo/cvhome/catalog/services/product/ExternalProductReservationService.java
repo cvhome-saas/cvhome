@@ -16,10 +16,6 @@ public interface ExternalProductReservationService {
     ProductReservationResult reserve(StoreMerchantId store, @PathVariable("ref") String ref,
                                      @RequestBody ProductReservationList productReservation);
 
-    @PostExchange("/auto-commit/{ref}")
-    ProductReservationResult autoCommit(StoreMerchantId store, @PathVariable("ref") String ref,
-                                        @RequestBody ProductReservationList productReservation);
-
     @PostExchange("/commit/{ref}")
     ProductReservationResult commit(StoreMerchantId store, @PathVariable("ref") String ref);
 
