@@ -50,20 +50,20 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         switch (paymentResponse.status()) {
             case PAID:
                 log.info("Payment PAID for order {}. Marking as PAID.", modelOrder.getId());
-                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                externalProductReservationService.autoCommit(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
                 orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PAID);
                 break;
 
             case PAY_LATER:
                 log.info("Payment PAY_LATER (COD) for order {}. Marking as ORDERED.", modelOrder.getId());
-                externalProductReservationService.autoCommit(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                externalProductReservationService.autoCommit(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
                 orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.ORDERED);
                 break;
 
             case PENDING:
                 log.debug("Reserving inventory for order {} (Status: PENDING, Redirect: {})",
                         modelOrder.getId(), paymentResponse.isRedirect());
-                externalProductReservationService.reserve(store, modelOrder.getId(), toProductReservationList(modelOrder));
+                externalProductReservationService.reserve(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
                 break;
 
             case FAILED:

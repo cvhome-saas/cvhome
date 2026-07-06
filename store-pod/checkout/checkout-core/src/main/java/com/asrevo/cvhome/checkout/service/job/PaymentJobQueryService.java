@@ -90,7 +90,7 @@ public class PaymentJobQueryService {
 
     private void release(StoreMerchantId store, Long orderId) {
         log.debug("Un-reserving inventory for order {}", orderId);
-        var result = externalProductReservationService.release(store, orderId);
+        var result = externalProductReservationService.release(store, orderId.toString());
         if (!result.status()) {
             log.error("Error while un-reserving inventory for order {}", orderId);
         }
@@ -98,7 +98,7 @@ public class PaymentJobQueryService {
 
     private void commit(StoreMerchantId store, Long orderId) {
         log.debug("Commit inventory reservation for order {}", orderId);
-        var result = externalProductReservationService.commit(store, orderId);
+        var result = externalProductReservationService.commit(store, orderId.toString());
         if (!result.status()) {
             log.error("Error while commit inventory for order {}", orderId);
         }
