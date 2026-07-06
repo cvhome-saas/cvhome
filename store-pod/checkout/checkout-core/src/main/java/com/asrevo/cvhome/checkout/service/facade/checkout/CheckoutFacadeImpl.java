@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -45,30 +46,47 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        PaymentResponse paymentResponse = initiatePayment(modelOrder);
+        ProductReservationResult result =
+                externalProductReservationService.reserve(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+
+        if (!result.status()) {
+            orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.FAILED);
+            return new OrderProcessingResult(modelOrder);
+        }
+
+
+        PaymentRequest paymentRequest = new PaymentRequest(
+                modelOrder.getId(),
+                modelOrder.getTotal(),
+                modelOrder.getCurrency(),
+                modelOrder.getPaymentType(),
+                result.expireAt()
+        );
+
+        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
+        PaymentResponse paymentResponse = externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
 
         switch (paymentResponse.status()) {
             case PAID:
                 log.info("Payment PAID for order {}. Marking as PAID.", modelOrder.getId());
-                externalProductReservationService.autoCommit(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+                externalProductReservationService.commit(store, modelOrder.getId().toString());
                 orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PAID);
                 break;
 
             case PAY_LATER:
                 log.info("Payment PAY_LATER (COD) for order {}. Marking as ORDERED.", modelOrder.getId());
-                externalProductReservationService.autoCommit(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+                externalProductReservationService.commit(store, modelOrder.getId().toString());
                 orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.ORDERED);
                 break;
 
             case PENDING:
-                log.debug("Reserving inventory for order {} (Status: PENDING, Redirect: {})",
-                        modelOrder.getId(), paymentResponse.isRedirect());
-                externalProductReservationService.reserve(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+                log.info("Payment Pending order {}.", modelOrder.getId());
                 break;
 
             case FAILED:
                 log.warn("Payment failed for order {}. Updating status.", modelOrder.getId());
                 orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.FAILED);
+                externalProductReservationService.release(store, modelOrder.getId().toString());
                 break;
         }
 
@@ -85,18 +103,6 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
                 .stream()
                 .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
                 .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
-    }
-
-    private PaymentResponse initiatePayment(Order modelOrder) {
-        PaymentRequest paymentRequest = new PaymentRequest(
-                modelOrder.getId(),
-                modelOrder.getTotal(),
-                modelOrder.getCurrency(),
-                modelOrder.getPaymentType()
-        );
-
-        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
     }
 
 
