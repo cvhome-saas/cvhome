@@ -11,4 +11,8 @@ public record PaymentResponse(
     public PaymentResponse(PaymentStatus status, String redirectUrl) {
         this(status, redirectUrl, true);
     }
+
+    public static PaymentResponse failed() {
+        return new PaymentResponse(PaymentStatus.FAILED);
+    }
 }

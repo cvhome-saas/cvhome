@@ -48,8 +48,7 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        ProductReservationResult result =
-                externalProductReservationService.reserve(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+        ProductReservationResult result = doOrderReservation(store, modelOrder);
 
         if (!result.status()) {
             orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED,
@@ -59,16 +58,7 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PENDING);
 
 
-        PaymentRequest paymentRequest = new PaymentRequest(
-                modelOrder.getId(),
-                modelOrder.getTotal(),
-                modelOrder.getCurrency(),
-                modelOrder.getPaymentType(),
-                result.expireAt()
-        );
-
-        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        PaymentResponse paymentResponse = externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+        PaymentResponse paymentResponse = doOrderPaymentInitiate(modelOrder, result);
 
         switch (paymentResponse.status()) {
             case PAID:
@@ -100,6 +90,32 @@ public class CheckoutFacadeImpl implements CheckoutFacade {
         }
 
         return new OrderProcessingResult(modelOrder);
+    }
+
+    private PaymentResponse doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
+        try {
+            PaymentRequest paymentRequest = new PaymentRequest(
+                    modelOrder.getId(),
+                    modelOrder.getTotal(),
+                    modelOrder.getCurrency(),
+                    modelOrder.getPaymentType(),
+                    result.expireAt()
+            );
+
+            log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
+            return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+
+        } catch (Exception _) {
+            return PaymentResponse.failed();
+        }
+    }
+
+    private ProductReservationResult doOrderReservation(StoreMerchantId store, Order modelOrder) {
+        try {
+            return externalProductReservationService.reserve(store, modelOrder.getId().toString(), toProductReservationList(modelOrder));
+        } catch (Exception _) {
+            return new ProductReservationResult(false);
+        }
     }
 
 

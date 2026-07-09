@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -26,7 +27,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "PRODUCT_RESERVATION")
+@Table(name = "PRODUCT_RESERVATION", uniqueConstraints = @UniqueConstraint(name = "UNQ_PRODUCT_RESERVATION", columnNames = {
+        "STORE_MERCHANT_ID", "REF"}))
 @Getter
 @Setter
 public class ProductReservation extends SalesManagerEntity<Long, ProductReservation> {

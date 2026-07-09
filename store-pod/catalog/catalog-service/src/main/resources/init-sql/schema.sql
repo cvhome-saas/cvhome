@@ -506,7 +506,8 @@ create table if not exists catalog.product_reservation
     ref               varchar(60)  not null,
     expire_at         timestamp(6) not null,
     status            varchar(20)  not null,
-    store_merchant_id varchar(50)  not null
+    store_merchant_id varchar(50)  not null,
+    constraint UNQ_PRODUCT_RESERVATION unique (store_merchant_id, ref)
 );
 
 create table if not exists catalog.product_reservation_line
