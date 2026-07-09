@@ -13,12 +13,13 @@ import org.springframework.data.repository.query.Param;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatus;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface ProductReservationRepository extends JpaRepository<ProductReservation, Long> {
 
-    Optional<ProductReservation> findByRef(String ref);
+    Optional<ProductReservation> findByRef(String ref, StoreMerchantId storeMerchantId);
 
-    List<ProductReservation> findAllByRef(String ref);
+    List<ProductReservation> findAllByRef(String ref, StoreMerchantId storeMerchantId);
 
     @Query(value = "SELECT pr FROM ProductReservation pr WHERE pr.status = :status AND pr.expireAt < :expireAt ORDER BY pr.id")
     @Lock(LockModeType.PESSIMISTIC_WRITE)

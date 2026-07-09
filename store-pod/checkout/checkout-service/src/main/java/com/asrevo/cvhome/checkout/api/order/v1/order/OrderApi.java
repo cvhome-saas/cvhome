@@ -24,7 +24,7 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
-import com.asrevo.cvhome.checkout.service.facade.checkout.CheckoutFacade;
+import com.asrevo.cvhome.checkout.service.facade.checkout.OrderPlacementFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
@@ -53,7 +53,7 @@ public class OrderApi {
 
     private final OrderFacade orderFacade;
 
-    private final CheckoutFacade checkoutFacade;
+    private final OrderPlacementFacade orderPlacementFacade;
 
     private final ShoppingCartService shoppingCartService;
 
@@ -61,11 +61,11 @@ public class OrderApi {
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public OrderApi(OrderFacade orderFacade, CheckoutFacade checkoutFacade, ShoppingCartService shoppingCartService,
+    public OrderApi(OrderFacade orderFacade, OrderPlacementFacade orderPlacementFacade, ShoppingCartService shoppingCartService,
                     CustomerFacade customerFacade,
                     ExternalMerchantStoreService externalMerchantStoreService) {
         this.orderFacade = orderFacade;
-        this.checkoutFacade = checkoutFacade;
+        this.orderPlacementFacade = orderPlacementFacade;
         this.shoppingCartService = shoppingCartService;
         this.customerFacade = customerFacade;
         this.externalMerchantStoreService = externalMerchantStoreService;
@@ -116,7 +116,7 @@ public class OrderApi {
                     .orElseThrow(() -> new ServiceRuntimeException(
                             "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
-            var processOrder = checkoutFacade.placeOrder(order, customer, merchantStore, language,
+            var processOrder = orderPlacementFacade.placeOrder(order, customer, merchantStore, language,
                     LocaleUtils.getLocale(language));
 
             return orderFacade.orderConfirmation(processOrder.order(), customer, merchantStore, language);

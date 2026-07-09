@@ -58,7 +58,7 @@ public class ProductReservationServiceImpl implements ProductReservationService 
             throw new ServiceException("No entries to reserve");
         }
 
-        ProductReservation reservation = productReservationRepository.findByRef(ref)
+        ProductReservation reservation = productReservationRepository.findByRef(ref, store)
                 .orElseGet(() -> {
                     ProductReservation res = new ProductReservation();
                     res.setRef(ref);
@@ -116,20 +116,25 @@ public class ProductReservationServiceImpl implements ProductReservationService 
     public ProductReservationResult commit(StoreMerchantId store, String ref) {
         try {
             List<ProductReservation> reservations =
-                    productReservationRepository.findAllByRef(ref);
+                    productReservationRepository.findAllByRef(ref, store);
             ProductReservation committedRes = null;
             for (ProductReservation res : reservations) {
-                if (Objects.equals(res.getStoreMerchantId(), store) &&
-                        res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-
-                    if (res.getExpireAt().isBefore(Instant.now())) {
-                        log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
-                        return new ProductReservationResult(false, res.getId(), res.getExpireAt());
+                if (Objects.equals(res.getStoreMerchantId(), store)) {
+                    if (res.getStatus() == ProductReservationStatus.COMPLETED) {
+                        log.info("Reservation for ref {} already committed", ref);
+                        return new ProductReservationResult(true, res.getId(), res.getExpireAt());
                     }
+                    if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+                        if (res.getExpireAt().isBefore(Instant.now())) {
+                            log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
+                            // Optional: auto-release here or leave for cleanup service
+                            return new ProductReservationResult(false, res.getId(), res.getExpireAt());
+                        }
 
-                    res.setStatus(ProductReservationStatus.COMPLETED);
-                    committedRes = productReservationRepository.save(res);
-                    log.info("Committed reservation for ref {}", ref);
+                        res.setStatus(ProductReservationStatus.COMPLETED);
+                        committedRes = productReservationRepository.save(res);
+                        log.info("Committed reservation for ref {}", ref);
+                    }
                 }
             }
             if (committedRes != null) {
@@ -147,24 +152,28 @@ public class ProductReservationServiceImpl implements ProductReservationService 
     public ProductReservationResult release(StoreMerchantId store, String ref) {
         try {
             List<ProductReservation> reservations =
-                    productReservationRepository.findAllByRef(ref);
+                    productReservationRepository.findAllByRef(ref, store);
             ProductReservation releasedRes = null;
             for (ProductReservation res : reservations) {
-                // Restore quantity for TEMPORARY_RESERVED status
-                if (Objects.equals(res.getStoreMerchantId(), store) &&
-                        res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                    for (ProductReservationLine line : res.getLines()) {
-                        var availability = line.getProductAvailability();
-                        if (availability != null) {
-                            availability.setProductQuantity(availability.getProductQuantity() + line.getQuantity());
-                            productAvailabilityRepository.save(availability);
-                        }
+                if (Objects.equals(res.getStoreMerchantId(), store)) {
+                    if (res.getStatus() == ProductReservationStatus.ROLLBACK) {
+                        log.info("Reservation for ref {} already released", ref);
+                        return new ProductReservationResult(true, res.getId(), res.getExpireAt());
                     }
+                    if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+                        for (ProductReservationLine line : res.getLines()) {
+                            var availability = line.getProductAvailability();
+                            if (availability != null) {
+                                availability.setProductQuantity(availability.getProductQuantity() + line.getQuantity());
+                                productAvailabilityRepository.save(availability);
+                            }
+                        }
 
-                    // Mark as rollback
-                    res.setStatus(ProductReservationStatus.ROLLBACK);
-                    releasedRes = productReservationRepository.save(res);
-                    log.info("Released reservation for ref {}. Status was {}", ref, res.getStatus());
+                        // Mark as rollback
+                        res.setStatus(ProductReservationStatus.ROLLBACK);
+                        releasedRes = productReservationRepository.save(res);
+                        log.info("Released reservation for ref {}. Status was {}", ref, res.getStatus());
+                    }
                 }
             }
             if (releasedRes != null) {
