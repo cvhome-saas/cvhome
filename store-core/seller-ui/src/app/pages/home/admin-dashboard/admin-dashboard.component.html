@@ -7,13 +7,15 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <input [formControl]="fromDateControl" [nbDatepicker]="fromDatePicker" [readOnly]="true" class="form-control has-person-icon inputText" fullWidth
+        <input [formControl]="fromDateControl" [nbDatepicker]="fromDatePicker" [readOnly]="true"
+               class="form-control has-person-icon inputText" fullWidth
                nbInput placeholder="Form Picker">
         <nb-datepicker #fromDatePicker (dateChange)="onFromDateChanged($event)"
                        [max]="fromMaxDates"/>
       </div>
       <div class="col col-lg-2">
-        <input [formControl]="toDateControl" [nbDatepicker]="toDatePicker" [readOnly]="true" class="form-control has-person-icon inputText" fullWidth
+        <input [formControl]="toDateControl" [nbDatepicker]="toDatePicker" [readOnly]="true"
+               class="form-control has-person-icon inputText" fullWidth
                nbInput placeholder="To Picker">
         <nb-datepicker #toDatePicker (dateChange)="onToDateChanged($event)" [max]="toMaxDates"/>
       </div>

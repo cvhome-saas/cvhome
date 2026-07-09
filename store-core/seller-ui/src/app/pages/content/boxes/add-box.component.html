@@ -41,7 +41,8 @@
                   <div class="form-group">
                     <label class="label " for="code">{{ 'CONTENT.CODE' | translate }} <span>*</span></label>
                     <div>
-                      <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control " formControlName='code'
+                      <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control "
+                             formControlName='code'
                              fullWidth
                              id="code"
                              nbInput placeholder="{{ 'COMMON.CODE' | translate}}"

@@ -16,21 +16,25 @@
 
     </div>
     <div class="d-flex justify-content-center">
-      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'" size="tiny"
-                status="warning">
+      <nb-alert
+        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'"
+        size="tiny"
+        status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
           {{ currentSubscriptionDetails.endDate }}
         </p>
       </nb-alert>
-      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
-                status="warning">
+      <nb-alert
+        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+        status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
         </p>
       </nb-alert>
-      <nb-alert *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
-                status="warning">
+      <nb-alert
+        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+        status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
         </p>
@@ -71,7 +75,8 @@
           </nb-card-body>
           <nb-card-footer>
             <div class="row justify-content-center">
-              <a [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan" [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
+              <a [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan"
+                 [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
                  size="medium"
                  status="primary">
                 {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}

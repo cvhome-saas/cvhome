@@ -11,7 +11,8 @@
       <div class="mb-2">{{ 'COMMON.DRAG_DROP' | translate }}</div>
       <div class="mb-2">{{ 'COMMON.OR' | translate }}</div>
 
-      <input #fileInput (change)="onFileSelected($event)" accept=".jpg, .png, .gif, .webp, .jpeg" multiple style="display: none"
+      <input #fileInput (change)="onFileSelected($event)" accept=".jpg, .png, .gif, .webp, .jpeg" multiple
+             style="display: none"
              type="file">
       <button (click)="fileInput.click()" nbButton status="primary">
         {{ 'COMMON.BROWSE_FILES' | translate }}

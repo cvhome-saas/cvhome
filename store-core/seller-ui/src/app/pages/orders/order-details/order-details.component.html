@@ -52,7 +52,8 @@
                       {{ 'ORDER_FORM.FIRST_NAME' | translate }}
                       <span>*</span>
                     </label>
-                    <input #firstName="ngModel" [(ngModel)]="billing.firstName" class="form-control " fullWidth id="billing_first_name"
+                    <input #firstName="ngModel" [(ngModel)]="billing.firstName" class="form-control " fullWidth
+                           id="billing_first_name"
                            name="firstName"
                            nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}" required
                            type="text">
@@ -64,7 +65,8 @@
                       {{ 'ORDER_FORM.LAST_NAME' | translate }}
                       <span>*</span>
                     </label>
-                    <input #lastName="ngModel" [(ngModel)]="billing.lastName" class="form-control " fullWidth id="billing_last_name"
+                    <input #lastName="ngModel" [(ngModel)]="billing.lastName" class="form-control " fullWidth
+                           id="billing_last_name"
                            name="lastName"
                            nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" required type="text">
                   </div>
@@ -77,7 +79,8 @@
                       {{ 'ORDER_FORM.STREET_ADDRESS' | translate }}
                       <span>*</span>
                     </label>
-                    <input #address="ngModel" [(ngModel)]="billing.address" class="form-control " fullWidth id="billing_address"
+                    <input #address="ngModel" [(ngModel)]="billing.address" class="form-control " fullWidth
+                           id="billing_address"
                            name="address"
                            nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}" required
                            type="text">
@@ -140,7 +143,8 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <label class="label ">{{ 'ORDER_FORM.EMAIL' | translate }}<span>*</span></label>
-                    <input #email="ngModel" [(ngModel)]="info.emailAddress" class="form-control " fullWidth id="billing_email"
+                    <input #email="ngModel" [(ngModel)]="info.emailAddress" class="form-control " fullWidth
+                           id="billing_email"
                            name="emailAddress"
                            nbInput pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]{2,}[.][a-zA-Z0-9-.]{2,}"
                            placeholder="{{'ORDER_FORM.EMAIL' | translate}}"
@@ -152,7 +156,8 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input #phone="ngModel" (keyup)="onPhoneChange()" [(ngModel)]="billing.phone" class="form-control " fullWidth
+                    <input #phone="ngModel" (keyup)="onPhoneChange()" [(ngModel)]="billing.phone" class="form-control "
+                           fullWidth
                            id="billing_phone"
                            maxlength=14 minlength=10
                            name="billing_phone"
@@ -184,7 +189,8 @@
                     <label class="label " for="shipping_first_name">
                       {{ 'ORDER_FORM.FIRST_NAME' |translate }}
                     </label>
-                    <input #firstName="ngModel" [(ngModel)]="shipping.firstName" class="form-control " fullWidth id="shipping_first_name"
+                    <input #firstName="ngModel" [(ngModel)]="shipping.firstName" class="form-control " fullWidth
+                           id="shipping_first_name"
                            name="shipping.firstName"
                            nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}"
                            type="text">
@@ -195,7 +201,8 @@
                     <label class="label " for="shipping_last_name">
                       {{ 'ORDER_FORM.LAST_NAME' |translate }}
                     </label>
-                    <input #lastName="ngModel" [(ngModel)]="shipping.lastName" class="form-control " fullWidth id="shipping_last_name"
+                    <input #lastName="ngModel" [(ngModel)]="shipping.lastName" class="form-control " fullWidth
+                           id="shipping_last_name"
                            name="shipping.lastName"
                            nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" type="text">
                   </div>
@@ -207,7 +214,8 @@
                     <label class="label " for="shipping_address">
                       {{ 'ORDER_FORM.STREET_ADDRESS' |translate }}
                     </label>
-                    <input #address="ngModel" [(ngModel)]="shipping.address" class="form-control " fullWidth id="shipping_address"
+                    <input #address="ngModel" [(ngModel)]="shipping.address" class="form-control " fullWidth
+                           id="shipping_address"
                            name="shipping.address"
                            nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}"
                            type="text">
@@ -218,7 +226,8 @@
                     <label class="label " for="shipping_city">
                       {{ 'ORDER_FORM.CITY' | translate }}
                     </label>
-                    <input #city="ngModel" [(ngModel)]="shipping.city" class="form-control " fullWidth id="shipping_city"
+                    <input #city="ngModel" [(ngModel)]="shipping.city" class="form-control " fullWidth
+                           id="shipping_city"
                            name="shipping.city"
                            nbInput placeholder="{{'ORDER_FORM.CITY' | translate}}" type="text">
                   </div>
@@ -269,7 +278,8 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input (keyup)="onShippingPhoneChange()" [(ngModel)]="shipping.phone" class="form-control " fullWidth
+                    <input (keyup)="onShippingPhoneChange()" [(ngModel)]="shipping.phone" class="form-control "
+                           fullWidth
                            id="shipping_phone"
                            maxlength=14
                            minlength=10 name="shipping_phone"
@@ -339,7 +349,8 @@
                 <textarea [(ngModel)]="statusFields.comments" class="txtArea" fullWidth name="comments" nbInput required
                           rows="3">
                            </textarea>
-                <button (click)="updateHistory()" [disabled]="statusFields.comments == '' || statusFields.status == ''" class="success_button lastBtn"
+                <button (click)="updateHistory()" [disabled]="statusFields.comments == '' || statusFields.status == ''"
+                        class="success_button lastBtn"
                         nbButton
                         status="success"
                         type="button">

@@ -35,7 +35,8 @@
         <label class="col-form-label ">
           {{ 'COMMON.CODE' | translate }}*
         </label>
-        <input (change)="checkCode($event)" [readOnly]="isReadonlyCode" class="form-control " formControlName='code' fullWidth
+        <input (change)="checkCode($event)" [readOnly]="isReadonlyCode" class="form-control " formControlName='code'
+               fullWidth
                id="code"
                nbInput
                required type="text">

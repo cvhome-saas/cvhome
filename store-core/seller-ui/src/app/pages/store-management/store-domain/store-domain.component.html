@@ -25,7 +25,8 @@
           <div class="col-md-12">
             <div class="form-group">
               <label class="label required" for="domain">{{ 'STORE.DOMAIN' | translate }}</label>
-              <input [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate" formControlName="domain" fullWidth id="domain" nbInput
+              <input [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate" formControlName="domain" fullWidth
+                     id="domain" nbInput
                      type="text">
               <ng-container *ngIf="(domain.dirty || domain.touched || isSubmited) && domain.invalid">
                 <p *ngIf="domain.errors?.required" class="caption status-danger">
@@ -99,7 +100,8 @@
           <button (click)="onAccess(row)" nbButton shape="round" size="small" status="success">
             <nb-icon icon="external-link"></nb-icon>
           </button>
-          <button (click)="onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round" size="small"
+          <button (click)="onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round"
+                  size="small"
                   status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>

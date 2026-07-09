@@ -36,7 +36,8 @@
               {{ 'STORE_FORM.STORE_NAME' |translate }}
               *</label>
             <div class="col-sm-12">
-              <input (change)="checkName($event)" [readOnly]="isReadonlyName" class="form-control " formControlName='name' fullWidth
+              <input (change)="checkName($event)" [readOnly]="isReadonlyName" class="form-control "
+                     formControlName='name' fullWidth
                      id="name"
                      nbInput placeholder="{{ 'STORE_FORM.STORE_NAME' | translate }}"
                      required type="text">
