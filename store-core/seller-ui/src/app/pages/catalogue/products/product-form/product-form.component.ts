@@ -4,7 +4,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 import {ManufactureService} from '../../brands/services/manufacture.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import moment from 'moment';
 import {NbRouteTab, NbToastrService} from '@nebular/theme';
 import {ProductService} from '../services/product.service';
 import {TranslateService} from '@ngx-translate/core';

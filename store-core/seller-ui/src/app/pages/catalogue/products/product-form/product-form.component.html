@@ -67,7 +67,8 @@
                   <div class="form-group">
                     <label class="col-form-label ">{{ 'PRODUCT.DATE_AVAILABLE' | translate }}</label>
                     <div>
-                      <input [nbDatepicker]="formpicker" [readOnly]="true" class="form-control" formControlName='dateAvailable'
+                      <input [nbDatepicker]="formpicker" [readOnly]="true" class="form-control"
+                             formControlName='dateAvailable'
                              fullWidth nbInput
                              placeholder="Form Picker">
                       <nb-datepicker #formpicker></nb-datepicker>
@@ -149,7 +150,8 @@
                           {{ ('LANG.' + currentLanguage) |translate }}
                           <span>*</span></label>
                         <div>
-                          <input (ngModelChange)="changeName($event, j)" class="form-control " formControlName='name' fullWidth
+                          <input (ngModelChange)="changeName($event, j)" class="form-control " formControlName='name'
+                                 fullWidth
                                  id="name" nbInput
                                  placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate }}"
                                  required type="text">

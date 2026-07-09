@@ -26,7 +26,8 @@
       <div class="form-group row mb-3">
         <label class="col-sm-2 col-form-label" for="code">{{ 'COMMON.CODE' | translate }} *</label>
         <div class="col-sm-10">
-          <input (blur)="checkCode($event)" [status]="(code.dirty || code.touched) ? (code.invalid || !isCodeUnique ? 'danger' : 'success') : 'basic'"
+          <input (blur)="checkCode($event)"
+                 [status]="(code.dirty || code.touched) ? (code.invalid || !isCodeUnique ? 'danger' : 'success') : 'basic'"
                  formControlName='code'
                  fullWidth
                  id="code"

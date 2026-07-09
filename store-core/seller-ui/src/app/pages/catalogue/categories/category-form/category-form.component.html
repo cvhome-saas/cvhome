@@ -11,7 +11,8 @@
         <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" *ngIf="!loader" [disabled]="!form.valid" [nbSpinner]="loader" nbButton nbSpinnerSize="large"
+        <button (click)="save()" *ngIf="!loader" [disabled]="!form.valid" [nbSpinner]="loader" nbButton
+                nbSpinnerSize="large"
                 nbSpinnerStatus="control" status="success"
                 type="submit">
           {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
@@ -56,7 +57,8 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label" for="code">Code *</label>
-                      <input (change)="checkCode($event)" [readOnly]="category.id" class="form-control" formControlName='code'
+                      <input (change)="checkCode($event)" [readOnly]="category.id" class="form-control"
+                             formControlName='code'
                              fullWidth
                              id="code"
                              nbInput placeholder="{{ 'COMMON.CODE' | translate}}"
@@ -132,7 +134,8 @@
                                   'DESCRIPTION_FORM.NAME' |
                                     translate
                                 }} *</label>
-                              <input (ngModelChange)="changeName($event, j)" class="form-control" formControlName='name' fullWidth
+                              <input (ngModelChange)="changeName($event, j)" class="form-control" formControlName='name'
+                                     fullWidth
                                      id="name" nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate}}"
                                      type="text">
@@ -172,7 +175,8 @@
                               <label class="label col-form-label" for="metaDescription">{{
                                   'DESCRIPTION_FORM.META_DESCRIPTION' | translate
                                 }}</label>
-                              <input class="form-control" formControlName='metaDescription' fullWidth id="metaDescription"
+                              <input class="form-control" formControlName='metaDescription' fullWidth
+                                     id="metaDescription"
                                      nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.META_DESCRIPTION' | translate}}"
                                      type="text">

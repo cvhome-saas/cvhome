@@ -8,7 +8,8 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button [disabled]="params.store==undefined||params.store==''" [routerLink]="['/pages/catalogue/products/create-product']" nbButton
+        <button [disabled]="params.store==undefined||params.store==''"
+                [routerLink]="['/pages/catalogue/products/create-product']" nbButton
                 status="success">
           <label>{{ 'COMPONENTS.CREATE_PRODUCT' | translate }}</label>
         </button>
