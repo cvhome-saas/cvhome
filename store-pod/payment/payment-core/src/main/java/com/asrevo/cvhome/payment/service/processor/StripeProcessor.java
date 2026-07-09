@@ -22,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 public class StripeProcessor implements PaymentProcessor {
 
     @Override
-    public PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request) {
+    public PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request,
+                                           Long transactionId) {
         RequestOptions requestOptions =
                 RequestOptions.builder()
                         .setApiKey(secret.getSecretKey())
@@ -30,8 +31,8 @@ public class StripeProcessor implements PaymentProcessor {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("https://example.com/success?orderId=" + request.orderId())
-                .setCancelUrl("https://example.com/cancel?orderId=" + request.orderId())
+                .setSuccessUrl(request.successUrl())
+                .setCancelUrl(request.cancelUrl())
                 .setExpiresAt(Instant.now()
                         .plusSeconds(paymentConfig.expireIn().toSeconds())
                         .getEpochSecond()
@@ -45,19 +46,24 @@ public class StripeProcessor implements PaymentProcessor {
                                                 .setUnitAmount(request.amount().longValue())
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Order #" + request.orderId())
+                                                                .setName("Order #" + request.ref())
                                                                 .build())
                                                 .build())
                                 .build())
-                .setClientReferenceId(request.orderId().toString())
+                .setClientReferenceId(transactionId.toString())
                 .build();
 
         try {
             Session session = Session.create(params, requestOptions);
-            return new PaymentResponse(PaymentStatus.PENDING, session.getUrl());
+            return PaymentResponse.builder()
+                    .status(PaymentStatus.PENDING)
+                    .redirectUrl(session.getUrl())
+                    .isRedirect(true)
+                    .externalId(session.getId())
+                    .build();
         } catch (Exception e) {
-            log.error("Error creating Stripe session for order {}", request.orderId(), e);
-            return new PaymentResponse(PaymentStatus.FAILED);
+            log.error("Error creating Stripe session for order {}", request.ref(), e);
+            return PaymentResponse.failed();
         }
     }
 }

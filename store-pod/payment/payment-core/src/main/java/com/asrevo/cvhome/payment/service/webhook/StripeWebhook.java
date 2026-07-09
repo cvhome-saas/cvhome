@@ -26,7 +26,7 @@ public class StripeWebhook implements PaymentWebhook {
     }
 
     @Override
-    public void handleFailedWebhook(Long orderId, StoreMerchantId store, String payload, Map<String, Object> headers,
+    public void handleFailedWebhook(Long transactionId, StoreMerchantId store, String payload, Map<String, Object> headers,
                                     PaymentConfiguration configuration) {
         log.info("Handling Stripe webhook for store {}", store);
 
@@ -35,8 +35,8 @@ public class StripeWebhook implements PaymentWebhook {
 
             if ("checkout.session.completed".equals(event.getType())) {
                 Session paymentIntent = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-                String orderIdStr = paymentIntent.getClientReferenceId();
-                log.info("Processing completed session for order ID: {}", orderIdStr);
+                String transactionIdStr = paymentIntent.getClientReferenceId();
+                log.info("Processing completed session for transaction ID: {}", transactionIdStr);
             }
         } catch (Exception e) {
             log.error("Error processing Stripe webhook for store {}", store, e);
@@ -44,15 +44,15 @@ public class StripeWebhook implements PaymentWebhook {
     }
 
     @Override
-    public void handleSuccessWebhook(Long orderId, StoreMerchantId store, String payload, Map<String, Object> headers,
+    public void handleSuccessWebhook(Long transactionId, StoreMerchantId store, String payload, Map<String, Object> headers,
                                      PaymentConfiguration configuration) {
         try {
             Event event = getEvent(payload, headers, configuration);
 
             if ("checkout.session.completed".equals(event.getType())) {
                 Session paymentIntent = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-                String orderIdStr = paymentIntent.getClientReferenceId();
-                log.info("Processing completed session for order ID: {}", orderIdStr);
+                String transactionIdStr = paymentIntent.getClientReferenceId();
+                log.info("Processing completed session for transaction ID: {}", transactionIdStr);
             }
         } catch (Exception e) {
             log.error("Error processing Stripe webhook for store {}", store, e);

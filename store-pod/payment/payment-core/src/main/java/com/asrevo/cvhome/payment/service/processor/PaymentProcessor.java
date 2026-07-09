@@ -6,5 +6,5 @@ import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 
 public interface PaymentProcessor {
-    PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request);
+    PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request, Long transactionId);
 }

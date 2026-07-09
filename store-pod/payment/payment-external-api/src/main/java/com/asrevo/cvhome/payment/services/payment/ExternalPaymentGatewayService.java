@@ -17,8 +17,8 @@ public interface ExternalPaymentGatewayService {
     PaymentResponse initiatePayment(StoreMerchantId store, @RequestBody PaymentRequest paymentRequest);
 
 
-    @GetExchange("/payments/{orderId}/status")
-    PaymentResponse status(StoreMerchantId store, @PathVariable("orderId") Long orderId);
+    @GetExchange("/payments/{ref}/status")
+    PaymentResponse status(StoreMerchantId store, @PathVariable("ref") String ref);
 
 
 }

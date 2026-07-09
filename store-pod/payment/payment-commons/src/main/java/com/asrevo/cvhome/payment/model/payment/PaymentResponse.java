@@ -7,19 +7,13 @@ public record PaymentResponse(
         PaymentStatus status,
         String redirectUrl,
         boolean isRedirect,
-        String externalId,
-        String clientSecret) {
-
+        String externalId) {
 
     public static PaymentResponse failed() {
-        return PaymentResponse.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+        return PaymentResponse.builder().status(PaymentStatus.FAILED).build();
     }
 
     public static PaymentResponse pending() {
-        return PaymentResponse.builder()
-                .status(PaymentStatus.PENDING)
-                .build();
+        return PaymentResponse.builder().status(PaymentStatus.PENDING).build();
     }
 }

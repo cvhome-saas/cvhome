@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum PaymentType {
 
-    COD("COD"), MANUAL_TRANSFER("MANUAL_TRANSFER"), PAYPAL("PAYPAL"), STRIPE("STRIPE");
+    COD("COD"), MANUAL_TRANSFER("MANUAL_TRANSFER"), STRIPE("STRIPE");
 
     private final String type;
 
