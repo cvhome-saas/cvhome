@@ -6,6 +6,9 @@ import java.time.Instant;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 
-public record PaymentRequest(Long orderId, BigDecimal amount, CurrencyCode currency, PaymentType paymentType, Instant expireAt) {
+import lombok.Builder;
 
+@Builder
+public record PaymentRequest(String ref, BigDecimal amount, CurrencyCode currency, PaymentType paymentType, Instant expireAt,
+                             String successUrl, String cancelUrl) {
 }

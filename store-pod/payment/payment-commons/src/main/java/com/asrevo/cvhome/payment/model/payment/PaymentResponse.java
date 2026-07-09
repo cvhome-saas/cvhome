@@ -1,18 +1,19 @@
 package com.asrevo.cvhome.payment.model.payment;
 
+import lombok.Builder;
+
+@Builder
 public record PaymentResponse(
         PaymentStatus status,
         String redirectUrl,
-        boolean isRedirect) {
-    public PaymentResponse(PaymentStatus status) {
-        this(status, null, false);
-    }
-
-    public PaymentResponse(PaymentStatus status, String redirectUrl) {
-        this(status, redirectUrl, true);
-    }
+        boolean isRedirect,
+        String externalId) {
 
     public static PaymentResponse failed() {
-        return new PaymentResponse(PaymentStatus.FAILED);
+        return PaymentResponse.builder().status(PaymentStatus.FAILED).build();
+    }
+
+    public static PaymentResponse pending() {
+        return PaymentResponse.builder().status(PaymentStatus.PENDING).build();
     }
 }

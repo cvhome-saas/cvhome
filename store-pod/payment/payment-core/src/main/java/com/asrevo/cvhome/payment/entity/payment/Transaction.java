@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,7 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
+import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
@@ -31,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @EntityListeners(value = AuditListener.class)
-@Table(name = "TRANSACTION")
+@Table(name = "TRANSACTION", uniqueConstraints = {
+        @UniqueConstraint(name = "UC_TRANSACTION_REF_STORE", columnNames = {"REF", "STORE_MERCHANT_ID"})
+})
 @Getter
 @Setter
 @Slf4j
@@ -55,11 +61,18 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "ORDER_ID")
-    private Long orderId;
+    @Column(name = "REF")
+    private String ref;
+
+    @Embedded
+    @AttributeOverride(name = "storeMerchantId", column = @Column(name = "STORE_MERCHANT_ID", length = 50))
+    private StoreMerchantId storeMerchantId;
 
     @Column(name = "AMOUNT")
     private BigDecimal amount;
+
+    @Column(name = "CURRENCY", length = 3)
+    private String currency;
 
     @Column(name = "TRANSACTION_DATE")
     private Instant transactionDate;
@@ -71,6 +84,28 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "PAYMENT_TYPE")
     @Enumerated(value = EnumType.STRING)
     private PaymentType paymentType;
+
+    @Column(name = "STATUS")
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
+    @Column(name = "EXTERNAL_ID")
+    private String externalId;
+
+    @Column(name = "REDIRECT_URL", length = 1000)
+    private String redirectUrl;
+
+    @Column(name = "SUCCESS_URL", length = 1000)
+    private String successUrl;
+
+    @Column(name = "CANCEL_URL", length = 1000)
+    private String cancelUrl;
+
+    @Column(name = "EXPIRE_AT")
+    private Instant expireAt;
+
+    @Column(name = "RETRY_COUNT")
+    private Integer retryCount = 0;
 
     @Column(name = "DETAILS", columnDefinition = "text")
     private String details;

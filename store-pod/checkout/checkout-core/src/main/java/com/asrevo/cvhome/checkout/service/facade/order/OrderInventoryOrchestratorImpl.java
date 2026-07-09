@@ -3,7 +3,6 @@ package com.asrevo.cvhome.checkout.service.facade.order;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
@@ -37,7 +36,7 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
         try {
             return externalProductReservationService.reserve(store, order.getId().toString(), toProductReservationList(order));
         } catch (Exception _) {
-            return new ProductReservationResult(false);
+            return ProductReservationResult.builder().status(false).build();
         }
     }
 

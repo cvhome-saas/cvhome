@@ -45,15 +45,15 @@ public class ExternalPaymentGatewayApi implements ExternalPaymentGatewayService 
         return paymentGatewayService.initiatePayment(store, paymentRequest);
     }
 
-    @GetMapping("/payments/{orderId}/status")
+    @GetMapping("/payments/{ref}/status")
     @Operation(method = "GET", description = "Payment Status",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentResponse.class))))
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @Override
-    public PaymentResponse status(StoreMerchantId store, @PathVariable("orderId") Long orderId) {
-        return paymentGatewayService.status(store, orderId);
+    public PaymentResponse status(StoreMerchantId store, @PathVariable("ref") String ref) {
+        return paymentGatewayService.status(store, ref);
     }
 
 
