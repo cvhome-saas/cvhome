@@ -3,14 +3,14 @@ package com.asrevo.cvhome.catalog.repositories.product.availability;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.LockModeType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-
-import jakarta.persistence.LockModeType;
 
 public interface ProductAvailabilityRepository extends JpaRepository<ProductAvailability, Long> {
 

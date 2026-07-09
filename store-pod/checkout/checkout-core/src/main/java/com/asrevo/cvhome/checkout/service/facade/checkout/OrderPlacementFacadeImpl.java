@@ -108,20 +108,22 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     private PaymentResponse doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
         try {
-            PaymentRequest paymentRequest = new PaymentRequest(
-                    modelOrder.getId(),
-                    modelOrder.getTotal(),
-                    modelOrder.getCurrency(),
-                    modelOrder.getPaymentType(),
-                    result.expireAt()
-            );
+            PaymentRequest paymentRequest = PaymentRequest.builder()
+                    .ref(modelOrder.getId().toString())
+                    .amount(modelOrder.getTotal())
+                    .currency(modelOrder.getCurrency())
+                    .paymentType(modelOrder.getPaymentType())
+                    .expireAt(result.expireAt())
+                    .build();
 
             log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
             return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
 
         } catch (Exception e) {
             log.error("Payment initiation error for order {}. Setting status to PENDING for reconciliation.", modelOrder.getId(), e);
-            return new PaymentResponse(com.asrevo.cvhome.payment.model.payment.PaymentStatus.PENDING, null, false);
+            return PaymentResponse.builder()
+                    .status(com.asrevo.cvhome.payment.model.payment.PaymentStatus.PENDING)
+                    .build();
         }
     }
 }

@@ -46,9 +46,10 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                                                                  ProductReservationStatus status) {
         try {
             ProductReservation reservation = doReserveWithStatus(store, ref, productReservation, status);
-            return new ProductReservationResult(true, reservation.getId(), reservation.getExpireAt());
+            return ProductReservationResult.builder().status(true).reservationId(reservation.getId()).expireAt(reservation.getExpireAt())
+                    .build();
         } catch (ServiceException _) {
-            return new ProductReservationResult(false);
+            return ProductReservationResult.builder().status(false).build();
         }
     }
 
@@ -122,13 +123,15 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 if (Objects.equals(res.getStoreMerchantId(), store)) {
                     if (res.getStatus() == ProductReservationStatus.COMPLETED) {
                         log.info("Reservation for ref {} already committed", ref);
-                        return new ProductReservationResult(true, res.getId(), res.getExpireAt());
+                        return ProductReservationResult.builder().status(true).reservationId(res.getId()).expireAt(res.getExpireAt())
+                                .build();
                     }
                     if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
                         if (res.getExpireAt().isBefore(Instant.now())) {
                             log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
                             // Optional: auto-release here or leave for cleanup service
-                            return new ProductReservationResult(false, res.getId(), res.getExpireAt());
+                            return ProductReservationResult.builder().status(false).reservationId(res.getId()).expireAt(res.getExpireAt())
+                                    .build();
                         }
 
                         res.setStatus(ProductReservationStatus.COMPLETED);
@@ -138,12 +141,13 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 }
             }
             if (committedRes != null) {
-                return new ProductReservationResult(true, committedRes.getId(), committedRes.getExpireAt());
+                return ProductReservationResult.builder().status(true).reservationId(committedRes.getId())
+                        .expireAt(committedRes.getExpireAt()).build();
             }
-            return new ProductReservationResult(false, null, null);
+            return ProductReservationResult.builder().status(false).build();
         } catch (Exception e) {
             log.error("Error committing reservation for ref {}", ref, e);
-            return new ProductReservationResult(false, null, null);
+            return ProductReservationResult.builder().status(false).build();
         }
     }
 
@@ -158,7 +162,8 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 if (Objects.equals(res.getStoreMerchantId(), store)) {
                     if (res.getStatus() == ProductReservationStatus.ROLLBACK) {
                         log.info("Reservation for ref {} already released", ref);
-                        return new ProductReservationResult(true, res.getId(), res.getExpireAt());
+                        return ProductReservationResult.builder().status(true).reservationId(res.getId()).expireAt(res.getExpireAt())
+                                .build();
                     }
                     if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
                         for (ProductReservationLine line : res.getLines()) {
@@ -177,12 +182,13 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 }
             }
             if (releasedRes != null) {
-                return new ProductReservationResult(true, releasedRes.getId(), releasedRes.getExpireAt());
+                return ProductReservationResult.builder().status(true).reservationId(releasedRes.getId())
+                        .expireAt(releasedRes.getExpireAt()).build();
             }
-            return new ProductReservationResult(false, null, null);
+            return ProductReservationResult.builder().status(false).build();
         } catch (Exception e) {
             log.error("Error releasing reservation for ref {}", ref, e);
-            return new ProductReservationResult(false, null, null);
+            return ProductReservationResult.builder().status(false).build();
         }
     }
 
