@@ -121,9 +121,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
         } catch (Exception e) {
             log.error("Payment initiation error for order {}. Setting status to PENDING for reconciliation.", modelOrder.getId(), e);
-            return PaymentResponse.builder()
-                    .status(com.asrevo.cvhome.payment.model.payment.PaymentStatus.PENDING)
-                    .build();
+            return PaymentResponse.pending();
         }
     }
 }
