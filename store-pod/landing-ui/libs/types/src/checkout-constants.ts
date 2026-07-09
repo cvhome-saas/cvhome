@@ -1,8 +1,7 @@
+import {PaymentType} from "./checkout-cart";
+
 export const defaultCheckoutValue = {
-    payment: {
-        paymentType: "COD",
-        transactionType: "INIT",
-    },
+    paymentType: PaymentType.COD,
     customer: {
         emailAddress: "",
         billing: {

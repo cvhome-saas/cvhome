@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
+import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
@@ -25,7 +26,7 @@ import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableOrderTotal;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCartItem;
-import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
+import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
@@ -41,18 +42,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, ReadableShoppingCart> {
 
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
+    private final OrderService orderService;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
     private final ExternalProductService externalProductService;
 
-    public ReadableShoppingCartMapper(ShoppingCartCalculationService shoppingCartCalculationService,
-                                      ExternalMerchantStoreService externalMerchantStoreService,
-                                      ExternalProductService externalProductService) {
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
+    public ReadableShoppingCartMapper(
+            ExternalMerchantStoreService externalMerchantStoreService,
+            ExternalProductService externalProductService, OrderService orderService) {
         this.externalMerchantStoreService = externalMerchantStoreService;
         this.externalProductService = externalProductService;
+        this.orderService = orderService;
     }
 
     @Override
@@ -117,7 +118,10 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
             // OrdetTotalSummary contains all calculations
 
-            OrderTotalSummary orderSummary = shoppingCartCalculationService.calculate(source, store, language);
+            OrderSummary summary = new OrderSummary();
+            summary.setProducts(new ArrayList<>(source.getLineItems()));
+
+            OrderTotalSummary orderSummary = orderService.calculateOrderTotal(summary, store);
 
             if (CollectionUtils.isNotEmpty(orderSummary.getTotals())) {
 

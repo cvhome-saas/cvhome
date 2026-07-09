@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
-import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.service.facade.checkout.OrderPlacementFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
@@ -53,15 +53,19 @@ public class OrderApi {
 
     private final OrderFacade orderFacade;
 
+    private final OrderPlacementFacade orderPlacementFacade;
+
     private final ShoppingCartService shoppingCartService;
 
     private final CustomerFacade customerFacade;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public OrderApi(OrderFacade orderFacade, ShoppingCartService shoppingCartService, CustomerFacade customerFacade,
+    public OrderApi(OrderFacade orderFacade, OrderPlacementFacade orderPlacementFacade, ShoppingCartService shoppingCartService,
+                    CustomerFacade customerFacade,
                     ExternalMerchantStoreService externalMerchantStoreService) {
         this.orderFacade = orderFacade;
+        this.orderPlacementFacade = orderPlacementFacade;
         this.shoppingCartService = shoppingCartService;
         this.customerFacade = customerFacade;
         this.externalMerchantStoreService = externalMerchantStoreService;
@@ -112,10 +116,10 @@ public class OrderApi {
                     .orElseThrow(() -> new ServiceRuntimeException(
                             "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
-            Order modelOrder = orderFacade.processOrder(order, customer, merchantStore, language,
+            var processOrder = orderPlacementFacade.placeOrder(order, customer, merchantStore, language,
                     LocaleUtils.getLocale(language));
 
-            return orderFacade.orderConfirmation(modelOrder, customer, merchantStore, language);
+            return orderFacade.orderConfirmation(processOrder.order(), customer, merchantStore, language);
 
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error during checkout", e);

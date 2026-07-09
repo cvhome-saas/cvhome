@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
@@ -13,13 +12,15 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public interface OrderFacade {
 
-    Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                       Locale locale) throws ServiceException;
+    Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language) throws ServiceException;
 
     ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
                                                 LanguageCode language);
@@ -38,4 +39,5 @@ public interface OrderFacade {
 
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
 
+    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
 }

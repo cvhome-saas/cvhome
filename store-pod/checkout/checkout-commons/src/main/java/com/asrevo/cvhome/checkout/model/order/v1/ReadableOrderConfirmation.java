@@ -7,6 +7,7 @@ import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableTotal;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,7 @@ public class ReadableOrderConfirmation extends Entity {
 
     private String shipping;
 
-    private String payment;
+    private PaymentType payment;
 
     private ReadableTotal total;
 

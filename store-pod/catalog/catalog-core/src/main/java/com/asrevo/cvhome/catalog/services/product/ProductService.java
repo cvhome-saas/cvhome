@@ -9,10 +9,8 @@ import org.springframework.data.domain.Page;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
@@ -44,9 +42,6 @@ public interface ProductService extends SalesManagerEntityService<Long, Product>
      * Find a product for a specific merchant
      */
     Product findOne(Long id, StoreMerchantId merchant);
-
-    ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
-            throws ServiceException;
 
     Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
 

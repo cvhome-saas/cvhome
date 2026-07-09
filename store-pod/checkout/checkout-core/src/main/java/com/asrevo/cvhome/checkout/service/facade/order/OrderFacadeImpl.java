@@ -1,23 +1,18 @@
 package com.asrevo.cvhome.checkout.service.facade.order;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
@@ -37,7 +32,6 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
-import com.asrevo.cvhome.checkout.model.payments.Payment;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.mapper.customer.ReadableCustomerMapper;
@@ -47,9 +41,7 @@ import com.asrevo.cvhome.checkout.service.populator.order.OrderProductPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.PersistableOrderApiPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderPopulator;
 import com.asrevo.cvhome.checkout.service.populator.order.ReadableOrderProductPopulator;
-import com.asrevo.cvhome.checkout.service.populator.order.transaction.PersistablePaymentPopulator;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
-import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartCalculationService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -57,12 +49,11 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,8 +73,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final OrderService orderService;
 
-    private final ExternalProductReservationService externalProductReservationService;
-
     private final PersistableOrderApiPopulator persistableOrderApiPopulator;
 
     private final CustomerFacade customerFacade;
@@ -96,47 +85,54 @@ public class OrderFacadeImpl implements OrderFacade {
 
     private final ReadableOrderPopulator readableOrderPopulator;
 
-    private final ShoppingCartCalculationService shoppingCartCalculationService;
-
-    private final PersistablePaymentPopulator paymentPopulator;
-
     private final OrderProductPopulator orderProductPopulator;
+
     private final ReadableOrderProductPopulator readableOrderProductPopulator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
                            OrderService orderService,
-                           ExternalProductReservationService externalProductReservationService,
                            PersistableOrderApiPopulator persistableOrderApiPopulator,
                            ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
                            ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
                            ReadableOrderPopulator readableOrderPopulator,
-                           ShoppingCartCalculationService shoppingCartCalculationService,
-                           PersistablePaymentPopulator paymentPopulator,
                            OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
-        this.externalProductReservationService = externalProductReservationService;
         this.persistableOrderApiPopulator = persistableOrderApiPopulator;
         this.readableOrderProductMapper = readableOrderProductMapper;
         this.customerFacade = customerFacade;
         this.readableCustomerMapper = readableCustomerMapper;
         this.readableOrderTotalMapper = readableOrderTotalMapper;
         this.readableOrderPopulator = readableOrderPopulator;
-        this.shoppingCartCalculationService = shoppingCartCalculationService;
-        this.paymentPopulator = paymentPopulator;
         this.orderProductPopulator = orderProductPopulator;
         this.readableOrderProductPopulator = readableOrderProductPopulator;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Order processOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                              Locale locale) throws ServiceException {
-
+    public Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language)
+            throws ServiceException {
         try {
 
+            Long shoppingCartId = order.getShoppingCartId();
+
+            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
+
+            if (cart == null) {
+                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
+            }
+
+            Optional<Order> previousOrder =
+                    orderService.findOrderByShoppingCartCodeAndStoreMerchantId(cart.getShoppingCartCode(), store);
+
+            if (previousOrder.isPresent()) {
+                log.info("Returning existing order {} for shopping cart code {}", previousOrder.get().getId(), cart.getShoppingCartCode());
+                return previousOrder.get();
+            }
+
             Order modelOrder = new Order();
+
             persistableOrderApiPopulator.populate(order, modelOrder, store, language);
 
             modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
@@ -147,17 +143,7 @@ public class OrderFacadeImpl implements OrderFacade {
             Billing billing = customer.getBilling();
             modelOrder.setBilling(billing);
 
-            Long shoppingCartId = order.getShoppingCartId();
-            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
-
-            if (cart == null) {
-                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
-            }
-            OrderTotalSummary calculate = shoppingCartCalculationService.calculate(cart, customer, store, language);
-            order.getPayment().setAmount(calculate.getTotal().toString());
-            Set<ShoppingCartItem> shoppingCartItems = cart.getLineItems();
-
-            List<ShoppingCartItem> items = new ArrayList<>(shoppingCartItems);
+            List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
 
             Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 
@@ -171,32 +157,12 @@ public class OrderFacadeImpl implements OrderFacade {
             modelOrder.setOrderProducts(orderProducts);
 
             OrderSummary orderSummary = new OrderSummary();
-            List<ShoppingCartItem> itemsSet = new ArrayList<>(cart.getLineItems());
-            orderSummary.setProducts(itemsSet);
 
-            OrderTotalSummary orderTotalSummary = orderService.caculateOrderTotal(orderSummary, customer, store,
-                    language);
+            orderSummary.setProducts(shoppingCartItems);
 
-            if (order.getPayment().getAmount() == null) {
-                throw new ConversionException("Requires Payment.amount");
-            }
+            OrderTotalSummary orderTotalSummary = orderService.calculateOrderTotal(orderSummary, store);
 
-            String submitedAmount = order.getPayment().getAmount();
-
-            BigDecimal formattedSubmittedAmount = PriceUtils.getAmount(submitedAmount);
-
-            BigDecimal calculatedAmount = orderTotalSummary.getTotal();
-            String strCalculatedTotal = calculatedAmount.toPlainString();
-
-            // compare both prices
-            if (calculatedAmount.compareTo(formattedSubmittedAmount) != 0) {
-
-                throw new ConversionException(
-                        "Payment.amount does not match what the system has calculated " + strCalculatedTotal
-                                + " (received " + submitedAmount + ") please recalculate the order and submit again");
-            }
-
-            modelOrder.setTotal(calculatedAmount);
+            modelOrder.setTotal(orderTotalSummary.getTotal());
             List<OrderTotal> totals = orderTotalSummary.getTotals();
             Set<OrderTotal> set = new HashSet<>();
 
@@ -208,35 +174,17 @@ public class OrderFacadeImpl implements OrderFacade {
             }
             modelOrder.setOrderTotal(set);
 
-            Payment paymentModel = new Payment();
-            paymentPopulator.populate(order.getPayment(), paymentModel, store, language);
-
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
+            modelOrder = orderService.process(modelOrder, customer, shoppingCartItems, orderTotalSummary, store);
 
-            // order service
-            modelOrder = orderService.process(modelOrder, customer, items, orderTotalSummary, paymentModel, null, store);
-
-            // Reserve inventory
-            log.debug("Update inventory");
-            ProductReservationList productReservation = modelOrder.getOrderProducts()
-                    .stream()
-                    .map(it -> new ReserveProductEntry(it.getSku(), it.getProductQuantity()))
-                    .collect(Collectors.collectingAndThen(Collectors.toSet(), ProductReservationList::new));
-
-            ProductReservationStatus reservationStatus = externalProductReservationService.reserve(store,
-                    productReservation);
-            if (!reservationStatus.status()) {
-                throw new ServiceException("error updating inventory with new qty");
-            }
-
-            // update cart
+            modelOrder.setStatus(OrderStatus.CREATED);
+            modelOrder.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
+            modelOrder.setPaymentStatus(PaymentStatus.PENDING);
+            orderService.save(modelOrder);
             cart.setOrderId(modelOrder.getId());
             shoppingCartFacade.saveOrUpdateShoppingCart(cart);
 
             return modelOrder;
-
-        } catch (ServiceException e) {
-            throw e;
         } catch (Exception e) {
             throw new ServiceException(e);
         }
@@ -274,10 +222,6 @@ public class OrderFacadeImpl implements OrderFacade {
                 .map(pr -> readableOrderProductMapper.convert(pr, store, language))
                 .toList();
         orderConfirmation.setProducts(products);
-
-        if (order.getPaymentType() != null) {
-            orderConfirmation.setPayment(order.getPaymentType().name());
-        }
 
         orderConfirmation.setId(order.getId());
 
@@ -458,4 +402,8 @@ public class OrderFacadeImpl implements OrderFacade {
         }
     }
 
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
+        orderService.updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus);
+    }
 }

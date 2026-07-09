@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
+import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
 @Configuration
@@ -14,6 +15,8 @@ public class ClientsConfig {
     private static final String CATALOG_SERVICE_NAME = "catalog";
 
     private static final String MERCHANT_SERVICE_NAME = "merchant";
+
+    private static final String PAYMENT_SERVICE_NAME = "payment";
 
     @Bean
     public ExternalMerchantStoreService externalMerchantStoreService(RestClientBuilder restClientBuilder) {
@@ -32,6 +35,11 @@ public class ClientsConfig {
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class);
+    }
+
+    @Bean
+    public ExternalPaymentGatewayService externalPaymentGatewayService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class);
     }
 
 }

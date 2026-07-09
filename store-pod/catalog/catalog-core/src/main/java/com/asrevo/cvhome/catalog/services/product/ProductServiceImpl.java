@@ -5,21 +5,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
@@ -32,8 +28,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
-import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
@@ -184,29 +178,6 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return productRepository.getById(id, merchant);
     }
 
-    @Transactional
-    @Override
-    public ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
-            throws ServiceException {
-        if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
-            throw new ServiceException("Cannot update product availability because no new availabilities exists");
-        }
-
-        for (ReserveProductEntry entry : productReservation.entries()) {
-            Product product = productRepository
-                    .getByProductIdFetchAvailabilities(findProductIdByCode(entry.sku(), store), store);
-            for (ProductAvailability availability : product.getAvailabilities()) {
-                int qty = availability.getProductQuantity();
-                if (qty < entry.reserveQty()) {
-                    throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
-                }
-                qty = qty - entry.reserveQty();
-                availability.setProductQuantity(qty);
-            }
-            productRepository.save(product);
-        }
-        return new ProductReservationStatus(true);
-    }
 
     @Override
     public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
