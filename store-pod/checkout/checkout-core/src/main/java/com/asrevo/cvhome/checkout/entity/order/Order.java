@@ -33,6 +33,8 @@ import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.converter.LocaleConverter;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
@@ -66,6 +68,14 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "ORDER_STATUS")
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status;
+
+    @Column(name = "INVENTORY_STATUS")
+    @Enumerated(value = EnumType.STRING)
+    private InventoryStatus inventoryStatus;
+
+    @Column(name = "PAYMENT_STATUS")
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
     @Column(name = "LAST_MODIFIED")
     private Instant lastModified;

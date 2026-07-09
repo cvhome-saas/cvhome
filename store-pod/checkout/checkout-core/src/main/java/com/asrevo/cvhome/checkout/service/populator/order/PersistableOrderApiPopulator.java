@@ -13,6 +13,8 @@ import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
@@ -48,7 +50,9 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             target.setChannel(OrderChannel.API);
             // need this
             target.setPaymentType(source.getPaymentType());
-            target.setStatus(OrderStatus.ORDERED);
+            target.setStatus(OrderStatus.CREATED);
+            target.setInventoryStatus(InventoryStatus.RESERVED);
+            target.setPaymentStatus(PaymentStatus.PENDING);
 
             target.setCustomerAgreement(source.isCustomerAgreement());
             target.setConfirmedAddress(true);

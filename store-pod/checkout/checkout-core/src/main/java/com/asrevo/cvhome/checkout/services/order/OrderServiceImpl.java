@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,8 @@ import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
@@ -87,8 +88,10 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
             if (status == null) {
-                status = OrderStatus.ORDERED;
+                status = OrderStatus.CREATED;
                 order.setStatus(status);
+                order.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
+                order.setPaymentStatus(PaymentStatus.PENDING);
             }
             Set<OrderStatusHistory> statusHistorySet = new HashSet<>();
             OrderStatusHistory statusHistory = new OrderStatusHistory();
@@ -149,26 +152,27 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public List<Order> findPendingOnlinePaymentOrders() {
-        OrderCriteria criteria = new OrderCriteria();
-        criteria.setStatus(OrderStatus.PENDING_PAYMENT.name());
-        return orderRepository.listOrders(null, criteria, Pageable.unpaged()).getContent();
-    }
-
-    @Override
     @Transactional
-    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
-            order.setStatus(newStatus);
-            // Add to history
-            OrderStatusHistory statusHistory = new OrderStatusHistory();
-            statusHistory.setStatus(newStatus);
-            statusHistory.setDateAdded(Instant.now());
-            statusHistory.setOrder(order);
-            order.getOrderHistory().add(statusHistory);
+            if (orderStatus != null) {
+                order.setStatus(orderStatus);
+                // Add to history
+                OrderStatusHistory statusHistory = new OrderStatusHistory();
+                statusHistory.setStatus(orderStatus);
+                statusHistory.setDateAdded(Instant.now());
+                statusHistory.setOrder(order);
+                order.getOrderHistory().add(statusHistory);
+            }
+            if (inventoryStatus != null) {
+                order.setInventoryStatus(inventoryStatus);
+            }
+            if (paymentStatus != null) {
+                order.setPaymentStatus(paymentStatus);
+            }
             orderRepository.save(order);
-            log.info("Order {} status updated to {}", orderId, newStatus);
+            log.info("Order {} status updated: status={}, inventory={}, payment={}", orderId, orderStatus, inventoryStatus, paymentStatus);
         } else {
             log.warn("Attempted to update status for non-existent order {}", orderId);
         }

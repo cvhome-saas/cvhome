@@ -15,6 +15,10 @@ public class OrderCriteria extends Criteria {
 
     private String status;
 
+    private String inventoryStatus;
+
+    private String paymentStatus;
+
     private Long id;
 
     private Long customerId;

@@ -233,15 +233,41 @@ create table if not exists checkout.orders
             (order_status):: text = ANY (
                 (
                     ARRAY [
-                        'ORDERED' :: character varying,
-                        'PROCESSED' :: character varying,
+                        'CREATED' :: character varying,
+                        'PROCESSING' :: character varying,
+                        'SHIPPED' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying,
-                        'CANCELED' :: character varying,
-                        'PENDING_PAYMENT' :: character varying,
+                        'COMPLETED' :: character varying,
+                        'CANCELLED' :: character varying,
+                        'RETURNED' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+    inventory_status        varchar(255)
+        constraint orders_inventory_status_check check (
+            (inventory_status):: text = ANY (
+                (
+                    ARRAY [
+                        'NOT_REQUESTED' :: character varying,
+                        'RESERVED' :: character varying,
+                        'COMMITTED' :: character varying,
+                        'RELEASED' :: character varying,
+                        'RESERVATION_FAILED' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+    payment_status          varchar(255)
+        constraint orders_payment_status_check check (
+            (payment_status):: text = ANY (
+                (
+                    ARRAY [
+                        'PENDING' :: character varying,
                         'PAID' :: character varying,
                         'FAILED' :: character varying,
-                        'EXPIRED' :: character varying
+                        'AUTHORIZED' :: character varying,
+                        'REFUNDED' :: character varying
                         ]
                     ):: text[]
                 )
@@ -358,15 +384,13 @@ create table if not exists checkout.order_status_history
             (status):: text = ANY (
                 (
                     ARRAY [
-                        'ORDERED' :: character varying,
-                        'PROCESSED' :: character varying,
+                        'CREATED' :: character varying,
+                        'PROCESSING' :: character varying,
+                        'SHIPPED' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying,
-                        'CANCELED' :: character varying,
-                        'PENDING_PAYMENT' :: character varying,
-                        'PAID' :: character varying,
-                        'FAILED' :: character varying,
-                        'EXPIRED' :: character varying
+                        'COMPLETED' :: character varying,
+                        'CANCELLED' :: character varying,
+                        'RETURNED' :: character varying
                         ]
                     ):: text[]
                 )

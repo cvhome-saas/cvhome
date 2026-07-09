@@ -13,6 +13,8 @@ import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus; // Import OrderStatus
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
@@ -30,9 +32,7 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
 
     Page<Order> getOrders(OrderCriteria criteria, StoreMerchantId store);
 
-    List<Order> findPendingOnlinePaymentOrders();
-
-    void updateOrderStatus(Long orderId, OrderStatus newStatus);
+    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
 
     Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
 }

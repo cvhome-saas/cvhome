@@ -49,8 +49,9 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
@@ -176,10 +177,9 @@ public class OrderFacadeImpl implements OrderFacade {
             modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
             modelOrder = orderService.process(modelOrder, customer, shoppingCartItems, orderTotalSummary, store);
 
-            modelOrder.setStatus(OrderStatus.PENDING_PAYMENT);
-            if (PaymentType.COD.equals(order.getPaymentType())) {
-                modelOrder.setStatus(OrderStatus.ORDERED);
-            }
+            modelOrder.setStatus(OrderStatus.CREATED);
+            modelOrder.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
+            modelOrder.setPaymentStatus(PaymentStatus.PENDING);
             orderService.save(modelOrder);
             cart.setOrderId(modelOrder.getId());
             shoppingCartFacade.saveOrUpdateShoppingCart(cart);
@@ -403,12 +403,7 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public List<Order> findPendingOnlinePaymentOrders() {
-        return orderService.findPendingOnlinePaymentOrders();
-    }
-
-    @Override
-    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        orderService.updateOrderStatus(orderId, newStatus);
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
+        orderService.updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus);
     }
 }
