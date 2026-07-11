@@ -31,7 +31,7 @@ public class StripeProcessor implements PaymentProcessor {
 
     @Override
     public PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
-                                          Long transactionId) {
+                                          Long transactionId) throws FailedPaymentInitiate {
         RequestOptions requestOptions =
                 RequestOptions.builder()
                         .setApiKey(secret.getSecretKey())
