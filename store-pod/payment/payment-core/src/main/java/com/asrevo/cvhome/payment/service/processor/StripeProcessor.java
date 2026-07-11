@@ -1,16 +1,24 @@
 package com.asrevo.cvhome.payment.service.processor;
 
-import java.time.Instant;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
-import com.asrevo.cvhome.payment.model.payment.DefaultPaymentConfig;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
+import com.asrevo.cvhome.payment.model.payment.WebhookResult;
+import com.asrevo.cvhome.payment.service.processor.exception.FailedPaymentInitiate;
+import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
+import com.asrevo.cvhome.payment.service.processor.exception.InvalidWebhookPayload;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
+import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 public class StripeProcessor implements PaymentProcessor {
 
     @Override
-    public PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request,
-                                           Long transactionId) {
+    public PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
+                                          Long transactionId) {
         RequestOptions requestOptions =
                 RequestOptions.builder()
                         .setApiKey(secret.getSecretKey())
@@ -33,10 +41,7 @@ public class StripeProcessor implements PaymentProcessor {
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(request.successUrl())
                 .setCancelUrl(request.cancelUrl())
-                .setExpiresAt(Instant.now()
-                        .plusSeconds(paymentConfig.expireIn().toSeconds())
-                        .getEpochSecond()
-                )
+                .setExpiresAt(request.expireAt().getEpochSecond())
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity(1L)
@@ -55,16 +60,71 @@ public class StripeProcessor implements PaymentProcessor {
 
         try {
             Session session = Session.create(params, requestOptions);
-            return PaymentResponse.builder()
-                    .status(PaymentStatus.PENDING)
+            return PaymentInitiateResult.builder()
                     .redirectUrl(session.getUrl())
-                    .isRedirect(true)
                     .externalId(session.getId())
                     .build();
-        } catch (Exception e) {
-            log.error("Error creating Stripe session for order {}", request.ref(), e);
-            return PaymentResponse.failed();
+
+        } catch (StripeException e) {
+            throw new FailedPaymentInitiate(e.getMessage(), e);
+        }
+
+    }
+
+    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
+            throws SignatureVerificationException {
+        String sigHeader = headers.get("stripe-signature");
+        if (sigHeader == null) {
+            sigHeader = headers.get("Stripe-Signature");
+        }
+        return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
+    }
+
+    @Override
+    public WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
+                                       PaymentConfiguration configuration) {
+        log.info("Handling Stripe webhook for store {}", storeMerchantId);
+        Event event;
+        try {
+
+            event = getEvent(payload, headers, configuration);
+        } catch (SignatureVerificationException e) {
+            log.error("Signature verification failed for Stripe webhook", e);
+            throw new InvalidWebhookPayload(e.getMessage(), e);
+        }
+
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
+            Long transactionId = getTransactionId(session);
+            log.info("Processing successful Stripe session for transaction ID: {}", transactionId);
+            return WebhookResult.builder()
+                    .transactionId(transactionId)
+                    .status(PaymentStatus.PAID)
+                    .build();
+        } else if ("checkout.session.expired".equals(event.getType()) || "payment_intent.payment_failed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
+            Long transactionId = getTransactionId(session);
+            log.info("Processing failed Stripe session for transaction ID: {}", transactionId);
+            return WebhookResult.builder()
+                    .transactionId(transactionId)
+                    .status(PaymentStatus.FAILED)
+                    .build();
+        }
+        return WebhookResult.builder().build();
+    }
+
+    private static Long getTransactionId(Session session) {
+        String transactionIdStr = session.getClientReferenceId();
+        if (transactionIdStr == null) {
+            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
+        }
+        try {
+            return Long.valueOf(transactionIdStr);
+        } catch (NumberFormatException _) {
+            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
         }
     }
+
+
 }
 

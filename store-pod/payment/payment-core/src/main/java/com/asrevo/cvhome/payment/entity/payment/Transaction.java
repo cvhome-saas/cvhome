@@ -104,9 +104,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "EXPIRE_AT")
     private Instant expireAt;
 
-    @Column(name = "RETRY_COUNT")
-    private Integer retryCount = 0;
-
     @Column(name = "DETAILS", columnDefinition = "text")
     private String details;
 

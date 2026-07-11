@@ -1,10 +1,20 @@
 package com.asrevo.cvhome.payment.service.processor;
 
+import java.util.Map;
+
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
-import com.asrevo.cvhome.payment.model.payment.DefaultPaymentConfig;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.model.payment.WebhookResult;
+import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
+import com.stripe.exception.SignatureVerificationException;
 
 public interface PaymentProcessor {
-    PaymentResponse initiatePayment(DefaultPaymentConfig paymentConfig, PaymentSecret secret, PaymentRequest request, Long transactionId);
+    PaymentInitiateResult initiate( PaymentSecret secret, PaymentRequest request,
+                                   Long transactionId);
+
+    WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers, PaymentConfiguration config)
+            throws InvalidPaymentReferenceId, SignatureVerificationException;
+
 }
