@@ -70,7 +70,7 @@ public class PaymentGatewayService {
                     .redirectUrl(transaction.getRedirectUrl())
                     .build();
         } catch (Exception _) {
-            return PaymentResponse.failed();
+            return PaymentResponse.failed(transaction.getId());
         }
     }
 
@@ -111,13 +111,21 @@ public class PaymentGatewayService {
             switch (paymentType) {
                 case STRIPE -> {
                     WebhookResult result = stripeProcessor.handleWebhook(store, payload, headers, config);
-                    transactionService.updateTransactionStatus(result.transactionId(), result.status());
+                    handleUseCase(result);
                 }
                 default -> log.warn("Unsupported payment type for webhook: {}", paymentType);
             }
 
         } catch (Exception e) {
             log.error("Error processing {} webhook for store {}", paymentType, store, e);
+        }
+    }
+
+    private void handleUseCase(WebhookResult result) {
+        log.info("Handling use case: {}", result.paymentUseCase());
+        switch (result.paymentUseCase()) {
+            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.updateTransactionStatus(result.transactionId(), result.status());
+            default -> log.warn("Unknown payment use case: {}", result.paymentUseCase());
         }
     }
 

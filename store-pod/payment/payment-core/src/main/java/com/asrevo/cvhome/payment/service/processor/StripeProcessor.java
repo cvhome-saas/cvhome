@@ -9,6 +9,7 @@ import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
+import com.asrevo.cvhome.payment.model.payment.PaymentUseCase;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.service.processor.exception.FailedPaymentInitiate;
 import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
@@ -73,27 +74,13 @@ public class StripeProcessor implements PaymentProcessor {
 
     }
 
-    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
-            throws SignatureVerificationException {
-        String sigHeader = headers.get("stripe-signature");
-        if (sigHeader == null) {
-            sigHeader = headers.get("Stripe-Signature");
-        }
-        return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
-    }
-
     @Override
     public WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                       PaymentConfiguration configuration) {
+                                       PaymentConfiguration configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
-        Event event;
-        try {
+        Event event = getEvent(payload, headers, configuration);
 
-            event = getEvent(payload, headers, configuration);
-        } catch (SignatureVerificationException e) {
-            log.error("Signature verification failed for Stripe webhook", e);
-            throw new InvalidWebhookPayload(e.getMessage(), e);
-        }
+        log.info("Stripe webhook event type: {} version {}", event.getType(), event.getApiVersion());
 
         if ("checkout.session.completed".equals(event.getType())) {
             Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
@@ -102,6 +89,7 @@ public class StripeProcessor implements PaymentProcessor {
             return WebhookResult.builder()
                     .transactionId(transactionId)
                     .status(PaymentStatus.PAID)
+                    .paymentUseCase(PaymentUseCase.PAYMENT_SUCCEEDED)
                     .build();
         } else if ("checkout.session.expired".equals(event.getType()) || "payment_intent.payment_failed".equals(event.getType())) {
             Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
@@ -110,9 +98,25 @@ public class StripeProcessor implements PaymentProcessor {
             return WebhookResult.builder()
                     .transactionId(transactionId)
                     .status(PaymentStatus.FAILED)
+                    .paymentUseCase(PaymentUseCase.PAYMENT_FAILED)
                     .build();
         }
         return WebhookResult.builder().build();
+    }
+
+
+    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
+            throws InvalidWebhookPayload {
+        try {
+            String sigHeader = headers.get("stripe-signature");
+            if (sigHeader == null) {
+                sigHeader = headers.get("Stripe-Signature");
+            }
+            return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
+        } catch (SignatureVerificationException e) {
+            log.error("Signature verification failed for Stripe webhook", e);
+            throw new InvalidWebhookPayload(e.getMessage(), e);
+        }
     }
 
     private static Long getTransactionId(Session session) {

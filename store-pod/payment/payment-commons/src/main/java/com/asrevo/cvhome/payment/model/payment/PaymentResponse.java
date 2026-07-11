@@ -14,6 +14,10 @@ public record PaymentResponse(
         return PaymentResponse.builder().status(PaymentStatus.FAILED).build();
     }
 
+    public static PaymentResponse failed(Long transactionId) {
+        return PaymentResponse.builder().transactionId(transactionId).status(PaymentStatus.FAILED).build();
+    }
+
     public static PaymentResponse pending() {
         return PaymentResponse.builder().status(PaymentStatus.PENDING).build();
     }
