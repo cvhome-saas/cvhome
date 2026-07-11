@@ -54,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setRef(request.ref());
         transaction.setStoreMerchantId(store);
         transaction.setAmount(request.amount());
-        transaction.setCurrency(request.currency().code());
+        transaction.setCurrency(request.currency());
         transaction.setPaymentType(request.paymentType());
         transaction.setStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(Instant.now());
