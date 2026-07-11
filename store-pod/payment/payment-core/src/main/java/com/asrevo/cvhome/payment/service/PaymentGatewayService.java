@@ -57,18 +57,21 @@ public class PaymentGatewayService {
         // Initialize transaction
         Transaction transaction = transactionService.createInitialTransaction(store, request);
 
-        PaymentInitiateResult initiateResult = switch (request.paymentType()) {
-            case STRIPE -> stripeProcessor.initiate(config, request, transaction.getId());
-            default -> throw new IllegalArgumentException("Unsupported payment type: " + request.paymentType());
-        };
+        try {
+            PaymentInitiateResult initiateResult = switch (request.paymentType()) {
+                case STRIPE -> stripeProcessor.initiate(config, request, transaction.getId());
+                default -> throw new IllegalArgumentException("Unsupported payment type: " + request.paymentType());
+            };
+            transactionService.completeInitiateTransaction(transaction.getId(), request, initiateResult);
 
-        transactionService.completeInitiateTransaction(transaction.getId(), request, initiateResult);
-
-        return PaymentResponse.builder()
-                .status(PaymentStatus.PENDING)
-                .transactionId(transaction.getId())
-                .redirectUrl(transaction.getRedirectUrl())
-                .build();
+            return PaymentResponse.builder()
+                    .status(PaymentStatus.PENDING)
+                    .transactionId(transaction.getId())
+                    .redirectUrl(transaction.getRedirectUrl())
+                    .build();
+        } catch (Exception _) {
+            return PaymentResponse.failed();
+        }
     }
 
 
