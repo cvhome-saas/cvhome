@@ -56,6 +56,8 @@ public class StripeProcessor implements PaymentProcessor {
                                                 .build())
                                 .build())
                 .setClientReferenceId(transactionId.toString())
+                .putMetadata("transactionId", transactionId.toString())
+                .putMetadata("ref", request.ref())
                 .build();
 
         try {
