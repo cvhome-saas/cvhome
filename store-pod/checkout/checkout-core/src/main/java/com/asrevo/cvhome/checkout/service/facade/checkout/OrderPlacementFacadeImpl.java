@@ -99,7 +99,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                 break;
         }
 
-        if (paymentResponse.isRedirect()) {
+        if (paymentResponse.shouldRedirect()) {
             return new OrderProcessingResult(modelOrder, paymentResponse.redirectUrl());
         }
 

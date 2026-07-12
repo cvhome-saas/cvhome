@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.service.PaymentGatewayService;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,21 +29,13 @@ public class PublicPaymentWebhookApi {
 
     private final PaymentGatewayService paymentGatewayService;
 
-    @PostMapping("/public/webhook/{internalId}/success")
-    @Operation(method = "POST", description = "Webhook success")
-    public void successHandler(@PathVariable("internalId") Long internalId,
-                               @RequestBody String payload,
-                               @RequestHeader Map<String, Object> headers) {
-        paymentGatewayService.handleSuccessWebhook(internalId, payload, headers);
-    }
-
-    @PostMapping("/public/webhook/{internalId}/fail")
-    @Operation(method = "POST", description = "Webhook failure")
-    public void failHandler(
-            @PathVariable("internalId") Long internalId,
-            @RequestBody String payload,
-            @RequestHeader Map<String, Object> headers) {
-        paymentGatewayService.handleFailedWebhook(internalId, payload, headers);
+    @PostMapping("/public/webhook/{storeId}/{paymentType}")
+    @Operation(method = "POST", description = "Payment Webhook")
+    public void webhook(@PathVariable("storeId") String storeId,
+                        @PathVariable("paymentType") PaymentType paymentType,
+                        @RequestBody String payload,
+                        @RequestHeader Map<String, String> headers) {
+        paymentGatewayService.handleWebhook(new StoreMerchantId(storeId), paymentType, payload, headers);
     }
 
 

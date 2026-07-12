@@ -7,6 +7,7 @@ import java.time.Instant;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -22,12 +23,14 @@ import jakarta.persistence.UniqueConstraint;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
+import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
+import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -71,8 +74,9 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "AMOUNT")
     private BigDecimal amount;
 
-    @Column(name = "CURRENCY", length = 3)
-    private String currency;
+    @Column(name = "CURRENCY_CODE", length = 6, nullable = false)
+    @Convert(converter = CurrencyCodeConverter.class)
+    private CurrencyCode currency;
 
     @Column(name = "TRANSACTION_DATE")
     private Instant transactionDate;
@@ -103,9 +107,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
 
     @Column(name = "EXPIRE_AT")
     private Instant expireAt;
-
-    @Column(name = "RETRY_COUNT")
-    private Integer retryCount = 0;
 
     @Column(name = "DETAILS", columnDefinition = "text")
     private String details;

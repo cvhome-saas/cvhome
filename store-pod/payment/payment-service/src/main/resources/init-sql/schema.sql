@@ -22,17 +22,28 @@ create table if not exists payment.payment_configuration
 
 create table if not exists payment.transaction
 (
-    transaction_id   bigint not null,
-    amount           numeric(38, 2),
-    date_created     timestamp(6) with time zone,
-    date_modified    timestamp(6) with time zone,
-    updt_id          varchar(60),
-    details          text,
-    order_id         bigint,
-    payment_type     varchar(255),
-    transaction_date timestamp(6) with time zone,
-    transaction_type varchar(255),
+    transaction_id    bigint     not null,
+    amount            numeric(38, 2),
+    date_created      timestamp(6) with time zone,
+    date_modified     timestamp(6) with time zone,
+    updt_id           varchar(60),
+    details           text,
+    order_id          bigint,
+    payment_type      varchar(255),
+    transaction_date  timestamp(6) with time zone,
+    transaction_type  varchar(255),
+    cancel_url        varchar(1000),
+    currency_code     varchar(6) not null,
+    expire_at         timestamp(6) with time zone,
+    external_id       varchar(255),
+    redirect_url      varchar(1000),
+    ref               varchar(255),
+    status            varchar(255) check ((status in ('PENDING', 'PAID', 'PAY_LATER', 'FAILED'))),
+    store_merchant_id varchar(50),
+    success_url       varchar(1000),
+
     primary key (transaction_id),
+    constraint uc_transaction_ref_store unique (ref, store_merchant_id),
     constraint transaction_payment_type_check
         check ((payment_type)::text = ANY
                ((ARRAY ['COD'::character varying, 'MANUAL_TRANSFER'::character varying, 'PAYPAL'::character varying, 'STRIPE'::character varying])::text[])),
@@ -40,4 +51,3 @@ create table if not exists payment.transaction
         check ((transaction_type)::text = ANY
                ((ARRAY ['INIT'::character varying, 'AUTHORIZE'::character varying, 'CAPTURE'::character varying, 'AUTHORIZECAPTURE'::character varying, 'REFUND'::character varying, 'OK'::character varying])::text[]))
 );
-
