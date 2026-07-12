@@ -124,7 +124,7 @@ public class PaymentGatewayService {
     private void handleUseCase(WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
-            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.updateTransactionStatus(result.transactionId(), result.status());
+            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.completeTransaction(result.transactionId(), result.status());
             default -> log.warn("Unknown payment use case: {}", result.paymentUseCase());
         }
     }

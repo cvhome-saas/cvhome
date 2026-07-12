@@ -37,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void updateTransactionStatus(Long transactionId, PaymentStatus status) {
+    public void completeTransaction(Long transactionId, PaymentStatus status) {
         Transaction transaction = findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
         transaction.setStatus(status);

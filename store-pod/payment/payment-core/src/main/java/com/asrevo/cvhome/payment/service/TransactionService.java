@@ -14,7 +14,7 @@ public interface TransactionService {
 
     Optional<Transaction> findById(Long id);
 
-    void updateTransactionStatus(Long transactionId, PaymentStatus status);
+    void completeTransaction(Long transactionId, PaymentStatus status);
 
     Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request);
 
