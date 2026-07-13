@@ -10,5 +10,7 @@ import com.asrevo.cvhome.payment.entity.payment.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    Optional<Transaction> findTopByRefAndStoreMerchantIdOrderByTransactionDateDesc(String ref, StoreMerchantId storeMerchantId);
+    Optional<Transaction> findTopByRequestRefAndStoreMerchantIdOrderByTransactionDateDesc(String ref, StoreMerchantId storeMerchantId);
+
+    Optional<Transaction> findByInternalRef(String internalRef);
 }

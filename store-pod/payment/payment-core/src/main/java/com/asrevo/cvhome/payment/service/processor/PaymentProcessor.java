@@ -8,13 +8,13 @@ import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
-import com.stripe.exception.SignatureVerificationException;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 public interface PaymentProcessor {
-    PaymentInitiateResult initiate( PaymentSecret secret, PaymentRequest request,
-                                   Long transactionId);
+    PaymentInitiateResult initiate(String internalReference, PaymentSecret secret, PaymentRequest request);
 
     WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers, PaymentConfiguration config)
-            throws InvalidPaymentReferenceId, SignatureVerificationException;
+            throws InvalidPaymentReferenceId;
 
+    PaymentType type();
 }

@@ -29,7 +29,6 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
 import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 
 import lombok.Getter;
@@ -64,8 +63,11 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "REF")
-    private String ref;
+    @Column(name = "INTERNAL_REF", nullable = false, length = 70)
+    private String internalRef;
+
+    @Column(name = "REF", nullable = false, length = 70)
+    private String requestRef;
 
     @Embedded
     @AttributeOverride(name = "storeMerchantId", column = @Column(name = "STORE_MERCHANT_ID", length = 50))
@@ -81,10 +83,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_DATE")
     private Instant transactionDate;
 
-    @Column(name = "TRANSACTION_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private TransactionType transactionType;
-
     @Column(name = "PAYMENT_TYPE")
     @Enumerated(value = EnumType.STRING)
     private PaymentType paymentType;
@@ -94,7 +92,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     private PaymentStatus status;
 
     @Column(name = "EXTERNAL_ID")
-    private String externalId;
+    private String paymentGatewayExternalId;
 
     @Column(name = "REDIRECT_URL", length = 1000)
     private String redirectUrl;

@@ -22,7 +22,7 @@ create table if not exists payment.payment_configuration
 
 create table if not exists payment.transaction
 (
-    transaction_id    bigint     not null,
+    transaction_id    bigint      not null,
     amount            numeric(38, 2),
     date_created      timestamp(6) with time zone,
     date_modified     timestamp(6) with time zone,
@@ -31,23 +31,87 @@ create table if not exists payment.transaction
     order_id          bigint,
     payment_type      varchar(255),
     transaction_date  timestamp(6) with time zone,
-    transaction_type  varchar(255),
     cancel_url        varchar(1000),
-    currency_code     varchar(6) not null,
+    currency_code     varchar(6)  not null,
     expire_at         timestamp(6) with time zone,
     external_id       varchar(255),
     redirect_url      varchar(1000),
-    ref               varchar(255),
+    internal_ref      varchar(70) not null,
+    ref               varchar(70) not null,
     status            varchar(255) check ((status in ('PENDING', 'PAID', 'PAY_LATER', 'FAILED'))),
     store_merchant_id varchar(50),
     success_url       varchar(1000),
 
     primary key (transaction_id),
+    constraint uc_transaction_internal_ref unique (internal_ref),
     constraint uc_transaction_ref_store unique (ref, store_merchant_id),
     constraint transaction_payment_type_check
         check ((payment_type)::text = ANY
-               ((ARRAY ['COD'::character varying, 'MANUAL_TRANSFER'::character varying, 'PAYPAL'::character varying, 'STRIPE'::character varying])::text[])),
-    constraint transaction_transaction_type_check
-        check ((transaction_type)::text = ANY
-               ((ARRAY ['INIT'::character varying, 'AUTHORIZE'::character varying, 'CAPTURE'::character varying, 'AUTHORIZECAPTURE'::character varying, 'REFUND'::character varying, 'OK'::character varying])::text[]))
+               ((ARRAY ['COD'::character varying, 'MANUAL_TRANSFER'::character varying, 'PAYPAL'::character varying, 'STRIPE'::character varying])::text[]))
 );
+
+
+CREATE TABLE IF NOT EXISTS payment.outbox_record
+(
+    id             VARCHAR(255)             NOT NULL,
+    status         VARCHAR(20)              NOT NULL,
+    record_key     VARCHAR(255)             NOT NULL,
+    record_type    VARCHAR(255)             NOT NULL,
+    payload        TEXT                     NOT NULL,
+    context        TEXT,
+    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    completed_at   TIMESTAMP WITH TIME ZONE,
+    failure_count  INT                      NOT NULL,
+    failure_reason VARCHAR(1000),
+    next_retry_at  TIMESTAMP WITH TIME ZONE NOT NULL,
+    partition_no   INTEGER                  NOT NULL,
+    handler_id     VARCHAR(1000)            NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS payment.outbox_instance
+(
+    instance_id    VARCHAR(255) PRIMARY KEY,
+    hostname       VARCHAR(255)             NOT NULL,
+    port           INTEGER                  NOT NULL,
+    status         VARCHAR(50)              NOT NULL,
+    started_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_heartbeat TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at     TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payment.outbox_partition
+(
+    partition_number INTEGER PRIMARY KEY,
+    instance_id      VARCHAR(255),
+    version          BIGINT                   NOT NULL DEFAULT 0,
+    updated_at       TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_record_record_key_created
+    ON payment.outbox_record (record_key, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_record_partition_status_retry
+    ON payment.outbox_record (partition_no, status, next_retry_at);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_record_status_retry
+    ON payment.outbox_record (status, next_retry_at);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_record_status
+    ON payment.outbox_record (status);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_record_record_key_completed_created
+    ON payment.outbox_record (record_key, completed_at, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_instance_status_heartbeat
+    ON payment.outbox_instance (status, last_heartbeat);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_instance_last_heartbeat
+    ON payment.outbox_instance (last_heartbeat);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_instance_status
+    ON payment.outbox_instance (status);
+
+CREATE INDEX IF NOT EXISTS idx_outbox_partition_instance_id
+    ON payment.outbox_partition (instance_id);

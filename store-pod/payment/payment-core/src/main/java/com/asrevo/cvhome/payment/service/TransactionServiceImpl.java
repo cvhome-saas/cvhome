@@ -2,6 +2,7 @@ package com.asrevo.cvhome.payment.service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,6 @@ import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.payment.repository.payment.TransactionRepository;
 import com.asrevo.cvhome.payment.service.processor.PaymentInitiateResult;
-import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,66 +24,59 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Transaction> findByRefAndStore(String ref, StoreMerchantId storeMerchantId) {
-        return transactionRepository.findTopByRefAndStoreMerchantIdOrderByTransactionDateDesc(ref, storeMerchantId);
-    }
-
-    @Override
-    public Optional<Transaction> findById(Long id) {
-        return transactionRepository.findById(id);
-    }
-
-    @Override
-    @Transactional
-    public void completeTransaction(Long transactionId, PaymentStatus status) {
-        Transaction transaction = findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
-        transaction.setStatus(status);
-        if (status == PaymentStatus.PAID) {
-            transaction.setTransactionType(TransactionType.CAPTURE);
-        }
-        transactionRepository.save(transaction);
-    }
-
-    @Override
-    @Transactional
-    public Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request) {
+    private static Transaction constructTransaction(StoreMerchantId store, PaymentRequest request) {
         Transaction transaction = new Transaction();
-        transaction.setRef(request.ref());
+        transaction.setInternalRef(UUID.randomUUID().toString());
+        transaction.setRequestRef(request.ref());
         transaction.setStoreMerchantId(store);
         transaction.setAmount(request.amount());
         transaction.setCurrency(request.currency());
         transaction.setPaymentType(request.paymentType());
         transaction.setStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(Instant.now());
-        transaction.setTransactionType(TransactionType.INIT);
         transaction.setExpireAt(request.expireAt());
+        return transaction;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Transaction> findByRefAndStore(String ref, StoreMerchantId storeMerchantId) {
+        return transactionRepository.findTopByRequestRefAndStoreMerchantIdOrderByTransactionDateDesc(ref, storeMerchantId);
+    }
+
+    @Override
+    public Optional<Transaction> findByTransactionInternalRef(String transactionInternalRef) {
+        return transactionRepository.findByInternalRef(transactionInternalRef);
+    }
+
+    @Override
+    @Transactional
+    public void completeTransaction(String transactionInternalRef, PaymentStatus status) {
+        Transaction transaction = findByTransactionInternalRef(transactionInternalRef)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionInternalRef));
+        transaction.setStatus(status);
+        transactionRepository.save(transaction);
+    }
+
+    @Override
+    @Transactional
+    public Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request) {
+        Transaction transaction = constructTransaction(store, request);
         return transactionRepository.save(transaction);
     }
 
     @Override
     @Transactional
-    public void completeInitiateTransaction(Long transactionId, PaymentRequest request, PaymentInitiateResult initiateResult) {
-        this.findById(transactionId).ifPresent(transaction -> {
-            transaction.setExternalId(initiateResult.externalId());
+    public void completeInitiateTransaction(String transactionInternalRef, PaymentRequest request, PaymentInitiateResult initiateResult) {
+        this.findByTransactionInternalRef(transactionInternalRef).ifPresent(transaction -> {
+            transaction.setPaymentGatewayExternalId(initiateResult.externalId());
             transaction.setRedirectUrl(initiateResult.redirectUrl());
-            transaction.setStatus(PaymentStatus.PENDING);
+            transaction.setStatus(initiateResult.status());
             transaction.setSuccessUrl(request.successUrl());
             transaction.setCancelUrl(request.cancelUrl());
             transactionRepository.save(transaction);
         });
 
-    }
-
-    @Override
-    @Transactional
-    public Transaction createCODTransaction(StoreMerchantId store, PaymentRequest request) {
-        Transaction transaction = createInitialTransaction(store, request);
-        transaction.setStatus(PaymentStatus.PAY_LATER);
-        transaction.setTransactionType(TransactionType.AUTHORIZECAPTURE);
-        return transactionRepository.save(transaction);
     }
 
 }

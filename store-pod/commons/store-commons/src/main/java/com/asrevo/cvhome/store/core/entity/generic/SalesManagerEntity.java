@@ -5,8 +5,10 @@ import java.io.Serializable;
 import java.text.Collator;
 import java.util.Locale;
 
-public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, ?>>
-        implements Serializable, Comparable<E> {
+import org.springframework.data.domain.AbstractAggregateRoot;
+
+public abstract class SalesManagerEntity<K extends Serializable & Comparable<K>, E extends SalesManagerEntity<K, E>>
+        extends AbstractAggregateRoot<E> implements Serializable, Comparable<E> {
 
     public static final Collator DEFAULT_STRING_COLLATOR = Collator.getInstance(Locale.FRENCH);
 

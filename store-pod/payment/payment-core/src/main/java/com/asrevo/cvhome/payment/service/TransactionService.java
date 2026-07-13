@@ -12,13 +12,12 @@ public interface TransactionService {
 
     Optional<Transaction> findByRefAndStore(String ref, StoreMerchantId storeMerchantId);
 
-    Optional<Transaction> findById(Long id);
+    Optional<Transaction> findByTransactionInternalRef(String transactionInternalRef);
 
-    void completeTransaction(Long transactionId, PaymentStatus status);
+    void completeTransaction(String transactionInternalRef, PaymentStatus status);
 
     Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request);
 
-    void completeInitiateTransaction(Long transactionId, PaymentRequest request, PaymentInitiateResult initiateResult);
+    void completeInitiateTransaction(String transactionInternalRef, PaymentRequest request, PaymentInitiateResult initiateResult);
 
-    Transaction createCODTransaction(StoreMerchantId store, PaymentRequest request);
 }

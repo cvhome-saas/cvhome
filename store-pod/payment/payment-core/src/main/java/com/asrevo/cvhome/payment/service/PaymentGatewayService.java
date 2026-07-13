@@ -1,7 +1,9 @@
 package com.asrevo.cvhome.payment.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +13,10 @@ import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.Transaction;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
-import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.repository.payment.PaymentConfigurationRepository;
 import com.asrevo.cvhome.payment.service.processor.PaymentInitiateResult;
-import com.asrevo.cvhome.payment.service.processor.StripeProcessor;
+import com.asrevo.cvhome.payment.service.processor.PaymentProcessor;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,9 @@ public class PaymentGatewayService {
 
     private final PaymentConfigurationRepository configRepository;
     private final TransactionService transactionService;
-    private final StripeProcessor stripeProcessor;
+
+    private final List<PaymentProcessor> paymentProcessors;
+
 
     @Transactional
     public PaymentResponse initiatePayment(StoreMerchantId store, PaymentRequest request) {
@@ -39,12 +42,8 @@ public class PaymentGatewayService {
         if (Objects.nonNull(existingTransaction)) {
             return PaymentResponse.builder()
                     .status(existingTransaction.getStatus())
-                    .transactionId(existingTransaction.getId())
+                    .gatewayRef(existingTransaction.getInternalRef())
                     .build();
-        }
-
-        if (PaymentType.COD.equals(request.paymentType())) {
-            return handleCODPayment(store, request);
         }
 
         PaymentConfiguration config = getPaymentConfiguration(store, request.paymentType());
@@ -58,29 +57,27 @@ public class PaymentGatewayService {
         Transaction transaction = transactionService.createInitialTransaction(store, request);
 
         try {
-            PaymentInitiateResult initiateResult = switch (request.paymentType()) {
-                case STRIPE -> stripeProcessor.initiate(config, request, transaction.getId());
-                default -> throw new IllegalArgumentException("Unsupported payment type: " + request.paymentType());
-            };
-            transactionService.completeInitiateTransaction(transaction.getId(), request, initiateResult);
+
+            PaymentProcessor processor = getProcessor(request.paymentType()).orElse(null);
+            if (processor == null) {
+                log.warn("un supported payment type {}", request.paymentType());
+                return PaymentResponse.failed();
+            }
+
+            PaymentInitiateResult initiateResult = processor.initiate(transaction.getInternalRef(), config, request);
+
+            log.info("Initiating transaction {} with gateway for store {} and type {} to {}", transaction.getInternalRef(), store,
+                    request.paymentType(), initiateResult.externalId());
+            transactionService.completeInitiateTransaction(transaction.getInternalRef(), request, initiateResult);
 
             return PaymentResponse.builder()
-                    .status(PaymentStatus.PENDING)
-                    .transactionId(transaction.getId())
+                    .status(initiateResult.status())
+                    .gatewayRef(transaction.getInternalRef())
                     .redirectUrl(transaction.getRedirectUrl())
                     .build();
         } catch (Exception _) {
-            return PaymentResponse.failed(transaction.getId());
+            return PaymentResponse.failed(transaction.getInternalRef());
         }
-    }
-
-
-    private PaymentResponse handleCODPayment(StoreMerchantId store, PaymentRequest request) {
-        Transaction transaction = transactionService.createCODTransaction(store, request);
-        return PaymentResponse.builder()
-                .status(PaymentStatus.PAY_LATER)
-                .transactionId(transaction.getId())
-                .build();
     }
 
 
@@ -95,7 +92,7 @@ public class PaymentGatewayService {
                 .map(tx -> PaymentResponse.builder()
                         .status(tx.getStatus())
                         .redirectUrl(tx.getRedirectUrl())
-                        .transactionId(tx.getId())
+                        .gatewayRef(tx.getInternalRef())
                         .build())
                 .orElse(PaymentResponse.failed());
     }
@@ -107,26 +104,25 @@ public class PaymentGatewayService {
             return;
         }
 
-        try {
-            switch (paymentType) {
-                case STRIPE -> {
-                    WebhookResult result = stripeProcessor.handleWebhook(store, payload, headers, config);
-                    handleUseCase(result);
-                }
-                default -> log.warn("Unsupported payment type for webhook: {}", paymentType);
-            }
-
-        } catch (Exception e) {
-            log.error("Error processing {} webhook for store {}", paymentType, store, e);
+        PaymentProcessor processor = getProcessor(paymentType).orElse(null);
+        if (processor == null) {
+            log.warn("No enabled {} processor found for store {}", paymentType, store);
+            return;
         }
+
+        WebhookResult result = processor.handleWebhook(store, payload, headers, config);
+        handleUseCase(result);
     }
 
     private void handleUseCase(WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
-            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.completeTransaction(result.transactionId(), result.status());
+            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.completeTransaction(result.internalReference(), result.status());
             default -> log.warn("Unknown payment use case: {}", result.paymentUseCase());
         }
     }
 
+    public Optional<PaymentProcessor> getProcessor(PaymentType type) {
+        return this.paymentProcessors.stream().filter(p -> p.type() == type).findFirst();
+    }
 }

@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record PaymentResponse(
-        Long transactionId,
+        String gatewayRef,
         PaymentStatus status,
         String redirectUrl) {
 
@@ -14,8 +14,8 @@ public record PaymentResponse(
         return PaymentResponse.builder().status(PaymentStatus.FAILED).build();
     }
 
-    public static PaymentResponse failed(Long transactionId) {
-        return PaymentResponse.builder().transactionId(transactionId).status(PaymentStatus.FAILED).build();
+    public static PaymentResponse failed(String gatewayRef) {
+        return PaymentResponse.builder().gatewayRef(gatewayRef).status(PaymentStatus.FAILED).build();
     }
 
     public static PaymentResponse pending() {
