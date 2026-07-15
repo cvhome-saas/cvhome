@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.crypto.caffeine;
 
+import java.time.Duration;
+
 import com.asrevo.cvhome.crypto.EncryptedValue;
 import com.asrevo.cvhome.crypto.SecretCryptoProvider;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-
-import java.time.Duration;
 
 public class CachingSecretCryptoProvider implements SecretCryptoProvider {
 
