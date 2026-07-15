@@ -8,7 +8,7 @@ public class TestControlPlaneApplication {
 
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.from(ControlPlaneApplication::main).with(TestcontainersConfiguration.class).run(args);
     }
 
