@@ -32,7 +32,7 @@ public class SecretCryptoProperties {
         /**
          * The active key ID to be used for encryption.
          */
-        private String activeKeyId;
+        private String activeKeyId = "default";
 
         /**
          * Key provider type: STATIC, ENV, FILE.

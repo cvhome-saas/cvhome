@@ -3,6 +3,8 @@ package com.asrevo.cvhome.crypto.autoconfigure;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -33,7 +35,8 @@ public class SecretCryptoAutoConfiguration {
     public SecretCryptoProvider localAesCryptoProvider(SecretCryptoProperties properties) {
         SecretCryptoProperties.LocalProperties local = properties.getLocal();
         LocalKeyProvider keyProvider = createKeyProvider(local);
-        SecretCryptoProvider provider = new LocalAesCryptoProvider(local.getActiveKeyId(), keyProvider);
+        String activeKeyId = local.getActiveKeyId() != null ? local.getActiveKeyId() : "default";
+        SecretCryptoProvider provider = new LocalAesCryptoProvider(activeKeyId, keyProvider);
         return wrapWithCache(provider, properties);
     }
 
@@ -59,7 +62,12 @@ public class SecretCryptoAutoConfiguration {
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local) {
         return switch (local.getKeyProviderType()) {
             case STATIC -> {
-                Map<String, byte[]> keys = local.getKeys().entrySet().stream()
+                Map<String, String> rawKeys =
+                        Optional.ofNullable(local.getKeys()).orElseGet(() -> {
+                            String randomKey = new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()));
+                            return Map.of("default", randomKey);
+                        });
+                Map<String, byte[]> keys = rawKeys.entrySet().stream()
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
                                 e -> Base64.getDecoder().decode(e.getValue())
@@ -67,7 +75,10 @@ public class SecretCryptoAutoConfiguration {
                 yield new StaticKeyProvider(keys);
             }
             case ENV -> new EnvironmentVariableKeyProvider();
-            case FILE -> new FileSystemKeyProvider(Paths.get(local.getFilePath()), local.isFileBase64());
+            case FILE -> {
+                String path = local.getFilePath() != null ? local.getFilePath() : "secrets/keys";
+                yield new FileSystemKeyProvider(Paths.get(path), local.isFileBase64());
+            }
         };
     }
 }
