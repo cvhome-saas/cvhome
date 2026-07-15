@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.crypto.autoconfigure;
 
+import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,6 +20,7 @@ public class SecretCryptoProperties {
 
     private LocalProperties local = new LocalProperties();
     private AwsProperties aws = new AwsProperties();
+    private CacheProperties cache = new CacheProperties();
 
     public enum ProviderType {
         LOCAL, AWS
@@ -69,5 +71,19 @@ public class SecretCryptoProperties {
          * AWS Region.
          */
         private String region;
+    }
+
+    @Getter
+    @Setter
+    public static class CacheProperties {
+        /**
+         * Whether to enable caching for decryption.
+         */
+        private boolean enabled = false;
+
+        /**
+         * Cache expiration duration.
+         */
+        private Duration duration = Duration.ofMinutes(10);
     }
 }

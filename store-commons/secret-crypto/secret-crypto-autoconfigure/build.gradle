@@ -6,6 +6,7 @@ dependencies {
     implementation project(":store-commons:secret-crypto:secret-crypto-core")
     implementation project(":store-commons:secret-crypto:secret-crypto-local")
     implementation project(":store-commons:secret-crypto:secret-crypto-aws")
+    implementation project(":store-commons:secret-crypto:secret-crypto-caffeine")
 
     implementation libs.spring.boot.starter.autoconfigure
 

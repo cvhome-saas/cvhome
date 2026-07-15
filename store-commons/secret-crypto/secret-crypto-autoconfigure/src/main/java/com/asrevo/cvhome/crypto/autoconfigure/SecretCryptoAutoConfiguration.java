@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.asrevo.cvhome.crypto.SecretCryptoProvider;
 import com.asrevo.cvhome.crypto.aws.AwsKmsCryptoProvider;
+import com.asrevo.cvhome.crypto.caffeine.CachingSecretCryptoProvider;
 import com.asrevo.cvhome.crypto.local.EnvironmentVariableKeyProvider;
 import com.asrevo.cvhome.crypto.local.FileSystemKeyProvider;
 import com.asrevo.cvhome.crypto.local.LocalAesCryptoProvider;
@@ -32,7 +33,27 @@ public class SecretCryptoAutoConfiguration {
     public SecretCryptoProvider localAesCryptoProvider(SecretCryptoProperties properties) {
         SecretCryptoProperties.LocalProperties local = properties.getLocal();
         LocalKeyProvider keyProvider = createKeyProvider(local);
-        return new LocalAesCryptoProvider(local.getActiveKeyId(), keyProvider);
+        SecretCryptoProvider provider = new LocalAesCryptoProvider(local.getActiveKeyId(), keyProvider);
+        return wrapWithCache(provider, properties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "com.asrevo.cvhome.crypto.type", havingValue = "AWS")
+    public SecretCryptoProvider awsKmsCryptoProvider(SecretCryptoProperties properties) {
+        SecretCryptoProperties.AwsProperties aws = properties.getAws();
+        KmsClient kmsClient = KmsClient.builder()
+                .region(Region.of(aws.getRegion()))
+                .build();
+        SecretCryptoProvider provider = new AwsKmsCryptoProvider(kmsClient, aws.getKeyId());
+        return wrapWithCache(provider, properties);
+    }
+
+    private SecretCryptoProvider wrapWithCache(SecretCryptoProvider provider, SecretCryptoProperties properties) {
+        if (properties.getCache().isEnabled()) {
+            return new CachingSecretCryptoProvider(provider, properties.getCache().getDuration());
+        }
+        return provider;
     }
 
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local) {
@@ -48,16 +69,5 @@ public class SecretCryptoAutoConfiguration {
             case ENV -> new EnvironmentVariableKeyProvider();
             case FILE -> new FileSystemKeyProvider(Paths.get(local.getFilePath()), local.isFileBase64());
         };
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnProperty(name = "com.asrevo.cvhome.asrevo.crypto.type", havingValue = "AWS")
-    public SecretCryptoProvider awsKmsCryptoProvider(SecretCryptoProperties properties) {
-        SecretCryptoProperties.AwsProperties aws = properties.getAws();
-        KmsClient kmsClient = KmsClient.builder()
-                .region(Region.of(aws.getRegion()))
-                .build();
-        return new AwsKmsCryptoProvider(kmsClient, aws.getKeyId());
     }
 }
