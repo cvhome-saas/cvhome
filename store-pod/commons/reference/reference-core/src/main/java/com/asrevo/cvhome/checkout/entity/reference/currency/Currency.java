@@ -11,7 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.store.core.serializer.LanguageCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.LanguageCodeSerializer;
 

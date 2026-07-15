@@ -14,7 +14,7 @@ import org.apache.commons.validator.routines.CurrencyValidator;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public class PriceUtils {

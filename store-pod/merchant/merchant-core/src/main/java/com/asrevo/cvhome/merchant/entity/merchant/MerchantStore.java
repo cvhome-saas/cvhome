@@ -38,10 +38,10 @@ import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

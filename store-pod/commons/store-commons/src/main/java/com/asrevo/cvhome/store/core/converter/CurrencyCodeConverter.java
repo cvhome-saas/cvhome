@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.core.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 
 @Converter
 public class CurrencyCodeConverter implements AttributeConverter<CurrencyCode, String> {

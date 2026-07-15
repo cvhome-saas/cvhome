@@ -16,9 +16,9 @@ import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.extern.slf4j.Slf4j;

@@ -30,7 +30,7 @@ import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 
 import lombok.Getter;
 import lombok.Setter;

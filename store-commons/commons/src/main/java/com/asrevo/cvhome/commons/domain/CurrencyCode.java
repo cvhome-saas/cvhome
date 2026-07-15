@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.store.core.model.reference;
+package com.asrevo.cvhome.commons.domain;
 
 import java.io.Serializable;
 import java.util.Currency;

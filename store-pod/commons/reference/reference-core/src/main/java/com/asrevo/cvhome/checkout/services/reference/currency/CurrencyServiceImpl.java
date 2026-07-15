@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.checkout.entity.reference.currency.Currency;
 import com.asrevo.cvhome.checkout.repositories.reference.currency.CurrencyRepository;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("currencyService")

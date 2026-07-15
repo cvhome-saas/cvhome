@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.checkout.service.facade.country.CountryFacade;
 import com.asrevo.cvhome.checkout.service.facade.zone.ZoneFacade;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.model.references.ReadableZone;
