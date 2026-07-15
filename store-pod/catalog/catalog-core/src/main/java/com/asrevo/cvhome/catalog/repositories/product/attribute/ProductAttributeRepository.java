@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface ProductAttributeRepository extends JpaRepository<ProductAttribute, Long> {
 

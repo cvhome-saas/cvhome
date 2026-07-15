@@ -27,13 +27,13 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1;
 
 @Service("storeFacade")
 @Slf4j

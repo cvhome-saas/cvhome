@@ -16,7 +16,7 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.AllArgsConstructor;
 

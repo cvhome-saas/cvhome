@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface ProductVariationRepository extends JpaRepository<ProductVariation, Long> {
 

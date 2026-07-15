@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.checkout.entity.reference.country.Country;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface CountryRepository extends JpaRepository<Country, CountryIsoCode> {
 

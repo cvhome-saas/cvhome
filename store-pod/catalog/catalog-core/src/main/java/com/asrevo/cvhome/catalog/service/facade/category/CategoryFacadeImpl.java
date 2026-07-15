@@ -40,7 +40,7 @@ import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

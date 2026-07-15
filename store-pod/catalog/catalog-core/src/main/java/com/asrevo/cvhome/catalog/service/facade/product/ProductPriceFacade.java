@@ -5,7 +5,7 @@ import java.util.List;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /**
  * Product price management api

@@ -11,7 +11,7 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 

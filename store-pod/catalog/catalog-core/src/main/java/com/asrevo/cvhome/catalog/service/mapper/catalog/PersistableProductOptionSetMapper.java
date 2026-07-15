@@ -17,7 +17,7 @@ import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionValueSe
 import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 @Component
 public class PersistableProductOptionSetMapper implements Mapper<PersistableProductOptionSet, ProductOptionSet> {

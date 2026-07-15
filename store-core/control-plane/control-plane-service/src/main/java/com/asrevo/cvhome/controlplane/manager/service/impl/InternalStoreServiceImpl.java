@@ -13,14 +13,12 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
-import com.asrevo.cvhome.commons.utils.OperationExecution;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.controlplane.manager.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.controlplane.manager.entity.ManagerStoreEntity;
 import com.asrevo.cvhome.controlplane.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.controlplane.manager.repository.ManagerStoreRepository;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
-import com.asrevo.cvhome.controlplane.manager.utils.ErrorCodes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,12 +82,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     }
 
     private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) {
-        return storeRepository.findById(store).orElseThrow(() -> new OperationExecution(ErrorCodes.store_not_found));
-    }
-
-    @Override
-    public ManagerOrgId getStoreOwner(ManagerStoreId store) {
-        return getManagerStoreEntity(store).getOrgId();
+        return storeRepository.findById(store).orElseThrow();
     }
 
     @Override

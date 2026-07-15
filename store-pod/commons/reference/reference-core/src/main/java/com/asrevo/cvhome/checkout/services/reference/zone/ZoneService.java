@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 

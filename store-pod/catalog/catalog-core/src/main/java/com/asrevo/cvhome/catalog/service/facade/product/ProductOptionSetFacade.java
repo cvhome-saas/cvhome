@@ -5,7 +5,7 @@ import java.util.List;
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.PersistableProductOptionSet;
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.ReadableProductOptionSet;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface ProductOptionSetFacade {
 

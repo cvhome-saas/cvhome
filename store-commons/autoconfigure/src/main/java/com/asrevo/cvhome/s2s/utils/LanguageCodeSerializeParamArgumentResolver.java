@@ -4,7 +4,7 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.service.invoker.HttpRequestValues;
 import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public class LanguageCodeSerializeParamArgumentResolver implements HttpServiceArgumentResolver {
 

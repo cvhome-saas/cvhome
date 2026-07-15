@@ -15,7 +15,7 @@ import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductPrice;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.AllArgsConstructor;

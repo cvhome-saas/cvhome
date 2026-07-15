@@ -14,13 +14,13 @@ import com.asrevo.cvhome.checkout.service.facade.country.CountryFacade;
 import com.asrevo.cvhome.checkout.service.facade.zone.ZoneFacade;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.model.references.ReadableZone;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1;
 
 /**
  * Get system Language, Country and Currency objects

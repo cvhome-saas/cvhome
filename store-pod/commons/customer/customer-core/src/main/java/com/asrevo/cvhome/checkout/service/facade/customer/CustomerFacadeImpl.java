@@ -21,7 +21,7 @@ import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.extern.slf4j.Slf4j;
 
