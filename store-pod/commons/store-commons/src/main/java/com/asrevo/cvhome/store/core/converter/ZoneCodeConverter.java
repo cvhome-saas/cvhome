@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.core.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 
 @Converter
 public class ZoneCodeConverter implements AttributeConverter<ZoneCode, String> {

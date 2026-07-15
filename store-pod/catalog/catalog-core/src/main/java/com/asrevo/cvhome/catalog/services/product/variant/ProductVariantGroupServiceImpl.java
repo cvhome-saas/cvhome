@@ -10,7 +10,7 @@ import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
 import com.asrevo.cvhome.catalog.repositories.product.variant.PageableProductVariantGroupRepository;
 import com.asrevo.cvhome.catalog.repositories.product.variant.ProductVariantGroupRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productVariantGroupService")

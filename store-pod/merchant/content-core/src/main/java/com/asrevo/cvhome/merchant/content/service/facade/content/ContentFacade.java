@@ -11,7 +11,7 @@ import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBoxLi
 import com.asrevo.cvhome.merchant.content.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPageList;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /**
  * Images and files management

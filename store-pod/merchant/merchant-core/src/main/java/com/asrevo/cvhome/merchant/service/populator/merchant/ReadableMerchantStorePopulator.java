@@ -12,7 +12,7 @@ import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.model.content.ReadableImage;
 import com.asrevo.cvhome.store.core.model.entity.ReadableAudit;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.ReadableBaseAddress;

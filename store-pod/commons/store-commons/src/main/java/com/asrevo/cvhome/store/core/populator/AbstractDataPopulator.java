@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.core.populator;
 import java.util.Locale;
 
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.Getter;
 import lombok.Setter;

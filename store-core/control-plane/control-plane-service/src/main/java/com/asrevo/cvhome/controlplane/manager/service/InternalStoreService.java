@@ -27,8 +27,6 @@ public interface InternalStoreService {
 
     Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
 
-    ManagerOrgId getStoreOwner(ManagerStoreId store);
-
     ManagerStoreDto findStore(ManagerStoreId store);
 
     Boolean checkNameExists(String name);

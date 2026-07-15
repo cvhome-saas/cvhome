@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.asrevo.cvhome.catalog.entity.product.group.ProductGroup;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 @Repository
 public interface ProductGroupRepository extends JpaRepository<ProductGroup, Long> {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValue;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.Getter;
 import lombok.Setter;

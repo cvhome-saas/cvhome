@@ -16,7 +16,7 @@ import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartItemRepo
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;

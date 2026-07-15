@@ -10,8 +10,8 @@ import jakarta.validation.constraints.NotEmpty;
 
 import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
 import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;

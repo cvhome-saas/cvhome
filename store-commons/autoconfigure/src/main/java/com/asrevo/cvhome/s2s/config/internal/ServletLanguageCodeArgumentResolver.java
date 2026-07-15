@@ -11,7 +11,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.asrevo.cvhome.s2s.utils.LanguageUtils;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public class ServletLanguageCodeArgumentResolver implements HandlerMethodArgumentResolver {
 

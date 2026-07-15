@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.core.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 
 @Converter
 public class CountryIsoCodeConverter implements AttributeConverter<CountryIsoCode, String> {

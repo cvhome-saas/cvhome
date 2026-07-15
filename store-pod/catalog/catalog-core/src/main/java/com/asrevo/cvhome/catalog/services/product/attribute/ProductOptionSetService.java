@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionSet;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductOptionSetService extends SalesManagerEntityService<Long, ProductOptionSet> {

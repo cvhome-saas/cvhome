@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 
 import lombok.Builder;
 

@@ -1,8 +1,8 @@
 package com.asrevo.cvhome.store.core.model;
 
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;

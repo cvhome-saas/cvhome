@@ -6,7 +6,7 @@ import com.asrevo.cvhome.catalog.model.product.inventory.PersistableInventory;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface ProductInventoryFacade {
 

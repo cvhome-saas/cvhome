@@ -15,7 +15,7 @@ import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOpti
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValueList;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /*
  * Attributes, Options and Options values management independently from Product

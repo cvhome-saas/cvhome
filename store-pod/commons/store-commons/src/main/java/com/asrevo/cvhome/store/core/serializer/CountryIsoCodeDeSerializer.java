@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.store.core.serializer;
 
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;

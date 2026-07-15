@@ -10,7 +10,7 @@ import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVa
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 @Component
 public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantGroup, ReadableProductVariantGroup> {

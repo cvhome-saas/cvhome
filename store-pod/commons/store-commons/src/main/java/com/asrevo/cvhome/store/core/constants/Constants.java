@@ -3,7 +3,7 @@ package com.asrevo.cvhome.store.core.constants;
 import java.util.Currency;
 import java.util.Locale;
 
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 
 public class Constants {
     public static final String PERCENT_SYMBOL = "%";
