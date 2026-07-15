@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    implementation project(":store-commons:secret-crypto:secret-crypto-core")
+    implementation project(":store-commons:secret-crypto:secret-crypto-local")
+    implementation project(":store-commons:secret-crypto:secret-crypto-aws")
+
+    implementation libs.spring.boot.starter.autoconfigure
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    annotationProcessor libs.spring.boot.configuration.processor
+}

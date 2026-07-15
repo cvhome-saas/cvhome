@@ -27,6 +27,10 @@ include(
         'store-commons:commons',
         'store-commons:uaa-client',
         'store-commons:uaa-client-impl',
+        'store-commons:secret-crypto:secret-crypto-core',
+        'store-commons:secret-crypto:secret-crypto-local',
+        'store-commons:secret-crypto:secret-crypto-aws',
+        'store-commons:secret-crypto:secret-crypto-autoconfigure',
         'store-commons:autoconfigure',
 
         'store-pod:spg',
