@@ -140,4 +140,24 @@ export class StoreService {
   updateSocialLoginConfigs(store: string, configs: any[]): Observable<any> {
     return this.crudService.post(`/spg/cua/api/v1/private/social-login-config`, configs, {store});
   }
+
+  getSupportedPaymentTypes(): Observable<string[]> {
+    return this.crudService.get(`/spg/payment/api/v1/private/payment-configuration/supported-payment-types`);
+  }
+
+  getPaymentConfigs(store: string): Observable<any> {
+    return this.crudService.get(`/spg/payment/api/v1/private/payment-configuration`, {store});
+  }
+
+  savePaymentConfig(store: string, config: any): Observable<any> {
+    return this.crudService.post(`/spg/payment/api/v1/private/payment-configuration`, config, {store});
+  }
+
+  updatePaymentConfig(store: string, id: number, config: any): Observable<any> {
+    return this.crudService.put(`/spg/payment/api/v1/private/payment-configuration/${id}`, config, {store});
+  }
+
+  deletePaymentConfig(store: string, id: number): Observable<any> {
+    return this.crudService.delete(`/spg/payment/api/v1/private/payment-configuration/${id}`, {store});
+  }
 }

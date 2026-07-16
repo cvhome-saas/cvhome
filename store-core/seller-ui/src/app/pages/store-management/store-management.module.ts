@@ -17,6 +17,7 @@ import {NgxFileDropModule} from "ngx-file-drop";
 import {StoreSocialLinksComponent} from "./store-social-links/store-social-links.component";
 import {StoreSliderImagesComponent} from "./store-slider-images/store-slider-images.component";
 import {StoreSocialLoginComponent} from "./store-social-login/store-social-login.component";
+import {StorePaymentConfigurationComponent} from "./store-payment-configuration/store-payment-configuration.component";
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {StoreSocialLoginComponent} from "./store-social-login/store-social-login
     StoreSocialLinksComponent,
     StoreSliderImagesComponent,
     StoreSocialLoginComponent,
+    StorePaymentConfigurationComponent,
     StoreFormComponent,
     StoreLandingPageComponent,
     StoreDetailInfoComponent,
