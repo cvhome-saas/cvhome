@@ -13,3 +13,7 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: store_core
+  sql:
+    init:
+      schema-locations: classpath:init-sql/schema.sql
+      data-locations: classpath:init-sql/data-common.sql
