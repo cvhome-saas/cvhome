@@ -61,6 +61,12 @@ export class StoreSocialLoginComponent implements OnInit {
       title: 'Store Social Login',
       key: 'COMPONENTS.STORE_SOCIAL_LOGIN',
       link: 'store-social-login'
+    },
+    {
+      id: '7',
+      title: 'Store Payment Configuration',
+      key: 'COMPONENTS.STORE_PAYMENT_CONFIGURATION',
+      link: 'store-payment-configuration'
     }
   ];
   form: FormGroup;

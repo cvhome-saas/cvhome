@@ -83,6 +83,13 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
+      crypto:
+        type: LOCAL
+        local:
+          active-key-id: default-key
+          key-provider-type: STATIC
+          keys:
+            default-key: "YXNyZXZvLXNlY3JldC1rZXktMzItYnl0ZXMtcGFkZGVkIQ=="
 spring:
   docker:
     compose:

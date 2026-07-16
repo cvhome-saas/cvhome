@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
-import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
+import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
+import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
+import com.asrevo.cvhome.cua.web.mapper.SocialLoginConfigMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,16 +18,19 @@ import lombok.RequiredArgsConstructor;
 public class SocialLoginConfigService {
 
     private final SocialLoginConfigRepository repository;
+    private final SocialLoginConfigMapper mapper;
 
-    public List<SocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
-        return repository.findAllByIdStoreMerchantId(merchantStore);
+    public List<ReadableSocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
+        return repository.findAllByIdStoreMerchantId(merchantStore).stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     @Transactional
-    public void saveConfigs(StoreMerchantId merchantStore, List<SocialLoginConfig> configs) {
-        configs.forEach(config -> {
-            config.setId(new SocialLoginConfigId(merchantStore, config.getId().providerId()));
-            repository.save(config);
+    public void saveConfigs(StoreMerchantId merchantStore, List<PersistableSocialLoginConfig> configs) {
+        configs.forEach(dto -> {
+            dto.setStoreMerchantId(merchantStore);
+            repository.save(mapper.toEntity(dto));
         });
     }
 
