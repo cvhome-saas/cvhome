@@ -49,6 +49,7 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
         isAgree,
         setIsAgree,
         readableCountryList,
+        supportedPaymentTypes,
         handleClickOnAgreement,
         onSubmit,
         login,
@@ -226,6 +227,30 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                         />
                         {errors?.customer?.billing?.address && (
                             <p className="text-xs text-destructive">{errors.customer.billing.address.message}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="paymentType"
+                               className="text-[10px] tracking-[0.2em] uppercase font-medium text-foreground">
+                            {t('PAYMENT_TYPE')}
+                        </Label>
+                        <Select onValueChange={(value) => setValue("paymentType", value)}
+                                value={supportedPaymentTypes?.length ? undefined : defaultCheckoutValue.paymentType}>
+                            <SelectTrigger id="paymentType" aria-invalid={!!errors.paymentType}
+                                           className="rounded-none border-border text-sm">
+                                <SelectValue placeholder={t('SELECT_PAYMENT_TYPE')}/>
+                            </SelectTrigger>
+                            <SelectContent className="rounded-none">
+                                {supportedPaymentTypes?.map((type) => (
+                                    <SelectItem key={type} value={type} className="text-sm">
+                                        {t(`PAYMENT_TYPES.${type}`)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors?.paymentType && (
+                            <p className="text-xs text-destructive">{errors.paymentType.message}</p>
                         )}
                     </div>
                 </div>

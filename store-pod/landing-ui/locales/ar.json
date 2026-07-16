@@ -49,6 +49,14 @@
       "CITY": "المدينة",
       "POSTAL_CODE": "الرمز البريدي",
       "ADDRESS": "العنوان",
+      "PAYMENT_TYPE": "نوع الدفع",
+      "SELECT_PAYMENT_TYPE": "اختر نوع الدفع",
+      "PAYMENT_TYPES": {
+        "COD": "الدفع عند الاستلام",
+        "STRIPE": "سترايب",
+        "PAYPAL": "بايبال",
+        "MANUAL_TRANSFER": "تحويل يدوي"
+      },
       "AGREEMENT": "أوافق على",
       "PLACE_ORDER": "إتمام الطلب",
       "ORDER_PLACED_SUCCESSFULLY": "تم إرسال الطلب بنجاح!",

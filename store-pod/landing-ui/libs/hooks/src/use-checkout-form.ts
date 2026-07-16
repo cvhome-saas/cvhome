@@ -3,7 +3,7 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import {useTranslations} from "next-intl";
-import {Box, defaultCheckoutValue, Order, ReadableCountryList, StoreContext} from "@store-front/types";
+import {Box, defaultCheckoutValue, Order, PaymentType, ReadableCountryList, StoreContext} from "@store-front/types";
 import {CartService} from "@store-front/services/cart-service";
 import {ContentService} from "@store-front/services/content-service";
 import {getCartManager} from "@store-front/services/cart-manager";
@@ -20,6 +20,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
     const [order, setOrder] = useState<Order | undefined>();
     const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
+    const [supportedPaymentTypes, setSupportedPaymentTypes] = useState<PaymentType[] | undefined>();
     const cartManager = getCartManager(storeContext);
     const {user, loading, login} = useUser(storeContext);
 
@@ -73,7 +74,16 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
             setReadableCountryList(countries);
         };
 
+        const fetchPaymentTypes = async () => {
+            const types = await CartService.getSupportedPaymentTypes(storeContext);
+            setSupportedPaymentTypes(types);
+            if (types && types.length > 0) {
+                setValue("paymentType", types[0]);
+            }
+        };
+
         fetchCountries().then();
+        fetchPaymentTypes().then();
         ContentService.getBox(storeContext, "agreement").then(it => {
             if (it == undefined) {
                 setIsAgree(true);
@@ -147,6 +157,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
         isAgree,
         setIsAgree,
         readableCountryList,
+        supportedPaymentTypes,
         handleClickOnAgreement,
         onSubmit,
         login,
