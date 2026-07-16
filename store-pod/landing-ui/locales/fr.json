@@ -49,6 +49,14 @@
       "CITY": "Ville",
       "POSTAL_CODE": "Code Postal",
       "ADDRESS": "Adresse",
+      "PAYMENT_TYPE": "Type de paiement",
+      "SELECT_PAYMENT_TYPE": "Sélectionner le type de paiement",
+      "PAYMENT_TYPES": {
+        "COD": "Paiement à la livraison",
+        "STRIPE": "Stripe",
+        "PAYPAL": "PayPal",
+        "MANUAL_TRANSFER": "Virement Manuel"
+      },
       "AGREEMENT": "J'accepte les",
       "PLACE_ORDER": "Passer la commande",
       "ORDER_PLACED_SUCCESSFULLY": "Commande passée avec succès !",

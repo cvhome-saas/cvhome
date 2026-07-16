@@ -49,6 +49,14 @@
       "CITY": "City",
       "POSTAL_CODE": "Postal Code",
       "ADDRESS": "Address",
+      "PAYMENT_TYPE": "Payment Type",
+      "SELECT_PAYMENT_TYPE": "Select Payment Type",
+      "PAYMENT_TYPES": {
+        "COD": "Cash on Delivery",
+        "STRIPE": "Stripe",
+        "PAYPAL": "PayPal",
+        "MANUAL_TRANSFER": "Manual Transfer"
+      },
       "AGREEMENT": "I agree to the",
       "PLACE_ORDER": "Place Order",
       "ORDER_PLACED_SUCCESSFULLY": "Order placed successfully!",

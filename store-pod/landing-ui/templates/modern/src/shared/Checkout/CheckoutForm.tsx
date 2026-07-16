@@ -52,6 +52,7 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
         isAgree,
         setIsAgree,
         readableCountryList,
+        supportedPaymentTypes,
         handleClickOnAgreement,
         onSubmit,
         login,
@@ -220,6 +221,31 @@ export const CheckoutForm = ({storeContext, requireLoginForOrderPlacement}: {
                                 {errors?.customer?.billing?.address && (
                                     <p className="text-sm font-medium text-destructive">
                                         {errors.customer.billing.address.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mt-4 space-y-2">
+                                <Label htmlFor="paymentType">{t('PAYMENT_TYPE')}</Label>
+                                <Select
+                                    onValueChange={(value) => setValue("paymentType", value)}
+                                    value={supportedPaymentTypes?.length ? undefined : defaultCheckoutValue.paymentType}
+                                >
+                                    <SelectTrigger id="paymentType" aria-invalid={!!errors.paymentType}
+                                                   className="w-full">
+                                        <SelectValue placeholder={t('SELECT_PAYMENT_TYPE')}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {supportedPaymentTypes?.map((type) => (
+                                            <SelectItem key={type} value={type}>
+                                                {t(`PAYMENT_TYPES.${type}`)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors?.paymentType && (
+                                    <p className="text-sm font-medium text-destructive">
+                                        {errors.paymentType.message}
                                     </p>
                                 )}
                             </div>

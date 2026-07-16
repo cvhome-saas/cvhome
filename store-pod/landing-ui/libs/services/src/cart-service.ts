@@ -3,6 +3,7 @@ import {CheckoutCart} from "@store-front/types/checkout-cart";
 import {Order} from "@store-front/types/order";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {del, get, handleResponse, post, put} from "./http-utils";
+import {PaymentType} from "@store-front/types/checkout-cart";
 import {ReadableCountryList} from "@store-front/types/country";
 
 export class CartService {
@@ -46,6 +47,11 @@ export class CartService {
     public static getCountries = async (storeContext: StoreContext): Promise<ReadableCountryList | undefined> => {
         return fetch(`${storeBaseServiceUrl('checkout', storeContext)}/api/v1/country?store=${storeContext.store}&lang=${storeContext.locale}`, get())
             .then(it => handleResponse<ReadableCountryList>(it))
+    }
+
+    public static getSupportedPaymentTypes = async (storeContext: StoreContext): Promise<PaymentType[] | undefined> => {
+        return fetch(`${storeBaseServiceUrl('payment', storeContext)}/api/v1/public/payment-configuration/${storeContext.store}/supported-payment-types`, get())
+            .then(it => handleResponse<PaymentType[]>(it))
     }
 
     private static addToNewCart = async (storeContext: StoreContext, product: string, quantity: number) => {

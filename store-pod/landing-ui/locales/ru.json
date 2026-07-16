@@ -49,6 +49,14 @@
       "CITY": "Город",
       "POSTAL_CODE": "Почтовый индекс",
       "ADDRESS": "Адрес",
+      "PAYMENT_TYPE": "Тип оплаты",
+      "SELECT_PAYMENT_TYPE": "Выберите тип оплаты",
+      "PAYMENT_TYPES": {
+        "COD": "Наложенный платеж",
+        "STRIPE": "Stripe",
+        "PAYPAL": "PayPal",
+        "MANUAL_TRANSFER": "Ручной перевод"
+      },
       "AGREEMENT": "Я согласен с",
       "PLACE_ORDER": "Оформить заказ",
       "ORDER_PLACED_SUCCESSFULLY": "Заказ успешно размещен!",
