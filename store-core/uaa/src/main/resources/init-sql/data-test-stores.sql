@@ -1,7 +1,5 @@
 insert into uaa.users (id, username, email, first_name, last_name, password_hash, enabled, metadata)
-values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'super-admin', 'super-admin@mail.com', 'Super', 'Admin',
-        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE, '{}'),
-       ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', 'org1-admin', 'org1-admin@mail.com', 'Org1', 'Admin',
+values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', 'org1-admin', 'org1-admin@mail.com', 'Org1', 'Admin',
         '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE,
         '{"org": "21f023932bc66470c104b76f"}'),
        ('60AB49A5-7F06-4B5A-BE81-9B30BB6559AE', 'org1-store1-admin', 'org1-store1-admin@mail.com', 'Store1', 'Admin',
@@ -39,8 +37,7 @@ on conflict (id) do nothing;
 
 -- Map user roles
 insert into uaa.user_roles (user_id, role_id)
-values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e'),
-       ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', '4CA169A8-E8AC-4874-ACAE-795BF7B27832'),
+values ('318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4', '4CA169A8-E8AC-4874-ACAE-795BF7B27832'),
        ('60AB49A5-7F06-4B5A-BE81-9B30BB6559AE', '58C35650-746C-48F8-84E7-78E588045194'),
        ('0C1C7C69-F504-47E2-AA5D-3348CBD1023F', '23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8'),
        ('E91EB99A-D3C9-4FBE-8CD3-8744E4F6CA29', '58C35650-746C-48F8-84E7-78E588045194'),

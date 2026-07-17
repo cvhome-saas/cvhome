@@ -6,6 +6,14 @@ values ('c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e', 'SUPER_ADMIN'),
        ('58C35650-746C-48F8-84E7-78E588045194', 'STORE_ADMIN'),
        ('23BAB562-5FF0-4690-A0C2-89E2CEA6FCE8', 'STORE_MODERATOR')
 on conflict (id) do nothing;
+
+insert into uaa.users (id, username, email, first_name, last_name, password_hash, enabled, metadata)
+values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'super-admin', 'super-admin@mail.com', 'Super', 'Admin',
+        '{bcrypt}$2a$10$pse9zsAXkH/zOjZpfiP7X.weD6CNtVY/NR5A4mYUwbYqcYThHchRa', TRUE, '{}');
+
+insert into uaa.user_roles (user_id, role_id)
+values ('65D8419C-8765-4B8B-A15F-910DCE959931', 'c1e3a8e6-3a3e-4b1a-8e3e-3a3e4b1a8e3e');
+
 -- Seed OAuth clients (note: settings are simplified and may be adjusted per SAS version)
 -- admin-sdk: client_credentials with scope super_admin
 -- client_secret: secret
