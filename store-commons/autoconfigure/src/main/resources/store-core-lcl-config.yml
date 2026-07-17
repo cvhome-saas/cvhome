@@ -1,7 +1,3 @@
-spring:
-  sql:
-    init:
-      data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
 com:
   asrevo:
     cvhome:
