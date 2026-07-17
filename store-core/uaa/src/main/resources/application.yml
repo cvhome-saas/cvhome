@@ -17,3 +17,10 @@ spring:
     init:
       schema-locations: classpath:init-sql/schema.sql
       data-locations: classpath:init-sql/data-common.sql
+
+com:
+  asrevo:
+    cvhome:
+      uaa:
+        admin:
+          password: admin

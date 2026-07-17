@@ -4,27 +4,27 @@ com:
       test-store:
         users:
           - id: 65D8419C-8765-4B8B-A15F-910DCE959931
-            password: password
+            password: admin
           - id: 318F2FD5-E235-4C2E-AB7E-6C949BA4CDD4
-            password: password
+            password: admin
           - id: 60AB49A5-7F06-4B5A-BE81-9B30BB6559AE
-            password: password
+            password: admin
           - id: 0C1C7C69-F504-47E2-AA5D-3348CBD1023F
-            password: password
+            password: admin
           - id: E91EB99A-D3C9-4FBE-8CD3-8744E4F6CA29
-            password: password
+            password: admin
           - id: 77E97256-9706-44A9-A640-52AF9C65E5EA
-            password: password
+            password: admin
           - id: 7B54CF3C-5510-40BF-BD0B-14C4078EDF07
-            password: password
+            password: admin
           - id: 6C303A6A-459C-44FB-B4B2-EAB53FB2B325
-            password: password
+            password: admin
           - id: F900B31E-376E-4757-8EAB-501ABA2CFDD3
-            password: password
+            password: admin
           - id: F1FA1FA2-51F3-41CD-A816-356F6816ABD4
-            password: password
+            password: admin
           - id: 97022CD5-CC0A-467A-A99A-460B8E2745C3
-            password: password
+            password: admin
 spring:
   sql:
     init:
