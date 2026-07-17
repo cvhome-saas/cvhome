@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.Domain;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.repositories.merchant.MerchantRepository;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

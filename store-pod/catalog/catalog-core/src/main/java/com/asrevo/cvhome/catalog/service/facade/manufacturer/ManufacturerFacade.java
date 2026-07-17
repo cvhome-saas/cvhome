@@ -8,9 +8,9 @@ import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /**
  * Manufacturer / brand / collection product grouping

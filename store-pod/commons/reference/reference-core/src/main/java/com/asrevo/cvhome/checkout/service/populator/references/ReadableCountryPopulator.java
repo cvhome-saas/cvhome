@@ -6,8 +6,8 @@ import org.springframework.util.CollectionUtils;
 
 import com.asrevo.cvhome.checkout.entity.reference.country.Country;
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.ReadableCountry;
 import com.asrevo.cvhome.store.model.references.ReadableZone;

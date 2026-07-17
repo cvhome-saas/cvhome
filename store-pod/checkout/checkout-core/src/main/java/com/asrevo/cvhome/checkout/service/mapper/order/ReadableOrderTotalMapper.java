@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableOrderTotal;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
 @Component

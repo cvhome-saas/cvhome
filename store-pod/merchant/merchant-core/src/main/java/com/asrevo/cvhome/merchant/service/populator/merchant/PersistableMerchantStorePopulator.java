@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
 

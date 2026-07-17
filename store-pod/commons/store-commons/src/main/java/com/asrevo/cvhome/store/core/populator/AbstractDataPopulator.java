@@ -2,8 +2,8 @@ package com.asrevo.cvhome.store.core.populator;
 
 import java.util.Locale;
 
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.store.core.exception.ConversionException;
 
 import lombok.Getter;
 import lombok.Setter;

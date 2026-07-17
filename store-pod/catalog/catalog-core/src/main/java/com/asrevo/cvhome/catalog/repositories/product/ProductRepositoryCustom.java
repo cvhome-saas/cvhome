@@ -5,8 +5,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface ProductRepositoryCustom {
 

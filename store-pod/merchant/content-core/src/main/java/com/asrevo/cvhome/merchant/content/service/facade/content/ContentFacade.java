@@ -2,6 +2,7 @@ package com.asrevo.cvhome.merchant.content.service.facade.content;
 
 import org.springframework.data.domain.Pageable;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
@@ -11,7 +12,6 @@ import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBoxLi
 import com.asrevo.cvhome.merchant.content.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPageList;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /**
  * Images and files management

@@ -8,8 +8,8 @@ import java.util.List;
 
 import com.asrevo.cvhome.checkout.model.order.total.OrderTotal;
 import com.asrevo.cvhome.checkout.model.order.v0.Order;
-import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CurrencyCodeSerializer;
 

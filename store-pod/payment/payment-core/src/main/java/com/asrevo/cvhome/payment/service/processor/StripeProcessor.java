@@ -30,6 +30,32 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class StripeProcessor implements PaymentProcessor {
 
+    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
+            throws InvalidWebhookPayload {
+        try {
+            String sigHeader = headers.get("stripe-signature");
+            if (sigHeader == null) {
+                sigHeader = headers.get("Stripe-Signature");
+            }
+            return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
+        } catch (SignatureVerificationException e) {
+            log.error("Signature verification failed for Stripe webhook", e);
+            throw new InvalidWebhookPayload(e.getMessage(), e);
+        }
+    }
+
+    private static Long getTransactionId(Session session) {
+        String transactionIdStr = session.getClientReferenceId();
+        if (transactionIdStr == null) {
+            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
+        }
+        try {
+            return Long.valueOf(transactionIdStr);
+        } catch (NumberFormatException _) {
+            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
+        }
+    }
+
     @Override
     public PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
                                           Long transactionId) throws FailedPaymentInitiate {
@@ -102,33 +128,6 @@ public class StripeProcessor implements PaymentProcessor {
                     .build();
         }
         return WebhookResult.builder().build();
-    }
-
-
-    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
-            throws InvalidWebhookPayload {
-        try {
-            String sigHeader = headers.get("stripe-signature");
-            if (sigHeader == null) {
-                sigHeader = headers.get("Stripe-Signature");
-            }
-            return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
-        } catch (SignatureVerificationException e) {
-            log.error("Signature verification failed for Stripe webhook", e);
-            throw new InvalidWebhookPayload(e.getMessage(), e);
-        }
-    }
-
-    private static Long getTransactionId(Session session) {
-        String transactionIdStr = session.getClientReferenceId();
-        if (transactionIdStr == null) {
-            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
-        }
-        try {
-            return Long.valueOf(transactionIdStr);
-        } catch (NumberFormatException _) {
-            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
-        }
     }
 
 

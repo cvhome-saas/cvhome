@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface ManufacturerRepository extends JpaRepository<Manufacturer, Long> {
 

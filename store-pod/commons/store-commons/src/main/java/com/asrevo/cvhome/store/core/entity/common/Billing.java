@@ -8,10 +8,10 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotEmpty;
 
-import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
-import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
+import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
+import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;

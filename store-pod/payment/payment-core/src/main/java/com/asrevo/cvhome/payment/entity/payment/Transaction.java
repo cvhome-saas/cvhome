@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.UniqueConstraint;
 
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
@@ -30,7 +31,6 @@ import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
-import com.asrevo.cvhome.commons.domain.CurrencyCode;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -10,9 +10,9 @@ import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionDescription;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionFull;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 @Component
 public class ReadableProductOptionMapper implements Mapper<ProductOption, ReadableProductOptionEntity> {

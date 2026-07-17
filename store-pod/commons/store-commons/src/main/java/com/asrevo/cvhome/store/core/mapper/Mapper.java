@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.mapper;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface Mapper<S, T> {
 

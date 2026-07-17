@@ -4,8 +4,8 @@ package com.asrevo.cvhome.catalog.service.populator.catalog;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.category.CategoryDescription;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableCategoryPopulator extends AbstractDataPopulator<Category, StoreMerchantId, ReadableCategory> {

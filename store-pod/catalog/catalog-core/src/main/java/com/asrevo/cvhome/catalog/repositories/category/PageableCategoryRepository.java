@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface PageableCategoryRepository
         extends PagingAndSortingRepository<Category, Long>, JpaSpecificationExecutor<Category> {

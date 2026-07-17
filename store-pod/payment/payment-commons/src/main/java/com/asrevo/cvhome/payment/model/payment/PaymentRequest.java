@@ -3,8 +3,8 @@ package com.asrevo.cvhome.payment.model.payment;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.Builder;
 

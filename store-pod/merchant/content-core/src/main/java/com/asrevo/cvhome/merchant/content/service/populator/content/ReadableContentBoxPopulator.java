@@ -3,11 +3,11 @@ package com.asrevo.cvhome.merchant.content.service.populator.content;
 import java.util.List;
 import java.util.Optional;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.entity.content.Content;
 import com.asrevo.cvhome.merchant.content.entity.content.ContentDescription;
 import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBox;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableContentBoxPopulator extends AbstractDataPopulator<Content, StoreMerchantId, ReadableContentBox> {

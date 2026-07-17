@@ -16,8 +16,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
-import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;

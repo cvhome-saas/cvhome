@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.asrevo.cvhome.catalog.entity.product.group.ProductGroup;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 @Repository
 public interface ProductGroupRepository extends JpaRepository<ProductGroup, Long> {

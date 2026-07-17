@@ -14,10 +14,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
-import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
-import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
+import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
+import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.serializer.ZoneCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.ZoneCodeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;

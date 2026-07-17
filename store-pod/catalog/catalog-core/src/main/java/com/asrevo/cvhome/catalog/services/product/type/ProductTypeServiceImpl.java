@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.repositories.product.type.PageableProductTypeRepository;
 import com.asrevo.cvhome.catalog.repositories.product.type.ProductTypeRepository;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productTypeService")

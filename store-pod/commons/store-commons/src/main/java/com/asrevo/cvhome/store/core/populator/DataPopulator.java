@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.store.core.populator;
 
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.store.core.exception.ConversionException;
 
 /**
  * @author Umesh A

@@ -11,7 +11,7 @@ import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentRefer
 import com.stripe.exception.SignatureVerificationException;
 
 public interface PaymentProcessor {
-    PaymentInitiateResult initiate( PaymentSecret secret, PaymentRequest request,
+    PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
                                    Long transactionId);
 
     WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers, PaymentConfiguration config)

@@ -14,6 +14,7 @@ import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.service.populator.customer.CustomerPopulator;
 import com.asrevo.cvhome.checkout.service.populator.customer.ReadableCustomerPopulator;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
@@ -21,7 +22,6 @@ import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.extern.slf4j.Slf4j;
 

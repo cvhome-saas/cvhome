@@ -2,8 +2,8 @@ package com.asrevo.cvhome.store.utils;
 
 import java.util.Locale;
 
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.store.core.constants.Constants;
 
 import lombok.extern.slf4j.Slf4j;
 

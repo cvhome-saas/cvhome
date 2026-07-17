@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.entity.content.Content;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 public interface ContentRepository extends JpaRepository<Content, Long>, ContentRepositoryCustom {
 

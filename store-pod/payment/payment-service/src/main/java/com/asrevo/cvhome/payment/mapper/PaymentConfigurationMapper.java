@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.crypto.EncryptedValue;
 import com.asrevo.cvhome.crypto.SecretCryptoProvider;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
-import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 
 import lombok.RequiredArgsConstructor;
 

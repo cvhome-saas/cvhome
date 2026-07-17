@@ -27,6 +27,7 @@ import org.hibernate.annotations.SQLOrder;
 
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
@@ -38,7 +39,6 @@ import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;

@@ -6,8 +6,8 @@ package com.asrevo.cvhome.checkout.service.facade.cart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * </p>

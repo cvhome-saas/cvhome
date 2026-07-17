@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.asrevo.cvhome.commons.domain.Entity;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
@@ -37,7 +38,6 @@ import com.asrevo.cvhome.merchant.content.service.facade.content.ContentFacade;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

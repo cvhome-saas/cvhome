@@ -3,11 +3,11 @@ package com.asrevo.cvhome.checkout.service.populator.customer;
 import org.apache.commons.lang3.StringUtils;
 
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, StoreMerchantId, ReadableCustomer> {

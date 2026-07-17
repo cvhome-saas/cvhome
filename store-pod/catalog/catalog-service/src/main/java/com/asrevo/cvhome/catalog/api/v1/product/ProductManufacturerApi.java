@@ -27,11 +27,11 @@ import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
 import com.asrevo.cvhome.catalog.service.facade.manufacturer.ManufacturerFacade;
 import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerService;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

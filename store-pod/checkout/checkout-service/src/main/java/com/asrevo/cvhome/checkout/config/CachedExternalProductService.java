@@ -4,8 +4,8 @@ import org.springframework.cache.annotation.Cacheable;
 
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public class CachedExternalProductService implements ExternalProductService {
 

@@ -3,6 +3,7 @@ package com.asrevo.cvhome.merchant.service.facade.merchant;
 import java.util.List;
 import java.util.Set;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -11,7 +12,6 @@ import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 /**
  * Layer between shop controllers, services and API with sm-core

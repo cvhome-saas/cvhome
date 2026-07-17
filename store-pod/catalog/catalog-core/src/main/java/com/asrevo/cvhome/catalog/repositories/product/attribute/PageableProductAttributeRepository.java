@@ -7,8 +7,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface PageableProductAttributeRepository extends PagingAndSortingRepository<Category, Long> {
 

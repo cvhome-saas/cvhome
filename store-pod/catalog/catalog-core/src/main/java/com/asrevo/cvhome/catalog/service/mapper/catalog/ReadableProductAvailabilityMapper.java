@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 @Component
 public class ReadableProductAvailabilityMapper implements Mapper<Product, ReadableProductAvailability> {

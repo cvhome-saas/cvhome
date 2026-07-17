@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.category.CategoryDescription;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
-import com.asrevo.cvhome.commons.domain.LanguageCode;
 
 import lombok.extern.slf4j.Slf4j;
 

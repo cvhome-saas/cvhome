@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface ProductGroupFacade {
 
