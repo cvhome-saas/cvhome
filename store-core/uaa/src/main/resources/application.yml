@@ -21,20 +21,19 @@ spring:
 com:
   asrevo:
     cvhome:
-      uaa:
-        admin:
-          password: admin
-        oauth2:
-          clients:
-            admin-sdk:
-              secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-            store-pod-507f1f77@service.store-pod.internal:
-              secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-            store-core@service.store-core.internal:
-              secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-            web-app:
-              secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
-              redirect-uri-paths:
-                - "/login/oauth2/code/uaa"
-              post-logout-redirect-uri-paths:
-                - ""
+      admin:
+        password: admin
+      oauth2:
+        clients:
+          admin-sdk:
+            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          store-pod-507f1f77@service.store-pod.internal:
+            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          store-core@service.store-core.internal:
+            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          web-app:
+            secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            redirect-uri-paths:
+              - "/login/oauth2/code/uaa"
+            post-logout-redirect-uri-paths:
+              - ""
