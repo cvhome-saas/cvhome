@@ -16,11 +16,8 @@ import lombok.Setter;
 public class AppProperties {
 
     private String domain;
-    private Set<String> sub=new LinkedHashSet<>();
-    private List<Handler> handlers=new ArrayList<>();
-
-    public record Handler(String schema, String port) {
-    }
+    private Set<String> sub = new LinkedHashSet<>();
+    private List<Handler> handlers = new ArrayList<>();
 
     public Set<String> getUrls() {
         Set<String> urls = new LinkedHashSet<>();
@@ -52,5 +49,8 @@ public class AppProperties {
             return "%s://%s".formatted(schema, host);
         }
         return "%s://%s:%s".formatted(schema, host, port);
+    }
+
+    public record Handler(String schema, String port) {
     }
 }

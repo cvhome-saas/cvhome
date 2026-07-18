@@ -2,6 +2,7 @@ package com.asrevo.cvhome.s2s.model;
 
 import java.util.Map;
 import java.util.Set;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "com.asrevo.cvhome.uaa.oauth2")
