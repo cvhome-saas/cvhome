@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "com.asrevo.cvhome.uaa.oauth2")
+@ConfigurationProperties(prefix = "com.asrevo.cvhome.oauth2")
 public record OAuth2ClientProperties(Map<String, ClientInfo> clients) {
     public record ClientInfo(
             String secret,
