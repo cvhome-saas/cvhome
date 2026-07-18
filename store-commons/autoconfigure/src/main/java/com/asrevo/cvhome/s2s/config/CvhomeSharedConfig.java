@@ -18,6 +18,7 @@ import com.asrevo.cvhome.s2s.model.AdminUserProperties;
 import com.asrevo.cvhome.s2s.model.AppProperties;
 import com.asrevo.cvhome.s2s.model.CdnProperties;
 import com.asrevo.cvhome.s2s.model.CdnStorageProperties;
+import com.asrevo.cvhome.s2s.model.OAuth2ClientProperties;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
 import com.asrevo.cvhome.s2s.model.PodProperties;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
@@ -33,7 +34,7 @@ import com.asrevo.cvhome.s2s.model.TestStoreProperties;
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
         PodProperties.class, CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class,
         CdnStorageProperties.class, IssuerUriSetConfigrationProperties.class, TestStoreProperties.class,
-        AdminUserProperties.class
+        AdminUserProperties.class, OAuth2ClientProperties.class
 })
 public class CvhomeSharedConfig {
 
