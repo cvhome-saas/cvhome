@@ -69,6 +69,17 @@
         }
     }
 
+    handle_path /payment* {
+        tracing {
+            span payment
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://payment.{$NAMESPACE}:8125
+    }
+
 
     route {
         tracing {
