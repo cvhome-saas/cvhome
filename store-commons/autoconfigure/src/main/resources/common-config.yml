@@ -6,6 +6,7 @@ com:
         sub:
           - www
           - seller-ui
+          - uaa
         handlers:
           - schema: http
             port: 8000
