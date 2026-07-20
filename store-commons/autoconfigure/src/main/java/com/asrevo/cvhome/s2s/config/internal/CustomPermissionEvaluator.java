@@ -43,7 +43,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
 
             case "STORE-POD.MERCHANT.*", "STORE-POD.CONTENT.*", "STORE-POD.CATALOG.*", "STORE-POD.CHECKOUT.*",
-                 "STORE-POD.CUA.*" -> checker.hasManageAccessOnStore(authentication,
+                 "STORE-POD.CUA.*", "STORE-POD.PAYMENT.*" -> checker.hasManageAccessOnStore(authentication,
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
 
             case "STORE-POD.CUSTOMER.*" -> checker.isCustomerInSameStore(authentication,
