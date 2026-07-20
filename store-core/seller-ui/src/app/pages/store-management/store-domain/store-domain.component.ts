@@ -11,6 +11,7 @@ import {ErrorService} from "../../shared/services/error.service";
 import {zip} from "rxjs";
 import {DnsCheckService} from "../services/dns-check.service";
 import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} from "./store-domain.validator";
+import {sideMenuLinks} from "../services/constents";
 
 @Component({
   selector: 'ngx-store-domain',
@@ -26,50 +27,7 @@ export class StoreDomainComponent implements OnInit, StoreDomainComponentValidat
   page: Page = new Page();
   rows = [];
   selectedItem = '2';
-  sidemenuLinks = [
-    {
-      id: '0',
-      title: 'Store branding',
-      key: 'COMPONENTS.STORE_BRANDING',
-      link: 'store-branding'
-    },
-    {
-      id: '1',
-      title: 'Store home page',
-      key: 'COMPONENTS.STORE_LANDING',
-      link: 'store-landing'
-    },
-    {
-      id: '2',
-      title: 'Store domain',
-      key: 'COMPONENTS.STORE_DOMAIN',
-      link: 'store-domain'
-    },
-    {
-      id: '3',
-      title: 'Store Social Links',
-      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
-      link: 'store-social-links'
-    },
-    {
-      id: '4',
-      title: 'Store Slider Images',
-      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
-      link: 'store-slider-images'
-    },
-    {
-      id: '5',
-      title: 'Store details',
-      key: 'COMPONENTS.STORE_DETAILS',
-      link: 'store'
-    },
-    {
-      id: '6',
-      title: 'Store Social Login',
-      key: 'COMPONENTS.STORE_SOCIAL_LOGIN',
-      link: 'store-social-login'
-    }
-  ];
+  protected readonly sideMenuLinks = sideMenuLinks;
   form: FormGroup;
   saasProperties = {alis: '', domain: ''};
   shortenPodId: string;
