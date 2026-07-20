@@ -11,6 +11,7 @@ import {forkJoin} from 'rxjs';
 import {ErrorService} from "../../shared/services/error.service";
 import {Pods, PodService} from "../services/pod.service";
 import {SelectedStoreService} from "../../shared/services/selected-store.service";
+import {sideMenuLinks} from "../services/constents";
 
 @Component({
   selector: 'ngx-store-form',
@@ -40,50 +41,7 @@ export class StoreFormComponent implements OnInit {
   isNameUnique = true;
   selectedItem = '5';
   submitted = false;
-  sidemenuLinks = [
-    {
-      id: '0',
-      title: 'Store branding',
-      key: 'COMPONENTS.STORE_BRANDING',
-      link: 'store-branding'
-    },
-    {
-      id: '1',
-      title: 'Store home page',
-      key: 'COMPONENTS.STORE_LANDING',
-      link: 'store-landing'
-    },
-    {
-      id: '2',
-      title: 'Store domain',
-      key: 'COMPONENTS.STORE_DOMAIN',
-      link: 'store-domain'
-    },
-    {
-      id: '3',
-      title: 'Store Social Links',
-      key: 'COMPONENTS.STORE_SOCIAL_LINKS',
-      link: 'store-social-links'
-    },
-    {
-      id: '4',
-      title: 'Store Slider Images',
-      key: 'COMPONENTS.STORE_SLIDER_IMAGES',
-      link: 'store-slider-images'
-    },
-    {
-      id: '5',
-      title: 'Store details',
-      key: 'COMPONENTS.STORE_DETAILS',
-      link: 'store'
-    },
-    {
-      id: '6',
-      title: 'Store Social Login',
-      key: 'COMPONENTS.STORE_SOCIAL_LOGIN',
-      link: 'store-social-login'
-    }
-  ];
+  protected readonly sideMenuLinks = sideMenuLinks;
 
   constructor(
     private fb: FormBuilder,

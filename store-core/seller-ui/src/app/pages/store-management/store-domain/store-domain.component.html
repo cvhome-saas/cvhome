@@ -8,7 +8,7 @@
       </div>
       <div class="col col-lg-2">
         <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">{{ item.title }}
+          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
 
