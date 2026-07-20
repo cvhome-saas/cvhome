@@ -3,6 +3,13 @@ com:
     cvhome:
       app:
         domain: gateway.com
+        sub:
+          - www
+          - seller-ui
+          - uaa
+        handlers:
+          - schema: http
+            port: 8000
       pod:
         domain: spg-507f1f77.gateway.com
       services:
