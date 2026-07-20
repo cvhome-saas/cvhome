@@ -229,7 +229,13 @@
     "SOCIAL_APP_SECRET": "App Secret",
     "SOCIAL_LOGIN_UPDATED": "Social login configuration updated",
     "SOCIAL_APP_ENABLED": "Enabled",
-    "SOCIAL_CALLBACK_URL": "Callback URL format: /cua/login/oauth2/code/{{storeId}}.{{provider}}"
+    "SOCIAL_CALLBACK_URL": "Callback URL format: /cua/login/oauth2/code/{{storeId}}.{{provider}}",
+    "PAYMENT_ENABLED": "Payment Enabled",
+    "PAYMENT_WEBHOOK_SECRET": "Payment Webhook Secret",
+    "PAYMENT_SECRET_KEY": "Payment Secret Key",
+    "PAYMENT_API_KEY": "Payment API Key",
+    "STORE_PAYMENT_CONFIGURATION": "Store Payment Configuration",
+    "PAYMENT_CONFIGURATION_UPDATED": "Payment configuration updated"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Landing page title",

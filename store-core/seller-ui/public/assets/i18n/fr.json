@@ -229,7 +229,13 @@
     "SOCIAL_APP_SECRET": "Secret d’application",
     "SOCIAL_LOGIN_UPDATED": "Configuration du login social mise à jour",
     "SOCIAL_APP_ENABLED": "Activé",
-    "SOCIAL_CALLBACK_URL": "Format d'URL de rappel : /cua/login/oauth2/code/{{storeId}}.{{provider}}"
+    "SOCIAL_CALLBACK_URL": "Format d'URL de rappel : /cua/login/oauth2/code/{{storeId}}.{{provider}}",
+    "PAYMENT_ENABLED": "Paiement activé",
+    "PAYMENT_WEBHOOK_SECRET": "Secret du webhook de paiement",
+    "PAYMENT_SECRET_KEY": "Clé secrète de paiement",
+    "PAYMENT_API_KEY": "Clé API de paiement",
+    "STORE_PAYMENT_CONFIGURATION": "Configuration du paiement du magasin",
+    "PAYMENT_CONFIGURATION_UPDATED": "Configuration du paiement mise à jour"
   },
   "STORE_LANDING": {
     "LANDING_PAGE_TITLE": "Titre de la page de destination",
