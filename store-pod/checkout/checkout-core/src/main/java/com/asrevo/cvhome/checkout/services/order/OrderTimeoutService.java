@@ -34,6 +34,9 @@ public class OrderTimeoutService {
         // For Stripe: 30 minutes
         processExpiredOrders(PaymentType.STRIPE, Duration.ofMinutes(30), PaymentStatus.EXPIRED);
 
+        // For PayPal: 30 minutes
+        processExpiredOrders(PaymentType.PAYPAL, Duration.ofMinutes(30), PaymentStatus.EXPIRED);
+
         // For Manual Transfer: 48 hours
         processExpiredOrders(PaymentType.MANUAL_TRANSFER, Duration.ofHours(48), PaymentStatus.EXPIRED);
         
