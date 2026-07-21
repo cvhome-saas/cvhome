@@ -55,6 +55,7 @@ dependencies {
     implementation project(':store-pod:commons:reference:reference-core')
     implementation project(':store-pod:commons:customer:customer-commons')
     implementation project(':store-pod:checkout:checkout-core')
+    implementation project(':store-pod:checkout:checkout-external-api')
     implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:catalog:catalog-external-api')
     implementation project(':store-pod:payment:payment-external-api')

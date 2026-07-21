@@ -88,6 +88,7 @@ public class OrderFacadeImpl implements OrderFacade {
     private final OrderProductPopulator orderProductPopulator;
 
     private final ReadableOrderProductPopulator readableOrderProductPopulator;
+    private final OrderInventoryOrchestrator orderInventoryOrchestrator;
 
     public OrderFacadeImpl(ShoppingCartFacade shoppingCartFacade, ShoppingCartService shoppingCartService,
                            OrderService orderService,
@@ -95,7 +96,8 @@ public class OrderFacadeImpl implements OrderFacade {
                            ReadableOrderProductMapper readableOrderProductMapper, CustomerFacade customerFacade,
                            ReadableCustomerMapper readableCustomerMapper, ReadableOrderTotalMapper readableOrderTotalMapper,
                            ReadableOrderPopulator readableOrderPopulator,
-                           OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator) {
+                           OrderProductPopulator orderProductPopulator, ReadableOrderProductPopulator readableOrderProductPopulator,
+                           OrderInventoryOrchestrator orderInventoryOrchestrator) {
         this.shoppingCartFacade = shoppingCartFacade;
         this.shoppingCartService = shoppingCartService;
         this.orderService = orderService;
@@ -107,6 +109,7 @@ public class OrderFacadeImpl implements OrderFacade {
         this.readableOrderPopulator = readableOrderPopulator;
         this.orderProductPopulator = orderProductPopulator;
         this.readableOrderProductPopulator = readableOrderProductPopulator;
+        this.orderInventoryOrchestrator = orderInventoryOrchestrator;
     }
 
     @Override
@@ -396,6 +399,16 @@ public class OrderFacadeImpl implements OrderFacade {
             history.setStatus(status.getOrderStatus());
 
             orderService.addOrderStatusHistory(order, history);
+
+            if ((status.getOrderStatus() == OrderStatus.DELIVERED || status.getOrderStatus() == OrderStatus.COMPLETED)
+                    && order.getInventoryStatus() == InventoryStatus.RESERVED) {
+                log.info("Order {} reached {} status. Committing inventory for store {}", id, status.getOrderStatus(), store);
+                orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(id, store, status.getOrderStatus(), PaymentStatus.PAID);
+            } else if (status.getOrderStatus() == OrderStatus.CANCELLED && order.getInventoryStatus() == InventoryStatus.RESERVED) {
+                log.info("Order {} cancelled. Releasing inventory for store {}", id, store);
+                orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(id, store, status.getOrderStatus(),
+                        PaymentStatus.CANCELLED);
+            }
 
         } catch (Exception e) {
             throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);

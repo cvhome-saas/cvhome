@@ -21,4 +21,12 @@ public interface TransactionService {
     void completeInitiateTransaction(Long transactionId, PaymentRequest request, PaymentInitiateResult initiateResult);
 
     Transaction createCODTransaction(StoreMerchantId store, PaymentRequest request);
+
+    Transaction createManualTransferTransaction(StoreMerchantId store, PaymentRequest request);
+
+    void submitProof(Long transactionId, String transactionNo, String proofImage);
+
+    void approvePayment(StoreMerchantId store, Long transactionId);
+
+    void rejectPayment(StoreMerchantId store, Long transactionId, String reason);
 }

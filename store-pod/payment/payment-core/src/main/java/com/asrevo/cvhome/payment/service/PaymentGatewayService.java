@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.Transaction;
@@ -29,6 +30,7 @@ public class PaymentGatewayService {
     private final PaymentConfigurationRepository configRepository;
     private final TransactionService transactionService;
     private final StripeProcessor stripeProcessor;
+    private final ExternalOrderService externalOrderService;
 
     @Transactional
     public PaymentResponse initiatePayment(StoreMerchantId store, PaymentRequest request) {
@@ -45,6 +47,10 @@ public class PaymentGatewayService {
 
         if (PaymentType.COD.equals(request.paymentType())) {
             return handleCODPayment(store, request);
+        }
+
+        if (PaymentType.MANUAL_TRANSFER.equals(request.paymentType())) {
+            return handleManualTransferPayment(store, request);
         }
 
         PaymentConfiguration config = getPaymentConfiguration(store, request.paymentType());
@@ -79,6 +85,14 @@ public class PaymentGatewayService {
         Transaction transaction = transactionService.createCODTransaction(store, request);
         return PaymentResponse.builder()
                 .status(PaymentStatus.PAY_LATER)
+                .transactionId(transaction.getId())
+                .build();
+    }
+
+    private PaymentResponse handleManualTransferPayment(StoreMerchantId store, PaymentRequest request) {
+        Transaction transaction = transactionService.createManualTransferTransaction(store, request);
+        return PaymentResponse.builder()
+                .status(PaymentStatus.PENDING)
                 .transactionId(transaction.getId())
                 .build();
     }
@@ -121,12 +135,81 @@ public class PaymentGatewayService {
         }
     }
 
+    public void submitProof(Long transactionId, String transactionNo, String proofImage) {
+        transactionService.submitProof(transactionId, transactionNo, proofImage);
+        transactionService.findById(transactionId).ifPresent(tx -> {
+            log.info("Propagating WAITING_VERIFICATION status to checkout for order {} store {}", tx.getRef(),
+                    tx.getStoreMerchantId());
+            try {
+                externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(),
+                        com.asrevo.cvhome.store.core.entity.common.PaymentStatus.WAITING_VERIFICATION);
+            } catch (Exception e) {
+                log.error("Failed to propagate status to checkout service for order {}", tx.getRef(), e);
+            }
+        });
+    }
+
+    public void approvePayment(StoreMerchantId store, Long transactionId) {
+        transactionService.approvePayment(store, transactionId);
+        transactionService.findById(transactionId).ifPresent(tx -> {
+            log.info("Propagating PAID status to checkout for order {} store {}", tx.getRef(),
+                    tx.getStoreMerchantId());
+            try {
+                externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(),
+                        com.asrevo.cvhome.store.core.entity.common.PaymentStatus.PAID);
+            } catch (Exception e) {
+                log.error("Failed to propagate status to checkout service for order {}", tx.getRef(), e);
+            }
+        });
+    }
+
+    public void rejectPayment(StoreMerchantId store, Long transactionId, String reason) {
+        transactionService.rejectPayment(store, transactionId, reason);
+        transactionService.findById(transactionId).ifPresent(tx -> {
+            log.info("Propagating REJECTED status to checkout for order {} store {}", tx.getRef(),
+                    tx.getStoreMerchantId());
+            try {
+                externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(),
+                        com.asrevo.cvhome.store.core.entity.common.PaymentStatus.REJECTED);
+            } catch (Exception e) {
+                log.error("Failed to propagate status to checkout service for order {}", tx.getRef(), e);
+            }
+        });
+    }
+
     private void handleUseCase(WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
-            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.completeTransaction(result.transactionId(), result.status());
+            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> {
+                transactionService.completeTransaction(result.transactionId(), result.status());
+                // Propagate to Checkout Service
+                transactionService.findById(result.transactionId()).ifPresent(tx -> {
+                    com.asrevo.cvhome.store.core.entity.common.PaymentStatus status = mapStatus(result.status());
+                    log.info("Propagating payment status {} to checkout for order {} store {}", status, tx.getRef(),
+                            tx.getStoreMerchantId());
+                    try {
+                        externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(), status);
+                    } catch (Exception e) {
+                        log.error("Failed to propagate payment status to checkout service for order {}", tx.getRef(), e);
+                    }
+                });
+            }
             default -> log.warn("Unknown payment use case: {}", result.paymentUseCase());
         }
+    }
+
+    private com.asrevo.cvhome.store.core.entity.common.PaymentStatus mapStatus(PaymentStatus status) {
+        return switch (status) {
+            case PAID -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.PAID;
+            case FAILED -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.FAILED;
+            case PENDING -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.PENDING;
+            case PAY_LATER -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.PENDING;
+            case WAITING_VERIFICATION -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.WAITING_VERIFICATION;
+            case REJECTED -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.REJECTED;
+            case EXPIRED -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.EXPIRED;
+            case CANCELLED -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.CANCELLED;
+            case PROCESSING -> com.asrevo.cvhome.store.core.entity.common.PaymentStatus.PROCESSING;
+        };
     }
 
 }
