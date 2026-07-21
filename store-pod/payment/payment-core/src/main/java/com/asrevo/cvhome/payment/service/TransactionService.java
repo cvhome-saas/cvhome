@@ -24,9 +24,7 @@ public interface TransactionService {
 
     Transaction createManualTransferTransaction(StoreMerchantId store, PaymentRequest request);
 
-    void submitProof(Long transactionId, String transactionNo, String proofImage);
+    void approvePayment(StoreMerchantId store, Long transactionId, String transactionNo);
 
-    void approvePayment(StoreMerchantId store, Long transactionId);
-
-    void rejectPayment(StoreMerchantId store, Long transactionId, String reason);
+    void rejectPayment(StoreMerchantId store, Long transactionId);
 }

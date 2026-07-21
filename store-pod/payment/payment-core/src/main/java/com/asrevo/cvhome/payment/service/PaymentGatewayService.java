@@ -135,22 +135,8 @@ public class PaymentGatewayService {
         }
     }
 
-    public void submitProof(Long transactionId, String transactionNo, String proofImage) {
-        transactionService.submitProof(transactionId, transactionNo, proofImage);
-        transactionService.findById(transactionId).ifPresent(tx -> {
-            log.info("Propagating WAITING_VERIFICATION status to checkout for order {} store {}", tx.getRef(),
-                    tx.getStoreMerchantId());
-            try {
-                externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(),
-                        com.asrevo.cvhome.store.core.entity.common.PaymentStatus.WAITING_VERIFICATION);
-            } catch (Exception e) {
-                log.error("Failed to propagate status to checkout service for order {}", tx.getRef(), e);
-            }
-        });
-    }
-
-    public void approvePayment(StoreMerchantId store, Long transactionId) {
-        transactionService.approvePayment(store, transactionId);
+    public void approvePayment(StoreMerchantId store, Long transactionId, String transactionNo) {
+        transactionService.approvePayment(store, transactionId, transactionNo);
         transactionService.findById(transactionId).ifPresent(tx -> {
             log.info("Propagating PAID status to checkout for order {} store {}", tx.getRef(),
                     tx.getStoreMerchantId());
@@ -163,8 +149,8 @@ public class PaymentGatewayService {
         });
     }
 
-    public void rejectPayment(StoreMerchantId store, Long transactionId, String reason) {
-        transactionService.rejectPayment(store, transactionId, reason);
+    public void rejectPayment(StoreMerchantId store, Long transactionId) {
+        transactionService.rejectPayment(store, transactionId);
         transactionService.findById(transactionId).ifPresent(tx -> {
             log.info("Propagating REJECTED status to checkout for order {} store {}", tx.getRef(),
                     tx.getStoreMerchantId());

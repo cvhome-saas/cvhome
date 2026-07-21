@@ -114,16 +114,4 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_NO")
     private String transactionNo;
 
-    @Column(name = "PROOF_IMAGE")
-    private String proofImage;
-
-    @Column(name = "REJECTION_REASON")
-    private String rejectionReason;
-
-    @Column(name = "VERIFIED_BY")
-    private String verifiedBy;
-
-    @Column(name = "VERIFIED_AT")
-    private Instant verifiedAt;
-
 }

@@ -97,34 +97,21 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void submitProof(Long transactionId, String transactionNo, String proofImage) {
+    public void approvePayment(StoreMerchantId store, Long transactionId, String transactionNo) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
         transaction.setTransactionNo(transactionNo);
-        transaction.setProofImage(proofImage);
-        transaction.setStatus(PaymentStatus.WAITING_VERIFICATION);
-        transactionRepository.save(transaction);
-    }
-
-    @Override
-    @Transactional
-    public void approvePayment(StoreMerchantId store, Long transactionId) {
-        Transaction transaction = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
         transaction.setStatus(PaymentStatus.PAID);
         transaction.setTransactionType(TransactionType.CAPTURE);
-        transaction.setVerifiedAt(Instant.now());
-        // verifiedBy should be set from security context, I'll skip it for now or use a placeholder
         transactionRepository.save(transaction);
     }
 
     @Override
     @Transactional
-    public void rejectPayment(StoreMerchantId store, Long transactionId, String reason) {
+    public void rejectPayment(StoreMerchantId store, Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
         transaction.setStatus(PaymentStatus.REJECTED);
-        transaction.setRejectionReason(reason);
         transactionRepository.save(transaction);
     }
 
