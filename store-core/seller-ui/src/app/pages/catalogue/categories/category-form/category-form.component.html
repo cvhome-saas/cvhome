@@ -8,23 +8,23 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" *ngIf="!loader" [disabled]="!form.valid" [nbSpinner]="loader" nbButton
+        <button (click)="facade.save()" *ngIf="!facade.loader()" [disabled]="!facade.formService.form.valid" [nbSpinner]="facade.loading()" nbButton
                 nbSpinnerSize="large"
                 nbSpinnerStatus="control" status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loading() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="!loader" [formGroup]='form'>
+    <form *ngIf="!facade.loader()" [formGroup]='facade.formService.form'>
 
-      <div [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+      <div [nbSpinner]="facade.loader()" nbSpinnerSize="large" nbSpinnerStatus="primary">
         <div class="row">
           <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <nb-card accent="info" status="control">
@@ -43,10 +43,10 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label">{{ 'CATEGORY.PARENT' | translate }}</label>
-                      <nb-select *ngIf="roots.length" formControlName='parent' fullWidth outline
+                      <nb-select *ngIf="facade.roots().length" formControlName='parent' fullWidth outline
                                  placeholder="root"
                                  shape="rectangle">
-                        <nb-option *ngFor="let category of roots" [value]="category.code">{{ category.code }}
+                        <nb-option *ngFor="let cat of facade.roots()" [value]="cat.code">{{ cat.code }}
                         </nb-option>
                       </nb-select>
                     </div>
@@ -57,22 +57,22 @@
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="form-group">
                       <label class="label col-form-label" for="code">Code *</label>
-                      <input (change)="checkCode($event)" [readOnly]="category.id" class="form-control"
+                      <input (change)="facade.checkCode($event)" [readOnly]="category?.id" class="form-control"
                              formControlName='code'
                              fullWidth
                              id="code"
                              nbInput placeholder="{{ 'COMMON.CODE' | translate}}"
                              required
                              type="text">
-                      <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
-                    <span *ngIf="code.errors.required">
+                      <div *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && facade.formService.code.invalid && facade.formService.code" class="err-message">
+                    <span *ngIf="facade.formService.code.errors?.required">
                       {{ 'COMMON.CODE_REQUIRED' | translate }}
                     </span>
-                        <span *ngIf="code.errors.pattern">
+                        <span *ngIf="facade.formService.code.errors?.pattern">
                       {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
                     </span>
                       </div>
-                      <span *ngIf="!isCodeUnique" class="err-message">
+                      <span *ngIf="!facade.isCodeUnique()" class="err-message">
                     {{ 'COMMON.CODE_EXISTS' | translate }}
                   </span>
                     </div>
@@ -97,9 +97,9 @@
                 <nb-actions size="small">
                   <nb-action>{{ 'COMMON.SEO_DETAILS' | translate }}</nb-action>
                   <nb-action>
-                    <nb-select *ngIf="languages.length" [selected]="defaultLanguage" name='selectedLanguage'
+                    <nb-select *ngIf="facade.languages().length" [selected]="facade.defaultLanguage()" name='selectedLanguage'
                                outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-                      <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
+                      <nb-option (click)="facade.selectLanguage(language.code)" *ngFor="let language of facade.languages()"
                                  [value]="language.code">
                         {{ ('LANG.' + language.code) |translate }}
                       </nb-option>
@@ -112,11 +112,11 @@
               <nb-card-body>
                 <div class="row">
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
+                    <div *ngIf="facade.formService.selectedLanguage.value !== ''" formArrayName='descriptions'>
 
-                      <div *ngFor="let descr of descriptions.controls; let j=index">
+                      <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
 
-                        <div *ngIf="descr.value.language === selectedLanguage.value">
+                        <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
 
 
                           <div [formGroupName]="j">
@@ -134,14 +134,14 @@
                                   'DESCRIPTION_FORM.NAME' |
                                     translate
                                 }} *</label>
-                              <input (ngModelChange)="changeName($event, j)" class="form-control" formControlName='name'
+                              <input (ngModelChange)="facade.changeName($event, j)" class="form-control" formControlName='name'
                                      fullWidth
                                      id="name" nbInput
                                      placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate}}"
                                      type="text">
                               <span
                                 *ngIf="(descr.get('name').dirty || descr.get('name').touched)
-                                                      && descr.get('name').invalid && descr.get('name').errors.required"
+                                                      && descr.get('name').invalid && descr.get('name').errors?.required"
                                 class="err-message">
                             {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }}
                           </span>
@@ -156,7 +156,7 @@
                                      type="text">
                               <span
                                 *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
-                                                      && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors.required"
+                                                      && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors?.required"
                                 class="err-message">
                             {{ 'DESCRIPTION_FORM.FRIENDLY_URL_REQUIRED' | translate }}
                           </span>
@@ -202,9 +202,9 @@
               <nb-card-header>{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}</nb-card-header>
               <nb-card-body>
                 <div>
-                  <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
-                    <div *ngFor="let descr of descriptions.controls; let k=index">
-                      <div *ngIf="descr.value.language === selectedLanguage.value">
+                  <div *ngIf="facade.formService.selectedLanguage.value !== ''" formArrayName='descriptions'>
+                    <div *ngFor="let descr of facade.formService.descriptions.controls; let k=index">
+                      <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
                         <div [formGroupName]="k">
                           <div class="form-group">
                             <quill-editor [styles]="{height: '200px'}" formControlName="description"/>
@@ -218,10 +218,7 @@
             </nb-card>
           </div>
         </div>
-
       </div>
     </form>
-
   </nb-card-body>
 </nb-card>
-

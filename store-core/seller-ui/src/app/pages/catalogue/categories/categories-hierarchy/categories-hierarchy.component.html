@@ -5,10 +5,9 @@
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.loader()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div>
-      <ngcx-tree #tree (nodeMoved)="onMoveNode($event)" [nodes]="nodes"></ngcx-tree>
+      <ngcx-tree #tree (nodeMoved)="facade.onMoveNode($event)" [nodes]="facade.nodes()"></ngcx-tree>
     </div>
   </nb-card-body>
 </nb-card>
-

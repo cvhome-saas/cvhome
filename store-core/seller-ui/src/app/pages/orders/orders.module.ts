@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 
 import {OrdersComponent} from './orders.component';
 import {OrdersRoutingModule} from './orders-routing.module';
-import {OrderListComponent} from './order-list/order-list.component';
+import {OrderListComponent} from './components/order-list.component';
 import {OrderDetailsComponent} from './order-details/order-details.component';
 import {OrderInvoiceComponent} from './order-invoice/order-invoice';
 import {OrderHistoryComponent} from './order-history/order-history';

@@ -11,14 +11,13 @@ export class OrderHistoryComponent {
   historyData: Array<any>;
 
   constructor(protected ref: NbDialogRef<OrderHistoryComponent>) {
-    // console.log(this.historyData)
   }
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name) {
+  submit(name?: any) {
     this.ref.close(name);
   }
 }

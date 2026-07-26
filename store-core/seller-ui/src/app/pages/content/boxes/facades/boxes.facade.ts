@@ -1,0 +1,118 @@
+import {Injectable, inject, signal} from '@angular/core';
+import {Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
+import {ErrorService} from "../../../shared/services/error.service";
+import {ContentService} from "../../services/content.service";
+import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {TableStateService} from "../../../shared/table/table-state.service";
+import {StorePageRequest, PageT} from "../../../shared/table/table.types";
+import {PageEvent} from "@swimlane/ngx-datatable";
+import {Observable, tap} from "rxjs";
+import {map} from "rxjs/operators";
+
+@Injectable()
+export class BoxesFacade {
+  private readonly contentService = inject(ContentService);
+  private readonly router = inject(Router);
+  private readonly errorService = inject(ErrorService);
+  private readonly translate = inject(TranslateService);
+  private readonly toastr = inject(NbToastrService);
+  private readonly selectedStoreService = inject(SelectedStoreService);
+  private readonly dialogService = inject(NbDialogService);
+  public readonly tableState = inject(TableStateService<any, StorePageRequest>);
+
+  readonly selectedStore = signal<string>('');
+
+  private readonly recommendedCodes = ["meta-title", "meta-description", "agreement", "header-message"];
+
+  init(): void {
+    this.selectedStoreService.current().subscribe({
+      next: (store) => {
+        this.selectedStore.set(store);
+        if (store) {
+          const params = this.tableState.params();
+          const request: StorePageRequest = { ...params, store };
+          this.loadBoxes(request).subscribe(page => this.tableState.setPage(page));
+        }
+      },
+      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.tableState.patchParams({ page: event.offset });
+    const store = this.selectedStore();
+    if (store) {
+      const params = this.tableState.params();
+      const request: StorePageRequest = { ...params, store };
+      this.loadBoxes(request).subscribe(page => this.tableState.setPage(page));
+    }
+  }
+
+  loadBoxes(request: StorePageRequest): Observable<PageT<any>> {
+    this.tableState.setLoading(true);
+    return this.contentService.getBoxes(request).pipe(
+      map((it: any) => {
+        const missingCodes = this.recommendedCodes.filter(code => !it.content.some((e: any) => e.code === code));
+        const content = [...it.content];
+        missingCodes.forEach(code => {
+          content.unshift({ code });
+        });
+        return {
+          ...it,
+          size: content.length,
+          totalElements: content.length,
+          content
+        };
+      }),
+      tap({
+        next: () => this.tableState.setLoading(false),
+        error: (err) => {
+          this.tableState.setLoading(false);
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        }
+      })
+    );
+  }
+
+  addBox(): void {
+    this.router.navigate(['/pages/content/boxes/add']);
+  }
+
+  onEdit(event: any): void {
+    this.router.navigate(['/pages/content/boxes/edit', event.code]);
+  }
+
+  onCreate(event: any): void {
+    this.router.navigate(['/pages/content/boxes/add'], { queryParams: { code: event.code } });
+  }
+
+  onDelete(event: any): void {
+    this.dialogService.open(ShowcaseDialogComponent, {
+      context: {
+        title: 'Are you sure!',
+        text: 'Do you really want to remove this entity?'
+      },
+    }).onClose.subscribe(res => {
+      if (res) {
+        this.contentService.deleteContent(event.id)
+          .subscribe({
+            next: () => {
+              this.toastr.success(this.translate.instant('CONTENT.BOX_DELETED'));
+              const store = this.selectedStore();
+              if (store) {
+                const params = this.tableState.params();
+                const request: StorePageRequest = { ...params, store };
+                this.loadBoxes(request).subscribe(page => this.tableState.setPage(page));
+              }
+            },
+            error: (err) => {
+              this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            }
+          });
+      }
+    });
+  }
+}

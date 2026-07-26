@@ -8,8 +8,8 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">
+        <nb-select [selected]="facade.selectedItem()" outline shape="rectangle">
+          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sidemenuLinks" [value]="item.id">
             {{ item.title |translate }}
           </nb-option>
         </nb-select>
@@ -20,17 +20,17 @@
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <ngx-datatable
-      (page)="onPageEvent($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="page.content"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
       class="material"
       rowHeight="auto">
 

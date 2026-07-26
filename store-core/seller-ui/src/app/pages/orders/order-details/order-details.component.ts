@@ -1,17 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
-import {OrdersService} from '../services/orders.service';
-import moment from 'moment';
-import {OrderInvoiceComponent} from '../order-invoice/order-invoice';
-import {OrderHistoryComponent} from '../order-history/order-history';
-import {OrderTransactionComponent} from '../order-transaction/order-transaction';
-
-import {ActivatedRoute, Router} from '@angular/router';
-import {AsYouType} from 'libphonenumber-js';
-import {ErrorService} from "../../shared/services/error.service";
-import {StoreService} from "../../store-management/services/store.service";
-import {SelectedStoreService} from "../../shared/services/selected-store.service";
-import {zip} from "rxjs";
+import {Component, OnInit, inject} from '@angular/core';
+import {OrderDetailsFacade} from './facades/order-details.facade';
 
 @Component({
   selector: 'ngx-order-details',
@@ -20,322 +8,72 @@ import {zip} from "rxjs";
   styleUrls: ['./order-details.component.scss']
 })
 export class OrderDetailsComponent implements OnInit {
-
-  shippingCountry: Array<any> = []
-  shippingStateData: Array<any> = []
-  billingStateData: Array<any> = []
-  billingCountry: Array<any> = []
-  groups: Array<any> = []
-  loader = false;
-  orderDetailsData: any;
-  historyListData: Array<any> = [];
-  transactionListData: Array<any> = [];
-  statusList: Array<any> = [{'name': 'ORDERED', 'id': 'ORDERED'}, {
-    'name': 'PROCESSED',
-    'id': 'PROCESSED'
-  }, {'name': 'DELIVERED', 'id': 'DELIVERED'}, {'name': 'REFUNDED', 'id': 'REFUNDED'}, {
-    'name': 'CANCELED',
-    'id': 'CANCELED'
-  }]
-  info = {
-    userName: '',
-    language: '',
-    emailAddress: '',
-    datePurchased: ''
-  }
-  statusFields = {
-    comments: '',
-    status: ''
-  }
-  shipping = {
-    phone: '',
-    firstName: '',
-    lastName: '',
-    company: '',
-    address: '',
-    city: '',
-    zone: '',
-    tempZone: '',
-    country: '',
-    tempCountry: '',
-    postalCode: '',
-
-  }
-  billing = {
-    firstName: '',
-    lastName: '',
-    company: '',
-    address: '',
-    city: '',
-    zone: '',
-    tempZone: '',
-    country: '',
-    tempCountry: '',
-    postalCode: '',
-    phone: ''
-  }
-  transactionType: string = ''
-  orderID: any;
-  storeID: any;
-  languages: Array<any> = [{'code': 'en', 'name': 'English'}, {'code': 'fr', 'name': 'French'}]
-  store: any;
-
-  constructor(private ordersService: OrdersService, private storeService: StoreService, private toastr: NbToastrService,
-              private errorService: ErrorService, private dialogService: NbDialogService, private router: Router,
-              private activatedRoute: ActivatedRoute, private selectedStoreService: SelectedStoreService) {
-
-  }
-
-  getOrderDetails() {
-    this.loader = true;
-    this.ordersService.getOrderDetails(this.orderID)
-      .subscribe({
-        next: (data) => {
-          this.loader = false;
-          // console.log(data);
-          this.orderDetailsData = data;
-          this.onBillingChange(data.billing.country, 0)
-
-
-          this.info.emailAddress = data.customer.emailAddress;
-          this.info.datePurchased = data.datePurchased;
-
-          this.billing = data.billing;
-          if (data.delivery) {
-            this.onShippingChange(data.delivery.country, 0)
-            this.shipping = data.delivery;
-          }
-        },
-        error: (err) => {
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-      });
-  }
+  protected readonly facade = inject(OrderDetailsFacade);
 
   ngOnInit() {
-
-    zip([this.selectedStoreService.current(), this.activatedRoute.params])
-      .subscribe({
-        next: ([selectedStore, params]) => {
-          this.storeID = selectedStore;
-          this.orderID = params.id
-          this.getStore();
-          this.getCountry();
-          this.getOrderDetails();
-          this.getHistory();
-        },
-        error: (err) => {
-          this.loader = false;
-        },
-        complete: () => {
-          this.loader = false;
-        }
-      });
+    this.facade.init();
   }
 
-  getHistory() {
-    this.ordersService.getHistory(this.orderID)
-      .subscribe(data => {
-        this.historyListData = data;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+  get orderDetailsData() { return this.facade.orderDetailsData(); }
+  get loader() { return this.facade.loader(); }
+  get orderID() { return this.facade.orderID(); }
+  get transactionType() { return this.facade.transactionType(); }
+  get statusList() { return this.facade.statusList; }
+
+  get billing() { return this.facade.billing(); }
+  set billing(value: any) { this.facade.updateBilling(value); }
+
+  get shipping() { return this.facade.shipping(); }
+  set shipping(value: any) { this.facade.updateShipping(value); }
+
+  get info() { return this.facade.info(); }
+  set info(value: any) { this.facade.updateInfo(value); }
+
+  get statusFields() { return this.facade.statusFields(); }
+  set statusFields(value: any) { this.facade.updateStatusFields(value); }
+
+  get shippingCountry() { return this.facade.shippingCountry(); }
+  get billingCountry() { return this.facade.billingCountry(); }
+  get shippingStateData() { return this.facade.shippingStateData(); }
+  get billingStateData() { return this.facade.billingStateData(); }
+
+  onBillingChange(value: any, flag: number) {
+    this.facade.onBillingChange(value, flag);
   }
 
-
-  getStore() {
-    this.storeService.getStore(this.storeID)
-      .subscribe({
-        next: (data) => {
-          this.store = data;
-        }, error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-
-  }
-
-  getCountry() {
-    this.ordersService.getCountry()
-      .subscribe({
-        next: (data) => {
-          this.shippingCountry = data;
-          this.billingCountry = data;
-        }, error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  onBillingChange(value, flag) {
-    this.ordersService.getBillingZone(value)
-      .subscribe({
-        next: (data) => {
-          if (data.length > 0) {
-            this.billingStateData = data;
-            if (flag == 1) {
-              this.billing.zone = data[0].code;
-            }
-          } else {
-            this.billingStateData = data;
-            this.billing.zone = '';
-          }
-        }, error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  onShippingChange(value, flag) {
-    this.ordersService.getBillingZone(value)
-      .subscribe({
-        next: (data) => {
-          if (data.length > 0) {
-            this.shippingStateData = data;
-            if (flag == 1) {
-              this.shipping.zone = data[0].code
-            }
-          } else {
-            this.shippingStateData = data;
-            this.shipping.zone = '';
-          }
-        }, error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  updateHistory() {
-    this.loader = true;
-    let param = {
-      comments: this.statusFields.comments,
-      date: moment().format('yyyy-MM-DD'),
-      orderStatus: this.statusFields.status
-    }
-    this.ordersService.addHistory(this.orderID, param)
-      .subscribe({
-        next: (data) => {
-          this.loader = false;
-          this.toastr.success("History Status has been submitted successfully");
-          this.statusFields = {
-            comments: '',
-            status: ''
-          }
-        },
-        error: (err) => {
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  save() {
-    this.loader = true;
-    let param = {
-      "emailAddress": this.info.emailAddress,
-      "billing": {
-        "postalCode": this.billing.postalCode,
-        "firstName": this.billing.firstName,
-        "lastName": this.billing.lastName,
-        "company": "",
-        "phone": this.billing.phone,
-        "address": this.billing.address,
-        "city": this.billing.city,
-        "billingAddress": false,
-        "zone": this.billing.zone,
-        "country": this.billing.country
-      },
-      "delivery": {
-        "postalCode": this.shipping.postalCode,
-        "firstName": this.shipping.firstName,
-        "lastName": this.shipping.lastName,
-        "company": "",
-        "phone": this.shipping.phone,
-        "address": this.shipping.address,
-        "city": this.shipping.city,
-        "billingAddress": false,
-        "zone": this.shipping.zone,
-        "country": this.shipping.country
-      }
-    }
-    this.ordersService.updateOrder(this.orderID, param)
-      .subscribe({
-        next: (data) => {
-          this.loader = false;
-          this.toastr.success("Order has been updated successfully");
-        },
-        error: (err) => {
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-      })
-  }
-
-  onPhoneChange() {
-    this.billing.phone = new AsYouType('US').input(this.billing.phone);
-  }
-
-  onShippingPhoneChange() {
-    this.shipping.phone = new AsYouType('US').input(this.shipping.phone);
+  onShippingChange(value: any, flag: number) {
+    this.facade.onShippingChange(value, flag);
   }
 
   goToBack() {
-    this.router.navigate(['pages/orders/order-list']);
+    this.facade.goBack();
+  }
+
+  showDialog(value: any) {
+    this.facade.showDialog(value);
+  }
+
+  onPhoneChange(phone: string) {
+    this.facade.onPhoneChange(phone);
+  }
+
+  onShippingPhoneChange(phone: string) {
+    this.facade.onShippingPhoneChange(phone);
+  }
+
+  updateHistory() {
+    this.facade.updateHistory();
+  }
+
+  save() {
+    this.facade.save();
   }
 
   onClickRefund() {
-    this.loader = true;
-    this.ordersService.refundOrder(this.orderID)
-      .subscribe({
-        next: (data) => {
-          console.log(data)
-          this.loader = false;
-          this.toastr.success("Order has been refunded successfully");
-        },
-        error: (err) => {
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
+    this.facade.onClickRefund();
   }
 
   onClickCapture() {
-    this.loader = true;
-    this.ordersService.captureOrder(this.orderID)
-      .subscribe({
-        next: (data) => {
-          this.loader = false;
-          this.toastr.success("Order has been captured successfully");
-        },
-        error: (err) => {
-          this.loader = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  showDialog(value) {
-    // console.log(value)
-    if (value == 1) {
-      this.dialogService.open(OrderTransactionComponent, {
-        context: {
-          transactionData: this.transactionListData,
-        },
-      });
-    } else if (value == 2) {
-      this.dialogService.open(OrderInvoiceComponent, {
-        context: {
-          orderData: this.orderDetailsData,
-          store: this.store
-        },
-      });
-    } else if (value == 3) {
-      this.dialogService.open(OrderHistoryComponent, {
-        context: {
-          historyData: this.historyListData
-        },
-      });
-    }
+    this.facade.onClickCapture();
   }
 }

@@ -7,13 +7,13 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sideMenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button (click)="save()" nbButton status="success"
+        <button (click)="facade.save()" nbButton status="success"
                 type="submit">
           {{ 'COMMON.SAVE'  | translate }}
         </button>
@@ -21,9 +21,9 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form (ngSubmit)="save()" *ngIf="form" [formGroup]="form">
+    <form (ngSubmit)="facade.save()" *ngIf="facade.form" [formGroup]="facade.form">
       <div formArrayName="configs">
-        <div *ngFor="let config of configForms.controls; let i=index" [formGroupName]="i" class="provider-config mb-4">
+        <div *ngFor="let config of facade.configForms.controls; let i=index" [formGroupName]="i" class="provider-config mb-4">
           <h6>{{ config.value.paymentType }}</h6>
           <div class="row">
             <div class="col-sm-3">

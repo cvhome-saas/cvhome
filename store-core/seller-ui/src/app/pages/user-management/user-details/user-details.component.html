@@ -1,4 +1,4 @@
 <div>
-  <ngx-user-form *ngIf="user.id" [action]="'EDIT'" [store]="user.store" [user]="user"
+  <ngx-user-form *ngIf="facade.user()?.id" [action]="'EDIT'" [store]="facade.user()?.store" [user]="facade.user()"
                  title="COMPONENTS.USER_DETAILS"></ngx-user-form>
 </div>

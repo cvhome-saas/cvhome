@@ -1,3 +1,2 @@
-<div *ngIf="loading" [nbSpinner]="loading" class="loading-block" nbSpinnerSize="large" nbSpinnerStatus="primary"></div>
-<ngx-category-form *ngIf="store&&category.id" [category]="category" [store]="store"></ngx-category-form>
-
+<div *ngIf="facade.loading()" [nbSpinner]="facade.loading()" class="loading-block" nbSpinnerSize="large" nbSpinnerStatus="primary"></div>
+<ngx-category-form *ngIf="facade.store() && facade.category()?.id" [category]="facade.category()" [store]="facade.store()"></ngx-category-form>

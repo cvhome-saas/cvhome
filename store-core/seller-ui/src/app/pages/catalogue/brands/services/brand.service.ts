@@ -9,7 +9,7 @@ import {Observable} from 'rxjs';
 export class BrandService {
 
   constructor(
-    private crudService: CrudService
+    private readonly crudService: CrudService
   ) {
   }
 

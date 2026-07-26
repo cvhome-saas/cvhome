@@ -23,5 +23,8 @@ export class ErrorService {
     console.log('Application error [' + errorCode + ']' + code != null ? code : '');
   }
 
+  handleError(err: Error) {
+
+  }
 
 }

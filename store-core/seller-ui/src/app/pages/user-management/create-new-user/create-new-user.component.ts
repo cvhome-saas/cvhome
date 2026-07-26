@@ -1,25 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-
-import {User} from '../../shared/models/user';
-import {ActivatedRoute} from "@angular/router";
+import {Component, OnInit, inject} from '@angular/core';
+import {CreateNewUserFacade} from './facades/create-new-user.facade';
 
 @Component({
   selector: 'ngx-create-new-user',
   standalone: false,
   templateUrl: './create-new-user.component.html',
-  styleUrls: ['./create-new-user.component.scss']
+  styleUrls: ['./create-new-user.component.scss'],
+  providers: [CreateNewUserFacade]
 })
 export class CreateNewUserComponent implements OnInit {
-  user: User;
-  store: string = '';
-
-  constructor(private activatedRoute: ActivatedRoute) {
-  }
+  protected readonly facade = inject(CreateNewUserFacade);
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(it => {
-      this.store = it['store']
-    })
+    this.facade.init();
   }
-
 }

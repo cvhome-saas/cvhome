@@ -18,23 +18,11 @@ export class OrderInvoiceComponent {
     this.ref.close();
   }
 
-  submit(name) {
+  submit(name?: any) {
     this.ref.close(name);
   }
 
   print() {
-    // var printContents = document.getElementById('print-section').innerHTML;
-    // var popupWin = window.open('', '_blank', 'width=300,height=300');
-    // popupWin.document.open();
-    // popupWin.document.write(printContents);
-    // popupWin.document.close();
-    // let printContents = document.getElementById('print-section').innerHTML;
-    // let originalContents = document.body.innerHTML;
-
-    // document.body.innerHTML = printContents;
-
     window.print();
-
-    // document.body.innerHTML = originalContents;
   }
 }

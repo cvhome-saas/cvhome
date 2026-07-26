@@ -5,17 +5,17 @@
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <ngx-datatable
-      (page)="onPageEvent($event)"
+      (page)="onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
       [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="page.content"
+      [offset]="tableState.page().pageNumber"
+      [rows]="tableState.page().content"
       class="material"
       rowHeight="auto">
 

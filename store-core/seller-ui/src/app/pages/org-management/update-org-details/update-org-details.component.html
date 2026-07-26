@@ -7,27 +7,27 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">
+        <nb-select [selected]="facade.selectedItem()" outline shape="rectangle">
+          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sidemenuLinks" [value]="item.id">
             {{ item.title |translate }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form [formGroup]='form'>
+    <form [formGroup]='facade.form'>
       <div class="form-group">
         <label class="col-sm-3 col-form-label " for="email">
           {{ 'ORG_FORM.EMAIL_ADDRESS' | translate }}*
@@ -45,18 +45,18 @@
         <div class="col-sm-12">
           <nb-select formControlName='subscriptionPlan' fullWidth
                      id="subscriptionPlan" placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}">
-            <nb-option *ngFor="let i of subscriptionPlans" [value]="i">{{ i }}</nb-option>
+            <nb-option *ngFor="let i of facade.subscriptionPlans()" [value]="i">{{ i }}</nb-option>
           </nb-select>
 
 
           <span
-            *ngIf="(form.controls['subscriptionPlan'].dirty || form.controls['subscriptionPlan'].touched) && form.controls['subscriptionPlan'].invalid && form.controls['subscriptionPlan']"
+            *ngIf="(facade.form.controls['subscriptionPlan'].dirty || facade.form.controls['subscriptionPlan'].touched) && facade.form.controls['subscriptionPlan'].invalid && facade.form.controls['subscriptionPlan']"
             class="err-message">
               <span
-                *ngIf="form.controls['subscriptionPlan'].errors.subscriptionPlan || form.controls['subscriptionPlan'].errors.pattern">
+                *ngIf="facade.form.controls['subscriptionPlan'].errors.subscriptionPlan || facade.form.controls['subscriptionPlan'].errors.pattern">
                 {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_NOT_VALID' | translate }}
               </span>
-              <span *ngIf="form.controls['subscriptionPlan'].errors.required">
+              <span *ngIf="facade.form.controls['subscriptionPlan'].errors.required">
                 {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_REQUIRED' | translate }}
               </span>
             </span>

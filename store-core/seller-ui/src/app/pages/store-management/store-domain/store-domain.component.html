@@ -7,8 +7,8 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sideMenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
 
@@ -19,7 +19,7 @@
   </nb-card-header>
   <nb-card-body>
 
-    <form (ngSubmit)="save()" [formGroup]='form' class="mx-auto" style="max-width: 600px;">
+    <form (ngSubmit)="facade.save()" [formGroup]='facade.form' class="mx-auto" style="max-width: 600px;">
       <div class="card border-0 shadow-sm rounded-3 p-4">
         <div class="row">
           <div class="col-md-12">
@@ -28,33 +28,33 @@
               <input [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate" formControlName="domain" fullWidth
                      id="domain" nbInput
                      type="text">
-              <ng-container *ngIf="(domain.dirty || domain.touched || isSubmited) && domain.invalid">
-                <p *ngIf="domain.errors?.required" class="caption status-danger">
+              <ng-container *ngIf="(facade.domain.dirty || facade.domain.touched || facade.isSubmited()) && facade.domain.invalid">
+                <p *ngIf="facade.domain.errors?.required" class="caption status-danger">
                   {{ 'STORE.DOMAIN_REQUIRED' | translate }}
                 </p>
-                <p *ngIf="domain.errors?.pattern" class="caption status-danger">
+                <p *ngIf="facade.domain.errors?.pattern" class="caption status-danger">
                   {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
                 </p>
-                <p *ngIf="domain.errors?.dnsNotPointingToCname" class="caption status-danger">
+                <p *ngIf="facade.domain.errors?.dnsNotPointingToCname" class="caption status-danger">
                   {{
                     'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
-                      domain: domain.errors.dnsNotPointingToCname.domainChecked,
-                      target: domain.errors.dnsNotPointingToCname.requiredTarget
+                      domain: facade.domain.errors.dnsNotPointingToCname.domainChecked,
+                      target: facade.domain.errors.dnsNotPointingToCname.requiredTarget
                     }
                   }}
                 </p>
-                <p *ngIf="domain.errors?.dnsCheckServiceError" class="caption status-warning">
+                <p *ngIf="facade.domain.errors?.dnsCheckServiceError" class="caption status-warning">
                   {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
                 </p>
-                <p *ngIf="domain.errors?.waitingForInfraInfo" class="caption text-hint">
+                <p *ngIf="facade.domain.errors?.waitingForInfraInfo" class="caption text-hint">
                   {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
                 </p>
               </ng-container>
-              <p *ngIf="domain.pending" class="caption text-hint">
+              <p *ngIf="facade.domain.pending" class="caption text-hint">
                 {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
               </p>
               <p class="caption">
-                {{ 'STORE.DOMAIN_HELP_TEXT' | translate: {podDomain: podServerDomain()} }}
+                {{ 'STORE.DOMAIN_HELP_TEXT' | translate: {podDomain: facade.podServerDomain()} }}
               </p>
             </div>
           </div>
@@ -71,15 +71,15 @@
     </form>
     <hr class="my-4">
     <ngx-datatable
-      (page)="setPage($event)"
+      (page)="facade.setPage($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="rows"
+      [limit]="facade.perPageSize"
+      [offset]="facade.page().pageNumber"
+      [rows]="facade.rows()"
       class="material"
       rowHeight="auto">
 
@@ -88,7 +88,7 @@
         <ng-template let-column="column" ngx-datatable-header-template> {{ 'STORE.STORE_DOMAIN' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          {{ generateDomain(row) }}
+          {{ facade.generateDomain(row) }}
         </ng-template>
       </ngx-datatable-column>
 
@@ -97,10 +97,10 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onAccess(row)" nbButton shape="round" size="small" status="success">
+          <button (click)="facade.onAccess(row)" nbButton shape="round" size="small" status="success">
             <nb-icon icon="external-link"></nb-icon>
           </button>
-          <button (click)="onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round"
+          <button (click)="facade.onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round"
                   size="small"
                   status="danger">
             <nb-icon icon="trash"></nb-icon>
@@ -111,4 +111,3 @@
 
   </nb-card-body>
 </nb-card>
-

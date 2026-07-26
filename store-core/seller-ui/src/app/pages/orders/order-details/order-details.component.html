@@ -1,9 +1,9 @@
-<nb-card *ngIf="orderDetailsData" accent="info" status="basic">
+<nb-card *ngIf="facade.orderDetailsData()" accent="info" status="basic">
   <nb-card-header>
     <div class="row">
       <h1 class="page_title">
         {{ 'COMPONENTS.ORDERS' | translate }} {{ 'COMMON.ID' | translate }}
-        {{ orderID }} - {{ orderDetailsData.orderStatus }}
+        {{ facade.orderID() }} - {{ facade.orderDetailsData().orderStatus }}
       </h1>
     </div>
     <div class="row">
@@ -156,7 +156,7 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input #phone="ngModel" (keyup)="onPhoneChange()" [(ngModel)]="billing.phone" class="form-control "
+                    <input #phone="ngModel" (keyup)="onPhoneChange($event.target.value)" [(ngModel)]="billing.phone" class="form-control "
                            fullWidth
                            id="billing_phone"
                            maxlength=14 minlength=10
@@ -278,7 +278,7 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-group">
                     <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input (keyup)="onShippingPhoneChange()" [(ngModel)]="shipping.phone" class="form-control "
+                    <input (keyup)="onShippingPhoneChange($event.target.value)" [(ngModel)]="shipping.phone" class="form-control "
                            fullWidth
                            id="shipping_phone"
                            maxlength=14

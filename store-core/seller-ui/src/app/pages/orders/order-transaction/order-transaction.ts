@@ -11,14 +11,13 @@ export class OrderTransactionComponent {
   transactionData: any;
 
   constructor(protected ref: NbDialogRef<OrderTransactionComponent>) {
-    // console.log(this.historyData)
   }
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name) {
+  submit(name?: any) {
     this.ref.close(name);
   }
 }

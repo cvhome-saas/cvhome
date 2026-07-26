@@ -7,33 +7,33 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sideMenuLinks" [value]="item.id">{{ item.title }}
           </nb-option>
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="!loader" [formGroup]='form'>
+    <form *ngIf="!facade.loader()" [formGroup]='facade.form'>
       <nb-select formControlName='selectedLanguage' fullWidth outline placeholder="Language" shape="rectangle">
-        <nb-option *ngFor="let lan of languages" [value]="lan.code">{{
+        <nb-option *ngFor="let lan of facade.languages()" [value]="lan.code">{{
             ('LANG.' + lan.code) | translate
           }}
         </nb-option>
       </nb-select>
       <input class="form-control " formControlName='code' fullWidth id="code" nbInput type="hidden">
-      <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
-        <div *ngFor="let descr of descriptions.controls; let j=index">
-          <div *ngIf="descr.value.language === selectedLanguage.value">
+      <div *ngIf="facade.selectedLanguage.value !== ''" formArrayName='descriptions'>
+        <div *ngFor="let descr of facade.descriptions.controls; let j=index">
+          <div *ngIf="descr.value.language === facade.selectedLanguage.value">
 
             <div [formGroupName]="j">
 
@@ -76,5 +76,3 @@
     </form>
   </nb-card-body>
 </nb-card>
-
-

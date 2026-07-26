@@ -8,36 +8,36 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form [formGroup]='form'>
+    <form [formGroup]='facade.formService.form'>
       <div class="form-group">
         <label class="col-sm-10 col-form-label" for="code">{{ 'COMMON.CODE' | translate }}</label>
         <div class="col-sm-12">
-          <input (change)="checkCode($event)" [readOnly]="brand.id" class="form-control" formControlName='code'
+          <input (change)="facade.checkCode($event)" [readOnly]="brand?.id" class="form-control" formControlName='code'
                  fullWidth
                  id="code" nbInput
                  placeholder="{{ 'COMMON.CODE' | translate}}" required type="text">
-          <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
-              <span *ngIf="code.errors.required">
+          <div *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && facade.formService.code.invalid && facade.formService.code" class="err-message">
+              <span *ngIf="facade.formService.code.errors?.required">
                 {{ 'COMMON.CODE_REQUIRED' | translate }}
               </span>
-            <span *ngIf="code.errors.pattern">
+            <span *ngIf="facade.formService.code.errors?.pattern">
                 {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
               </span>
           </div>
-          <span *ngIf="!isCodeUnique" class="err-message">
+          <span *ngIf="!facade.isCodeUnique()" class="err-message">
               {{ 'COMMON.CODE_EXISTS' | translate }}
             </span>
         </div>
@@ -55,9 +55,9 @@
       <div class="form-group">
         <label class="col-sm-10 col-form-label ">{{ 'COMMON.LANGUAGE' | translate }} *</label>
         <div class="col-sm-12">
-          <nb-select *ngIf="languages.length" class="fullWidth" formControlName='selectedLanguage' fullWidth
+          <nb-select *ngIf="facade.languages().length" class="fullWidth" formControlName='selectedLanguage' fullWidth
                      outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-            <nb-option *ngFor="let language of languages" [value]="language.code">{{
+            <nb-option *ngFor="let language of facade.languages()" [value]="language.code">{{
                 ('LANG.' + language.code) |
                   translate
               }}
@@ -66,9 +66,9 @@
         </div>
       </div>
 
-      <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
-        <div *ngFor="let descr of descriptions.controls; let j=index">
-          <div *ngIf="descr.value.language === selectedLanguage.value">
+      <div *ngIf="facade.formService.selectedLanguage.value !== ''" formArrayName='descriptions'>
+        <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
+          <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
 
             <div [formGroupName]="j" class="description-block">
 
@@ -78,13 +78,13 @@
                       translate
                   }}</label>
                 <div class="col-sm-12">
-                  <input (ngModelChange)="changeName($event, j)" class="form-control " formControlName='name' fullWidth
+                  <input (ngModelChange)="facade.changeName($event, j)" class="form-control " formControlName='name' fullWidth
                          id="name"
                          nbInput
                          placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate}}"
                          type="text">
                   <span *ngIf="(descr.get('name').dirty || descr.get('name').touched)
-                              && descr.get('name').invalid && descr.get('name').errors.required" class="err-message">
+                              && descr.get('name').invalid && descr.get('name').errors?.required" class="err-message">
                       {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }}
                     </span>
                 </div>
@@ -110,7 +110,7 @@
                          placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate}}"
                          type="text">
                   <span *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
-                              && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors.required"
+                              && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors?.required"
                         class="err-message">
                       {{ 'DESCRIPTION_FORM.FRIENDLY_URL_REQUIRED' | translate }}
                     </span>
@@ -168,5 +168,3 @@
     </form>
   </nb-card-body>
 </nb-card>
-
-
