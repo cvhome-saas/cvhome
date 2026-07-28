@@ -1,7 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from '@nebular/theme';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {Banner} from '../../models/banner';
@@ -10,7 +9,6 @@ import {Banner} from '../../models/banner';
 export class StoreBrandingBannerFacade {
   private readonly formBuilder = inject(FormBuilder);
   private readonly storeService = inject(StoreService);
-  private readonly toastr = inject(NbToastrService);
   private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
@@ -99,7 +97,7 @@ export class StoreBrandingBannerFacade {
     this.loadingButton.set(true);
     this.storeService.addStoreBanner(storeId, this.bannerFile).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('STORE_BRANDING.BANNER_SAVED'));
+        this.errorService.success('STORE_BRANDING.BANNER_SAVED');
         this.loadingButton.set(false);
       },
       error: (err) => {
@@ -123,7 +121,7 @@ export class StoreBrandingBannerFacade {
     }
     this.storeService.removeStoreBanner(storeId).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('STORE_BRANDING.BANNER_REMOVED'));
+        this.errorService.success('STORE_BRANDING.BANNER_REMOVED');
       },
       error: (err) => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);

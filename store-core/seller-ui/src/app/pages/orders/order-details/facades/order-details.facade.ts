@@ -1,7 +1,8 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {DestroyRef, inject, Injectable, signal} from '@angular/core';
+import {NbDialogService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
 import {zip} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OrderDetailsMapper} from '../services/order-details.mapper';
 import {AsYouType} from 'libphonenumber-js';
 import {LANGUAGES, ORDER_STATUS_LIST, OrderDialogType} from '../constants/order-details.constants';
@@ -13,13 +14,12 @@ import {OrderTransactionComponent} from "../../order-transaction/order-transacti
 import {OrderInvoiceComponent} from "../../order-invoice/order-invoice";
 import {OrderHistoryComponent} from "../../order-history/order-history";
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class OrderDetailsFacade {
   private readonly ordersService = inject(OrdersService);
   private readonly storeService = inject(StoreService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly errorService = inject(ErrorService);
-  private readonly toastr = inject(NbToastrService);
   private readonly dialogService = inject(NbDialogService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -66,10 +66,10 @@ export class OrderDetailsFacade {
   });
   statusFields = signal({comments: '', status: ''});
 
-  init(route?: ActivatedRoute) {
-    const actRoute = route || this.activatedRoute;
+  init(destroyRef: DestroyRef): void {
     this.loader.set(true);
-    zip([this.selectedStoreService.current(), actRoute.params])
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(takeUntilDestroyed(destroyRef))
       .subscribe({
         next: ([selectedStore, params]) => {
           this.orderID.set(params.id);
@@ -107,7 +107,7 @@ export class OrderDetailsFacade {
   }
 
   private getOrderDetails() {
-    this.ordersService.getOrderDetails(this.orderID).subscribe({
+    this.ordersService.getOrderDetails(this.orderID()).subscribe({
       next: (data) => {
         this.orderDetailsData.set(data);
         this.loader.set(false);
@@ -132,7 +132,7 @@ export class OrderDetailsFacade {
   }
 
   private getHistory() {
-    this.ordersService.getHistory(this.orderID).subscribe({
+    this.ordersService.getHistory(this.orderID()).subscribe({
       next: (data) => this.historyListData.set(data),
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
     });
@@ -172,7 +172,7 @@ export class OrderDetailsFacade {
     this.ordersService.addHistory(this.orderID(), param).subscribe({
       next: (data) => {
         this.loader.set(false);
-        this.toastr.success("History Status has been submitted successfully");
+        this.errorService.success("History Status has been submitted successfully");
         this.statusFields.set({comments: '', status: ''});
       },
       error: (err) => {
@@ -182,29 +182,13 @@ export class OrderDetailsFacade {
     });
   }
 
-  updateBilling(billing: any) {
-    this.billing.set(billing);
-  }
-
-  updateShipping(shipping: any) {
-    this.shipping.set(shipping);
-  }
-
-  updateInfo(info: any) {
-    this.info.set(info);
-  }
-
-  updateStatusFields(statusFields: any) {
-    this.statusFields.set(statusFields);
-  }
-
   save() {
     this.loader.set(true);
     const param = this.mapper.mapUpdateOrderPayload(this.info(), this.billing(), this.shipping());
     this.ordersService.updateOrder(this.orderID(), param).subscribe({
       next: (data) => {
         this.loader.set(false);
-        this.toastr.success("Order has been updated successfully");
+        this.errorService.success("Order has been updated successfully");
       },
       error: (err) => {
         this.loader.set(false);
@@ -226,7 +210,7 @@ export class OrderDetailsFacade {
     this.ordersService.refundOrder(this.orderID()).subscribe({
       next: (data) => {
         this.loader.set(false);
-        this.toastr.success("Order has been refunded successfully");
+        this.errorService.success("Order has been refunded successfully");
       },
       error: (err) => {
         this.loader.set(false);
@@ -240,7 +224,7 @@ export class OrderDetailsFacade {
     this.ordersService.captureOrder(this.orderID()).subscribe({
       next: (data) => {
         this.loader.set(false);
-        this.toastr.success("Order has been captured successfully");
+        this.errorService.success("Order has been captured successfully");
       },
       error: (err) => {
         this.loader.set(false);
@@ -253,24 +237,18 @@ export class OrderDetailsFacade {
     this.router.navigate(['pages/orders/order-list']);
   }
 
-  showDialog(value: OrderDialogType | number | string, orderDetailsData?: any, historyListData?: any, transactionListData?: any, store?: any) {
-    const val = value;
-    const detailsData = orderDetailsData ?? this.orderDetailsData();
-    const historyData = historyListData ?? this.historyListData();
-    const transactionData = transactionListData ?? this.transactionListData();
-    const storeData = store ?? this.store();
-
-    if (val == OrderDialogType.Transaction || val == 1 || val == '1') {
+  showDialog(value: OrderDialogType | number | string): void {
+    if (value == OrderDialogType.Transaction || value == 1 || value == '1') {
       this.dialogService.open(OrderTransactionComponent, {
-        context: {transactionData: transactionData},
+        context: {transactionData: this.transactionListData()},
       });
-    } else if (val == OrderDialogType.Invoice || val == 2 || val == '2') {
+    } else if (value == OrderDialogType.Invoice || value == 2 || value == '2') {
       this.dialogService.open(OrderInvoiceComponent, {
-        context: {orderData: detailsData, store: storeData},
+        context: {orderData: this.orderDetailsData(), store: this.store()},
       });
-    } else if (val == OrderDialogType.History || val == 3 || val == '3') {
+    } else if (value == OrderDialogType.History || value == 3 || value == '3') {
       this.dialogService.open(OrderHistoryComponent, {
-        context: {historyData: historyData},
+        context: {historyData: this.historyListData()},
       });
     }
   }

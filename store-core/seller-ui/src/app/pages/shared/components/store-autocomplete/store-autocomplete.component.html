@@ -1,4 +1,4 @@
 <nb-select (selectedChange)="changed({id:$event})" [disabled]="!selectable" [selected]="selectedItem?.id"
            placeholder="Select Store">
-  <nb-option *ngFor="let s of stores" [value]="s.id.id">{{ s.name }}</nb-option>
+  <nb-option *ngFor="let s of facade.stores()" [value]="s.id.id">{{ s.name }}</nb-option>
 </nb-select>

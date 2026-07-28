@@ -56,7 +56,4 @@ export const routedComponents = [
   BoxesComponent,
   AddBoxComponent,
   FilesComponent
-  /*  UploadComponent,
-  PromotionComponent,
-*/
 ];

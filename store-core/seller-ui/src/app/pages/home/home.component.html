@@ -1,2 +1,2 @@
-<ngx-client-dashboard *ngIf="userType=='ORG_USER'||userType=='MANAGED_USER'"></ngx-client-dashboard>
-<ngx-admin-dashboard *ngIf="userType=='SUPPER_USER'"></ngx-admin-dashboard>
+<ngx-client-dashboard *ngIf="facade.isClientUser()"></ngx-client-dashboard>
+<ngx-admin-dashboard *ngIf="facade.isAdminUser()"></ngx-admin-dashboard>

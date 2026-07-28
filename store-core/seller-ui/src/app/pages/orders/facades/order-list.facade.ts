@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {OrdersService} from '../services/orders.service';
 import {SelectedStoreService} from "../../shared/services/selected-store.service";
 import {TableStateService} from "../../shared/table/table-state.service";
@@ -6,6 +6,7 @@ import {Observable, tap} from "rxjs";
 import {StorePageRequest, PageT} from "../../common/BaseTable";
 import {ErrorService} from "../../shared/services/error.service";
 import {PageEvent} from "@swimlane/ngx-datatable";
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export interface OrderFilterPageRequest extends StorePageRequest {
   phone?: string;
@@ -14,32 +15,37 @@ export interface OrderFilterPageRequest extends StorePageRequest {
   status?: string;
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class OrderListFacade {
-  constructor(
-    private readonly ordersService: OrdersService,
-    private readonly selectedStoreService: SelectedStoreService,
-    public tableState: TableStateService<any, OrderFilterPageRequest>,
-    private readonly errorService: ErrorService
-  ) {}
+  private readonly ordersService = inject(OrdersService);
+  private readonly selectedStoreService = inject(SelectedStoreService);
+  private readonly errorService = inject(ErrorService);
+  readonly tableState = inject(TableStateService<any, OrderFilterPageRequest>);
 
-  init(): void {
-    const store = this.selectedStoreService.currentSelectedStore();
-    if (store) {
-      const params = this.tableState.params();
-      const request: StorePageRequest = { ...params, store: store.id.id };
-      this.loadOrders(request).subscribe(page => this.tableState.setPage(page));
-    }
+  readonly store = signal<string>('');
+
+  init(destroyRef: DestroyRef): void {
+    this.selectedStoreService.current()
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: (store) => {
+          this.store.set(store || '');
+          if (store) {
+            this.refresh();
+          }
+        },
+        error: (err) => this.errorService.handleError(err)
+      });
   }
 
   onPageChange(event: PageEvent): void {
-    this.tableState.patchParams({ page: event.offset } as OrderFilterPageRequest);
-    this.init();
+    this.tableState.patchParams({page: event.offset} as OrderFilterPageRequest);
+    this.refresh();
   }
 
   onFilterChange(filters: any): void {
     this.tableState.patchParams(filters as OrderFilterPageRequest);
-    this.init();
+    this.refresh();
   }
 
   filter(): any {
@@ -52,7 +58,15 @@ export class OrderListFacade {
     };
   }
 
-  loadOrders(request: StorePageRequest): Observable<PageT<any>> {
+  private refresh(): void {
+    const store = this.store();
+    if (!store) return;
+
+    const request: OrderFilterPageRequest = {...this.tableState.params(), store};
+    this.loadOrders(request).subscribe(page => this.tableState.setPage(page));
+  }
+
+  private loadOrders(request: StorePageRequest): Observable<PageT<any>> {
     this.tableState.setLoading(true);
     return this.ordersService.getOrders(request).pipe(
       tap({

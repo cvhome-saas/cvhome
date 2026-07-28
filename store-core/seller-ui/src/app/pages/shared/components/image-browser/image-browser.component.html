@@ -6,11 +6,11 @@
         <span class="title_text">Image Gallery</span>
         <button (click)="cancel()" class="close" type="button"></button>
     </span>
-  <div [nbSpinner]="loadingList" class="row" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <div [nbSpinner]="facade.loading()" class="row" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
       <ul class="gallery_listing_main">
 
-        <li *ngFor="let images of uploadedFiles;let i=index">
+        <li *ngFor="let images of facade.images();let i=index">
           <div class="gallery_listing_box">
             <!-- <div class="image-title-main">
                 <p class="image-title">{{images.name}}</p>

@@ -1,7 +1,6 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {ErrorService} from "../../../shared/services/error.service";
 import {ContentService} from "../../services/content.service";
@@ -11,14 +10,13 @@ import {StorePageRequest, PageT} from "../../../shared/table/table.types";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {Observable, tap} from "rxjs";
 import {map} from "rxjs/operators";
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Injectable()
 export class PagesFacade {
   private readonly contentService = inject(ContentService);
   private readonly router = inject(Router);
   private readonly errorService = inject(ErrorService);
-  private readonly translate = inject(TranslateService);
-  private readonly toastr = inject(NbToastrService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   public readonly tableState = inject(TableStateService<any, StorePageRequest>);
@@ -27,28 +25,31 @@ export class PagesFacade {
 
   private readonly recommendedCodes = ["about-us", "contact-us", "faq", "location", "privacy", "terms"];
 
-  init(): void {
-    this.selectedStoreService.current().subscribe({
-      next: (store) => {
-        this.selectedStore.set(store);
-        if (store) {
-          const params = this.tableState.params();
-          const request: StorePageRequest = { ...params, store };
-          this.loadPages(request).subscribe(page => this.tableState.setPage(page));
-        }
-      },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
-    });
+  init(destroyRef: DestroyRef): void {
+    this.selectedStoreService.current()
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: (store) => {
+          this.selectedStore.set(store);
+          if (store) {
+            this.refresh();
+          }
+        },
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      });
   }
 
   onPageChange(event: PageEvent): void {
     this.tableState.patchParams({ page: event.offset });
+    this.refresh();
+  }
+
+  private refresh(): void {
     const store = this.selectedStore();
-    if (store) {
-      const params = this.tableState.params();
-      const request: StorePageRequest = { ...params, store };
-      this.loadPages(request).subscribe(page => this.tableState.setPage(page));
-    }
+    if (!store) return;
+
+    const request: StorePageRequest = { ...this.tableState.params(), store };
+    this.loadPages(request).subscribe(page => this.tableState.setPage(page));
   }
 
   loadPages(request: StorePageRequest): Observable<PageT<any>> {
@@ -101,13 +102,8 @@ export class PagesFacade {
         this.contentService.deleteContent(event.id)
           .subscribe({
             next: () => {
-              this.toastr.success('Content page deleted successfully');
-              const store = this.selectedStore();
-              if (store) {
-                const params = this.tableState.params();
-                const request: StorePageRequest = { ...params, store };
-                this.loadPages(request).subscribe(page => this.tableState.setPage(page));
-              }
+              this.errorService.success('Content page deleted successfully');
+              this.refresh();
             },
             error: (err) => {
               this.errorService.error('ERROR.SYSTEM_ERROR', err);

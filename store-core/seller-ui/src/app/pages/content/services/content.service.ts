@@ -1,16 +1,17 @@
 import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
 import {CrudService} from "../../shared/services/crud.service";
+import {PageT, StorePageRequest} from "../../shared/table/table.types";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContentService {
 
-  constructor(private crudService: CrudService) {
+  constructor(private readonly crudService: CrudService) {
   }
 
-
-  getBoxes(params: any) {
+  getBoxes(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/boxes', params);
   }
 
@@ -18,11 +19,11 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/private/content/boxes/' + uniqueCode, params);
   }
 
-  checkCodeBoxExist(code, params: any) {
+  checkCodeBoxExist(code: string, params: any) {
     return this.crudService.get('/spg/merchant/api/v1/private/content/box/' + code + '/exists', params);
   }
 
-  updateBox(id, object: any, param: any) {
+  updateBox(id: number | string, object: any, param: any) {
     return this.crudService.put('/spg/merchant/api/v1/private/content/box/' + id, object, param)
 
   }
@@ -35,8 +36,8 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/content/images')
   }
 
-  deleteImage(e) {
-    return this.crudService.delete(`/spg/merchant/api/v1/private/content/?contentType=IMAGE&name=${e}`);
+  deleteImage(name: string) {
+    return this.crudService.delete(`/spg/merchant/api/v1/private/content/?contentType=IMAGE&name=${name}`);
   }
 
   saveImage(formData: FormData) {
@@ -48,7 +49,7 @@ export class ContentService {
     return this.crudService.get('/spg/merchant/api/v1/private/content/page/' + code + '/exists');
   }
 
-  updatePage(id, object: any) {
+  updatePage(id: number | string, object: any) {
     return this.crudService.put('/spg/merchant/api/v1/private/content/page/' + id, object)
 
   }
@@ -62,11 +63,11 @@ export class ContentService {
 
   }
 
-  pages(params: any) {
+  pages(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/pages', params)
   }
 
-  deleteContent(id) {
+  deleteContent(id: number | string) {
     return this.crudService.delete('/spg/merchant/api/v1/private/content/' + id + '?id=' + id)
 
   }

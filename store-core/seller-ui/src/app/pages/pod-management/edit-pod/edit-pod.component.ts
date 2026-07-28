@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {EditPodFacade} from '../facades/edit-pod.facade';
 
 @Component({
@@ -10,8 +10,9 @@ import {EditPodFacade} from '../facades/edit-pod.facade';
 })
 export class EditPodComponent implements OnInit {
   protected readonly facade = inject(EditPodFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

@@ -1,7 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
 import {ErrorService} from "../../../shared/services/error.service";
 import {StoreService} from "../../services/store.service";
@@ -13,9 +12,7 @@ import {PageEvent} from "@swimlane/ngx-datatable";
 export class StoresListFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
   public readonly tableState = inject(TableStateService<any, StorePageRequest>);
 
@@ -57,7 +54,7 @@ export class StoresListFacade {
       if (res) {
         this.storeService.deleteStore(row.id.id).subscribe({
           next: () => {
-            this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
+            this.errorService.success('USER_FORM.USER_REMOVED');
             this.loadStores();
           },
           error: (err) => {

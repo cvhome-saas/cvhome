@@ -1,5 +1,7 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {switchMap} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Pod, PodService} from '../../store-management/services/pod.service';
 import {ErrorService} from '../../shared/services/error.service';
 
@@ -11,11 +13,11 @@ export class EditPodFacade {
 
   readonly pod = signal<Pod | null>(null);
 
-  init(): void {
-    const podId = this.route.snapshot.paramMap.get('id');
-    if (!podId) return;
-
-    this.podService.getPod(podId).subscribe({
+  init(destroyRef: DestroyRef): void {
+    this.route.params.pipe(
+      switchMap((params) => this.podService.getPod(params['id'])),
+      takeUntilDestroyed(destroyRef)
+    ).subscribe({
       next: (pod) => this.pod.set(pod),
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
     });

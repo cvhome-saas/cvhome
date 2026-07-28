@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'ngx-usage',
@@ -6,13 +6,5 @@ import {Component, OnInit} from '@angular/core';
   templateUrl: './usage.component.html',
   styleUrls: ['./usage.component.scss']
 })
-export class UsageComponent implements OnInit {
-  loadingList = false;
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+export class UsageComponent {
 }

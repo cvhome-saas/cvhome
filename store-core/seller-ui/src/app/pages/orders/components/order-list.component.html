@@ -5,7 +5,7 @@
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="filter-section">
       <div class="row">
         <div class="col-md-3">
@@ -59,13 +59,13 @@
     <ngx-datatable
       (page)="onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="tableState.page().totalElements"
+      [count]="facade.tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="tableState.page().pageNumber"
-      [rows]="tableState.page().content"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
       class="material"
       rowHeight="auto">
 

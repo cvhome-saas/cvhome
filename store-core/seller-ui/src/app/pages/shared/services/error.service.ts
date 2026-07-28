@@ -14,11 +14,15 @@ export class ErrorService {
   ) {
   }
 
-  success(code) {
+  success(code: string) {
     this.toastrService.success(this.translateService.instant(code));
   }
 
-  error(errorCode, code) {
+  warning(code: string) {
+    this.toastrService.warning(this.translateService.instant(code));
+  }
+
+  error(errorCode: string, code: string) {
     this.toastrService.danger(this.translateService.instant(errorCode));
     console.log('Application error [' + errorCode + ']' + code != null ? code : '');
   }

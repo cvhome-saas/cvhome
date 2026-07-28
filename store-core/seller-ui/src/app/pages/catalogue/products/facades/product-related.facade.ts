@@ -1,7 +1,6 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {zip} from 'rxjs';
 import {Page} from '../../../shared/models/Page';
 import {ProductRelationshipService} from '../product-related/services/product-relationship.service';
@@ -13,8 +12,6 @@ export class ProductRelatedFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly productRelationshipService = inject(ProductRelationshipService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly store = signal<string>('');
@@ -23,15 +20,17 @@ export class ProductRelatedFacade {
 
   private product = '';
 
-  init(): void {
-    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params]).subscribe({
-      next: ([selectedStore, params]) => {
-        this.store.set(selectedStore);
-        this.product = params['code'];
-        this.loadRelationships();
-      },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
-    });
+  init(destroyRef: DestroyRef): void {
+    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params])
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          this.store.set(selectedStore);
+          this.product = params['code'];
+          this.loadRelationships();
+        },
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      });
   }
 
   private loadRelationships(): void {
@@ -45,7 +44,7 @@ export class ProductRelatedFacade {
     this.productRelationshipService.addProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows([...this.rows(), item]);
-        this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_ADDED'));
+        this.errorService.success('PRODUCT_GROUP.PRODUCT_ADDED');
       },
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
     });
@@ -55,7 +54,7 @@ export class ProductRelatedFacade {
     this.productRelationshipService.removeProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows(this.rows().filter((it) => it.id !== item.id));
-        this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_REMOVED'));
+        this.errorService.success('PRODUCT_GROUP.PRODUCT_REMOVED');
       },
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
     });

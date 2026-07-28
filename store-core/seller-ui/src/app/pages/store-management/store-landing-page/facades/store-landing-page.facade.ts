@@ -1,8 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {StoreLandingPageFormService} from '../services/store-landing-page.form.service';
@@ -13,8 +11,6 @@ import {sideMenuLinks} from '../../services/constents';
 export class StoreLandingPageFacade {
   private readonly formService = inject(StoreLandingPageFormService);
   private readonly storeService = inject(StoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
@@ -82,14 +78,14 @@ export class StoreLandingPageFacade {
     if (pg && pg.id) {
       this.storeService.updatePageContent(st.id, pg.id, this.form.value).subscribe({
         next: () => {
-          this.toastr.success(this.translate.instant('STORE_LANDING.PAGE_UPDATED'));
+          this.errorService.success('STORE_LANDING.PAGE_UPDATED');
         },
         error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
       });
     } else {
       this.storeService.createPageContent(this.form.value, st.id).subscribe({
         next: () => {
-          this.toastr.success(this.translate.instant('STORE_LANDING.PAGE_ADDED'));
+          this.errorService.success('STORE_LANDING.PAGE_ADDED');
           this.router.navigate(['pages/store-management/store/', st.id]);
         },
         error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)

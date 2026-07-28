@@ -1,8 +1,7 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {map, mergeMap} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OrgService} from '../../services/org.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {UpdateOrgDetailsFormService} from '../services/update-org-details-form.service';
@@ -15,8 +14,6 @@ export class UpdateOrgDetailsFacade {
   private readonly orgService = inject(OrgService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly loader = signal<boolean>(false);
@@ -30,10 +27,11 @@ export class UpdateOrgDetailsFacade {
     return this.formService.form;
   }
 
-  init(): void {
+  init(destroyRef: DestroyRef): void {
     this.activatedRoute.params.pipe(
       map(params => params['id']),
-      mergeMap(id => this.orgService.getOrg(id))
+      mergeMap(id => this.orgService.getOrg(id)),
+      takeUntilDestroyed(destroyRef)
     ).subscribe({
       next: (res) => {
         this.loadingInfo.set(false);
@@ -59,7 +57,7 @@ export class UpdateOrgDetailsFacade {
     this.loader.set(true);
     this.orgService.updateOrg(currentOrg.id.id, this.form.value).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('ORG_FORM.ORG_UPDATED'));
+        this.errorService.success('ORG_FORM.ORG_UPDATED');
         this.loader.set(false);
       },
       error: (err) => {

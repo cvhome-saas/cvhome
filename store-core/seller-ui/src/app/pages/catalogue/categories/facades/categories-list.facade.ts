@@ -1,8 +1,7 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {CategoryService} from '../services/category.service';
-import {TranslateService} from '@ngx-translate/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
@@ -16,9 +15,7 @@ export class CategoriesListFacade {
   private readonly router = inject(Router);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
-  private readonly toastr = inject(NbToastrService);
   readonly tableState = inject(TableStateService<any, StorePageRequest>);
 
   readonly store = signal<string>('');
@@ -85,7 +82,7 @@ export class CategoriesListFacade {
       if (res) {
         this.categoryService.deleteCategory(row.id).subscribe({
           next: () => {
-            this.toastr.success(this.translate.instant('CATEGORY.CATEGORY_REMOVED'));
+            this.errorService.success('CATEGORY.CATEGORY_REMOVED');
             this.loadPage();
           },
           error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)

@@ -1,28 +1,28 @@
 <nb-card accent="info" status="basic">
   <nb-card-header>
     <div class="row">
-      <h1 *ngIf="action == 'save'" class="page_title">{{ 'CONTENT.ADD_BOX_DETAILS' | translate }}</h1>
-      <h1 *ngIf="action == 'edit'" class="page_title">{{ 'CONTENT.UPDATE_BOX_DETAILS' | translate }}</h1>
+      <h1 *ngIf="facade.action() == 'save'" class="page_title">{{ 'CONTENT.ADD_BOX_DETAILS' | translate }}</h1>
+      <h1 *ngIf="facade.action() == 'edit'" class="page_title">{{ 'CONTENT.UPDATE_BOX_DETAILS' | translate }}</h1>
     </div>
 
     <div class="row">
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form #boxForm="ngForm" *ngIf="!loader" [formGroup]='form' role="form">
+    <form #boxForm="ngForm" *ngIf="!facade.loader()" [formGroup]='facade.form' role="form">
 
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -41,21 +41,21 @@
                   <div class="form-group">
                     <label class="label " for="code">{{ 'CONTENT.CODE' | translate }} <span>*</span></label>
                     <div>
-                      <input (change)="checkCode($event)" [readOnly]="uniqueCode" class="form-control "
+                      <input (change)="facade.checkCode($event)" [readOnly]="facade.uniqueCode()" class="form-control "
                              formControlName='code'
                              fullWidth
                              id="code"
                              nbInput placeholder="{{ 'COMMON.CODE' | translate}}"
                              required type="text">
-                      <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message">
-                        <span *ngIf="code.errors.required">
+                      <div *ngIf="(facade.code.dirty || facade.code.touched) && facade.code.invalid && facade.code" class="err-message">
+                        <span *ngIf="facade.code.errors.required">
                           {{ 'COMMON.CODE_REQUIRED' | translate }}
                         </span>
-                        <span *ngIf="code.errors.pattern">
+                        <span *ngIf="facade.code.errors.pattern">
                           {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
                         </span>
                       </div>
-                      <span *ngIf="isCodeExists" class="err-message">
+                      <span *ngIf="facade.isCodeExists()" class="err-message">
                         {{ 'COMMON.CODE_EXISTS' | translate }}
                       </span>
                     </div>
@@ -70,11 +70,11 @@
           <nb-card accent="info" status="control">
             <nb-card-header>{{ 'CONTENT.PAGE_CONTENT' | translate }} - {{
                 ('LANG.' +
-                  currentLanguage) |translate
+                  facade.currentLanguage()) |translate
               }}&nbsp;
-              <nb-select *ngIf="languages.length" [selected]="defaultLanguage" fullWidth name='selectedLanguage'
+              <nb-select *ngIf="facade.languages().length" [selected]="facade.defaultLanguage()" fullWidth name='selectedLanguage'
                          outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-                <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
+                <nb-option (click)="facade.selectLanguage(language.code)" *ngFor="let language of facade.languages()"
                            [value]="language.code">{{
                     ('LANG.' + language.code) |translate
                   }}
@@ -82,9 +82,9 @@
               </nb-select>
             </nb-card-header>
             <nb-card-body>
-              <div *ngIf="selectedLanguage.value !== ''" formArrayName='descriptions'>
-                <div *ngFor="let descr of descriptions.controls; let j=index">
-                  <div *ngIf="descr.value.language === selectedLanguage.value">
+              <div *ngIf="facade.selectedLanguage.value !== ''" formArrayName='descriptions'>
+                <div *ngFor="let descr of facade.descriptions.controls; let j=index">
+                  <div *ngIf="descr.value.language === facade.selectedLanguage.value">
                     <div [formGroupName]="j">
                       <div class="form-group">
                         <quill-editor [styles]="{height: '200px'}" formControlName="description"/>

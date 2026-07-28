@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
-import {Router} from "@angular/router";
+import {Component, inject} from '@angular/core';
+import {PublicNavigationFacade} from '../../shared/facades/public-navigation.facade';
 
 @Component({
   selector: 'app-seller-ui-fail-subscription',
   standalone: false,
+  providers: [PublicNavigationFacade],
   styles: `
       .flex-centered {
         margin: auto;
@@ -47,12 +48,9 @@ import {Router} from "@angular/router";
     `,
 })
 export class FailSubscriptionComponent {
+  private readonly facade = inject(PublicNavigationFacade);
 
-  constructor(private router: Router) {
-    console.log('ngx-fail-subscription');
-  }
-
-  goToHome() {
-    this.router.navigate(['/']);
+  goToHome(): void {
+    this.facade.goHome();
   }
 }

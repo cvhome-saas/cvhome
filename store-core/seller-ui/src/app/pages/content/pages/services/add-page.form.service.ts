@@ -2,14 +2,12 @@ import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
-import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from '@nebular/theme';
+import {ErrorService} from '../../../shared/services/error.service';
 
 @Injectable()
 export class AddPageFormService {
   private readonly fb = inject(FormBuilder);
-  private readonly translate = inject(TranslateService);
-  private readonly toastr = inject(NbToastrService);
+  private readonly errorService = inject(ErrorService);
 
   createForm(defaultLanguage: string): FormGroup {
     return this.fb.group({
@@ -86,7 +84,7 @@ export class AddPageFormService {
       }
     }
     if (invalid.length > 0) {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
     }
     return invalid;
   }

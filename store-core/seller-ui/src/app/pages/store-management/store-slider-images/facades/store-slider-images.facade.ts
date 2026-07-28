@@ -1,7 +1,5 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {sideMenuLinks} from '../../services/constents';
@@ -15,8 +13,6 @@ export interface SliderImage {
 @Injectable()
 export class StoreSliderImagesFacade {
   private readonly storeService = inject(StoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
@@ -69,7 +65,7 @@ export class StoreSliderImagesFacade {
       }));
       this.storeService.saveStoreImageSliders(st.id, sliderImagesPayload).subscribe({
         next: () => {
-          this.toastr.success(this.translate.instant('STORE.SLIDER_IMAGE_UPDATED'));
+          this.errorService.success('STORE.SLIDER_IMAGE_UPDATED');
         },
         error: (err) => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);
@@ -137,7 +133,7 @@ export class StoreSliderImagesFacade {
       next: (data) => {
         const imgs = [...this.sliderImages(), data];
         this.sliderImages.set(imgs);
-        this.toastr.success(this.translate.instant('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY'));
+        this.errorService.success('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY');
       },
       error: (err) => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);

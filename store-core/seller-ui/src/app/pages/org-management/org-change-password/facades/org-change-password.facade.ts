@@ -1,6 +1,7 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OrgService} from '../../services/org.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {OrgChangePasswordFormService} from '../services/org-change-password-form.service';
@@ -24,10 +25,11 @@ export class OrgChangePasswordFacade {
     return this.formService.form;
   }
 
-  init(): void {
+  init(destroyRef: DestroyRef): void {
     this.activatedRoute.params.pipe(
       map(params => params['id']),
-      mergeMap(id => this.orgService.getOrg(id))
+      mergeMap(id => this.orgService.getOrg(id)),
+      takeUntilDestroyed(destroyRef)
     ).subscribe({
       next: (res) => {
         this.org.set(res);

@@ -1,56 +1,29 @@
-import {AfterViewInit, Component, EventEmitter} from '@angular/core';
-import {FormControl} from "@angular/forms";
-import {StatisticsParams} from "../service/statistic.service";
-import {SelectedStoreService} from '../../shared/services/selected-store.service';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {ClientDashboardFacade} from '../facades/client-dashboard.facade';
+import {DashboardFilterFormService} from '../services/dashboard-filter-form.service';
+import {DateRangeStateService} from '../state/date-range.state';
 
 @Component({
   selector: 'ngx-client-dashboard',
   standalone: false,
   templateUrl: './client-dashboard.component.html',
-  styleUrl: './client-dashboard.component.scss'
+  styleUrl: './client-dashboard.component.scss',
+  providers: [ClientDashboardFacade, DateRangeStateService, DashboardFilterFormService]
 })
-export class ClientDashboardComponent implements AfterViewInit {
-  loading = false;
-  loader: boolean = false;
-  params: StatisticsParams;
-  paramsEmitter: EventEmitter<StatisticsParams> = new EventEmitter();
-  fromDateControl: FormControl<Date>;
-  toDateControl: FormControl<Date>;
-  fromMaxDates: Date = new Date();
-  toMaxDates: Date = new Date();
+export class ClientDashboardComponent implements OnInit {
+  protected readonly facade = inject(ClientDashboardFacade);
+  protected readonly formService = inject(DashboardFilterFormService);
+  private readonly destroyRef = inject(DestroyRef);
 
-
-  constructor(private selectedStoreService: SelectedStoreService) {
-    this.fromDateControl = new FormControl(this.previousDays(7));
-    this.toDateControl = new FormControl(new Date());
-    this.params = {
-      store: "",
-      fromDate: this.fromDateControl.value,
-      toDate: this.toDateControl.value
-    }
+  ngOnInit(): void {
+    this.facade.init(this.destroyRef);
   }
 
-  ngAfterViewInit(): void {
-    this.selectedStoreService.current().subscribe((store) => {
-      this.params.store = store;
-      this.paramsEmitter.emit(this.params)
-    })
+  onFromDateChanged(date: Date): void {
+    this.facade.onFromDateChange(date);
   }
 
-  previousDays(days: number) {
-    let d = new Date();
-    d.setDate(d.getDate() - days);
-    return d;
+  onToDateChanged(date: Date): void {
+    this.facade.onToDateChange(date);
   }
-
-  onFromDateChanged(e: Date) {
-    this.params.fromDate = e;
-    this.paramsEmitter.emit(this.params)
-  }
-
-  onToDateChanged(e: Date) {
-    this.params.toDate = e;
-    this.paramsEmitter.emit(this.params)
-  }
-
 }

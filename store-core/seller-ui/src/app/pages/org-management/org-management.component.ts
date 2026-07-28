@@ -1,4 +1,4 @@
-import {Component, DoCheck, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'ngx-org-management',
@@ -6,15 +6,5 @@ import {Component, DoCheck, OnInit} from '@angular/core';
   templateUrl: './org-management.component.html',
   styleUrls: ['./org-management.component.scss']
 })
-export class OrgManagementComponent implements OnInit, DoCheck {
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-
-  ngDoCheck() {
-  }
-
+export class OrgManagementComponent {
 }

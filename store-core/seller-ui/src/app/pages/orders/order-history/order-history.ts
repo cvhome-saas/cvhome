@@ -1,4 +1,4 @@
-import {Component,} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NbDialogRef} from '@nebular/theme';
 
 @Component({
@@ -8,10 +8,9 @@ import {NbDialogRef} from '@nebular/theme';
   styleUrls: ['order-history.scss'],
 })
 export class OrderHistoryComponent {
-  historyData: Array<any>;
+  protected readonly ref = inject(NbDialogRef<OrderHistoryComponent>);
 
-  constructor(protected ref: NbDialogRef<OrderHistoryComponent>) {
-  }
+  historyData: Array<any>;
 
   cancel() {
     this.ref.close();

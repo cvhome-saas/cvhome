@@ -1,6 +1,5 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {TypeFormService} from '../services/type-form.service';
 import {TypesService} from '../services/types.service';
@@ -9,6 +8,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {zip} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Injectable()
 export class TypeDetailsFacade {
@@ -19,7 +19,6 @@ export class TypeDetailsFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
   private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
@@ -33,17 +32,19 @@ export class TypeDetailsFacade {
   private typeData: any = null;
   private defaultLanguage = '';
 
-  init(): void {
-    zip([this.selectedStoreService.current(), this.activatedRoute.params]).subscribe({
-      next: ([selectedStore, params]) => {
-        const typeId = params.id;
-        this.loadFormContext(selectedStore, typeId);
-      },
-      error: (err) => {
-        this.loaded.set(true);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      }
-    });
+  init(destroyRef: DestroyRef): void {
+    zip([this.selectedStoreService.current(), this.activatedRoute.params])
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          const typeId = params.id;
+          this.loadFormContext(selectedStore, typeId);
+        },
+        error: (err) => {
+          this.loaded.set(true);
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        }
+      });
   }
 
   private loadFormContext(selectedStore: string, typeId: string): void {
@@ -118,7 +119,7 @@ export class TypeDetailsFacade {
     request$.subscribe({
       next: () => {
         this.loader.set(false);
-        this.toastr.success(this.translate.instant(
+        this.errorService.success(this.translate.instant(
           this.typeData?.id ? 'PRODUCT_TYPE.PRODUCT_TYPE_UPDATED' : 'PRODUCT_TYPE.PRODUCT_TYPE_CREATED'
         ));
         if (!this.typeData?.id) {

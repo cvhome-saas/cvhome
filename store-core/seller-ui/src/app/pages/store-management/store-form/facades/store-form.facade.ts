@@ -1,8 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../../shared/services/config.service';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
@@ -18,8 +16,6 @@ export class StoreFormFacade {
   private readonly configService = inject(ConfigService);
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly podService = inject(PodService);
@@ -116,7 +112,7 @@ export class StoreFormFacade {
         storeObj.id = storeInput.id;
         this.storeService.updateStore(storeObj).subscribe({
           next: () => {
-            this.toastr.success(this.translate.instant('STORE_FORM.STORE_UPDATED'));
+            this.errorService.success('STORE_FORM.STORE_UPDATED');
             this.router.navigate(['pages/store-management/stores-list']);
           },
           error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
@@ -125,12 +121,12 @@ export class StoreFormFacade {
         this.storeService.checkIfStoreExist(this.form.value.name).subscribe({
           next: (res) => {
             if (res.exist) {
-              this.toastr.success(this.translate.instant('COMMON.NAME_EXISTS'));
+              this.errorService.success('COMMON.NAME_EXISTS');
             } else {
               this.storeService.createStore(storeObj).subscribe({
                 next: (createdStore) => {
                   this.selectedStoreService.newStore(createdStore);
-                  this.toastr.success(this.translate.instant('STORE_FORM.STORE_CREATED'));
+                  this.errorService.success('STORE_FORM.STORE_CREATED');
                   this.router.navigate(['pages/store-management/stores-list']);
                 },
                 error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)

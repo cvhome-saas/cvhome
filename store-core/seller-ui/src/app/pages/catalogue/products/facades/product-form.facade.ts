@@ -1,6 +1,7 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
-import {NbRouteTab, NbToastrService} from '@nebular/theme';
+import {NbRouteTab} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {forkJoin} from 'rxjs';
 import {ProductFormService} from '../services/product-form.service';
@@ -22,7 +23,6 @@ export class ProductFormFacade {
   private readonly storeService = inject(StoreService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
   private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
@@ -41,12 +41,14 @@ export class ProductFormFacade {
 
   private productData: any;
 
-  init(product: any): void {
+  init(product: any, destroyRef: DestroyRef): void {
     this.productData = product;
-    this.selectedStoreService.current().subscribe({
-      next: (store) => this.loadFormContext(store),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
-    });
+    this.selectedStoreService.current()
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: (store) => this.loadFormContext(store),
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      });
   }
 
   private loadFormContext(store: string): void {
@@ -143,7 +145,7 @@ export class ProductFormFacade {
     }
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || productObject.sku === '' || productObject.manufacturer === '') {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
       this.loader.set(false);
       return;
     }
@@ -178,7 +180,7 @@ export class ProductFormFacade {
     request$.subscribe({
       next: () => {
         this.loader.set(false);
-        this.toastr.success(this.translate.instant(
+        this.errorService.success(this.translate.instant(
           this.productData?.id ? 'PRODUCT.PRODUCT_UPDATED' : 'PRODUCT.PRODUCT_CREATED'
         ));
         if (!this.productData?.id) {
@@ -189,7 +191,7 @@ export class ProductFormFacade {
         this.loader.set(false);
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
         if (!this.productData?.id && err?.error?.message) {
-          this.toastr.danger(err.error.message);
+          this.errorService.error(err.error.message, err);
         }
       }
     });
@@ -208,7 +210,7 @@ export class ProductFormFacade {
       }
     }
     if (invalid.length > 0) {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS') + ' [' + invalid + ' ]');
+      this.errorService.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS') + ' [' + invalid + ' ]', null);
     }
     return invalid;
   }

@@ -1,8 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {StoreDomainFormService} from '../services/store-domain.form.service';
@@ -15,8 +13,6 @@ import {sideMenuLinks} from '../../services/constents';
 export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
   private readonly formService = inject(StoreDomainFormService);
   private readonly storeService = inject(StoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
@@ -100,7 +96,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.storeService.removeDomain(this.store(), domainStr).subscribe({
       next: () => {
         this.loading.set(false);
-        this.toastr.success(this.translate.instant('STORE.DOMAIN_REMOVED'));
+        this.errorService.success('STORE.DOMAIN_REMOVED');
         this.getAllocations();
       },
       error: (err) => {
@@ -115,7 +111,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.storeService.allocateDomain(this.store(), domainStr).subscribe({
       next: () => {
         this.loading.set(false);
-        this.toastr.success(this.translate.instant('STORE.DOMAIN_CREATED'));
+        this.errorService.success('STORE.DOMAIN_CREATED');
         this.getAllocations();
       },
       error: (err) => {

@@ -1,8 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {StorePaymentConfigurationFormService} from '../services/store-payment-configuration.form.service';
@@ -13,8 +11,6 @@ import {sideMenuLinks} from '../../services/constents';
 export class StorePaymentConfigurationFacade {
   private readonly formService = inject(StorePaymentConfigurationFormService);
   private readonly storeService = inject(StoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
@@ -89,7 +85,7 @@ export class StorePaymentConfigurationFacade {
 
     zip(...requests).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('STORE.PAYMENT_CONFIGURATION_UPDATED'));
+        this.errorService.success('STORE.PAYMENT_CONFIGURATION_UPDATED');
         this.init();
       },
       error: (err) => {

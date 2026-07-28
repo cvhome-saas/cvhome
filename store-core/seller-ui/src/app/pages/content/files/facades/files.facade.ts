@@ -1,4 +1,4 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {NbDialogService} from '@nebular/theme';
 import {Lightbox} from 'ngx-lightbox';
 import {IAlbum} from 'ngx-lightbox/lightbox-event.service';
@@ -7,6 +7,7 @@ import {FileSystemFileEntry, NgxFileDropEntry} from 'ngx-file-drop';
 import {ErrorService} from '../../../shared/services/error.service';
 import {ContentService} from '../../services/content.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export interface FileImage extends IAlbum {
   file?: File;
@@ -27,18 +28,20 @@ export class FilesFacade {
   readonly files = signal<FileImage[]>([]);
   readonly images = signal<FileImage[]>([]);
 
-  init(): void {
-    this.selectedStoreService.current().subscribe({
-      next: (it) => {
-        this.store.set(it);
-      },
-      error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      },
-      complete: () => {
-        this.getFiles();
-      }
-    });
+  init(destroyRef: DestroyRef): void {
+    this.selectedStoreService.current()
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: (it) => {
+          this.store.set(it);
+        },
+        error: (err) => {
+          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        },
+        complete: () => {
+          this.getFiles();
+        }
+      });
   }
 
   getFiles(): void {
@@ -94,10 +97,6 @@ export class FilesFacade {
 
   openImage(data: FileImage[], index: number): void {
     this.lightbox.open(data, index);
-  }
-
-  close(): void {
-    this.lightbox.close();
   }
 
   unSelectImage(i: number): void {

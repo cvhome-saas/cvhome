@@ -8,26 +8,27 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large"
+                nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form [formGroup]='form'>
+    <form [formGroup]='facade.formService.form'>
 
       <div class="form-group row mb-3">
         <label class="col-sm-2 col-form-label" for="code">{{ 'COMMON.CODE' | translate }} *</label>
         <div class="col-sm-10">
-          <input (blur)="checkCode($event)"
-                 [status]="(code.dirty || code.touched) ? (code.invalid || !isCodeUnique ? 'danger' : 'success') : 'basic'"
+          <input (blur)="facade.checkCode($event.target.value.trim())"
+                 [status]="(facade.formService.code.dirty || facade.formService.code.touched) ? (facade.formService.code.invalid || !facade.isCodeUnique() ? 'danger' : 'success') : 'basic'"
                  formControlName='code'
                  fullWidth
                  id="code"
@@ -35,14 +36,14 @@
                  placeholder="{{ 'COMMON.CODE' | translate}}"
                  required
                  type="text">
-          <ng-container *ngIf="(code.dirty || code.touched) && (code.invalid || !isCodeUnique)">
-            <p *ngIf="code.errors?.required" class="caption status-danger">
+          <ng-container *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && (facade.formService.code.invalid || !facade.isCodeUnique())">
+            <p *ngIf="facade.formService.code.errors?.['required']" class="caption status-danger">
               {{ 'COMMON.CODE_REQUIRED' | translate }}
             </p>
-            <p *ngIf="code.errors?.pattern" class="caption status-danger">
+            <p *ngIf="facade.formService.code.errors?.['pattern']" class="caption status-danger">
               {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
             </p>
-            <p *ngIf="!isCodeUnique && !code.errors?.required && !code.errors?.pattern" class="caption status-danger">
+            <p *ngIf="!facade.isCodeUnique() && !facade.formService.code.errors?.['required'] && !facade.formService.code.errors?.['pattern']" class="caption status-danger">
               {{ 'COMMON.CODE_EXISTS' | translate }}
             </p>
           </ng-container>
@@ -57,12 +58,12 @@
         </div>
       </div>
 
-      <div *ngIf="languages.length > 1" class="form-group row mb-3">
+      <div *ngIf="facade.languages().length > 1" class="form-group row mb-3">
         <label class="col-sm-2 col-form-label">{{ 'COMMON.LANGUAGE' | translate }}</label>
         <div class="col-sm-10">
           <nb-button-group>
-            <button (click)="selectLanguage(lang.code)" *ngFor="let lang of languages"
-                    [status]="languageTabStatus(lang.code)"
+            <button (click)="facade.selectLanguage(lang.code)" *ngFor="let lang of facade.languages()"
+                    [status]="facade.formService.languageTabStatus(lang.code)"
                     nbButton
                     type="button">
               {{ lang.code | uppercase }}
@@ -72,18 +73,18 @@
       </div>
 
       <div formArrayName="descriptions">
-        <ng-container *ngFor="let desc of descriptions.controls; let i = index">
-          <div *ngIf="desc.get('language').value === selectedLanguage.value" [formGroupName]="i">
+        <ng-container *ngFor="let desc of facade.formService.descriptions.controls; let i = index">
+          <div *ngIf="desc.get('language').value === facade.formService.selectedLanguage.value" [formGroupName]="i">
 
             <div class="form-group row mb-3">
               <label class="col-sm-2 col-form-label">{{ 'CONTENT.NAME' | translate }} *</label>
               <div class="col-sm-10">
-                <input [status]="descriptionNameStatus(desc)" formControlName="name"
+                <input [status]="facade.formService.descriptionNameStatus(i)" formControlName="name"
                        fullWidth
                        nbInput
                        placeholder="{{ 'CONTENT.NAME' | translate }}"
                        type="text">
-                <p *ngIf="desc.get('name').touched && desc.get('name').errors?.required" class="caption status-danger">
+                <p *ngIf="desc.get('name').touched && desc.get('name').errors?.['required']" class="caption status-danger">
                   {{ 'COMMON.NAME_REQUIRED' | translate }}
                 </p>
               </div>
@@ -101,23 +102,23 @@
         <label class="col-sm-4 col-form-label"
                for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
         <div class="col-sm-6">
-          <ngx-product-auto-complete (onProduct)="onItemSelect($event, uniqueCode)" *ngIf="store"
-                                     [disabled]="uniqueCode == undefined"
-                                     [store]="store"/>
+          <ngx-product-auto-complete (onProduct)="facade.onItemSelect($event)" *ngIf="facade.store()"
+                                     [disabled]="facade.uniqueCode() == undefined"
+                                     [store]="facade.store()"/>
         </div>
       </div>
 
     </form>
     <ngx-datatable
-      (page)="setPage($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="rows"
+      [limit]="50"
+      [offset]="facade.page().pageNumber"
+      [rows]="facade.rows()"
       class="material"
       rowHeight="auto">
 
@@ -134,7 +135,7 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onItemDeSelect(row, uniqueCode)" nbButton shape="round" size="small" status="danger">
+          <button (click)="facade.onItemDeSelect(row)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>

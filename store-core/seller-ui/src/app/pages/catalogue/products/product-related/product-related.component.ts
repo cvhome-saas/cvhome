@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, inject} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {ColumnMode} from '@swimlane/ngx-datatable';
 import {ProductRelatedFacade} from '../facades/product-related.facade';
 
@@ -12,11 +12,12 @@ import {ProductRelatedFacade} from '../facades/product-related.facade';
 export class ProductRelatedComponent implements OnInit, AfterViewInit {
   protected readonly ColumnMode = ColumnMode;
   protected readonly facade = inject(ProductRelatedFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
   }
 
   ngAfterViewInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

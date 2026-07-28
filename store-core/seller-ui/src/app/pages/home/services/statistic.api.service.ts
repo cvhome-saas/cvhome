@@ -5,9 +5,9 @@ import {CrudService} from '../../shared/services/crud.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StatisticService {
+export class StatisticApiService {
 
-  constructor(private crudService: CrudService) {
+  constructor(private readonly crudService: CrudService) {
   }
 
   getOrderStatistic(params: StatisticsParams): Observable<StatisticList> {
@@ -22,15 +22,15 @@ export class StatisticService {
     return this.crudService.post(`/spg/checkout/api/v2/private/product-statistic`, params);
   }
 
-  getNewStoreCreatedStatistic(params: StatisticsParams) {
+  getNewStoreCreatedStatistic(params: StatisticsParams): Observable<StatisticList> {
     return this.crudService.post(`/control-plane/api/v2/private/store-statistic`, params);
   }
 
-  getNewOrgJoinerStatistic(params: StatisticsParams) {
+  getNewOrgJoinerStatistic(params: StatisticsParams): Observable<StatisticList> {
     return this.crudService.post(`/control-plane/api/v2/private/org-statistic`, params);
   }
 
-  getSubscriptionStatistic(params: StatisticsParams) {
+  getSubscriptionStatistic(params: StatisticsParams): Observable<StatisticList> {
     return this.crudService.post(`/control-plane/api/v2/private/subscription-statistic`, params);
   }
 }
@@ -50,3 +50,5 @@ export interface StatisticsParams {
   fromDate: Date
   toDate: Date
 }
+
+export const EMPTY_STATISTIC_LIST: StatisticList = {entries: []};

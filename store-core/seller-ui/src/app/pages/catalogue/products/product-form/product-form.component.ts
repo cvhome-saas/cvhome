@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, Input, OnInit, inject} from '@angular/core';
 import {ProductFormFacade} from '../facades/product-form.facade';
 import {ProductFormService} from '../services/product-form.service';
 
@@ -14,8 +14,9 @@ export class ProductFormComponent implements OnInit {
   @Input() _title: string;
 
   protected readonly facade = inject(ProductFormFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init(this.product);
+    this.facade.init(this.product, this.destroyRef);
   }
 }

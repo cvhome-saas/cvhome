@@ -1,7 +1,6 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {forkJoin, zip} from 'rxjs';
 import {CategoryService} from '../../categories/services/category.service';
 import {ProductService} from '../services/product.service';
@@ -16,8 +15,6 @@ export class ProductToCategoryFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly loading = signal<boolean>(false);
@@ -27,15 +24,17 @@ export class ProductToCategoryFacade {
   private store = '';
   private uniqueCode = '';
 
-  init(): void {
-    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params]).subscribe({
-      next: ([selectedStore, params]) => {
-        this.store = selectedStore;
-        this.uniqueCode = params['code'];
-        this.load();
-      },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
-    });
+  init(destroyRef: DestroyRef): void {
+    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params])
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: ([selectedStore, params]) => {
+          this.store = selectedStore;
+          this.uniqueCode = params['code'];
+          this.load();
+        },
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      });
   }
 
   onSelectionChange(newItems: string[]): void {
@@ -52,7 +51,7 @@ export class ProductToCategoryFacade {
   private addProductToCategory(categoryId: string): void {
     this.productService.addProductToCategory(this.uniqueCode, categoryId).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_ADDED'));
+        this.errorService.success('PRODUCT.PRODUCT_TO_CATEGORY_ADDED');
         this.load();
       },
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
@@ -62,7 +61,7 @@ export class ProductToCategoryFacade {
   private removeProductFromCategory(categoryId: string): void {
     this.productService.removeProductFromCategory(this.uniqueCode, categoryId).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED'));
+        this.errorService.success('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED');
         this.load();
       },
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)

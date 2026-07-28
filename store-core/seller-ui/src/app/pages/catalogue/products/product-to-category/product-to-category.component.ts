@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, inject} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {ProductToCategoryFacade} from '../facades/product-to-category.facade';
 
 @Component({
@@ -10,9 +10,10 @@ import {ProductToCategoryFacade} from '../facades/product-to-category.facade';
 })
 export class ProductToCategoryComponent implements OnInit, AfterViewInit {
   protected readonly facade = inject(ProductToCategoryFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 
   ngAfterViewInit(): void {

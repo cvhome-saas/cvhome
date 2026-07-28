@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'ngx-brands',
@@ -6,12 +6,5 @@ import {Component, OnInit} from '@angular/core';
   templateUrl: './brands.component.html',
   styleUrls: ['./brands.component.scss']
 })
-export class BrandsComponent implements OnInit {
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+export class BrandsComponent {
 }

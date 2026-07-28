@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'ngx-subscription-and-usage',
@@ -6,12 +6,5 @@ import {Component, OnInit} from '@angular/core';
   templateUrl: './subscription-and-usage.component.html',
   styleUrls: ['./subscription-and-usage.component.scss']
 })
-export class SubscriptionAndUsageComponent implements OnInit {
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-
+export class SubscriptionAndUsageComponent {
 }

@@ -1,95 +1,35 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService} from '@nebular/theme';
-
-import {filter, map, Subject, takeUntil} from 'rxjs';
-import {TranslateService} from "@ngx-translate/core";
-import {NavigationEnd, Router} from "@angular/router";
-import {AuthService} from "../../../shared/services/auth.service";
-import {StoreService} from "../../../shared/services/store.service";
-import {ErrorService} from "../../../shared/services/error.service";
-import {ManagerStoreId, Store} from "../../../shared/models/commons";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {SelectedLanguageService} from '../../../shared/services/selected-language.service';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {NbMenuService, NbSidebarService} from '@nebular/theme';
+import {ManagerStoreId} from '../../../shared/models/commons';
+import {HEADER_USER_MENU} from './constants/header.constants';
+import {HeaderFacade} from './facades/header.facade';
 
 @Component({
   selector: 'ngx-header',
   standalone: false,
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  providers: [HeaderFacade]
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit {
+  protected readonly facade = inject(HeaderFacade);
+  protected readonly userMenu = HEADER_USER_MENU;
+  protected readonly userPictureOnly = false;
 
-  isStoreSelectDisabled: boolean = false;
-  userPictureOnly: boolean = false;
-  user: any;
-  languages: string[];
-  currentLanguage: string;
-  userMenu = [{title: 'Profile'}, {title: 'Log out'}];
-  selectedStoreId: string | undefined;
-  stores: Store[] | undefined;
-  private destroy$: Subject<void> = new Subject<void>();
+  private readonly sidebarService = inject(NbSidebarService);
+  private readonly menuService = inject(NbMenuService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(private sidebarService: NbSidebarService,
-              private menuService: NbMenuService,
-              private router: Router,
-              private breakpointService: NbMediaBreakpointsService,
-              private translateService: TranslateService,
-              private authService: AuthService,
-              private storeService: StoreService,
-              private selectedStoreService: SelectedStoreService,
-              private selectedLanguageService: SelectedLanguageService,
-              private errorService: ErrorService
-  ) {
-    this.languages = this.selectedLanguageService.languages();
-    this.currentLanguage = this.selectedLanguageService.current();
-    this.translateService.use(this.currentLanguage);
+  ngOnInit(): void {
+    this.facade.init(this.destroyRef);
   }
 
-  changed($event: ManagerStoreId) {
-    if ($event != undefined && $event.id != undefined) {
-      this.selectedStoreService.select($event.id);
-      location.reload();
-    }
+  onStoreChange(id: ManagerStoreId): void {
+    this.facade.onStoreChange(id);
   }
 
-  ngOnInit() {
-    this.checkStoreSelectDisabledState(this.router.url);
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      map(it => (<NavigationEnd>it)),
-      takeUntil(this.destroy$)
-    ).subscribe((event: NavigationEnd) => {
-      this.checkStoreSelectDisabledState(event.urlAfterRedirects || event.url);
-    });
-    this.selectedStoreService.current().subscribe(it => {
-      this.selectedStoreId = it;
-    });
-    this.menuService.onItemClick().subscribe(it => this.onNbMenuItemClick(it.item));
-    this.authService.getAuthUser().subscribe(it => {
-      this.user = it
-    });
-    this.storeService.list()
-      .subscribe({
-        next: (it) => {
-          this.stores = it.content;
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      });
-
-
-    const {xl} = this.breakpointService.getBreakpointsMap();
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  changeLanguage(language: string) {
-    this.selectedLanguageService.select(language);
-    location.reload();
+  onLanguageChange(language: string): void {
+    this.facade.onLanguageChange(language);
   }
 
   toggleSidebar(): boolean {
@@ -97,26 +37,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  navigateHome() {
+  navigateHome(): boolean {
     this.menuService.navigateHome();
     return false;
-  }
-
-  onNbMenuItemClick(item: NbMenuItem) {
-    if (item.title == 'Profile') {
-      this.router.navigate(['/pages/user-management/profile'])
-    }
-    if (item.title == 'Log out') {
-      this.authService.logout();
-    }
-  }
-
-  private checkStoreSelectDisabledState(currentUrl: string): void {
-    const disablePatterns = [
-      '/pages/store-management',
-      '/pages/subscription-and-usage',
-      '/pages/org-management'
-    ];
-    this.isStoreSelectDisabled = disablePatterns.some(pattern => currentUrl.startsWith(pattern));
   }
 }

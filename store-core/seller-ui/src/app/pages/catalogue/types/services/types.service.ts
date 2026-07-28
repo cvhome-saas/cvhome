@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {StorageService} from '../../../shared/services/storage.service';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
 
 @Injectable({
   providedIn: 'root'
@@ -16,27 +17,27 @@ export class TypesService {
   }
 
 
-  getListOfTypes(params): Observable<any> {
+  getListOfTypes(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/types`, params);
   }
 
-  getType(id): Observable<any> {
+  getType(id: string | number): Observable<any> {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
-  createType(req): Observable<any> {
+  createType(req: any): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/type`, req);
   }
 
-  updateType(id, req): Observable<any> {
+  updateType(id: string | number, req: any): Observable<any> {
     return this.crudService.put(`/spg/catalog/api/v1/private/product/type/${id}`, req);
   }
 
-  deleteType(id): Observable<any> {
+  deleteType(id: string | number): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
-  checkCode(code): Observable<any> {
+  checkCode(code: string): Observable<any> {
     const params = {
       code
     };

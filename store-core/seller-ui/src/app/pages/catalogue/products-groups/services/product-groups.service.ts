@@ -1,25 +1,25 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductGroupsService {
-  constructor(private crudService: CrudService) {
+  private readonly crudService = inject(CrudService);
+
+  getListOfProductGroups(params: StorePageRequest): Observable<PageT<any>> {
+    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups`, params);
   }
 
-  getListOfProductGroups(param): Observable<any> {
-    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups`, param);
-  }
-
-  createProductGroup(group): Observable<any> {
+  createProductGroup(group: any): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v1/private/products/groups`, group);
   }
 
-  getProductGroup(code, params?): Observable<any> {
+  getProductGroup(code: string, params?: any): Observable<any> {
     return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/${code}`, params);
   }
 
@@ -27,7 +27,7 @@ export class ProductGroupsService {
     return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/unique`, {code});
   }
 
-  updateGroupActiveValue(group): Observable<any> {
+  updateGroupActiveValue(group: any): Observable<any> {
     return this.getProductGroup(group.code).pipe(
       switchMap(current => {
         const updated = {
@@ -43,15 +43,15 @@ export class ProductGroupsService {
     );
   }
 
-  addProductToGroup(productId, groupCode): Observable<any> {
+  addProductToGroup(productId: number | string, groupCode: string): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`, {});
   }
 
-  removeProductFromGroup(productId, groupCode) {
+  removeProductFromGroup(productId: number | string, groupCode: string): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`);
   }
 
-  removeProductGroup(groupCode) {
+  removeProductGroup(groupCode: string): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}`);
   }
 }

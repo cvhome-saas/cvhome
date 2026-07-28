@@ -16,7 +16,6 @@ export class SubscribeComponent {
   email: string = '';
 
   public sub() {
-    console.log("sub " + this.email)
     this.email = '';
   }
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {OrgChangePasswordFacade} from './facades/org-change-password.facade';
 import {OrgChangePasswordFormService} from './services/org-change-password-form.service';
 
@@ -11,8 +11,9 @@ import {OrgChangePasswordFormService} from './services/org-change-password-form.
 })
 export class OrgChangePasswordComponent implements OnInit {
   protected readonly facade = inject(OrgChangePasswordFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit() {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

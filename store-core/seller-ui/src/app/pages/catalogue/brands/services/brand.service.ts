@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
+import {PageT, StorePageRequest} from '../../../common/BaseTable';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +14,15 @@ export class BrandService {
   ) {
   }
 
-  getListOfBrands(params): Observable<any> {
+  getListOfBrands(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/manufacturers`, params);
   }
 
-  updateBrand(id, brand): Observable<any> {
+  updateBrand(id: number | string, brand): Observable<any> {
     return this.crudService.put(`/spg/catalog/api/v1/private/manufacturer/${id}`, brand);
   }
 
-  getBrandById(id): Observable<any> {
+  getBrandById(id: number | string): Observable<any> {
 
     return this.crudService.get(`/spg/catalog/api/v1/private/manufacturer/${id}`);
   }
@@ -30,7 +31,7 @@ export class BrandService {
     return this.crudService.post(`/spg/catalog/api/v1/private/manufacturer`, brand);
   }
 
-  deleteBrand(id): Observable<any> {
+  deleteBrand(id: number | string): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/manufacturer/${id}`);
   }
 

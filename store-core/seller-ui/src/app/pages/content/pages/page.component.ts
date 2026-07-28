@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {ColumnMode} from "@swimlane/ngx-datatable";
 import {PagesFacade} from "./facades/pages.facade";
 import {TableStateService} from "../../shared/table/table-state.service";
@@ -13,8 +13,9 @@ import {TableStateService} from "../../shared/table/table-state.service";
 export class PageComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
   protected readonly facade = inject(PagesFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

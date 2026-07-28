@@ -1,6 +1,5 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {map} from 'rxjs/operators';
 import {UserService} from '../../../shared/services/user.service';
@@ -12,7 +11,6 @@ import {USER_DETAILS_SIDE_MENU_LINKS} from '../../constants/user-management.cons
 export class ChangePasswordFacade {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
   private readonly translate = inject(TranslateService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
@@ -66,7 +64,7 @@ export class ChangePasswordFacade {
     this.userService.updatePassword(this.userService.getUserId(), passwords).subscribe({
       next: () => {
         this.loader.set(false);
-        this.toastr.success(this.translate.instant('USER.PASSWORD_CHANGED'));
+        this.errorService.success('USER.PASSWORD_CHANGED');
       },
       error: (err) => {
         this.loader.set(false);

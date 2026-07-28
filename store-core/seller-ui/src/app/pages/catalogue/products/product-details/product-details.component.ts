@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {ProductDetailsFacade} from '../facades/product-details.facade';
 
 @Component({
@@ -10,8 +10,9 @@ import {ProductDetailsFacade} from '../facades/product-details.facade';
 })
 export class ProductDetailsComponent implements OnInit {
   protected readonly facade = inject(ProductDetailsFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

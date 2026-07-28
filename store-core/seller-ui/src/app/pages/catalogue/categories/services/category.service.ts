@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class CategoryService {
   ) {
   }
 
-  getListOfCategories(params?): Observable<any> {
+  getListOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<any>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category`, params);
   }
 
@@ -49,7 +50,7 @@ export class CategoryService {
     return this.crudService.get(`/spg/catalog/api/v1/private/category/unique`, params);
   }
 
-  getHierarchyOfCategories(params?): Observable<any> {
+  getHierarchyOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<any>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category-hierarchy`, params);
   }
 

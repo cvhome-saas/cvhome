@@ -1,40 +1,20 @@
-import {Component, Input} from '@angular/core';
-
-import {ProductGroupsService} from '../services/product-groups.service';
-import {TranslateService} from "@ngx-translate/core";
-import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../shared/services/error.service";
-
+import {Component, Input, inject} from '@angular/core';
+import {ActiveButtonFacade} from '../facades/active-button.facade';
 
 @Component({
   selector: 'ngx-product-groups-active',
   standalone: false,
   template: `<nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
+  providers: [ActiveButtonFacade]
 })
 export class ActiveButtonComponent {
   @Input() value: boolean;
   @Input() rowData: any;
   @Input() store: string;
 
-  constructor(
-    private productGroupsService: ProductGroupsService,
-    private translate: TranslateService,
-    private errorService: ErrorService,
-    private toastr: NbToastrService) {
-  }
+  private readonly facade = inject(ActiveButtonFacade);
 
-  clicked() {
-    this.value = !this.value;
-    const group = {
-      active: this.value,
-      code: this.rowData.code,
-    };
-    this.productGroupsService.updateGroupActiveValue(group)
-      .subscribe(res => {
-        this.toastr.success(this.translate.instant('PRODUCT_GROUP.GROUP_ACTIVATION'));
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+  clicked(): void {
+    this.value = this.facade.toggleActive(this.rowData, this.value);
   }
-
 }

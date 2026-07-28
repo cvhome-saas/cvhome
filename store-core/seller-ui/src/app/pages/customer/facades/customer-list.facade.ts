@@ -1,45 +1,59 @@
-import {Injectable} from '@angular/core';
+import {DestroyRef, inject, Injectable, signal} from '@angular/core';
 import {CustomersService} from '../services/customer.service';
-import {SelectedStoreService} from "../../shared/services/selected-store.service";
-import {TableStateService} from "../../shared/table/table-state.service";
-import {Observable, tap} from "rxjs";
-import {StorePageRequest, PageT} from "../../common/BaseTable";
-import {ErrorService} from "../../shared/services/error.service";
-import {PageEvent} from "@swimlane/ngx-datatable";
+import {SelectedStoreService} from '../../shared/services/selected-store.service';
+import {TableStateService} from '../../shared/table/table-state.service';
+import {ErrorService} from '../../shared/services/error.service';
+import {StorePageRequest} from '../../common/BaseTable';
+import {PageEvent} from '@swimlane/ngx-datatable';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class CustomerListFacade {
-  constructor(
-    private customersService: CustomersService,
-    private selectedStoreService: SelectedStoreService,
-    private tableState: TableStateService<any>,
-    private errorService: ErrorService
-  ) {}
+  private readonly customersService = inject(CustomersService);
+  private readonly selectedStoreService = inject(SelectedStoreService);
+  private readonly errorService = inject(ErrorService);
+  readonly tableState = inject(TableStateService<any, StorePageRequest>);
 
-  init(): void {
-    const store = this.selectedStoreService.currentSelectedStore();
-    if (store) {
-      const params = this.tableState.params();
-      const request: StorePageRequest = { ...params, store: store.id.id };
-      this.loadCustomers(request).subscribe(page => this.tableState.setPage(page));
-    }
+  readonly store = signal<string>('');
+
+  init(destroyRef: DestroyRef): void {
+    this.selectedStoreService.current()
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
+        next: (store) => {
+          this.store.set(store || '');
+          if (store) {
+            this.loadPage();
+          }
+        },
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      });
+  }
+
+  loadPage(): void {
+    const currentStore = this.store();
+    if (!currentStore) return;
+
+    this.tableState.setLoading(true);
+    const request: StorePageRequest = {...this.tableState.params(), store: currentStore};
+
+    this.customersService.getCustomers(request).subscribe({
+      next: (page) => {
+        this.tableState.setPage(page);
+        this.tableState.setLoading(false);
+      },
+      error: (err) => {
+        this.tableState.setLoading(false);
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+      }
+    });
   }
 
   onPageChange(event: PageEvent): void {
-    this.tableState.patchParams({ page: event.offset });
-    this.init();
-  }
-
-  loadCustomers(request: StorePageRequest): Observable<PageT<any>> {
-    this.tableState.setLoading(true);
-    return this.customersService.getCustomers(request).pipe(
-      tap({
-        next: () => this.tableState.setLoading(false),
-        error: (err) => {
-          this.tableState.setLoading(false);
-          this.errorService.handleError(err);
-        }
-      })
-    );
+    this.tableState.setParams({
+      ...this.tableState.params(),
+      page: event.offset
+    });
+    this.loadPage();
   }
 }

@@ -9,7 +9,7 @@ import {Component} from '@angular/core';
 })
 export class NotFoundComponent {
 
-  constructor(private menuService: NbMenuService) {
+  constructor(private readonly menuService: NbMenuService) {
   }
 
   goToHome() {

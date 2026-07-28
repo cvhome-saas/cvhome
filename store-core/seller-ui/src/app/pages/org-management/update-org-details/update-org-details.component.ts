@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {UpdateOrgDetailsFacade} from './facades/update-org-details.facade';
 import {UpdateOrgDetailsFormService} from './services/update-org-details-form.service';
 
@@ -10,10 +10,10 @@ import {UpdateOrgDetailsFormService} from './services/update-org-details-form.se
   providers: [UpdateOrgDetailsFacade, UpdateOrgDetailsFormService]
 })
 export class UpdateOrgDetailsComponent implements OnInit {
-  @Input() title: string;
   protected readonly facade = inject(UpdateOrgDetailsFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit() {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

@@ -1,11 +1,10 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {FormArray} from '@angular/forms';
 import {BrandFormService} from '../services/brand-form.service';
 import {BrandService} from '../services/brand.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {Store} from '../../../store-management/models/store';
@@ -16,8 +15,6 @@ export class BrandFormFacade {
   private readonly brandService = inject(BrandService);
   private readonly configService = inject(ConfigService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly loader = signal<boolean>(false);
@@ -28,7 +25,7 @@ export class BrandFormFacade {
   private brandData: any;
   private storeData: Store;
 
-  init(brand: any, store: Store): void {
+  init(brand: any, store: Store, destroyRef: DestroyRef): void {
     this.brandData = brand || {};
     this.storeData = store;
     if (!store) return;
@@ -36,7 +33,9 @@ export class BrandFormFacade {
     this.defaultLanguage.set(store.defaultLanguage || 'en');
     this.loader.set(true);
 
-    this.configService.getListOfSupportedLanguages(store.id).subscribe({
+    this.configService.getListOfSupportedLanguages(store.id)
+      .pipe(takeUntilDestroyed(destroyRef))
+      .subscribe({
       next: (res) => {
         this.languages.set([...res]);
         if (this.brandData.id) {
@@ -96,7 +95,7 @@ export class BrandFormFacade {
     });
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || brandObject.code === '') {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
       return;
     }
 
@@ -124,7 +123,7 @@ export class BrandFormFacade {
     });
 
     if (!this.isCodeUnique()) {
-      this.toastr.danger(this.translate.instant('COMMON.CODE_EXISTS'));
+      this.errorService.error('COMMON.CODE_EXISTS', null);
       return;
     }
 
@@ -134,7 +133,7 @@ export class BrandFormFacade {
       this.brandService.updateBrand(this.brandData.id, brandObject).subscribe({
         next: () => {
           this.loader.set(false);
-          this.toastr.success(this.translate.instant('BRAND.BRAND_UPDATED'));
+          this.errorService.success('BRAND.BRAND_UPDATED');
         },
         error: (err) => {
           this.loader.set(false);
@@ -145,7 +144,7 @@ export class BrandFormFacade {
       this.brandService.createBrand(brandObject).subscribe({
         next: () => {
           this.loader.set(false);
-          this.toastr.success(this.translate.instant('BRAND.BRAND_CREATED'));
+          this.errorService.success('BRAND.BRAND_CREATED');
           this.router.navigate(['pages/catalogue/brands/brands-list']);
         },
         error: (err) => {

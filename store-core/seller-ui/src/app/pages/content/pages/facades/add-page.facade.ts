@@ -1,8 +1,6 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {ContentService} from '../../services/content.service';
@@ -16,10 +14,8 @@ export class AddPageFacade {
   private readonly formService = inject(AddPageFormService);
   private readonly contentService = inject(ContentService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
   private readonly configService = inject(ConfigService);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly storeService = inject(StoreService);
@@ -121,7 +117,7 @@ export class AddPageFacade {
         .subscribe({
           next: () => {
             this.loadingList.set(false);
-            this.toastr.success('Page updated successfully');
+            this.errorService.success('Page updated successfully');
             this.router.navigate(['/pages/content/pages/list']);
           },
           error: (err) => {
@@ -134,7 +130,7 @@ export class AddPageFacade {
         .subscribe({
           next: () => {
             this.loadingList.set(false);
-            this.toastr.success('Page added successfully');
+            this.errorService.success('Page added successfully');
             this.router.navigate(['/pages/content/pages/list']);
           },
           error: (err) => {

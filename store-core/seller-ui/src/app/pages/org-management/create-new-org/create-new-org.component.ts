@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, inject} from '@angular/core';
+import {Component, OnInit, inject} from '@angular/core';
 import {CreateNewOrgFacade} from './facades/create-new-org.facade';
 import {CreateNewOrgFormService} from './services/create-new-org-form.service';
 
@@ -10,7 +10,6 @@ import {CreateNewOrgFormService} from './services/create-new-org-form.service';
   providers: [CreateNewOrgFacade, CreateNewOrgFormService]
 })
 export class CreateNewOrgComponent implements OnInit {
-  @Input() title: string;
   protected readonly facade = inject(CreateNewOrgFacade);
 
   ngOnInit() {

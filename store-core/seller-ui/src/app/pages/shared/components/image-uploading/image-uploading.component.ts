@@ -1,23 +1,17 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {HttpEventType} from "@angular/common/http";
-import {catchError, map} from "rxjs/operators";
-import {of} from "rxjs";
-import {CrudService} from "../../services/crud.service";
+import {Component, DestroyRef, EventEmitter, Input, Output, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ImageUploadingFacade} from './facades/image-uploading.facade';
 
-interface UploadItem {
-  file: File;
-  progress: number;
-  error: boolean;
-}
+const REMOVE_FROM_QUEUE_DELAY_MS = 2000;
 
 @Component({
-  selector: "ngx-image-uploading",
+  selector: 'ngx-image-uploading',
   standalone: false,
-  templateUrl: "./image-uploading.component.html",
-  styleUrls: ["./image-uploading.component.scss"],
+  templateUrl: './image-uploading.component.html',
+  styleUrls: ['./image-uploading.component.scss'],
+  providers: [ImageUploadingFacade]
 })
-export class ImageUploadingComponent implements OnInit {
-
+export class ImageUploadingComponent {
   @Input() images: any[] = [];
   @Input() addImageUrl: string;
   @Input() deleteImageUrl: string;
@@ -28,22 +22,17 @@ export class ImageUploadingComponent implements OnInit {
   @Output() success = new EventEmitter<string>();
   @Output() fileAdded = new EventEmitter<any>();
 
-  uploadQueue: UploadItem[] = [];
+  protected readonly facade = inject(ImageUploadingFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(private crudService: CrudService) {
-  }
-
-  ngOnInit() {
-  }
-
-  public itemTrackBy(index, item) {
+  itemTrackBy(index: number, item: any) {
     return item.id;
   }
 
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
     this.handleFiles(files);
-    event.target.value = ''; // Reset input
+    event.target.value = '';
   }
 
   onDragOver(event: DragEvent) {
@@ -60,7 +49,11 @@ export class ImageUploadingComponent implements OnInit {
     }
   }
 
-  handleFiles(files: FileList) {
+  removeImage(image: any) {
+    this.remove.emit(image.id);
+  }
+
+  private handleFiles(files: FileList) {
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         this.uploadFile(files[i]);
@@ -68,47 +61,17 @@ export class ImageUploadingComponent implements OnInit {
     }
   }
 
-  uploadFile(file: File) {
-    const item: UploadItem = {
-      file: file,
-      progress: 0,
-      error: false
-    };
-    this.uploadQueue.push(item);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    this.crudService.request('POST', this.addImageUrl, formData, {
-      reportProgress: true,
-    })
-
-      .pipe(
-        map(event => {
-          if (event.type === HttpEventType.UploadProgress) {
-            if (event.total) {
-              item.progress = Math.round(100 * event.loaded / event.total);
-            }
-          } else if (event.type === HttpEventType.Response) {
-            item.progress = 100;
-            this.success.emit(file.name);
-            this.fileAdded.emit(true);
-            // Remove from queue after delay
-            setTimeout(() => {
-              this.uploadQueue = this.uploadQueue.filter(i => i !== item);
-            }, 2000);
-          }
-        }),
-        catchError(err => {
-          console.error(err);
-          item.error = true;
-          this.error.emit(err.message || 'Upload failed');
-          return of(null);
-        })
-      ).subscribe();
-  }
-
-  removeImage(image) {
-    this.remove.emit(image.id);
+  private uploadFile(file: File) {
+    this.facade.uploadFile(file, this.addImageUrl)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result.type === 'success') {
+          this.success.emit(file.name);
+          this.fileAdded.emit(true);
+          setTimeout(() => this.facade.removeFromQueue(result.item), REMOVE_FROM_QUEUE_DELAY_MS);
+        } else if (result.type === 'error') {
+          this.error.emit(result.message);
+        }
+      });
   }
 }

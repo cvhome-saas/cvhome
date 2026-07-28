@@ -1,5 +1,7 @@
-import {Component} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {Component, inject} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {ContactFacade} from './facades/contact.facade';
+import {ContactFormService} from './services/contact-form.service';
 
 @Component({
   selector: 'app-contact',
@@ -7,35 +9,21 @@ import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
   imports: [
     ReactiveFormsModule
   ],
+  providers: [ContactFacade, ContactFormService],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.css'
 })
 export class ContactComponent {
+  protected readonly facade = inject(ContactFacade);
+
   title: string = 'Stay Tuned';
   d1: string = 'Contact us';
   d2: string = 'We are happy to help you';
   address: string = 'cairo festival city podium 1 New Cairo egypt';
   phone: string = '+20**********';
   email: string = 'me@asrevo.com';
-  contactForm = new FormGroup({
-    name: new FormControl(''),
-    email: new FormControl(''),
-    subject: new FormControl(''),
-    message: new FormControl(''),
-  });
 
-  contact() {
-    if (this.contactForm.valid) {
-      const message = this.contactForm.value as ContactMessage;
-      console.log(message)
-      this.contactForm.reset({})
-    }
+  contact(): void {
+    this.facade.submit();
   }
-}
-
-interface ContactMessage {
-  name: string
-  email: string
-  subject: string
-  message: string
 }

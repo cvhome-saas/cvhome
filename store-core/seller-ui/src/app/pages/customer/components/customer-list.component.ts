@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {CustomerListFacade} from '../facades/customer-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {ColumnMode} from "@swimlane/ngx-datatable";
+import {ColumnMode} from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'ngx-list',
@@ -12,18 +12,10 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 })
 export class CustomerListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
-  perPageSize = 10;
-
-  constructor(
-    private facade: CustomerListFacade,
-    public tableState: TableStateService<any>
-  ) {}
+  protected readonly facade = inject(CustomerListFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
-  }
-
-  onPageChange(event: any): void {
-    this.facade.onPageChange(event);
+    this.facade.init(this.destroyRef);
   }
 }

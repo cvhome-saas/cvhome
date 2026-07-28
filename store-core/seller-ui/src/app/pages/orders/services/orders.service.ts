@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
+import {PageT, StorePageRequest} from '../../common/BaseTable';
 
 @Injectable({
   providedIn: 'root'
@@ -8,15 +9,15 @@ import {CrudService} from '../../shared/services/crud.service';
 export class OrdersService {
 
   constructor(
-    private crudService: CrudService
+    private readonly crudService: CrudService
   ) {
   }
 
-  getOrders(params): Observable<any> {
+  getOrders(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders`, params);
   }
 
-  getOrderDetails(orderID): Observable<any> {
+  getOrderDetails(orderID: number | string): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}`);
   }
 
@@ -24,27 +25,27 @@ export class OrdersService {
     return this.crudService.get(`/spg/checkout/api/v1/country`)
   }
 
-  getBillingZone(value): Observable<any> {
+  getBillingZone(value: string): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/zones?code=${value}`)
   }
 
-  getHistory(orderID): Observable<any> {
+  getHistory(orderID: number | string): Observable<any> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}/history`)
   }
 
-  addHistory(orderID, param): Observable<any> {
+  addHistory(orderID: number | string, param: any): Observable<any> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/history`, param);
   }
 
-  updateOrder(orderID, param): Observable<any> {
+  updateOrder(orderID: number | string, param: any): Observable<any> {
     return this.crudService.patch(`/spg/checkout/api/v1/private/orders/${orderID}/customer`, param);
   }
 
-  refundOrder(orderID): Observable<any> {
+  refundOrder(orderID: number | string): Observable<any> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/refund`, {});
   }
 
-  captureOrder(orderID): Observable<any> {
+  captureOrder(orderID: number | string): Observable<any> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/capture`, {});
   }
 

@@ -1,5 +1,5 @@
 <div class="contact-box bg-white text-center rounded p-1 pr-sm-5 pl-sm-5 pb-sm-5 mt-4 mt-lg-0 shadow-lg">
-  <form (submit)="signUp()" [formGroup]="userForm" id="contact-form">
+  <form (submit)="signUp()" [formGroup]="facade.formService.form" id="contact-form">
     <div class="contact-top pb-sm-3 pt-sm-3">
       <h3 class="contact-title">{{ title }}</h3>
     </div>

@@ -1,4 +1,5 @@
-import {Injectable, inject, signal} from '@angular/core';
+import {DestroyRef, Injectable, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
@@ -14,10 +15,11 @@ export class BrandCreationFacade {
   readonly brand = signal<any>({});
   readonly store = signal<Store | null>(null);
 
-  init(): void {
+  init(destroyRef: DestroyRef): void {
     this.selectedStoreService.current()
       .pipe(
-        switchMap((selectedStore) => this.storeService.getStore(selectedStore))
+        switchMap((selectedStore) => this.storeService.getStore(selectedStore)),
+        takeUntilDestroyed(destroyRef)
       )
       .subscribe({
         next: (store) => this.store.set(store),

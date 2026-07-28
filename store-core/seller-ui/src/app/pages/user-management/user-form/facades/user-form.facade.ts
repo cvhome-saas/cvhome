@@ -1,7 +1,5 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {UserService} from '../../../shared/services/user.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {UserFormFormService} from '../services/user-form-form.service';
@@ -12,8 +10,6 @@ import {NEW_USER_SIDE_MENU_LINKS, USER_DETAILS_SIDE_MENU_LINKS} from '../../cons
 export class UserFormFacade {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
   private readonly formService = inject(UserFormFormService);
 
@@ -105,7 +101,7 @@ export class UserFormFacade {
     const userData = this.form.value;
 
     if (newRoles.length === 0) {
-      this.toastr.warning(this.translate.instant('COMMON.ADDING_USER_ROLES_ERROR'));
+      this.errorService.warning('COMMON.ADDING_USER_ROLES_ERROR');
       this.loader.set(false);
       return;
     }
@@ -114,7 +110,7 @@ export class UserFormFacade {
       userData.id = user.id;
       this.userService.updateUser(userData, store).subscribe({
         next: () => {
-          this.toastr.success(this.translate.instant('USER_FORM.USER_UPDATED'));
+          this.errorService.success('USER_FORM.USER_UPDATED');
           this.loader.set(false);
         },
         error: (err) => {
@@ -126,7 +122,7 @@ export class UserFormFacade {
       this.userService.createUser(userData, store).subscribe({
         next: () => {
           this.loader.set(false);
-          this.toastr.success(this.translate.instant('USER_FORM.USER_CREATED'));
+          this.errorService.success('USER_FORM.USER_CREATED');
           this.router.navigate(['pages/user-management/users']);
         },
         error: (err) => {

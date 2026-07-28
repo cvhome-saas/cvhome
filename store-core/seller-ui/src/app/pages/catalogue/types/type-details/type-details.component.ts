@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, OnInit, inject, DestroyRef} from '@angular/core';
 import {TypeDetailsFacade} from '../facades/type-details.facade';
 import {TypeFormService} from '../services/type-form.service';
 
@@ -11,8 +11,9 @@ import {TypeFormService} from '../services/type-form.service';
 })
 export class TypeDetailsComponent implements OnInit {
   protected readonly facade = inject(TypeDetailsFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

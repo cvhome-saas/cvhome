@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, OnInit, inject, DestroyRef} from '@angular/core';
 import {BrandCreationFacade} from '../facades/brand-creation.facade';
 
 @Component({
@@ -10,8 +10,9 @@ import {BrandCreationFacade} from '../facades/brand-creation.facade';
 })
 export class BrandCreationComponent implements OnInit {
   protected readonly facade = inject(BrandCreationFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 }

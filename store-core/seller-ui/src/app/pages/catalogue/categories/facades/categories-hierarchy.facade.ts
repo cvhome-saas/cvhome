@@ -1,7 +1,5 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {CategoryService} from '../services/category.service';
-import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from '@nebular/theme';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {NgcxTreeNode} from '@cluetec/ngcx-tree';
@@ -11,8 +9,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 export class CategoriesHierarchyFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly translate = inject(TranslateService);
-  private readonly toastr = inject(NbToastrService);
   private readonly errorService = inject(ErrorService);
 
   readonly nodes = signal<NgcxTreeNode[]>([]);
@@ -57,7 +53,7 @@ export class CategoriesHierarchyFacade {
     const parentId = event.parent === undefined ? -1 : event.parent.id;
     this.categoryService.updateHierarchy(event.node.id, parentId).subscribe({
       next: () => {
-        this.toastr.success(this.translate.instant('CATEGORY.HIERARCHY_UPDATED'));
+        this.errorService.success('CATEGORY.HIERARCHY_UPDATED');
       },
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
     });

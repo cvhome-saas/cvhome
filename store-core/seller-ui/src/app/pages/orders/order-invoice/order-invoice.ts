@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NbDialogRef} from '@nebular/theme';
 
 @Component({
@@ -8,11 +8,10 @@ import {NbDialogRef} from '@nebular/theme';
   styleUrls: ['order-invoice.scss'],
 })
 export class OrderInvoiceComponent {
+  protected readonly ref = inject(NbDialogRef<OrderInvoiceComponent>);
+
   orderData: any;
   store: any;
-
-  constructor(protected ref: NbDialogRef<OrderInvoiceComponent>) {
-  }
 
   cancel() {
     this.ref.close();

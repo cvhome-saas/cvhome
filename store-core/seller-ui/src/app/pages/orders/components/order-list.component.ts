@@ -1,4 +1,4 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {OrderListFacade} from '../facades/order-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
 import {ColumnMode} from "@swimlane/ngx-datatable";
@@ -12,18 +12,13 @@ import {ColumnMode} from "@swimlane/ngx-datatable";
 })
 export class OrderListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
-  perPageSize = 10;
-
   protected readonly facade = inject(OrderListFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
-  filter = { ...this.facade.filter() };
-
-  get tableState() {
-    return this.facade.tableState;
-  }
+  filter = {...this.facade.filter()};
 
   ngOnInit(): void {
-    this.facade.init();
+    this.facade.init(this.destroyRef);
   }
 
   onPageChange(event: any): void {

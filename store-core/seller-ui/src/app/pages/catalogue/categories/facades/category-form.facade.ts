@@ -4,8 +4,6 @@ import {FormArray, FormGroup} from '@angular/forms';
 import {CategoryFormService} from '../services/category-form.service';
 import {CategoryService} from '../services/category.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {Store} from '../../../store-management/models/store';
@@ -17,8 +15,6 @@ export class CategoryFormFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly configService = inject(ConfigService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly loader = signal<boolean>(false);
@@ -141,7 +137,7 @@ export class CategoryFormFacade {
     });
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || categoryObject.code === '') {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
       this.loading.set(false);
       return;
     }
@@ -170,14 +166,14 @@ export class CategoryFormFacade {
     });
 
     if (!this.isCodeUnique()) {
-      this.toastr.danger(this.translate.instant('COMMON.CODE_EXISTS'));
+      this.errorService.error('COMMON.CODE_EXISTS', null);
       this.loading.set(false);
       return;
     }
 
     const invalidControls = this.findInvalidControls();
     if (invalidControls.length > 0) {
-      this.toastr.danger(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS'));
+      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
       this.loading.set(false);
       return;
     }
@@ -186,7 +182,7 @@ export class CategoryFormFacade {
       this.categoryService.updateCategory(this.categoryData.id, categoryObject).subscribe({
         next: () => {
           this.loading.set(false);
-          this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_UPDATED'));
+          this.errorService.success('CATEGORY_FORM.CATEGORY_UPDATED');
         },
         error: (err) => {
           this.loading.set(false);
@@ -197,7 +193,7 @@ export class CategoryFormFacade {
       this.categoryService.addCategory(categoryObject).subscribe({
         next: () => {
           this.loading.set(false);
-          this.toastr.success(this.translate.instant('CATEGORY_FORM.CATEGORY_CREATED'));
+          this.errorService.success('CATEGORY_FORM.CATEGORY_CREATED');
           this.router.navigate(['pages/catalogue/categories/categories-list']);
         },
         error: (err) => {

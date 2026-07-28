@@ -6,34 +6,34 @@
 
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="d-flex justify-content-center">
       <div class="toggle-btn pb-3">
         <span>{{ 'SUBSCRIPTION.RECURRING_MONTH' | translate }}</span>
-        <nb-toggle (checkedChange)="toggle()" [checked]="flag" status="basic"></nb-toggle>
+        <nb-toggle (checkedChange)="facade.toggle()" [checked]="facade.isYearly()" status="basic"></nb-toggle>
         <span>{{ 'SUBSCRIPTION.RECURRING_YEAR' | translate }}</span>
       </div>
 
     </div>
-    <div class="d-flex justify-content-center">
+    <div *ngIf="facade.currentSubscriptionDetails() as details" class="d-flex justify-content-center">
       <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'"
+        *ngIf="details.subscriptionPlan=='FREE'&&details.status=='ACTIVE'"
         size="tiny"
         status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
-          {{ currentSubscriptionDetails.endDate }}
+          {{ details.endDate }}
         </p>
       </nb-alert>
       <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+        *ngIf="details.subscriptionPlan=='FREE'&&details.status=='IN_ACTIVE'"
         status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
         </p>
       </nb-alert>
       <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
+        *ngIf="details.subscriptionPlan!='FREE'&&details.status=='IN_ACTIVE'"
         status="warning">
         <p class="text-center">
           {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
@@ -42,9 +42,9 @@
 
     </div>
 
-    <div *ngIf="prices" class="row ">
+    <div *ngIf="facade.prices() as prices" class="row ">
       <div *ngFor="let p of prices; index as i" class="col-md-4">
-        <nb-card [accent]="accent[i]">
+        <nb-card [accent]="facade.accents[i]">
           <nb-card-header>
             {{ 'SUBSCRIPTION.SUBSCRIPTION_PLAN.' + p.name | translate }}
             <h6 class="fw-7">
@@ -75,7 +75,7 @@
           </nb-card-body>
           <nb-card-footer>
             <div class="row justify-content-center">
-              <a [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan"
+              <a [disabled]="p.name==facade.currentSubscriptionDetails()?.subscriptionPlan"
                  [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
                  size="medium"
                  status="primary">

@@ -20,8 +20,8 @@
     </div>
 
     <!-- Upload Queue / Progress -->
-    <div *ngIf="uploadQueue.length > 0" class="mt-3">
-      <div *ngFor="let item of uploadQueue" class="mb-2 p-2 border rounded">
+    <div *ngIf="facade.uploadQueue().length > 0" class="mt-3">
+      <div *ngFor="let item of facade.uploadQueue()" class="mb-2 p-2 border rounded">
         <div class="d-flex justify-content-between mb-1">
           <small>{{ item.file.name }}</small>
           <small>{{ item.progress }}%</small>

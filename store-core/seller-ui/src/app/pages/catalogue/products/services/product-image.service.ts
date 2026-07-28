@@ -13,27 +13,27 @@ export class ProductImageService {
   ) {
   }
 
-  addImageUrl(id) {//post
+  addImageUrl(id: string | number): string {//post
     return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 
-  removeImageUrl(id) {//delete
+  removeImageUrl(id: string | number): string {//delete
     return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;
   }
 
-  getImages(productId): Observable<any> {
+  getImages(productId: string | number): Observable<any> {
     return this.crudService.get(`/spg/catalog/api/v1/product/${productId}/images`);
   }
 
-  removeImage(productId, imageId): Observable<any> {
+  removeImage(productId: string | number, imageId: string | number): Observable<any> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/${productId}/image/${imageId}`);
   }
 
-  createImage(id, uploadData): Observable<any> {
+  createImage(id: string | number, uploadData: any): Observable<any> {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/${id}/images`, uploadData);
   }
 
-  updateImage(productId, event): Observable<any> {
+  updateImage(productId: string | number, event: { id: string | number; position: number }): Observable<any> {
     return this.crudService.patch(`/spg/catalog/api/v1/private/product/${productId}/image/${event.id}?order=${event.position}`, []);
   }
 

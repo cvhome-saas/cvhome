@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, inject} from '@angular/core';
+import {Component, Input, OnInit, inject, DestroyRef} from '@angular/core';
 import {Store} from '../../../store-management/models/store';
 import {BrandFormFacade} from '../facades/brand-form.facade';
 import {BrandFormService} from '../services/brand-form.service';
@@ -16,8 +16,9 @@ export class BrandFormComponent implements OnInit {
   @Input() store: Store;
 
   protected readonly facade = inject(BrandFormFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.facade.init(this.brand, this.store);
+    this.facade.init(this.brand, this.store, this.destroyRef);
   }
 }

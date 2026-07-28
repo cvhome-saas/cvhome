@@ -1,7 +1,6 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {Router} from '@angular/router';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
+import {NbDialogService} from '@nebular/theme';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UserService} from '../../../shared/services/user.service';
 import {ErrorService} from '../../../shared/services/error.service';
@@ -14,8 +13,6 @@ export class UsersListFacade {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(NbDialogService);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   readonly tableState = inject(TableStateService);
@@ -80,7 +77,7 @@ export class UsersListFacade {
         const store = this.store();
         this.userService.deleteUser(row.id, store).subscribe({
           next: () => {
-            this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
+            this.errorService.success('USER_FORM.USER_REMOVED');
             this.loadData();
           },
           error: (err) => {

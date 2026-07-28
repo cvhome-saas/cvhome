@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {Org} from "../model/org";
+import {PageT, StorePageRequest} from '../../common/BaseTable';
 
 @Injectable({
   providedIn: 'root'
@@ -10,16 +11,15 @@ import {Org} from "../model/org";
 export class OrgService {
 
   constructor(
-    private crudService: CrudService) {
+    private readonly crudService: CrudService) {
   }
 
-
-  getListOfOrg(params): Observable<any> {
+  getListOfOrg(params: StorePageRequest): Observable<PageT<Org>> {
     return this.crudService.get('control-plane/api/v1/org-manager/find-all', params);
   }
 
-  getOrg(params): Observable<Org> {
-    return this.crudService.get('control-plane/api/v1/org-manager/find-one?id=' + params);
+  getOrg(id: string): Observable<Org> {
+    return this.crudService.get('control-plane/api/v1/org-manager/find-one?id=' + id);
   }
 
   getSubscriptionPlans(): Observable<string[]> {
@@ -38,7 +38,7 @@ export class OrgService {
     return this.crudService.post('control-plane/api/v1/org-manager/change-password?id=' + id, passwords);
   }
 
-  getOrgStoresList(params: any): Observable<any> {
+  getOrgStoresList(params: {id: string} & Partial<StorePageRequest>): Observable<PageT<any>> {
     return this.crudService.get('control-plane/api/v1/org-manager/stores', params);
   }
 }

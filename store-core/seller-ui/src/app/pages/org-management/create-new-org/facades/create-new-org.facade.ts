@@ -1,7 +1,5 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {NbToastrService} from '@nebular/theme';
-import {TranslateService} from '@ngx-translate/core';
 import {OrgService} from '../../services/org.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {CreateNewOrgFormService} from '../services/create-new-org-form.service';
@@ -11,8 +9,6 @@ export class CreateNewOrgFacade {
   private readonly formService = inject(CreateNewOrgFormService);
   private readonly orgService = inject(OrgService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(NbToastrService);
-  private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
 
   readonly loader = signal<boolean>(false);
@@ -39,7 +35,7 @@ export class CreateNewOrgFacade {
     this.orgService.createOrg(this.form.value).subscribe({
       next: () => {
         this.loader.set(false);
-        this.toastr.success(this.translate.instant('ORG_FORM.ORG_CREATED'));
+        this.errorService.success('ORG_FORM.ORG_CREATED');
         this.goToBack();
       },
       error: (err) => {
