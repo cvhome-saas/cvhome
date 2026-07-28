@@ -1,125 +1,39 @@
-import {Component, OnInit} from '@angular/core';
-import {ProductService} from "../services/product.service";
-import {NbDialogService, NbToastrService} from "@nebular/theme";
-import {TranslateService} from "@ngx-translate/core";
-import {Router} from "@angular/router";
-import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {BaseTable, PageT, StorePageRequest} from "../../../common/BaseTable";
-import {Observable, of} from "rxjs";
-
-export interface ProductFilterPageRequest extends StorePageRequest {
-  sku?: string;
-  available?: string;
-}
+import {Component, OnInit, inject} from '@angular/core';
+import {ColumnMode} from '@swimlane/ngx-datatable';
+import {ProductsListFacade} from '../facades/products-list.facade';
+import {TableStateService} from '../../../shared/table/table-state.service';
 
 @Component({
   selector: 'ngx-products-list',
   standalone: false,
   templateUrl: './products-list.component.html',
-  styleUrls: ['./products-list.component.scss']
+  styleUrls: ['./products-list.component.scss'],
+  providers: [ProductsListFacade, TableStateService]
 })
-export class ProductsListComponent extends BaseTable<any> implements OnInit {
-  editing = {};
-  filter = {
-    sku: '',
-    available: '',
-    categoryIds: '',
-    manufacturerId: ''
-  };
+export class ProductsListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
-  private isInitialized: boolean = false;
+  protected readonly facade = inject(ProductsListFacade);
 
-  constructor(
-    private productService: ProductService,
-    private dialogService: NbDialogService,
-    errorService: ErrorService,
-    private translate: TranslateService,
-    private toastr: NbToastrService,
-    private router: Router,
-    selectedStoreService: SelectedStoreService
-  ) {
-    super(selectedStoreService, errorService);
-  }
+  editing: Record<string, boolean> = {};
+  filter = {...this.facade.filter()};
 
   ngOnInit(): void {
-    this.isInitialized = true;
-    this.trigger();
-  }
-
-  override list(request: ProductFilterPageRequest): Observable<PageT<any>> {
-    if (!super.params.store || !this.isInitialized) {
-      return of();
-    }
-    Object.assign(request, this.filter);
-    return this.productService.getListOfProducts(request)
-  }
-
-
-  updateValue(event, cell, rowIndex) {
-    let newValue = undefined;
-    console.log(event.target.type)
-    if (event.target.type == 'checkbox') {
-      newValue = event.target.checked
-    } else if (event.target.type == 'number') {
-      newValue = event.target.value
-    }
-    if (newValue != undefined) {
-      this.page.content[rowIndex][cell] = newValue;
-      this.updateRecord(this.page.content[rowIndex])
-      this.page.content = [...this.page.content];
-    }
-    this.editing[rowIndex + '-' + cell] = false;
-
-  }
-
-  updateRecord(newData) {
-    const product = {
-      available: newData.available,
-      price: newData.price,
-      quantity: newData.quantity
-    };
-    this.productService.updateProductFromTable(newData.id, product)
-      .subscribe({
-        next: (data) => {
-          this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED'));
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  onEdit(row: any) {
-    this.router.navigate(['pages/catalogue/products/product/' + row.id]);
-  }
-
-  onDelete(row: any) {
-    this.dialogService.open(ShowcaseDialogComponent, {})
-      .onClose.subscribe(res => {
-      if (res) {
-        this.productService.deleteProduct(row.id)
-          .subscribe(result => {
-            this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_REMOVED'));
-            this.trigger();
-            // event.confirm.resolve();
-          }, err => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
-          });
-      } else {
-      }
-    });
+    this.facade.init();
   }
 
   onFilterChange(): void {
-    this.trigger();
+    this.facade.onFilterChange(this.filter);
   }
 
   resetFilters(): void {
     this.filter = {sku: '', available: '', categoryIds: '', manufacturerId: ''};
-    this.trigger();
+    this.facade.onFilterChange(this.filter);
   }
 
+  updateValue(event: Event, cell: 'quantity' | 'price' | 'available', rowIndex: number): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    this.facade.updateCell(rowIndex, cell, value);
+    this.editing[rowIndex + '-' + cell] = false;
+  }
 }

@@ -1,59 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ProductService} from '../services/product.service';
-import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {zip} from "rxjs";
+import {Component, OnInit, inject} from '@angular/core';
+import {ProductDetailsFacade} from '../facades/product-details.facade';
 
 @Component({
   selector: 'ngx-product-details',
   standalone: false,
   templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.scss']
+  styleUrls: ['./product-details.component.scss'],
+  providers: [ProductDetailsFacade]
 })
 export class ProductDetailsComponent implements OnInit {
-  product: any = {};
-  store: string;
-  action: any = 'save'
-  uniqueCode: string;//identifier fromroute
+  protected readonly facade = inject(ProductDetailsFacade);
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private productService: ProductService,
-    private errorService: ErrorService,
-    private router: Router,
-    private selectedStoreService: SelectedStoreService
-  ) {
-  }
-
-  ngOnInit() {
-    zip([this.selectedStoreService.current(), this.activatedRoute.params])
-      .subscribe({
-        next: ([selectedStore, params]) => {
-          this.store = selectedStore;
-          this.uniqueCode = params.code
-          if (this.uniqueCode) {
-            this.loadContent();
-          }
-        },
-        error: (err) => {
-        },
-        complete: () => {
-        }
-      });
-
-  }
-
-  route(link) {
-    this.router.navigate(['pages/catalogue/products/' + this.product.sku + '/' + link]);
-  }
-
-  loadContent() {
-    this.productService.getProductDefinitionById(this.uniqueCode)
-      .subscribe(res => {
-        this.product = res;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+  ngOnInit(): void {
+    this.facade.init();
   }
 }

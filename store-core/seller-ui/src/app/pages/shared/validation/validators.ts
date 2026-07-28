@@ -3,5 +3,7 @@ export const validators = {
   alphanumeric: '^[a-zA-Zа-яА-Я0-9\-]+$',
   alphanumericwithhyphen: '^[a-zA-Z0-9-_]+$',
   emailPattern: '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$',
-  domainPattern: '^(?!-)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
+  domainPattern: '^(?!-)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+  url: '^(http|https):\\/\\/[^ "]+$',
+  podName: '^[a-zA-Z0-9-]+$'
 };

@@ -1,28 +1,28 @@
 <nb-card>
   <nb-card-body>
 
-    <div *ngIf="params.store">
+    <div *ngIf="facade.store()">
       <h5 class="mb-3">{{ 'PRODUCT_GROUP.ADD_PRODUCTS' | translate }}</h5>
 
       <div class="form-group row mb-3">
         <label class="col-sm-4 col-form-label"
                for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
         <div class="col-sm-6">
-          <ngx-product-auto-complete (onProduct)="onItemSelect($event)" [store]="params.store"/>
+          <ngx-product-auto-complete (onProduct)="facade.onItemSelect($event)" [store]="facade.store()"/>
         </div>
       </div>
 
     </div>
     <ngx-datatable
-      (page)="setPage($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="rows"
+      [limit]="50"
+      [offset]="facade.page().pageNumber"
+      [rows]="facade.rows()"
       class="material"
       rowHeight="auto">
 
@@ -40,7 +40,7 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onItemDeSelect(row)" nbButton shape="round" size="small" status="danger">
+          <button (click)="facade.onItemDeSelect(row)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>
@@ -50,4 +50,3 @@
 
   </nb-card-body>
 </nb-card>
-

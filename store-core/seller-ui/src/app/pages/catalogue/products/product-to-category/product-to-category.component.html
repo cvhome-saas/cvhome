@@ -1,5 +1,5 @@
-<div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
-  <div *ngIf="!loading" class="inner_pages inventory_create_page tab-padding">
+<div [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <div *ngIf="!facade.loading()" class="inner_pages inventory_create_page tab-padding">
     <nb-card class="mainBody">
       <nb-card-body>
         <div class="form-group row">
@@ -7,11 +7,11 @@
             {{ 'COMPONENTS.PRODUCT_TO_CATEGORY_ADD' |translate }}
           </label>
           <div class="col-sm-8">
-            <nb-select (selectedChange)="change($event)" [(selected)]="selectedItems" fullWidth id="inputCategory"
+            <nb-select (selectedChange)="facade.onSelectionChange($event)" [selected]="facade.selectedItems()" fullWidth id="inputCategory"
                        multiple
                        placeholder="'...'"
                        status="info">
-              <nb-option *ngFor="let o of categories" [value]="o.id">{{ o.name }}</nb-option>
+              <nb-option *ngFor="let o of facade.categories()" [value]="o.id">{{ o.name }}</nb-option>
             </nb-select>
           </div>
         </div>

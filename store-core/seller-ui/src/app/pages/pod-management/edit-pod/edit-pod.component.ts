@@ -1,28 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Pod, PodService} from '../../store-management/services/pod.service';
+import {Component, OnInit, inject} from '@angular/core';
+import {EditPodFacade} from '../facades/edit-pod.facade';
 
 @Component({
   selector: 'app-edit-pod',
   standalone: false,
   templateUrl: './edit-pod.component.html',
-  styleUrls: ['./edit-pod.component.scss']
+  styleUrls: ['./edit-pod.component.scss'],
+  providers: [EditPodFacade]
 })
 export class EditPodComponent implements OnInit {
-  pod: Pod;
-
-  constructor(
-    private podService: PodService,
-    private route: ActivatedRoute
-  ) {
-  }
+  protected readonly facade = inject(EditPodFacade);
 
   ngOnInit(): void {
-    const podId = this.route.snapshot.paramMap.get('id');
-    if (podId) {
-      this.podService.getPod(podId).subscribe(pod => {
-        this.pod = pod;
-      });
-    }
+    this.facade.init();
   }
 }

@@ -1,0 +1,111 @@
+import {Injectable, inject} from '@angular/core';
+import {Router} from '@angular/router';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
+import {TranslateService} from '@ngx-translate/core';
+import {PageEvent} from '@swimlane/ngx-datatable';
+import {ProductService} from '../services/product.service';
+import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {ErrorService} from '../../../shared/services/error.service';
+import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {TableStateService} from '../../../shared/table/table-state.service';
+import {StorePageRequest} from '../../../common/BaseTable';
+
+export interface ProductFilterPageRequest extends StorePageRequest {
+  sku?: string;
+  available?: string;
+  categoryIds?: string;
+  manufacturerId?: string;
+}
+
+@Injectable()
+export class ProductsListFacade {
+  private readonly productService = inject(ProductService);
+  private readonly router = inject(Router);
+  private readonly selectedStoreService = inject(SelectedStoreService);
+  private readonly dialogService = inject(NbDialogService);
+  private readonly translate = inject(TranslateService);
+  private readonly errorService = inject(ErrorService);
+  private readonly toastr = inject(NbToastrService);
+  readonly tableState = inject(TableStateService<any, ProductFilterPageRequest>);
+
+  init(): void {
+    const store = this.selectedStoreService.currentSelectedStore();
+    if (store) {
+      this.tableState.patchParams({store: store.id.id} as ProductFilterPageRequest);
+      this.loadPage();
+    }
+  }
+
+  loadPage(): void {
+    this.tableState.setLoading(true);
+    this.productService.getListOfProducts(this.tableState.params()).subscribe({
+      next: (page) => {
+        this.tableState.setPage(page);
+        this.tableState.setLoading(false);
+      },
+      error: (err) => {
+        this.tableState.setLoading(false);
+        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+      }
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.tableState.patchParams({page: event.offset} as ProductFilterPageRequest);
+    this.loadPage();
+  }
+
+  filter(): Partial<ProductFilterPageRequest> {
+    const params = this.tableState.params();
+    return {
+      sku: params.sku || '',
+      available: params.available || '',
+      categoryIds: params.categoryIds || '',
+      manufacturerId: params.manufacturerId || ''
+    };
+  }
+
+  onFilterChange(filter: Partial<ProductFilterPageRequest>): void {
+    this.tableState.patchParams(filter);
+    this.loadPage();
+  }
+
+  resetFilters(): void {
+    this.tableState.patchParams({sku: '', available: '', categoryIds: '', manufacturerId: ''});
+    this.loadPage();
+  }
+
+  onEdit(row: any): void {
+    this.router.navigate(['pages/catalogue/products/product/' + row.id]);
+  }
+
+  onDelete(row: any): void {
+    this.dialogService.open(ShowcaseDialogComponent, {}).onClose.subscribe((res) => {
+      if (res) {
+        this.productService.deleteProduct(row.id).subscribe({
+          next: () => {
+            this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_REMOVED'));
+            this.loadPage();
+          },
+          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        });
+      }
+    });
+  }
+
+  updateCell(rowIndex: number, field: 'quantity' | 'price' | 'available', value: any): void {
+    const content = [...this.tableState.page().content];
+    const row = {...content[rowIndex], [field]: value};
+    content[rowIndex] = row;
+    this.tableState.setPage({...this.tableState.page(), content});
+
+    this.productService.updateProductFromTable(row.id, {
+      available: row.available,
+      price: row.price,
+      quantity: row.quantity
+    }).subscribe({
+      next: () => this.toastr.success(this.translate.instant('PRODUCT.PRODUCT_UPDATED')),
+      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+    });
+  }
+}

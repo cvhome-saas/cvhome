@@ -7,20 +7,21 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large"
+                nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="loaded" [formGroup]='form'>
+    <form *ngIf="facade.loaded()" [formGroup]='facade.formService.form'>
       <div class="form-group">
         <label class="col-form-label"></label>
         <nb-checkbox formControlName='allowAddToCart' name="allowAddToCart">
@@ -35,25 +36,27 @@
         <label class="col-form-label ">
           {{ 'COMMON.CODE' | translate }}*
         </label>
-        <input (change)="checkCode($event)" [readOnly]="isReadonlyCode" class="form-control " formControlName='code'
+        <input (change)="facade.checkCode($event.target.value.trim())" [readOnly]="facade.isReadonlyCode()"
+               class="form-control " formControlName='code'
                fullWidth
                id="code"
                nbInput
                required type="text">
-        <div *ngIf="(code.dirty || code.touched) && code.invalid && code" class="err-message"
+        <div *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && facade.formService.code.invalid"
+             class="err-message"
              style="margin-top:10px;">
-            <span *ngIf="code.errors.required">
+            <span *ngIf="facade.formService.code.errors?.['required']">
               {{ 'COMMON.CODE_REQUIRED' | translate }}
             </span>
-          <span *ngIf="code.errors.pattern">
+          <span *ngIf="facade.formService.code.errors?.['pattern']">
               {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
             </span>
         </div>
 
-        <span *ngIf="isCodeExist" class="err-message">
+        <span *ngIf="facade.isCodeExist()" class="err-message">
             {{ 'COMMON.CODE_EXISTS' | translate }}
           </span>
-        <div *ngIf="!isValidCode" class="err-message" style="margin-top:10px;">
+        <div *ngIf="!facade.isValidCode()" class="err-message" style="margin-top:10px;">
           {{ 'COMMON.CODE_REQUIRED' | translate }}
         </div>
       </div>
@@ -61,9 +64,9 @@
 
       <div class="form-group">
         <label class="col-form-label ">{{ 'COMMON.LANGUAGE' | translate }} *</label>
-        <nb-select *ngIf="languages.length" formControlName='selectedLanguage' fullWidth
+        <nb-select *ngIf="facade.languages().length" formControlName='selectedLanguage' fullWidth
                    outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-          <nb-option (click)="selectLanguage(language.code)" *ngFor="let language of languages"
+          <nb-option (click)="facade.selectLanguage(language.code)" *ngFor="let language of facade.languages()"
                      [value]="language.code">{{
               ('LANG.' + language.code) |
                 translate
@@ -72,8 +75,8 @@
         </nb-select>
       </div>
       <div formArrayName='descriptions'>
-        <div *ngFor="let descr of descriptions.controls; let j=index">
-          <div *ngIf="descr.value.language === selectedLanguage.value">
+        <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
+          <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
             <div [formGroupName]="j">
               <div class="form-group">
                 <label class="col-form-label ">{{ 'COMMON.NAME' | translate }}*</label>

@@ -8,13 +8,14 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large"
+                nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
 
       </div>
@@ -22,17 +23,19 @@
   </nb-card-header>
   <nb-card-body>
 
-    <form (ngSubmit)="save()" [formGroup]="form">
+    <form (ngSubmit)="facade.save()" [formGroup]="facade.formService.form">
       <div class="form-group row">
         <label class="label col-sm-3 col-form-label" for="name">{{ 'POD_FORM.NAME' | translate }}</label>
         <div class="col-sm-9">
-          <input [status]="name.invalid && (name.dirty || name.touched) ? 'danger' : 'basic'" formControlName="name"
+          <input [status]="facade.formService.name.invalid && (facade.formService.name.dirty || facade.formService.name.touched) ? 'danger' : 'basic'"
+                 formControlName="name"
                  fullWidth id="name" nbInput
                  placeholder="{{ 'POD_FORM.NAME' | translate }}"
                  type="text">
-          <div *ngIf="name.invalid && (name.dirty || name.touched)" class="caption status-danger mt-1">
-            <div *ngIf="name.errors?.['required']">{{ 'POD_FORM.NAME_REQUIRED' | translate }}</div>
-            <div *ngIf="name.errors?.['pattern']">{{ 'POD_FORM.NAME_PATTERN' | translate }}</div>
+          <div *ngIf="facade.formService.name.invalid && (facade.formService.name.dirty || facade.formService.name.touched)"
+               class="caption status-danger mt-1">
+            <div *ngIf="facade.formService.name.errors?.['required']">{{ 'POD_FORM.NAME_REQUIRED' | translate }}</div>
+            <div *ngIf="facade.formService.name.errors?.['pattern']">{{ 'POD_FORM.NAME_PATTERN' | translate }}</div>
           </div>
         </div>
       </div>
@@ -41,14 +44,14 @@
         <div class="form-group row">
           <label class="label col-sm-3 col-form-label" for="endpoint">{{ 'POD_FORM.ENDPOINT_URL' | translate }}</label>
           <div class="col-sm-9">
-            <input [status]="endpointUrl.invalid && (endpointUrl.dirty || endpointUrl.touched) ? 'danger' : 'basic'"
+            <input [status]="facade.formService.endpointUrl.invalid && (facade.formService.endpointUrl.dirty || facade.formService.endpointUrl.touched) ? 'danger' : 'basic'"
                    formControlName="endpoint" fullWidth id="endpoint" nbInput
                    placeholder="{{ 'POD_FORM.ENDPOINT_URL' | translate }}"
                    type="text">
-            <div *ngIf="endpointUrl.invalid && (endpointUrl.dirty || endpointUrl.touched)"
+            <div *ngIf="facade.formService.endpointUrl.invalid && (facade.formService.endpointUrl.dirty || facade.formService.endpointUrl.touched)"
                  class="caption status-danger mt-1">
-              <div *ngIf="endpointUrl.errors?.['required']">{{ 'POD_FORM.ENDPOINT_URL_REQUIRED' | translate }}</div>
-              <div *ngIf="endpointUrl.errors?.['pattern']">{{ 'POD_FORM.ENDPOINT_URL_PATTERN' | translate }}</div>
+              <div *ngIf="facade.formService.endpointUrl.errors?.['required']">{{ 'POD_FORM.ENDPOINT_URL_REQUIRED' | translate }}</div>
+              <div *ngIf="facade.formService.endpointUrl.errors?.['pattern']">{{ 'POD_FORM.ENDPOINT_URL_PATTERN' | translate }}</div>
             </div>
           </div>
         </div>
@@ -57,7 +60,7 @@
           <div class="col-sm-9">
             <nb-select formControlName="type" fullWidth id="type"
                        placeholder="{{ 'POD_FORM.SELECT_TYPE' | translate }}">
-              <nb-option *ngFor="let type of endpointTypes" [value]="type">{{ type }}</nb-option>
+              <nb-option *ngFor="let type of facade.formService.endpointTypes" [value]="type">{{ type }}</nb-option>
             </nb-select>
           </div>
         </div>
