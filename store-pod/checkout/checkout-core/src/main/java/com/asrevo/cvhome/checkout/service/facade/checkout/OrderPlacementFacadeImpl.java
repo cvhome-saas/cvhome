@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
@@ -45,7 +45,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        ProductReservationResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        ProductReservationReserveResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
 
         if (!result.status()) {
             orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED,
@@ -97,7 +97,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
-    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
+    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result) {
         try {
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .ref(modelOrder.getId().toString())

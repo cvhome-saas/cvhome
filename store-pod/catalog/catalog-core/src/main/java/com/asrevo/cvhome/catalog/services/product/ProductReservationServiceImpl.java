@@ -13,7 +13,9 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationLine;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatus;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationCommitResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReleaseResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductAvailabilityRepository;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductReservationRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -37,19 +39,20 @@ public class ProductReservationServiceImpl implements ProductReservationService 
 
     @Transactional
     @Override
-    public ProductReservationResult reserve(StoreMerchantId store, String ref, ProductReservationList productReservation) {
+    public ProductReservationReserveResult reserve(StoreMerchantId store, String ref, ProductReservationList productReservation) {
         return getProductReservationResult(store, ref, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
     }
 
-    private ProductReservationResult getProductReservationResult(StoreMerchantId store, String ref,
-                                                                 ProductReservationList productReservation,
-                                                                 ProductReservationStatus status) {
+    private ProductReservationReserveResult getProductReservationResult(StoreMerchantId store, String ref,
+                                                                        ProductReservationList productReservation,
+                                                                        ProductReservationStatus status) {
         try {
             ProductReservation reservation = doReserveWithStatus(store, ref, productReservation, status);
-            return ProductReservationResult.builder().status(true).reservationId(reservation.getId()).expireAt(reservation.getExpireAt())
+            return ProductReservationReserveResult.builder().status(true).reservationId(reservation.getId())
+                    .expireAt(reservation.getExpireAt())
                     .build();
         } catch (ServiceException _) {
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationReserveResult.builder().status(false).build();
         }
     }
 
@@ -114,7 +117,7 @@ public class ProductReservationServiceImpl implements ProductReservationService 
 
     @Transactional
     @Override
-    public ProductReservationResult commit(StoreMerchantId store, String ref) {
+    public ProductReservationCommitResult commit(StoreMerchantId store, String ref) {
         try {
             List<ProductReservation> reservations =
                     productReservationRepository.findAllByRef(ref, store);
@@ -123,15 +126,15 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 if (Objects.equals(res.getStoreMerchantId(), store)) {
                     if (res.getStatus() == ProductReservationStatus.COMPLETED) {
                         log.info("Reservation for ref {} already committed", ref);
-                        return ProductReservationResult.builder().status(true).reservationId(res.getId()).expireAt(res.getExpireAt())
-                                .build();
+                        return ProductReservationCommitResult.builder().status(true).reservationId(res.getId())
+                                .expireAt(res.getExpireAt()).build();
                     }
                     if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
                         if (res.getExpireAt().isBefore(Instant.now())) {
                             log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
                             // Optional: auto-release here or leave for cleanup service
-                            return ProductReservationResult.builder().status(false).reservationId(res.getId()).expireAt(res.getExpireAt())
-                                    .build();
+                            return ProductReservationCommitResult.builder().status(false).reservationId(res.getId())
+                                    .expireAt(res.getExpireAt()).build();
                         }
 
                         res.setStatus(ProductReservationStatus.COMPLETED);
@@ -141,19 +144,19 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 }
             }
             if (committedRes != null) {
-                return ProductReservationResult.builder().status(true).reservationId(committedRes.getId())
+                return ProductReservationCommitResult.builder().status(true).reservationId(committedRes.getId())
                         .expireAt(committedRes.getExpireAt()).build();
             }
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationCommitResult.builder().status(false).build();
         } catch (Exception e) {
             log.error("Error committing reservation for ref {}", ref, e);
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationCommitResult.builder().status(false).build();
         }
     }
 
     @Transactional
     @Override
-    public ProductReservationResult release(StoreMerchantId store, String ref) {
+    public ProductReservationReleaseResult release(StoreMerchantId store, String ref) {
         try {
             List<ProductReservation> reservations =
                     productReservationRepository.findAllByRef(ref, store);
@@ -162,8 +165,8 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 if (Objects.equals(res.getStoreMerchantId(), store)) {
                     if (res.getStatus() == ProductReservationStatus.ROLLBACK) {
                         log.info("Reservation for ref {} already released", ref);
-                        return ProductReservationResult.builder().status(true).reservationId(res.getId()).expireAt(res.getExpireAt())
-                                .build();
+                        return ProductReservationReleaseResult.builder().status(true).reservationId(res.getId())
+                                .expireAt(res.getExpireAt()).build();
                     }
                     if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
                         for (ProductReservationLine line : res.getLines()) {
@@ -182,13 +185,13 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                 }
             }
             if (releasedRes != null) {
-                return ProductReservationResult.builder().status(true).reservationId(releasedRes.getId())
+                return ProductReservationReleaseResult.builder().status(true).reservationId(releasedRes.getId())
                         .expireAt(releasedRes.getExpireAt()).build();
             }
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationReleaseResult.builder().status(false).build();
         } catch (Exception e) {
             log.error("Error releasing reservation for ref {}", ref, e);
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationReleaseResult.builder().status(false).build();
         }
     }
 

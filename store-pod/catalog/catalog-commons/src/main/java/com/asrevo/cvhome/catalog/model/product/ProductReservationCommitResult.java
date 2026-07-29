@@ -6,5 +6,5 @@ import java.time.Instant;
 import lombok.Builder;
 
 @Builder
-public record ProductReservationResult(boolean status, Long reservationId, Instant expireAt) implements Serializable {
+public record ProductReservationCommitResult(boolean status, Long reservationId, Instant expireAt) implements Serializable {
 }

@@ -4,7 +4,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationCommitResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReleaseResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
@@ -32,11 +34,11 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
     }
 
     @Override
-    public ProductReservationResult reserveProduct(StoreMerchantId store, Order order) {
+    public ProductReservationReserveResult reserveProduct(StoreMerchantId store, Order order) {
         try {
             return externalProductReservationService.reserve(store, order.getId().toString(), toProductReservationList(order));
         } catch (Exception _) {
-            return ProductReservationResult.builder().status(false).build();
+            return ProductReservationReserveResult.builder().status(false).build();
         }
     }
 
@@ -51,7 +53,7 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
     public void updateOrderStatusWithReservationCommit(Long orderId, StoreMerchantId store, OrderStatus successOrder,
                                                        PaymentStatus successPay) {
         try {
-            ProductReservationResult result = externalProductReservationService.commit(store, orderId.toString());
+            ProductReservationCommitResult result = externalProductReservationService.commit(store, orderId.toString());
             if (result.status()) {
                 orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.COMMITTED, successPay);
             } else {
@@ -68,7 +70,7 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
     public void updateOrderStatusWithReservationRelease(Long orderId, StoreMerchantId store, OrderStatus successOrder,
                                                         PaymentStatus successPay) {
         try {
-            ProductReservationResult result = externalProductReservationService.release(store, orderId.toString());
+            ProductReservationReleaseResult result = externalProductReservationService.release(store, orderId.toString());
             if (result.status()) {
                 orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RELEASED, successPay);
             } else {
