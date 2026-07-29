@@ -3,6 +3,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AuthService} from '../shared/services/auth.service';
 import {SelectedStoreService} from '../shared/services/selected-store.service';
+import {SelectedLanguageService} from '../shared/services/selected-language.service';
 import {Roles} from '../shared/models/roles';
 import {MenuItem} from '../menu-item';
 import {MENU_ITEMS} from '../pages-menu';
@@ -12,12 +13,15 @@ export class PagesFacade {
   private readonly translate = inject(TranslateService);
   private readonly authService = inject(AuthService);
   private readonly selectedStoreService = inject(SelectedStoreService);
+  private readonly selectedLanguageService = inject(SelectedLanguageService);
 
   readonly menu = signal<MenuItem[]>(MENU_ITEMS);
   readonly storesReady = signal<boolean>(false);
 
   init(destroyRef: DestroyRef): void {
     this.applyMenuState();
+
+    this.translate.use(this.selectedLanguageService.current() ?? 'en');
 
     this.translate.onLangChange
       .pipe(takeUntilDestroyed(destroyRef))
