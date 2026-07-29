@@ -2,6 +2,8 @@ package com.asrevo.cvhome.payment.model.payment;
 
 import java.util.Objects;
 
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
+
 import lombok.Builder;
 
 @Builder

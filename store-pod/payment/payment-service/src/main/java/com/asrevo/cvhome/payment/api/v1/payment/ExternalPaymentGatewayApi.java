@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.service.PaymentGatewayService;
@@ -36,12 +37,12 @@ public class ExternalPaymentGatewayApi implements ExternalPaymentGatewayService 
 
     @PostMapping("/private/payments/initiate")
     @Operation(method = "POST", description = "Initiate Payment",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentResponse.class))))
+            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentInitiateResult.class))))
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @Override
-    public PaymentResponse initiatePayment(StoreMerchantId store, PaymentRequest paymentRequest) {
+    public PaymentInitiateResult initiatePayment(StoreMerchantId store, PaymentRequest paymentRequest) {
         return paymentGatewayService.initiatePayment(store, paymentRequest);
     }
 

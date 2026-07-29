@@ -5,6 +5,7 @@ plugins {
 dependencies {
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:payment:payment-commons')
+    api project(':store-pod:checkout:checkout-external-api')
     implementation libs.stripe.java
     implementation libs.gson
     compileOnly libs.spring.data.jpa

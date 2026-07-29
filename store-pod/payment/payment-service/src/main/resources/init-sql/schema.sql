@@ -38,9 +38,10 @@ create table if not exists payment.transaction
     external_id       varchar(255),
     redirect_url      varchar(1000),
     ref               varchar(255),
-    status            varchar(255) check ((status in ('PENDING', 'PAID', 'PAY_LATER', 'FAILED'))),
+    status            varchar(255) check ((status in ('PENDING', 'PROCESSING', 'PAID', 'FAILED', 'EXPIRED', 'CANCELLED', 'WAITING_VERIFICATION', 'REJECTED', 'PAY_LATER'))),
     store_merchant_id varchar(50),
     success_url       varchar(1000),
+    transaction_no    varchar(255),
 
     primary key (transaction_id),
     constraint uc_transaction_ref_store unique (ref, store_merchant_id),

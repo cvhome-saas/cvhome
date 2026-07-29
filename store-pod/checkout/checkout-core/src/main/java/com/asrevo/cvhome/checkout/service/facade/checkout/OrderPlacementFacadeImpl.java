@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.model.product.ProductReservationResult;
+import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
@@ -13,8 +13,8 @@ import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrato
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -45,45 +45,36 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        ProductReservationResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        ProductReservationReserveResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
 
         if (!result.status()) {
             orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED,
                     PaymentStatus.FAILED);
             return new OrderProcessingResult(modelOrder);
         }
-        orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PENDING);
+        orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PENDING);
 
 
-        PaymentResponse paymentResponse = doOrderPaymentInitiate(modelOrder, result);
+        PaymentInitiateResult paymentResponse = doOrderPaymentInitiate(modelOrder, result);
 
         switch (paymentResponse.status()) {
             case PAID:
-                log.info("Payment PAID for order {}. Marking as PAID.", modelOrder.getId());
+                log.info("Payment PAID for order {}. Marking as CONFIRMED.", modelOrder.getId());
                 try {
-                    orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(modelOrder.getId(), store, OrderStatus.PROCESSING,
+                    orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(modelOrder.getId(), store, OrderStatus.CONFIRMED,
                             PaymentStatus.PAID);
                 } catch (Exception e) {
                     log.error("Failed to commit reservation for PAID order {}. Manual intervention required.", modelOrder.getId(), e);
                     // Ensure local status reflects payment even if catalog commit failed
-                    orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PAID);
-                }
-                break;
-
-            case PAY_LATER:
-                log.info("Payment PAY_LATER (COD) for order {}. Marking as ORDERED.", modelOrder.getId());
-                try {
-                    orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(modelOrder.getId(), store, OrderStatus.CREATED,
-                            PaymentStatus.PENDING);
-                } catch (Exception e) {
-                    log.error("Failed to commit reservation for PAY_LATER order {}.", modelOrder.getId(), e);
-                    orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PENDING);
+                    orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
+                            PaymentStatus.PAID);
                 }
                 break;
 
             case PENDING:
                 log.info("Payment Pending order {}.", modelOrder.getId());
-                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PENDING);
+                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
+                        PaymentStatus.PENDING);
                 break;
 
             case FAILED:
@@ -106,7 +97,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
-    private PaymentResponse doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
+    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result) {
         try {
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .ref(modelOrder.getId().toString())
@@ -121,7 +112,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
         } catch (Exception e) {
             log.error("Payment initiation error for order {}. Setting status to PENDING for reconciliation.", modelOrder.getId(), e);
-            return PaymentResponse.pending();
+            return PaymentInitiateResult.pending();
         }
     }
 }

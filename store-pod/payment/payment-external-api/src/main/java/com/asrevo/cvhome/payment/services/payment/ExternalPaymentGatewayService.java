@@ -7,6 +7,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 
@@ -14,7 +15,7 @@ import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 public interface ExternalPaymentGatewayService {
 
     @PostExchange("/payments/initiate")
-    PaymentResponse initiatePayment(StoreMerchantId store, @RequestBody PaymentRequest paymentRequest);
+    PaymentInitiateResult initiatePayment(StoreMerchantId store, @RequestBody PaymentRequest paymentRequest);
 
 
     @GetExchange("/payments/{ref}/status")

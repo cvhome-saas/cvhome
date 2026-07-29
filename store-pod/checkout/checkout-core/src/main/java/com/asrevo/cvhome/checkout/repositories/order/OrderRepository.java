@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.checkout.repositories.order;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
@@ -122,4 +124,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     }
 
     Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
+
+    @Query("select o from Order o where o.status = 'PENDING_PAYMENT' and o.paymentType = :paymentType and o.datePurchased < :cutoff")
+    List<Order> findExpiredOrders(@Param("paymentType") PaymentType paymentType, @Param("cutoff") Instant cutoff);
 }

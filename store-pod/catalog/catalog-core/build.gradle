@@ -5,6 +5,7 @@ plugins {
 dependencies {
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:catalog:catalog-commons')
+    api project(':store-pod:checkout:checkout-external-api')
     api project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:commons:store-modules:store-cms-commons')
     compileOnly libs.spring.data.jpa
