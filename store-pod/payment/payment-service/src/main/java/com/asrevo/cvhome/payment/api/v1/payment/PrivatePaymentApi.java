@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.api.v1.payment.model.PaymentApprovalRequest;
-import com.asrevo.cvhome.payment.service.PaymentGatewayService;
+import com.asrevo.cvhome.payment.service.PaymentApprovalService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -23,17 +23,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PrivatePaymentApi {
 
-    private final PaymentGatewayService paymentGatewayService;
+    private final PaymentApprovalService paymentApprovalService;
 
     @PostMapping("/payment/transaction/{transactionId}/approve")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')")
     public void approve(StoreMerchantId store, @PathVariable Long transactionId, @Valid @RequestBody PaymentApprovalRequest approvalModel) {
-        paymentGatewayService.approvePayment(store, transactionId, approvalModel.getTransactionNo());
+        paymentApprovalService.approvePayment(store, transactionId, approvalModel.getTransactionNo());
     }
 
     @PostMapping("/payment/transaction/{transactionId}/reject")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')")
     public void reject(StoreMerchantId store, @PathVariable Long transactionId) {
-        paymentGatewayService.rejectPayment(store, transactionId);
+        paymentApprovalService.rejectPayment(store, transactionId);
     }
 }

@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentUseCase;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.service.processor.exception.FailedPaymentInitiate;
 import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
 import com.asrevo.cvhome.payment.service.processor.exception.InvalidWebhookPayload;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -29,6 +31,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class StripeProcessor implements PaymentProcessor {
+
+    private static final String EVENT_CHECKOUT_COMPLETED = "checkout.session.completed";
+    private static final String EVENT_CHECKOUT_EXPIRED = "checkout.session.expired";
+    private static final String EVENT_PAYMENT_INTENT_FAILED = "payment_intent.payment_failed";
+
+    private static PaymentUseCase resolveUseCase(String eventType) {
+        return switch (eventType) {
+            case EVENT_CHECKOUT_COMPLETED -> PaymentUseCase.PAYMENT_SUCCEEDED;
+            case EVENT_CHECKOUT_EXPIRED, EVENT_PAYMENT_INTENT_FAILED -> PaymentUseCase.PAYMENT_FAILED;
+            default -> PaymentUseCase.UNKNOWN;
+        };
+    }
 
     private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
             throws InvalidWebhookPayload {
@@ -90,6 +104,8 @@ public class StripeProcessor implements PaymentProcessor {
         try {
             Session session = Session.create(params, requestOptions);
             return PaymentInitiateResult.builder()
+                    .transactionId(transactionId)
+                    .status(PaymentInitiateStatus.PENDING)
                     .redirectUrl(session.getUrl())
                     .externalId(session.getId())
                     .build();
@@ -101,33 +117,29 @@ public class StripeProcessor implements PaymentProcessor {
     }
 
     @Override
-    public WebhookResult handleWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                       PaymentConfiguration configuration) throws InvalidWebhookPayload {
+    public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
+                                      PaymentConfiguration configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
         Event event = getEvent(payload, headers, configuration);
 
         log.info("Stripe webhook event type: {} version {}", event.getType(), event.getApiVersion());
 
-        if ("checkout.session.completed".equals(event.getType())) {
-            Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-            Long transactionId = getTransactionId(session);
-            log.info("Processing successful Stripe session for transaction ID: {}", transactionId);
-            return WebhookResult.builder()
-                    .transactionId(transactionId)
-                    .status(PaymentStatus.PAID)
-                    .paymentUseCase(PaymentUseCase.PAYMENT_SUCCEEDED)
-                    .build();
-        } else if ("checkout.session.expired".equals(event.getType()) || "payment_intent.payment_failed".equals(event.getType())) {
-            Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-            Long transactionId = getTransactionId(session);
-            log.info("Processing failed Stripe session for transaction ID: {}", transactionId);
-            return WebhookResult.builder()
-                    .transactionId(transactionId)
-                    .status(PaymentStatus.FAILED)
-                    .paymentUseCase(PaymentUseCase.PAYMENT_FAILED)
-                    .build();
+        PaymentUseCase useCase = resolveUseCase(event.getType());
+        if (useCase == PaymentUseCase.UNKNOWN) {
+            log.info("Ignoring unhandled Stripe event type: {}", event.getType());
+            return WebhookResult.builder().paymentUseCase(PaymentUseCase.UNKNOWN).build();
         }
-        return WebhookResult.builder().build();
+
+        Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
+        Long transactionId = getTransactionId(session);
+        PaymentStatus status = useCase == PaymentUseCase.PAYMENT_SUCCEEDED ? PaymentStatus.PAID : PaymentStatus.FAILED;
+        log.info("Processing Stripe session for transaction ID: {}, useCase: {}", transactionId, useCase);
+
+        return WebhookResult.builder()
+                .transactionId(transactionId)
+                .status(status)
+                .paymentUseCase(useCase)
+                .build();
     }
 
 

@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.Transaction;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentStatus;
 import com.asrevo.cvhome.payment.repository.payment.TransactionRepository;
-import com.asrevo.cvhome.payment.service.processor.PaymentInitiateResult;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
 
 import lombok.RequiredArgsConstructor;
@@ -49,13 +51,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request) {
+    public Transaction createInitialTransaction(StoreMerchantId store, PaymentConfiguration config, PaymentRequest request) {
         Transaction transaction = new Transaction();
         transaction.setRef(request.ref());
         transaction.setStoreMerchantId(store);
         transaction.setAmount(request.amount());
         transaction.setCurrency(request.currency());
-        transaction.setPaymentType(request.paymentType());
+        transaction.setPaymentType(config.getPaymentType());
         transaction.setStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(Instant.now());
         transaction.setTransactionType(TransactionType.INIT);
@@ -69,7 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.findById(transactionId).ifPresent(transaction -> {
             transaction.setExternalId(initiateResult.externalId());
             transaction.setRedirectUrl(initiateResult.redirectUrl());
-            transaction.setStatus(PaymentStatus.PENDING);
+            transaction.setStatus(toTransactionStatus(initiateResult.status()));
             transaction.setSuccessUrl(request.successUrl());
             transaction.setCancelUrl(request.cancelUrl());
             transactionRepository.save(transaction);
@@ -77,22 +79,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-    @Override
-    @Transactional
-    public Transaction createCODTransaction(StoreMerchantId store, PaymentRequest request) {
-        Transaction transaction = createInitialTransaction(store, request);
-        transaction.setStatus(PaymentStatus.PAY_LATER);
-        transaction.setTransactionType(TransactionType.AUTHORIZECAPTURE);
-        return transactionRepository.save(transaction);
-    }
-
-    @Override
-    @Transactional
-    public Transaction createManualTransferTransaction(StoreMerchantId store, PaymentRequest request) {
-        Transaction transaction = createInitialTransaction(store, request);
-        transaction.setStatus(PaymentStatus.PENDING);
-        transaction.setTransactionType(TransactionType.AUTHORIZECAPTURE);
-        return transactionRepository.save(transaction);
+    private static PaymentStatus toTransactionStatus(PaymentInitiateStatus status) {
+        return switch (status) {
+            case PENDING -> PaymentStatus.PENDING;
+            case FAILED -> PaymentStatus.FAILED;
+            case PAID -> PaymentStatus.PAID;
+        };
     }
 
     @Override

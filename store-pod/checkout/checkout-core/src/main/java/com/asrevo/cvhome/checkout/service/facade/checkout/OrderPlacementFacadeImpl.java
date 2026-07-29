@@ -13,8 +13,8 @@ import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrato
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -55,7 +55,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PENDING);
 
 
-        PaymentResponse paymentResponse = doOrderPaymentInitiate(modelOrder, result);
+        PaymentInitiateResult paymentResponse = doOrderPaymentInitiate(modelOrder, result);
 
         switch (paymentResponse.status()) {
             case PAID:
@@ -69,11 +69,6 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
                             PaymentStatus.PAID);
                 }
-                break;
-
-            case PAY_LATER:
-                log.info("Payment PAY_LATER (COD) for order {}. Marking as PENDING.", modelOrder.getId());
-                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING, InventoryStatus.RESERVED, PaymentStatus.PENDING);
                 break;
 
             case PENDING:
@@ -102,7 +97,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
-    private PaymentResponse doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
+    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationResult result) {
         try {
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .ref(modelOrder.getId().toString())
@@ -117,7 +112,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
         } catch (Exception e) {
             log.error("Payment initiation error for order {}. Setting status to PENDING for reconciliation.", modelOrder.getId(), e);
-            return PaymentResponse.pending();
+            return PaymentInitiateResult.pending();
         }
     }
 }
