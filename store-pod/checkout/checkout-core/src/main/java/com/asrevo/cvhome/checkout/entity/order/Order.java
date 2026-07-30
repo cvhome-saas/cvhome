@@ -156,4 +156,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
 
     @Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 50, nullable = false)
     private String customerEmailAddress;
+
+    @Column(name = "REDIRECT_URI", length = 2048)
+    private String redirectUri;
 }

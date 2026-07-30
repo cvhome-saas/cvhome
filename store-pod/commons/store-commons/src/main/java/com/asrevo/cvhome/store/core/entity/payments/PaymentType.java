@@ -1,16 +1,57 @@
 package com.asrevo.cvhome.store.core.entity.payments;
 
+import java.util.List;
+
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public enum PaymentType {
 
-    COD("COD"), MANUAL_TRANSFER("MANUAL_TRANSFER"), STRIPE("STRIPE"), PAYPAL("PAYPAL");
+    COD(),
 
-    private final String type;
+    MANUAL_TRANSFER(),
 
-    PaymentType(String type) {
-        this.type = type;
+    STRIPE(List.of(
+            requiredString("clientId"),
+            requiredString("secretKey")
+    )),
+
+    PAYPAL(List.of(
+            requiredString("clientId"),
+            requiredString("secretKey")
+    ));
+
+    private final List<Attr> attrs;
+
+    PaymentType() {
+        this.attrs = List.of();
     }
 
+    PaymentType(List<Attr> attrs) {
+        this.attrs = List.copyOf(attrs);
+    }
+
+    private static Attr requiredString(String name) {
+        return Attr.builder()
+                .name(name)
+                .type(AttrType.STRING)
+                .required(true)
+                .build();
+    }
+
+    public enum AttrType {
+        INTEGER,
+        STRING,
+        DATE
+    }
+
+    @Builder
+    public record Attr(
+            String name,
+            AttrType type,
+            String defaultValue,
+            boolean required
+    ) {
+    }
 }

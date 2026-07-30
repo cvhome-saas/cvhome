@@ -26,6 +26,9 @@ public class ReadableOrderPopulator extends AbstractDataPopulator<Order, StoreMe
         target.setDatePurchased(source.getDatePurchased());
         target.setOrderStatus(source.getStatus());
         target.setCurrency(source.getCurrency());
+        target.setPaymentStatus(source.getPaymentStatus());
+        target.setReservationStatus(source.getInventoryStatus());
+        target.setRedirectUri(source.getRedirectUri());
 
         target.setStore(source.getStoreMerchantId());
 

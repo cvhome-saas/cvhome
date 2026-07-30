@@ -11,6 +11,7 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderStatus;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
@@ -29,6 +30,12 @@ public interface OrderFacade {
 
     ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language);
 
+    /**
+     * Lookup used by the checkout success/cancel redirect pages. Whether this requires
+     * authentication is decided by the caller based on the store's requireLoginForOrderPlacement flag.
+     */
+    ReadableOrderStatus getOrderStatus(Long orderId, StoreMerchantId store);
+
     ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language);
 
     List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
@@ -40,4 +47,7 @@ public interface OrderFacade {
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store);
 
     void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
+
+    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
+                           String redirectUri);
 }

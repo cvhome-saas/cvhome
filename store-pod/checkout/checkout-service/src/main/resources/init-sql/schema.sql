@@ -234,8 +234,11 @@ create table if not exists checkout.orders
                 (
                     ARRAY [
                         'CREATED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying,
+                        'CONFIRMED' :: character varying,
                         'PROCESSING' :: character varying,
                         'SHIPPED' :: character varying,
+                        'DELIVERING' :: character varying,
                         'DELIVERED' :: character varying,
                         'COMPLETED' :: character varying,
                         'CANCELLED' :: character varying,
@@ -292,7 +295,8 @@ create table if not exists checkout.orders
     currency_id             varchar(6),
     delivery_country_CODE   varchar(6),
     delivery_zone_code      varchar(100),
-    store_merchant_id       varchar(50)
+    store_merchant_id       varchar(50),
+    redirect_uri            varchar(2048)
 );
 create index if not exists orders_cart_code_idx on checkout.orders (cart_code);
 create table if not exists checkout.order_account
@@ -385,8 +389,11 @@ create table if not exists checkout.order_status_history
                 (
                     ARRAY [
                         'CREATED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying,
+                        'CONFIRMED' :: character varying,
                         'PROCESSING' :: character varying,
                         'SHIPPED' :: character varying,
+                        'DELIVERING' :: character varying,
                         'DELIVERED' :: character varying,
                         'COMPLETED' :: character varying,
                         'CANCELLED' :: character varying,
