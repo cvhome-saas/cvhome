@@ -66,7 +66,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "INTERNAL_REF", nullable = false, length = 70)
     private String internalRef;
 
-    @Column(name = "REF", nullable = false, length = 70)
+    @Column(name = "REQUEST_REF", nullable = false, length = 70)
     private String requestRef;
 
     @Embedded

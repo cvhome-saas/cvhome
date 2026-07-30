@@ -36,7 +36,7 @@ create table if not exists payment.transaction
     external_id       varchar(255),
     redirect_url      varchar(1000),
     internal_ref      varchar(70) not null,
-    ref               varchar(70),
+    request_ref varchar(70),
     status            varchar(255) check ((status in ('PENDING', 'PROCESSING', 'PAID', 'FAILED', 'EXPIRED', 'CANCELLED', 'WAITING_VERIFICATION', 'REJECTED', 'PAY_LATER'))),
     store_merchant_id varchar(50),
     success_url       varchar(1000),
@@ -44,7 +44,7 @@ create table if not exists payment.transaction
 
     primary key (transaction_id),
     constraint uc_transaction_internal_ref unique (internal_ref),
-    constraint uc_transaction_ref_store unique (ref, store_merchant_id),
+    constraint uc_transaction_request_ref_store unique (request_ref, store_merchant_id),
     constraint transaction_payment_type_check
         check ((payment_type)::text = ANY
                ((ARRAY ['COD'::character varying, 'MANUAL_TRANSFER'::character varying, 'PAYPAL'::character varying, 'STRIPE'::character varying])::text[]))

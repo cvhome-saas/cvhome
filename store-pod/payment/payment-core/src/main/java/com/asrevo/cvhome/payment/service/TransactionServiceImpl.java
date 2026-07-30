@@ -13,6 +13,7 @@ import com.asrevo.cvhome.payment.entity.payment.Transaction;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
+import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.repository.payment.TransactionRepository;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 
@@ -41,12 +42,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<Transaction> findByRequestRef(StoreMerchantId store, String ref) {
-        return transactionRepository.findTopByStoreMerchantIdAndRequestRefOrderByTransactionDateDesc(store, ref);
-    }
-
-    @Override
     @Transactional
     public void completeTransaction(StoreMerchantId store, String transactionInternalRef, PaymentStatus status) {
         Transaction transaction = getTransaction(store, transactionInternalRef);
@@ -56,9 +51,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request) {
-        Transaction transaction = constructTransaction(store, request);
-        return transactionRepository.save(transaction);
+    public String createInitialTransaction(StoreMerchantId store, PaymentRequest request) {
+        Transaction transaction = transactionRepository.save(constructTransaction(store, request));
+        return transaction.getInternalRef();
     }
 
     @Override
@@ -101,6 +96,35 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.save(transaction);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public PaymentResponse status(StoreMerchantId store, String requestRef) {
+        return this.transactionRepository.findTopByStoreMerchantIdAndRequestRefOrderByTransactionDateDesc(store, requestRef)
+                .map(tx -> PaymentResponse.builder()
+                        .status(tx.getStatus())
+                        .redirectUrl(tx.getRedirectUrl())
+                        .gatewayRef(tx.getInternalRef())
+                        .build())
+                .orElse(PaymentResponse.failed());
+    }
+
+    @Override
+    public Optional<PaymentInitiateResult> findExistingInitialResultByRequestRef(StoreMerchantId store, String requestRef) {
+        return this.transactionRepository.findTopByStoreMerchantIdAndRequestRefOrderByTransactionDateDesc(store, requestRef)
+                .map(it -> PaymentInitiateResult.builder()
+                        .status(toInitiateStatus(it.getStatus()))
+                        .gatewayRef(it.getInternalRef())
+                        .build());
+    }
+
+
+    private static PaymentInitiateStatus toInitiateStatus(PaymentStatus status) {
+        return switch (status) {
+            case PAID -> PaymentInitiateStatus.PAID;
+            case PENDING, PROCESSING, WAITING_VERIFICATION, AUTHORIZED -> PaymentInitiateStatus.PENDING;
+            case FAILED, EXPIRED, CANCELLED, REJECTED, REFUNDED -> PaymentInitiateStatus.FAILED;
+        };
+    }
 
     private @NonNull Transaction getTransaction(StoreMerchantId store, String internalRef) {
         return transactionRepository.findByStoreMerchantIdAndInternalRef(store, internalRef)
