@@ -77,7 +77,7 @@ public class PaymentGatewayService {
     }
 
     private PaymentConfiguration getPaymentConfiguration(StoreMerchantId store, PaymentType paymentType) {
-        return configRepository.findByStoreMerchantIdAndPaymentType(store, paymentType)
+        return configRepository.findByIdStoreMerchantIdAndIdPaymentType(store, paymentType)
                 .filter(PaymentConfiguration::isEnabled)
                 .orElse(null);
     }

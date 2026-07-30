@@ -24,6 +24,6 @@ spring:
 
 reservation:
   expiry:
-    minutes: 15
+    minutes: 45
   cleanup:
     interval: 60000

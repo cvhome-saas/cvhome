@@ -153,11 +153,11 @@ export class StoreService {
     return this.crudService.post(`/spg/payment/api/v1/private/payment-configuration`, config, {store});
   }
 
-  updatePaymentConfig(store: string, id: number, config: any): Observable<any> {
-    return this.crudService.put(`/spg/payment/api/v1/private/payment-configuration/${id}`, config, {store});
+  updatePaymentConfig(store: string, paymentType: string, config: any): Observable<any> {
+    return this.crudService.put(`/spg/payment/api/v1/private/payment-configuration/${paymentType}`, config, {store});
   }
 
-  deletePaymentConfig(store: string, id: number): Observable<any> {
-    return this.crudService.delete(`/spg/payment/api/v1/private/payment-configuration/${id}`, {store});
+  deletePaymentConfig(store: string, paymentType: string): Observable<any> {
+    return this.crudService.delete(`/spg/payment/api/v1/private/payment-configuration/${paymentType}`, {store});
   }
 }

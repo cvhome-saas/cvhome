@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReadablePaymentConfiguration {
-    private Long id;
     private StoreMerchantId storeMerchantId;
     private PaymentType paymentType;
     private String apiKey;

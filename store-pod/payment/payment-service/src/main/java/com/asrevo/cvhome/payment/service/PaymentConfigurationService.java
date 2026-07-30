@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfigurationId;
 import com.asrevo.cvhome.payment.mapper.PaymentConfigurationMapper;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
@@ -24,7 +25,7 @@ public class PaymentConfigurationService {
     private final PaymentConfigurationMapper mapper;
 
     public List<ReadablePaymentConfiguration> getConfigs(StoreMerchantId merchantStore) {
-        return repository.findAllByStoreMerchantId(merchantStore).stream()
+        return repository.findAllByIdStoreMerchantId(merchantStore).stream()
                 .map(mapper::toDTO)
                 .toList();
     }
@@ -36,34 +37,28 @@ public class PaymentConfigurationService {
     }
 
     @Transactional
-    public void updateConfig(StoreMerchantId merchantStore, Long id, PersistablePaymentConfiguration dto) {
+    public void updateConfig(StoreMerchantId merchantStore, PaymentType paymentType, PersistablePaymentConfiguration dto) {
+        PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("PaymentConfiguration not found with id: " + id));
-
-        if (!entity.getStoreMerchantId().equals(merchantStore)) {
-            throw new ResourceNotFoundException("PaymentConfiguration not found for this merchant");
-        }
 
         mapper.updateEntity(entity, dto);
         repository.save(entity);
     }
 
     @Transactional
-    public void deleteConfig(StoreMerchantId merchantStore, Long id) {
+    public void deleteConfig(StoreMerchantId merchantStore, PaymentType paymentType) {
+        PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("PaymentConfiguration not found with id: " + id));
-
-        if (!entity.getStoreMerchantId().equals(merchantStore)) {
-            throw new ResourceNotFoundException("PaymentConfiguration not found for this merchant");
-        }
 
         repository.delete(entity);
     }
 
     public PaymentType[] getSupportedPaymentTypes(StoreMerchantId storeId) {
-        return repository.findAllByStoreMerchantId(storeId).stream()
+        return repository.findAllByIdStoreMerchantId(storeId).stream()
                 .filter(PaymentConfiguration::isEnabled)
-                .map(PaymentConfiguration::getPaymentType)
+                .map(entity -> entity.getId().getPaymentType())
                 .toArray(PaymentType[]::new);
     }
 }
