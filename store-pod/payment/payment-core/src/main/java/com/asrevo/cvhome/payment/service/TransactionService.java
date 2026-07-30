@@ -15,7 +15,7 @@ public interface TransactionService {
 
     Optional<Transaction> findById(Long id);
 
-    Transaction createInitialTransaction(StoreMerchantId store, PaymentConfiguration config, PaymentRequest request);
+    Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request);
 
     void completeInitiateTransaction(Long transactionId, PaymentRequest request, PaymentInitiateResult initiateResult);
 

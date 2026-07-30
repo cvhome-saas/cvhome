@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.payment.models;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadablePaymentConfiguration {
+public class ReadablePaymentConfiguration implements PaymentSecret {
     private StoreMerchantId storeMerchantId;
     private PaymentType paymentType;
     private String apiKey;

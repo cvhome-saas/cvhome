@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.payment.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,11 @@ public class PaymentConfigurationService {
         return repository.findAllByIdStoreMerchantId(merchantStore).stream()
                 .map(mapper::toDTO)
                 .toList();
+    }
+
+    public Optional<ReadablePaymentConfiguration> getConfig(StoreMerchantId merchantStore, PaymentType paymentType) {
+        return repository.findByIdStoreMerchantIdAndIdPaymentType(merchantStore, paymentType)
+                .map(mapper::toDTO);
     }
 
     @Transactional

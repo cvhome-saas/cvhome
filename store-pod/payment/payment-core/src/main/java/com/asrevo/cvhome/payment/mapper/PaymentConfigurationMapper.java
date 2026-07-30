@@ -12,9 +12,11 @@ import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentConfigurationMapper {
 
     private final SecretCryptoProvider cryptoProvider;
@@ -28,17 +30,17 @@ public class PaymentConfigurationMapper {
         entity.setId(new PaymentConfigurationId(dto.getStoreMerchantId(), dto.getPaymentType()));
         entity.setEnabled(dto.isEnabled());
 
-        if (dto.getApiKey() != null) {
+        if (dto.getApiKey() != null && !EncryptedValue.isEncrypted(dto.getApiKey())) {
             EncryptedValue encrypted = cryptoProvider.encrypt(dto.getApiKey().getBytes(StandardCharsets.UTF_8));
             entity.setApiKey(encrypted.serialize());
         }
 
-        if (dto.getSecretKey() != null) {
+        if (dto.getSecretKey() != null && !EncryptedValue.isEncrypted(dto.getSecretKey())) {
             EncryptedValue encrypted = cryptoProvider.encrypt(dto.getSecretKey().getBytes(StandardCharsets.UTF_8));
             entity.setSecretKey(encrypted.serialize());
         }
 
-        if (dto.getWebhookSecret() != null) {
+        if (dto.getWebhookSecret() != null && !EncryptedValue.isEncrypted(dto.getWebhookSecret())) {
             EncryptedValue encrypted = cryptoProvider.encrypt(dto.getWebhookSecret().getBytes(StandardCharsets.UTF_8));
             entity.setWebhookSecret(encrypted.serialize());
         }
@@ -64,16 +66,12 @@ public class PaymentConfigurationMapper {
     }
 
     private String decrypt(String value) {
-        if (value != null) {
-            if (EncryptedValue.isEncrypted(value)) {
+        if (EncryptedValue.isEncrypted(value)) {
                 try {
                     byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(value));
                     return new String(decrypted, StandardCharsets.UTF_8);
                 } catch (Exception _) {
-                    return value;
-                }
-            } else {
-                return value;
+                    log.error("Failed to decrypt value: {}", value);
             }
         }
         return null;

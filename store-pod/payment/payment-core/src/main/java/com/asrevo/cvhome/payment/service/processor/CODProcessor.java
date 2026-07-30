@@ -27,7 +27,7 @@ public class CODProcessor implements PaymentProcessor {
 
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                      PaymentConfiguration config) throws InvalidPaymentReferenceId, SignatureVerificationException {
+                                      PaymentSecret config) throws InvalidPaymentReferenceId {
         return null;
     }
 }

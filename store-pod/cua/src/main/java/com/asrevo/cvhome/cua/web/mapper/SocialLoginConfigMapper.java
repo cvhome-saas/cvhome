@@ -12,9 +12,11 @@ import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SocialLoginConfigMapper {
 
     private final SecretCryptoProvider cryptoProvider;
@@ -28,13 +30,13 @@ public class SocialLoginConfigMapper {
         entity.setId(new SocialLoginConfigId(dto.getStoreMerchantId(), dto.getProviderId()));
 
         // Encrypt appId
-        if (dto.getAppId() != null) {
+        if (dto.getAppId() != null && !EncryptedValue.isEncrypted(dto.getAppId())) {
             EncryptedValue encrypted = cryptoProvider.encrypt(dto.getAppId().getBytes(StandardCharsets.UTF_8));
             entity.setAppId(encrypted.serialize());
         }
 
         // Encrypt appSecret
-        if (dto.getAppSecret() != null) {
+        if (dto.getAppSecret() != null && !EncryptedValue.isEncrypted(dto.getAppSecret())) {
             EncryptedValue encrypted = cryptoProvider.encrypt(dto.getAppSecret().getBytes(StandardCharsets.UTF_8));
             entity.setAppSecret(encrypted.serialize());
         }
@@ -53,34 +55,24 @@ public class SocialLoginConfigMapper {
         dto.setProviderId(entity.getId().providerId());
 
         // Decrypt appId
-        if (entity.getAppId() != null) {
-            if (EncryptedValue.isEncrypted(entity.getAppId())) {
+        if (EncryptedValue.isEncrypted(entity.getAppId())) {
                 try {
                     byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppId()));
                     dto.setAppId(new String(decrypted, StandardCharsets.UTF_8));
                 } catch (Exception _) {
-                    dto.setAppId(entity.getAppId());
+                    log.error("Failed to decrypt appId for social login config with id: {}", entity.getId());
                 }
-            } else {
-                dto.setAppId(entity.getAppId());
-            }
         }
 
         // Decrypt appSecret
-        if (entity.getAppSecret() != null) {
-            if (EncryptedValue.isEncrypted(entity.getAppSecret())) {
+        if (EncryptedValue.isEncrypted(entity.getAppSecret())) {
                 try {
                     byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppSecret()));
                     dto.setAppSecret(new String(decrypted, StandardCharsets.UTF_8));
                 } catch (Exception _) {
-                    dto.setAppSecret(entity.getAppSecret());
+                    log.error("Failed to decrypt appSecret for social login config with id: {}", entity.getId());
                 }
-            } else {
-                dto.setAppSecret(entity.getAppSecret());
-            }
         }
-
-        dto.setEnabled(entity.getEnabled());
         return dto;
     }
 }
