@@ -112,4 +112,13 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_NO")
     private String transactionNo;
 
+    public Transaction completeSuccess() {
+        this.status = PaymentStatus.PAID;
+        return this;
+    }
+
+    public Transaction completeFailed() {
+        this.status = PaymentStatus.FAILED;
+        return this;
+    }
 }

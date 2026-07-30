@@ -43,9 +43,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void completeTransaction(StoreMerchantId store, String transactionInternalRef, PaymentStatus status) {
-        Transaction transaction = getTransaction(store, transactionInternalRef);
-        transaction.setStatus(status);
+    public void completeSuccess(StoreMerchantId store, String transactionInternalRef) {
+        Transaction transaction = getTransaction(store, transactionInternalRef).completeSuccess();
+        transactionRepository.save(transaction);
+    }
+
+    @Override
+    @Transactional
+    public void completeFailed(StoreMerchantId store, String transactionInternalRef) {
+        Transaction transaction = getTransaction(store, transactionInternalRef).completeFailed();
         transactionRepository.save(transaction);
     }
 

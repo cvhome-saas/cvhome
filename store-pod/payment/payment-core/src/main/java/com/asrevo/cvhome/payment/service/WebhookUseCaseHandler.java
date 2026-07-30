@@ -18,7 +18,8 @@ public class WebhookUseCaseHandler {
     public void handleUseCase(StoreMerchantId store,WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
-            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> transactionService.completeTransaction(store,result.internalReference(), result.status());
+            case PAYMENT_SUCCEEDED -> transactionService.completeSuccess(store, result.internalReference());
+            case PAYMENT_FAILED -> transactionService.completeFailed(store, result.internalReference());
             case NONE -> log.info("No action for webhook event, transactionId={}", result.internalReference());
             default -> log.warn("Unhandled payment use case: {}", result.paymentUseCase());
         }

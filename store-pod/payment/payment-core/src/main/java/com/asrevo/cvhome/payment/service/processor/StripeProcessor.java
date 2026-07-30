@@ -116,7 +116,6 @@ public class StripeProcessor implements PaymentProcessor {
             log.info("Processing successful Stripe session for client reference ID: {}", clientReferenceId);
             return WebhookResult.builder()
                     .internalReference(clientReferenceId)
-                    .status(PaymentStatus.PAID)
                     .paymentUseCase(PaymentUseCase.PAYMENT_SUCCEEDED)
                     .build();
         } else if ("checkout.session.expired".equals(event.getType()) || "payment_intent.payment_failed".equals(event.getType())) {
@@ -125,7 +124,6 @@ public class StripeProcessor implements PaymentProcessor {
             log.info("Processing failed Stripe session for client reference ID: {}", clientReferenceId);
             return WebhookResult.builder()
                     .internalReference(clientReferenceId)
-                    .status(PaymentStatus.FAILED)
                     .paymentUseCase(PaymentUseCase.PAYMENT_FAILED)
                     .build();
         }

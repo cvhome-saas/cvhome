@@ -6,7 +6,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
-import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 
 public interface TransactionService {
 
@@ -15,7 +14,9 @@ public interface TransactionService {
     void completeInitiateTransaction(StoreMerchantId store, String transactionInternalRef, PaymentRequest request,
                                      PaymentInitiateResult initiateResult);
 
-    void completeTransaction(StoreMerchantId store,String transactionInternalRef, PaymentStatus status);
+    void completeSuccess(StoreMerchantId store, String transactionInternalRef);
+
+    void completeFailed(StoreMerchantId store, String transactionInternalRef);
 
     void approvePayment(StoreMerchantId store, String internalRef, String transactionNo);
 
