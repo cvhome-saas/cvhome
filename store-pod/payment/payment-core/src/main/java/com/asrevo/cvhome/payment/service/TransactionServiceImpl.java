@@ -57,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStoreMerchantId(store);
         transaction.setAmount(request.amount());
         transaction.setCurrency(request.currency());
-        transaction.setPaymentType(config.getPaymentType());
+        transaction.setPaymentType(config.getId().getPaymentType());
         transaction.setStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(Instant.now());
         transaction.setTransactionType(TransactionType.INIT);

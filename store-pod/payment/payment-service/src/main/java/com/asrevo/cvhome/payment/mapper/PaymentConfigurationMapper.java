@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.crypto.EncryptedValue;
 import com.asrevo.cvhome.crypto.SecretCryptoProvider;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.entity.payment.PaymentConfigurationId;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 
@@ -24,8 +25,7 @@ public class PaymentConfigurationMapper {
         }
 
         PaymentConfiguration entity = new PaymentConfiguration();
-        entity.setStoreMerchantId(dto.getStoreMerchantId());
-        entity.setPaymentType(dto.getPaymentType());
+        entity.setId(new PaymentConfigurationId(dto.getStoreMerchantId(), dto.getPaymentType()));
         entity.setEnabled(dto.isEnabled());
 
         if (dto.getApiKey() != null) {
@@ -52,9 +52,8 @@ public class PaymentConfigurationMapper {
         }
 
         ReadablePaymentConfiguration dto = new ReadablePaymentConfiguration();
-        dto.setId(entity.getId());
-        dto.setStoreMerchantId(entity.getStoreMerchantId());
-        dto.setPaymentType(entity.getPaymentType());
+        dto.setStoreMerchantId(entity.getId().getStoreMerchantId());
+        dto.setPaymentType(entity.getId().getPaymentType());
         dto.setEnabled(entity.isEnabled());
 
         dto.setApiKey(decrypt(entity.getApiKey()));

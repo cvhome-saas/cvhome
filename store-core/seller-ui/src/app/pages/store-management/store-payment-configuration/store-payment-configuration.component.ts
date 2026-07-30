@@ -75,8 +75,8 @@ export class StorePaymentConfigurationComponent implements OnInit {
         enabled: it.enabled
       };
 
-      if (it.id) {
-        return this.storeService.updatePaymentConfig(this.store.id, it.id, payload);
+      if (it.exists) {
+        return this.storeService.updatePaymentConfig(this.store.id, it.paymentType, payload);
       } else {
         return this.storeService.savePaymentConfig(this.store.id, payload);
       }
@@ -85,7 +85,7 @@ export class StorePaymentConfigurationComponent implements OnInit {
     zip(...requests).subscribe({
       next: () => {
         this.toastr.success(this.translate.instant('STORE.PAYMENT_CONFIGURATION_UPDATED'));
-        this.ngOnInit(); // Reload to get IDs for new configs
+        this.ngOnInit(); // Reload to get updated existence flags
       },
       error: (err) => {
         this.errorService.error('ERROR.SYSTEM_ERROR', err);
@@ -97,7 +97,7 @@ export class StorePaymentConfigurationComponent implements OnInit {
     const configGroups = this.paymentTypes.map(type => {
       const config = configs.find(c => c.paymentType === type) || {};
       return this.fb.group({
-        id: [config.id || null],
+        exists: [configs.some(c => c.paymentType === type)],
         paymentType: [type],
         apiKey: [config.apiKey || ''],
         secretKey: [config.secretKey || ''],

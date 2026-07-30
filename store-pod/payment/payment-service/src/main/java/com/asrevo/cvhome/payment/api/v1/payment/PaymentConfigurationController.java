@@ -39,16 +39,16 @@ public class PaymentConfigurationController {
         service.saveConfig(merchantStore, config);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{paymentType}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')")
-    public void updateConfig(StoreMerchantId merchantStore, @PathVariable Long id, @RequestBody PersistablePaymentConfiguration config) {
-        service.updateConfig(merchantStore, id, config);
+    public void updateConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType, @RequestBody PersistablePaymentConfiguration config) {
+        service.updateConfig(merchantStore, paymentType, config);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{paymentType}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')")
-    public void deleteConfig(StoreMerchantId merchantStore, @PathVariable Long id) {
-        service.deleteConfig(merchantStore, id);
+    public void deleteConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType) {
+        service.deleteConfig(merchantStore, paymentType);
     }
 
     @GetMapping("/supported-payment-types")
