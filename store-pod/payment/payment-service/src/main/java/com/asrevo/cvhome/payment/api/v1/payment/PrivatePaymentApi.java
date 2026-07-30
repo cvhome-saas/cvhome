@@ -25,15 +25,15 @@ public class PrivatePaymentApi {
 
     private final PaymentApprovalService paymentApprovalService;
 
-    @PostMapping("/payment/transaction/{transactionId}/approve")
+    @PostMapping("/payment/transaction/{internalRef}/approve")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')")
-    public void approve(StoreMerchantId store, @PathVariable Long transactionId, @Valid @RequestBody PaymentApprovalRequest approvalModel) {
-        paymentApprovalService.approvePayment(store, transactionId, approvalModel.getTransactionNo());
+    public void approve(StoreMerchantId store, @PathVariable String internalRef, @Valid @RequestBody PaymentApprovalRequest approvalModel) {
+        paymentApprovalService.approvePayment(store, internalRef, approvalModel.getTransactionNo());
     }
 
-    @PostMapping("/payment/transaction/{transactionId}/reject")
+    @PostMapping("/payment/transaction/{internalRef}/reject")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.PAYMENT.*')")
-    public void reject(StoreMerchantId store, @PathVariable Long transactionId) {
-        paymentApprovalService.rejectPayment(store, transactionId);
+    public void reject(StoreMerchantId store, @PathVariable String internalRef) {
+        paymentApprovalService.rejectPayment(store, internalRef);
     }
 }

@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.payment.service.PaymentGatewayService;
+import com.asrevo.cvhome.payment.model.payment.WebhookEvent;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
+import io.namastack.outbox.Outbox;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class PublicPaymentWebhookApi {
 
-    private final PaymentGatewayService paymentGatewayService;
+    private final Outbox outbox;
 
     @PostMapping("/public/webhook/{storeId}/{paymentType}")
     @Operation(method = "POST", description = "Payment Webhook")
@@ -35,7 +35,10 @@ public class PublicPaymentWebhookApi {
                         @PathVariable("paymentType") PaymentType paymentType,
                         @RequestBody String payload,
                         @RequestHeader Map<String, String> headers) {
-        paymentGatewayService.handleWebhook(new StoreMerchantId(storeId), paymentType, payload, headers);
+        log.info("Received webhook for store {} and type {}", storeId, paymentType);
+        outbox.schedule(
+                new WebhookEvent(storeId, paymentType, payload, headers)
+        );
     }
 
 

@@ -60,6 +60,7 @@ spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-te
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache", version.ref = "springBoot" }
 
 namastack-outbox-starter-jdbc = { module = "io.namastack:namastack-outbox-starter-jdbc", version.ref = "namastack-outbox" }
+namastack-outbox-starter-jpa = { module = "io.namastack:namastack-outbox-starter-jpa", version.ref = "namastack-outbox" }
 namastack-outbox-api = { module = "io.namastack:namastack-outbox-api", version.ref = "namastack-outbox" }
 
 spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient", version.ref = "springBoot" }

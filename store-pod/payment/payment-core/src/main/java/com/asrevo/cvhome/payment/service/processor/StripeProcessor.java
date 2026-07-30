@@ -13,12 +13,14 @@ import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentUseCase;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.service.processor.exception.FailedPaymentInitiate;
-import com.asrevo.cvhome.payment.service.processor.exception.InvalidPaymentReferenceId;
 import com.asrevo.cvhome.payment.service.processor.exception.InvalidWebhookPayload;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
+import com.stripe.exception.EventDataObjectDeserializationException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.net.Webhook;
@@ -32,16 +34,15 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class StripeProcessor implements PaymentProcessor {
 
-    private static final String EVENT_CHECKOUT_COMPLETED = "checkout.session.completed";
-    private static final String EVENT_CHECKOUT_EXPIRED = "checkout.session.expired";
-    private static final String EVENT_PAYMENT_INTENT_FAILED = "payment_intent.payment_failed";
-
-    private static PaymentUseCase resolveUseCase(String eventType) {
-        return switch (eventType) {
-            case EVENT_CHECKOUT_COMPLETED -> PaymentUseCase.PAYMENT_SUCCEEDED;
-            case EVENT_CHECKOUT_EXPIRED, EVENT_PAYMENT_INTENT_FAILED -> PaymentUseCase.PAYMENT_FAILED;
-            default -> PaymentUseCase.UNKNOWN;
-        };
+    private static <T> T unSafeDeserialization(Event event, Class<T> clazz) {
+        try {
+            StripeObject stripeObject = event.getDataObjectDeserializer().deserializeUnsafe();
+            return clazz.cast(stripeObject);
+        } catch (ClassCastException e) {
+            throw new InvalidWebhookPayload("Stripe event data object is not of expected type: " + clazz.getSimpleName(), e);
+        } catch (EventDataObjectDeserializationException e) {
+            throw new InvalidWebhookPayload("Failed to deserialize Stripe event data object", e);
+        }
     }
 
     private static Event getEvent(String payload, Map<String, String> headers, PaymentSecret configuration)
@@ -58,21 +59,9 @@ public class StripeProcessor implements PaymentProcessor {
         }
     }
 
-    private static Long getTransactionId(Session session) {
-        String transactionIdStr = session.getClientReferenceId();
-        if (transactionIdStr == null) {
-            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
-        }
-        try {
-            return Long.valueOf(transactionIdStr);
-        } catch (NumberFormatException _) {
-            throw new InvalidPaymentReferenceId("Transaction ID not found in Stripe session payload");
-        }
-    }
-
     @Override
-    public PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
-                                          Long transactionId) throws FailedPaymentInitiate {
+    public PaymentInitiateResult initiate(String internalReference, PaymentSecret secret, PaymentRequest request)
+            throws FailedPaymentInitiate {
         RequestOptions requestOptions =
                 RequestOptions.builder()
                         .setApiKey(secret.getSecretKey())
@@ -96,18 +85,15 @@ public class StripeProcessor implements PaymentProcessor {
                                                                 .build())
                                                 .build())
                                 .build())
-                .setClientReferenceId(transactionId.toString())
-                .putMetadata("transactionId", transactionId.toString())
-                .putMetadata("ref", request.ref())
+                .setClientReferenceId(internalReference)
                 .build();
 
         try {
             Session session = Session.create(params, requestOptions);
             return PaymentInitiateResult.builder()
-                    .transactionId(transactionId)
-                    .status(PaymentInitiateStatus.PENDING)
                     .redirectUrl(session.getUrl())
                     .externalId(session.getId())
+                    .status(PaymentInitiateStatus.PENDING)
                     .build();
 
         } catch (StripeException e) {
@@ -118,28 +104,37 @@ public class StripeProcessor implements PaymentProcessor {
 
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                      PaymentSecret configuration) throws InvalidWebhookPayload {
+                                       PaymentSecret configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
         Event event = getEvent(payload, headers, configuration);
 
         log.info("Stripe webhook event type: {} version {}", event.getType(), event.getApiVersion());
 
-        PaymentUseCase useCase = resolveUseCase(event.getType());
-        if (useCase == PaymentUseCase.UNKNOWN) {
-            log.info("Ignoring unhandled Stripe event type: {}", event.getType());
-            return WebhookResult.builder().paymentUseCase(PaymentUseCase.UNKNOWN).build();
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = unSafeDeserialization(event, Session.class);
+            String clientReferenceId = session.getClientReferenceId();
+            log.info("Processing successful Stripe session for client reference ID: {}", clientReferenceId);
+            return WebhookResult.builder()
+                    .internalReference(clientReferenceId)
+                    .status(PaymentStatus.PAID)
+                    .paymentUseCase(PaymentUseCase.PAYMENT_SUCCEEDED)
+                    .build();
+        } else if ("checkout.session.expired".equals(event.getType()) || "payment_intent.payment_failed".equals(event.getType())) {
+            Session session = unSafeDeserialization(event, Session.class);
+            String clientReferenceId = session.getClientReferenceId();
+            log.info("Processing failed Stripe session for client reference ID: {}", clientReferenceId);
+            return WebhookResult.builder()
+                    .internalReference(clientReferenceId)
+                    .status(PaymentStatus.FAILED)
+                    .paymentUseCase(PaymentUseCase.PAYMENT_FAILED)
+                    .build();
         }
+        return WebhookResult.noneUseCase();
+    }
 
-        Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-        Long transactionId = getTransactionId(session);
-        PaymentStatus status = useCase == PaymentUseCase.PAYMENT_SUCCEEDED ? PaymentStatus.PAID : PaymentStatus.FAILED;
-        log.info("Processing Stripe session for transaction ID: {}, useCase: {}", transactionId, useCase);
-
-        return WebhookResult.builder()
-                .transactionId(transactionId)
-                .status(status)
-                .paymentUseCase(useCase)
-                .build();
+    @Override
+    public PaymentType type() {
+        return PaymentType.STRIPE;
     }
 
 
