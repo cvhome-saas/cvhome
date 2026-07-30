@@ -22,6 +22,9 @@ import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentCanceledEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentFailedEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentPaidEvent;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -112,13 +115,28 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_NO")
     private String transactionNo;
 
-    public Transaction completeSuccess() {
+    public Transaction success(String transactionNo) {
         this.status = PaymentStatus.PAID;
+        this.transactionNo = transactionNo;
+        this.registerEvent(PaymentPaidEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
         return this;
     }
 
-    public Transaction completeFailed() {
+    public Transaction success() {
+        this.status = PaymentStatus.PAID;
+        this.registerEvent(PaymentPaidEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction failed() {
         this.status = PaymentStatus.FAILED;
+        this.registerEvent(PaymentFailedEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction canceled() {
+        this.status = PaymentStatus.CANCELLED;
+        this.registerEvent(PaymentCanceledEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
         return this;
     }
 }

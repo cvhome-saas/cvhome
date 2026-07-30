@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.payment.model.payment.WebhookEvent;
+import com.asrevo.cvhome.payment.model.payment.event.webhook.WebhookEvent;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import io.namastack.outbox.Outbox;

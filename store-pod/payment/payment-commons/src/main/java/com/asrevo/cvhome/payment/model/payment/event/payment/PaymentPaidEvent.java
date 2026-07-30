@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.payment.model.payment;
+package com.asrevo.cvhome.payment.model.payment.event.payment;
 
 import java.util.Map;
 
@@ -7,11 +7,11 @@ import com.asrevo.cvhome.commons.event.Event;
 import io.namastack.outbox.annotation.OutboxEvent;
 
 @OutboxEvent(key = "#this.internalRef()")
-public record PaymentPaidEvent(String internalRef, String requestRef, String storeId, String externalId,
+public record PaymentPaidEvent(String internalRef, String requestRef, String storeId,
                                Map<String, String> data) implements Event {
 
-    public static PaymentPaidEvent from(String internalRef, String requestRef, String storeId, String externalId) {
-        return new PaymentPaidEvent(internalRef, requestRef, storeId, externalId, Map.of());
+    public static PaymentPaidEvent from(String internalRef, String requestRef, String storeId) {
+        return new PaymentPaidEvent(internalRef, requestRef, storeId, Map.of());
     }
 
     @Override
@@ -24,8 +24,7 @@ public record PaymentPaidEvent(String internalRef, String requestRef, String sto
         return Map.of(
                 "internalRef", internalRef,
                 "requestRef", requestRef,
-                "storeId", storeId,
-                "externalId", externalId
+                "storeId", storeId
         );
     }
 }

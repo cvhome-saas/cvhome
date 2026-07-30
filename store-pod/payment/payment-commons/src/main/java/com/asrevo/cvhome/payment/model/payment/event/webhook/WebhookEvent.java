@@ -1,4 +1,4 @@
-package com.asrevo.cvhome.payment.model.payment;
+package com.asrevo.cvhome.payment.model.payment.event.webhook;
 
 import java.util.Map;
 

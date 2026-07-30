@@ -3,7 +3,7 @@ package com.asrevo.cvhome.payment.service;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.payment.model.payment.WebhookEvent;
+import com.asrevo.cvhome.payment.model.payment.event.webhook.WebhookEvent;
 
 import io.namastack.outbox.annotation.OutboxHandler;
 

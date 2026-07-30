@@ -36,11 +36,11 @@ public class PaymentGatewayService {
     public PaymentInitiateResult initiatePayment(StoreMerchantId store, PaymentRequest request) {
         log.info("Initiating payment for store {} and order {}", store, request.ref());
 
-        PaymentInitiateResult existingTransaction =
+        PaymentInitiateResult existingRequest =
                 transactionService.findExistingInitialResultByRequestRef(store, request.ref()).orElse(null);
 
-        if (Objects.nonNull(existingTransaction)) {
-            return existingTransaction;
+        if (Objects.nonNull(existingRequest)) {
+            return existingRequest;
         }
 
         ReadablePaymentConfiguration config = getPaymentConfiguration(store, request.paymentType());

@@ -44,14 +44,21 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void completeSuccess(StoreMerchantId store, String transactionInternalRef) {
-        Transaction transaction = getTransaction(store, transactionInternalRef).completeSuccess();
+        Transaction transaction = getTransaction(store, transactionInternalRef).success();
         transactionRepository.save(transaction);
     }
 
     @Override
     @Transactional
     public void completeFailed(StoreMerchantId store, String transactionInternalRef) {
-        Transaction transaction = getTransaction(store, transactionInternalRef).completeFailed();
+        Transaction transaction = getTransaction(store, transactionInternalRef).failed();
+        transactionRepository.save(transaction);
+    }
+
+    @Override
+    @Transactional
+    public void completeCanceled(StoreMerchantId store, String transactionInternalRef) {
+        Transaction transaction = getTransaction(store, transactionInternalRef).canceled();
         transactionRepository.save(transaction);
     }
 
@@ -88,9 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void approvePayment(StoreMerchantId store, String internalRef, String transactionNo) {
-        Transaction transaction = getTransaction(store, internalRef);
-        transaction.setTransactionNo(transactionNo);
-        transaction.setStatus(PaymentStatus.PAID);
+        Transaction transaction = getTransaction(store, internalRef).success(transactionNo);
         transactionRepository.save(transaction);
     }
 

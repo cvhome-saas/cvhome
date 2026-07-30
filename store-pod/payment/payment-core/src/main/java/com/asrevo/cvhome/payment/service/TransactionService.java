@@ -18,6 +18,8 @@ public interface TransactionService {
 
     void completeFailed(StoreMerchantId store, String transactionInternalRef);
 
+    void completeCanceled(StoreMerchantId store, String transactionInternalRef);
+
     void approvePayment(StoreMerchantId store, String internalRef, String transactionNo);
 
     void rejectPayment(StoreMerchantId store, String internalRef);
