@@ -5,7 +5,7 @@ import java.util.Objects;
 import lombok.Builder;
 
 @Builder
-public record PaymentInitiateResult(Long transactionId, PaymentInitiateStatus status, String redirectUrl, String externalId,String gatewayRef) {
+public record PaymentInitiateResult(PaymentInitiateStatus status, String redirectUrl, String externalId, String gatewayRef) {
 
     public static PaymentInitiateResult failed() {
         return PaymentInitiateResult.builder().status(PaymentInitiateStatus.FAILED).build();
