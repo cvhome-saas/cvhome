@@ -14,6 +14,8 @@ export interface Order {
     shipping: any
     payment: string
     orderStatus: string
+    paymentStatus: string
+    redirectUrl: string | undefined
     datePurchased: string
     total: OrderTotal | undefined
     products: ProductItem[] | undefined
@@ -65,6 +67,13 @@ export interface ProductItem {
     subTotal: string
     attributes: any[]
     image: any
+}
+
+export interface OrderStatusResult {
+    orderId: number
+    orderStatus: string
+    paymentStatus: string
+    redirectUrl: string | undefined
 }
 
 // order-history.ts

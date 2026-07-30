@@ -34,7 +34,7 @@ public class ProductReservationServiceImpl implements ProductReservationService 
     private final ProductReservationRepository productReservationRepository;
     private final ProductAvailabilityRepository productAvailabilityRepository;
 
-    @Value("${reservation.expiry.minutes:15}")
+    @Value("${reservation.expiry.minutes:45}")
     private int reservationExpiryMinutes;
 
     @Transactional

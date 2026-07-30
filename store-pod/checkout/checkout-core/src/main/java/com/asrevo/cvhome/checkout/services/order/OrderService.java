@@ -34,5 +34,8 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
 
     void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
 
+    void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
+                           String redirectUri);
+
     Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId);
 }

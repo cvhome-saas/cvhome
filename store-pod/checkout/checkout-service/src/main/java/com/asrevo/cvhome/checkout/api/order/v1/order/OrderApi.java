@@ -2,6 +2,7 @@ package com.asrevo.cvhome.checkout.api.order.v1.order;
 
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Pageable;
@@ -24,10 +25,14 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableAnonymousOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderStatus;
 import com.asrevo.cvhome.checkout.service.facade.checkout.OrderPlacementFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
+import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.checkout.utils.DomainResolver;
+import com.asrevo.cvhome.checkout.utils.RedirectUriConfirmation;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -35,6 +40,7 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -83,10 +89,10 @@ public class OrderApi {
 
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
-                                              StoreMerchantId merchantStore, LanguageCode language) {
+                                              StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
+            throws ServiceException {
 
         ShoppingCart cart;
-        try {
             ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
             if (store.isRequireLoginForOrderPlacement()) {
@@ -116,14 +122,44 @@ public class OrderApi {
                     .orElseThrow(() -> new ServiceRuntimeException(
                             "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
-            var processOrder = orderPlacementFacade.placeOrder(order, customer, merchantStore, language,
-                    LocaleUtils.getLocale(language));
+        String domain = new DomainResolver(request).domain();
 
-            return orderFacade.orderConfirmation(processOrder.order(), customer, merchantStore, language);
 
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error during checkout", e);
+        RedirectUriConfirmation redirectUriConfirmation = new RedirectUriConfirmation(domain, language);
+        OrderProcessingResult processOrder = orderPlacementFacade.placeOrder(order, customer, merchantStore, language,
+                LocaleUtils.getLocale(language), redirectUriConfirmation.success(), redirectUriConfirmation.cancel());
+
+        ReadableOrderConfirmation orderConfirmation = orderFacade.orderConfirmation(processOrder.order(), customer, merchantStore,
+                language);
+        orderConfirmation.setRedirectUrl(processOrder.redirectUrl());
+
+        return orderConfirmation;
+
+    }
+
+
+    /**
+     * Status lookup used by the checkout success/cancel redirect pages. Mirrors the same login
+     * requirement as placing the order: if the store requires login for order placement, the
+     * caller must be authenticated to view the status too; otherwise it's public.
+     */
+    @GetMapping(value = {"/order/{orderId}/status"})
+    @ResponseStatus(HttpStatus.OK)
+    @Parameter(name = "store",
+            schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
+    public ReadableOrderStatus orderStatus(@PathVariable Long orderId, JwtAuthenticationToken auth, StoreMerchantId merchantStore) {
+        ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
+
+        if (store.isRequireLoginForOrderPlacement()) {
+            if (auth == null || !auth.isAuthenticated()) {
+                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required to view order status");
+            }
+            if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
+                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
+            }
         }
+
+        return orderFacade.getOrderStatus(orderId, merchantStore);
     }
 
     @GetMapping(value = {"/private/orders"})

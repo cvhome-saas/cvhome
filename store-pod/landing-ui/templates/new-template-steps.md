@@ -83,6 +83,8 @@ src/app/[locale]/callback/callback-client.tsx  ← copy, no changes
 src/app/[locale]/product/[url]/page.tsx    ← copy, no changes
 src/app/[locale]/category/[url]/page.tsx   ← copy, no changes
 src/app/[locale]/checkout/page.tsx         ← copy, no changes
+src/app/[locale]/checkout/success/page.tsx ← copy, no changes
+src/app/[locale]/checkout/cancel/page.tsx  ← copy, no changes
 src/app/[locale]/content/[url]/page.tsx    ← copy, no changes
 src/app/[locale]/customer/page.tsx         ← copy, no changes
 src/app/[locale]/customer/order/[id]/page.tsx ← copy, no changes
@@ -91,6 +93,13 @@ src/app/[locale]/favicon.ico              ← copy or replace with your own
 
 > `layout.tsx` injects the store's runtime color template via `<style>` tag using `toRootStyle()` from
 `@store-front/services`. Do not change this.
+
+> `checkout/success/page.tsx` and `checkout/cancel/page.tsx` are reached after the payment gateway redirects the
+customer back to `{domain}/{locale}/checkout/success?code={cartCode}&orderId={id}` (or `.../cancel?...`) — these
+query params are set server-side by the checkout API's `successUrl`/`cancelUrl`. Both pages only extract
+`storeContext` and render `<CheckoutResult storeContext={...}/>` (same component for both routes — like
+`callback/callback-client.tsx`, `CheckoutResult` reads `code`/`orderId` itself via `useSearchParams()` and fetches
+the *actual* order status from the API rather than trusting which route the browser landed on).
 
 ---
 
@@ -110,7 +119,7 @@ You can regenerate any of these via `npx shadcn add <component>` if you want a d
 
 ---
 
-### Step 7 — Shared Components (THE BRAND NEW DESIGN — 18 files)
+### Step 7 — Shared Components (THE BRAND NEW DESIGN — 19 files)
 
 These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a
 **completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and
@@ -146,6 +155,7 @@ src/shared/
 
   Checkout/
     CheckoutForm.tsx            ← checkout form (CheckoutForm) + cart summary sidebar (CheckoutCartBox)
+    CheckoutResult.tsx          ← post-payment success/cancel result screen (order status, redirect-to-pay CTA)
 
   Customer/
     CustomerDashboard.tsx       ← Tabs for Customer Info, Addresses, and Orders List
@@ -168,6 +178,7 @@ Each component receives typed props from the page server components. The hooks u
 | `ProductCategoryFilter`       | `useProductCategoryFilter`    |
 | `CheckoutForm`                | `useCheckoutForm`             |
 | `CheckoutCartBox`             | `useCart`                     |
+| `CheckoutResult`              | `useOrderStatus`              |
 | `ProductDetailedActionBox`    | `useProductDetailedAddToCart` |
 | `CustomerDashboard`           | `useUser`, `useCustomer`      |
 | `OrderDetails`                | `useUser`, `useCustomer`      |
@@ -267,6 +278,8 @@ npm run dev          # starts Express server on port 8110
 [ ] src/app/[locale]/product/[url]/page.tsx
 [ ] src/app/[locale]/category/[url]/page.tsx
 [ ] src/app/[locale]/checkout/page.tsx
+[ ] src/app/[locale]/checkout/success/page.tsx
+[ ] src/app/[locale]/checkout/cancel/page.tsx
 [ ] src/app/[locale]/content/[url]/page.tsx
 [ ] src/app/[locale]/customer/page.tsx
 [ ] src/app/[locale]/customer/order/[id]/page.tsx
@@ -291,6 +304,7 @@ npm run dev          # starts Express server on port 8110
 [ ] src/shared/Category/ProductCategoryFilter.tsx
 [ ] src/shared/Cart/CartProductList.tsx
 [ ] src/shared/Checkout/CheckoutForm.tsx
+[ ] src/shared/Checkout/CheckoutResult.tsx
 [ ] src/shared/Customer/CustomerDashboard.tsx
 [ ] src/shared/Customer/OrderDetails.tsx
 [ ] src/shared/Common/Breadcrumb.tsx
@@ -317,6 +331,7 @@ import { ProductService } from '@store-front/services/product-service'
 import { CategoryService } from '@store-front/services/category-service'
 import { StoreService } from '@store-front/services/store-service'
 import { ContentService } from '@store-front/services/content-service'
+import { OrderService } from '@store-front/services/order-service'
 import { AuthService } from '@store-front/services/auth-service'
 import { toRootStyle } from '@store-front/services/color-utils'
 import { getDirection } from '@store-front/services/direction-utils'
@@ -326,6 +341,7 @@ import { useCart } from '@store-front/hooks/use-cart'
 import { useUser } from '@store-front/hooks/use-user'
 import { useCustomer } from '@store-front/hooks/use-customer'
 import { useCheckoutForm } from '@store-front/hooks/use-checkout-form'
+import { useOrderStatus } from '@store-front/hooks/use-order-status'
 import { useProductCategoryFilter } from '@store-front/hooks/use-product-category-filter'
 import { useProductDetailedAddToCart } from '@store-front/hooks/use-product-detailed-add-to-cart'
 ```

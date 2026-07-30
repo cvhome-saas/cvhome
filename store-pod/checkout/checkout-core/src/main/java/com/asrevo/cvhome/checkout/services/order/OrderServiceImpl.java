@@ -154,6 +154,13 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     @Override
     @Transactional
     public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
+        updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus, null);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
+                                  String redirectUri) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
             if (orderStatus != null) {
@@ -170,6 +177,9 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
             }
             if (paymentStatus != null) {
                 order.setPaymentStatus(paymentStatus);
+            }
+            if (redirectUri != null) {
+                order.setRedirectUri(redirectUri);
             }
             orderRepository.save(order);
             log.info("Order {} status updated: status={}, inventory={}, payment={}", orderId, orderStatus, inventoryStatus, paymentStatus);

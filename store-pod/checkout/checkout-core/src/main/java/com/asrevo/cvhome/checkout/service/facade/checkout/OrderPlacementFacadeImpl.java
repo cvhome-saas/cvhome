@@ -41,21 +41,20 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                                            Locale locale) throws ServiceException {
+                                            Locale locale, String successUrl, String cancelUrl) throws ServiceException {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
         ProductReservationReserveResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
 
         if (!result.status()) {
-            orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED,
-                    PaymentStatus.FAILED);
+            updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
             return new OrderProcessingResult(modelOrder);
         }
-        orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PENDING);
+        updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PENDING);
 
 
-        PaymentInitiateResult paymentResponse = doOrderPaymentInitiate(modelOrder, result);
+        PaymentInitiateResult paymentResponse = doOrderPaymentInitiate(modelOrder, result, successUrl, cancelUrl);
 
         switch (paymentResponse.status()) {
             case PAID:
@@ -63,17 +62,19 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                 try {
                     orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(modelOrder.getId(), store, OrderStatus.CONFIRMED,
                             PaymentStatus.PAID);
+                    modelOrder.setStatus(OrderStatus.CONFIRMED);
+                    modelOrder.setInventoryStatus(InventoryStatus.COMMITTED);
+                    modelOrder.setPaymentStatus(PaymentStatus.PAID);
                 } catch (Exception e) {
                     log.error("Failed to commit reservation for PAID order {}. Manual intervention required.", modelOrder.getId(), e);
                     // Ensure local status reflects payment even if catalog commit failed
-                    orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
-                            PaymentStatus.PAID);
+                    updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PAID);
                 }
                 break;
 
             case PENDING:
                 log.info("Payment Pending order {}.", modelOrder.getId());
-                orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
+                updateOrderStatus(modelOrder, paymentResponse, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED,
                         PaymentStatus.PENDING);
                 break;
 
@@ -82,10 +83,12 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                 try {
                     orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(modelOrder.getId(), store, OrderStatus.CANCELLED,
                             PaymentStatus.FAILED);
+                    modelOrder.setStatus(OrderStatus.CANCELLED);
+                    modelOrder.setInventoryStatus(InventoryStatus.RELEASED);
+                    modelOrder.setPaymentStatus(PaymentStatus.FAILED);
                 } catch (Exception e) {
                     log.error("Failed to release reservation for FAILED order {}.", modelOrder.getId(), e);
-                    orderFacade.updateOrderStatus(modelOrder.getId(), OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED,
-                            PaymentStatus.FAILED);
+                    updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }
                 break;
         }
@@ -97,22 +100,43 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
-    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result) {
-        try {
+    private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result, String successUrl,
+                                                         String cancelUrl) {
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .ref(modelOrder.getId().toString())
                     .amount(modelOrder.getTotal())
                     .currency(modelOrder.getCurrency())
                     .paymentType(modelOrder.getPaymentType())
                     .expireAt(result.expireAt())
+                    .successUrl(appendOrderId(successUrl, modelOrder.getId()))
+                    .cancelUrl(appendOrderId(cancelUrl, modelOrder.getId()))
                     .build();
 
             log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
             return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
 
-        } catch (Exception e) {
-            log.error("Payment initiation error for order {}. Setting status to PENDING for reconciliation.", modelOrder.getId(), e);
-            return PaymentInitiateResult.pending();
-        }
+    }
+
+    private String appendOrderId(String url, Long orderId) {
+        return url + (url.contains("?") ? "&" : "?") + "orderId=" + orderId;
+    }
+
+    private void updateOrderStatus(Order modelOrder, OrderStatus orderStatus, InventoryStatus inventoryStatus,
+                                   PaymentStatus paymentStatus) {
+        orderFacade.updateOrderStatus(modelOrder.getId(), orderStatus, inventoryStatus, paymentStatus);
+        modelOrder.setStatus(orderStatus);
+        modelOrder.setInventoryStatus(inventoryStatus);
+        modelOrder.setPaymentStatus(paymentStatus);
+    }
+
+    private void updateOrderStatus(Order modelOrder, PaymentInitiateResult paymentInitiateResult, OrderStatus orderStatus,
+                                   InventoryStatus inventoryStatus,
+                                   PaymentStatus paymentStatus) {
+        String redirectUri = paymentInitiateResult.redirectUrl();
+        orderFacade.updateOrderStatus(modelOrder.getId(), orderStatus, inventoryStatus, paymentStatus, redirectUri);
+        modelOrder.setStatus(orderStatus);
+        modelOrder.setInventoryStatus(inventoryStatus);
+        modelOrder.setPaymentStatus(paymentStatus);
+        modelOrder.setRedirectUri(redirectUri);
     }
 }

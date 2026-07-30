@@ -12,5 +12,5 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 public interface OrderPlacementFacade {
 
     OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                                     Locale locale) throws ServiceException;
+                                     Locale locale, String successUrl, String cancelUrl) throws ServiceException;
 }

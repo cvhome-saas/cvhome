@@ -124,9 +124,19 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
         }
         cartManager.checkout(checkoutCart, (o) => {
                 setOrder(o);
-                if (o) {
+                if (o && o.redirectUrl) {
+                    window.location.href = o.redirectUrl;
+                } else if (o && o.orderStatus !== 'CANCELLED') {
                     setSuccessDialogOpen(true);
                     reset();
+                } else {
+                    showToast.error(t('PAYMENT_FAILED'), {
+                        duration: 3000,
+                        progress: false,
+                        position: toastDirection(storeContext.locale),
+                        transition: "bounceIn",
+                        sound: false,
+                    });
                 }
             }, () => showToast.error(t('FAILED_TO_PLACE_ORDER'), {
                 duration: 3000,

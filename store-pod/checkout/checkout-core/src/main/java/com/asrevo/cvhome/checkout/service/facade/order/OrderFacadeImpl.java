@@ -32,6 +32,7 @@ import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
+import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderStatus;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.mapper.customer.ReadableCustomerMapper;
@@ -227,6 +228,8 @@ public class OrderFacadeImpl implements OrderFacade {
         orderConfirmation.setProducts(products);
 
         orderConfirmation.setId(order.getId());
+        orderConfirmation.setOrderStatus(order.getStatus());
+        orderConfirmation.setPaymentStatus(order.getPaymentStatus());
 
         return orderConfirmation;
     }
@@ -258,6 +261,22 @@ public class OrderFacadeImpl implements OrderFacade {
         } catch (Exception e) {
             throw new ServiceRuntimeException("Error while getting orders", e);
         }
+    }
+
+    @Override
+    public ReadableOrderStatus getOrderStatus(Long orderId, StoreMerchantId store) {
+        Order modelOrder = orderService.getOrder(orderId, store);
+        if (modelOrder == null) {
+            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace("{}", String.valueOf(orderId)));
+        }
+
+        ReadableOrderStatus readableOrderStatus = new ReadableOrderStatus();
+        readableOrderStatus.setOrderId(modelOrder.getId());
+        readableOrderStatus.setOrderStatus(modelOrder.getStatus());
+        readableOrderStatus.setPaymentStatus(modelOrder.getPaymentStatus());
+        readableOrderStatus.setRedirectUrl(modelOrder.getRedirectUri());
+
+        return readableOrderStatus;
     }
 
     @Override
@@ -418,5 +437,11 @@ public class OrderFacadeImpl implements OrderFacade {
     @Override
     public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
         orderService.updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus);
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
+                                  String redirectUri) {
+        orderService.updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus, redirectUri);
     }
 }
