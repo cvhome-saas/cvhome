@@ -4,4 +4,6 @@ public interface PaymentSecret {
     String getApiKey();
 
     String getSecretKey();
+
+    String getWebhookSecret();
 }

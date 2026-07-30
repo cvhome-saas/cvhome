@@ -44,7 +44,7 @@ public class StripeProcessor implements PaymentProcessor {
         };
     }
 
-    private static Event getEvent(String payload, Map<String, String> headers, PaymentConfiguration configuration)
+    private static Event getEvent(String payload, Map<String, String> headers, PaymentSecret configuration)
             throws InvalidWebhookPayload {
         try {
             String sigHeader = headers.get("stripe-signature");
@@ -118,7 +118,7 @@ public class StripeProcessor implements PaymentProcessor {
 
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                      PaymentConfiguration configuration) throws InvalidWebhookPayload {
+                                      PaymentSecret configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
         Event event = getEvent(payload, headers, configuration);
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.payment.entity.payment.Transaction;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
@@ -51,13 +52,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction createInitialTransaction(StoreMerchantId store, PaymentConfiguration config, PaymentRequest request) {
+    public Transaction createInitialTransaction(StoreMerchantId store,  PaymentRequest request) {
         Transaction transaction = new Transaction();
         transaction.setRef(request.ref());
         transaction.setStoreMerchantId(store);
         transaction.setAmount(request.amount());
         transaction.setCurrency(request.currency());
-        transaction.setPaymentType(config.getId().getPaymentType());
+        transaction.setPaymentType(request.paymentType());
         transaction.setStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(Instant.now());
         transaction.setTransactionType(TransactionType.INIT);

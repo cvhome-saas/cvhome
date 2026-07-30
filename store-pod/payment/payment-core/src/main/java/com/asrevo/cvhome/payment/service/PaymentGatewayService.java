@@ -8,12 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
+import com.asrevo.cvhome.payment.entity.payment.PaymentSecret;
 import com.asrevo.cvhome.payment.entity.payment.Transaction;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
+import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.payment.repository.payment.PaymentConfigurationRepository;
 import com.asrevo.cvhome.payment.service.processor.CODProcessor;
 import com.asrevo.cvhome.payment.service.processor.ManualTransferredProcessor;
@@ -29,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PaymentGatewayService {
 
-    private final PaymentConfigurationRepository configRepository;
+    private final PaymentConfigurationService paymentConfigurationService;
     private final TransactionService transactionService;
     private final StripeProcessor stripeProcessor;
     private final CODProcessor codProcessor;
@@ -51,7 +53,7 @@ public class PaymentGatewayService {
         }
 
 
-        PaymentConfiguration config = getPaymentConfiguration(store, request.paymentType());
+        ReadablePaymentConfiguration config = getPaymentConfiguration(store, request.paymentType());
 
         if (config == null) {
             log.warn("No enabled payment configuration found for store {} and type {}", store, request.paymentType());
@@ -59,7 +61,7 @@ public class PaymentGatewayService {
         }
 
         // Initialize transaction
-        Transaction transaction = transactionService.createInitialTransaction(store,config, request);
+        Transaction transaction = transactionService.createInitialTransaction(store, request);
 
         try {
             PaymentInitiateResult initiateResult = switch (request.paymentType()) {
@@ -76,9 +78,9 @@ public class PaymentGatewayService {
         }
     }
 
-    private PaymentConfiguration getPaymentConfiguration(StoreMerchantId store, PaymentType paymentType) {
-        return configRepository.findByIdStoreMerchantIdAndIdPaymentType(store, paymentType)
-                .filter(PaymentConfiguration::isEnabled)
+    private ReadablePaymentConfiguration getPaymentConfiguration(StoreMerchantId store, PaymentType paymentType) {
+        return paymentConfigurationService.getConfig(store, paymentType)
+                .filter(ReadablePaymentConfiguration::isEnabled)
                 .orElse(null);
     }
 
@@ -101,7 +103,7 @@ public class PaymentGatewayService {
     }
 
     public void handleWebhook(StoreMerchantId store, PaymentType paymentType, String payload, Map<String, String> headers) {
-        PaymentConfiguration config = getPaymentConfiguration(store, paymentType);
+        PaymentSecret config = getPaymentConfiguration(store, paymentType);
         if (config == null) {
             log.warn("No enabled {} configuration found for store {}", paymentType, store);
             return;

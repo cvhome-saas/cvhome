@@ -15,7 +15,7 @@ public interface PaymentProcessor {
     PaymentInitiateResult initiate(PaymentSecret secret, PaymentRequest request,
                                    Long transactionId);
 
-    WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers, PaymentConfiguration config)
+    WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers, PaymentSecret config)
             throws InvalidPaymentReferenceId, SignatureVerificationException;
 
 }
