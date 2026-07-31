@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +18,9 @@ import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateStatus;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.model.payment.ReadableTransaction;
+import com.asrevo.cvhome.payment.model.payment.ReadableTransactionList;
+import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
 import com.asrevo.cvhome.payment.repository.payment.TransactionRepository;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 
@@ -24,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
+
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "transactionDate");
 
     private final TransactionRepository transactionRepository;
 
@@ -105,6 +114,34 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getTransaction(store, internalRef);
         transaction.setStatus(PaymentStatus.REJECTED);
         transactionRepository.save(transaction);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ReadableTransactionList list(StoreMerchantId store, TransactionSearchFilter filter, Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSortOr(DEFAULT_SORT));
+        Page<Transaction> page = transactionRepository.findAll(store, filter, sortedPageable);
+        ReadableTransactionList result = new ReadableTransactionList();
+        result.setContent(page.getContent().stream().map(TransactionServiceImpl::toReadableTransaction).toList());
+        result.setSize(page.getSize());
+        result.setTotalElements(page.getTotalElements());
+        result.setTotalPages(page.getTotalPages());
+        result.setPageNumber(page.getNumber());
+        return result;
+    }
+
+    private static ReadableTransaction toReadableTransaction(Transaction transaction) {
+        return ReadableTransaction.builder()
+                .id(transaction.getId())
+                .internalRef(transaction.getInternalRef())
+                .requestRef(transaction.getRequestRef())
+                .amount(transaction.getAmount())
+                .currency(transaction.getCurrency())
+                .paymentType(transaction.getPaymentType())
+                .status(transaction.getStatus())
+                .transactionDate(transaction.getTransactionDate())
+                .transactionNo(transaction.getTransactionNo())
+                .build();
     }
 
     @Transactional(readOnly = true)

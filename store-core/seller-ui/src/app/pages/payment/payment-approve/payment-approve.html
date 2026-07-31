@@ -1,0 +1,23 @@
+<div class="approve-box">
+  <span class="titleBar">
+    <span></span>
+    <span class="title_text">{{ 'TRANSACTION.APPROVE_TITLE' | translate }}</span>
+    <button (click)="cancel()" class="close" type="button"></button>
+  </span>
+
+  <div class="formSec">
+    <nb-form-field>
+      <input [(ngModel)]="transactionNo" fullWidth nbInput
+             placeholder="{{ 'TRANSACTION.APPROVE_TRANSACTION_NO' | translate }}" type="text">
+    </nb-form-field>
+
+    <div class="actions">
+      <button (click)="cancel()" nbButton outline status="basic">
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button (click)="submit()" [disabled]="!transactionNo" nbButton status="primary">
+        {{ 'TRANSACTION.APPROVE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

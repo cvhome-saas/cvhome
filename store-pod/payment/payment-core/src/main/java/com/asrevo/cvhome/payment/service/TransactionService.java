@@ -2,10 +2,14 @@ package com.asrevo.cvhome.payment.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.model.payment.ReadableTransactionList;
+import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
 
 public interface TransactionService {
 
@@ -23,6 +27,8 @@ public interface TransactionService {
     void approvePayment(StoreMerchantId store, String internalRef, String transactionNo);
 
     void rejectPayment(StoreMerchantId store, String internalRef);
+
+    ReadableTransactionList list(StoreMerchantId store, TransactionSearchFilter filter, Pageable pageable);
 
     PaymentResponse status(StoreMerchantId store, String ref);
 
