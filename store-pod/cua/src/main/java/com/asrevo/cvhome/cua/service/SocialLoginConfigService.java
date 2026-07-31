@@ -1,11 +1,13 @@
 package com.asrevo.cvhome.cua.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
 import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
 import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
 import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
@@ -34,4 +36,7 @@ public class SocialLoginConfigService {
         });
     }
 
+    public Optional<ReadableSocialLoginConfig> findById(SocialLoginConfigId socialLoginConfigId) {
+        return repository.findById(socialLoginConfigId).map(mapper::toDTO);
+    }
 }
