@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.payment.service.processor;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -83,7 +84,7 @@ public class StripeProcessor implements PaymentProcessor {
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
                                                 .setCurrency(request.currency().code().toLowerCase())
-                                                .setUnitAmount(request.amount().longValue())
+                                                .setUnitAmount(toStripeUnitAmount(request.amount()))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                                 .setName("Order #" + request.ref())
@@ -105,6 +106,10 @@ public class StripeProcessor implements PaymentProcessor {
             throw new FailedPaymentInitiate(e.getMessage(), e);
         }
 
+    }
+
+    private static long toStripeUnitAmount(BigDecimal amount) {
+        return amount.longValue() * 100;
     }
 
     @Override

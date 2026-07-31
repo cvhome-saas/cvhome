@@ -33,7 +33,6 @@ public class ExternalOrderApi implements ExternalOrderService {
 
     @Override
     @PostMapping("/private/order/{orderRef}/payment-status")
-    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void updatePaymentStatus(StoreMerchantId store, @PathVariable String orderRef,
                                    @RequestParam PaymentStatus status) {
         log.info("Updating payment status for order {} to {} for store {}", orderRef, status, store);
@@ -66,7 +65,6 @@ public class ExternalOrderApi implements ExternalOrderService {
 
     @Override
     @PostMapping("/private/order/{orderRef}/reservation-expired")
-    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void handleReservationExpired(StoreMerchantId store, @PathVariable String orderRef) {
         log.info("Handling reservation expired for order {} for store {}", orderRef, store);
         Long orderId = Long.parseLong(orderRef);

@@ -126,7 +126,10 @@
       "PROCESSED": "Обработан",
       "DELIVERED": "Доставлен",
       "REFUNDED": "Возвращён",
-      "CANCELED": "Отменён"
+      "CANCELED": "Отменён",
+      "CREATED": "Создан",
+      "CONFIRMED": "Подтверждён",
+      "PENDING_PAYMENT": "Ожидает оплаты"
     }
   },
   "COMPONENTS": {

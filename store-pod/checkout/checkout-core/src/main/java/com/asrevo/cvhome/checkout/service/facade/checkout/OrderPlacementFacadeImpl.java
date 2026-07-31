@@ -51,7 +51,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
             updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
             return new OrderProcessingResult(modelOrder);
         }
-        updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PENDING);
+        updateOrderStatus(modelOrder, OrderStatus.CREATED, InventoryStatus.RESERVED, PaymentStatus.PENDING);
 
 
         PaymentInitiateResult paymentResponse = doOrderPaymentInitiate(modelOrder, result, successUrl, cancelUrl);
