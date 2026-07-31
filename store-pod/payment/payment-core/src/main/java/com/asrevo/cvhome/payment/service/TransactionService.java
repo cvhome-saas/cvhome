@@ -2,26 +2,35 @@ package com.asrevo.cvhome.payment.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
-import com.asrevo.cvhome.payment.entity.payment.Transaction;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
-import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
+import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
+import com.asrevo.cvhome.payment.model.payment.ReadableTransactionList;
+import com.asrevo.cvhome.payment.models.TransactionSearchFilter;
 
 public interface TransactionService {
 
-    Optional<Transaction> findByRefAndStore(String ref, StoreMerchantId storeMerchantId);
+    String createInitialTransaction(StoreMerchantId store, PaymentRequest request);
 
-    Optional<Transaction> findById(Long id);
+    void completeInitiateTransaction(StoreMerchantId store, String transactionInternalRef, PaymentRequest request,
+                                     PaymentInitiateResult initiateResult);
 
-    Transaction createInitialTransaction(StoreMerchantId store, PaymentRequest request);
+    void completeSuccess(StoreMerchantId store, String transactionInternalRef);
 
-    void completeInitiateTransaction(Long transactionId, PaymentRequest request, PaymentInitiateResult initiateResult);
+    void completeFailed(StoreMerchantId store, String transactionInternalRef);
 
-    void completeTransaction(Long transactionId, PaymentStatus status);
+    void completeCanceled(StoreMerchantId store, String transactionInternalRef);
 
-    void approvePayment(StoreMerchantId store, Long transactionId, String transactionNo);
+    void approvePayment(StoreMerchantId store, String internalRef, String transactionNo);
 
-    void rejectPayment(StoreMerchantId store, Long transactionId);
+    void rejectPayment(StoreMerchantId store, String internalRef);
+
+    ReadableTransactionList list(StoreMerchantId store, TransactionSearchFilter filter, Pageable pageable);
+
+    PaymentResponse status(StoreMerchantId store, String ref);
+
+    Optional<PaymentInitiateResult> findExistingInitialResultByRequestRef(StoreMerchantId store, String requestRef);
 }

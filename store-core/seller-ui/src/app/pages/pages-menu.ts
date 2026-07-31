@@ -5,6 +5,10 @@ const CanAccessOrders = (roles: Roles) => {
   return roles.isOrgAdmin || roles.isStoreAdmin || roles.isStoreModerator;
 };
 
+const CanAccessPayments = (roles: Roles) => {
+  return roles.isOrgAdmin || roles.isStoreAdmin || roles.isStoreModerator;
+};
+
 const CanAccessHome = (roles: Roles) => {
   return true;
 };
@@ -292,6 +296,20 @@ export const MENU_ITEMS: MenuItem[] =
           title: 'COMPONENTS.ORDERS',
           key: 'COMPONENTS.ORDERS',
           link: '/pages/orders',
+        }
+      ]
+    },
+    {
+      title: 'COMPONENTS.PAYMENT_MANAGEMENT',
+      key: 'COMPONENTS.PAYMENT_MANAGEMENT',
+      icon: 'credit-card',
+      hidden: false,
+      guards: [CanAccessPayments],
+      children: [
+        {
+          title: 'COMPONENTS.PAYMENTS',
+          key: 'COMPONENTS.PAYMENTS',
+          link: '/pages/payment',
         }
       ]
     },

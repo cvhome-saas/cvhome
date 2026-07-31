@@ -16,6 +16,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,11 @@ public class PaymentConfigurationController {
     @GetMapping("/supported-payment-types")
     public PaymentType[] getSupportedPaymentTypes() {
         return PaymentType.values();
+    }
+
+    @GetMapping("/supported-payment-statuses")
+    public PaymentStatus[] getSupportedPaymentStatuses() {
+        return PaymentStatus.values();
     }
 
 }

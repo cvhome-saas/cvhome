@@ -22,6 +22,9 @@ import jakarta.persistence.UniqueConstraint;
 
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentCanceledEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentFailedEvent;
+import com.asrevo.cvhome.payment.model.payment.event.payment.PaymentPaidEvent;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
@@ -30,7 +33,6 @@ import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.entity.payments.TransactionType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -64,8 +66,11 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Embedded
     private AuditSection auditSection = new AuditSection();
 
-    @Column(name = "REF")
-    private String ref;
+    @Column(name = "INTERNAL_REF", nullable = false, length = 70)
+    private String internalRef;
+
+    @Column(name = "REQUEST_REF", nullable = false, length = 70)
+    private String requestRef;
 
     @Embedded
     @AttributeOverride(name = "storeMerchantId", column = @Column(name = "STORE_MERCHANT_ID", length = 50))
@@ -81,10 +86,6 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_DATE")
     private Instant transactionDate;
 
-    @Column(name = "TRANSACTION_TYPE")
-    @Enumerated(value = EnumType.STRING)
-    private TransactionType transactionType;
-
     @Column(name = "PAYMENT_TYPE")
     @Enumerated(value = EnumType.STRING)
     private PaymentType paymentType;
@@ -94,7 +95,7 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     private PaymentStatus status;
 
     @Column(name = "EXTERNAL_ID")
-    private String externalId;
+    private String paymentGatewayExternalId;
 
     @Column(name = "REDIRECT_URL", length = 1000)
     private String redirectUrl;
@@ -114,4 +115,28 @@ public class Transaction extends SalesManagerEntity<Long, Transaction> implement
     @Column(name = "TRANSACTION_NO")
     private String transactionNo;
 
+    public Transaction success(String transactionNo) {
+        this.status = PaymentStatus.PAID;
+        this.transactionNo = transactionNo;
+        this.registerEvent(PaymentPaidEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction success() {
+        this.status = PaymentStatus.PAID;
+        this.registerEvent(PaymentPaidEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction failed() {
+        this.status = PaymentStatus.FAILED;
+        this.registerEvent(PaymentFailedEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
+
+    public Transaction canceled() {
+        this.status = PaymentStatus.CANCELLED;
+        this.registerEvent(PaymentCanceledEvent.from(this.internalRef, this.requestRef, this.storeMerchantId.getId()));
+        return this;
+    }
 }

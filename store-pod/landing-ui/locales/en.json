@@ -126,7 +126,10 @@
       "PROCESSED": "Processed",
       "DELIVERED": "Delivered",
       "REFUNDED": "Refunded",
-      "CANCELED": "Canceled"
+      "CANCELED": "Canceled",
+      "CREATED": "Created",
+      "CONFIRMED": "Confirmed",
+      "PENDING_PAYMENT": "Pending Payment"
     }
   },
   "COMPONENTS": {

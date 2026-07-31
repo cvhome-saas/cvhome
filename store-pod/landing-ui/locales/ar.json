@@ -126,7 +126,10 @@
       "PROCESSED": "قيد المعالجة",
       "DELIVERED": "تم التوصيل",
       "REFUNDED": "تم الاسترجاع",
-      "CANCELED": "ملغى"
+      "CANCELED": "ملغى",
+      "CREATED": "تم الإنشاء",
+      "CONFIRMED": "تم التأكيد",
+      "PENDING_PAYMENT": "في انتظار الدفع"
     }
   },
   "COMPONENTS": {

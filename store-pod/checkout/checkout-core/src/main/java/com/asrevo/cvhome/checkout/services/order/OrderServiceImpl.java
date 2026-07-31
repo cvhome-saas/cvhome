@@ -163,7 +163,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
                                   String redirectUri) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
-            if (orderStatus != null) {
+            if (orderStatus != null && !orderStatus.equals(order.getStatus())) {
                 order.setStatus(orderStatus);
                 // Add to history
                 OrderStatusHistory statusHistory = new OrderStatusHistory();

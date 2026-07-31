@@ -2,9 +2,8 @@ package com.asrevo.cvhome.payment.service;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.model.payment.WebhookResult;
-import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,28 +14,32 @@ import lombok.extern.slf4j.Slf4j;
 public class WebhookUseCaseHandler {
 
     private final TransactionService transactionService;
-    private final ExternalOrderService externalOrderService;
 
-    public void handleUseCase(WebhookResult result) {
+    public void handleUseCase(StoreMerchantId store,WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
-            case PAYMENT_SUCCEEDED, PAYMENT_FAILED -> {
-                transactionService.completeTransaction(result.transactionId(), result.status());
-                // Propagate to Checkout Service
-                transactionService.findById(result.transactionId()).ifPresent(tx -> {
-                    PaymentStatus status = result.status();
-                    log.info("Propagating payment status {} to checkout for order {} store {}", status, tx.getRef(),
-                            tx.getStoreMerchantId());
-                    try {
-                        externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getRef(), status);
-                    } catch (Exception e) {
-                        log.error("Failed to propagate payment status to checkout service for order {}", tx.getRef(), e);
-                    }
-                });
-            }
-            case UNKNOWN -> log.info("No action for webhook event, transactionId={}", result.transactionId());
+            case PAYMENT_SUCCEEDED -> transactionService.completeSuccess(store, result.internalReference());
+            case PAYMENT_FAILED -> transactionService.completeFailed(store, result.internalReference());
+            case PAYMENT_CANCELED -> transactionService.completeCanceled(store, result.internalReference());
+            case NONE -> log.info("No action for webhook event, transactionId={}", result.internalReference());
             default -> log.warn("Unhandled payment use case: {}", result.paymentUseCase());
         }
     }
 
 }
+/*
+*                   @TODO fire event to order service when completeTransaction
+*                 // Propagate to Checkout Service
+                transactionService.findByTransactionInternalRef(result.internalReference()).ifPresent(tx -> {
+                    PaymentStatus status = result.status();
+                    log.info("Propagating payment status {} to checkout for order {} store {}", status, tx.getInternalRef(),
+                            tx.getStoreMerchantId());
+                    try {
+                        externalOrderService.updatePaymentStatus(tx.getStoreMerchantId(), tx.getInternalRef(), status);
+                    } catch (Exception e) {
+                        log.error("Failed to propagate payment status to checkout service for order {}", tx.getInternalRef(), e);
+                    }
+                });
+
+*
+* */

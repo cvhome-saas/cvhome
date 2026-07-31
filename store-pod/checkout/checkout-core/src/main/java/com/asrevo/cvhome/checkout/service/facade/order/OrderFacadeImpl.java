@@ -369,7 +369,7 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).toList();
+        return historyList.stream().map(this::mapToReadableOrderStatusHistory).toList();
     }
 
     @Override
@@ -388,10 +388,10 @@ public class OrderFacadeImpl implements OrderFacade {
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
-        return historyList.stream().map(this::mapToReadbleOrderStatusHistory).toList();
+        return historyList.stream().map(this::mapToReadableOrderStatusHistory).toList();
     }
 
-    ReadableOrderStatusHistory mapToReadbleOrderStatusHistory(OrderStatusHistory source) {
+    ReadableOrderStatusHistory mapToReadableOrderStatusHistory(OrderStatusHistory source) {
         ReadableOrderStatusHistory readable = new ReadableOrderStatusHistory();
         readable.setComments(source.getComments());
         readable.setDate(source.getDateAdded());

@@ -16,7 +16,6 @@ public record PaymentRequest(String ref, BigDecimal amount, CurrencyCode currenc
         if (Objects.isNull(ref)) {
             throw new IllegalArgumentException("Payment request ref invalid");
         }
-
         if (Objects.isNull(amount)) {
             throw new IllegalArgumentException("Payment request currency invalid");
         }
@@ -25,6 +24,9 @@ public record PaymentRequest(String ref, BigDecimal amount, CurrencyCode currenc
         }
         if (Objects.isNull(paymentType)) {
             throw new IllegalArgumentException("Payment request paymentType invalid");
+        }
+        if (Objects.isNull(expireAt)) {
+            throw new IllegalArgumentException("Payment request expireAt invalid");
         }
         if (Objects.isNull(successUrl)) {
             throw new IllegalArgumentException("Payment request successUrl invalid");

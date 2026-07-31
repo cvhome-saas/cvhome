@@ -126,7 +126,10 @@
       "PROCESSED": "Procesado",
       "DELIVERED": "Entregado",
       "REFUNDED": "Reembolsado",
-      "CANCELED": "Cancelado"
+      "CANCELED": "Cancelado",
+      "CREATED": "Creado",
+      "CONFIRMED": "Confirmado",
+      "PENDING_PAYMENT": "Pago Pendiente"
     }
   },
   "COMPONENTS": {
