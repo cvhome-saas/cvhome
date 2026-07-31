@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.crypto.autoconfigure;
 
 import java.time.Duration;
-import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -14,35 +13,27 @@ import lombok.Setter;
 public class SecretCryptoProperties {
 
     /**
-     * Crypto provider type: LOCAL or AWS.
+     * Id of the active SecretCryptoProvider used for encryption: "LOCAL", "AWS", or the
+     * providerId() of a custom SecretCryptoProvider bean.
      */
-    private ProviderType type = ProviderType.LOCAL;
+    private String type = "LOCAL";
 
     private LocalProperties local = new LocalProperties();
     private AwsProperties aws = new AwsProperties();
     private CacheProperties cache = new CacheProperties();
 
-    public enum ProviderType {
-        LOCAL, AWS
-    }
-
     @Getter
     @Setter
     public static class LocalProperties {
         /**
-         * The active key ID to be used for encryption.
-         */
-        private String activeKeyId = "default";
-
-        /**
-         * Key provider type: STATIC, ENV, FILE.
+         * Key provider type: STATIC, ENV, FILE, RANDOM.
          */
         private KeyProviderType keyProviderType = KeyProviderType.STATIC;
 
         /**
-         * Static keys map (ID to Base64-encoded key).
+         * The hex-encoded AES key (STATIC provider only).
          */
-        private Map<String, String> keys;
+        private String key;
 
         /**
          * Directory path for file-based key provider.
@@ -55,7 +46,7 @@ public class SecretCryptoProperties {
         private boolean fileBase64 = false;
 
         public enum KeyProviderType {
-            STATIC, ENV, FILE
+            STATIC, ENV, FILE, RANDOM
         }
     }
 
@@ -76,11 +67,6 @@ public class SecretCryptoProperties {
     @Getter
     @Setter
     public static class CacheProperties {
-        /**
-         * Whether to enable caching for decryption.
-         */
-        private boolean enabled = false;
-
         /**
          * Cache expiration duration.
          */

@@ -93,10 +93,7 @@ com:
       crypto:
         type: LOCAL
         local:
-          active-key-id: default-key
-          key-provider-type: STATIC
-          keys:
-            default-key: "YXNyZXZvLXNlY3JldC1rZXktMzItYnl0ZXMtcGFkZGVkIQ=="
+          key-provider-type: RANDOM
 spring:
   docker:
     compose:

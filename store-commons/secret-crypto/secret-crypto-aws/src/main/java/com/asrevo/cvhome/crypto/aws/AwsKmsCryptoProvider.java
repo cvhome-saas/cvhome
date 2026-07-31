@@ -12,6 +12,8 @@ import software.amazon.awssdk.services.kms.model.EncryptResponse;
 
 public class AwsKmsCryptoProvider implements SecretCryptoProvider {
 
+    public static final String PROVIDER_ID = "AWS-KMS";
+
     private final KmsClient kmsClient;
     private final String keyId;
 
@@ -32,7 +34,7 @@ public class AwsKmsCryptoProvider implements SecretCryptoProvider {
         return EncryptedValue.builder()
                 .version(1)
                 .keyId(keyId)
-                .algorithm("AWS-KMS")
+                .algorithm(PROVIDER_ID)
                 .ciphertext(encryptResponse.ciphertextBlob().asByteArray())
                 .build();
     }
@@ -47,5 +49,10 @@ public class AwsKmsCryptoProvider implements SecretCryptoProvider {
         DecryptResponse decryptResponse = kmsClient.decrypt(decryptRequest);
 
         return decryptResponse.plaintext().asByteArray();
+    }
+
+    @Override
+    public String providerId() {
+        return PROVIDER_ID;
     }
 }
