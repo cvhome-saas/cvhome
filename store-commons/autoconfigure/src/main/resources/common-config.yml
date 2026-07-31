@@ -92,8 +92,6 @@ com:
           gateway-service-name: spg
       crypto:
         type: LOCAL
-        local:
-          key-provider-type: RANDOM
 spring:
   docker:
     compose:

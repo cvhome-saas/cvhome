@@ -9,8 +9,7 @@ public interface LocalKeyProvider {
     /**
      * Retrieves the key material for a given key ID.
      *
-     * @param keyId The identifier of the key.
      * @return Optional containing the key bytes, or empty if not found.
      */
-    Optional<byte[]> getKey(String keyId);
+    Optional<byte[]> getKey();
 }

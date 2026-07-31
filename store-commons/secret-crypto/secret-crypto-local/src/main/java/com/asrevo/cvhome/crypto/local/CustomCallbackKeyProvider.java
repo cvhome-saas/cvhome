@@ -1,21 +1,21 @@
 package com.asrevo.cvhome.crypto.local;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Key provider that delegates to a custom function.
  */
 public class CustomCallbackKeyProvider implements LocalKeyProvider {
 
-    private final Function<String, byte[]> callback;
+    private final Supplier<byte[]> callback;
 
-    public CustomCallbackKeyProvider(Function<String, byte[]> callback) {
+    public CustomCallbackKeyProvider(Supplier<byte[]> callback) {
         this.callback = callback;
     }
 
     @Override
-    public Optional<byte[]> getKey(String keyId) {
-        return Optional.ofNullable(callback.apply(keyId));
+    public Optional<byte[]> getKey() {
+        return Optional.ofNullable(callback.get());
     }
 }
