@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.crypto.local;
 
 import java.security.SecureRandom;
-import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -20,25 +19,20 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
     private static final String KEY_ALGORITHM = "AES";
 
     private final LocalKeyProvider keyProvider;
-    private final String activeKeyId;
+    private static final String ACTIVE_KEY_ID = "default-key";
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public LocalAesCryptoProvider(String activeKeyId, LocalKeyProvider keyProvider) {
-        this.activeKeyId = activeKeyId;
+    public LocalAesCryptoProvider(LocalKeyProvider keyProvider) {
         this.keyProvider = keyProvider;
-        if (keyProvider.getKey(activeKeyId).isEmpty()) {
+        if (keyProvider.getKey().isEmpty()) {
             throw new IllegalArgumentException("Active key ID not found in key provider");
         }
     }
 
-    public LocalAesCryptoProvider(String activeKeyId, Map<String, byte[]> initialKeys) {
-        this(activeKeyId, new StaticKeyProvider(initialKeys));
-    }
-
     @Override
     public EncryptedValue encrypt(byte[] plaintext) {
-        byte[] key = keyProvider.getKey(activeKeyId)
-                .orElseThrow(() -> new IllegalStateException("Active key not found: " + activeKeyId));
+        byte[] key = keyProvider.getKey()
+                .orElseThrow(() -> new IllegalStateException("Active key not found: " + ACTIVE_KEY_ID));
         byte[] iv = new byte[IV_LENGTH_BYTE];
         secureRandom.nextBytes(iv);
 
@@ -50,7 +44,7 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
 
             return EncryptedValue.builder()
                     .version(1)
-                    .keyId(activeKeyId)
+                    .keyId(ACTIVE_KEY_ID)
                     .algorithm(PROVIDER_ID)
                     .ciphertext(ciphertext)
                     .iv(iv)
@@ -62,7 +56,7 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
 
     @Override
     public byte[] decrypt(EncryptedValue encryptedValue) {
-        byte[] key = keyProvider.getKey(encryptedValue.getKeyId())
+        byte[] key = keyProvider.getKey()
                 .orElseThrow(() -> new IllegalArgumentException("Key not found: " + encryptedValue.getKeyId()));
 
         try {

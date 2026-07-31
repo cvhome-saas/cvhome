@@ -4,7 +4,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -33,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableConfigurationProperties(SecretCryptoProperties.class)
 public class SecretCryptoAutoConfiguration {
     private static final String DEFAULT_FILE_PATH = "${user.home}/.cvhome/secret-crypto/keys";
-    private static final String KEY_ID = "default-key";
+
     @Bean
     @Primary
     public SecretCryptoProvider secretCryptoProvider(SecretCryptoProperties properties,
@@ -65,7 +64,7 @@ public class SecretCryptoAutoConfiguration {
     private Optional<SecretCryptoProvider> tryCreateLocal(SecretCryptoProperties.LocalProperties local) {
         try {
             LocalKeyProvider keyProvider = createKeyProvider(local);
-            return Optional.of(new LocalAesCryptoProvider(KEY_ID, keyProvider));
+            return Optional.of(new LocalAesCryptoProvider(keyProvider));
         } catch (Exception e) {
             log.warn("Local AES crypto provider unavailable, skipping: {}", e.getMessage());
             return Optional.empty();
@@ -100,12 +99,12 @@ public class SecretCryptoAutoConfiguration {
      */
     private LocalKeyProvider resolveKeyProviderByPriority(SecretCryptoProperties.LocalProperties local) {
         LocalKeyProvider envProvider = createKeyProvider(local, SecretCryptoProperties.LocalProperties.KeyProviderType.ENV);
-        if (envProvider.getKey(KEY_ID).isPresent()) {
+        if (envProvider.getKey().isPresent()) {
             return envProvider;
         }
 
         LocalKeyProvider fileProvider = createKeyProvider(local, SecretCryptoProperties.LocalProperties.KeyProviderType.FILE);
-        if (fileProvider.getKey(KEY_ID).isPresent()) {
+        if (fileProvider.getKey().isPresent()) {
             return fileProvider;
         }
 
@@ -122,7 +121,7 @@ public class SecretCryptoAutoConfiguration {
                     throw new IllegalStateException(
                             "STATIC key provider requires com.asrevo.cvhome.crypto.local.key to be set");
                 }
-                yield new StaticKeyProvider(Map.of(KEY_ID, HexFormat.of().parseHex(local.getKey())));
+                yield new StaticKeyProvider(HexFormat.of().parseHex(local.getKey()));
             }
             case ENV -> new EnvironmentVariableKeyProvider();
             case FILE -> {
