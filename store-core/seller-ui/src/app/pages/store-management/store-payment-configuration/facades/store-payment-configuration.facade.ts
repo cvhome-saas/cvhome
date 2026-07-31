@@ -76,8 +76,8 @@ export class StorePaymentConfigurationFacade {
         enabled: it.enabled
       };
 
-      if (it.id) {
-        return this.storeService.updatePaymentConfig(st.id, it.id, payload);
+      if (it.exists) {
+        return this.storeService.updatePaymentConfig(st.id, it.paymentType, payload);
       } else {
         return this.storeService.savePaymentConfig(st.id, payload);
       }

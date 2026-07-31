@@ -9,7 +9,7 @@ export class StorePaymentConfigurationFormService {
     const configGroups = paymentTypes.map(type => {
       const config = configs.find(c => c.paymentType === type) || {};
       return this.fb.group({
-        id: [config.id || null],
+        exists: [configs.some(c => c.paymentType === type)],
         paymentType: [type],
         apiKey: [config.apiKey || ''],
         secretKey: [config.secretKey || ''],
