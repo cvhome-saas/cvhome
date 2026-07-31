@@ -26,9 +26,10 @@ public class SecretCryptoProperties {
     @Setter
     public static class LocalProperties {
         /**
-         * Key provider type: STATIC, ENV, FILE, RANDOM.
+         * Key provider type: STATIC, ENV, FILE, RANDOM. When unset, resolved by priority:
+         * ENV, then FILE, then RANDOM (with a warning) as a last resort.
          */
-        private KeyProviderType keyProviderType = KeyProviderType.STATIC;
+        private KeyProviderType keyProviderType;
 
         /**
          * The hex-encoded AES key (STATIC provider only).

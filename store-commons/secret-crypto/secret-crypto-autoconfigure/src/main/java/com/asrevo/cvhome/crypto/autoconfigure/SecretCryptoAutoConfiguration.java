@@ -88,7 +88,35 @@ public class SecretCryptoAutoConfiguration {
     }
 
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local) {
-        return switch (local.getKeyProviderType()) {
+        if (local.getKeyProviderType() != null) {
+            return createKeyProvider(local, local.getKeyProviderType());
+        }
+        return resolveKeyProviderByPriority(local);
+    }
+
+    /**
+     * No explicit keyProviderType configured: probe ENV then FILE for an actual key, falling
+     * back to RANDOM (with a warning) so the application still starts.
+     */
+    private LocalKeyProvider resolveKeyProviderByPriority(SecretCryptoProperties.LocalProperties local) {
+        LocalKeyProvider envProvider = createKeyProvider(local, SecretCryptoProperties.LocalProperties.KeyProviderType.ENV);
+        if (envProvider.getKey(KEY_ID).isPresent()) {
+            return envProvider;
+        }
+
+        LocalKeyProvider fileProvider = createKeyProvider(local, SecretCryptoProperties.LocalProperties.KeyProviderType.FILE);
+        if (fileProvider.getKey(KEY_ID).isPresent()) {
+            return fileProvider;
+        }
+
+        log.warn("No com.asrevo.cvhome.crypto.local.keyProviderType configured and no key found via ENV or FILE,"
+                + " falling back to RANDOM key provider");
+        return new RandomKeyProvider();
+    }
+
+    private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local,
+                                                SecretCryptoProperties.LocalProperties.KeyProviderType type) {
+        return switch (type) {
             case STATIC -> {
                 if (local.getKey() == null) {
                     throw new IllegalStateException(
