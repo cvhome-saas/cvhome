@@ -1,14 +1,12 @@
 package com.asrevo.cvhome.crypto.autoconfigure;
 
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +20,7 @@ import com.asrevo.cvhome.crypto.local.EnvironmentVariableKeyProvider;
 import com.asrevo.cvhome.crypto.local.FileSystemKeyProvider;
 import com.asrevo.cvhome.crypto.local.LocalAesCryptoProvider;
 import com.asrevo.cvhome.crypto.local.LocalKeyProvider;
+import com.asrevo.cvhome.crypto.local.RandomKeyProvider;
 import com.asrevo.cvhome.crypto.local.StaticKeyProvider;
 
 import software.amazon.awssdk.regions.Region;
@@ -33,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfiguration
 @EnableConfigurationProperties(SecretCryptoProperties.class)
 public class SecretCryptoAutoConfiguration {
-    private static final SecureRandom secureRandom = new SecureRandom();
     private static final String DEFAULT_FILE_PATH = "${user.home}/.cvhome/secret-crypto/keys";
     private static final String KEY_ID = "default-key";
     @Bean
@@ -92,20 +90,18 @@ public class SecretCryptoAutoConfiguration {
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local) {
         return switch (local.getKeyProviderType()) {
             case STATIC -> {
-                String hexKey = Optional.ofNullable(local.getKey()).orElseGet(SecretCryptoAutoConfiguration::createDefaultKey);
-                yield new StaticKeyProvider(Map.of(KEY_ID, HexFormat.of().parseHex(hexKey)));
+                if (local.getKey() == null) {
+                    throw new IllegalStateException(
+                            "STATIC key provider requires com.asrevo.cvhome.crypto.local.key to be set");
+                }
+                yield new StaticKeyProvider(Map.of(KEY_ID, HexFormat.of().parseHex(local.getKey())));
             }
             case ENV -> new EnvironmentVariableKeyProvider();
             case FILE -> {
                 String path = Optional.ofNullable(local.getFilePath()).orElse(DEFAULT_FILE_PATH);
                 yield new FileSystemKeyProvider(Paths.get(path), local.isFileBase64());
             }
+            case RANDOM -> new RandomKeyProvider();
         };
-    }
-
-    private static @NonNull String createDefaultKey() {
-        byte[] randomKey = new byte[32];
-        secureRandom.nextBytes(randomKey);
-        return HexFormat.of().formatHex(randomKey);
     }
 }

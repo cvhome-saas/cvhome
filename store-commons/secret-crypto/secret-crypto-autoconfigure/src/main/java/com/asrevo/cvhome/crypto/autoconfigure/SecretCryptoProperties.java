@@ -26,7 +26,7 @@ public class SecretCryptoProperties {
     @Setter
     public static class LocalProperties {
         /**
-         * Key provider type: STATIC, ENV, FILE.
+         * Key provider type: STATIC, ENV, FILE, RANDOM.
          */
         private KeyProviderType keyProviderType = KeyProviderType.STATIC;
 
@@ -46,7 +46,7 @@ public class SecretCryptoProperties {
         private boolean fileBase64 = false;
 
         public enum KeyProviderType {
-            STATIC, ENV, FILE
+            STATIC, ENV, FILE, RANDOM
         }
     }
 

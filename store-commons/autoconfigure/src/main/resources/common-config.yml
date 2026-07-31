@@ -93,8 +93,7 @@ com:
       crypto:
         type: LOCAL
         local:
-          key-provider-type: FILE
-          file-path: "${user.home}/.cvhome/secret-crypto/keys"
+          key-provider-type: RANDOM
 spring:
   docker:
     compose:
