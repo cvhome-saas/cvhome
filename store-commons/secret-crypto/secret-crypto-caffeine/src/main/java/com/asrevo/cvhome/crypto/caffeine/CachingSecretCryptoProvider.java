@@ -28,4 +28,9 @@ public class CachingSecretCryptoProvider implements SecretCryptoProvider {
     public byte[] decrypt(EncryptedValue encryptedValue) {
         return cache.get(encryptedValue, delegate::decrypt);
     }
+
+    @Override
+    public String providerId() {
+        return delegate.providerId();
+    }
 }

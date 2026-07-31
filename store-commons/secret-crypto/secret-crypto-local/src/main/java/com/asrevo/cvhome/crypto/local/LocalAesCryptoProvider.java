@@ -12,6 +12,8 @@ import com.asrevo.cvhome.crypto.SecretCryptoProvider;
 
 public class LocalAesCryptoProvider implements SecretCryptoProvider {
 
+    public static final String PROVIDER_ID = "AES-256-GCM";
+
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int TAG_LENGTH_BIT = 128;
     private static final int IV_LENGTH_BYTE = 12;
@@ -49,7 +51,7 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
             return EncryptedValue.builder()
                     .version(1)
                     .keyId(activeKeyId)
-                    .algorithm("AES-256-GCM")
+                    .algorithm(PROVIDER_ID)
                     .ciphertext(ciphertext)
                     .iv(iv)
                     .build();
@@ -71,5 +73,10 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
         } catch (Exception e) {
             throw new RuntimeException("Decryption failed", e);
         }
+    }
+
+    @Override
+    public String providerId() {
+        return PROVIDER_ID;
     }
 }
