@@ -6,6 +6,7 @@ import {StoreService} from '../../../store-management/services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {Store} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
+import {ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoryDetailFacade {
@@ -15,7 +16,7 @@ export class CategoryDetailFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly errorService = inject(ErrorService);
 
-  readonly category = signal<any>(null);
+  readonly category = signal<ReadableCategory | null>(null);
   readonly store = signal<Store | null>(null);
   readonly loading = signal<boolean>(false);
 

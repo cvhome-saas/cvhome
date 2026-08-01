@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {PageT, StorePageRequest} from '../../../shared/table/table.types';
+import {EntityExists} from '../../../shared/models/entity.model';
+import {PersistableCategory, ReadableCategory} from '../models/category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,47 +13,47 @@ export class CategoryService {
   private crudService = inject(CrudService);
 
 
-  getListOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<any>> {
+  getListOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<ReadableCategory>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category`, params);
   }
 
 
-  getCategoryById(id): Observable<any> {
+  getCategoryById(id: number | string): Observable<ReadableCategory> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category/${id}`);
   }
 
-  getCategoryByProductId(id): Observable<any> {
+  getCategoryByProductId(id: number | string): Observable<PageT<ReadableCategory>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category/product/${id}`);
   }
 
-  addCategory(category): Observable<any> {
+  addCategory(category: PersistableCategory): Observable<PersistableCategory> {
     return this.crudService.post(`/spg/catalog/api/v1/private/category`, category);
   }
 
-  updateCategory(id, category): Observable<any> {
+  updateCategory(id: number | string, category: PersistableCategory): Observable<PersistableCategory> {
     return this.crudService.put(`/spg/catalog/api/v1/private/category/${id}`, category);
   }
 
-  updateCategoryVisibility(category): Observable<any> {
+  updateCategoryVisibility(category: PersistableCategory): Observable<void> {
     return this.crudService.patch(`/spg/catalog/api/v1/private/category/${category.id}/visible`, category);
   }
 
-  deleteCategory(id): Observable<any> {
+  deleteCategory(id: number | string): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/category/${id}`);
   }
 
-  checkCategoryCode(code): Observable<any> {
+  checkCategoryCode(code: string): Observable<EntityExists> {
     const params = {
       'code': code,
     };
     return this.crudService.get(`/spg/catalog/api/v1/private/category/unique`, params);
   }
 
-  getHierarchyOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<any>> {
+  getHierarchyOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<ReadableCategory>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category-hierarchy`, params);
   }
 
-  updateHierarchy(childId, parentId): Observable<any> {
+  updateHierarchy(childId: number | string, parentId: number | string): Observable<void> {
     return this.crudService.put(`/spg/catalog/api/v1/private/category/${childId}/move/${parentId}`, {});
   }
 

@@ -1,6 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {CategoriesVisibilityFacade} from '../facades/categories-visibility.facade';
+import {PersistableCategory} from '../models/category.model';
 
 @Component({
   selector: 'ngx-categories-visibility',
@@ -13,7 +14,7 @@ import {CategoriesVisibilityFacade} from '../facades/categories-visibility.facad
 export class CategoriesVisibilityComponent {
   @Input() value: boolean;
   @Input() store: string;
-  @Input() rowData: any;
+  @Input() rowData: PersistableCategory;
 
   protected readonly facade = inject(CategoriesVisibilityFacade);
 }

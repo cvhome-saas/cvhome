@@ -8,6 +8,8 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {Store} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {CategoryDescription, ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoryFormFacade {
@@ -20,14 +22,14 @@ export class CategoryFormFacade {
   readonly loader = signal<boolean>(false);
   readonly loading = signal<boolean>(false);
   readonly isCodeUnique = signal<boolean>(true);
-  readonly roots = signal<any[]>([]);
-  readonly languages = signal<any[]>([]);
+  readonly roots = signal<ReadableCategory[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly defaultLanguage = signal<string>('');
 
-  private categoryData: any;
+  private categoryData: ReadableCategory;
   private storeData: Store;
 
-  init(category: any, store: Store): void {
+  init(category: ReadableCategory, store: Store): void {
     this.categoryData = category || {};
     this.storeData = store;
     if (!store) return;
@@ -44,10 +46,10 @@ export class CategoryFormFacade {
       next: ([categoriesRes, languagesRes]) => {
         this.loader.set(false);
 
-        const content = categoriesRes.content ? [...categoriesRes.content] : [];
+        const content: ReadableCategory[] = categoriesRes.content ? [...categoriesRes.content] : [];
         content.push({id: 0, code: 'root', children: []});
 
-        const rootList: any[] = [];
+        const rootList: ReadableCategory[] = [];
         content.forEach((el) => {
           this.getChildren(el, rootList);
         });
@@ -75,11 +77,11 @@ export class CategoryFormFacade {
     });
   }
 
-  private getChildren(node: any, rootList: any[]): void {
+  private getChildren(node: ReadableCategory, rootList: ReadableCategory[]): void {
     if (node.id === this.categoryData?.id) return;
     if (node.children && node.children.length !== 0) {
       rootList.push(node);
-      node.children.forEach((el: any) => {
+      node.children.forEach((el) => {
         this.getChildren(el, rootList);
       });
     } else {
@@ -93,14 +95,14 @@ export class CategoryFormFacade {
     });
   }
 
-  changeName(event: any, index: number): void {
+  changeName(event: string, index: number): void {
     this.formService.descriptions.at(index).patchValue({
       friendlyUrl: slugify(event)
     });
   }
 
-  checkCode(event: any): void {
-    const code = event.target.value;
+  checkCode(event: Event): void {
+    const code = (event.target as HTMLInputElement).value;
     if (!code) return;
 
     this.categoryService.checkCategoryCode(code).subscribe({
@@ -115,12 +117,12 @@ export class CategoryFormFacade {
     this.loading.set(true);
     const categoryObject = this.prepareSaveData();
 
-    const tmpObj: any = {
+    const tmpObj: Record<string, string> = {
       name: '',
       friendlyUrl: ''
     };
 
-    categoryObject.descriptions.forEach((el: any) => {
+    categoryObject.descriptions.forEach((el: CategoryDescription) => {
       if (tmpObj.name === '' && el.name !== '') {
         tmpObj.name = el.name;
       }
@@ -142,7 +144,7 @@ export class CategoryFormFacade {
       return;
     }
 
-    categoryObject.descriptions.forEach((el: any) => {
+    categoryObject.descriptions.forEach((el: CategoryDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
@@ -152,7 +154,7 @@ export class CategoryFormFacade {
       }
     });
 
-    categoryObject.descriptions.forEach((el: any) => {
+    categoryObject.descriptions.forEach((el: CategoryDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el.name) {
@@ -208,7 +210,7 @@ export class CategoryFormFacade {
     this.router.navigate(['pages/catalogue/categories/categories-list']);
   }
 
-  private prepareSaveData(): any {
+  private prepareSaveData() {
     const data = {...this.formService.form.value};
     const matchedCategory = this.roots().find((el) => el.code === data.parent);
     if (matchedCategory) {

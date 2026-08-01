@@ -7,7 +7,9 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoriesListFacade {
@@ -16,7 +18,7 @@ export class CategoriesListFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, StorePageRequest>);
+  readonly tableState = inject(TableStateService<ReadableCategory, StorePageRequest>);
 
   readonly store = signal<string>('');
 
@@ -56,7 +58,7 @@ export class CategoriesListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset
@@ -64,7 +66,7 @@ export class CategoriesListFacade {
     this.loadPage();
   }
 
-  onEdit(row: any): void {
+  onEdit(row: ReadableCategory): void {
     this.router.navigate(['pages/catalogue/categories/category/', row.id]);
   }
 
@@ -72,7 +74,7 @@ export class CategoriesListFacade {
     this.router.navigate(['/pages/catalogue/categories/create-category']);
   }
 
-  onDelete(row: any): void {
+  onDelete(row: ReadableCategory): void {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',

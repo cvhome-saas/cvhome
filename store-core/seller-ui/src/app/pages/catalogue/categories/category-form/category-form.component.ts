@@ -15,6 +15,7 @@ import {QuillModule} from 'ngx-quill';
 import {Store} from '../../../store-management/models/store';
 import {CategoryFormFacade} from '../facades/category-form.facade';
 import {CategoryFormService} from '../services/category-form.service';
+import {ReadableCategory} from '../models/category.model';
 
 @Component({
   selector: 'ngx-category-form',
@@ -37,7 +38,7 @@ import {CategoryFormService} from '../services/category-form.service';
   providers: [CategoryFormFacade, CategoryFormService]
 })
 export class CategoryFormComponent implements OnInit {
-  @Input() category: any;
+  @Input() category: ReadableCategory;
   @Input() store: Store;
 
   protected readonly facade = inject(CategoryFormFacade);

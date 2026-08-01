@@ -1,6 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {CategoryDescription, ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoryFormService {
@@ -28,7 +30,7 @@ export class CategoryFormService {
     return this.form.get('descriptions') as FormArray;
   }
 
-  initDescriptions(languages: any[]): void {
+  initDescriptions(languages: SupportedLanguageCode[]): void {
     this.descriptions.clear();
     languages.forEach((lang) => {
       this.descriptions.push(this.createDescriptionFormGroup(lang.code));
@@ -55,7 +57,7 @@ export class CategoryFormService {
     });
   }
 
-  patchForm(category: any, languages: any[], defaultLanguage: string): void {
+  patchForm(category: ReadableCategory, languages: SupportedLanguageCode[], defaultLanguage: string): void {
     if (!category) return;
 
     this.form.patchValue({
@@ -69,7 +71,7 @@ export class CategoryFormService {
 
     this.descriptions.clear();
     languages.forEach((lang) => {
-      const desc = category.descriptions?.find((d: any) => d.language === lang.code) || {};
+      const desc: CategoryDescription = category.descriptions?.find((d) => d.language === lang.code) || {};
       this.descriptions.push(this.fb.group({
         language: [lang.code, [Validators.required]],
         name: [desc.name || '', [Validators.required]],

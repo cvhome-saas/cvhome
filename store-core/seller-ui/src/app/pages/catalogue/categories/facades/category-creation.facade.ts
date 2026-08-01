@@ -4,6 +4,7 @@ import {StoreService} from '../../../store-management/services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {Store} from '../../../store-management/models/store';
 import {switchMap} from 'rxjs';
+import {ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoryCreationFacade {
@@ -11,7 +12,7 @@ export class CategoryCreationFacade {
   private readonly storeService = inject(StoreService);
   private readonly errorService = inject(ErrorService);
 
-  readonly category = signal<any>({});
+  readonly category = signal<ReadableCategory>({});
   readonly store = signal<Store | null>(null);
 
   init(): void {

@@ -4,6 +4,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {NgcxTreeNode} from '@cluetec/ngcx-tree';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {CategoryTreeMoveEvent, ReadableCategory} from '../models/category.model';
 
 @Injectable()
 export class CategoriesHierarchyFacade {
@@ -49,7 +50,7 @@ export class CategoriesHierarchyFacade {
     });
   }
 
-  onMoveNode(event: any): void {
+  onMoveNode(event: CategoryTreeMoveEvent): void {
     const parentId = event.parent === undefined ? -1 : event.parent.id;
     this.categoryService.updateHierarchy(event.node.id, parentId).subscribe({
       next: () => {
@@ -59,15 +60,15 @@ export class CategoriesHierarchyFacade {
     });
   }
 
-  private toTreeRoot(categories: any[]): NgcxTreeNode[] {
+  private toTreeRoot(categories: ReadableCategory[]): NgcxTreeNode[] {
     const root = this.toNode(undefined, '-1');
     this.toTreeNode(root, categories);
     return root.children;
   }
 
-  private toTreeNode(root: NgcxTreeNode, categories: any[]): void {
+  private toTreeNode(root: NgcxTreeNode, categories: ReadableCategory[]): void {
     categories.forEach((it) => {
-      const node: NgcxTreeNode = this.toNode(it.code, it.id);
+      const node: NgcxTreeNode = this.toNode(it.code, `${it.id}`);
       root.children.push(node);
       if (it.children) {
         this.toTreeNode(node, it.children);
