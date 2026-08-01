@@ -1,0 +1,249 @@
+---
+name: project-structure
+description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, control-plane, seller-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), service-to-service calls via @HttpExchange -external-api clients, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme. Trigger when navigating the repo, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
+metadata:
+  version: '3.0'
+---
+
+# cvhome monorepo
+
+Multi-tenant e-commerce SaaS (evolved from Shopizer). One root Gradle build (`settings.gradle`, **no** root
+`build.gradle`) drives everything — Java services *and* the npm/Angular/Next.js frontends. See `README.md` for
+tech stack and build/run commands.
+
+**Java package root:** `com.asrevo.cvhome.*` · **Gradle group:** `com.asrevo.cvhome`
+
+`settings.gradle`'s `include(...)` list is the source of truth for what is a real Gradle module versus a plain
+grouping folder. Check it there first.
+
+## The three top-level trees
+
+| Tree | Contains | Deployed? |
+|---|---|---|
+| `store-commons/` | Platform-wide shared **libraries** — no runnable app | No, libs only |
+| `store-core/` | **Control-plane / platform** services: identity, gateway, tenant management, admin UI. One shared instance for the whole SaaS. | Yes |
+| `store-pod/` | **Business pods** — the per-tenant "store" runtime: merchant, catalog, checkout, payment, customer auth, storefront, edge proxy. Deployed as an isolated pod, **many times over**. | Yes, once per pod |
+
+Plus `build-logic/` (Gradle convention plugins, a composite build) and `gradle/libs.versions.toml` (version
+catalog). See `references/build-system.md`.
+
+## Service catalog — what each one is and does
+
+**Category legend:** `BE` = pure backend (Spring Boot, REST/JSON) · `FE` = pure frontend (npm app) ·
+`BE+FE` = one deployable that serves both a Java backend and its own UI · `INFRA` = proxy/edge.
+
+### store-core — platform layer
+
+| Service | Category | Port | Purpose |
+|---|---|---|---|
+| `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder, plus Thymeleaf login pages. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
+| `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies to `control-plane` / `seller-ui`. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
+| `store-core/control-plane/control-plane-service` | **BE** | 8020 | The **SaaS control plane**: organizations, store provisioning, subscription plans, Stripe billing, usage statistics. Controllers: `PodController`, `StoreManagerController`, `OrgManagerController`, `SubscriptionController`, `StripeWebhookController`, `SignUpController`, `StoreStatisticApi`. |
+| `store-core/seller-ui` | **FE** | 8010 | Angular 20 (SSR) **seller/admin console** — the UI merchants and platform admins use. Feature areas under `src/app/pages/`: catalogue, orders, customer, payment, store-management, org-management, pod-management, subscription-and-usage, user-management, content. Logs in via `/oauth2/authorization/uaa`. |
+
+`control-plane` is backed by sibling library modules (`manager-*`, `subscription-*`, `pod-external-api`) — see
+`references/store-core.md`.
+
+### store-pod — per-tenant business layer
+
+| Service | Category | Port | Purpose |
+|---|---|---|---|
+| `store-pod/spg` | **INFRA** | 80 | "SaaS Pod Gateway" — a **Caddy** reverse proxy (not Java). Terminates TLS with **on-demand certificates** for custom tenant domains, resolves the domain → store via `domain_lookup`, adds tracing headers, and path-routes `/merchant*`, `/catalog*`, `/checkout*`, `/cua*`, `/payment*` to the pod services; everything else falls through to `landing-ui`. Config: `Caddyfile`. |
+| `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, plus a `content` sub-domain (CMS pages/boxes). APIs: `MerchantStoreApi`, `ContentApi`, `ExternalMerchantStoreApi`. |
+| `store-pod/catalog` | **BE** | 8122 | **Products & categories**: product CRUD, inventory, pricing, images, attributes/options, product types, groups, manufacturers, relationships, reservations. APIs: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi`, `ExternalProductReservationApi`. |
+| `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
+| `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
+| `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
+| `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. Next.js 16 / React 19 inside an npm-workspaces monorepo, with a **multi-template theming system** — one Next.js app per visual theme (`basis`, `modern`, `beauty`, `jewelery`), all sharing business logic from `libs/`. An Express server picks the template per request from the store's `theme` header. See `references/landing-ui.md`. |
+
+## Multi-tenancy in one paragraph
+
+**A store is a logical tenant; a pod is a physical deployment.** `store-pod/` is not deployed once — it is
+deployed many times, each instance (a **pod**) being a complete isolated stack (spg + merchant + catalog +
+checkout + payment + cua + landing-ui) with **its own database**, hosting many stores. Control-plane's
+`ManagerStoreEntity.podId` column is the whole routing table: it records which physical pod hosts each store.
+Because a pod's `PodEndpoint` can be `INTERNAL` (same cluster) or `EXTERNAL` (a URL anywhere), **assigning a
+store to a pod is what decides which region its data physically lives in.** A pod may be dedicated to one org or
+shared by many.
+
+Two runtime paths reach a store: sellers go through `store-core-gateway`, whose `PodClient` rebuilds its route
+table from control-plane every minute and token-relays into the right pod; shoppers hit a custom domain on that
+pod's own Caddy (`spg`), which asks the pod's `merchant-service` to map domain → store and injects
+`Store-Id` / `Theme` headers.
+
+Full model — provisioning flow, isolation table, who may manage pods: `references/multi-tenancy.md`.
+
+## Two authorization servers
+
+Deliberate, and the thing most likely to confuse: **`uaa` (:8001, store-core) authenticates staff, org owners
+and merchants; `cua` (:8124, store-pod) authenticates storefront shoppers.** Separate realms, separate user
+tables, separate issuers — same underlying Spring tech, so they look alike in code.
+
+Pod services are resource servers that accept tokens from **both**, via `MultiIssuerJwtDecoder` and the
+`issuer-uri-set` list in `store-pod-lcl-config.yml`. The `cua` issuer is spg-fronted *with* the `/cua` prefix,
+which is why the Caddyfile preserves that prefix for `cua` alone. Services authenticate to each other with a
+`client_credentials` `s2s` client against `uaa` (scope `store_core` or `store_pod`).
+
+Details: `references/authentication.md`.
+
+## Shared configuration
+
+Config is **not** duplicated per service. Shared YAML ships inside `store-commons:autoconfigure`'s resources and
+each service imports slices from the classpath:
+
+```
+common-config.yml   service registry: name, domain, port, namespace, gateway — for EVERY service
+lcl-config.yml  / fargate-config.yml               environment slice
+store-core-lcl-config.yml                          layer slice (core)
+store-pod-lcl-config.yml / store-pod-fargate-...   layer slice (pod)
+```
+
+Composition rule: **`common-config` (always) + one environment slice + one layer slice.** A service's own
+`application.yml` sets only `spring.application.name`, its `s2s` client, its schema, and its own settings.
+
+**Change a port, host, or namespace in `common-config.yml`** — never hardcode one in a service. Profiles are
+`lcl`, `fargate`, and `test-stores`. Details: `references/configuration.md`.
+
+## API conventions — apply these to every new endpoint
+
+**Almost every API takes `StoreMerchantId` and `LanguageCode`**, unannotated — custom argument resolvers supply
+them from the `store` and `lang` query params. `store` is **mandatory** (the resolver throws if absent); `lang`
+defaults to `en`. Tenant context is then passed explicitly down through facades and services, so every query is
+tenant-scoped by construction.
+
+```java
+@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
+public Entity create(@Valid @RequestBody PersistableProduct product,
+                     StoreMerchantId merchantStore, LanguageCode language) { ... }
+```
+
+**Authorization is declarative**, never an inline role check: `hasPermission(target, type, 'LAYER.DOMAIN.ACTION')`
+dispatches through `CustomPermissionEvaluator` → `PermissionAccessChecker`, which is pod-aware and denies by
+default.
+
+**Value objects are used everywhere** instead of raw `String`/`Long` — ~40 records in
+`store-commons/commons/.../domain/` (`StoreMerchantId`, `LanguageCode`, `PodId`, `Email`, `Domain`,
+`CurrencyCode`, …). They carry behaviour (`LanguageCode.isAllLanguage()`, `PodId.shorten()`), let the resolvers
+and permission evaluator dispatch on type, and persist via `AttributeConverter`s. Don't introduce a raw `String`
+id or code — check `commons/domain/` first.
+
+Details: `references/api-conventions.md`.
+
+## Persistence — schema per service, two stacks
+
+Every service owns a **Postgres schema** and ships its own hand-written DDL; there is no shared database and no
+cross-service foreign key. Two persistence stacks coexist:
+
+- **Spring Data JDBC** — `control-plane-service`. Entities use
+  `org.springframework.data.relational.core.mapping.@Table(schema = "manager", …)`, extend `BaseEntity`, and it
+  owns four schemas (`manager`, `subscription`, `org`, `control`) mirroring its bounded contexts. DDL at
+  `src/main/resources/schema.sql`.
+- **Spring Data JPA / Hibernate** — the pod services. Entities use `jakarta.persistence`, extend
+  `SalesManagerEntity`, and get their schema from `hibernate.default_schema: ${spring.application.name}`. DDL at
+  `src/main/resources/init-sql/schema.sql` plus `data-common.sql`.
+
+`spring.sql.init.mode: always` runs the SQL on every startup (everything is `CREATE TABLE IF NOT EXISTS`), and
+`ddl-auto: update` is only a safety net — **`schema.sql` is the source of truth.** Enums are `varchar` +
+`CHECK` constraints, so adding an enum value needs a DDL change too.
+
+Details: `references/database-schemas.md`.
+
+## Secrets are encrypted at rest
+
+Tenant-supplied credentials (payment API keys, social-login app secrets, webhook secrets) are **encrypted in the
+mapper layer**, so the database only ever holds an opaque `ENC:<version>:<keyId>:<algorithm>:<iv>:<ciphertext>`
+envelope — nobody can read them straight from the table. Encrypt in `toEntity`, decrypt in `toDTO`, guard with
+`EncryptedValue.isEncrypted(...)`. See `PaymentConfigurationMapper` and `SocialLoginConfigMapper`.
+
+Details: `references/secrets-encryption.md`.
+
+## Talking between services
+
+Two sanctioned mechanisms — pick by whether the caller needs an answer now:
+
+- **Synchronous:** a `@HttpExchange` interface in the provider's `-external-api` module. The provider's
+  `External*Api` controller *implements* that same interface; the consumer builds a proxy with
+  `RestClientBuilder.buildClient("catalog", Iface.class)`. Never depend on another pod's `-core` or `-service`.
+  → `references/service-to-service.md`
+- **Asynchronous:** a domain event registered on an aggregate root (`registerEvent(...)` via
+  `AbstractAggregateRoot`) and delivered by the **namastack transactional outbox** to an `@OutboxHandler`.
+  Used in `control-plane-service` and `payment-service`. Put event types in their own **`-events` module**
+  (like `subscription-events`) — consumers must know an event's structure, so the contract has to be
+  dependable without pulling in the producer. Delivery is **at-least-once, so handlers must be idempotent**,
+  and `@OutboxEvent(key = …)` picks the ordering key. → `references/events-outbox.md`
+
+## The pod module pattern: `-commons` / `-core` / `-external-api` / `-service`
+
+Business pods (`merchant`, `catalog`, `checkout`, `payment`) are split into up to four Gradle modules named
+`<domain>-<suffix>`:
+
+| Suffix | Role | Depends on |
+|---|---|---|
+| `-commons` | Domain model: JPA entities + `Readable*`/`Persistable*` DTOs. Leaf module. | pod `store-commons`, `reference-commons` |
+| `-core` | Business logic: repositories, services, facades, populators. | its own `-commons` |
+| `-external-api` | Thin **client contract** so *other* services can call this pod over HTTP without pulling in `-core`. | its own `-commons` only |
+| `-service` | The deployable Spring Boot app: `*Api` controllers, `SecurityConfig`, `*Application` main class. | `-core` + `-external-api` |
+
+A pod may host more than one sub-domain in one service (e.g. `merchant-service` serves both `merchant-*` and
+`content-*` modules). Details and per-pod module lists: `references/store-pod.md`.
+
+## Frontend patterns — three distinct ones
+
+1. **`-ui` suffix = Gradle-wrapped npm app.** `seller-ui` (Angular) and `landing-ui` (Next.js) both apply the
+   `ui-conventions` plugin, so Gradle `build` → `npm run build` and Gradle `bootRun` → `npm run dev`, and both
+   get container images the same way. Framework differs; the build contract does not.
+2. **Embedded Angular in Spring Boot** (`uaa`): `uaa-fe` lives at `store-core/uaa/src/main/resources/uaa-fe`,
+   is **not** a Gradle module, is built by the `node` plugin, and its `dist` is copied into
+   `src/main/resources/static` before `processResources` — so Spring Boot serves the SPA from its own port.
+3. **Server-rendered Thymeleaf** (`uaa` login pages, `cua`): classic server-side templates, no SPA.
+
+See `references/frontends.md`.
+
+## Where to look
+
+| I need to… | Go to |
+|---|---|
+| Find a business capability | `store-pod/<domain>/` — or `store-core/` if it's platform-level (auth, billing, tenants) |
+| Find a REST endpoint | the `<domain>-service` module, in `**/api/**` or `**/controller/**` |
+| Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")` |
+| Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
+| Store an API key / secret | encrypt in the mapper via `SecretCryptoProvider` — never a plaintext column |
+| Add a table or column | the service's `schema.sql` / `init-sql/schema.sql`, not just the entity |
+| Debug "the event never arrived" | query `outbox_record` for `status='FAILED'`, read `failure_reason` |
+| Pass an id or code around | use the value object from `store-commons/commons/.../domain/`, not a `String` |
+| Change business logic | `<domain>-core` (services/facades), not `-service` |
+| Add/change an entity or DTO | `<domain>-commons` |
+| Call another pod from a service | that pod's `-external-api` module + a bean in your `ClientsConfig` |
+| React to something without blocking | a domain event in an `-events` module + `@OutboxHandler` |
+| Understand how a store maps to physical infrastructure | `ManagerStoreEntity.podId` → `org.pod` → `PodEndpoint` |
+| Find shared auth/JWT/security code | `store-commons:autoconfigure`, package `com.asrevo.cvhome.s2s.*` |
+| Debug a login problem | first decide: seller/admin → `uaa`, shopper → `cua` |
+| Change a service port or host | `store-commons/autoconfigure/src/main/resources/common-config.yml` |
+| Bump a dependency version | `gradle/libs.versions.toml` — never hardcode versions in a `build.gradle` |
+| Add a storefront theme | `store-pod/landing-ui/templates/` — follow `references/new-landing-ui-template.md` |
+| Know if a folder is a build unit | `settings.gradle` |
+
+## Reference files
+
+**Architecture**
+- `references/multi-tenancy.md` — orgs / stores / pods, provisioning, pod routing, regional placement, isolation.
+
+**Structure**
+- `references/store-core.md` — platform services in depth: uaa, gateway, control-plane and its library modules.
+- `references/store-pod.md` — the 4-module pod pattern with evidence, per-pod breakdown, spg routing, pod-shared libs.
+- `references/shared-libraries.md` — `store-commons` submodules, the `store-commons` naming collision.
+
+**Cross-cutting mechanics**
+- `references/api-conventions.md` — `StoreMerchantId`/`LanguageCode` on every API, value objects, `hasPermission`.
+- `references/database-schemas.md` — schema per service, Spring Data JDBC vs JPA, DDL locations, outbox tables.
+- `references/secrets-encryption.md` — encrypting tenant credentials at rest via `secret-crypto`.
+- `references/authentication.md` — the two authorization servers, multi-issuer JWT, s2s clients, login flows.
+- `references/configuration.md` — the shared config slices, the composition rule, the service registry.
+- `references/service-to-service.md` — `@HttpExchange` contracts, `RestClientBuilder`, URL/namespace resolution.
+- `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
+
+**Frontend & build**
+- `references/frontends.md` — seller-ui, the embedded `uaa-fe` build flow, `ui-conventions`.
+- `references/landing-ui.md` — landing-ui workspace layout and the template/theme system.
+- `references/new-landing-ui-template.md` — **step-by-step procedure + checklist for adding a storefront theme.**
+- `references/build-system.md` — version catalog, convention plugins, build commands.
