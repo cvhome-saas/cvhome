@@ -1,9 +1,14 @@
 import {Injectable} from '@angular/core';
 import moment from 'moment';
+import {CustomerAddress, PersistableOrderStatusHistory, UpdateOrderPayload} from '../../models/order.model';
+
+interface OrderInfo {
+  emailAddress?: string;
+}
 
 @Injectable({providedIn: 'root'})
 export class OrderDetailsMapper {
-  mapUpdateOrderPayload(info: any, billing: any, shipping: any) {
+  mapUpdateOrderPayload(info: OrderInfo, billing: CustomerAddress, shipping: CustomerAddress): UpdateOrderPayload {
     return {
       "emailAddress": info.emailAddress,
       "billing": {
@@ -33,7 +38,7 @@ export class OrderDetailsMapper {
     };
   }
 
-  mapHistoryPayload(comments: string, status: string) {
+  mapHistoryPayload(comments: string, status: string): PersistableOrderStatusHistory {
     return {
       comments: comments,
       date: moment().format('yyyy-MM-DD'),

@@ -7,6 +7,7 @@ import {StorePageRequest, PageT} from "../../shared/table/table.types";
 import {ErrorService} from "../../shared/services/error.service";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableOrder} from "../models/order.model";
 
 export interface OrderFilterPageRequest extends StorePageRequest {
   phone?: string;
@@ -20,7 +21,7 @@ export class OrderListFacade {
   private readonly ordersService = inject(OrdersService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, OrderFilterPageRequest>);
+  readonly tableState = inject(TableStateService<ReadableOrder, OrderFilterPageRequest>);
 
   readonly store = signal<string>('');
 
@@ -43,12 +44,12 @@ export class OrderListFacade {
     this.refresh();
   }
 
-  onFilterChange(filters: any): void {
+  onFilterChange(filters: Partial<OrderFilterPageRequest>): void {
     this.tableState.patchParams(filters as OrderFilterPageRequest);
     this.refresh();
   }
 
-  filter(): any {
+  filter(): Partial<OrderFilterPageRequest> {
     const params = this.tableState.params();
     return {
       phone: params.phone || '',
@@ -66,7 +67,7 @@ export class OrderListFacade {
     this.loadOrders(request).subscribe(page => this.tableState.setPage(page));
   }
 
-  private loadOrders(request: StorePageRequest): Observable<PageT<any>> {
+  private loadOrders(request: StorePageRequest): Observable<PageT<ReadableOrder>> {
     this.tableState.setLoading(true);
     return this.ordersService.getOrders(request).pipe(
       tap({

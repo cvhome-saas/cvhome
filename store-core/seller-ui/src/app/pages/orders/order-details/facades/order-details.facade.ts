@@ -13,6 +13,8 @@ import {StoreService} from "../../../store-management/services/store.service";
 import {OrderTransactionComponent} from "../../order-transaction/order-transaction";
 import {OrderInvoiceComponent} from "../../order-invoice/order-invoice";
 import {OrderHistoryComponent} from "../../order-history/order-history";
+import {CustomerAddress, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "../../models/order.model";
+import {Store} from "../../../store-management/models/store";
 
 @Injectable()
 export class OrderDetailsFacade {
@@ -27,22 +29,22 @@ export class OrderDetailsFacade {
 
   statusList = ORDER_STATUS_LIST;
   languages = LANGUAGES;
-  orderID = signal<any>(null);
+  orderID = signal<string>(null);
   transactionType = signal<string>('');
 
   // State signals
-  orderDetailsData = signal<any>(null);
+  orderDetailsData = signal<ReadableOrder>(null);
   loader = signal<boolean>(false);
-  store = signal<any>(null);
-  shippingCountry = signal<any[]>([]);
-  billingCountry = signal<any[]>([]);
-  shippingStateData = signal<any[]>([]);
-  billingStateData = signal<any[]>([]);
-  historyListData = signal<any[]>([]);
-  transactionListData = signal<any[]>([]);
+  store = signal<Store>(null);
+  shippingCountry = signal<ReadableCountry[]>([]);
+  billingCountry = signal<ReadableCountry[]>([]);
+  shippingStateData = signal<ReadableZone[]>([]);
+  billingStateData = signal<ReadableZone[]>([]);
+  historyListData = signal<ReadableOrderStatusHistory[]>([]);
+  transactionListData = signal<unknown[]>([]);
 
   info = signal({userName: '', language: '', emailAddress: '', datePurchased: ''});
-  billing = signal({
+  billing = signal<CustomerAddress>({
     firstName: '',
     lastName: '',
     company: '',
@@ -53,7 +55,7 @@ export class OrderDetailsFacade {
     phone: '',
     country: ''
   });
-  shipping = signal({
+  shipping = signal<CustomerAddress>({
     firstName: '',
     lastName: '',
     company: '',
@@ -112,8 +114,8 @@ export class OrderDetailsFacade {
         this.orderDetailsData.set(data);
         this.loader.set(false);
         this.info.set({
-          userName: data.customer.userName,
-          language: data.customer.language,
+          userName: data.customer.username,
+          language: '',
           emailAddress: data.customer.emailAddress,
           datePurchased: data.datePurchased
         });
@@ -138,7 +140,7 @@ export class OrderDetailsFacade {
     });
   }
 
-  onBillingChange(value: any, flag: number) {
+  onBillingChange(value: string, flag: number) {
     this.ordersService.getBillingZone(value).subscribe({
       next: (data) => {
         this.billingStateData.set(data);
@@ -152,7 +154,7 @@ export class OrderDetailsFacade {
     });
   }
 
-  onShippingChange(value: any, flag: number) {
+  onShippingChange(value: string, flag: number) {
     this.ordersService.getBillingZone(value).subscribe({
       next: (data) => {
         this.shippingStateData.set(data);

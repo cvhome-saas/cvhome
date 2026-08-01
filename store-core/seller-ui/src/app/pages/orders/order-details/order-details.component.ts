@@ -10,6 +10,7 @@ import {
   NbSpinnerModule
 } from '@nebular/theme';
 import {OrderDetailsFacade} from './facades/order-details.facade';
+import {OrderDialogType} from './constants/order-details.constants';
 
 @Component({
   selector: 'ngx-order-details',
@@ -36,11 +37,11 @@ export class OrderDetailsComponent implements OnInit {
     this.facade.init(this.destroyRef);
   }
 
-  onBillingChange(value: any, flag: number): void {
+  onBillingChange(value: string, flag: number): void {
     this.facade.onBillingChange(value, flag);
   }
 
-  onShippingChange(value: any, flag: number): void {
+  onShippingChange(value: string, flag: number): void {
     this.facade.onShippingChange(value, flag);
   }
 
@@ -48,7 +49,7 @@ export class OrderDetailsComponent implements OnInit {
     this.facade.goBack();
   }
 
-  showDialog(value: any): void {
+  showDialog(value: OrderDialogType | number | string): void {
     this.facade.showDialog(value);
   }
 

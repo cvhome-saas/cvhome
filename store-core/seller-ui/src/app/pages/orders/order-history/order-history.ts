@@ -1,6 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
+import {ReadableOrderStatusHistory} from '../models/order.model';
 
 @Component({
   selector: 'ngx-order-history',
@@ -12,13 +13,13 @@ import {NbDialogRef} from '@nebular/theme';
 export class OrderHistoryComponent {
   protected readonly ref = inject(NbDialogRef<OrderHistoryComponent>);
 
-  historyData: any[];
+  historyData: ReadableOrderStatusHistory[];
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name?: any) {
+  submit(name?: string) {
     this.ref.close(name);
   }
 }

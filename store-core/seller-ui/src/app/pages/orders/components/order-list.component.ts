@@ -3,7 +3,7 @@ import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {OrderListFacade} from '../facades/order-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {ColumnMode, NgxDatatableModule, PageEvent} from "@swimlane/ngx-datatable";
 import {TranslateModule} from '@ngx-translate/core';
 import {
   NbButtonModule,
@@ -48,7 +48,7 @@ export class OrderListComponent implements OnInit {
     this.facade.init(this.destroyRef);
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: PageEvent): void {
     this.facade.onPageChange(event);
   }
 

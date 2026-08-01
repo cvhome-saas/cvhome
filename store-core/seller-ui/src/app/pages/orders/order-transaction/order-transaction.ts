@@ -12,13 +12,13 @@ import {NbDialogRef} from '@nebular/theme';
 export class OrderTransactionComponent {
   protected readonly ref = inject(NbDialogRef<OrderTransactionComponent>);
 
-  transactionData: any;
+  transactionData: unknown[];
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name?: any) {
+  submit(name?: string) {
     this.ref.close(name);
   }
 }
