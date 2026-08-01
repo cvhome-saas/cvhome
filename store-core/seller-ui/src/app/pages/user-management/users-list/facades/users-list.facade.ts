@@ -7,6 +7,9 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {StorePageRequest} from '../../../shared/table/table.types';
+import {User} from '../../../shared/models/user';
 
 @Injectable()
 export class UsersListFacade {
@@ -15,7 +18,7 @@ export class UsersListFacade {
   private readonly dialogService = inject(NbDialogService);
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  readonly tableState = inject(TableStateService);
+  readonly tableState = inject(TableStateService<User, StorePageRequest>);
 
   readonly store = signal<string>('');
 
@@ -54,7 +57,7 @@ export class UsersListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset
@@ -62,11 +65,11 @@ export class UsersListFacade {
     this.loadData();
   }
 
-  onEdit(row: any): void {
+  onEdit(row: User): void {
     this.router.navigate(['pages/user-management/user/', row.id]);
   }
 
-  onDelete(row: any): void {
+  onDelete(row: User): void {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',

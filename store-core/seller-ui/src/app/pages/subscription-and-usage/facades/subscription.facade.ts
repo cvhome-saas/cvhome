@@ -1,6 +1,7 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {zip} from 'rxjs';
-import {SubscriptionDetails, SubscriptionService, Table} from '../services/subscription.service';
+import {SubscriptionDetails, SubscriptionService} from '../services/subscription.service';
+import {Table} from '../../shared/models/subscription.model';
 import {ErrorService} from '../../shared/services/error.service';
 import {PRICING_CARD_ACCENTS} from '../constants/subscription.constants';
 import {Pricing, toFreePricing, toPricing} from '../mappers/subscription.mapper';

@@ -1,4 +1,7 @@
 import {ManagerStoreDomain, ReadableMerchantStore} from './store';
+import {SpringPage} from '../../shared/table/table.types';
+
+export type {SpringPage};
 
 /** control-plane StoreManagerServiceImpl#getStore forwards to the merchant
  *  pod's ReadableMerchantStore and merges in a `pod` key — not a separate
@@ -6,16 +9,6 @@ import {ManagerStoreDomain, ReadableMerchantStore} from './store';
  *  controller's declared `Object` return type. */
 export interface ReadableMerchantStoreWithPod extends ReadableMerchantStore {
   pod: {id: string};
-}
-
-/** Mirrors control-plane manager/controller/StoreManagerController#findAllStoresDetailed —
- *  Spring Data's Page<ManagerStoreDto>, not this app's PageT<T> (different field names). */
-export interface SpringPage<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
 }
 
 /** Local shape of the store-scoped "page content" (e.g. LANDING_PAGE) fetched

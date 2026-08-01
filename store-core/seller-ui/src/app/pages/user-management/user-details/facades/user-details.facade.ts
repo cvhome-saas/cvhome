@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {UserService} from '../../../shared/services/user.service';
 import {ErrorService} from '../../../shared/services/error.service';
+import {User} from '../../../shared/models/user';
 
 @Injectable()
 export class UserDetailsFacade {
@@ -10,7 +11,7 @@ export class UserDetailsFacade {
   private readonly userService = inject(UserService);
   private readonly errorService = inject(ErrorService);
 
-  readonly user = signal<any>(null);
+  readonly user = signal<User>(null);
   readonly loadingInfo = signal<boolean>(false);
 
   init(): void {

@@ -4,6 +4,7 @@ import {Pod, PodService} from '../../store-management/services/pod.service';
 import {ErrorService} from '../../shared/services/error.service';
 import {TableStateService} from '../../shared/table/table-state.service';
 import {PageRequest} from '../../shared/table/table.types';
+import {DatatablePageEvent} from '../../shared/table/table-events';
 
 @Injectable()
 export class PodListFacade {
@@ -30,7 +31,7 @@ export class PodListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.patchParams({page: event.offset});
     this.loadPage();
   }

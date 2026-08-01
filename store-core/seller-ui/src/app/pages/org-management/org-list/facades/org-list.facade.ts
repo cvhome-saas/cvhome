@@ -3,10 +3,13 @@ import {Router} from '@angular/router';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {OrgService} from '../../services/org.service';
 import {ErrorService} from '../../../shared/services/error.service';
+import {StorePageRequest, PageT} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {Org} from '../../model/org';
 
 @Injectable()
 export class OrgListFacade {
-  readonly tableState = inject(TableStateService);
+  readonly tableState = inject(TableStateService<Org, StorePageRequest>);
   private readonly orgService = inject(OrgService);
   private readonly router = inject(Router);
   private readonly errorService = inject(ErrorService);
@@ -19,7 +22,14 @@ export class OrgListFacade {
     this.tableState.setLoading(true);
     this.orgService.getListOfOrg(this.tableState.params()).subscribe({
       next: (data) => {
-        this.tableState.setPage(data);
+        const mapped: PageT<Org> = {
+          content: data.content,
+          size: data.size,
+          totalElements: data.totalElements,
+          totalPages: data.totalPages,
+          pageNumber: data.number
+        };
+        this.tableState.setPage(mapped);
         this.tableState.setLoading(false);
       },
       error: (err) => {
@@ -29,7 +39,7 @@ export class OrgListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset
@@ -37,7 +47,7 @@ export class OrgListFacade {
     this.loadOrgs();
   }
 
-  onEdit(row: any): void {
+  onEdit(row: Org): void {
     this.router.navigate(['pages/org-management/org/', row.id.id]);
   }
 }

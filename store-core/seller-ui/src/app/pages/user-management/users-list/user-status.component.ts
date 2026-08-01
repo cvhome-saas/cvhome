@@ -1,6 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {UserStatusFacade} from './facades/user-status.facade';
+import {User} from '../../shared/models/user';
 
 @Component({
   selector: 'ngx-user-status',
@@ -12,6 +13,6 @@ import {UserStatusFacade} from './facades/user-status.facade';
 })
 export class UserStatusComponent {
   @Input() store: string;
-  @Input() rowData: any;
+  @Input() rowData: User;
   protected readonly facade = inject(UserStatusFacade);
 }

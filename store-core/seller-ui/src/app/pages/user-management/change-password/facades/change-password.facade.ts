@@ -19,7 +19,7 @@ export class ChangePasswordFacade {
   readonly loader = signal<boolean>(false);
   readonly errorMessage = signal<string>('');
   readonly selectedItem = signal<string>('1');
-  readonly sidemenuLinks = signal<any[]>([]);
+  readonly sidemenuLinks = signal<(typeof USER_DETAILS_SIDE_MENU_LINKS)[number][]>([]);
 
   get form() {
     return this.formService.form;

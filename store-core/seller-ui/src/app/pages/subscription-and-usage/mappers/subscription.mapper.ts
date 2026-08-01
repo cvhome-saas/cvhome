@@ -1,4 +1,4 @@
-import {FreeOption, Option} from '../services/subscription.service';
+import {FreeOption, Option} from '../../shared/models/subscription.model';
 import {SUBSCRIPTION_ICON_BASE_PATH} from '../constants/subscription.constants';
 
 export interface PricingFeature {

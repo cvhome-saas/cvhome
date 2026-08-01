@@ -48,8 +48,9 @@ export class PodFormFacade {
     this.router.navigate(['pages/pod-management/list']);
   }
 
-  private toPod(formValue: any): Pod {
-    const pod: Pod = {...formValue};
+  private toPod(formValue: Partial<Pod>): Pod {
+    // Form validators already require name/shortenPodId/endpoint before save() calls this.
+    const pod = {...formValue} as Pod;
     if (!pod.orgId || !pod.orgId.id || pod.orgId.id.trim() === '') {
       delete pod.orgId;
     }

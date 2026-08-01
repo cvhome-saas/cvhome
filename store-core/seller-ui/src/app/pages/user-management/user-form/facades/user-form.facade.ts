@@ -16,7 +16,7 @@ export class UserFormFacade {
   readonly loader = signal<boolean>(false);
   readonly roles = signal<{ name: string; checked: boolean }[]>([]);
   readonly selectedItem = signal<string>('0');
-  readonly sidemenuLinks = signal<any[]>([]);
+  readonly sidemenuLinks = signal<(typeof USER_DETAILS_SIDE_MENU_LINKS)[number][]>([]);
 
   get form() {
     return this.formService.form;

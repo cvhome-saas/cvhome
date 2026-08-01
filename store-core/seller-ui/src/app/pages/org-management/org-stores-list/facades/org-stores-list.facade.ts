@@ -7,10 +7,13 @@ import {OrgService} from '../../services/org.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {Org} from '../../model/org';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {ManagerStore} from '../../../shared/models/commons';
 
 @Injectable()
 export class OrgStoresListFacade {
-  readonly tableState = inject(TableStateService);
+  readonly tableState = inject(TableStateService<ManagerStore, {id: string} & Partial<StorePageRequest>>);
   private readonly orgService = inject(OrgService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -48,7 +51,14 @@ export class OrgStoresListFacade {
 
     this.orgService.getOrgStoresList(params).subscribe({
       next: (data) => {
-        this.tableState.setPage(data);
+        const mapped: PageT<ManagerStore> = {
+          content: data.content,
+          size: data.size,
+          totalElements: data.totalElements,
+          totalPages: data.totalPages,
+          pageNumber: data.number
+        };
+        this.tableState.setPage(mapped);
         this.tableState.setLoading(false);
       },
       error: (err) => {
@@ -58,7 +68,7 @@ export class OrgStoresListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset

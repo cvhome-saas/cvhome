@@ -6,13 +6,14 @@ import {ErrorService} from '../../shared/services/error.service';
 import {StorePageRequest} from '../../shared/table/table.types';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableCustomer} from '../../orders/models/order.model';
 
 @Injectable()
 export class CustomerListFacade {
   private readonly customersService = inject(CustomersService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, StorePageRequest>);
+  readonly tableState = inject(TableStateService<ReadableCustomer, StorePageRequest>);
 
   readonly store = signal<string>('');
 

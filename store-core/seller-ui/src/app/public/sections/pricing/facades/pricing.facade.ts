@@ -1,6 +1,7 @@
 import {Injectable, PLATFORM_ID, inject, signal} from '@angular/core';
 import {isPlatformBrowser} from '@angular/common';
-import {SubscriptionService, Table} from '../../../service/subscription.service';
+import {SubscriptionService} from '../../../service/subscription.service';
+import {Table} from '../../../../pages/shared/models/subscription.model';
 import {Pricing, toFreePricing, toPricing} from '../mappers/pricing.mapper';
 
 @Injectable()

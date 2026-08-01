@@ -15,7 +15,8 @@ export class UpdateOrgDetailsFormService {
     if (!org) return;
     this.form.patchValue({
       email: org.email?.email || '',
-      subscriptionPlan: org.subscriptionPlan || '',
+      // `subscriptionPlan` does not exist on Org/ManagerOrgDto — always undefined.
+      subscriptionPlan: (org as unknown as Record<string, string>)['subscriptionPlan'] || '',
     });
   }
 }

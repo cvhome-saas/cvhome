@@ -40,7 +40,7 @@ export class PodService {
 export type Pods = Pod[]
 
 export interface Pod {
-  id: PodId
+  id?: PodId
   name: string
   shortenPodId: string
   endpoint: Endpoint
