@@ -3,6 +3,14 @@ import {Language} from '../models/Language';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../../../environments/environment';
 import {CrudService} from "./crud.service";
+import {Observable} from 'rxjs';
+
+/** Mirrors the wire shape of List<LanguageCode> as returned by
+ *  MerchantStoreApi#supportedLanguages — a record with only `code`
+ *  (no custom LanguageCode serializer is applied on this endpoint). */
+export interface SupportedLanguageCode {
+  code: string;
+}
 
 
 @Injectable({
@@ -14,7 +22,7 @@ export class ConfigService {
 
   languages = [];
 
-  getListOfSupportedLanguages(store: string) {
+  getListOfSupportedLanguages(store: string): Observable<SupportedLanguageCode[]> {
     const params = {
       'store': store
     };

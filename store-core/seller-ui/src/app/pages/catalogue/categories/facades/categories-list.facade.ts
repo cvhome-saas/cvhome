@@ -6,7 +6,7 @@ import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialo
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
-import {StorePageRequest} from '../../../common/BaseTable';
+import {StorePageRequest} from '../../../shared/table/table.types';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Injectable()

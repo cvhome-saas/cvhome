@@ -7,7 +7,7 @@ import {ProductGroupsService} from '../services/product-groups.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {Page} from '../../../shared/models/Page';
+import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 
 @Injectable()
 export class ProductGroupFormFacade {
@@ -25,7 +25,7 @@ export class ProductGroupFormFacade {
   readonly store = signal<string>('');
   readonly uniqueCode = signal<string | undefined>(undefined);
   readonly rows = signal<any[]>([]);
-  readonly page = signal<Page>(new Page());
+  readonly page = signal<PageT<never>>(EMPTY_PAGE);
 
   private defaultLanguage = '';
   private action: 'create' | 'edit' = 'create';

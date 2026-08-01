@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {Org} from "../model/org";
-import {PageT, StorePageRequest} from '../../common/BaseTable';
+import {PageT, StorePageRequest} from '../../shared/table/table.types';
 
 @Injectable({
   providedIn: 'root'

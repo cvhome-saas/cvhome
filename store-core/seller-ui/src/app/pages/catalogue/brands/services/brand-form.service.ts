@@ -1,6 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ManufacturerDescription, ReadableManufacturer} from '../models/brand.model';
 
 @Injectable()
 export class BrandFormService {
@@ -29,7 +31,7 @@ export class BrandFormService {
     return this.form.get('descriptions') as FormArray;
   }
 
-  initDescriptions(languages: any[]): void {
+  initDescriptions(languages: SupportedLanguageCode[]): void {
     this.descriptions.clear();
     languages.forEach((lang) => {
       this.descriptions.push(this.createDescriptionFormGroup(lang.code));
@@ -49,7 +51,7 @@ export class BrandFormService {
     });
   }
 
-  patchForm(brand: any, languages: any[], defaultLang: string): void {
+  patchForm(brand: ReadableManufacturer, languages: SupportedLanguageCode[], defaultLang: string): void {
     if (!brand) return;
 
     this.form.patchValue({
@@ -60,7 +62,7 @@ export class BrandFormService {
 
     this.descriptions.clear();
     languages.forEach((lang) => {
-      const desc = brand.descriptions?.find((d: any) => d.language === lang.code) || {};
+      const desc: ManufacturerDescription = brand.descriptions?.find((d) => d.language === lang.code) || {};
       this.descriptions.push(this.fb.group({
         language: [lang.code, [Validators.required]],
         name: [desc.name || '', [Validators.required]],

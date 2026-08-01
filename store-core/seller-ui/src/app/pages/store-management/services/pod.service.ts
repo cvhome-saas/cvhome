@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import {CrudService} from "../../shared/services/crud.service";
 import {Observable} from "rxjs";
-import {PageRequest, PageT} from "../../common/BaseTable";
+import {PageRequest, PageT} from "../../shared/table/table.types";
 
 @Injectable({
   providedIn: 'root'

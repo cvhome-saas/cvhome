@@ -2,7 +2,7 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {zip} from 'rxjs';
-import {Page} from '../../../shared/models/Page';
+import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {ProductRelationshipService} from '../product-related/services/product-relationship.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
@@ -16,7 +16,7 @@ export class ProductRelatedFacade {
 
   readonly store = signal<string>('');
   readonly rows = signal<any[]>([]);
-  readonly page = signal<Page>(new Page());
+  readonly page = signal<PageT<never>>(EMPTY_PAGE);
 
   private product = '';
 

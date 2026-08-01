@@ -2,9 +2,16 @@ import {Injectable, inject} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
-import {HttpClient, HttpParams, HttpRequest} from '@angular/common/http';
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from '@angular/common/http';
 import {SelectedStoreService} from "./selected-store.service";
 import {Store} from "../models/commons";
+
+export type HttpParamsLike = Record<string, string | number | boolean | undefined>;
+
+export interface RequestOptions {
+  params?: HttpParamsLike;
+  reportProgress?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,45 +22,46 @@ export class CrudService {
 
   url = environment.apiUrl;
 
-  get(path, params?: any): Observable<any> {
-    return this.http.get(`${this.url}${path}`, {responseType: 'json', params: this.getParams(params)});
+  get<T>(path: string, params?: HttpParamsLike): Observable<T> {
+    return this.http.get<T>(`${this.url}${path}`, {responseType: 'json', params: this.getParams(params)});
   }
 
-  post(path, body: any | null, params?: any): Observable<any> {
-    return this.http.post(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
+  post<T, B = unknown>(path: string, body: B | null, params?: HttpParamsLike): Observable<T> {
+    return this.http.post<T>(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
   }
 
-  patch(path, body: any | null, params?: any) {
-    return this.http.patch(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
+  patch<T, B = unknown>(path: string, body: B | null, params?: HttpParamsLike): Observable<T> {
+    return this.http.patch<T>(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
   }
 
-  put(path, body: any | null, params?: any): Observable<any> {
-    return this.http.put(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
+  put<T, B = unknown>(path: string, body: B | null, params?: HttpParamsLike): Observable<T> {
+    return this.http.put<T>(`${this.url}${path}`, body, {responseType: 'json', params: this.getParams(params)});
   }
 
-  delete(path, params?: any): Observable<any> {
-    return this.http.delete(`${this.url}${path}`, {responseType: 'json', params: this.getParams(params)});
+  delete<T>(path: string, params?: HttpParamsLike): Observable<T> {
+    return this.http.delete<T>(`${this.url}${path}`, {responseType: 'json', params: this.getParams(params)});
   }
 
 
-  getBaseUrl() {
+  getBaseUrl(): string {
     return `${this.url}`;
   }
 
-  request(method: string, url: string, body: any | null, p?: any) {
+  request<B = unknown>(method: string, url: string, body: B | null, p?: RequestOptions): Observable<HttpEvent<unknown>> {
     const options = p ? {...p} : {};
     const req = new HttpRequest(method, url, body, {
-      params: this.getParams(options.params ? options.params : {})
+      params: this.getParams(options.params ? options.params : {}),
+      reportProgress: options.reportProgress
     });
     return this.http.request(req);
   }
 
-  private getParams(p?: Record<string, string>): HttpParams {
-    const params = p ? {...p} : {};
+  private getParams(p?: HttpParamsLike): HttpParams {
+    const params: HttpParamsLike = p ? {...p} : {};
     let store: Store;
 
     if (p && p.store) {
-      store = this.selectedStoreService.getStore(p.store);
+      store = this.selectedStoreService.getStore(p.store as string);
     } else {
       store = this.selectedStoreService.currentSelectedStore();
     }
@@ -64,7 +72,12 @@ export class CrudService {
       params['pod'] = store.podId.id;
     }
     let result = new HttpParams();
-    Object.keys(params).forEach(key => result = result.append(key, params[key]));
+    Object.keys(params).forEach(key => {
+      const value = params[key];
+      if (value !== undefined) {
+        result = result.append(key, value);
+      }
+    });
     return result;
   }
 }

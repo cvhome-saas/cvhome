@@ -3,7 +3,7 @@ import {CustomersService} from '../services/customer.service';
 import {SelectedStoreService} from '../../shared/services/selected-store.service';
 import {TableStateService} from '../../shared/table/table-state.service';
 import {ErrorService} from '../../shared/services/error.service';
-import {StorePageRequest} from '../../common/BaseTable';
+import {StorePageRequest} from '../../shared/table/table.types';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 

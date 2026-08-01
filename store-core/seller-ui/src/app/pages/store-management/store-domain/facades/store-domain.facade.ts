@@ -5,7 +5,7 @@ import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {StoreDomainFormService} from '../services/store-domain.form.service';
 import {StoreDomainComponentValidatorContext} from '../store-domain.validator';
-import {Page} from '../../../shared/models/Page';
+import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
 
@@ -21,7 +21,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
   readonly store = signal<string>('');
   readonly perPageSize = 50;
   readonly loading = signal<boolean>(false);
-  readonly page = signal<Page>(new Page());
+  readonly page = signal<PageT<never>>(EMPTY_PAGE);
   readonly rows = signal<any[]>([]);
   readonly selectedItem = signal<string>('2');
   readonly sideMenuLinks = sideMenuLinks;
@@ -70,11 +70,12 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
         this.shortenPodId = it[2].shortenPodId;
         if (it[1] && it[1].length > 0) {
           this.rows.set(it[1]);
-          const pg = new Page();
-          pg.totalPages = 1;
-          pg.totalElements = it[1].length;
-          pg.size = it[1].length;
-          this.page.set(pg);
+          this.page.set({
+            ...EMPTY_PAGE,
+            totalPages: 1,
+            totalElements: it[1].length,
+            size: it[1].length
+          });
         }
       },
       error: (err) => {

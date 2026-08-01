@@ -7,7 +7,7 @@ import {PaymentService} from '../services/payment.service';
 import {SelectedStoreService} from '../../shared/services/selected-store.service';
 import {ErrorService} from '../../shared/services/error.service';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {StorePageRequest, PageT} from '../../common/BaseTable';
+import {StorePageRequest, PageT} from '../../shared/table/table.types';
 import {PaymentApproveComponent} from '../payment-approve/payment-approve';
 import {ACTIONABLE_PAYMENT_STATUSES, EMPTY_PAYMENT_FILTER} from '../constants/payment.constants';
 import {PaymentTransaction} from '../models/payment-transaction.model';

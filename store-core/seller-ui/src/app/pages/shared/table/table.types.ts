@@ -1,4 +1,5 @@
 export interface PageRequest {
+  [key: string]: string | number | boolean | undefined;
   count: number;
   page: number;
 }
@@ -13,6 +14,7 @@ export interface PageT<T> {
   totalPages: number;
   pageNumber: number;
   content: T[];
+  recordsFiltered?: number;
 }
 
 export const EMPTY_PAGE: PageT<never> = {

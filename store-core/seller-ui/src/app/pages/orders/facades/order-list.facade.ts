@@ -3,7 +3,7 @@ import {OrdersService} from '../services/orders.service';
 import {SelectedStoreService} from "../../shared/services/selected-store.service";
 import {TableStateService} from "../../shared/table/table-state.service";
 import {Observable, tap} from "rxjs";
-import {StorePageRequest, PageT} from "../../common/BaseTable";
+import {StorePageRequest, PageT} from "../../shared/table/table.types";
 import {ErrorService} from "../../shared/services/error.service";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';

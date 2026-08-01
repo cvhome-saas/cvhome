@@ -7,6 +7,8 @@ import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {Store} from '../../../store-management/models/store';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ManufacturerDescription, ReadableManufacturer} from '../models/brand.model';
 
 @Injectable()
 export class BrandFormFacade {
@@ -18,13 +20,13 @@ export class BrandFormFacade {
 
   readonly loader = signal<boolean>(false);
   readonly isCodeUnique = signal<boolean>(true);
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly defaultLanguage = signal<string>('');
 
-  private brandData: any;
+  private brandData: ReadableManufacturer;
   private storeData: Store;
 
-  init(brand: any, store: Store, destroyRef: DestroyRef): void {
+  init(brand: ReadableManufacturer, store: Store, destroyRef: DestroyRef): void {
     this.brandData = brand || {};
     this.storeData = store;
     if (!store) return;
@@ -58,8 +60,8 @@ export class BrandFormFacade {
     });
   }
 
-  checkCode(event: any): void {
-    const code = event.target.value;
+  checkCode(event: Event): void {
+    const code = (event.target as HTMLInputElement).value;
     if (!code) return;
 
     this.brandService.checkBrandCode(code).subscribe({
@@ -72,12 +74,12 @@ export class BrandFormFacade {
 
   save(): void {
     const brandObject = this.formService.form.value;
-    const tmpObj: any = {
+    const tmpObj: Record<string, string> = {
       name: '',
       friendlyUrl: ''
     };
 
-    brandObject.descriptions.forEach((el: any) => {
+    brandObject.descriptions.forEach((el: ManufacturerDescription) => {
       if (tmpObj.name === '' && el.name !== '') {
         tmpObj.name = el.name;
       }
@@ -98,7 +100,7 @@ export class BrandFormFacade {
       return;
     }
 
-    brandObject.descriptions.forEach((el: any) => {
+    brandObject.descriptions.forEach((el: ManufacturerDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
@@ -108,7 +110,7 @@ export class BrandFormFacade {
       }
     });
 
-    brandObject.descriptions.forEach((el: any) => {
+    brandObject.descriptions.forEach((el: ManufacturerDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el.name) {

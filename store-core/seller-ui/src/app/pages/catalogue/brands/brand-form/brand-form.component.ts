@@ -13,6 +13,7 @@ import {QuillModule} from 'ngx-quill';
 import {Store} from '../../../store-management/models/store';
 import {BrandFormFacade} from '../facades/brand-form.facade';
 import {BrandFormService} from '../services/brand-form.service';
+import {ReadableManufacturer} from '../models/brand.model';
 
 @Component({
   selector: 'ngx-brand-form',
@@ -33,7 +34,7 @@ import {BrandFormService} from '../services/brand-form.service';
   providers: [BrandFormFacade, BrandFormService]
 })
 export class BrandFormComponent implements OnInit {
-  @Input() brand: any;
+  @Input() brand: ReadableManufacturer;
   @Input() title: string;
   @Input() store: Store;
 

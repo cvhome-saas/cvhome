@@ -7,6 +7,7 @@ import {BrandService} from '../services/brand.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {Store} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
+import {ReadableManufacturer} from '../models/brand.model';
 
 @Injectable()
 export class BrandDetailsFacade {
@@ -16,7 +17,7 @@ export class BrandDetailsFacade {
   private readonly brandService = inject(BrandService);
   private readonly errorService = inject(ErrorService);
 
-  readonly brand = signal<any>(null);
+  readonly brand = signal<ReadableManufacturer | null>(null);
   readonly store = signal<Store | null>(null);
 
   init(destroyRef: DestroyRef): void {

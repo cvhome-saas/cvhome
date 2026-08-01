@@ -6,8 +6,10 @@ import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialo
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
-import {StorePageRequest} from '../../../common/BaseTable';
+import {StorePageRequest} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableManufacturer} from '../models/brand.model';
 
 @Injectable()
 export class BrandsListFacade {
@@ -16,7 +18,7 @@ export class BrandsListFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, StorePageRequest>);
+  readonly tableState = inject(TableStateService<ReadableManufacturer, StorePageRequest>);
 
   readonly store = signal<string>('');
 
@@ -56,7 +58,7 @@ export class BrandsListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset
@@ -64,7 +66,7 @@ export class BrandsListFacade {
     this.loadPage();
   }
 
-  onEdit(row: any): void {
+  onEdit(row: ReadableManufacturer): void {
     this.router.navigate(['pages/catalogue/brands/brand/', row.id]);
   }
 
@@ -72,7 +74,7 @@ export class BrandsListFacade {
     this.router.navigate(['/pages/catalogue/brands/create-brand']);
   }
 
-  onDelete(row: any): void {
+  onDelete(row: ReadableManufacturer): void {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',

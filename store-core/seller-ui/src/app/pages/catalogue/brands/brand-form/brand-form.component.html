@@ -25,7 +25,7 @@
       <div class="form-group">
         <label class="col-sm-10 col-form-label" for="code">{{ 'COMMON.CODE' | translate }}</label>
         <div class="col-sm-12">
-          <input (change)="facade.checkCode($event)" [readOnly]="brand?.id" class="form-control" formControlName='code'
+          <input (change)="facade.checkCode($event)" [readOnly]="!!brand?.id" class="form-control" formControlName='code'
                  fullWidth
                  id="code" nbInput
                  placeholder="{{ 'COMMON.CODE' | translate}}" required type="text">

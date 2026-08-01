@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
-import {PageT, StorePageRequest} from '../../common/BaseTable';
+import {PageT, StorePageRequest} from '../../shared/table/table.types';
 import {PaymentTransaction} from '../models/payment-transaction.model';
 
 @Injectable({
