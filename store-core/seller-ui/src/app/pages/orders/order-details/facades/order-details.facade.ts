@@ -34,12 +34,12 @@ export class OrderDetailsFacade {
   orderDetailsData = signal<any>(null);
   loader = signal<boolean>(false);
   store = signal<any>(null);
-  shippingCountry = signal<Array<any>>([]);
-  billingCountry = signal<Array<any>>([]);
-  shippingStateData = signal<Array<any>>([]);
-  billingStateData = signal<Array<any>>([]);
-  historyListData = signal<Array<any>>([]);
-  transactionListData = signal<Array<any>>([]);
+  shippingCountry = signal<any[]>([]);
+  billingCountry = signal<any[]>([]);
+  shippingStateData = signal<any[]>([]);
+  billingStateData = signal<any[]>([]);
+  historyListData = signal<any[]>([]);
+  transactionListData = signal<any[]>([]);
 
   info = signal({userName: '', language: '', emailAddress: '', datePurchased: ''});
   billing = signal({
@@ -170,7 +170,7 @@ export class OrderDetailsFacade {
     this.loader.set(true);
     const param = this.mapper.mapHistoryPayload(this.statusFields().comments, this.statusFields().status);
     this.ordersService.addHistory(this.orderID(), param).subscribe({
-      next: (data) => {
+      next: () => {
         this.loader.set(false);
         this.errorService.success("History Status has been submitted successfully");
         this.statusFields.set({comments: '', status: ''});
@@ -186,7 +186,7 @@ export class OrderDetailsFacade {
     this.loader.set(true);
     const param = this.mapper.mapUpdateOrderPayload(this.info(), this.billing(), this.shipping());
     this.ordersService.updateOrder(this.orderID(), param).subscribe({
-      next: (data) => {
+      next: () => {
         this.loader.set(false);
         this.errorService.success("Order has been updated successfully");
       },
@@ -208,7 +208,7 @@ export class OrderDetailsFacade {
   onClickRefund() {
     this.loader.set(true);
     this.ordersService.refundOrder(this.orderID()).subscribe({
-      next: (data) => {
+      next: () => {
         this.loader.set(false);
         this.errorService.success("Order has been refunded successfully");
       },
@@ -222,7 +222,7 @@ export class OrderDetailsFacade {
   onClickCapture() {
     this.loader.set(true);
     this.ordersService.captureOrder(this.orderID()).subscribe({
-      next: (data) => {
+      next: () => {
         this.loader.set(false);
         this.errorService.success("Order has been captured successfully");
       },

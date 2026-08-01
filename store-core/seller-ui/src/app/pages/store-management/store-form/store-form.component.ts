@@ -1,10 +1,34 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges, inject} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbCheckboxModule,
+  NbDatepickerModule,
+  NbInputModule,
+  NbOptionModule,
+  NbSelectModule,
+  NbSpinnerModule
+} from '@nebular/theme';
 import {StoreFormFacade} from './facades/store-form.facade';
 import {StoreFormService} from './services/store-form.service';
 
 @Component({
   selector: 'ngx-store-form',
-  standalone: false,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbCheckboxModule,
+    NbDatepickerModule,
+    NbInputModule,
+    NbOptionModule,
+    NbSelectModule,
+    NbSpinnerModule
+  ],
   templateUrl: './store-form.component.html',
   styleUrls: ['./store-form.component.scss'],
   providers: [StoreFormFacade, StoreFormService]

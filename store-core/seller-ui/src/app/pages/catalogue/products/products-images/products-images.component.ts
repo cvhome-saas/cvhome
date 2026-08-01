@@ -1,10 +1,13 @@
 import {AfterViewInit, Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {Location} from '@angular/common';
+import {NbSpinnerModule} from '@nebular/theme';
 import {ProductsImagesFacade} from '../facades/products-images.facade';
+import {ImageUploadingComponent} from '../../../shared/components/image-uploading/image-uploading.component';
 
 @Component({
   selector: 'ngx-products-images',
-  standalone: false,
+  standalone: true,
+  imports: [NbSpinnerModule, ImageUploadingComponent],
   templateUrl: './products-images.component.html',
   styleUrls: ['./products-images.component.css'],
   providers: [ProductsImagesFacade]

@@ -1,9 +1,11 @@
 import {Component, OnInit, inject, DestroyRef} from '@angular/core';
 import {BrandDetailsFacade} from '../facades/brand-details.facade';
+import {BrandFormComponent} from '../brand-form/brand-form.component';
 
 @Component({
   selector: 'ngx-brand-details',
-  standalone: false,
+  standalone: true,
+  imports: [BrandFormComponent],
   templateUrl: './brand-details.component.html',
   styleUrls: ['./brand-details.component.scss'],
   providers: [BrandDetailsFacade]

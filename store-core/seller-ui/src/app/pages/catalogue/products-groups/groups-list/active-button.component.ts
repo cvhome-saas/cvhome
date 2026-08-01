@@ -1,9 +1,11 @@
 import {Component, Input, inject} from '@angular/core';
+import {NbCheckboxModule} from '@nebular/theme';
 import {ActiveButtonFacade} from '../facades/active-button.facade';
 
 @Component({
   selector: 'ngx-product-groups-active',
-  standalone: false,
+  standalone: true,
+  imports: [NbCheckboxModule],
   template: `<nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
   providers: [ActiveButtonFacade]
 })

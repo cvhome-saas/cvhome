@@ -1,12 +1,23 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
-import {NbMenuService, NbSidebarService} from '@nebular/theme';
+import {
+  NbActionsModule,
+  NbContextMenuModule,
+  NbIconModule,
+  NbMenuService,
+  NbOptionModule,
+  NbSearchModule,
+  NbSelectModule,
+  NbSidebarService,
+  NbUserModule
+} from '@nebular/theme';
 import {ManagerStoreId} from '../../../shared/models/commons';
 import {HEADER_USER_MENU} from './constants/header.constants';
 import {HeaderFacade} from './facades/header.facade';
 
 @Component({
   selector: 'ngx-header',
-  standalone: false,
+  standalone: true,
+  imports: [NbIconModule, NbSelectModule, NbOptionModule, NbActionsModule, NbSearchModule, NbUserModule, NbContextMenuModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   providers: [HeaderFacade]

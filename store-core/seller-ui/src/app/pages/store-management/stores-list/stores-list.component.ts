@@ -1,11 +1,15 @@
 import {Component, OnInit, inject} from '@angular/core';
-import {ColumnMode} from "@swimlane/ngx-datatable";
+import {RouterLink} from '@angular/router';
+import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {StoresListFacade} from "./facades/stores-list.facade";
 import {TableStateService} from "../../shared/table/table-state.service";
 
 @Component({
   selector: 'ngx-stores-list',
-  standalone: false,
+  standalone: true,
+  imports: [RouterLink, TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule, NgxDatatableModule],
   templateUrl: './stores-list.component.html',
   styleUrls: ['./stores-list.component.scss'],
   providers: [StoresListFacade, TableStateService]

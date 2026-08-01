@@ -1,9 +1,29 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbInputModule,
+  NbOptionModule,
+  NbSelectModule,
+  NbSpinnerModule
+} from '@nebular/theme';
 import {OrderDetailsFacade} from './facades/order-details.facade';
 
 @Component({
   selector: 'ngx-order-details',
-  standalone: false,
+  standalone: true,
+  imports: [
+    FormsModule,
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbInputModule,
+    NbOptionModule,
+    NbSelectModule,
+    NbSpinnerModule
+  ],
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.scss'],
   providers: [OrderDetailsFacade]

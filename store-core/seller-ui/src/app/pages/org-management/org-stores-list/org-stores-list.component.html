@@ -9,9 +9,11 @@
       </div>
       <div class="col col-lg-2">
         <nb-select [selected]="facade.selectedItem()" outline shape="rectangle">
-          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sidemenuLinks" [value]="item.id">
-            {{ item.title |translate }}
-          </nb-option>
+          @for (item of facade.sidemenuLinks; track item.id) {
+            <nb-option (click)="facade.route(item.link)" [value]="item.id">
+              {{ item.title |translate }}
+            </nb-option>
+          }
         </nb-select>
       </div>
       <div class="col col-lg-2">

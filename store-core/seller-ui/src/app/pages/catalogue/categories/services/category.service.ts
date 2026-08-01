@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
@@ -8,11 +8,8 @@ import {PageT, StorePageRequest} from '../../../shared/table/table.types';
   providedIn: 'root'
 })
 export class CategoryService {
+  private crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService
-  ) {
-  }
 
   getListOfCategories(params?: Partial<StorePageRequest>): Observable<PageT<any>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/category`, params);

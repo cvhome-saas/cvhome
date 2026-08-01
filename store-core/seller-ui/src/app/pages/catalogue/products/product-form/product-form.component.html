@@ -11,359 +11,394 @@
         <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="facade.save()" *ngIf="!facade.loader()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large"
-                nbSpinnerStatus="control" status="success"
-                type="submit">
-          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
-        </button>
+        @if (!facade.loader()) {
+          <button (click)="facade.save()" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large"
+                  nbSpinnerStatus="control" status="success"
+                  type="submit">
+            {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
+          </button>
+        }
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
 
-    <form *ngIf="facade.loaded()" [formGroup]='facade.formService.form'>
-      <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'PRODUCT.DEFINITION' | translate }}</nb-card-header>
-            <nb-card-body>
-              <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <div>
-                      <nb-checkbox formControlName='visible'>
-                        {{ 'CONTENT.VISIBLE' | translate }}
-                      </nb-checkbox>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="col-form-label " for="sku">{{ 'PRODUCT.UNIQUE_ID' | translate }}
-                      <span>*</span></label>
-                    <div>
-                      <input (change)="facade.checkSku($event.target.value)" class="form-control " formControlName='sku' fullWidth id="sku"
-                             nbInput
-                             placeholder="{{ 'Unique sku' | translate}}" required type="text">
-                      <span *ngIf="(facade.formService.sku.dirty || facade.formService.sku.touched) && facade.formService.sku.invalid" class="err-message">
-                        <span *ngIf="facade.formService.sku.errors?.['required']">
-                          {{ 'PRODUCT.ID_REQUIRED' | translate }}
-                        </span>
-                        <span *ngIf="facade.formService.sku.errors?.['pattern']">
-                          {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
-                        </span>
-                        <span *ngIf="!facade.isCodeUnique()" class="err-message">
-                          {{ 'COMMON.SKU_EXISTS' | translate }}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="col-form-label ">{{ 'PRODUCT.DATE_AVAILABLE' | translate }}</label>
-                    <div>
-                      <input [nbDatepicker]="formpicker" [readOnly]="true" class="form-control"
-                             formControlName='dateAvailable'
-                             fullWidth nbInput
-                             placeholder="Form Picker">
-                      <nb-datepicker #formpicker></nb-datepicker>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label col-form-label" for="order">{{ 'COMMON.ORDER' | translate }}</label>
-                    <input class="form-control " formControlName='sortOrder' fullWidth id="order" nbInput
-                           placeholder="{{ 'COMMON.ORDER' | translate}}" required type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="col-form-label ">{{ 'PRODUCT.MANUFACTURER' | translate }} <span
-                    >*</span></label>
-                    <div>
-                      <nb-select formControlName='manufacturer' placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}">
-                        <nb-option *ngFor="let item of facade.manufacturers()" [value]="item.value">{{ item.label }}</nb-option>
-                      </nb-select>
-                    </div>
-                    <span *ngIf="(facade.formService.manufacturer.dirty || facade.formService.manufacturer.touched) && facade.formService.manufacturer.invalid"
-                          class="err-message">
-                      <span *ngIf="facade.formService.manufacturer.errors?.['required']">
-                        {{ 'PRODUCT.MANUFACTURER' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row" style="margin-bottom:125px;">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class=" col-form-label ">{{ 'PRODUCT.PRODUCT_TYPE' | translate }}</label>
-                    <div>
-                      <nb-select formControlName='type' placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}">
-                        <nb-option *ngFor="let item of facade.productTypes()" [value]="item.value">{{ item.label }}</nb-option>
-                      </nb-select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>
-              <nb-actions class="pull-right" size="small">
-                <nb-action>{{ 'COMMON.SEO_DETAILS' | translate }}</nb-action>
-                <nb-action>
-                  <nb-select *ngIf="facade.languages().length" [selected]="facade.defaultLanguage()" name='selectedLanguage'
-                             outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-                    <nb-option (click)="facade.selectLanguage(language.code)" *ngFor="let language of facade.languages()"
-                               [value]="language.code">{{
-                        ('LANG.' + language.code) |translate
-                      }}
-                    </nb-option>
-                  </nb-select>
-
-                </nb-action>
-              </nb-actions>
-            </nb-card-header>
-            <nb-card-body>
-
-              <div formArrayName='descriptions'>
-                <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
-                  <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
-                    <div [formGroupName]="j">
-                      <div class="form-group">
-                        <label class="col-form-label " for="name">{{ 'DESCRIPTION_FORM.NAME' | translate }} -
-                          {{ ('LANG.' + facade.currentLanguage()) |translate }}
-                          <span>*</span></label>
-                        <div>
-                          <input (ngModelChange)="facade.changeName($event, j)" class="form-control " formControlName='name'
-                                 fullWidth
-                                 id="name" nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate }}"
-                                 required type="text">
-                          <span
-                            *ngIf="(descr.get('name').dirty || descr.get('name').touched) && descr.get('name').invalid && descr.get('name').errors?.['required']"
-                            class="err-message">
-                            {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }} - {{
-                              ('LANG.' + facade.currentLanguage())
-                                |translate
-                            }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label class=" col-form-label " for="title">{{
-                            'DESCRIPTION_FORM.TITLE' | translate
-                          }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
-                        <div>
-                          <input class="form-control " formControlName='title' fullWidth id="title" nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate }}"
-                                 type="text">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label class=" col-form-label " for="highlight">{{
-                            'DESCRIPTION_FORM.HIGHLIGHT'
-                              |
-                              translate
-                          }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
-                        <div>
-                          <input class="form-control " formControlName='highlights' fullWidth id="highlight" nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate }}"
-                                 type="text">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class=" col-form-label " for="friendlyUrl">{{
-                            'DESCRIPTION_FORM.FRIENDLY_URL' | translate
-                          }} - {{
-                            ('LANG.' + facade.currentLanguage()) |translate
-                          }}<span>*</span></label>
-                        <div>
-                          <input class="form-control " formControlName='friendlyUrl' fullWidth id="friendlyUrl" nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate }}"
-                                 required type="text">
-                          <span
-                            *ngIf="(descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
-                                                        && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors?.['required']"
-                            class="err-message">
-                            {{ 'DESCRIPTION_FORM.FRIENDLY_URL_REQUIRED' | translate }}
-                          </span>
-                        </div>
-                      </div>
-
-
-                      <div class="form-group">
-                        <label class=" col-form-label " for="keyWords">{{
-                            'DESCRIPTION_FORM.KEYWORDS' |
-                              translate
-                          }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
-                        <div>
-                          <input class="form-control " formControlName='keyWords' fullWidth id="keyWords" nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.KEYWORDS_PLACEHOLDER' | translate }}"
-                                 type="text">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class="col-form-label " for="metaDescription">{{
-                            'DESCRIPTION_FORM.META_DESCRIPTION' | translate
-                          }} - {{
-                            ('LANG.' + facade.currentLanguage()) |translate
-                          }}</label>
-                        <div>
-                          <input class="form-control " formControlName='metaDescription' fullWidth id="metaDescription"
-                                 nbInput
-                                 placeholder="{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}"
-                                 type="text">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }} - {{
-                ('LANG.' +
-                  facade.currentLanguage()) |translate
-              }}
-            </nb-card-header>
-            <nb-card-body>
-              <div *ngIf="facade.formService.selectedLanguage.value !== ''" formArrayName='descriptions'>
-                <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
-                  <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
-                    <div [formGroupName]="j">
-                      <div class="form-group">
-                        <quill-editor [styles]="{height: '200px'}" formControlName="description"/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'Specifications' | translate }}</nb-card-header>
-            <nb-card-body formGroupName='productSpecifications'>
-
-              <div class="form-group">
-                <label class=" col-form-label " for="width">{{ 'COMMON.WIDTH' | translate }}</label>
-                <div>
-                  <input class="form-control " formControlName='width' fullWidth id="width" nbInput
-                         placeholder="{{ 'COMMON.WIDTH' | translate }}" type="number">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class=" col-form-label " for="height">{{ 'COMMON.HEIGHT' | translate }}</label>
-                <div>
-                  <input class="form-control " formControlName='height' fullWidth id="height" nbInput
-                         placeholder="{{ 'COMMON.HEIGHT' | translate }}" type="number">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class=" col-form-label " for="length">{{ 'COMMON.LENGTH' | translate }}</label>
-                <div>
-                  <input class="form-control " formControlName='length' fullWidth id="length" nbInput
-                         placeholder="{{ 'COMMON.LENGTH' | translate }}" type="number">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class=" col-form-label " for="weight">{{ 'COMMON.WEIGHT' | translate }}</label>
-                <div>
-                  <input class="form-control " formControlName='weight' fullWidth id="weight" nbInput
-                         placeholder="{{ 'COMMON.WEIGHT' | translate }} " type="number">
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'COMPONENTS.INVENTORY' | translate }}</nb-card-header>
-            <nb-card-body>
-
-              <div class="form-group">
-                <div>
-                  <nb-checkbox formControlName='canBePurchased'>
-                    {{ 'Available for purchase' | translate }}
-                  </nb-checkbox>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-form-label ">
-                  {{ 'PRICE.FINAL_PRICE' | translate }}
-                  <span>*</span>
-                </label>
-                <div>
-                  <input class="form-control " formControlName='price' fullWidth nbInput
-                         placeholder="{{ 'PRODUCT.PRICE' | translate}}"
-                         type="number">
-                  <span *ngIf="(facade.formService.price.dirty || facade.formService.price.touched) && facade.formService.price.invalid" class="err-message">
-                    <span *ngIf="facade.formService.price.errors?.['required']">
-                      {{ 'PRODUCT.PRICE' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
-                    </span>
-                  </span>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-form-label ">{{ 'Quantity' | translate }}<span
-                >*</span></label>
-                <div>
-                  <input class="form-control " formControlName='quantity' fullWidth nbInput
-                         placeholder="{{ 'PRODUCT.QUANTITY' | translate}}"
-                         type="number">
-                  <span *ngIf="(facade.formService.quantity.dirty || facade.formService.quantity.touched) && facade.formService.quantity.invalid" class="err-message">
-                    <span *ngIf="facade.formService.quantity.errors?.['required']">
-                      {{ 'PRODUCT.QUANTITY' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-        </div>
-      </div>
-
-
-      <div *ngIf="product.id" class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <div [nbSpinner]="facade.tabLoader()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    @if (facade.loaded()) {
+      <form [formGroup]='facade.formService.form'>
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <nb-card accent="info" status="control">
-              <nb-route-tabset [tabs]="facade.tabs()" fullWidth id="tabs"></nb-route-tabset>
+              <nb-card-header>{{ 'PRODUCT.DEFINITION' | translate }}</nb-card-header>
+              <nb-card-body>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <div>
+                        <nb-checkbox formControlName='visible'>
+                          {{ 'CONTENT.VISIBLE' | translate }}
+                        </nb-checkbox>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="col-form-label " for="sku">{{ 'PRODUCT.UNIQUE_ID' | translate }}
+                        <span>*</span></label>
+                      <div>
+                        <input (change)="facade.checkSku($event.target.value)" class="form-control " formControlName='sku' fullWidth id="sku"
+                               nbInput
+                               placeholder="{{ 'Unique sku' | translate}}" required type="text">
+                        @if ((facade.formService.sku.dirty || facade.formService.sku.touched) && facade.formService.sku.invalid) {
+                          <span class="err-message">
+                            @if (facade.formService.sku.errors?.['required']) {
+                              <span>
+                                {{ 'PRODUCT.ID_REQUIRED' | translate }}
+                              </span>
+                            }
+                            @if (facade.formService.sku.errors?.['pattern']) {
+                              <span>
+                                {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
+                              </span>
+                            }
+                            @if (!facade.isCodeUnique()) {
+                              <span class="err-message">
+                                {{ 'COMMON.SKU_EXISTS' | translate }}
+                              </span>
+                            }
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="col-form-label " for="dateAvailable">{{ 'PRODUCT.DATE_AVAILABLE' | translate }}</label>
+                      <div>
+                        <input [nbDatepicker]="formpicker" [readOnly]="true" class="form-control"
+                               formControlName='dateAvailable'
+                               fullWidth id="dateAvailable" nbInput
+                               placeholder="Form Picker">
+                        <nb-datepicker #formpicker></nb-datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label col-form-label" for="order">{{ 'COMMON.ORDER' | translate }}</label>
+                      <input class="form-control " formControlName='sortOrder' fullWidth id="order" nbInput
+                             placeholder="{{ 'COMMON.ORDER' | translate}}" required type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="col-form-label " for="manufacturer">{{ 'PRODUCT.MANUFACTURER' | translate }} <span
+                      >*</span></label>
+                      <div>
+                        <nb-select formControlName='manufacturer' id="manufacturer" placeholder="{{ 'PRODUCT.MANUFACTURER' | translate}}">
+                          @for (item of facade.manufacturers(); track item.value) {
+                            <nb-option [value]="item.value">{{ item.label }}</nb-option>
+                          }
+                        </nb-select>
+                      </div>
+                      @if ((facade.formService.manufacturer.dirty || facade.formService.manufacturer.touched) && facade.formService.manufacturer.invalid) {
+                        <span class="err-message">
+                          @if (facade.formService.manufacturer.errors?.['required']) {
+                            <span>
+                              {{ 'PRODUCT.MANUFACTURER' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
+                            </span>
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row" style="margin-bottom:125px;">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class=" col-form-label " for="type">{{ 'PRODUCT.PRODUCT_TYPE' | translate }}</label>
+                      <div>
+                        <nb-select formControlName='type' id="type" placeholder="{{ 'PRODUCT.PRODUCT_TYPE' | translate}}">
+                          @for (item of facade.productTypes(); track item.value) {
+                            <nb-option [value]="item.value">{{ item.label }}</nb-option>
+                          }
+                        </nb-select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>
+                <nb-actions class="pull-right" size="small">
+                  <nb-action>{{ 'COMMON.SEO_DETAILS' | translate }}</nb-action>
+                  <nb-action>
+                    @if (facade.languages().length) {
+                      <nb-select [selected]="facade.defaultLanguage()" name='selectedLanguage'
+                                 outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
+                        @for (language of facade.languages(); track language.code) {
+                          <nb-option (click)="facade.selectLanguage(language.code)"
+                                     [value]="language.code">{{
+                              ('LANG.' + language.code) |translate
+                            }}
+                          </nb-option>
+                        }
+                      </nb-select>
+                    }
+
+                  </nb-action>
+                </nb-actions>
+              </nb-card-header>
+              <nb-card-body>
+
+                <div formArrayName='descriptions'>
+                  @for (descr of facade.formService.descriptions.controls; track $index; let j = $index) {
+                    @if (descr.value.language === facade.formService.selectedLanguage.value) {
+                      <div [formGroupName]="j">
+                        <div class="form-group">
+                          <label class="col-form-label " for="name">{{ 'DESCRIPTION_FORM.NAME' | translate }} -
+                            {{ ('LANG.' + facade.currentLanguage()) |translate }}
+                            <span>*</span></label>
+                          <div>
+                            <input (ngModelChange)="facade.changeName($event, j)" class="form-control " formControlName='name'
+                                   fullWidth
+                                   id="name" nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.NAME' | translate }}"
+                                   required type="text">
+                            @if ((descr.get('name').dirty || descr.get('name').touched) && descr.get('name').invalid && descr.get('name').errors?.['required']) {
+                              <span class="err-message">
+                                {{ 'DESCRIPTION_FORM.NAME_REQUIRED' | translate }} - {{
+                                  ('LANG.' + facade.currentLanguage())
+                                    |translate
+                                }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class=" col-form-label " for="title">{{
+                              'DESCRIPTION_FORM.TITLE' | translate
+                            }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
+                          <div>
+                            <input class="form-control " formControlName='title' fullWidth id="title" nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.TITLE' | translate }}"
+                                   type="text">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class=" col-form-label " for="highlight">{{
+                              'DESCRIPTION_FORM.HIGHLIGHT'
+                                |
+                                translate
+                            }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
+                          <div>
+                            <input class="form-control " formControlName='highlights' fullWidth id="highlight" nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.HIGHLIGHT' | translate }}"
+                                   type="text">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class=" col-form-label " for="friendlyUrl">{{
+                              'DESCRIPTION_FORM.FRIENDLY_URL' | translate
+                            }} - {{
+                              ('LANG.' + facade.currentLanguage()) |translate
+                            }}<span>*</span></label>
+                          <div>
+                            <input class="form-control " formControlName='friendlyUrl' fullWidth id="friendlyUrl" nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.FRIENDLY_URL' | translate }}"
+                                   required type="text">
+                            @if ((descr.get('friendlyUrl').dirty || descr.get('friendlyUrl').touched)
+                                && descr.get('friendlyUrl').invalid && descr.get('friendlyUrl').errors?.['required']) {
+                              <span class="err-message">
+                                {{ 'DESCRIPTION_FORM.FRIENDLY_URL_REQUIRED' | translate }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+
+
+                        <div class="form-group">
+                          <label class=" col-form-label " for="keyWords">{{
+                              'DESCRIPTION_FORM.KEYWORDS' |
+                                translate
+                            }} - {{ ('LANG.' + facade.currentLanguage()) |translate }}</label>
+                          <div>
+                            <input class="form-control " formControlName='keyWords' fullWidth id="keyWords" nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.KEYWORDS_PLACEHOLDER' | translate }}"
+                                   type="text">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class="col-form-label " for="metaDescription">{{
+                              'DESCRIPTION_FORM.META_DESCRIPTION' | translate
+                            }} - {{
+                              ('LANG.' + facade.currentLanguage()) |translate
+                            }}</label>
+                          <div>
+                            <input class="form-control " formControlName='metaDescription' fullWidth id="metaDescription"
+                                   nbInput
+                                   placeholder="{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }}"
+                                   type="text">
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </nb-card-body>
+            </nb-card>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'DESCRIPTION_FORM.DESCRIPTION' | translate }} - {{
+                  ('LANG.' +
+                    facade.currentLanguage()) |translate
+                }}
+              </nb-card-header>
+              <nb-card-body>
+                @if (facade.formService.selectedLanguage.value !== '') {
+                  <div formArrayName='descriptions'>
+                    @for (descr of facade.formService.descriptions.controls; track $index; let j = $index) {
+                      @if (descr.value.language === facade.formService.selectedLanguage.value) {
+                        <div [formGroupName]="j">
+                          <div class="form-group">
+                            <quill-editor [styles]="{height: '200px'}" formControlName="description"/>
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                }
+              </nb-card-body>
             </nb-card>
           </div>
         </div>
-      </div>
 
-    </form>
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'Specifications' | translate }}</nb-card-header>
+              <nb-card-body formGroupName='productSpecifications'>
+
+                <div class="form-group">
+                  <label class=" col-form-label " for="width">{{ 'COMMON.WIDTH' | translate }}</label>
+                  <div>
+                    <input class="form-control " formControlName='width' fullWidth id="width" nbInput
+                           placeholder="{{ 'COMMON.WIDTH' | translate }}" type="number">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class=" col-form-label " for="height">{{ 'COMMON.HEIGHT' | translate }}</label>
+                  <div>
+                    <input class="form-control " formControlName='height' fullWidth id="height" nbInput
+                           placeholder="{{ 'COMMON.HEIGHT' | translate }}" type="number">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class=" col-form-label " for="length">{{ 'COMMON.LENGTH' | translate }}</label>
+                  <div>
+                    <input class="form-control " formControlName='length' fullWidth id="length" nbInput
+                           placeholder="{{ 'COMMON.LENGTH' | translate }}" type="number">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class=" col-form-label " for="weight">{{ 'COMMON.WEIGHT' | translate }}</label>
+                  <div>
+                    <input class="form-control " formControlName='weight' fullWidth id="weight" nbInput
+                           placeholder="{{ 'COMMON.WEIGHT' | translate }} " type="number">
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'COMPONENTS.INVENTORY' | translate }}</nb-card-header>
+              <nb-card-body>
+
+                <div class="form-group">
+                  <div>
+                    <nb-checkbox formControlName='canBePurchased'>
+                      {{ 'Available for purchase' | translate }}
+                    </nb-checkbox>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-form-label " for="price">
+                    {{ 'PRICE.FINAL_PRICE' | translate }}
+                    <span>*</span>
+                  </label>
+                  <div>
+                    <input class="form-control " formControlName='price' fullWidth id="price" nbInput
+                           placeholder="{{ 'PRODUCT.PRICE' | translate}}"
+                           type="number">
+                    @if ((facade.formService.price.dirty || facade.formService.price.touched) && facade.formService.price.invalid) {
+                      <span class="err-message">
+                        @if (facade.formService.price.errors?.['required']) {
+                          <span>
+                            {{ 'PRODUCT.PRICE' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
+                          </span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-form-label " for="quantity">{{ 'Quantity' | translate }}<span
+                  >*</span></label>
+                  <div>
+                    <input class="form-control " formControlName='quantity' fullWidth id="quantity" nbInput
+                           placeholder="{{ 'PRODUCT.QUANTITY' | translate}}"
+                           type="number">
+                    @if ((facade.formService.quantity.dirty || facade.formService.quantity.touched) && facade.formService.quantity.invalid) {
+                      <span class="err-message">
+                        @if (facade.formService.quantity.errors?.['required']) {
+                          <span>
+                            {{ 'PRODUCT.QUANTITY' | translate }} {{ 'COMMON.IS_REQUIRED' | translate }}
+                          </span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+
+          </div>
+        </div>
+
+
+        @if (product.id) {
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div [nbSpinner]="facade.tabLoader()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+                <nb-card accent="info" status="control">
+                  <nb-route-tabset [tabs]="facade.tabs()" fullWidth id="tabs"></nb-route-tabset>
+                </nb-card>
+              </div>
+            </div>
+          </div>
+        }
+
+      </form>
+    }
   </nb-card-body>
 </nb-card>

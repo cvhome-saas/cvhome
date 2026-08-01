@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {StoreService} from './store.service';
 import {Store} from '../models/commons';
 import {map, Observable, of, tap} from 'rxjs';
@@ -8,10 +8,8 @@ import {map, Observable, of, tap} from 'rxjs';
 })
 export class SelectedStoreService {
   public static SELECTED_STORE_ID_KEY = "Selected-Store-Id";
+  private readonly storeService = inject(StoreService);
   private _stores: Store[] | undefined = undefined;
-
-  constructor(private storeService: StoreService) {
-  }
 
   public select(storeId: string): void {
     const selectedStore = this._stores.find(it => it.id.id == storeId);
@@ -41,8 +39,8 @@ export class SelectedStoreService {
   }
 
   current(): Observable<string> {
-    return this.getAllStores().pipe(map(it => {
-      let current: Store | undefined = this.currentSelectedStore();
+    return this.getAllStores().pipe(map(() => {
+      const current: Store | undefined = this.currentSelectedStore();
       if (current) {
         return current.id.id;
       }

@@ -11,6 +11,6 @@ import {ShapeComponent} from "../../components/shape/shape.component";
   styleUrl: './welcome.component.css'
 })
 export class WelcomeComponent {
-  title: string = 'Make cool store easily with Cvhome';
-  desc: string = 'Join our clients and try create your store with few clicks for free.';
+  title = 'Make cool store easily with Cvhome';
+  desc = 'Join our clients and try create your store with few clicks for free.';
 }

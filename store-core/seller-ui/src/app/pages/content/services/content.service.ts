@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import {Observable} from "rxjs";
 import {CrudService} from "../../shared/services/crud.service";
 import {PageT, StorePageRequest} from "../../shared/table/table.types";
@@ -7,9 +7,8 @@ import {PageT, StorePageRequest} from "../../shared/table/table.types";
   providedIn: 'root'
 })
 export class ContentService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(private readonly crudService: CrudService) {
-  }
 
   getBoxes(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/boxes', params);

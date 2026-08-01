@@ -21,73 +21,87 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="facade.loaded()" [formGroup]='facade.formService.form'>
-      <div class="form-group">
-        <label class="col-form-label"></label>
-        <nb-checkbox formControlName='allowAddToCart' name="allowAddToCart">
-          {{ 'PRODUCT_TYPE.ALLOW_ADD_TO_CART' | translate }}
-        </nb-checkbox>
-        <nb-checkbox formControlName='visible' name="visible">
-          {{ 'CONTENT.VISIBLE' | translate }}
-        </nb-checkbox>
-      </div>
-
-      <div class="form-group">
-        <label class="col-form-label ">
-          {{ 'COMMON.CODE' | translate }}*
-        </label>
-        <input (change)="facade.checkCode($event.target.value.trim())" [readOnly]="facade.isReadonlyCode()"
-               class="form-control " formControlName='code'
-               fullWidth
-               id="code"
-               nbInput
-               required type="text">
-        <div *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && facade.formService.code.invalid"
-             class="err-message"
-             style="margin-top:10px;">
-            <span *ngIf="facade.formService.code.errors?.['required']">
-              {{ 'COMMON.CODE_REQUIRED' | translate }}
-            </span>
-          <span *ngIf="facade.formService.code.errors?.['pattern']">
-              {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
-            </span>
+    @if (facade.loaded()) {
+      <form [formGroup]='facade.formService.form'>
+        <div class="form-group">
+          <nb-checkbox formControlName='allowAddToCart' name="allowAddToCart">
+            {{ 'PRODUCT_TYPE.ALLOW_ADD_TO_CART' | translate }}
+          </nb-checkbox>
+          <nb-checkbox formControlName='visible' name="visible">
+            {{ 'CONTENT.VISIBLE' | translate }}
+          </nb-checkbox>
         </div>
 
-        <span *ngIf="facade.isCodeExist()" class="err-message">
-            {{ 'COMMON.CODE_EXISTS' | translate }}
-          </span>
-        <div *ngIf="!facade.isValidCode()" class="err-message" style="margin-top:10px;">
-          {{ 'COMMON.CODE_REQUIRED' | translate }}
-        </div>
-      </div>
-
-
-      <div class="form-group">
-        <label class="col-form-label ">{{ 'COMMON.LANGUAGE' | translate }} *</label>
-        <nb-select *ngIf="facade.languages().length" formControlName='selectedLanguage' fullWidth
-                   outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
-          <nb-option (click)="facade.selectLanguage(language.code)" *ngFor="let language of facade.languages()"
-                     [value]="language.code">{{
-              ('LANG.' + language.code) |
-                translate
-            }}
-          </nb-option>
-        </nb-select>
-      </div>
-      <div formArrayName='descriptions'>
-        <div *ngFor="let descr of facade.formService.descriptions.controls; let j=index">
-          <div *ngIf="descr.value.language === facade.formService.selectedLanguage.value">
-            <div [formGroupName]="j">
-              <div class="form-group">
-                <label class="col-form-label ">{{ 'COMMON.NAME' | translate }}*</label>
-                <input class="form-control " formControlName='name' fullWidth id="name" nbInput required type="text">
-              </div>
+        <div class="form-group">
+          <label class="col-form-label " for="code">
+            {{ 'COMMON.CODE' | translate }}*
+          </label>
+          <input (change)="facade.checkCode($event.target.value.trim())" [readOnly]="facade.isReadonlyCode()"
+                 class="form-control " formControlName='code'
+                 fullWidth
+                 id="code"
+                 nbInput
+                 required type="text">
+          @if ((facade.formService.code.dirty || facade.formService.code.touched) && facade.formService.code.invalid) {
+            <div class="err-message"
+                 style="margin-top:10px;">
+              @if (facade.formService.code.errors?.['required']) {
+                <span>
+                  {{ 'COMMON.CODE_REQUIRED' | translate }}
+                </span>
+              }
+              @if (facade.formService.code.errors?.['pattern']) {
+                <span>
+                  {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
+                </span>
+              }
             </div>
-          </div>
-        </div>
-      </div>
+          }
 
-    </form>
+          @if (facade.isCodeExist()) {
+            <span class="err-message">
+              {{ 'COMMON.CODE_EXISTS' | translate }}
+            </span>
+          }
+          @if (!facade.isValidCode()) {
+            <div class="err-message" style="margin-top:10px;">
+              {{ 'COMMON.CODE_REQUIRED' | translate }}
+            </div>
+          }
+        </div>
+
+
+        <div class="form-group">
+          <label class="col-form-label " for="selectedLanguage">{{ 'COMMON.LANGUAGE' | translate }} *</label>
+          @if (facade.languages().length) {
+            <nb-select formControlName='selectedLanguage' fullWidth id="selectedLanguage"
+                       outline placeholder="{{ 'COMMON.LANGUAGE' | translate}}" shape="rectangle">
+              @for (language of facade.languages(); track language.code) {
+                <nb-option (click)="facade.selectLanguage(language.code)"
+                           [value]="language.code">{{
+                    ('LANG.' + language.code) |
+                      translate
+                  }}
+                </nb-option>
+              }
+            </nb-select>
+          }
+        </div>
+        <div formArrayName='descriptions'>
+          @for (descr of facade.formService.descriptions.controls; track $index; let j = $index) {
+            @if (descr.value.language === facade.formService.selectedLanguage.value) {
+              <div [formGroupName]="j">
+                <div class="form-group">
+                  <label class="col-form-label " for="name">{{ 'COMMON.NAME' | translate }}*</label>
+                  <input class="form-control " formControlName='name' fullWidth id="name" nbInput required type="text">
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+      </form>
+    }
 
   </nb-card-body>
 

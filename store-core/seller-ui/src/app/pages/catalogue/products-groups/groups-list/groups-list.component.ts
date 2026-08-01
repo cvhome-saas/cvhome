@@ -1,11 +1,23 @@
 import {Component, OnInit, inject, DestroyRef} from '@angular/core';
-import {ColumnMode} from '@swimlane/ngx-datatable';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
+import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {GroupsListFacade} from '../facades/groups-list.facade';
 import {TableStateService} from '../../../shared/table/table-state.service';
+import {ActiveButtonComponent} from './active-button.component';
 
 @Component({
   selector: 'ngx-groups-list',
-  standalone: false,
+  standalone: true,
+  imports: [
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbIconModule,
+    NbSpinnerModule,
+    NgxDatatableModule,
+    ActiveButtonComponent
+  ],
   templateUrl: './groups-list.component.html',
   styleUrls: ['./groups-list.component.scss'],
   providers: [GroupsListFacade, TableStateService]

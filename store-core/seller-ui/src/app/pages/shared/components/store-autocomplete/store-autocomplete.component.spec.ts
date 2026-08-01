@@ -8,7 +8,7 @@ describe('StoreAutocompleteComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [StoreAutocompleteComponent]
+      imports: [StoreAutocompleteComponent]
     });
     fixture = TestBed.createComponent(StoreAutocompleteComponent);
     component = fixture.componentInstance;

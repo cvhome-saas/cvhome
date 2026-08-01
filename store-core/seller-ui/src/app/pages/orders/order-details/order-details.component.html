@@ -1,367 +1,403 @@
-<nb-card *ngIf="facade.orderDetailsData()" accent="info" status="basic">
-  <nb-card-header>
-    <div class="row">
-      <h1 class="page_title">
-        {{ 'COMPONENTS.ORDERS' | translate }} {{ 'COMMON.ID' | translate }}
-        {{ facade.orderID() }} - {{ facade.orderDetailsData().orderStatus }}
-      </h1>
-    </div>
-    <div class="row">
-      <div class="col">
-      </div>
-
-      <div class="col col-lg-2">
-        <nb-select (selectedChange)="showDialog($event)" fullWidth outline
-                   placeholder="{{'ORDER_FORM.MORE_OPTIONS' | translate}}"
-                   shape="rectangle">
-          <nb-option value="1">{{ 'ORDER_FORM.TRANSACTIONS_LIST' | translate }}</nb-option>
-          <nb-option value="2">{{ 'ORDER_FORM.VIEW_INVOICE' | translate }}</nb-option>
-          <nb-option value="3">{{ 'ORDER_FORM.HISTORY_LIST' | translate }}</nb-option>
-        </nb-select>
-      </div>
-      <div class="col col-lg-2">
-        <button (click)="onClickRefund()" *ngIf="facade.transactionType() == 'REFUND'" class="refund_button" nbButton
-                type="button">{{ 'ORDER_FORM.REFUND'|translate }}
-        </button>
-        <button (click)="onClickCapture()" *ngIf="facade.transactionType() == 'CAPTURE'" class="capture_button" nbButton
-                type="button">{{ 'ORDER_FORM.CAPTURE' |translate }}
-        </button>
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
-          {{ 'ORDER_FORM.CANCEL'| translate }}
-        </button>
-        <button (click)="save()" *ngIf="!facade.loader()" [disabled]="!orderForm.form.valid" [nbSpinner]="facade.loader()" nbButton
-                nbSpinnerSize="large"
-                nbSpinnerStatus="control" status="success"
-                type="submit">
-          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
-        </button>
-      </div>
-    </div>
-  </nb-card-header>
-  <nb-card-body>
-    <form #orderForm="ngForm" role="form">
+@if (facade.orderDetailsData()) {
+  <nb-card accent="info" status="basic">
+    <nb-card-header>
       <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'ORDER_FORM.BILLING_INFO' | translate }}</nb-card-header>
-            <nb-card-body>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="billing_first_name">
-                      {{ 'ORDER_FORM.FIRST_NAME' | translate }}
-                      <span>*</span>
-                    </label>
-                    <input #firstName="ngModel" [(ngModel)]="facade.billing().firstName" class="form-control " fullWidth
-                           id="billing_first_name"
-                           name="firstName"
-                           nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}" required
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="billing_last_name">
-                      {{ 'ORDER_FORM.LAST_NAME' | translate }}
-                      <span>*</span>
-                    </label>
-                    <input #lastName="ngModel" [(ngModel)]="facade.billing().lastName" class="form-control " fullWidth
-                           id="billing_last_name"
-                           name="lastName"
-                           nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" required type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">
-                      {{ 'ORDER_FORM.STREET_ADDRESS' | translate }}
-                      <span>*</span>
-                    </label>
-                    <input #address="ngModel" [(ngModel)]="facade.billing().address" class="form-control " fullWidth
-                           id="billing_address"
-                           name="address"
-                           nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}" required
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.CITY' | translate }}<span>*</span></label>
-                    <input #city="ngModel" [(ngModel)]="facade.billing().city" class="form-control " fullWidth id="billing_city"
-                           name="city"
-                           nbInput placeholder="{{'ORDER_FORM.CITY' | translate}}" required type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.COUNTRY' | translate }}<span>*</span></label>
-                    <nb-select (selectedChange)="onBillingChange($event, 1)" *ngIf="facade.billingCountry().length > 0"
-                               [(ngModel)]="facade.billing().country"
-                               class="select_fields" fullWidth name="country" outline
-                               placeholder="{{'ORDER_FORM.SELECT_COUNTRY' | translate}}"
-                               required shape="rectangle">
-                      <nb-option *ngFor="let country of facade.billingCountry()" [value]="country.code">
-                        {{ country.name }}
-                      </nb-option>
-                    </nb-select>
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div *ngIf="facade.billingStateData().length > 0" class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.STATE' | translate }}<span>*</span></label>
-                    <nb-select [(ngModel)]="facade.billing().zone" class="select_fields" name="zone"
-                               outline placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" required
-                               shape="rectangle">
-                      <nb-option *ngFor="let state of facade.billingStateData()" [value]="state.code">
-                        {{ state.name }}
-                      </nb-option>
-                    </nb-select>
-                  </div>
-                  <div *ngIf="facade.billingStateData().length == 0" class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.STATE' | translate }}<span>*</span></label>
-                    <input [(ngModel)]="facade.billing().zone" class="form-control " fullWidth name="zone"
-                           nbInput
-                           placeholder="{{'ORDER_FORM.ENTER_STATE' | translate}}" required type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.POSTAL_CODE' | translate }}<span>*</span></label>
-                    <input #postalCode="ngModel" [(ngModel)]="
-                                 facade.billing().postalCode" class="form-control " fullWidth id="billing_postal"
-                           name="postalCode"
-                           nbInput placeholder="{{'ORDER_FORM.POSTAL_CODE' | translate}}" required
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.EMAIL' | translate }}<span>*</span></label>
-                    <input #email="ngModel" [(ngModel)]="facade.info().emailAddress" class="form-control " fullWidth
-                           id="billing_email"
-                           name="emailAddress"
-                           nbInput pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]{2,}[.][a-zA-Z0-9-.]{2,}"
-                           placeholder="{{'ORDER_FORM.EMAIL' | translate}}"
-                           required type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input #phone="ngModel" (keyup)="onPhoneChange($event.target.value)" [(ngModel)]="facade.billing().phone" class="form-control "
-                           fullWidth
-                           id="billing_phone"
-                           maxlength=14 minlength=10
-                           name="billing_phone"
-                           nbInput placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" required
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.ORDER_DATE' | translate }}<span>*</span></label>
-                    <input #datePurchased="ngModel" [(ngModel)]="facade.info().datePurchased" class="form-control " fullWidth
-                           id="datePurchased"
-                           name="datePurchased"
-                           nbInput placeholder="{{'ORDER_FORM.ORDER_DATE' | translate}}" required
-                           type="text">
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-          <nb-card accent="info" status="control">
-            <nb-card-header>{{ 'ORDER_FORM.SHIPPING_INFO' | translate }}</nb-card-header>
-            <nb-card-body>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="shipping_first_name">
-                      {{ 'ORDER_FORM.FIRST_NAME' |translate }}
-                    </label>
-                    <input #firstName="ngModel" [(ngModel)]="facade.shipping().firstName" class="form-control " fullWidth
-                           id="shipping_first_name"
-                           name="shipping.firstName"
-                           nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}"
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="shipping_last_name">
-                      {{ 'ORDER_FORM.LAST_NAME' |translate }}
-                    </label>
-                    <input #lastName="ngModel" [(ngModel)]="facade.shipping().lastName" class="form-control " fullWidth
-                           id="shipping_last_name"
-                           name="shipping.lastName"
-                           nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="shipping_address">
-                      {{ 'ORDER_FORM.STREET_ADDRESS' |translate }}
-                    </label>
-                    <input #address="ngModel" [(ngModel)]="facade.shipping().address" class="form-control " fullWidth
-                           id="shipping_address"
-                           name="shipping.address"
-                           nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}"
-                           type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label " for="shipping_city">
-                      {{ 'ORDER_FORM.CITY' | translate }}
-                    </label>
-                    <input #city="ngModel" [(ngModel)]="facade.shipping().city" class="form-control " fullWidth
-                           id="shipping_city"
-                           name="shipping.city"
-                           nbInput placeholder="{{'ORDER_FORM.CITY' | translate}}" type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.COUNTRY' | translate }}</label>
-                    <nb-select (selectedChange)="onShippingChange($event, 1)" *ngIf="facade.shippingCountry().length > 0"
-                               [(ngModel)]="facade.shipping().country"
-                               class="select_fields" fullWidth name="shipping.country"
-                               outline
-                               placeholder="{{'ORDER_FORM.SELECT_COUNTRY' | translate}}" shape="rectangle">
-                      <nb-option *ngFor="let country of facade.shippingCountry()" [value]="country.code">
-                        {{ country.name }}
-                      </nb-option>
-                    </nb-select>
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div *ngIf="facade.shippingStateData().length > 0" class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.STATE' | translate }}</label>
-                    <nb-select [(ngModel)]="facade.shipping().zone" class="select_fields" name="shipping.zone"
-                               outline placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" shape="rectangle">
-                      <nb-option *ngFor="let state of facade.shippingStateData()" [value]="state.code">{{ state.name }}
-                      </nb-option>
-                    </nb-select>
-                  </div>
-                  <div *ngIf="facade.shippingStateData().length == 0" class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.STATE' | translate }}</label>
-                    <input [(ngModel)]="facade.shipping().zone" class="form-control " fullWidth name="shipping.zone"
-                           nbInput
-                           placeholder="{{'ORDER_FORM.ENTER_STATE' | translate}}" type="text">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.POSTAL_CODE' | translate }}</label>
-                    <input [(ngModel)]="facade.shipping().postalCode" class="form-control " fullWidth id="shipping_postal"
-                           name="shipping.postalCode"
-                           nbInput
-                           placeholder="{{'ORDER_FORM.POSTAL_CODE' | translate}}" type="text">
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                  <div class="form-group">
-                    <label class="label ">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
-                    <input (keyup)="onShippingPhoneChange($event.target.value)" [(ngModel)]="facade.shipping().phone" class="form-control "
-                           fullWidth
-                           id="shipping_phone"
-                           maxlength=14
-                           minlength=10 name="shipping_phone"
-                           nbInput
-                           placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" type="text">
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
+        <h1 class="page_title">
+          {{ 'COMPONENTS.ORDERS' | translate }} {{ 'COMMON.ID' | translate }}
+          {{ facade.orderID() }} - {{ facade.orderDetailsData().orderStatus }}
+        </h1>
       </div>
-    </form>
-    <div *ngIf="facade.orderDetailsData()" class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <nb-card accent="info" status="control">
-          <div class="containerCenter">
-            <div class="centerSec">
-              <div class="tabelSec">
-                <table border="1">
-                  <thead>
-                  <tr>
-                    <th>{{ 'ORDER_FORM.ITEM' | translate }}</th>
-                    <th>{{ 'ORDER_FORM.QUANTITY' | translate }}</th>
-                    <th>{{ 'ORDER_FORM.PRICE' | translate }}</th>
-                    <th>{{ 'ORDER_FORM.TOTAL' | translate }}</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let product of facade.orderDetailsData().products">
-                    <td>
-                      <span>{{ product.productName }} -</span>
-                      <span class="blueTxt">{{ product.sku }}</span>
-                    </td>
-                    <td>{{ product.orderedQuantity }}</td>
-                    <td class="boldTxt">{{ product.price }}</td>
-                    <td class="boldTxt">{{ product.subTotal }}</td>
-                  </tr>
-                  <tr *ngFor="let total of facade.orderDetailsData().totals">
-                    <td></td>
-                    <td colspan="2">{{ total.module }}</td>
-                    <td class="boldTxt">US${{ total.value }}</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="statusSec">
-                <label class="terms">
-                  {{ 'ORDER_FORM.TERMS_CONDITIONS' | translate }}:
-                  <span class="boldTxt">{{ facade.orderDetailsData().customerAgreed }}</span>
-                </label>
-                <label>{{ 'ORDER_FORM.PAYMENT_MODE' | translate }}</label>
-                <label class="boldTxt">
-                  {{ facade.orderDetailsData().paymentType }}-{{ facade.orderDetailsData().paymentModule }}
-                </label>
-                <label class="status">{{ 'ORDER_FORM.SELECT_STATUS' | translate }}</label>
-                <nb-select [(ngModel)]="facade.statusFields().status" fullWidth name="status" outline
-                           placeholder="{{'ORDER_FORM.SELECT_STATUS' | translate}}" required
-                           shape="rectangle">
-                  <nb-option *ngFor="let status of facade.statusList" [value]="status.id">
-                    {{ status.name }}
-                  </nb-option>
-                </nb-select>
-              </div>
-              <div class="btnSec">
-                <label>{{ 'ORDER_FORM.STATUS_COMMENT' | translate }}</label>
-                <textarea [(ngModel)]="facade.statusFields().comments" class="txtArea" fullWidth name="comments" nbInput required
-                          rows="3">
-                           </textarea>
-                <button (click)="updateHistory()" [disabled]="facade.statusFields().comments == '' || facade.statusFields().status == ''"
-                        class="success_button lastBtn"
-                        nbButton
-                        status="success"
-                        type="button">
-                  {{ 'ORDER_FORM.UPDATE_STATUS'| translate }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </nb-card>
-      </div>
-    </div>
+      <div class="row">
+        <div class="col">
+        </div>
 
-  </nb-card-body>
-</nb-card>
+        <div class="col col-lg-2">
+          <nb-select (selectedChange)="showDialog($event)" fullWidth outline
+                     placeholder="{{'ORDER_FORM.MORE_OPTIONS' | translate}}"
+                     shape="rectangle">
+            <nb-option value="1">{{ 'ORDER_FORM.TRANSACTIONS_LIST' | translate }}</nb-option>
+            <nb-option value="2">{{ 'ORDER_FORM.VIEW_INVOICE' | translate }}</nb-option>
+            <nb-option value="3">{{ 'ORDER_FORM.HISTORY_LIST' | translate }}</nb-option>
+          </nb-select>
+        </div>
+        <div class="col col-lg-2">
+          @if (facade.transactionType() === 'REFUND') {
+            <button (click)="onClickRefund()" class="refund_button" nbButton
+                    type="button">{{ 'ORDER_FORM.REFUND'|translate }}
+            </button>
+          }
+          @if (facade.transactionType() === 'CAPTURE') {
+            <button (click)="onClickCapture()" class="capture_button" nbButton
+                    type="button">{{ 'ORDER_FORM.CAPTURE' |translate }}
+            </button>
+          }
+          <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+            {{ 'ORDER_FORM.CANCEL'| translate }}
+          </button>
+          @if (!facade.loader()) {
+            <button (click)="save()" [disabled]="!orderForm.form.valid" [nbSpinner]="facade.loader()" nbButton
+                    nbSpinnerSize="large"
+                    nbSpinnerStatus="control" status="success"
+                    type="submit">
+              {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
+            </button>
+          }
+        </div>
+      </div>
+    </nb-card-header>
+    <nb-card-body>
+      <form #orderForm="ngForm" role="form">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'ORDER_FORM.BILLING_INFO' | translate }}</nb-card-header>
+              <nb-card-body>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_first_name">
+                        {{ 'ORDER_FORM.FIRST_NAME' | translate }}
+                        <span>*</span>
+                      </label>
+                      <input #firstName="ngModel" [(ngModel)]="facade.billing().firstName" class="form-control " fullWidth
+                             id="billing_first_name"
+                             name="firstName"
+                             nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}" required
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_last_name">
+                        {{ 'ORDER_FORM.LAST_NAME' | translate }}
+                        <span>*</span>
+                      </label>
+                      <input #lastName="ngModel" [(ngModel)]="facade.billing().lastName" class="form-control " fullWidth
+                             id="billing_last_name"
+                             name="lastName"
+                             nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" required type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_address">
+                        {{ 'ORDER_FORM.STREET_ADDRESS' | translate }}
+                        <span>*</span>
+                      </label>
+                      <input #address="ngModel" [(ngModel)]="facade.billing().address" class="form-control " fullWidth
+                             id="billing_address"
+                             name="address"
+                             nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}" required
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_city">{{ 'ORDER_FORM.CITY' | translate }}<span>*</span></label>
+                      <input #city="ngModel" [(ngModel)]="facade.billing().city" class="form-control " fullWidth id="billing_city"
+                             name="city"
+                             nbInput placeholder="{{'ORDER_FORM.CITY' | translate}}" required type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_country">{{ 'ORDER_FORM.COUNTRY' | translate }}<span>*</span></label>
+                      @if (facade.billingCountry().length > 0) {
+                        <nb-select (selectedChange)="onBillingChange($event, 1)"
+                                   [(ngModel)]="facade.billing().country"
+                                   class="select_fields" fullWidth id="billing_country" name="country" outline
+                                   placeholder="{{'ORDER_FORM.SELECT_COUNTRY' | translate}}"
+                                   required shape="rectangle">
+                          @for (country of facade.billingCountry(); track country.code) {
+                            <nb-option [value]="country.code">
+                              {{ country.name }}
+                            </nb-option>
+                          }
+                        </nb-select>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    @if (facade.billingStateData().length > 0) {
+                      <div class="form-group">
+                        <label class="label " for="billing_zone">{{ 'ORDER_FORM.STATE' | translate }}<span>*</span></label>
+                        <nb-select [(ngModel)]="facade.billing().zone" class="select_fields" id="billing_zone" name="zone"
+                                   outline placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" required
+                                   shape="rectangle">
+                          @for (state of facade.billingStateData(); track state.code) {
+                            <nb-option [value]="state.code">
+                              {{ state.name }}
+                            </nb-option>
+                          }
+                        </nb-select>
+                      </div>
+                    }
+                    @if (facade.billingStateData().length === 0) {
+                      <div class="form-group">
+                        <label class="label " for="billing_zone_input">{{ 'ORDER_FORM.STATE' | translate }}<span>*</span></label>
+                        <input [(ngModel)]="facade.billing().zone" class="form-control " fullWidth id="billing_zone_input" name="zone"
+                               nbInput
+                               placeholder="{{'ORDER_FORM.ENTER_STATE' | translate}}" required type="text">
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_postal">{{ 'ORDER_FORM.POSTAL_CODE' | translate }}<span>*</span></label>
+                      <input #postalCode="ngModel" [(ngModel)]="
+                                   facade.billing().postalCode" class="form-control " fullWidth id="billing_postal"
+                             name="postalCode"
+                             nbInput placeholder="{{'ORDER_FORM.POSTAL_CODE' | translate}}" required
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_email">{{ 'ORDER_FORM.EMAIL' | translate }}<span>*</span></label>
+                      <input #email="ngModel" [(ngModel)]="facade.info().emailAddress" class="form-control " fullWidth
+                             id="billing_email"
+                             name="emailAddress"
+                             nbInput pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]{2,}[.][a-zA-Z0-9-.]{2,}"
+                             placeholder="{{'ORDER_FORM.EMAIL' | translate}}"
+                             required type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="billing_phone">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
+                      <input #phone="ngModel" (keyup)="onPhoneChange($event.target.value)" [(ngModel)]="facade.billing().phone" class="form-control "
+                             fullWidth
+                             id="billing_phone"
+                             maxlength=14 minlength=10
+                             name="billing_phone"
+                             nbInput placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" required
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="datePurchased">{{ 'ORDER_FORM.ORDER_DATE' | translate }}<span>*</span></label>
+                      <input #datePurchased="ngModel" [(ngModel)]="facade.info().datePurchased" class="form-control " fullWidth
+                             id="datePurchased"
+                             name="datePurchased"
+                             nbInput placeholder="{{'ORDER_FORM.ORDER_DATE' | translate}}" required
+                             type="text">
+                    </div>
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <nb-card-header>{{ 'ORDER_FORM.SHIPPING_INFO' | translate }}</nb-card-header>
+              <nb-card-body>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_first_name">
+                        {{ 'ORDER_FORM.FIRST_NAME' |translate }}
+                      </label>
+                      <input #firstName="ngModel" [(ngModel)]="facade.shipping().firstName" class="form-control " fullWidth
+                             id="shipping_first_name"
+                             name="shipping.firstName"
+                             nbInput placeholder="{{'ORDER_FORM.FIRST_NAME' | translate}}"
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_last_name">
+                        {{ 'ORDER_FORM.LAST_NAME' |translate }}
+                      </label>
+                      <input #lastName="ngModel" [(ngModel)]="facade.shipping().lastName" class="form-control " fullWidth
+                             id="shipping_last_name"
+                             name="shipping.lastName"
+                             nbInput placeholder="{{'ORDER_FORM.LAST_NAME' | translate}}" type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_address">
+                        {{ 'ORDER_FORM.STREET_ADDRESS' |translate }}
+                      </label>
+                      <input #address="ngModel" [(ngModel)]="facade.shipping().address" class="form-control " fullWidth
+                             id="shipping_address"
+                             name="shipping.address"
+                             nbInput placeholder="{{'ORDER_FORM.STREET_ADDRESS' | translate}}"
+                             type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_city">
+                        {{ 'ORDER_FORM.CITY' | translate }}
+                      </label>
+                      <input #city="ngModel" [(ngModel)]="facade.shipping().city" class="form-control " fullWidth
+                             id="shipping_city"
+                             name="shipping.city"
+                             nbInput placeholder="{{'ORDER_FORM.CITY' | translate}}" type="text">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_country">{{ 'ORDER_FORM.COUNTRY' | translate }}</label>
+                      @if (facade.shippingCountry().length > 0) {
+                        <nb-select (selectedChange)="onShippingChange($event, 1)"
+                                   [(ngModel)]="facade.shipping().country"
+                                   class="select_fields" fullWidth id="shipping_country" name="shipping.country"
+                                   outline
+                                   placeholder="{{'ORDER_FORM.SELECT_COUNTRY' | translate}}" shape="rectangle">
+                          @for (country of facade.shippingCountry(); track country.code) {
+                            <nb-option [value]="country.code">
+                              {{ country.name }}
+                            </nb-option>
+                          }
+                        </nb-select>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    @if (facade.shippingStateData().length > 0) {
+                      <div class="form-group">
+                        <label class="label " for="shipping_zone">{{ 'ORDER_FORM.STATE' | translate }}</label>
+                        <nb-select [(ngModel)]="facade.shipping().zone" class="select_fields" id="shipping_zone" name="shipping.zone"
+                                   outline placeholder="{{'ORDER_FORM.SELECT_STATE' | translate}}" shape="rectangle">
+                          @for (state of facade.shippingStateData(); track state.code) {
+                            <nb-option [value]="state.code">{{ state.name }}
+                            </nb-option>
+                          }
+                        </nb-select>
+                      </div>
+                    }
+                    @if (facade.shippingStateData().length === 0) {
+                      <div class="form-group">
+                        <label class="label " for="shipping_zone_input">{{ 'ORDER_FORM.STATE' | translate }}</label>
+                        <input [(ngModel)]="facade.shipping().zone" class="form-control " fullWidth id="shipping_zone_input" name="shipping.zone"
+                               nbInput
+                               placeholder="{{'ORDER_FORM.ENTER_STATE' | translate}}" type="text">
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_postal">{{ 'ORDER_FORM.POSTAL_CODE' | translate }}</label>
+                      <input [(ngModel)]="facade.shipping().postalCode" class="form-control " fullWidth id="shipping_postal"
+                             name="shipping.postalCode"
+                             nbInput
+                             placeholder="{{'ORDER_FORM.POSTAL_CODE' | translate}}" type="text">
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                      <label class="label " for="shipping_phone">{{ 'ORDER_FORM.PHONE_NUMBER' | translate }}<span>*</span></label>
+                      <input (keyup)="onShippingPhoneChange($event.target.value)" [(ngModel)]="facade.shipping().phone" class="form-control "
+                             fullWidth
+                             id="shipping_phone"
+                             maxlength=14
+                             minlength=10 name="shipping_phone"
+                             nbInput
+                             placeholder="{{'ORDER_FORM.PHONE_NUMBER' | translate}}" type="text">
+                    </div>
+                  </div>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </div>
+      </form>
+      @if (facade.orderDetailsData()) {
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <nb-card accent="info" status="control">
+              <div class="containerCenter">
+                <div class="centerSec">
+                  <div class="tabelSec">
+                    <table border="1">
+                      <thead>
+                      <tr>
+                        <th>{{ 'ORDER_FORM.ITEM' | translate }}</th>
+                        <th>{{ 'ORDER_FORM.QUANTITY' | translate }}</th>
+                        <th>{{ 'ORDER_FORM.PRICE' | translate }}</th>
+                        <th>{{ 'ORDER_FORM.TOTAL' | translate }}</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      @for (product of facade.orderDetailsData().products; track product) {
+                        <tr>
+                          <td>
+                            <span>{{ product.productName }} -</span>
+                            <span class="blueTxt">{{ product.sku }}</span>
+                          </td>
+                          <td>{{ product.orderedQuantity }}</td>
+                          <td class="boldTxt">{{ product.price }}</td>
+                          <td class="boldTxt">{{ product.subTotal }}</td>
+                        </tr>
+                      }
+                      @for (total of facade.orderDetailsData().totals; track total) {
+                        <tr>
+                          <td></td>
+                          <td colspan="2">{{ total.module }}</td>
+                          <td class="boldTxt">US${{ total.value }}</td>
+                        </tr>
+                      }
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="statusSec">
+                    <span class="terms">
+                      {{ 'ORDER_FORM.TERMS_CONDITIONS' | translate }}:
+                      <span class="boldTxt">{{ facade.orderDetailsData().customerAgreed }}</span>
+                    </span>
+                    <span>{{ 'ORDER_FORM.PAYMENT_MODE' | translate }}</span>
+                    <span class="boldTxt">
+                      {{ facade.orderDetailsData().paymentType }}-{{ facade.orderDetailsData().paymentModule }}
+                    </span>
+                    <label class="status" for="status">{{ 'ORDER_FORM.SELECT_STATUS' | translate }}</label>
+                    <nb-select [(ngModel)]="facade.statusFields().status" fullWidth id="status" name="status" outline
+                               placeholder="{{'ORDER_FORM.SELECT_STATUS' | translate}}" required
+                               shape="rectangle">
+                      @for (status of facade.statusList; track status.id) {
+                        <nb-option [value]="status.id">
+                          {{ status.name }}
+                        </nb-option>
+                      }
+                    </nb-select>
+                  </div>
+                  <div class="btnSec">
+                    <label for="comments">{{ 'ORDER_FORM.STATUS_COMMENT' | translate }}</label>
+                    <textarea [(ngModel)]="facade.statusFields().comments" class="txtArea" fullWidth id="comments" name="comments" nbInput required
+                              rows="3">
+                             </textarea>
+                    <button (click)="updateHistory()" [disabled]="facade.statusFields().comments === '' || facade.statusFields().status === ''"
+                            class="success_button lastBtn"
+                            nbButton
+                            status="success"
+                            type="button">
+                      {{ 'ORDER_FORM.UPDATE_STATUS'| translate }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </nb-card>
+          </div>
+        </div>
+      }
+
+    </nb-card-body>
+  </nb-card>
+}

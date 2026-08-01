@@ -1,11 +1,12 @@
 import {ChangeDetectorRef, Component, DestroyRef, EventEmitter, Input, Output, ViewChild, effect, inject} from '@angular/core';
 import {ManagerStoreId} from '../../models/commons';
-import {NbSelectComponent} from '@nebular/theme';
+import {NbOptionModule, NbSelectComponent, NbSelectModule} from '@nebular/theme';
 import {StoreAutocompleteFacade} from './facades/store-autocomplete.facade';
 
 @Component({
   selector: 'ngx-store-autocomplete',
-  standalone: false,
+  standalone: true,
+  imports: [NbSelectModule, NbOptionModule],
   templateUrl: './store-autocomplete.component.html',
   styleUrls: ['./store-autocomplete.component.scss'],
   providers: [StoreAutocompleteFacade]
@@ -14,11 +15,11 @@ export class StoreAutocompleteComponent {
   @ViewChild(NbSelectComponent)
   routeSelect: NbSelectComponent;
   @Output()
-  onStore: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>();
+  storeSelected: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>();
   @Input()
   selectedItem: ManagerStoreId | undefined;
   @Input()
-  selectable: boolean = true;
+  selectable = true;
 
   protected readonly facade = inject(StoreAutocompleteFacade);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -40,7 +41,7 @@ export class StoreAutocompleteComponent {
 
   changed(event: ManagerStoreId | undefined): void {
     if (event != undefined && event.id != undefined && (this.lastStore == undefined || this.lastStore.id != event.id)) {
-      this.onStore.emit(event);
+      this.storeSelected.emit(event);
     }
     this.lastStore = event;
   }

@@ -1,5 +1,5 @@
 import {Injectable, inject} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 @Injectable()
 export class StoreSocialLoginFormService {

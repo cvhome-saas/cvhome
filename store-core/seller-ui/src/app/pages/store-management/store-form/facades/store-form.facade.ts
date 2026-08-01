@@ -156,7 +156,7 @@ export class StoreFormFacade {
     return storeInput.supportedLanguages.find((l: any) => l === language.code) !== undefined;
   }
 
-  checkName(event: any): void {
+  checkName(_event: Event): void {
     this.storeService.checkIfStoreExist(this.form.value.name).subscribe({
       next: (res) => this.isNameUnique.set(!res.exists),
       error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)

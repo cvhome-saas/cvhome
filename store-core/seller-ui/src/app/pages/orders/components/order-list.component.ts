@@ -1,11 +1,38 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {RouterLink} from '@angular/router';
 import {OrderListFacade} from '../facades/order-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {ColumnMode} from "@swimlane/ngx-datatable";
+import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from '@ngx-translate/core';
+import {
+  NbButtonModule,
+  NbFormFieldModule,
+  NbIconModule,
+  NbInputModule,
+  NbOptionModule,
+  NbSelectModule,
+  NbSpinnerModule,
+  NbCardModule
+} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-order-list',
-  standalone: false,
+  standalone: true,
+  imports: [
+    FormsModule,
+    RouterLink,
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbFormFieldModule,
+    NbIconModule,
+    NbInputModule,
+    NbOptionModule,
+    NbSelectModule,
+    NbSpinnerModule,
+    NgxDatatableModule
+  ],
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss'],
   providers: [OrderListFacade, TableStateService]

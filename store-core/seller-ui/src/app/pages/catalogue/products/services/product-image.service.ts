@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
@@ -7,11 +7,8 @@ import {Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class ProductImageService {
+  private crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService
-  ) {
-  }
 
   addImageUrl(id: string | number): string {//post
     return this.crudService.getBaseUrl() + `/spg/catalog/api/v1/private/product/${id}/image`;

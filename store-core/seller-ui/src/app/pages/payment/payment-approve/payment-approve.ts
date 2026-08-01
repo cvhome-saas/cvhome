@@ -1,18 +1,19 @@
-import {Component} from '@angular/core';
-import {NbDialogRef} from '@nebular/theme';
+import {Component, inject} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbDialogRef, NbFormFieldModule, NbInputModule} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-payment-approve',
-  standalone: false,
+  standalone: true,
+  imports: [FormsModule, TranslateModule, NbButtonModule, NbFormFieldModule, NbInputModule],
   templateUrl: 'payment-approve.html',
   styleUrls: ['payment-approve.scss'],
 })
 export class PaymentApproveComponent {
-  internalRef: string;
-  transactionNo: string = '';
+  protected readonly ref = inject(NbDialogRef<PaymentApproveComponent>);
 
-  constructor(protected ref: NbDialogRef<PaymentApproveComponent>) {
-  }
+  transactionNo = '';
 
   cancel() {
     this.ref.close();

@@ -1,18 +1,20 @@
 <nb-card>
   <nb-card-body>
 
-    <div *ngIf="facade.store()">
-      <h5 class="mb-3">{{ 'PRODUCT_GROUP.ADD_PRODUCTS' | translate }}</h5>
+    @if (facade.store()) {
+      <div>
+        <h5 class="mb-3">{{ 'PRODUCT_GROUP.ADD_PRODUCTS' | translate }}</h5>
 
-      <div class="form-group row mb-3">
-        <label class="col-sm-4 col-form-label"
-               for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
-        <div class="col-sm-6">
-          <ngx-product-auto-complete (onProduct)="facade.onItemSelect($event)" [store]="facade.store()"/>
+        <div class="form-group row mb-3">
+          <label class="col-sm-4 col-form-label"
+                 for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
+          <div class="col-sm-6">
+            <ngx-product-auto-complete (productSelected)="facade.onItemSelect($event)" [store]="facade.store()"/>
+          </div>
         </div>
-      </div>
 
-    </div>
+      </div>
+    }
     <ngx-datatable
       (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"

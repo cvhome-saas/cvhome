@@ -1,2 +1,6 @@
-<ngx-client-dashboard *ngIf="facade.isClientUser()"></ngx-client-dashboard>
-<ngx-admin-dashboard *ngIf="facade.isAdminUser()"></ngx-admin-dashboard>
+@if (facade.isClientUser()) {
+  <ngx-client-dashboard></ngx-client-dashboard>
+}
+@if (facade.isAdminUser()) {
+  <ngx-admin-dashboard></ngx-admin-dashboard>
+}

@@ -13,8 +13,8 @@ export const canAccessSecuredPages: CanActivateFn = (
   const oauthService: AuthService = inject(AuthService);
   const platformId = inject(PLATFORM_ID);
 
-  return oauthService.getAuthUser().pipe(map(it => true), catchError(
-    it => {
+  return oauthService.getAuthUser().pipe(map(() => true), catchError(
+    () => {
       if (isPlatformBrowser(platformId)) {
         const redirectTo = encodeURIComponent(state.url);
         window.location.href = `${environment.LOGIN_URL}?redirectTo=${redirectTo}`;

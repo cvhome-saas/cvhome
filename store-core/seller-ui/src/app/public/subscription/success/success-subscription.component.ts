@@ -1,9 +1,12 @@
 import {Component, inject} from '@angular/core';
+import {NbCardModule} from '@nebular/theme';
+import {TranslateModule} from '@ngx-translate/core';
 import {PublicNavigationFacade} from '../../shared/facades/public-navigation.facade';
 
 @Component({
   selector: 'app-seller-ui-success-subscription',
-  standalone: false,
+  standalone: true,
+  imports: [NbCardModule, TranslateModule],
   providers: [PublicNavigationFacade],
   styles: `
       .flex-centered {

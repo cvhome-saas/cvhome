@@ -29,13 +29,15 @@
         <div class="col-sm-12">
           <input class="form-control " formControlName='firstName' fullWidth id="firstName" nbInput
                  placeholder="{{ 'ORG_FORM.FIRST_NAME' | translate }}" required type="text">
-          <span
-            *ngIf="(facade.form.controls['user'].get('firstName').dirty || facade.form.controls['user'].get('firstName').touched) && facade.form.controls['user'].get('firstName').invalid && facade.form.controls['user'].get('firstName')"
-            class="err-message">
-              <span *ngIf="facade.form.controls['user'].get('firstName').errors.required">
-                {{ 'ORG_FORM.FIRST_NAME_ERROR_REQUIRED' | translate }}
-              </span>
+          @if ((facade.form.controls['user'].get('firstName').dirty || facade.form.controls['user'].get('firstName').touched) && facade.form.controls['user'].get('firstName').invalid && facade.form.controls['user'].get('firstName')) {
+            <span class="err-message">
+              @if (facade.form.controls['user'].get('firstName').errors.required) {
+                <span>
+                  {{ 'ORG_FORM.FIRST_NAME_ERROR_REQUIRED' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
       <div class="form-group" formGroupName="user">
@@ -45,13 +47,15 @@
         <div class="col-sm-12">
           <input class="form-control " formControlName='lastName' fullWidth id="lastName" nbInput
                  placeholder="{{ 'ORG_FORM.LAST_NAME' | translate }}" required type="text">
-          <span
-            *ngIf="(facade.form.controls['user'].get('lastName').dirty || facade.form.controls['user'].get('lastName').touched) && facade.form.controls['user'].get('lastName').invalid && facade.form.controls['user'].get('lastName')"
-            class="err-message">
-              <span *ngIf="facade.form.controls['user'].get('lastName').errors.required">
-                {{ 'ORG_FORM.LAST_NAME_ERROR_REQUIRED' | translate }}
-              </span>
+          @if ((facade.form.controls['user'].get('lastName').dirty || facade.form.controls['user'].get('lastName').touched) && facade.form.controls['user'].get('lastName').invalid && facade.form.controls['user'].get('lastName')) {
+            <span class="err-message">
+              @if (facade.form.controls['user'].get('lastName').errors.required) {
+                <span>
+                  {{ 'ORG_FORM.LAST_NAME_ERROR_REQUIRED' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
       <div class="form-group" formGroupName="user">
@@ -61,17 +65,20 @@
         <div class="col-sm-12">
           <input class="form-control " formControlName='emailAddress' fullWidth id="email" nbInput
                  placeholder="{{ 'ORG_FORM.EMAIL_ADDRESS' | translate }}" required type="email">
-          <span
-            *ngIf="(facade.form.controls['user'].get('emailAddress').dirty || facade.form.controls['user'].get('emailAddress').touched) && facade.form.controls['user'].get('emailAddress').invalid && facade.form.controls['user'].get('emailAddress')"
-            class="err-message">
-              <span
-                *ngIf="facade.form.controls['user'].get('emailAddress').errors.email || facade.form.controls['user'].get('emailAddress').errors.pattern">
-                {{ 'ORG_FORM.EMAIL_ADDRESS_ERROR_NOT_VALID' | translate }}
-              </span>
-              <span *ngIf="facade.form.controls['user'].get('emailAddress').errors.required">
-                {{ 'ORG_FORM.EMAIL_ADDRESS_ERROR_REQUIRED' | translate }}
-              </span>
+          @if ((facade.form.controls['user'].get('emailAddress').dirty || facade.form.controls['user'].get('emailAddress').touched) && facade.form.controls['user'].get('emailAddress').invalid && facade.form.controls['user'].get('emailAddress')) {
+            <span class="err-message">
+              @if (facade.form.controls['user'].get('emailAddress').errors.email || facade.form.controls['user'].get('emailAddress').errors.pattern) {
+                <span>
+                  {{ 'ORG_FORM.EMAIL_ADDRESS_ERROR_NOT_VALID' | translate }}
+                </span>
+              }
+              @if (facade.form.controls['user'].get('emailAddress').errors.required) {
+                <span>
+                  {{ 'ORG_FORM.EMAIL_ADDRESS_ERROR_REQUIRED' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
 
@@ -83,17 +90,21 @@
           <input class="form-control " formControlName='password' fullWidth id="password" nbInput
                  placeholder="{{ 'COMMON.PASSWORD' | translate }}"
                  required type="password">
-          <span
-            *ngIf="(facade.form.controls['user'].get('password').dirty || facade.form.controls['user'].get('password').touched) && facade.form.controls['user'].get('password').invalid && facade.form.controls['user'].get('password')"
-            class="err-message">
-              <span *ngIf="facade.form.controls['user'].get('password').errors.required">
-                {{ 'ORG_FORM.PASSWORD_ERROR_REQUIRED' | translate }}
-              </span>
-              <span *ngIf="facade.form.controls['user'].get('password').errors.pattern">
-                {{ 'ORG_FORM.PASSWORD_ERROR_NOT_VALID' | translate }} <br/>
-                {{ 'ORG_FORM.PASSWORD_ERROR_RULES' | translate }}
-              </span>
+          @if ((facade.form.controls['user'].get('password').dirty || facade.form.controls['user'].get('password').touched) && facade.form.controls['user'].get('password').invalid && facade.form.controls['user'].get('password')) {
+            <span class="err-message">
+              @if (facade.form.controls['user'].get('password').errors.required) {
+                <span>
+                  {{ 'ORG_FORM.PASSWORD_ERROR_REQUIRED' | translate }}
+                </span>
+              }
+              @if (facade.form.controls['user'].get('password').errors.pattern) {
+                <span>
+                  {{ 'ORG_FORM.PASSWORD_ERROR_NOT_VALID' | translate }} <br/>
+                  {{ 'ORG_FORM.PASSWORD_ERROR_RULES' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
       <div class="form-group" formGroupName="user">
@@ -104,19 +115,23 @@
           <input class="form-control " formControlName='repeatPassword' fullWidth id="repeatPassword" nbInput
                  placeholder="Repeat Password"
                  required type="password">
-          <span
-            *ngIf="(facade.form.controls['user'].get('repeatPassword').dirty || facade.form.controls['user'].get('repeatPassword').touched) && facade.form.controls['user'].get('repeatPassword').invalid && facade.form.controls['user'].get('repeatPassword')"
-            class="err-message">
-              <span *ngIf="facade.form.controls['user'].get('repeatPassword').errors.required">
-                {{ 'ORG_FORM.PASSWORD_ERROR_REQUIRED' | translate }}<br/>
-              </span>
+          @if ((facade.form.controls['user'].get('repeatPassword').dirty || facade.form.controls['user'].get('repeatPassword').touched) && facade.form.controls['user'].get('repeatPassword').invalid && facade.form.controls['user'].get('repeatPassword')) {
+            <span class="err-message">
+              @if (facade.form.controls['user'].get('repeatPassword').errors.required) {
+                <span>
+                  {{ 'ORG_FORM.PASSWORD_ERROR_REQUIRED' | translate }}<br/>
+                </span>
+              }
 
             </span>
-          <span *ngIf="facade.form.hasError('notSame')" class="err-message">
+          }
+          @if (facade.form.hasError('notSame')) {
+            <span class="err-message">
               <span>
                 {{ 'ORG_CHANGE_PASSWORD.PASSWORDS_NOT_MATCH' | translate }}
               </span>
             </span>
+          }
         </div>
       </div>
       <div class="form-group">
@@ -127,21 +142,26 @@
 
           <nb-select formControlName='subscriptionPlan'
                      id="subscriptionPlan" placeholder=" {{ 'ORG_FORM.SUBSCRIPTION_PLAN' | translate }}">
-            <nb-option *ngFor="let i of facade.subscriptionPlans()" [value]="i">{{ i }}</nb-option>
+            @for (i of facade.subscriptionPlans(); track i) {
+              <nb-option [value]="i">{{ i }}</nb-option>
+            }
           </nb-select>
 
 
-          <span
-            *ngIf="(facade.form.controls['subscriptionPlan'].dirty || facade.form.controls['subscriptionPlan'].touched) && facade.form.controls['subscriptionPlan'].invalid && facade.form.controls['subscriptionPlan']"
-            class="err-message">
-              <span
-                *ngIf="facade.form.controls['subscriptionPlan'].errors.subscriptionPlan || facade.form.controls['subscriptionPlan'].errors.pattern">
-                {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_NOT_VALID' | translate }}
-              </span>
-              <span *ngIf="facade.form.controls['subscriptionPlan'].errors.required">
-                {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_REQUIRED' | translate }}
-              </span>
+          @if ((facade.form.controls['subscriptionPlan'].dirty || facade.form.controls['subscriptionPlan'].touched) && facade.form.controls['subscriptionPlan'].invalid && facade.form.controls['subscriptionPlan']) {
+            <span class="err-message">
+              @if (facade.form.controls['subscriptionPlan'].errors.subscriptionPlan || facade.form.controls['subscriptionPlan'].errors.pattern) {
+                <span>
+                  {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_NOT_VALID' | translate }}
+                </span>
+              }
+              @if (facade.form.controls['subscriptionPlan'].errors.required) {
+                <span>
+                  {{ 'ORG_FORM.SUBSCRIPTION_PLAN_ERROR_REQUIRED' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
     </form>

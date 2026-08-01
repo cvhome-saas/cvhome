@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
 import {PageT, StorePageRequest} from '../../common/BaseTable';
@@ -7,11 +7,8 @@ import {PageT, StorePageRequest} from '../../common/BaseTable';
   providedIn: 'root'
 })
 export class OrdersService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(
-    private readonly crudService: CrudService
-  ) {
-  }
 
   getOrders(params: StorePageRequest): Observable<PageT<any>> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders`, params);

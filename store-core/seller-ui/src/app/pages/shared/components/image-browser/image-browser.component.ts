@@ -1,10 +1,11 @@
 import {Component, DestroyRef, Input, OnInit, inject} from '@angular/core';
-import {NbDialogRef} from '@nebular/theme';
+import {NbDialogRef, NbSpinnerModule} from '@nebular/theme';
 import {BrowsableImage, ImageBrowserFacade} from './facades/image-browser.facade';
 
 @Component({
   selector: 'ngx-image-browser',
-  standalone: false,
+  standalone: true,
+  imports: [NbSpinnerModule],
   templateUrl: './image-browser.component.html',
   styleUrls: ['./image-browser.component.scss'],
   providers: [ImageBrowserFacade]

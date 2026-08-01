@@ -1,18 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {StoreFormComponent} from '../store-form/store-form.component';
 
 @Component({
   selector: 'ngx-store-creation',
-  standalone: false,
+  standalone: true,
+  imports: [StoreFormComponent],
   templateUrl: './store-creation.component.html',
   styleUrls: ['./store-creation.component.scss']
 })
-export class StoreCreationComponent implements OnInit {
+export class StoreCreationComponent {
   store: any;
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
 }

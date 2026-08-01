@@ -10,7 +10,7 @@
       <div class="col col-lg-2">
         <button (click)="facade.createGroup()" [disabled]="!facade.store()" nbButton
                 status="success">
-          <label>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate }}</label>
+          <span>{{ 'COMPONENTS.CREATE_PRODUCTS_GROUPS' | translate }}</span>
         </button>
 
       </div>
@@ -42,8 +42,10 @@
         <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ACTIVE' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <ngx-product-groups-active *ngIf="row.id" [rowData]="row" [store]="facade.store()"
-                                     [value]="row.active"></ngx-product-groups-active>
+          @if (row.id) {
+            <ngx-product-groups-active [rowData]="row" [store]="facade.store()"
+                                       [value]="row.active"></ngx-product-groups-active>
+          }
         </ng-template>
       </ngx-datatable-column>
 
@@ -53,15 +55,19 @@
           {{ 'COMMON.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="facade.onCreate(row)" *ngIf="!row.id" nbButton shape="round" size="small" status="success">
-            <nb-icon icon="external-link"></nb-icon>
-          </button>
-          <button (click)="facade.onEdit(row)" *ngIf="row.id" nbButton shape="round" size="small" status="primary">
-            <nb-icon icon="edit"></nb-icon>
-          </button>
-          <button (click)="facade.onDelete(row)" *ngIf="row.id" nbButton shape="round" size="small" status="danger">
-            <nb-icon icon="trash"></nb-icon>
-          </button>
+          @if (!row.id) {
+            <button (click)="facade.onCreate(row)" nbButton shape="round" size="small" status="success">
+              <nb-icon icon="external-link"></nb-icon>
+            </button>
+          }
+          @if (row.id) {
+            <button (click)="facade.onEdit(row)" nbButton shape="round" size="small" status="primary">
+              <nb-icon icon="edit"></nb-icon>
+            </button>
+            <button (click)="facade.onDelete(row)" nbButton shape="round" size="small" status="danger">
+              <nb-icon icon="trash"></nb-icon>
+            </button>
+          }
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>

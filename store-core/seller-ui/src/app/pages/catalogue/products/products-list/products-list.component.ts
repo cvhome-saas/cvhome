@@ -1,11 +1,38 @@
 import {Component, OnInit, inject} from '@angular/core';
-import {ColumnMode} from '@swimlane/ngx-datatable';
+import {FormsModule} from '@angular/forms';
+import {RouterLink} from '@angular/router';
+import {TranslateModule} from '@ngx-translate/core';
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbFormFieldModule,
+  NbIconModule,
+  NbInputModule,
+  NbOptionModule,
+  NbSelectModule,
+  NbSpinnerModule
+} from '@nebular/theme';
+import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {ProductsListFacade} from '../facades/products-list.facade';
 import {TableStateService} from '../../../shared/table/table-state.service';
 
 @Component({
   selector: 'ngx-products-list',
-  standalone: false,
+  standalone: true,
+  imports: [
+    FormsModule,
+    RouterLink,
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbFormFieldModule,
+    NbIconModule,
+    NbInputModule,
+    NbOptionModule,
+    NbSelectModule,
+    NbSpinnerModule,
+    NgxDatatableModule
+  ],
   templateUrl: './products-list.component.html',
   styleUrls: ['./products-list.component.scss'],
   providers: [ProductsListFacade, TableStateService]

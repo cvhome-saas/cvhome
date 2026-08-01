@@ -1,11 +1,14 @@
 import {Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbCardModule, NbSpinnerModule} from '@nebular/theme';
+import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {CustomerListFacade} from '../facades/customer-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {ColumnMode} from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'ngx-list',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbCardModule, NbSpinnerModule, NgxDatatableModule],
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.scss'],
   providers: [CustomerListFacade, TableStateService]

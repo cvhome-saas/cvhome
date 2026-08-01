@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
 
@@ -6,9 +6,8 @@ import {CrudService} from '../../shared/services/crud.service';
   providedIn: 'root'
 })
 export class StatisticApiService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(private readonly crudService: CrudService) {
-  }
 
   getOrderStatistic(params: StatisticsParams): Observable<StatisticList> {
     return this.crudService.post(`/spg/checkout/api/v2/private/order-statistic`, params);

@@ -128,8 +128,8 @@ export class CategoryFormFacade {
         tmpObj.friendlyUrl = el.friendlyUrl;
       }
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
-          if (!tmpObj.hasOwnProperty(elKey) && el[elKey] !== '') {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
+          if (!Object.prototype.hasOwnProperty.call(tmpObj, elKey) && el[elKey] !== '') {
             tmpObj[elKey] = el[elKey];
           }
         }
@@ -144,7 +144,7 @@ export class CategoryFormFacade {
 
     categoryObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
             el[elKey] = tmpObj[elKey];
           }
@@ -154,7 +154,7 @@ export class CategoryFormFacade {
 
     categoryObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el.name) {
             el.name = el.name.trim();
           }

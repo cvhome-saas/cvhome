@@ -8,8 +8,10 @@
       </div>
       <div class="col col-lg-2">
         <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
-          <nb-option (click)="facade.route(item.link)" *ngFor="let item of facade.sideMenuLinks" [value]="item.id">{{ item.title }}
-          </nb-option>
+          @for (item of facade.sideMenuLinks; track item.id) {
+            <nb-option (click)="facade.route(item.link)" [value]="item.id">{{ item.title }}
+            </nb-option>
+          }
         </nb-select>
 
       </div>
@@ -28,31 +30,43 @@
               <input [placeholder]="'STORE.DOMAIN_PLACEHOLDER' | translate" formControlName="domain" fullWidth
                      id="domain" nbInput
                      type="text">
-              <ng-container *ngIf="(facade.domain.dirty || facade.domain.touched || facade.isSubmited()) && facade.domain.invalid">
-                <p *ngIf="facade.domain.errors?.required" class="caption status-danger">
-                  {{ 'STORE.DOMAIN_REQUIRED' | translate }}
+              @if ((facade.domain.dirty || facade.domain.touched || facade.isSubmited()) && facade.domain.invalid) {
+                @if (facade.domain.errors?.required) {
+                  <p class="caption status-danger">
+                    {{ 'STORE.DOMAIN_REQUIRED' | translate }}
+                  </p>
+                }
+                @if (facade.domain.errors?.pattern) {
+                  <p class="caption status-danger">
+                    {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
+                  </p>
+                }
+                @if (facade.domain.errors?.dnsNotPointingToCname) {
+                  <p class="caption status-danger">
+                    {{
+                      'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
+                        domain: facade.domain.errors.dnsNotPointingToCname.domainChecked,
+                        target: facade.domain.errors.dnsNotPointingToCname.requiredTarget
+                      }
+                    }}
+                  </p>
+                }
+                @if (facade.domain.errors?.dnsCheckServiceError) {
+                  <p class="caption status-warning">
+                    {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
+                  </p>
+                }
+                @if (facade.domain.errors?.waitingForInfraInfo) {
+                  <p class="caption text-hint">
+                    {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
+                  </p>
+                }
+              }
+              @if (facade.domain.pending) {
+                <p class="caption text-hint">
+                  {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
                 </p>
-                <p *ngIf="facade.domain.errors?.pattern" class="caption status-danger">
-                  {{ 'STORE.DOMAIN_INVALID_PATTERN' | translate }}
-                </p>
-                <p *ngIf="facade.domain.errors?.dnsNotPointingToCname" class="caption status-danger">
-                  {{
-                    'STORE.DOMAIN_DNS_CNAME_HINT' | translate: {
-                      domain: facade.domain.errors.dnsNotPointingToCname.domainChecked,
-                      target: facade.domain.errors.dnsNotPointingToCname.requiredTarget
-                    }
-                  }}
-                </p>
-                <p *ngIf="facade.domain.errors?.dnsCheckServiceError" class="caption status-warning">
-                  {{ 'STORE.DOMAIN_DNS_CHECK_ERROR' | translate }}
-                </p>
-                <p *ngIf="facade.domain.errors?.waitingForInfraInfo" class="caption text-hint">
-                  {{ 'STORE.DOMAIN_DNS_WAITING_INFO' | translate }}
-                </p>
-              </ng-container>
-              <p *ngIf="facade.domain.pending" class="caption text-hint">
-                {{ 'STORE.DOMAIN_DNS_CHECKING' | translate }}
-              </p>
+              }
               <p class="caption">
                 {{ 'STORE.DOMAIN_HELP_TEXT' | translate: {podDomain: facade.podServerDomain()} }}
               </p>
@@ -100,11 +114,13 @@
           <button (click)="facade.onAccess(row)" nbButton shape="round" size="small" status="success">
             <nb-icon icon="external-link"></nb-icon>
           </button>
-          <button (click)="facade.onDelete(row.domain)" *ngIf="row.domainType!='SUB_DOMAIN'" nbButton shape="round"
-                  size="small"
-                  status="danger">
-            <nb-icon icon="trash"></nb-icon>
-          </button>
+          @if (row.domainType!=='SUB_DOMAIN') {
+            <button (click)="facade.onDelete(row.domain)" nbButton shape="round"
+                    size="small"
+                    status="danger">
+              <nb-icon icon="trash"></nb-icon>
+            </button>
+          }
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>

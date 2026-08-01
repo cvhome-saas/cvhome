@@ -15,7 +15,7 @@ import {SignUpFormService} from './services/sign-up-form.service';
 })
 export class SignUpFormComponent {
   protected readonly facade = inject(SignUpFormFacade);
-  title: string = 'Sign Up';
+  title = 'Sign Up';
 
   signUp(): void {
     this.facade.signUp();

@@ -19,42 +19,46 @@
     </div>
   </nb-card-header>
   <nb-card-body [nbSpinner]="facade.loader()" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <div [hidden]="facade.files().length==0" class="file_listing_scroll">
+    <div [hidden]="facade.files().length===0" class="file_listing_scroll">
       <ul class="file_listing_main">
-        <li *ngFor="let images of facade.files();let i=index">
-          <div class="file_listing_box">
-            <div class="image-title-main">
-              <div class="close_main">
-                <nb-icon (click)="facade.openImage(facade.files(),i)" class="edit"></nb-icon>
+        @for (images of facade.files(); track images; let i = $index) {
+          <li>
+            <div class="file_listing_box">
+              <div class="image-title-main">
+                <div class="close_main">
+                  <nb-icon (click)="facade.openImage(facade.files(),i)" class="edit"></nb-icon>
 
-                <nb-icon (click)="facade.unSelectImage(i)" icon="trash"></nb-icon>
+                  <nb-icon (click)="facade.unSelectImage(i)" icon="trash"></nb-icon>
+                </div>
+              </div>
+              <div class="image_box">
+                <img [alt]="images.name" [id]="'blah-'+i" [src]="images.src" class="banner-image"/>
               </div>
             </div>
-            <div class="image_box">
-              <img [id]="'blah-'+i" [src]="images.src" class="banner-image"/>
-            </div>
-          </div>
-        </li>
+          </li>
+        }
       </ul>
-      <button (click)="facade.upload()" [disabled]="facade.files().length==0" nbButton
+      <button (click)="facade.upload()" [disabled]="facade.files().length===0" nbButton
               status="success">{{ 'filemanager.upload' | translate }}
       </button>
     </div>
     <div class="file_listing_scroll">
       <ul class="file_listing_main">
-        <li *ngFor="let image of facade.images();let i=index">
-          <div class="file_listing_box">
-            <div class="image-title-main">
-              <div class="close_main">
-                <nb-icon (click)="facade.openImage(facade.images(),i)" icon="edit"></nb-icon>
-                <nb-icon (click)="facade.removeImage(image.name)" icon="trash"></nb-icon>
+        @for (image of facade.images(); track image; let i = $index) {
+          <li>
+            <div class="file_listing_box">
+              <div class="image-title-main">
+                <div class="close_main">
+                  <nb-icon (click)="facade.openImage(facade.images(),i)" icon="edit"></nb-icon>
+                  <nb-icon (click)="facade.removeImage(image.name)" icon="trash"></nb-icon>
+                </div>
+              </div>
+              <div class="image_box">
+                <img alt="{{image.name}}" class="banner-image" src="{{image.src}}"/>
               </div>
             </div>
-            <div class="image_box">
-              <img class="banner-image" src="{{image.src}}"/>
-            </div>
-          </div>
-        </li>
+          </li>
+        }
       </ul>
     </div>
   </nb-card-body>

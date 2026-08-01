@@ -1,5 +1,5 @@
 // /home/ashraf-revo/IdeaProjects/cvhome-saas/cvhome/store-core/seller-ui/src/app/pages/store-management/services/dns-check.service.ts
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http'; // Removed HttpHeaders import
 import {Observable, of} from 'rxjs';
 import {catchError, map, tap} from 'rxjs/operators';
@@ -21,10 +21,9 @@ interface GoogleDnsResponse {
   providedIn: 'root'
 })
 export class DnsCheckService {
-  private googleDohUrl = 'https://dns.google/resolve'; // Google DNS-over-HTTPS endpoint
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-  } // Inject HttpClient
+  private googleDohUrl = 'https://dns.google/resolve'; // Inject HttpClient
 
   /**
    * Checks if a custom domain's CNAME record points to the targetPodDomain using Google's Public DNS API.

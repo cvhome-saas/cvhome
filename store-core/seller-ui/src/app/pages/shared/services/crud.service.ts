@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
@@ -10,10 +10,10 @@ import {Store} from "../models/commons";
   providedIn: 'root'
 })
 export class CrudService {
-  url = environment.apiUrl;
+  private readonly http = inject(HttpClient);
+  private readonly selectedStoreService = inject(SelectedStoreService);
 
-  constructor(private http: HttpClient, private selectedStoreService: SelectedStoreService) {
-  }
+  url = environment.apiUrl;
 
   get(path, params?: any): Observable<any> {
     return this.http.get(`${this.url}${path}`, {responseType: 'json', params: this.getParams(params)});
@@ -41,7 +41,7 @@ export class CrudService {
   }
 
   request(method: string, url: string, body: any | null, p?: any) {
-    let options = p ? {...p} : {};
+    const options = p ? {...p} : {};
     const req = new HttpRequest(method, url, body, {
       params: this.getParams(options.params ? options.params : {})
     });

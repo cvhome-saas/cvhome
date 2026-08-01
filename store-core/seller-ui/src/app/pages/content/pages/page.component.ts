@@ -1,11 +1,14 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
-import {ColumnMode} from "@swimlane/ngx-datatable";
+import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {PagesFacade} from "./facades/pages.facade";
 import {TableStateService} from "../../shared/table/table-state.service";
 
 @Component({
-  selector: 'page-table',
-  standalone: false,
+  selector: 'app-page-table',
+  standalone: true,
+  imports: [TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule, NgxDatatableModule],
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss'],
   providers: [PagesFacade, TableStateService]

@@ -114,7 +114,7 @@ export class ProductFormService {
   private toPrice(price: string): number {
     try {
       return parseFloat(price.replace(/,/g, ''));
-    } catch (e) {
+    } catch {
       return 0;
     }
   }

@@ -1,14 +1,20 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {NbMenuModule} from '@nebular/theme';
+import {OneColumnLayoutComponent} from './theme/layout/one-column/one-column.layout';
 import {PagesFacade} from './facades/pages.facade';
 
 @Component({
   selector: 'ngx-pages',
-  standalone: false,
+  standalone: true,
+  imports: [OneColumnLayoutComponent, NbMenuModule, RouterOutlet],
   styleUrls: ['pages.component.scss'],
   template: `
     <ngx-one-column-layout>
       <nb-menu [items]="facade.menu()"></nb-menu>
-      <router-outlet *ngIf="facade.storesReady()"></router-outlet>
+      @if (facade.storesReady()) {
+        <router-outlet></router-outlet>
+      }
     </ngx-one-column-layout>
   `,
   providers: [PagesFacade]

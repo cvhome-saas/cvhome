@@ -81,7 +81,7 @@ export class StoreFormService {
   }
 }
 
-export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): { [key: string]: boolean } | null {
+export function defaultLanguageMustBeInSupportedValidator(group: FormGroup): Record<string, boolean> | null {
   const defaultLangControl: AbstractControl = group.get('defaultLanguage');
   const supportedLangsControl: AbstractControl = group.get('supportedLanguages');
 

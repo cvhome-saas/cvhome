@@ -1,14 +1,21 @@
 import {Component, Input, OnInit, ViewChild, ElementRef, inject} from "@angular/core";
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
 import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade";
 
 @Component({
   selector: 'ngx-store-branding-banner',
-  standalone: false,
+  standalone: true,
+  imports: [ReactiveFormsModule, TranslateModule, NbButtonModule, NbInputModule, NbSpinnerModule],
   template: `
     <form [formGroup]="facade.imageUpload">
-      <div (click)='imageInput.click()' (dragover)="facade.allowDrop($event)" (drop)="facade.drop($event, imageDrop)" class="wrapper">
+      <div (click)='imageInput.click()' (dragover)="facade.allowDrop($event)" (drop)="facade.drop($event, imageDrop)"
+           (keydown.enter)='imageInput.click()' class="wrapper" role="button" tabindex="0">
         <div #imageDrop id="imageDrop">
-          <img *ngIf="facade.banner()" [src]="facade.banner()?.path" style="height:250px"/>
+          @if (facade.banner()) {
+            <img [src]="facade.banner()?.path" alt="{{ 'STORE_BRANDING.BANNER' | translate }}" style="height:250px"/>
+          }
         </div>
         <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate }}</div>
       </div>
@@ -17,14 +24,18 @@ import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade"
              type="file">
 
       <div class="form-group actions-button">
-        <button nbButton status="danger" (click)="facade.removeBanner(store.id, imageDrop)" *ngIf="facade.showRemoveButton()" type="submit">{{
-            'COMMON.REMOVE' | translate
-          }}
-        </button>
-        <button nbButton status="success" (click)="facade.saveBanner(store.id)" *ngIf="facade.bannerFile" [nbSpinner]="facade.loadingButton()"
-                nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
-          {{ (!facade.loadingButton() ? 'COMMON.SAVE' : '') | translate }}
-        </button>
+        @if (facade.showRemoveButton()) {
+          <button nbButton status="danger" (click)="facade.removeBanner(store.id, imageDrop)" type="submit">{{
+              'COMMON.REMOVE' | translate
+            }}
+          </button>
+        }
+        @if (facade.bannerFile) {
+          <button nbButton status="success" (click)="facade.saveBanner(store.id)" [nbSpinner]="facade.loadingButton()"
+                  nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
+            {{ (!facade.loadingButton() ? 'COMMON.SAVE' : '') | translate }}
+          </button>
+        }
       </div>
     </form>
   `,

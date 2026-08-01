@@ -12,10 +12,8 @@ import {SharedModule} from './shared/shared.module';
     PagesRoutingModule,
     ThemeModule,
     SharedModule,
-  ],
-  declarations: [
+    NotFoundComponent,
     PagesComponent,
-    NotFoundComponent
   ],
 })
 export class PagesModule {

@@ -1,9 +1,11 @@
 import {Component, DoCheck, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 import {UserManagementFacade} from './facades/user-management.facade';
 
 @Component({
   selector: 'ngx-user-management',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
   providers: [UserManagementFacade]

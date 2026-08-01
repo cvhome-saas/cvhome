@@ -1,11 +1,15 @@
 import {Component, OnInit, inject, DestroyRef} from '@angular/core';
-import {ColumnMode} from "@swimlane/ngx-datatable";
+import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {UsersListFacade} from "./facades/users-list.facade";
 import {TableStateService} from "../../shared/table/table-state.service";
+import {UserStatusComponent} from './user-status.component';
 
 @Component({
   selector: 'ngx-users-list',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule, NgxDatatableModule, UserStatusComponent],
   templateUrl: './users-list.component.html',
   styleUrls: ['./users-list.component.scss'],
   providers: [UsersListFacade, TableStateService]

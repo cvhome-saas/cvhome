@@ -1,11 +1,28 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbCardModule, NbDatepickerModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
 import {ClientDashboardFacade} from '../facades/client-dashboard.facade';
 import {DashboardFilterFormService} from '../services/dashboard-filter-form.service';
 import {DateRangeStateService} from '../state/date-range.state';
+import {OrdersStatisticComponent} from '../charts/orders/orders-statistic.component';
+import {CustomerCountriesStatisticComponent} from '../charts/customer-countries/customer-countries-statistic.component';
+import {ProductsStatisticComponent} from '../charts/products/product-statistic.component';
 
 @Component({
   selector: 'ngx-client-dashboard',
-  standalone: false,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    NbCardModule,
+    NbDatepickerModule,
+    NbInputModule,
+    NbSpinnerModule,
+    OrdersStatisticComponent,
+    CustomerCountriesStatisticComponent,
+    ProductsStatisticComponent
+  ],
   templateUrl: './client-dashboard.component.html',
   styleUrl: './client-dashboard.component.scss',
   providers: [ClientDashboardFacade, DateRangeStateService, DashboardFilterFormService]

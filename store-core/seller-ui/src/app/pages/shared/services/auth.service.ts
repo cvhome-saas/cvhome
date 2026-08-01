@@ -1,34 +1,23 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {Injectable, inject} from '@angular/core';
 import {map, Observable, of} from "rxjs";
 import {Router} from "@angular/router";
 import {Roles} from "../models/roles";
+import {CrudService} from "./crud.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private authUser: AuthUser | undefined;
+  private readonly crudService = inject(CrudService);
+  private readonly router = inject(Router);
 
-  constructor(private httpClient: HttpClient, private router: Router) {
-    // this.authUser = {
-    //   email_verified: false,
-    //   family_name: "",
-    //   given_name: "",
-    //   preferred_username: "",
-    //   sub: "temp",
-    //   user_type: UserType.ORG_USER,
-    //   authorities: [
-    //     "ROLE_ORG_ADMIN"
-    //   ]
-    // }
-  }
+  private authUser: AuthUser | undefined;
 
   getAuthUser(): Observable<AuthUser> {
     if (this.authUser) {
       return of(this.authUser)
     } else {
-      return this.httpClient.get<any>("/api/v1/auth/me")
+      return this.crudService.get("/api/v1/auth/me")
         .pipe(map((it: any) => {
           this.authUser = it.principal.claims;
           this.authUser.authorities = it.authorities.map(a => a.authority)
@@ -38,11 +27,11 @@ export class AuthService {
   }
 
   getRoles(): Roles {
-    let isSuperAdmin = this.authUser.authorities.indexOf("ROLE_SUPER_ADMIN") != -1;
-    let isSupport = this.authUser.authorities.indexOf("ROLE_SUPPORT") != -1;
-    let isOrgAdmin = this.authUser.authorities.indexOf("ROLE_ORG_ADMIN") != -1;
-    let isStoreAdmin = this.authUser.authorities.indexOf("ROLE_STORE_ADMIN") != -1;
-    let isStoreModerator = this.authUser.authorities.indexOf("ROLE_STORE_MODERATOR") != -1;
+    const isSuperAdmin = this.authUser.authorities.indexOf("ROLE_SUPER_ADMIN") != -1;
+    const isSupport = this.authUser.authorities.indexOf("ROLE_SUPPORT") != -1;
+    const isOrgAdmin = this.authUser.authorities.indexOf("ROLE_ORG_ADMIN") != -1;
+    const isStoreAdmin = this.authUser.authorities.indexOf("ROLE_STORE_ADMIN") != -1;
+    const isStoreModerator = this.authUser.authorities.indexOf("ROLE_STORE_MODERATOR") != -1;
 
     return {
       isSuperAdmin,

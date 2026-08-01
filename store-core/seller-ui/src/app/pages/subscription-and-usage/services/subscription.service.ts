@@ -1,21 +1,20 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import { Injectable, inject } from '@angular/core';
 import {Observable} from "rxjs";
+import {CrudService} from "../../shared/services/crud.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubscriptionService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(private httpClient: HttpClient) {
-  }
 
   table(): Observable<Table> {
-    return this.httpClient.get<Table>("control-plane/api/v1/subscription-plan/public/tables");
+    return this.crudService.get("control-plane/api/v1/subscription-plan/public/tables");
   }
 
   details(): Observable<SubscriptionDetails> {
-    return this.httpClient.get<SubscriptionDetails>("control-plane/api/v1/subscription/subscription-plan-details");
+    return this.crudService.get("control-plane/api/v1/subscription/subscription-plan-details");
   }
 }
 

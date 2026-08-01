@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
@@ -9,10 +9,8 @@ import {Pod} from "./pod.service";
   providedIn: 'root'
 })
 export class StoreService {
+  private crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService) {
-  }
 
 
   getStore(store): Observable<any> {

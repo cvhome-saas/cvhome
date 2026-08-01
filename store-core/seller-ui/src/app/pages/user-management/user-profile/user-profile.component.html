@@ -1,3 +1,5 @@
 <div>
-  <ngx-user-form *ngIf="!facade.loading() && facade.user()?.id" [user]="facade.user()" action="'VIEW'" title="COMPONENTS.PROFILE"></ngx-user-form>
+  @if (!facade.loading() && facade.user()?.id) {
+    <ngx-user-form [user]="facade.user()" action="'VIEW'" title="COMPONENTS.PROFILE"></ngx-user-form>
+  }
 </div>

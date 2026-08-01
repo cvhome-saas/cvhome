@@ -9,7 +9,7 @@ const CanAccessPayments = (roles: Roles) => {
   return roles.isOrgAdmin || roles.isStoreAdmin || roles.isStoreModerator;
 };
 
-const CanAccessHome = (roles: Roles) => {
+const CanAccessHome = (_roles: Roles) => {
   return true;
 };
 

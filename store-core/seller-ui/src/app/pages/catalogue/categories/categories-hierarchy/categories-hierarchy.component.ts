@@ -1,10 +1,13 @@
 import {Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
-import {CategoriesHierarchyFacade} from '../facades/categories-hierarchy.facade';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbCardModule, NbSpinnerModule} from '@nebular/theme';
 import {NgcxTreeComponent, NgcxTreeNode} from '@cluetec/ngcx-tree';
+import {CategoriesHierarchyFacade} from '../facades/categories-hierarchy.facade';
 
 @Component({
   selector: 'ngx-categories-hierarchy',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbCardModule, NbSpinnerModule, NgcxTreeComponent],
   templateUrl: './categories-hierarchy.component.html',
   styleUrls: ['./categories-hierarchy.component.scss'],
   providers: [CategoriesHierarchyFacade]

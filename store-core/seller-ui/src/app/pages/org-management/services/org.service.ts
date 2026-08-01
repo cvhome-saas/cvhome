@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../shared/services/crud.service';
 import {Observable} from 'rxjs';
@@ -9,10 +9,8 @@ import {PageT, StorePageRequest} from '../../common/BaseTable';
   providedIn: 'root'
 })
 export class OrgService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(
-    private readonly crudService: CrudService) {
-  }
 
   getListOfOrg(params: StorePageRequest): Observable<PageT<Org>> {
     return this.crudService.get('control-plane/api/v1/org-manager/find-all', params);

@@ -1,9 +1,11 @@
 import {Component, OnInit, inject} from '@angular/core';
 import {UserDetailsFacade} from './facades/user-details.facade';
+import {UserFormComponent} from '../user-form/user-form.component';
 
 @Component({
   selector: 'ngx-user-details',
-  standalone: false,
+  standalone: true,
+  imports: [UserFormComponent],
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.scss'],
   providers: [UserDetailsFacade]

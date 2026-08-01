@@ -13,50 +13,50 @@ const routes: Routes = [{
   children: [
     {
       path: '',
-      loadChildren: () => import('./home/home.module')
-        .then(m => m.HomeModule)
+      loadChildren: () => import('./home/home.routes')
+        .then(m => m.HOME_ROUTES)
     }, {
       path: 'user-management',
-      loadChildren: () => import('./user-management/user-management.module')
-        .then(m => m.UserManagementModule),
+      loadChildren: () => import('./user-management/user-management.routes')
+        .then(m => m.USER_MANAGEMENT_ROUTES),
     }, {
       path: 'org-management',
-      loadChildren: () => import('./org-management/org-management.module')
-        .then(m => m.OrgManagementModule),
+      loadChildren: () => import('./org-management/org-management.routes')
+        .then(m => m.ORG_MANAGEMENT_ROUTES),
     }, {
       path: 'store-management',
-      loadChildren: () => import('./store-management/store-management.module')
-        .then(m => m.StoreManagementModule),
+      loadChildren: () => import('./store-management/store-management.routes')
+        .then(m => m.STORE_MANAGEMENT_ROUTES),
     }, {
       path: 'pod-management',
-      loadChildren: () => import('./pod-management/pod-management.module')
-        .then(m => m.PodManagementModule),
+      loadChildren: () => import('./pod-management/pod-management.routes')
+        .then(m => m.POD_MANAGEMENT_ROUTES),
     }, {
       path: 'subscription-and-usage',
-      loadChildren: () => import('./subscription-and-usage/subscription-and-usage.module')
-        .then(m => m.SubscriptionAndUsageModule),
+      loadChildren: () => import('./subscription-and-usage/subscription-and-usage.routes')
+        .then(m => m.SUBSCRIPTION_AND_USAGE_ROUTES),
     },
     {
       path: 'orders',
-      loadChildren: () => import('./orders/orders.module')
-        .then(m => m.OrdersModule),
+      loadChildren: () => import('./orders/orders.routes')
+        .then(m => m.ORDERS_ROUTES),
     }, {
       path: 'payment',
-      loadChildren: () => import('./payment/payment.module')
-        .then(m => m.PaymentModule),
+      loadChildren: () => import('./payment/payment.routes')
+        .then(m => m.PAYMENT_ROUTES),
     }, {
       path: 'catalogue',
-      loadChildren: () => import('./catalogue/catalogue.module')
-        .then(m => m.CatalogueModule),
+      loadChildren: () => import('./catalogue/catalogue.routes')
+        .then(m => m.CATALOGUE_ROUTES),
 
     }, {
       path: 'content',
-      loadChildren: () => import('./content/content.module')
-        .then(m => m.ContentModule),
+      loadChildren: () => import('./content/content.routes')
+        .then(m => m.CONTENT_ROUTES),
     }, {
       path: 'customer',
-      loadChildren: () => import('./customer/customer.module')
-        .then(m => m.CustomersModule),
+      loadChildren: () => import('./customer/customer.routes')
+        .then(m => m.CUSTOMER_ROUTES),
     },
     {
       path: '**',

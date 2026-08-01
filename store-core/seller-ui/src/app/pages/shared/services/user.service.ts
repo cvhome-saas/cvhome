@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {CrudService} from './crud.service';
@@ -8,12 +8,8 @@ import {CrudService} from './crud.service';
 })
 
 export class UserService {
+  private readonly crudService = inject(CrudService);
   userIdString = 'userId';
-
-  constructor(
-    private crudService: CrudService
-  ) {
-  }
 
 
   getUserProfile(): Observable<any> {
@@ -58,7 +54,7 @@ export class UserService {
   }
 
   disable(userId: string, store: string) {
-    return this.crudService.post(`/control-plane/api/v1/user-account/disable?userId=${userId}`, {});
+    return this.crudService.post(`/control-plane/api/v1/user-account/disable?userId=${userId}`, {store});
   }
 
   enable(userId: string, store: string) {

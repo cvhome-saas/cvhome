@@ -1,9 +1,11 @@
 import {Component, OnInit, inject} from '@angular/core';
 import {UserProfileFacade} from './facades/user-profile.facade';
+import {UserFormComponent} from '../user-form/user-form.component';
 
 @Component({
   selector: 'ngx-user-profile',
-  standalone: false,
+  standalone: true,
+  imports: [UserFormComponent],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss'],
   providers: [UserProfileFacade]

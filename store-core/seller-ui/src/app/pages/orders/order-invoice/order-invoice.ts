@@ -1,9 +1,11 @@
 import {Component, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
 
 @Component({
   selector: 'ngx-order-invoice',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule],
   templateUrl: 'order-invoice.html',
   styleUrls: ['order-invoice.scss'],
 })

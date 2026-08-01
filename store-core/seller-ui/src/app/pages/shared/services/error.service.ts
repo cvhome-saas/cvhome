@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
 import {NbToastrService} from "@nebular/theme";
@@ -7,12 +7,8 @@ import {NbToastrService} from "@nebular/theme";
   providedIn: 'root'
 })
 export class ErrorService {
-
-  constructor(
-    private toastrService: NbToastrService,
-    private translateService: TranslateService
-  ) {
-  }
+  private readonly toastrService = inject(NbToastrService);
+  private readonly translateService = inject(TranslateService);
 
   success(code: string) {
     this.toastrService.success(this.translateService.instant(code));
@@ -24,11 +20,11 @@ export class ErrorService {
 
   error(errorCode: string, code: string) {
     this.toastrService.danger(this.translateService.instant(errorCode));
-    console.log('Application error [' + errorCode + ']' + code != null ? code : '');
+    console.log('Application error [' + errorCode + ']' + (code != null ? code : ''));
   }
 
   handleError(err: Error) {
-
+    console.error(err);
   }
 
 }

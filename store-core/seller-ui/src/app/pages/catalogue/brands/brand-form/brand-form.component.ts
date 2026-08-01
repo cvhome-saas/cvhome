@@ -1,11 +1,33 @@
 import {Component, Input, OnInit, inject, DestroyRef} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbInputModule,
+  NbOptionModule,
+  NbSelectModule,
+  NbSpinnerModule
+} from '@nebular/theme';
+import {QuillModule} from 'ngx-quill';
 import {Store} from '../../../store-management/models/store';
 import {BrandFormFacade} from '../facades/brand-form.facade';
 import {BrandFormService} from '../services/brand-form.service';
 
 @Component({
   selector: 'ngx-brand-form',
-  standalone: false,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    NbButtonModule,
+    NbCardModule,
+    NbInputModule,
+    NbOptionModule,
+    NbSelectModule,
+    NbSpinnerModule,
+    QuillModule
+  ],
   templateUrl: './brand-form.component.html',
   styleUrls: ['./brand-form.component.scss'],
   providers: [BrandFormFacade, BrandFormService]

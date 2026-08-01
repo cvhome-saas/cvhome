@@ -1,11 +1,13 @@
 import {Component, computed, inject, input} from '@angular/core';
 import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {NgxEchartsDirective} from 'ngx-echarts';
 import {EMPTY_STATISTIC_LIST, StatisticList} from '../../services/statistic.api.service';
 
 @Component({
   selector: 'ngx-products-statistic',
-  standalone: false,
+  standalone: true,
+  imports: [NgxEchartsDirective],
   template: `
     <div echarts [options]="options()" class="echart"></div>
   `,

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
@@ -12,11 +12,8 @@ export interface TinyProductPageRequest extends StorePageRequest {
   providedIn: 'root'
 })
 export class ProductService {
+  private crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService,
-  ) {
-  }
 
   getListOfProducts(params: StorePageRequest): Observable<PageT<any>> {
     //release 3.2.1 use V2

@@ -16,12 +16,12 @@ import {ContactFormService} from './services/contact-form.service';
 export class ContactComponent {
   protected readonly facade = inject(ContactFacade);
 
-  title: string = 'Stay Tuned';
-  d1: string = 'Contact us';
-  d2: string = 'We are happy to help you';
-  address: string = 'cairo festival city podium 1 New Cairo egypt';
-  phone: string = '+20**********';
-  email: string = 'me@asrevo.com';
+  title = 'Stay Tuned';
+  d1 = 'Contact us';
+  d2 = 'We are happy to help you';
+  address = 'cairo festival city podium 1 New Cairo egypt';
+  phone = '+20**********';
+  email = 'me@asrevo.com';
 
   contact(): void {
     this.facade.submit();

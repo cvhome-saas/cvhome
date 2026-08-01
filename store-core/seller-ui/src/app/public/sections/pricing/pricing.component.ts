@@ -1,5 +1,4 @@
 import {Component, OnInit, inject} from '@angular/core';
-import {NgFor, NgIf} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {PricingFacade} from './facades/pricing.facade';
 
@@ -7,7 +6,7 @@ import {PricingFacade} from './facades/pricing.facade';
   selector: 'app-pricing',
   standalone: true,
   imports: [
-    NgFor, RouterLink, NgIf
+    RouterLink
   ],
   providers: [PricingFacade],
   templateUrl: './pricing.component.html',
@@ -16,8 +15,8 @@ import {PricingFacade} from './facades/pricing.facade';
 export class PricingComponent implements OnInit {
   protected readonly facade = inject(PricingFacade);
 
-  title: string = 'Unlock Full Power Of Cvhome';
-  desc: string = 'Choose your Plan that fit your business.';
+  title = 'Unlock Full Power Of Cvhome';
+  desc = 'Choose your Plan that fit your business.';
 
   ngOnInit(): void {
     this.facade.init();

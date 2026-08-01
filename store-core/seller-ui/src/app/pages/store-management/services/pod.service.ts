@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import {CrudService} from "../../shared/services/crud.service";
 import {Observable} from "rxjs";
 import {PageRequest, PageT} from "../../common/BaseTable";
@@ -7,9 +7,8 @@ import {PageRequest, PageT} from "../../common/BaseTable";
   providedIn: 'root'
 })
 export class PodService {
-  constructor(
-    private crudService: CrudService) {
-  }
+  private crudService = inject(CrudService);
+
 
   listPods(): Observable<Pod[]> {
     return this.crudService.get(`/control-plane/api/v1/pod/list`);

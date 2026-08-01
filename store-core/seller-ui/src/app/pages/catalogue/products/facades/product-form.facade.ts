@@ -131,8 +131,8 @@ export class ProductFormFacade {
         tmpObj.title = el.name;
       }
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
-          if (!tmpObj.hasOwnProperty(elKey) && el[elKey] !== '') {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
+          if (!Object.prototype.hasOwnProperty.call(tmpObj, elKey) && el[elKey] !== '') {
             tmpObj[elKey] = el[elKey];
           }
         }
@@ -152,7 +152,7 @@ export class ProductFormFacade {
 
     productObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
             el[elKey] = tmpObj[elKey];
           }
@@ -162,7 +162,7 @@ export class ProductFormFacade {
 
     productObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (typeof el[elKey] === 'undefined' || !el[elKey]) {
             el.name = el.name.trim();
             el[elKey] = '';

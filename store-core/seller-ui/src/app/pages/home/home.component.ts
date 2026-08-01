@@ -1,9 +1,12 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {HomeFacade} from './facades/home.facade';
+import {ClientDashboardComponent} from './client-dashboard/client-dashboard.component';
+import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 
 @Component({
   selector: 'ngx-home',
-  standalone: false,
+  standalone: true,
+  imports: [ClientDashboardComponent, AdminDashboardComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   providers: [HomeFacade]

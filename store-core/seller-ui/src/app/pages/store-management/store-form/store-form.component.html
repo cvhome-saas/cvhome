@@ -7,13 +7,17 @@
     <div class="row">
       <div class="col">
       </div>
-      <div *ngIf="store&&store.id" class="col col-lg-2">
-        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
-          <nb-option (click)="facade.route(item.link, store.id)" *ngFor="let item of facade.sideMenuLinks" [value]="item.id">
-            {{ item.title }}
-          </nb-option>
-        </nb-select>
-      </div>
+      @if (store&&store.id) {
+        <div class="col col-lg-2">
+          <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+            @for (item of facade.sideMenuLinks; track item.id) {
+              <nb-option (click)="facade.route(item.link, store.id)" [value]="item.id">
+                {{ item.title }}
+              </nb-option>
+            }
+          </nb-select>
+        </div>
+      }
       <div class="col col-lg-2">
         <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
@@ -28,309 +32,366 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form *ngIf="!facade.loader()" [formGroup]='facade.form'>
-      <nb-card class="nb-card inline-form-card">
-        <nb-card-body>
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label " for="name">
-              {{ 'STORE_FORM.STORE_NAME' |translate }}
-              *</label>
-            <div class="col-sm-12">
-              <input (change)="facade.checkName($event)" [readOnly]="facade.isReadonlyName()" class="form-control "
-                     formControlName='name' fullWidth
-                     id="name"
-                     nbInput placeholder="{{ 'STORE_FORM.STORE_NAME' | translate }}"
-                     required type="text">
-              <span *ngIf="facade.submitted() && facade.name.invalid && facade.name.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_NAME_REQUIRED' | translate }}
-            </span>
-              <span *ngIf="facade.submitted() && facade.name.invalid && facade.name.errors?.pattern" class="err-message">
-                {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
-            </span>
-              <span *ngIf="!facade.isNameUnique()" class="err-message">
-              {{ 'COMMON.NAME_EXISTS' | translate }}
-            </span>
-            </div>
-          </div>
-
-          <div *ngIf="facade.pods() && facade.pods().length > 0" class="" formGroupName="pod">
+    @if (!facade.loader()) {
+      <form [formGroup]='facade.form'>
+        <nb-card class="nb-card inline-form-card">
+          <nb-card-body>
             <div class="form-group">
-              <label class="col-sm-10 col-form-label ">
-                {{ 'STORE.PREFERRED_POD' | translate }}
+              <label class="col-sm-10 col-form-label " for="name">
+                {{ 'STORE_FORM.STORE_NAME' |translate }}
+                *</label>
+              <div class="col-sm-12">
+                <input (change)="facade.checkName($event)" [readOnly]="facade.isReadonlyName()" class="form-control "
+                       formControlName='name' fullWidth
+                       id="name"
+                       nbInput placeholder="{{ 'STORE_FORM.STORE_NAME' | translate }}"
+                       required type="text">
+                @if (facade.submitted() && facade.name.invalid && facade.name.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_NAME_REQUIRED' | translate }}
+                  </span>
+                }
+                @if (facade.submitted() && facade.name.invalid && facade.name.errors?.pattern) {
+                  <span class="err-message">
+                    {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
+                  </span>
+                }
+                @if (!facade.isNameUnique()) {
+                  <span class="err-message">
+                    {{ 'COMMON.NAME_EXISTS' | translate }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            @if (facade.pods() && facade.pods().length > 0) {
+              <div class="" formGroupName="pod">
+                <div class="form-group">
+                  <label class="col-sm-10 col-form-label " for="pod">
+                    {{ 'STORE.PREFERRED_POD' | translate }}
+                  </label>
+                  <div class="col-sm-12">
+                    <nb-select formControlName='id' fullWidth id="pod"
+                               placeholder="{{ 'STORE.PREFERRED_POD' | translate }}" shape="rectangle">
+                      @for (p of facade.pods(); track p.id.id) {
+                        <nb-option [value]="p.id.id">
+                          {{ p.name }}
+                        </nb-option>
+                      }
+                    </nb-select>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="theme">
+                {{ 'STORE_FORM.THEME' | translate }}
               </label>
               <div class="col-sm-12">
-                <nb-select formControlName='id' fullWidth
-                           placeholder="{{ 'STORE.PREFERRED_POD' | translate }}" shape="rectangle">
-                  <nb-option *ngFor="let p of facade.pods()" [value]="p.id.id">
-                    {{ p.name }}
-                  </nb-option>
-                </nb-select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.THEME' | translate }}
-            </label>
-            <div class="col-sm-12">
-              <nb-select *ngIf="facade.supportedTheme().length" formControlName='theme'
-                         fullWidth outline placeholder="{{ 'STORE_FORM.THEME' | translate }}"
-                         shape="rectangle">
-                <nb-option *ngFor="let theme of facade.supportedTheme()" [value]="theme">{{ theme }}
-                </nb-option>
-              </nb-select>
-              <span *ngIf="facade.submitted() && facade.theme.invalid && facade.theme.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_THEME_REQUIRED' | translate }}
-            </span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.COLOR_THEME' | translate }}
-            </label>
-            <div class="col-sm-12">
-              <nb-select *ngIf="facade.supportedColorThemes().length" formControlName='colorTheme'
-                         fullWidth outline placeholder="{{ 'STORE_FORM.COLOR_THEME' | translate }}"
-                         shape="rectangle">
-                <nb-option *ngFor="let colorTheme of facade.supportedColorThemes()" [value]="colorTheme">{{ colorTheme }}
-                </nb-option>
-              </nb-select>
-              <span *ngIf="facade.submitted() && facade.colorTheme.invalid && facade.colorTheme.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_COLOR_THEME_REQUIRED' | translate }}
-            </span>
-
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label " for="phone">
-              {{ 'STORE_FORM.STORE_PHONE'| translate }}
-              *</label>
-            <div class="col-sm-12">
-              <input class="form-control " formControlName='phone' fullWidth id="phone" nbInput
-                     placeholder="{{ 'STORE_FORM.STORE_PHONE' | translate }}"
-                     required type="text">
-              <span *ngIf="facade.submitted() && facade.phone.invalid && facade.phone.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_PHONE_REQUIRED' | translate }}
-            </span>
-            </div>
-          </div>
-
-          <div formGroupName="address">
-
-            <div class="form-group">
-              <label class="col-sm-10 col-form-label " for="address">
-                {{ 'STORE_FORM.ADDRESS' | translate }}
-                *</label>
-              <div class="col-sm-12">
-                <input class="form-control " formControlName='address' fullWidth id="address" nbInput
-                       placeholder="{{ 'STORE_FORM.ADDRESS' | translate }}"
-                       required type="text">
-                <span *ngIf="facade.submitted() && facade.address.invalid && facade.address.errors?.required" class="err-message">
-                {{ 'STORE_FORM.ADDRESS_REQUIRED' | translate }}
-              </span>
+                @if (facade.supportedTheme().length) {
+                  <nb-select formControlName='theme' id="theme"
+                             fullWidth outline placeholder="{{ 'STORE_FORM.THEME' | translate }}"
+                             shape="rectangle">
+                    @for (theme of facade.supportedTheme(); track theme) {
+                      <nb-option [value]="theme">{{ theme }}
+                      </nb-option>
+                    }
+                  </nb-select>
+                }
+                @if (facade.submitted() && facade.theme.invalid && facade.theme.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_THEME_REQUIRED' | translate }}
+                  </span>
+                }
               </div>
             </div>
 
             <div class="form-group">
-              <label class="col-sm-10 col-form-label " for="postalCode">
-                {{ 'STORE_FORM.POSTAL_CODE' | translate }}
-                *</label>
-              <div class="col-sm-12">
-                <input class="form-control " formControlName='postalCode' fullWidth id="postalCode"
-                       nbInput placeholder="{{ 'STORE_FORM.POSTAL_CODE' | translate }}"
-                       required type="text">
-                <span *ngIf="facade.submitted() && facade.postalCode.invalid && facade.postalCode.errors?.required"
-                      class="err-message">
-                {{ 'STORE_FORM.POSTAL_CODE_REQUIRED' | translate }}
-              </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="col-sm-10 col-form-label " for="city">
-                {{ 'STORE_FORM.CITY' | translate }}
-                *</label>
-              <div class="col-sm-12">
-                <input class="form-control " formControlName='city' fullWidth id="city" nbInput
-                       placeholder="{{ 'STORE_FORM.CITY' | translate }}"
-                       required type="text">
-                <span *ngIf="facade.submitted() && facade.city.invalid && facade.city.errors?.required" class="err-message">
-                {{ 'STORE_FORM.CITY_REQUIRED' | translate }}
-              </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="col-sm-10 col-form-label ">
-                {{ 'STORE_FORM.COUNTRY' | translate }}
-                *</label>
-              <div class="col-sm-12">
-                <nb-select formControlName='country' fullWidth outline
-                           placeholder="{{ 'STORE_FORM.COUNTRY' | translate }}" shape="rectangle">
-                  <nb-option *ngFor="let country of facade.countries()" [value]="country.code">{{ country.name }}
-                  </nb-option>
-                </nb-select>
-
-                <span *ngIf="facade.submitted() && facade.country.invalid && facade.country.errors?.required" class="err-message">
-                {{ 'STORE_FORM.COUNTRY_REQUIRED' | translate }}
-              </span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="col-sm-10 col-form-label " for="stateProvince">
-                {{ 'STORE_FORM.STATE_PROVINCE' | translate }}
+              <label class="col-sm-10 col-form-label " for="colorTheme">
+                {{ 'STORE_FORM.COLOR_THEME' | translate }}
               </label>
-
               <div class="col-sm-12">
-                <input class="form-control " formControlName='stateProvince' fullWidth id="stateProvince"
-                       nbInput placeholder="{{ 'STORE_FORM.STATE_PROVINCE' | translate }}"
-                       type="text">
+                @if (facade.supportedColorThemes().length) {
+                  <nb-select formControlName='colorTheme' id="colorTheme"
+                             fullWidth outline placeholder="{{ 'STORE_FORM.COLOR_THEME' | translate }}"
+                             shape="rectangle">
+                    @for (colorTheme of facade.supportedColorThemes(); track colorTheme) {
+                      <nb-option [value]="colorTheme">{{ colorTheme }}
+                      </nb-option>
+                    }
+                  </nb-select>
+                }
+                @if (facade.submitted() && facade.colorTheme.invalid && facade.colorTheme.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_COLOR_THEME_REQUIRED' | translate }}
+                  </span>
+                }
+
               </div>
             </div>
 
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label " for="email">
-              {{ 'STORE_FORM.STORE_EMAIL' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <input class="form-control " formControlName='email' fullWidth id="email" nbInput
-                     placeholder="{{ 'STORE_FORM.STORE_EMAIL' | translate }}"
-                     required type="email">
-              <span *ngIf="facade.submitted() && facade.email.invalid && facade.email.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_EMAIL_REQUIRED' | translate }}
-            </span>
-              <span *ngIf="facade.submitted() && facade.email.invalid && facade.email.errors?.pattern" class="err-message">
-              {{ 'COMMON.EMAIL_RULE' | translate }}
-            </span>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="phone">
+                {{ 'STORE_FORM.STORE_PHONE'| translate }}
+                *</label>
+              <div class="col-sm-12">
+                <input class="form-control " formControlName='phone' fullWidth id="phone" nbInput
+                       placeholder="{{ 'STORE_FORM.STORE_PHONE' | translate }}"
+                       required type="text">
+                @if (facade.submitted() && facade.phone.invalid && facade.phone.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_PHONE_REQUIRED' | translate }}
+                  </span>
+                }
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label " for="email">
-              {{ 'STORE_FORM.SUPPORTED_LANGUAGES' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <nb-checkbox (change)="facade.addSupportedLanguage(language.code)"
-                           *ngFor="let language of facade.supportedLanguagesList()"
-                           [checked]="facade.userHasSupportedLanguage(language, store)" class="col-sm-4">
-                {{ 'LANG.' + language.code | translate }}
-              </nb-checkbox>
+            <div formGroupName="address">
+
+              <div class="form-group">
+                <label class="col-sm-10 col-form-label " for="address">
+                  {{ 'STORE_FORM.ADDRESS' | translate }}
+                  *</label>
+                <div class="col-sm-12">
+                  <input class="form-control " formControlName='address' fullWidth id="address" nbInput
+                         placeholder="{{ 'STORE_FORM.ADDRESS' | translate }}"
+                         required type="text">
+                  @if (facade.submitted() && facade.address.invalid && facade.address.errors?.required) {
+                    <span class="err-message">
+                      {{ 'STORE_FORM.ADDRESS_REQUIRED' | translate }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-10 col-form-label " for="postalCode">
+                  {{ 'STORE_FORM.POSTAL_CODE' | translate }}
+                  *</label>
+                <div class="col-sm-12">
+                  <input class="form-control " formControlName='postalCode' fullWidth id="postalCode"
+                         nbInput placeholder="{{ 'STORE_FORM.POSTAL_CODE' | translate }}"
+                         required type="text">
+                  @if (facade.submitted() && facade.postalCode.invalid && facade.postalCode.errors?.required) {
+                    <span class="err-message">
+                      {{ 'STORE_FORM.POSTAL_CODE_REQUIRED' | translate }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-10 col-form-label " for="city">
+                  {{ 'STORE_FORM.CITY' | translate }}
+                  *</label>
+                <div class="col-sm-12">
+                  <input class="form-control " formControlName='city' fullWidth id="city" nbInput
+                         placeholder="{{ 'STORE_FORM.CITY' | translate }}"
+                         required type="text">
+                  @if (facade.submitted() && facade.city.invalid && facade.city.errors?.required) {
+                    <span class="err-message">
+                      {{ 'STORE_FORM.CITY_REQUIRED' | translate }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-10 col-form-label " for="country">
+                  {{ 'STORE_FORM.COUNTRY' | translate }}
+                  *</label>
+                <div class="col-sm-12">
+                  <nb-select formControlName='country' fullWidth id="country" outline
+                             placeholder="{{ 'STORE_FORM.COUNTRY' | translate }}" shape="rectangle">
+                    @for (country of facade.countries(); track country.code) {
+                      <nb-option [value]="country.code">{{ country.name }}
+                      </nb-option>
+                    }
+                  </nb-select>
+
+                  @if (facade.submitted() && facade.country.invalid && facade.country.errors?.required) {
+                    <span class="err-message">
+                      {{ 'STORE_FORM.COUNTRY_REQUIRED' | translate }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-10 col-form-label " for="stateProvince">
+                  {{ 'STORE_FORM.STATE_PROVINCE' | translate }}
+                </label>
+
+                <div class="col-sm-12">
+                  <input class="form-control " formControlName='stateProvince' fullWidth id="stateProvince"
+                         nbInput placeholder="{{ 'STORE_FORM.STATE_PROVINCE' | translate }}"
+                         type="text">
+                </div>
+              </div>
+
             </div>
-            <span *ngIf="facade.submitted() && facade.supportedLanguages.invalid && facade.supportedLanguages.errors?.required"
-                  class="err-message">
-              {{ 'STORE_FORM.STORE_SUPPORTED_LANGUAGES_REQUIRED' | translate }}
-            </span>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.DEFAULT_LANGUAGE' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <nb-select formControlName='defaultLanguage' fullWidth outline
-                         placeholder="{{ 'STORE_FORM.DEFAULT_LANGUAGE' | translate }}"
-                         shape="rectangle">
-                <nb-option *ngFor="let language of facade.supportedLanguagesList()" [value]="language.code">
-                  {{ 'LANG.' + language.code | translate }}
-                </nb-option>
-              </nb-select>
-              <span *ngIf="facade.submitted() && facade.defaultLanguage.invalid && facade.defaultLanguage.errors?.required"
-                    class="err-message">
-              {{ 'STORE_FORM.STORE_DEFAULT_LANGUAGE_REQUIRED' | translate }}
-            </span>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="email">
+                {{ 'STORE_FORM.STORE_EMAIL' | translate }}
+                *</label>
+              <div class="col-sm-12">
+                <input class="form-control " formControlName='email' fullWidth id="email" nbInput
+                       placeholder="{{ 'STORE_FORM.STORE_EMAIL' | translate }}"
+                       required type="email">
+                @if (facade.submitted() && facade.email.invalid && facade.email.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_EMAIL_REQUIRED' | translate }}
+                  </span>
+                }
+                @if (facade.submitted() && facade.email.invalid && facade.email.errors?.pattern) {
+                  <span class="err-message">
+                    {{ 'COMMON.EMAIL_RULE' | translate }}
+                  </span>
+                }
+              </div>
             </div>
-            <span *ngIf="facade.submitted() && facade.form.errors?.defaultLanguageNotInSupported" class="err-message">
-              {{ 'STORE_FORM.STORE_DEFAULT_LANGUAGE_MUST_BE_IN_SUPPORTED' | translate }}
-            </span>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.CURRENCY' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <nb-select formControlName='currency' fullWidth outline
-                         placeholder="{{ 'STORE_FORM.CURRENCY' | translate }}" shape="rectangle">
-                <nb-option *ngFor="let currency of facade.supportedCurrency()" [value]="currency.code">{{ currency.code }}
-                </nb-option>
-              </nb-select>
-
-              <span *ngIf="facade.submitted() && facade.currency.invalid && facade.currency.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_CURRENCY_REQUIRED' | translate }}
-            </span>
+            <div class="form-group">
+              <span class="col-sm-10 col-form-label ">
+                {{ 'STORE_FORM.SUPPORTED_LANGUAGES' | translate }}
+                *</span>
+              <div class="col-sm-12">
+                @for (language of facade.supportedLanguagesList(); track language.code) {
+                  <nb-checkbox (change)="facade.addSupportedLanguage(language.code)"
+                               [checked]="facade.userHasSupportedLanguage(language, store)" class="col-sm-4">
+                    {{ 'LANG.' + language.code | translate }}
+                  </nb-checkbox>
+                }
+              </div>
+              @if (facade.submitted() && facade.supportedLanguages.invalid && facade.supportedLanguages.errors?.required) {
+                <span class="err-message">
+                  {{ 'STORE_FORM.STORE_SUPPORTED_LANGUAGES_REQUIRED' | translate }}
+                </span>
+              }
             </div>
-          </div>
 
-          <div class="form-group">
-            <div class="col-sm-10 col-form-label ">
-              <nb-checkbox formControlName='currencyFormatNational'>
-                {{ 'STORE_FORM.CURRENCY_FORMAT_NATIONAL' | translate }}
-              </nb-checkbox>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="defaultLanguage">
+                {{ 'STORE_FORM.DEFAULT_LANGUAGE' | translate }}
+                *</label>
+              <div class="col-sm-12">
+                <nb-select formControlName='defaultLanguage' fullWidth id="defaultLanguage" outline
+                           placeholder="{{ 'STORE_FORM.DEFAULT_LANGUAGE' | translate }}"
+                           shape="rectangle">
+                  @for (language of facade.supportedLanguagesList(); track language.code) {
+                    <nb-option [value]="language.code">
+                      {{ 'LANG.' + language.code | translate }}
+                    </nb-option>
+                  }
+                </nb-select>
+                @if (facade.submitted() && facade.defaultLanguage.invalid && facade.defaultLanguage.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_DEFAULT_LANGUAGE_REQUIRED' | translate }}
+                  </span>
+                }
+              </div>
+              @if (facade.submitted() && facade.form.errors?.defaultLanguageNotInSupported) {
+                <span class="err-message">
+                  {{ 'STORE_FORM.STORE_DEFAULT_LANGUAGE_MUST_BE_IN_SUPPORTED' | translate }}
+                </span>
+              }
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.WEIGHT' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <nb-select formControlName='weight' fullWidth outline
-                         placeholder="{{ 'STORE_FORM.WEIGHT' | translate }}" shape="rectangle">
-                <nb-option *ngFor="let weight of facade.weightList()" [value]="weight">{{ weight }}
-                </nb-option>
-              </nb-select>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="currency">
+                {{ 'STORE_FORM.CURRENCY' | translate }}
+                *</label>
+              <div class="col-sm-12">
+                <nb-select formControlName='currency' fullWidth id="currency" outline
+                           placeholder="{{ 'STORE_FORM.CURRENCY' | translate }}" shape="rectangle">
+                  @for (currency of facade.supportedCurrency(); track currency.code) {
+                    <nb-option [value]="currency.code">{{ currency.code }}
+                    </nb-option>
+                  }
+                </nb-select>
 
-              <span *ngIf="facade.submitted() && facade.weight.invalid && facade.weight.errors?.required" class="err-message">
-              {{ 'STORE_FORM.STORE_WEIGHT_REQUIRED' | translate }}
-            </span>
+                @if (facade.submitted() && facade.currency.invalid && facade.currency.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_CURRENCY_REQUIRED' | translate }}
+                  </span>
+                }
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label ">
-              {{ 'STORE_FORM.DIMENSIONS' | translate }}
-              *</label>
-            <div class="col-sm-12">
-              <nb-select formControlName='dimension' fullWidth outline
-                         placeholder="{{ 'STORE_FORM.DIMENSIONS' | translate }}" shape="rectangle">
-                <nb-option *ngFor="let dimension of facade.sizeList()" [value]="dimension">{{ dimension }}
-                </nb-option>
-              </nb-select>
-
-              <span *ngIf="facade.submitted() && facade.dimension.invalid && facade.dimension.errors?.required"
-                    class="err-message">
-              {{ 'STORE_FORM.STORE_DIMENSIONS_REQUIRED' | translate }}
-            </span>
+            <div class="form-group">
+              <div class="col-sm-10 col-form-label ">
+                <nb-checkbox formControlName='currencyFormatNational'>
+                  {{ 'STORE_FORM.CURRENCY_FORMAT_NATIONAL' | translate }}
+                </nb-checkbox>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <div class="col-sm-10 col-form-label ">
-              <nb-checkbox formControlName='requireLoginForOrderPlacement'>
-                {{ 'STORE_FORM.REQUIRE_LOGIN_FOR_ORDER_PLACEMENT' | translate }}
-              </nb-checkbox>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="weight">
+                {{ 'STORE_FORM.WEIGHT' | translate }}
+                *</label>
+              <div class="col-sm-12">
+                <nb-select formControlName='weight' fullWidth id="weight" outline
+                           placeholder="{{ 'STORE_FORM.WEIGHT' | translate }}" shape="rectangle">
+                  @for (weight of facade.weightList(); track weight) {
+                    <nb-option [value]="weight">{{ weight }}
+                    </nb-option>
+                  }
+                </nb-select>
+
+                @if (facade.submitted() && facade.weight.invalid && facade.weight.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_WEIGHT_REQUIRED' | translate }}
+                  </span>
+                }
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="col-sm-10 col-form-label " for="inBusinessSince">
-              {{ 'STORE_FORM.IN_BUSINESS_SINCE' | translate }}
-            </label>
-            <div class="col-sm-12">
-              <input [nbDatepicker]="inBusinessSince" class="form-control" formControlName="inBusinessSince" fullWidth
-                     id="inBusinessSince" nbInput placeholder="{{ 'STORE_FORM.IN_BUSINESS_SINCE' | translate }}">
-              <nb-datepicker #inBusinessSince></nb-datepicker>
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="dimension">
+                {{ 'STORE_FORM.DIMENSIONS' | translate }}
+                *</label>
+              <div class="col-sm-12">
+                <nb-select formControlName='dimension' fullWidth id="dimension" outline
+                           placeholder="{{ 'STORE_FORM.DIMENSIONS' | translate }}" shape="rectangle">
+                  @for (dimension of facade.sizeList(); track dimension) {
+                    <nb-option [value]="dimension">{{ dimension }}
+                    </nb-option>
+                  }
+                </nb-select>
+
+                @if (facade.submitted() && facade.dimension.invalid && facade.dimension.errors?.required) {
+                  <span class="err-message">
+                    {{ 'STORE_FORM.STORE_DIMENSIONS_REQUIRED' | translate }}
+                  </span>
+                }
+              </div>
             </div>
-          </div>
 
-        </nb-card-body>
-      </nb-card>
-    </form>
+            <div class="form-group">
+              <div class="col-sm-10 col-form-label ">
+                <nb-checkbox formControlName='requireLoginForOrderPlacement'>
+                  {{ 'STORE_FORM.REQUIRE_LOGIN_FOR_ORDER_PLACEMENT' | translate }}
+                </nb-checkbox>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-10 col-form-label " for="inBusinessSince">
+                {{ 'STORE_FORM.IN_BUSINESS_SINCE' | translate }}
+              </label>
+              <div class="col-sm-12">
+                <input [nbDatepicker]="inBusinessSince" class="form-control" formControlName="inBusinessSince" fullWidth
+                       id="inBusinessSince" nbInput placeholder="{{ 'STORE_FORM.IN_BUSINESS_SINCE' | translate }}">
+                <nb-datepicker #inBusinessSince></nb-datepicker>
+              </div>
+            </div>
+
+          </nb-card-body>
+        </nb-card>
+      </form>
+    }
   </nb-card-body>
 </nb-card>

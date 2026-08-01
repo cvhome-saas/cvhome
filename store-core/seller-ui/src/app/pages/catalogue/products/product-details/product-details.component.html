@@ -1,3 +1,5 @@
 <div>
-  <ngx-product-form *ngIf="facade.product().id" [product]="facade.product()" _title="COMPONENTS.PRODUCT"></ngx-product-form>
+  @if (facade.product().id) {
+    <ngx-product-form [product]="facade.product()" _title="COMPONENTS.PRODUCT"></ngx-product-form>
+  }
 </div>

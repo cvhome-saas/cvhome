@@ -27,7 +27,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
   readonly sideMenuLinks = sideMenuLinks;
 
   saasProperties = {alis: '', domain: ''};
-  shortenPodId: string = '';
+  shortenPodId = '';
 
   form: FormGroup = this.formService.createForm(this);
 

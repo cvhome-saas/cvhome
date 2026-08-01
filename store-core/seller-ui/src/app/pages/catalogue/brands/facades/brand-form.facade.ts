@@ -1,7 +1,6 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
-import {FormArray} from '@angular/forms';
 import {BrandFormService} from '../services/brand-form.service';
 import {BrandService} from '../services/brand.service';
 import {ConfigService} from '../../../shared/services/config.service';
@@ -86,8 +85,8 @@ export class BrandFormFacade {
         tmpObj.friendlyUrl = el.friendlyUrl;
       }
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
-          if (!tmpObj.hasOwnProperty(elKey) && el[elKey] !== '') {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
+          if (!Object.prototype.hasOwnProperty.call(tmpObj, elKey) && el[elKey] !== '') {
             tmpObj[elKey] = el[elKey];
           }
         }
@@ -101,7 +100,7 @@ export class BrandFormFacade {
 
     brandObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
             el[elKey] = tmpObj[elKey];
           }
@@ -111,7 +110,7 @@ export class BrandFormFacade {
 
     brandObject.descriptions.forEach((el: any) => {
       for (const elKey in el) {
-        if (el.hasOwnProperty(elKey)) {
+        if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el.name) {
             el.name = el.name.trim();
           }

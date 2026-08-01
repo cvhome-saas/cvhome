@@ -1,11 +1,15 @@
 import {Component, OnInit, inject} from '@angular/core';
-import {ColumnMode} from '@swimlane/ngx-datatable';
+import {RouterLink} from '@angular/router';
+import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {PodListFacade} from '../facades/pod-list.facade';
 import {TableStateService} from '../../shared/table/table-state.service';
 
 @Component({
   selector: 'ngx-pod-list',
-  standalone: false,
+  standalone: true,
+  imports: [RouterLink, TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule, NgxDatatableModule],
   templateUrl: './pod-list.component.html',
   styleUrls: ['./pod-list.component.scss'],
   providers: [PodListFacade, TableStateService]

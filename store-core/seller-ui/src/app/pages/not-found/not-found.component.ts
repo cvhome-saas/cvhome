@@ -1,16 +1,16 @@
-import {NbMenuService} from '@nebular/theme';
-import {Component} from '@angular/core';
+import {NbCardModule, NbMenuService} from '@nebular/theme';
+import {Component, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
   selector: 'ngx-not-found',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbCardModule],
   styleUrls: ['./not-found.component.scss'],
   templateUrl: './not-found.component.html',
 })
 export class NotFoundComponent {
-
-  constructor(private readonly menuService: NbMenuService) {
-  }
+  private readonly menuService = inject(NbMenuService);
 
   goToHome() {
     this.menuService.navigateHome();

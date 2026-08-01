@@ -36,17 +36,23 @@
                  placeholder="{{ 'COMMON.CODE' | translate}}"
                  required
                  type="text">
-          <ng-container *ngIf="(facade.formService.code.dirty || facade.formService.code.touched) && (facade.formService.code.invalid || !facade.isCodeUnique())">
-            <p *ngIf="facade.formService.code.errors?.['required']" class="caption status-danger">
-              {{ 'COMMON.CODE_REQUIRED' | translate }}
-            </p>
-            <p *ngIf="facade.formService.code.errors?.['pattern']" class="caption status-danger">
-              {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
-            </p>
-            <p *ngIf="!facade.isCodeUnique() && !facade.formService.code.errors?.['required'] && !facade.formService.code.errors?.['pattern']" class="caption status-danger">
-              {{ 'COMMON.CODE_EXISTS' | translate }}
-            </p>
-          </ng-container>
+          @if ((facade.formService.code.dirty || facade.formService.code.touched) && (facade.formService.code.invalid || !facade.isCodeUnique())) {
+            @if (facade.formService.code.errors?.['required']) {
+              <p class="caption status-danger">
+                {{ 'COMMON.CODE_REQUIRED' | translate }}
+              </p>
+            }
+            @if (facade.formService.code.errors?.['pattern']) {
+              <p class="caption status-danger">
+                {{ 'COMMON.ALPHA_DECIMAL_RULE' | translate }}
+              </p>
+            }
+            @if (!facade.isCodeUnique() && !facade.formService.code.errors?.['required'] && !facade.formService.code.errors?.['pattern']) {
+              <p class="caption status-danger">
+                {{ 'COMMON.CODE_EXISTS' | translate }}
+              </p>
+            }
+          }
         </div>
       </div>
 
@@ -58,40 +64,48 @@
         </div>
       </div>
 
-      <div *ngIf="facade.languages().length > 1" class="form-group row mb-3">
-        <label class="col-sm-2 col-form-label">{{ 'COMMON.LANGUAGE' | translate }}</label>
-        <div class="col-sm-10">
-          <nb-button-group>
-            <button (click)="facade.selectLanguage(lang.code)" *ngFor="let lang of facade.languages()"
-                    [status]="facade.formService.languageTabStatus(lang.code)"
-                    nbButton
-                    type="button">
-              {{ lang.code | uppercase }}
-            </button>
-          </nb-button-group>
+      @if (facade.languages().length > 1) {
+        <div class="form-group row mb-3">
+          <span class="col-sm-2 col-form-label">{{ 'COMMON.LANGUAGE' | translate }}</span>
+          <div class="col-sm-10">
+            <nb-button-group>
+              @for (lang of facade.languages(); track lang.code) {
+                <button (click)="facade.selectLanguage(lang.code)"
+                        [status]="facade.formService.languageTabStatus(lang.code)"
+                        nbButton
+                        type="button">
+                  {{ lang.code | uppercase }}
+                </button>
+              }
+            </nb-button-group>
+          </div>
         </div>
-      </div>
+      }
 
       <div formArrayName="descriptions">
-        <ng-container *ngFor="let desc of facade.formService.descriptions.controls; let i = index">
-          <div *ngIf="desc.get('language').value === facade.formService.selectedLanguage.value" [formGroupName]="i">
+        @for (desc of facade.formService.descriptions.controls; track $index; let i = $index) {
+          @if (desc.get('language').value === facade.formService.selectedLanguage.value) {
+            <div [formGroupName]="i">
 
-            <div class="form-group row mb-3">
-              <label class="col-sm-2 col-form-label">{{ 'CONTENT.NAME' | translate }} *</label>
-              <div class="col-sm-10">
-                <input [status]="facade.formService.descriptionNameStatus(i)" formControlName="name"
-                       fullWidth
-                       nbInput
-                       placeholder="{{ 'CONTENT.NAME' | translate }}"
-                       type="text">
-                <p *ngIf="desc.get('name').touched && desc.get('name').errors?.['required']" class="caption status-danger">
-                  {{ 'COMMON.NAME_REQUIRED' | translate }}
-                </p>
+              <div class="form-group row mb-3">
+                <label [attr.for]="'name-' + i" class="col-sm-2 col-form-label">{{ 'CONTENT.NAME' | translate }} *</label>
+                <div class="col-sm-10">
+                  <input [id]="'name-' + i" [status]="facade.formService.descriptionNameStatus(i)" formControlName="name"
+                         fullWidth
+                         nbInput
+                         placeholder="{{ 'CONTENT.NAME' | translate }}"
+                         type="text">
+                  @if (desc.get('name').touched && desc.get('name').errors?.['required']) {
+                    <p class="caption status-danger">
+                      {{ 'COMMON.NAME_REQUIRED' | translate }}
+                    </p>
+                  }
+                </div>
               </div>
-            </div>
 
-          </div>
-        </ng-container>
+            </div>
+          }
+        }
       </div>
 
       <hr class="my-4">
@@ -102,9 +116,11 @@
         <label class="col-sm-4 col-form-label"
                for="product-autocomplete">{{ 'PRODUCT_GROUP.SEARCH_PRODUCT' | translate }}</label>
         <div class="col-sm-6">
-          <ngx-product-auto-complete (onProduct)="facade.onItemSelect($event)" *ngIf="facade.store()"
-                                     [disabled]="facade.uniqueCode() == undefined"
-                                     [store]="facade.store()"/>
+          @if (facade.store()) {
+            <ngx-product-auto-complete (productSelected)="facade.onItemSelect($event)"
+                                       [disabled]="facade.uniqueCode() === undefined"
+                                       [store]="facade.store()"/>
+          }
         </div>
       </div>
 

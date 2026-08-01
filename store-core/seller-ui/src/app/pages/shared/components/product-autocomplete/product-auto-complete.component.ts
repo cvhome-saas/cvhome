@@ -1,10 +1,13 @@
 import {AfterViewInit, Component, DestroyRef, ElementRef, EventEmitter, Input, Output, ViewChild, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule} from '@nebular/theme';
 import {ProductAutocompleteFacade} from './facades/product-autocomplete.facade';
 import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autocomplete.constants';
 
 @Component({
   selector: 'ngx-product-auto-complete',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule],
   template: `<input #autoInput
                     nbInput fullWidth
                     type="text"
@@ -14,18 +17,20 @@ import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autoco
                     [nbAutocomplete]="auto"/>
 
   <nb-autocomplete #auto (selectedChange)="onSelectionChange($event)">
-    <nb-option *ngFor="let option of facade.options()" [value]="option">
-      {{ option.sku }}
-      <nb-icon icon="heart-outline" status="success"></nb-icon>
-    </nb-option>
+    @for (option of facade.options(); track option) {
+      <nb-option [value]="option">
+        {{ option.sku }}
+        <nb-icon icon="heart-outline" status="success"></nb-icon>
+      </nb-option>
+    }
   </nb-autocomplete>
   `,
   providers: [ProductAutocompleteFacade]
 })
 export class ProductAutoCompleteComponent implements AfterViewInit {
   @Input() store: string;
-  @Input() disabled: boolean = false;
-  @Output() onProduct: EventEmitter<any> = new EventEmitter<any>();
+  @Input() disabled = false;
+  @Output() productSelected: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('autoInput', {static: false}) autoInput: ElementRef;
 
   protected readonly facade = inject(ProductAutocompleteFacade);
@@ -48,7 +53,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
   }
 
   onSelectionChange(value: any): void {
-    this.onProduct.emit(value);
+    this.productSelected.emit(value);
     this.autoInput.nativeElement.value = '';
     this.facade.resetToFirst();
   }

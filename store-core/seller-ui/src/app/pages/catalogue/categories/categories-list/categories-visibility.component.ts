@@ -1,9 +1,11 @@
 import {Component, Input, inject} from '@angular/core';
+import {NbCheckboxModule} from '@nebular/theme';
 import {CategoriesVisibilityFacade} from '../facades/categories-visibility.facade';
 
 @Component({
   selector: 'ngx-categories-visibility',
-  standalone: false,
+  standalone: true,
+  imports: [NbCheckboxModule],
   template: `
     <nb-checkbox [checked]="value" (checkedChange)="facade.toggleVisibility(rowData, value)"/>`,
   providers: [CategoriesVisibilityFacade]
