@@ -22,19 +22,19 @@ public class PaymentOutboxHandler {
 
     @OutboxHandler
     public void handlePaymentPaidEvent(PaymentPaidEvent event) {
-        log.info("processing paid payment event for store {} for requestRef {}",event.storeId(),event.requestRef());
-        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()),event.requestRef(), PaymentStatus.PAID);
+        log.info("processing paid payment event for store {} for requestRef {}", event.storeId(), event.requestRef());
+        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()), event.requestRef(), PaymentStatus.PAID);
     }
 
     @OutboxHandler
     public void handlePaymentFailedEvent(PaymentFailedEvent event) {
-        log.info("processing failed payment event for store {} for requestRef {}",event.storeId(),event.requestRef());
-        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()),event.requestRef(), PaymentStatus.FAILED);
+        log.info("processing failed payment event for store {} for requestRef {}", event.storeId(), event.requestRef());
+        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()), event.requestRef(), PaymentStatus.FAILED);
     }
 
     @OutboxHandler
     public void handlePaymentCanceledEvent(PaymentCanceledEvent event) {
-        log.info("processing canceled payment event for store {} for requestRef {}",event.storeId(),event.requestRef());
-        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()),event.requestRef(), PaymentStatus.CANCELLED);
+        log.info("processing canceled payment event for store {} for requestRef {}", event.storeId(), event.requestRef());
+        externalOrderService.updatePaymentStatus(new StoreMerchantId(event.storeId()), event.requestRef(), PaymentStatus.CANCELLED);
     }
 }

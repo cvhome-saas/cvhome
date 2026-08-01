@@ -57,6 +57,10 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @Slf4j
 public class OrderApi {
 
+    private static final String CLIENT_ID_ATTRIBUTE = "clientId";
+
+    private static final String INVALID_CLIENT_ID_MESSAGE = "HTTP 401 Unauthorized - Invalid clientId";
+
     private final OrderFacade orderFacade;
 
     private final OrderPlacementFacade orderPlacementFacade;
@@ -99,8 +103,8 @@ public class OrderApi {
                 if (auth == null || !auth.isAuthenticated()) {
                     throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
                 }
-                if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
-                    throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
+                if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
+                    throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
                 }
             }
 
@@ -154,8 +158,8 @@ public class OrderApi {
             if (auth == null || !auth.isAuthenticated()) {
                 throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required to view order status");
             }
-            if (!merchantStore.getId().equals(auth.getTokenAttributes().get("clientId"))) {
-                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Invalid clientId");
+            if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
+                throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
             }
         }
 
