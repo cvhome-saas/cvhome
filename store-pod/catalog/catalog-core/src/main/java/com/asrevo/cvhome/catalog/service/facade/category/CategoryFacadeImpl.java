@@ -56,15 +56,19 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     private static final String ADMIN_CATEGORY = "admin";
 
-    private static final String NOT_FOUND_SUFFIX = "] not found";
+    private static final String CATEGORY_ID_NOT_FOUND_TEMPLATE = "Category id [%s] not found";
 
-    private static final String CATEGORY_WITH_ID_MESSAGE = "Category with id [";
+    private static final String CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE = "Category with id [%s] not found";
 
-    private static final String FOR_STORE_MESSAGE = "] for store [";
+    private static final String CATEGORY_NOT_FOUND_TEMPLATE = "Category [%s] not found";
 
-    private static final String BRACKET_CLOSE = "]";
+    private static final String CATEGORY_WITH_ID_FOR_STORE_TEMPLATE = "Category with id [%s] for store [%s]";
 
-    private static final String INVALID_IDENTIFIERS_MESSAGE = "Invalid identifiers for Merchant [";
+    private static final String INVALID_IDENTIFIERS_TEMPLATE = "Invalid identifiers for Merchant [%s]";
+
+    private static final String READING_CATEGORY_CODE_ERROR_TEMPLATE = "Exception while reading category code [%s]";
+
+    private static final String GETTING_CATEGORY_ERROR_TEMPLATE = "Error while getting category [%s]";
 
     private final CategoryService categoryService;
 
@@ -215,7 +219,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         Category category = categoryService.getById(id, store);
 
         if (category == null) {
-            throw new ResourceNotFoundException("Category id [" + id + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(CATEGORY_ID_NOT_FOUND_TEMPLATE.formatted(id));
         }
 
         String lineage = category.getLineage();
@@ -264,7 +268,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
     private Category getById(StoreMerchantId store, Long id) {
         Category category = categoryService.getById(id, store);
         if (category == null) {
-            throw new ResourceNotFoundException(CATEGORY_WITH_ID_MESSAGE + id + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(id));
         }
         if (!Objects.equals(category.getStoreMerchantId(), store)) {
             throw new UnauthorizedException("Unauthorized");
@@ -293,7 +297,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         List<ReadableProductVariant> variants = new ArrayList<>();
 
         if (category == null) {
-            throw new ResourceNotFoundException("Category [" + categoryId + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND_TEMPLATE.formatted(categoryId));
         }
 
         try {
@@ -380,8 +384,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
             Category c = categoryService.getById(child, store);
 
             if (c == null) {
-                throw new ResourceNotFoundException(
-                        CATEGORY_WITH_ID_MESSAGE + child + FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(CATEGORY_WITH_ID_FOR_STORE_TEMPLATE.formatted(child, store));
             }
 
             if (parent == -1) {
@@ -392,8 +395,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
             Category p = categoryService.getById(parent, store);
 
             if (p == null) {
-                throw new ResourceNotFoundException(
-                        CATEGORY_WITH_ID_MESSAGE + parent + FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(CATEGORY_WITH_ID_FOR_STORE_TEMPLATE.formatted(parent, store));
             }
 
             if (c.getParent() != null && c.getParent().getId().equals(parent)) {
@@ -401,13 +403,11 @@ public class CategoryFacadeImpl implements CategoryFacade {
             }
 
             if (!Objects.equals(c.getStoreMerchantId(), store)) {
-                throw new OperationNotAllowedException(
-                        INVALID_IDENTIFIERS_MESSAGE + c.getStoreMerchantId() + BRACKET_CLOSE);
+                throw new OperationNotAllowedException(INVALID_IDENTIFIERS_TEMPLATE.formatted(c.getStoreMerchantId()));
             }
 
             if (!Objects.equals(p.getStoreMerchantId(), store)) {
-                throw new OperationNotAllowedException(
-                        INVALID_IDENTIFIERS_MESSAGE + c.getStoreMerchantId() + BRACKET_CLOSE);
+                throw new OperationNotAllowedException(INVALID_IDENTIFIERS_TEMPLATE.formatted(c.getStoreMerchantId()));
             }
 
             p.getAuditSection().setModifiedBy("Api");
@@ -424,7 +424,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         try {
             return categoryService.getByCode(store, code);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while reading category code [" + code + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(READING_CATEGORY_CODE_ERROR_TEMPLATE.formatted(code), e);
         }
     }
 
@@ -435,7 +435,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
             c.setVisible(category.isVisible());
             categoryService.saveOrUpdate(c);
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting category [" + category.getId() + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(GETTING_CATEGORY_ERROR_TEMPLATE.formatted(category.getId()), e);
         }
     }
 

@@ -43,17 +43,43 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
-    private static final String BRACKET_CLOSE = "]";
+    private static final String PRODUCT_OPTION_NOT_FOUND_FOR_IF_TEMPLATE = "ProductOption not found for if [%s] and store [%s]";
 
-    private static final String AND_STORE_MESSAGE = "] and store [";
+    private static final String PRODUCT_OPTION_NOT_FOUND_TEMPLATE = "ProductOption not found for [%s] and store [%s]";
 
-    private static final String NOT_FOUND_SUFFIX = "] not found";
+    private static final String DELETING_PRODUCT_OPTION_ERROR_TEMPLATE = "An exception occured while deleting ProductOption [%s]";
 
-    private static final String PRODUCT_ATTRIBUTE_MESSAGE = "Product attribute [";
+    private static final String PRODUCT_OPTION_VALUE_NOT_FOUND_TEMPLATE = "ProductOptionValue not found for  [%s] and store [%s]";
 
-    private static final String PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE = "ProductAttribute not found for [";
+    private static final String DELETING_PRODUCT_OPTION_VALUE_ERROR_TEMPLATE =
+            "An exception occured while deleting ProductOptionValue [%s]";
 
-    private static final String AND_PRODUCT_MESSAGE = "] and product [";
+    private static final String OPTION_ID_NOT_FOUND_TEMPLATE = "Option id [%s] not found";
+
+    private static final String PRODUCT_OPTION_VALUE_DOES_NOT_EXIST_TEMPLATE =
+            "ProductOptionValue [%s] does not exists for store [%s]";
+
+    private static final String OPTION_VALUE_ID_NOT_FOUND_TEMPLATE = "OptionValue id [%s] not found";
+
+    private static final String PRODUCT_ATTRIBUTE_NOT_FOUND_TEMPLATE = "Product attribute [%s] not found";
+
+    private static final String PRODUCT_ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE =
+            "Product attribute [%s] not found for product [%s]";
+
+    private static final String ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE = "ProductAttribute not found for [%s] and store [%s]";
+
+    private static final String ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE =
+            "ProductAttribute not found for [%s] and product [%s]";
+
+    private static final String ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE =
+            "ProductAttribute not found for [%s] and product [%s] and store [%s]";
+
+    private static final String PRODUCT_NOT_FOUND_FOR_ID_TEMPLATE = "Productnot found for id [%s]";
+
+    private static final String PRODUCT_NOT_FOUND_ID_FOR_STORE_TEMPLATE = "Productnot found id [%s] for store [%s]";
+
+    private static final String DELETING_PRODUCT_ATTRIBUTE_ERROR_TEMPLATE =
+            "An exception occured while deleting ProductAttribute [%s]";
 
     private final ProductOptionService productOptionService;
 
@@ -83,7 +109,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             optionModel = productOptionService.getById(store, option.getId());
             if (optionModel == null) {
                 throw new ResourceNotFoundException(
-                        "ProductOption not found for if [" + option.getId() + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                        PRODUCT_OPTION_NOT_FOUND_FOR_IF_TEMPLATE.formatted(option.getId(), store));
             }
         }
 
@@ -102,14 +128,12 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     public void deleteOption(Long optionId, StoreMerchantId store) {
         ProductOption optionModel = productOptionService.getById(store, optionId);
         if (optionModel == null) {
-            throw new ResourceNotFoundException(
-                    "ProductOption not found for [" + optionId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_NOT_FOUND_TEMPLATE.formatted(optionId, store));
         }
         try {
             productOptionService.delete(optionModel);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while deleting ProductOption [" + optionId + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(DELETING_PRODUCT_OPTION_ERROR_TEMPLATE.formatted(optionId), e);
         }
     }
 
@@ -117,14 +141,12 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     public void deleteOptionValue(Long optionValueId, StoreMerchantId store) {
         ProductOptionValue optionModel = productOptionValueService.getById(store, optionValueId);
         if (optionModel == null) {
-            throw new ResourceNotFoundException(
-                    "ProductOptionValue not found for  [" + optionValueId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_VALUE_NOT_FOUND_TEMPLATE.formatted(optionValueId, store));
         }
         try {
             productOptionValueService.delete(optionModel);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while deleting ProductOptionValue [" + optionValueId + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(DELETING_PRODUCT_OPTION_VALUE_ERROR_TEMPLATE.formatted(optionValueId), e);
         }
     }
 
@@ -173,7 +195,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ProductOption option = productOptionService.getById(store, optionId);
 
         if (option == null) {
-            throw new ResourceNotFoundException("Option id [" + optionId + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(OPTION_ID_NOT_FOUND_TEMPLATE.formatted(optionId));
         }
 
         return readableMapper.convert(option, store, language);
@@ -207,7 +229,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             value = productOptionValueService.getById(store, optionValue.getId());
             if (value == null) {
                 throw new ResourceNotFoundException(
-                        "ProductOptionValue [" + optionValue.getId() + "] does not exists for store [" + store + BRACKET_CLOSE);
+                        PRODUCT_OPTION_VALUE_DOES_NOT_EXIST_TEMPLATE.formatted(optionValue.getId(), store));
             }
         }
 
@@ -235,7 +257,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ProductOptionValue optionValue = productOptionValueService.getById(store, optionValueId);
 
         if (optionValue == null) {
-            throw new ResourceNotFoundException("OptionValue id [" + optionValueId + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(OPTION_VALUE_ID_NOT_FOUND_TEMPLATE.formatted(optionValueId));
         }
 
         return readableOptionValueMapper.convert(optionValue, store, language);
@@ -249,12 +271,12 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         if (attribute.getId() != null && attribute.getId() > 0) {
             attr = productAttributeService.getById(attribute.getId());
             if (attr == null) {
-                throw new ResourceNotFoundException(PRODUCT_ATTRIBUTE_MESSAGE + attribute.getId() + NOT_FOUND_SUFFIX);
+                throw new ResourceNotFoundException(PRODUCT_ATTRIBUTE_NOT_FOUND_TEMPLATE.formatted(attribute.getId()));
             }
 
             if (productId != attr.getProduct().getId().longValue()) {
                 throw new ResourceNotFoundException(
-                        PRODUCT_ATTRIBUTE_MESSAGE + attribute.getId() + "] not found for product [" + productId + BRACKET_CLOSE);
+                        PRODUCT_ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attribute.getId(), productId));
             }
         }
 
@@ -275,18 +297,17 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         ProductAttribute attr = productAttributeService.getById(attributeId);
 
         if (attr == null) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(attributeId, store));
         }
 
         if (attr.getProduct().getId().longValue() != productId) {
             throw new ResourceNotFoundException(
-                    PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId + AND_PRODUCT_MESSAGE + productId + BRACKET_CLOSE);
+                    ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attributeId, productId));
         }
 
         if (!Objects.equals(attr.getProduct().getStore(), store)) {
-            throw new ResourceNotFoundException(PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId + AND_PRODUCT_MESSAGE
-                    + productId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(
+                    ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE.formatted(attributeId, productId, store));
         }
 
         return readableProductAttributeMapper.convert(attr, store, language);
@@ -296,11 +317,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         Product product = productService.getById(id);
 
         if (product == null) {
-            throw new ResourceNotFoundException("Productnot found for id [" + id + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_FOR_ID_TEMPLATE.formatted(id));
         }
 
         if (!Objects.equals(product.getStore(), store)) {
-            throw new ResourceNotFoundException("Productnot found id [" + id + "] for store [" + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_ID_FOR_STORE_TEMPLATE.formatted(id, store));
         }
 
         return product;
@@ -342,24 +363,23 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
             ProductAttribute attr = productAttributeService.getById(attributeId);
             if (attr == null) {
                 throw new ResourceNotFoundException(
-                        PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                        ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(attributeId, store));
             }
 
             if (attr.getProduct().getId().longValue() != productId) {
                 throw new ResourceNotFoundException(
-                        PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId + AND_PRODUCT_MESSAGE + productId + BRACKET_CLOSE);
+                        ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attributeId, productId));
             }
 
             if (!Objects.equals(attr.getProduct().getStore(), store)) {
-                throw new ResourceNotFoundException(PRODUCT_ATTRIBUTE_NOT_FOUND_MESSAGE + attributeId
-                        + AND_PRODUCT_MESSAGE + productId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(
+                        ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE.formatted(attributeId, productId, store));
             }
 
             productAttributeService.delete(attr);
 
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while deleting ProductAttribute [" + attributeId + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(DELETING_PRODUCT_ATTRIBUTE_ERROR_TEMPLATE.formatted(attributeId), e);
         }
     }
 

@@ -21,11 +21,9 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 @Service
 public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
-    private static final String PRODUCT_OPTION_SET_NOT_FOUND_MESSAGE = "ProductOptionSet not found for id [";
+    private static final String PRODUCT_OPTION_SET_NOT_FOUND_TEMPLATE = "ProductOptionSet not found for id [%s] and store [%s]";
 
-    private static final String AND_STORE_MESSAGE = "] and store [";
-
-    private static final String BRACKET_CLOSE = "]";
+    private static final String CANT_FIND_PRODUCT_TYPE_TEMPLATE = "Can't fing product type [%s] fpr merchand [%s]";
 
     private final PersistableProductOptionSetMapper persistableProductOptionSetMapper;
 
@@ -48,8 +46,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     public ReadableProductOptionSet get(Long id, StoreMerchantId store, LanguageCode language) {
         ProductOptionSet optionSet = productOptionSetService.getById(store, id, language);
         if (optionSet == null) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_OPTION_SET_NOT_FOUND_MESSAGE + id + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_SET_NOT_FOUND_TEMPLATE.formatted(id, store));
         }
 
         return readableProductOptionSetMapper.convert(optionSet, store, language);
@@ -84,8 +81,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     public void update(Long id, PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language) {
         ProductOptionSet opt = productOptionSetService.getById(store, id, language);
         if (opt == null) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_OPTION_SET_NOT_FOUND_MESSAGE + id + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_SET_NOT_FOUND_TEMPLATE.formatted(id, store));
         }
 
         optionSet.setId(id);
@@ -99,12 +95,10 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     public void delete(Long id, StoreMerchantId store) {
         ProductOptionSet opt = productOptionSetService.getById(id);
         if (opt == null) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_OPTION_SET_NOT_FOUND_MESSAGE + id + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_SET_NOT_FOUND_TEMPLATE.formatted(id, store));
         }
         if (!opt.getStoreMerchantId().equals(store)) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_OPTION_SET_NOT_FOUND_MESSAGE + id + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_OPTION_SET_NOT_FOUND_TEMPLATE.formatted(id, store));
         }
         try {
             productOptionSetService.delete(opt);
@@ -124,8 +118,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
         ReadableProductType readable = productTypeFacade.get(store, type, language);
 
         if (readable == null) {
-            throw new ResourceNotFoundException(
-                    "Can't fing product type [" + type + "] fpr merchand [" + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(CANT_FIND_PRODUCT_TYPE_TEMPLATE.formatted(type, store));
         }
 
         List<ProductOptionSet> optionSets = productOptionSetService.getByProductType(readable.getId(), store, language);

@@ -124,7 +124,8 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
     }
 
     private String appendOrderId(String url, Long orderId) {
-        return url + (url.contains(QUERY_PARAM_SEPARATOR) ? "&" : QUERY_PARAM_SEPARATOR) + "orderId=" + orderId;
+        String separator = url.contains(QUERY_PARAM_SEPARATOR) ? "&" : QUERY_PARAM_SEPARATOR;
+        return "%s%sorderId=%d".formatted(url, separator, orderId);
     }
 
     private void updateOrderStatus(Order modelOrder, OrderStatus orderStatus, InventoryStatus inventoryStatus,

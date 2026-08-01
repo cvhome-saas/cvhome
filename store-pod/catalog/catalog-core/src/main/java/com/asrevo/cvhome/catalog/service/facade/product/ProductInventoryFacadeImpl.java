@@ -33,17 +33,14 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
-    private static final String PRODUCT_WITH_ID_MESSAGE = "Product with id [";
+    private static final String PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE =
+            "Product with id [%s] and inventory id [%s] not found for store id [%s]";
 
-    private static final String AND_INVENTORY_ID_MESSAGE = "] and inventory id [";
+    private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s] not found";
 
-    private static final String NOT_FOUND_FOR_STORE_ID_MESSAGE = "] not found for store id [";
+    private static final String PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE = "Product with instance [%s] not found";
 
-    private static final String BRACKET_CLOSE = "]";
-
-    private static final String NOT_FOUND_SUFFIX = "] not found";
-
-    private static final String INVENTORY_WITH_ID_MESSAGE = "Inventory with id [";
+    private static final String INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE = "Inventory with id [%s] not found";
 
     private final ProductAvailabilityService productAvailabilityService;
 
@@ -77,12 +74,12 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                 if (availability.get().getProduct().getId().equals(productId)) {
                     productAvailabilityService.delete(availability.get());
                 } else {
-                    throw new ResourceNotFoundException(PRODUCT_WITH_ID_MESSAGE + productId + AND_INVENTORY_ID_MESSAGE
-                            + inventoryId + NOT_FOUND_FOR_STORE_ID_MESSAGE + store + BRACKET_CLOSE);
+                    throw new ResourceNotFoundException(
+                            PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
                 }
             } else {
-                throw new ResourceNotFoundException(PRODUCT_WITH_ID_MESSAGE + productId + AND_INVENTORY_ID_MESSAGE
-                        + inventoryId + NOT_FOUND_FOR_STORE_ID_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(
+                        PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
             }
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while deleting inventory", e);
@@ -91,13 +88,13 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     private Product getProductById(Long productId, StoreMerchantId store) {
         return productService.retrieveById(productId, store)
-                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_WITH_ID_MESSAGE + productId + NOT_FOUND_SUFFIX));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE.formatted(productId)));
     }
 
     private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store) {
         return productVariantService.getById(instanceId, store)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Product with instance [" + instanceId + NOT_FOUND_SUFFIX));
+                        () -> new ResourceNotFoundException(PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE.formatted(instanceId)));
     }
 
     @Override
@@ -128,7 +125,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
         ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException(INVENTORY_WITH_ID_MESSAGE + inventoryId + NOT_FOUND_SUFFIX));
+                        () -> new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventoryId)));
         return readableInventoryMapper.convert(availability, store, language);
     }
 
@@ -152,7 +149,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                 .flatMap(it -> it.stream().filter(a -> a.getId().equals(inventory.getId())).findAny())
                 .orElse(null);
         if (avail == null) {
-            throw new ResourceNotFoundException(INVENTORY_WITH_ID_MESSAGE + inventory.getId() + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventory.getId()));
         }
 
         if (product != null) {

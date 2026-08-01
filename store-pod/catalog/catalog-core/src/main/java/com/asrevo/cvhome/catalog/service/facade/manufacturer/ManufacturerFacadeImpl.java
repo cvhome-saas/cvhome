@@ -29,15 +29,16 @@ import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 @Service("manufacturerFacade")
 public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
-    private static final String NOT_FOUND_SUFFIX = "] not found";
+    private static final String CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE = "Category with id [%s] not found";
 
-    private static final String MANUFACTURER_WITH_ID_MESSAGE = "Manufacturer with id [";
+    private static final String MANUFACTURER_WITH_ID_NOT_FOUND_TEMPLATE = "Manufacturer with id [%s] not found";
 
-    private static final String NOT_FOUND_FOR_STORE_MESSAGE = "] not found for store [";
+    private static final String MANUFACTURER_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE =
+            "Manufacturer with id [%s] not found for store [%s]";
 
-    private static final String BRACKET_CLOSE = "]";
+    private static final String MANUFACTURER_NOT_FOUND_TEMPLATE = "Manufacturer [%s] not found";
 
-    private static final String MANUFACTURER_MESSAGE = "Manufacturer [";
+    private static final String MANUFACTURER_NOT_FOUND_FOR_STORE_TEMPLATE = "Manufacturer [%s] not found for store [%s]";
 
     private final Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter;
 
@@ -58,7 +59,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         Category category = categoryService.getById(categoryId, store);
 
         if (category == null) {
-            throw new ResourceNotFoundException("Category with id [" + categoryId + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(categoryId));
         }
 
         if (!Objects.equals(category.getStoreMerchantId(), store)) {
@@ -84,12 +85,12 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         if (manufacturer.getId() != null && manufacturer.getId() > 0) {
             manuf = manufacturerService.getById(manufacturer.getId());
             if (manuf == null) {
-                throw new ResourceNotFoundException(MANUFACTURER_WITH_ID_MESSAGE + manufacturer.getId() + NOT_FOUND_SUFFIX);
+                throw new ResourceNotFoundException(MANUFACTURER_WITH_ID_NOT_FOUND_TEMPLATE.formatted(manufacturer.getId()));
             }
 
             if (!Objects.equals(manuf.getStoreMerchantId(), store)) {
-                throw new ResourceNotFoundException(MANUFACTURER_WITH_ID_MESSAGE + manufacturer.getId()
-                        + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(
+                        MANUFACTURER_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(manufacturer.getId(), store));
             }
         }
 
@@ -110,12 +111,11 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         Manufacturer manufacturer = manufacturerService.getById(id);
 
         if (manufacturer == null) {
-            throw new ResourceNotFoundException(MANUFACTURER_MESSAGE + id + NOT_FOUND_SUFFIX);
+            throw new ResourceNotFoundException(MANUFACTURER_NOT_FOUND_TEMPLATE.formatted(id));
         }
 
         if (!manufacturer.getStoreMerchantId().equals(store)) {
-            throw new ResourceNotFoundException(
-                    MANUFACTURER_MESSAGE + id + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(MANUFACTURER_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
         }
 
         ReadableManufacturer readableManufacturer = new ReadableManufacturer();
