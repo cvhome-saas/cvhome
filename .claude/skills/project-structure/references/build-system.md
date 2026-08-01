@@ -99,7 +99,12 @@ is in `configuration.md`.
 ./gradlew :store-core:seller-ui:bootRun                 # npm run dev, via ui-conventions
 ./gradlew :store-core:uaa:build                         # also builds + embeds uaa-fe
 docker compose -f docker-compose-lcl.yml up             # postgres, spg, otel-collector, loki, tempo, prometheus, grafana
+sudo ./extra/scripts/configure-domain.sh                # one-off: /etc/hosts entries for *.gateway.com
 ```
+
+Run `configure-domain.sh` **before** the first local run — services address each other by hostname
+(`merchant.gateway.com`, `spg-507f1f77.gateway.com`, `org1-store1.spg-507f1f77.gateway.com`), not `localhost`,
+and nothing resolves without those entries. See `gateways-and-local-domains.md`.
 
 Local infra in `docker-compose-lcl.yml`: `postgres:15-alpine`, `saas-gateway` (spg image),
 `otel/opentelemetry-collector-contrib`, `grafana/loki`, `grafana/tempo`, `prom/prometheus`, `grafana/grafana` —

@@ -105,7 +105,9 @@ Two fields do real work at runtime, not just documentation:
   caller's namespace against the target's to decide between a direct `lb://<service>` call and a
   gateway-routed one. See `service-to-service.md`.
 - **`gateway-service-name`** — which edge fronts that service (`store-core-gateway` or `spg`) when it is
-  reached from outside its namespace.
+  reached from outside its namespace. This is what makes `merchant` reachable as
+  `spg-507f1f77.gateway.com/merchant` in addition to `merchant.gateway.com:8120` —
+  see `gateways-and-local-domains.md`.
 
 `crypto.type: LOCAL` selects the `secret-crypto` provider (KMS in AWS).
 
@@ -115,8 +117,10 @@ Two fields do real work at runtime, not just documentation:
 
 - Datasource: `jdbc:postgresql://localhost:5432/cvhome`, `postgres`/`password`
 - `spring.cloud.discovery.client.simple.instances` — every service registered with a hardcoded
-  `http://localhost:<port>` URI. This is what makes `lb://catalog` resolve without any discovery infrastructure
-  locally.
+  `http://localhost:<port>` URI, consumed by Spring's `SimpleDiscoveryClient` /
+  `SimpleReactiveDiscoveryClient`. This is what makes `lb://catalog` resolve without any discovery
+  infrastructure locally. **A new service needs an entry here as well as in `common-config.yml`** —
+  see `service-discovery.md`.
 
 ## `fargate-config.yml` — AWS environment
 
@@ -124,9 +128,10 @@ Two fields do real work at runtime, not just documentation:
 - `spring.cloud.loadbalancer.eager-load.clients` — pre-warms LB state for all services
 - `spring.cloud.ecs.discovery` — namespace + namespace-id for **AWS Cloud Map**, `enabled: true`,
   `default-port: 8080`, and a `service-ports` map repeating the port per service. Consumed by
-  `ecs-service-discoveryclient` (`EcsDiscoveryClient`).
+  `ecs-service-discoveryclient` (`EcsDiscoveryClient`). Both `enabled` and `namespace` must be present for
+  those beans to exist — their absence in `lcl-config.yml` is what keeps the module dormant locally.
 
-Same `lb://` URLs as local; only the discovery client behind them changes.
+Same `lb://` URLs as local; only the discovery client behind them changes (`service-discovery.md`).
 
 ## `store-pod-lcl-config.yml` / `store-pod-fargate-config.yml` — the pod layer
 

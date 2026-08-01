@@ -90,7 +90,11 @@ service name** (`"catalog"`), never a URL.
 
 The `lb://` scheme means Spring Cloud LoadBalancer resolves instances via the discovery client — `SimpleDiscoveryClient`
 with hardcoded localhost URIs in `lcl`, and `EcsDiscoveryClient` (AWS Cloud Map) in `fargate`. Same code, different
-environment.
+environment. How both are wired, and what to add when introducing a service: `service-discovery.md`.
+
+Note the two builder flavours in `WebClientServicesConfig`: `buildClient(String, …)` uses the `@LoadBalanced`
+`microService*` builder (so it can speak `lb://`), while `buildClient(Pod, …)` uses the plain `default*` builder,
+because an `EXTERNAL` pod endpoint is an absolute URL. Both carry the `s2s` OAuth2 interceptor.
 
 There is a second overload, `buildClient(Pod pod, String serviceName, Class<T>)`, for calls into a **specific
 tenant pod** where the target is data, not config. `ServiceUrlBuilder.getServiceUrl(Pod)` switches on

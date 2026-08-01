@@ -145,6 +145,10 @@ Caddy, not Java. Responsibilities, from the `Caddyfile`:
 
    `cua` is the exception: it needs the `/cua` prefix preserved because OAuth2 redirect URIs must match.
 
+**Every pod service therefore has two addresses** — its port (`merchant:8120`, inside the namespace) and its
+spg path (`spg-507f1f77.gateway.com/merchant`, from anywhere else). Prefer the gateway path when calling by
+hand; `gateways-and-local-domains.md` has both edges' routing tables and the local `/etc/hosts` setup.
+
 ## Pod-shared libraries (`store-pod/commons/`)
 
 | Module | Role |

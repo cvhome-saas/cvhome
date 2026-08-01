@@ -48,7 +48,11 @@ merely depending on this module.
 A typed SDK for UAA's admin API, so services can manage users/clients without hand-rolling HTTP:
 `AbstractAdminClient`, `AdminUserClient`, `AdminClientClient`, `OAuth2TokenManager`, `ApiException`, and DTOs
 (`ClientDetailsSettings`, `ClientSummary`, `UpdateUserRequest`, `ResetUserPasswordRequest`, `OAuthGrantType`,
-`OAuth2TokenFormat`, `PageResponse`). Split interface/impl so consumers can depend on the contract alone.
+`OAuth2TokenFormat`, `PageResponse`). Split interface/impl so consumers can depend on the contract alone:
+`uaa-client` holds `UserAccountService` + `Persistable*`/`ReadableUser`, `uaa-client-impl` the HTTP client.
+
+Full usage — wiring, the `admin-sdk` token, creating/fetching a user, and why the caller owns tenant scoping —
+in `uaa-client.md`.
 
 ## `store-commons:secret-crypto:*`
 
@@ -71,11 +75,13 @@ AWS runtime helpers, depended on by every `-service`:
 
 - `ecs-service-discoveryclient` — `EcsDiscoveryClient` / `EcsReactiveDiscoveryClient`, `CloudMapServiceInstance`,
   `EcsDiscoveryProperties`, `ConditionalOnEcsDiscoveryEnabled`. Implements Spring Cloud's `DiscoveryClient` over
-  **AWS Cloud Map**, which is how services resolve one another in Fargate.
+  **AWS Cloud Map**, which is how services resolve one another in Fargate. Also vendors a patched copy of
+  Spring's `org.springframework.cloud.client.DefaultServiceInstance` (adds a `getScheme()` override).
 - `fargate-task-info` — reads the ECS task metadata endpoint (`Container`, `Network`,
-  `EphemeralStorageMetrics`).
+  `EphemeralStorageMetrics`); surfaced as a bean + health indicator by `autoconfigure`'s `EcsInfoConfig`.
 
-Both are inert outside AWS (guarded by conditionals), so they stay on the classpath locally.
+Both are inert outside AWS (guarded by conditionals), so they stay on the classpath locally. The local
+counterpart and the whole `lb://` resolution story: `service-discovery.md`.
 
 ---
 

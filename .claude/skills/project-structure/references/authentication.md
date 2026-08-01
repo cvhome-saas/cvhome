@@ -109,6 +109,14 @@ app holds no tokens and makes same-origin relative calls. Relevant gateway class
 Each `-service` also has its own small `controller/v1/auth/AuthController` for exposing the current principal to
 its own clients.
 
+## Managing users (as opposed to authenticating them)
+
+Creating, listing, enabling or role-assigning a **staff/seller** account means calling `uaa`'s admin API, and
+that goes through the `store-commons:uaa-client` / `uaa-client-impl` SDK (`UserAccountService` →
+`AdminUserClient` → `/api/v1/admin/users`), authenticated by its own `admin-sdk` `client_credentials` token with
+scope `super_admin` — not the `s2s` registration. Because that scope is platform-wide, the caller is responsible
+for tenant scoping via the `org`/`store` user metadata. Full guide: `uaa-client.md`.
+
 ## Related
 
 - Per-environment issuer/port values: `configuration.md`
