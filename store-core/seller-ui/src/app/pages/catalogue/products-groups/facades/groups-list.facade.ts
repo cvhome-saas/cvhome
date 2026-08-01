@@ -7,7 +7,9 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableProductGroup} from '../models/product-group.model';
 
 @Injectable()
 export class GroupsListFacade {
@@ -16,7 +18,7 @@ export class GroupsListFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, StorePageRequest>);
+  readonly tableState = inject(TableStateService<ReadableProductGroup, StorePageRequest>);
 
   readonly store = signal<string>('');
 
@@ -71,7 +73,7 @@ export class GroupsListFacade {
     });
   }
 
-  onPageChange(event: any): void {
+  onPageChange(event: DatatablePageEvent): void {
     this.tableState.setParams({
       ...this.tableState.params(),
       page: event.offset
@@ -83,17 +85,17 @@ export class GroupsListFacade {
     this.router.navigate(['/pages/catalogue/products-groups/create-products-group']);
   }
 
-  onCreate(event: any): void {
+  onCreate(event: ReadableProductGroup): void {
     this.router.navigate(['/pages/catalogue/products-groups/create-products-group'], {
       queryParams: {code: event.code}
     });
   }
 
-  onEdit(row: any): void {
+  onEdit(row: ReadableProductGroup): void {
     this.router.navigate([`/pages/catalogue/products-groups/update-products-group/${row.code}`]);
   }
 
-  onDelete(row: any): void {
+  onDelete(row: ReadableProductGroup): void {
     this.dialogService.open(ShowcaseDialogComponent, {}).onClose.subscribe((res) => {
       if (res) {
         this.productGroupsService.removeProductGroup(row.code).subscribe({

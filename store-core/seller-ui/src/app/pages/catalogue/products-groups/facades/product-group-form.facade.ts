@@ -8,6 +8,9 @@ import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ProductGroupItem} from '../models/product-group.model';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
 
 @Injectable()
 export class ProductGroupFormFacade {
@@ -21,10 +24,10 @@ export class ProductGroupFormFacade {
 
   readonly loader = signal<boolean>(false);
   readonly isCodeUnique = signal<boolean>(true);
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly store = signal<string>('');
   readonly uniqueCode = signal<string | undefined>(undefined);
-  readonly rows = signal<any[]>([]);
+  readonly rows = signal<ProductGroupItem[]>([]);
   readonly page = signal<PageT<never>>(EMPTY_PAGE);
 
   private defaultLanguage = '';
@@ -116,7 +119,7 @@ export class ProductGroupFormFacade {
     this.router.navigate(['pages/catalogue/products-groups/groups-list']);
   }
 
-  onItemSelect(item: any): void {
+  onItemSelect(item: ProductGroupItem): void {
     const groupCode = this.uniqueCode();
     this.loader.set(true);
     this.productGroupsService.addProductToGroup(item.id, groupCode).subscribe({
@@ -132,7 +135,7 @@ export class ProductGroupFormFacade {
     });
   }
 
-  onItemDeSelect(item: any): void {
+  onItemDeSelect(item: ProductGroupItem): void {
     const groupCode = this.uniqueCode();
     this.loader.set(true);
     this.productGroupsService.removeProductFromGroup(item.id, groupCode).subscribe({
@@ -148,13 +151,13 @@ export class ProductGroupFormFacade {
     });
   }
 
-  onPageChange(pageInfo: any): void {
+  onPageChange(pageInfo: DatatablePageEvent): void {
     if (!this.uniqueCode() || !this.isLoaded) return;
     this.page.update((current) => ({...current, pageNumber: pageInfo.offset}));
     this.loadGroup();
   }
 
-  private setRows(rows: any[]): void {
+  private setRows(rows: ProductGroupItem[]): void {
     this.rows.set(rows);
     this.page.update((current) => ({
       ...current,

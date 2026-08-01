@@ -1,6 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {ActiveButtonFacade} from '../facades/active-button.facade';
+import {ReadableProductGroup} from '../models/product-group.model';
 
 @Component({
   selector: 'ngx-product-groups-active',
@@ -11,7 +12,7 @@ import {ActiveButtonFacade} from '../facades/active-button.facade';
 })
 export class ActiveButtonComponent {
   @Input() value: boolean;
-  @Input() rowData: any;
+  @Input() rowData: ReadableProductGroup;
   @Input() store: string;
 
   private readonly facade = inject(ActiveButtonFacade);

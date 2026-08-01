@@ -1,6 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ReadableProductGroup, ReadableProductGroupDescription} from '../models/product-group.model';
 
 @Injectable()
 export class ProductGroupFormService {
@@ -25,7 +27,7 @@ export class ProductGroupFormService {
     return this.form.get('descriptions') as FormArray;
   }
 
-  initDescriptions(languages: any[]): void {
+  initDescriptions(languages: SupportedLanguageCode[]): void {
     this.descriptions.clear();
     languages.forEach((lang) => {
       this.descriptions.push(this.fb.group({
@@ -43,14 +45,14 @@ export class ProductGroupFormService {
     this.form.patchValue({code});
   }
 
-  patchForm(group: any, defaultLanguage: string): void {
+  patchForm(group: ReadableProductGroup, defaultLanguage: string): void {
     this.form.patchValue({
       code: group.code,
       active: group.active,
       selectedLanguage: defaultLanguage
     });
 
-    (group.descriptions || []).forEach((desc: any) => {
+    (group.descriptions || []).forEach((desc: ReadableProductGroupDescription) => {
       const index = this.descriptions.controls.findIndex(
         (control) => control.value.language === desc.language
       );
@@ -72,7 +74,7 @@ export class ProductGroupFormService {
     return this.selectedLanguage.value === langCode ? 'primary' : 'basic';
   }
 
-  prepareSaveData(): any {
+  prepareSaveData() {
     const {code, active, descriptions} = this.form.value;
     return {code, active, descriptions};
   }
