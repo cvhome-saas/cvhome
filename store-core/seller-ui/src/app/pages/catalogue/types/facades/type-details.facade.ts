@@ -7,8 +7,10 @@ import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
-import {zip} from 'rxjs';
+import {Observable, zip} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ReadableProductType} from '../models/product-type.model';
 
 @Injectable()
 export class TypeDetailsFacade {
@@ -27,9 +29,9 @@ export class TypeDetailsFacade {
   readonly isCodeExist = signal<boolean>(false);
   readonly isValidCode = signal<boolean>(true);
   readonly isReadonlyCode = signal<boolean>(false);
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
 
-  private typeData: any = null;
+  private typeData: ReadableProductType = null;
   private defaultLanguage = '';
 
   init(destroyRef: DestroyRef): void {
@@ -112,7 +114,7 @@ export class TypeDetailsFacade {
 
     const typeObject = this.formService.form.value;
 
-    const request$ = this.typeData?.id
+    const request$: Observable<unknown> = this.typeData?.id
       ? this.typesService.updateType(this.typeData.id, typeObject)
       : this.typesService.createType(typeObject);
 

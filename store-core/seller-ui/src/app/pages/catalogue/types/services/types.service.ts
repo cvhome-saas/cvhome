@@ -4,6 +4,8 @@ import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {StorageService} from '../../../shared/services/storage.service';
 import {PageT, StorePageRequest} from '../../../shared/table/table.types';
+import {EntityExists} from '../../../shared/models/entity.model';
+import {CreatedEntity, PersistableProductType, ReadableProductType} from '../models/product-type.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,27 +16,27 @@ export class TypesService {
 
 
 
-  getListOfTypes(params: StorePageRequest): Observable<PageT<any>> {
+  getListOfTypes(params: StorePageRequest): Observable<PageT<ReadableProductType>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/types`, params);
   }
 
-  getType(id: string | number): Observable<any> {
+  getType(id: string | number): Observable<ReadableProductType> {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
-  createType(req: any): Observable<any> {
+  createType(req: PersistableProductType): Observable<CreatedEntity> {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/type`, req);
   }
 
-  updateType(id: string | number, req: any): Observable<any> {
+  updateType(id: string | number, req: PersistableProductType): Observable<void> {
     return this.crudService.put(`/spg/catalog/api/v1/private/product/type/${id}`, req);
   }
 
-  deleteType(id: string | number): Observable<any> {
+  deleteType(id: string | number): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/type/${id}`);
   }
 
-  checkCode(code: string): Observable<any> {
+  checkCode(code: string): Observable<EntityExists> {
     const params = {
       code
     };
