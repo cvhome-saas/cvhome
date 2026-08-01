@@ -6,6 +6,8 @@ import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {ProductRelationshipService} from '../product-related/services/product-relationship.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {ProductGroupItem} from '../../products-groups/models/product-group.model';
 
 @Injectable()
 export class ProductRelatedFacade {
@@ -15,7 +17,7 @@ export class ProductRelatedFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly store = signal<string>('');
-  readonly rows = signal<any[]>([]);
+  readonly rows = signal<ProductGroupItem[]>([]);
   readonly page = signal<PageT<never>>(EMPTY_PAGE);
 
   private product = '';
@@ -40,7 +42,7 @@ export class ProductRelatedFacade {
     });
   }
 
-  onItemSelect(item: any): void {
+  onItemSelect(item: ProductGroupItem): void {
     this.productRelationshipService.addProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows([...this.rows(), item]);
@@ -50,7 +52,7 @@ export class ProductRelatedFacade {
     });
   }
 
-  onItemDeSelect(item: any): void {
+  onItemDeSelect(item: ProductGroupItem): void {
     this.productRelationshipService.removeProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows(this.rows().filter((it) => it.id !== item.id));
@@ -60,11 +62,11 @@ export class ProductRelatedFacade {
     });
   }
 
-  onPageChange(pageInfo: any): void {
+  onPageChange(pageInfo: DatatablePageEvent): void {
     this.page.update((current) => ({...current, pageNumber: pageInfo.offset}));
   }
 
-  private setRows(rows: any[]): void {
+  private setRows(rows: ProductGroupItem[]): void {
     this.rows.set(rows);
     this.page.update((current) => ({
       ...current,

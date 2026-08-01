@@ -5,6 +5,7 @@ import {zip} from 'rxjs';
 import {ProductImageService} from '../services/product-image.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {ReadableImage} from '../models/product.model';
 
 @Injectable()
 export class ProductsImagesFacade {
@@ -13,7 +14,7 @@ export class ProductsImagesFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly errorService = inject(ErrorService);
 
-  readonly images = signal<any>(null);
+  readonly images = signal<ReadableImage[]>(null);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
   readonly addImageUrl = signal<string>('');
@@ -64,7 +65,7 @@ export class ProductsImagesFacade {
     });
   }
 
-  updateImage(event: any): void {
+  updateImage(event: { id: string | number; position: number }): void {
     this.loading.set(true);
     this.productImageService.updateImage(this.uniqueCode, event).subscribe({
       next: () => this.load(),

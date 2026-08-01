@@ -1,6 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ProductDescription, ReadableProductDefinition} from '../models/product.model';
 
 @Injectable()
 export class ProductFormService {
@@ -52,7 +54,7 @@ export class ProductFormService {
     return this.form.get('descriptions') as FormArray;
   }
 
-  initDescriptions(languages: any[]): void {
+  initDescriptions(languages: SupportedLanguageCode[]): void {
     this.descriptions.clear();
     languages.forEach((lang) => {
       this.descriptions.push(this.fb.group({
@@ -72,7 +74,7 @@ export class ProductFormService {
     this.form.patchValue({selectedLanguage: langCode});
   }
 
-  patchForm(product: any, defaultLanguage: string): void {
+  patchForm(product: ReadableProductDefinition, defaultLanguage: string): void {
     this.form.patchValue({
       sku: product.sku,
       visible: product.visible,
@@ -92,7 +94,7 @@ export class ProductFormService {
       selectedLanguage: defaultLanguage
     });
 
-    (product.descriptions || []).forEach((description: any) => {
+    (product.descriptions || []).forEach((description: ProductDescription) => {
       const index = this.descriptions.controls.findIndex(
         (control) => control.value.language === description.language
       );

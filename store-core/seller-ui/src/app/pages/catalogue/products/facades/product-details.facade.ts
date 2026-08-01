@@ -5,6 +5,7 @@ import {ProductService} from '../services/product.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {zip} from 'rxjs';
+import {ReadableProductDefinition} from '../models/product.model';
 
 @Injectable()
 export class ProductDetailsFacade {
@@ -13,7 +14,7 @@ export class ProductDetailsFacade {
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
 
-  readonly product = signal<any>({});
+  readonly product = signal<ReadableProductDefinition>({});
   readonly store = signal<string>('');
 
   init(destroyRef: DestroyRef): void {

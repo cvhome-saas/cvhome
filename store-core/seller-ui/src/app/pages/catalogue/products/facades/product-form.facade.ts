@@ -3,7 +3,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {NbRouteTab} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
-import {forkJoin} from 'rxjs';
+import {Observable, forkJoin} from 'rxjs';
 import {ProductFormService} from '../services/product-form.service';
 import {ProductService} from '../services/product.service';
 import {ManufactureService} from '../../brands/services/manufacture.service';
@@ -13,6 +13,10 @@ import {SelectedStoreService} from '../../../shared/services/selected-store.serv
 import {StoreService} from '../../../store-management/services/store.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {PRODUCT_FORM_TABS} from '../constants/product-form.constants';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ProductDescription, ReadableProductDefinition} from '../models/product.model';
+import {ReadableManufacturer} from '../../brands/models/brand.model';
+import {ReadableProductType} from '../../types/models/product-type.model';
 
 @Injectable()
 export class ProductFormFacade {
@@ -31,7 +35,7 @@ export class ProductFormFacade {
   readonly tabLoader = signal<boolean>(false);
   readonly manufacturers = signal<{ value: string; label: string }[]>([]);
   readonly productTypes = signal<{ value: string; label: string }[]>([]);
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly defaultLanguage = signal<string>('');
   readonly currentLanguage = signal<string>('');
   readonly isCodeUnique = signal<boolean>(true);
@@ -39,9 +43,9 @@ export class ProductFormFacade {
     PRODUCT_FORM_TABS.map((tab) => ({title: this.translate.instant(tab.titleKey), route: tab.route}))
   );
 
-  private productData: any;
+  private productData: ReadableProductDefinition;
 
-  init(product: any, destroyRef: DestroyRef): void {
+  init(product: ReadableProductDefinition, destroyRef: DestroyRef): void {
     this.productData = product;
     this.selectedStoreService.current()
       .pipe(takeUntilDestroyed(destroyRef))
@@ -63,8 +67,8 @@ export class ProductFormFacade {
       next: ([storeData, manufacturers, productTypes, languages]) => {
         this.defaultLanguage.set(storeData.defaultLanguage);
         this.currentLanguage.set(storeData.defaultLanguage);
-        this.manufacturers.set(manufacturers.content.map((option: any) => ({value: option.code, label: option.code})));
-        this.productTypes.set(productTypes.content.map((option: any) => ({value: option.code, label: option.code})));
+        this.manufacturers.set(manufacturers.content.map((option: ReadableManufacturer) => ({value: option.code, label: option.code})));
+        this.productTypes.set(productTypes.content.map((option: ReadableProductType) => ({value: option.code, label: option.code})));
         this.languages.set([...languages]);
 
         this.formService.initDescriptions(languages);
@@ -115,8 +119,8 @@ export class ProductFormFacade {
 
     const productObject = this.formService.form.value;
 
-    const tmpObj: any = {name: '', friendlyUrl: '', title: '', language: ''};
-    productObject.descriptions.forEach((el: any) => {
+    const tmpObj: Record<string, string> = {name: '', friendlyUrl: '', title: '', language: ''};
+    productObject.descriptions.forEach((el: ProductDescription) => {
       tmpObj.language = el.language;
       if (tmpObj.name === '' && el.name !== '') {
         tmpObj.name = el.name;
@@ -150,7 +154,7 @@ export class ProductFormFacade {
       return;
     }
 
-    productObject.descriptions.forEach((el: any) => {
+    productObject.descriptions.forEach((el: ProductDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (el[elKey] === '' && tmpObj[elKey] !== '') {
@@ -160,7 +164,7 @@ export class ProductFormFacade {
       }
     });
 
-    productObject.descriptions.forEach((el: any) => {
+    productObject.descriptions.forEach((el: ProductDescription) => {
       for (const elKey in el) {
         if (Object.prototype.hasOwnProperty.call(el, elKey)) {
           if (typeof el[elKey] === 'undefined' || !el[elKey]) {
@@ -173,7 +177,7 @@ export class ProductFormFacade {
 
     delete productObject.selectedLanguage;
 
-    const request$ = this.productData?.id
+    const request$: Observable<unknown> = this.productData?.id
       ? this.productService.updateProduct(this.productData.id, productObject)
       : this.productService.createProduct(productObject);
 

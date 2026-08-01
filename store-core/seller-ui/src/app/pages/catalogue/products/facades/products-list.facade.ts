@@ -8,6 +8,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
+import {ReadableProduct} from '../models/product.model';
 
 export interface ProductFilterPageRequest extends StorePageRequest {
   sku?: string;
@@ -23,7 +24,7 @@ export class ProductsListFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   private readonly errorService = inject(ErrorService);
-  readonly tableState = inject(TableStateService<any, ProductFilterPageRequest>);
+  readonly tableState = inject(TableStateService<ReadableProduct, ProductFilterPageRequest>);
 
   init(): void {
     const store = this.selectedStoreService.currentSelectedStore();
@@ -72,11 +73,11 @@ export class ProductsListFacade {
     this.loadPage();
   }
 
-  onEdit(row: any): void {
+  onEdit(row: ReadableProduct): void {
     this.router.navigate(['pages/catalogue/products/product/' + row.id]);
   }
 
-  onDelete(row: any): void {
+  onDelete(row: ReadableProduct): void {
     this.dialogService.open(ShowcaseDialogComponent, {}).onClose.subscribe((res) => {
       if (res) {
         this.productService.deleteProduct(row.id).subscribe({
@@ -90,7 +91,7 @@ export class ProductsListFacade {
     });
   }
 
-  updateCell(rowIndex: number, field: 'quantity' | 'price' | 'available', value: any): void {
+  updateCell(rowIndex: number, field: 'quantity' | 'price' | 'available', value: string | boolean): void {
     const content = [...this.tableState.page().content];
     const row = {...content[rowIndex], [field]: value};
     content[rowIndex] = row;
@@ -98,7 +99,7 @@ export class ProductsListFacade {
 
     this.productService.updateProductFromTable(row.id, {
       available: row.available,
-      price: row.price,
+      price: `${row.price}`,
       quantity: row.quantity
     }).subscribe({
       next: () => this.errorService.success('PRODUCT.PRODUCT_UPDATED'),

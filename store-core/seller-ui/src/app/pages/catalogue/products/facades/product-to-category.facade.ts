@@ -6,6 +6,7 @@ import {CategoryService} from '../../categories/services/category.service';
 import {ProductService} from '../services/product.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {ReadableCategory} from '../../categories/models/category.model';
 
 const PER_PAGE = 50; // ideally display all categories
 
@@ -77,8 +78,8 @@ export class ProductToCategoryFacade {
 
     forkJoin([productCategories$, allCategories$]).subscribe({
       next: ([productCategories, allCategories]) => {
-        this.selectedItems.set(productCategories.content.map((data: any) => data.id));
-        this.categories.set(allCategories.content.map((value: any) => ({id: value.id, name: value.code})));
+        this.selectedItems.set(productCategories.content.map((data: ReadableCategory) => `${data.id}`));
+        this.categories.set(allCategories.content.map((value: ReadableCategory) => ({id: `${value.id}`, name: value.code})));
         this.loading.set(false);
       },
       error: (err) => {

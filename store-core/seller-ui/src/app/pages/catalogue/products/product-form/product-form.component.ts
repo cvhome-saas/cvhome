@@ -16,6 +16,7 @@ import {
 import {QuillModule} from 'ngx-quill';
 import {ProductFormFacade} from '../facades/product-form.facade';
 import {ProductFormService} from '../services/product-form.service';
+import {ReadableProductDefinition} from '../models/product.model';
 
 @Component({
   selector: 'ngx-product-form',
@@ -40,7 +41,7 @@ import {ProductFormService} from '../services/product-form.service';
   providers: [ProductFormFacade, ProductFormService]
 })
 export class ProductFormComponent implements OnInit {
-  @Input() product: any;
+  @Input() product: ReadableProductDefinition;
   @Input() _title: string;
 
   protected readonly facade = inject(ProductFormFacade);
