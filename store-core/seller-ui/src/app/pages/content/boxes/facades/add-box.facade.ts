@@ -8,6 +8,9 @@ import {SelectedStoreService} from '../../../shared/services/selected-store.serv
 import {StoreService} from '../../../store-management/services/store.service';
 import {AddBoxFormService} from '../services/add-box.form.service';
 import {mergeMap, of, zip} from 'rxjs';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {HttpParamsLike} from '../../../shared/services/crud.service';
+import {ContentDescription, PersistableContentBox, ReadableContentBox} from '../../models/content.model';
 
 @Injectable()
 export class AddBoxFacade {
@@ -22,14 +25,14 @@ export class AddBoxFacade {
 
   readonly loader = signal<boolean>(false);
   readonly action = signal<'save' | 'edit'>('save');
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly defaultLanguage = signal<string>('');
   readonly currentLanguage = signal<string>('');
   readonly uniqueCode = signal<string>('');
   readonly isCodeExists = signal<boolean>(false);
-  readonly content = signal<any>(null);
+  readonly content = signal<ReadableContentBox>(null);
 
-  params: any = { store: '' };
+  params: HttpParamsLike = { store: '' };
   form!: FormGroup;
 
   get code() {
@@ -89,12 +92,12 @@ export class AddBoxFacade {
     this.currentLanguage.set(lang);
   }
 
-  checkCode(event: any): void {
-    const code = event.target.value.trim();
+  checkCode(event: Event): void {
+    const code = (event.target as HTMLInputElement).value.trim();
     this.contentService.checkCodeBoxExist(code, this.params)
       .subscribe({
-        next: (res: any) => this.isCodeExists.set(res.exists),
-        error: (err: any) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        next: (res) => this.isCodeExists.set(res.exists),
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
       });
   }
 
@@ -113,7 +116,7 @@ export class AddBoxFacade {
     delete object.selectedLanguage;
 
     const tmpObj = { name: '', friendlyUrl: '' };
-    object.descriptions.forEach((el: any) => {
+    object.descriptions.forEach((el: ContentDescription) => {
       if (el.name === '') {
         el.name = object.code;
       }
@@ -122,7 +125,7 @@ export class AddBoxFacade {
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || object.code === '') {
       // noop
     } else {
-      object.descriptions.forEach((el: any) => {
+      object.descriptions.forEach((el: ContentDescription) => {
         for (const elKey in el) {
           if (Object.prototype.hasOwnProperty.call(el, elKey)) {
             if (el[elKey] === '' && tmpObj[elKey as keyof typeof tmpObj] !== '') {
@@ -131,7 +134,7 @@ export class AddBoxFacade {
           }
         }
       });
-      object.descriptions.forEach((el: any) => {
+      object.descriptions.forEach((el: ContentDescription) => {
         for (const elKey in el) {
           if (Object.prototype.hasOwnProperty.call(el, elKey)) {
             if (el.name) {

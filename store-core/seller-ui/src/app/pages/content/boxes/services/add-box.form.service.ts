@@ -1,6 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ContentDescription, ReadableContentBox} from '../../models/content.model';
 
 @Injectable()
 export class AddBoxFormService {
@@ -16,7 +18,7 @@ export class AddBoxFormService {
     });
   }
 
-  addFormArray(form: FormGroup, languages: any[]): void {
+  addFormArray(form: FormGroup, languages: SupportedLanguageCode[]): void {
     const control = form.controls['descriptions'] as FormArray;
     languages.forEach(lang => {
       control.push(
@@ -31,7 +33,7 @@ export class AddBoxFormService {
     });
   }
 
-  fillForm(form: FormGroup, content: any, defaultLanguage: string): void {
+  fillForm(form: FormGroup, content: ReadableContentBox, defaultLanguage: string): void {
     form.patchValue({
       id: content.id,
       code: content.code,
@@ -42,11 +44,11 @@ export class AddBoxFormService {
     this.fillFormArray(form, content);
   }
 
-  fillFormArray(form: FormGroup, content: any): void {
+  fillFormArray(form: FormGroup, content: ReadableContentBox): void {
     const descriptions = form.value.descriptions || [];
-    descriptions.forEach((desc: any, index: number) => {
+    descriptions.forEach((desc: ContentDescription, index: number) => {
       if (content != null && content.descriptions) {
-        content.descriptions.forEach((description: any) => {
+        content.descriptions.forEach((description) => {
           if (desc.language === description.language) {
             (form.get('descriptions') as FormArray).at(index).patchValue({
               id: description.id,

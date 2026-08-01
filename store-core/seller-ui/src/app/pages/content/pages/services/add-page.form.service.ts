@@ -3,6 +3,8 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
 import {ErrorService} from '../../../shared/services/error.service';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {ContentDescription, ReadableContentPage} from '../../models/content.model';
 
 @Injectable()
 export class AddPageFormService {
@@ -21,7 +23,7 @@ export class AddPageFormService {
     });
   }
 
-  addFormArray(form: FormGroup, languages: any[]): void {
+  addFormArray(form: FormGroup, languages: SupportedLanguageCode[]): void {
     const control = form.controls['descriptions'] as FormArray;
     languages.forEach(lang => {
       control.push(
@@ -37,7 +39,7 @@ export class AddPageFormService {
     });
   }
 
-  fillForm(form: FormGroup, content: any, defaultLanguage: string): void {
+  fillForm(form: FormGroup, content: ReadableContentPage, defaultLanguage: string): void {
     form.patchValue({
       id: content.id,
       code: content.code,
@@ -49,11 +51,11 @@ export class AddPageFormService {
     this.fillFormArray(form, content);
   }
 
-  fillFormArray(form: FormGroup, content: any): void {
+  fillFormArray(form: FormGroup, content: ReadableContentPage): void {
     const descriptions = form.value.descriptions || [];
-    descriptions.forEach((desc: any, index: number) => {
+    descriptions.forEach((desc: ContentDescription, index: number) => {
       if (content != null && content.descriptions) {
-        content.descriptions.forEach((description: any) => {
+        content.descriptions.forEach((description) => {
           if (desc.language === description.language) {
             (form.get('descriptions') as FormArray).at(index).patchValue({
               language: description.language,
@@ -69,7 +71,7 @@ export class AddPageFormService {
     });
   }
 
-  urlTitle(form: FormGroup, event: any, index: number): void {
+  urlTitle(form: FormGroup, event: string, index: number): void {
     (form.get('descriptions') as FormArray).at(index).patchValue({
       friendlyUrl: slugify(event)
     });

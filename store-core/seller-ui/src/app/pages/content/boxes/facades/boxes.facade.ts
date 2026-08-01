@@ -11,6 +11,7 @@ import {PageEvent} from "@swimlane/ngx-datatable";
 import {Observable, tap} from "rxjs";
 import {map} from "rxjs/operators";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ReadableContentBox} from "../../models/content.model";
 
 @Injectable()
 export class BoxesFacade {
@@ -19,7 +20,7 @@ export class BoxesFacade {
   private readonly errorService = inject(ErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
-  public readonly tableState = inject(TableStateService<any, StorePageRequest>);
+  public readonly tableState = inject(TableStateService<ReadableContentBox, StorePageRequest>);
 
   readonly selectedStore = signal<string>('');
 
@@ -52,12 +53,12 @@ export class BoxesFacade {
     this.loadBoxes(request).subscribe(page => this.tableState.setPage(page));
   }
 
-  loadBoxes(request: StorePageRequest): Observable<PageT<any>> {
+  loadBoxes(request: StorePageRequest): Observable<PageT<ReadableContentBox>> {
     this.tableState.setLoading(true);
     return this.contentService.getBoxes(request).pipe(
-      map((it: any) => {
-        const missingCodes = this.recommendedCodes.filter(code => !it.content.some((e: any) => e.code === code));
-        const content = [...it.content];
+      map((it) => {
+        const missingCodes = this.recommendedCodes.filter(code => !it.content.some((e) => e.code === code));
+        const content: ReadableContentBox[] = [...it.content];
         missingCodes.forEach(code => {
           content.unshift({ code });
         });
@@ -82,15 +83,15 @@ export class BoxesFacade {
     this.router.navigate(['/pages/content/boxes/add']);
   }
 
-  onEdit(event: any): void {
+  onEdit(event: ReadableContentBox): void {
     this.router.navigate(['/pages/content/boxes/edit', event.code]);
   }
 
-  onCreate(event: any): void {
+  onCreate(event: ReadableContentBox): void {
     this.router.navigate(['/pages/content/boxes/add'], { queryParams: { code: event.code } });
   }
 
-  onDelete(event: any): void {
+  onDelete(event: ReadableContentBox): void {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',

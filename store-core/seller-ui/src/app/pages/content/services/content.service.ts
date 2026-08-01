@@ -1,7 +1,16 @@
 import { Injectable, inject } from "@angular/core";
 import {Observable} from "rxjs";
-import {CrudService} from "../../shared/services/crud.service";
+import {CrudService, HttpParamsLike} from "../../shared/services/crud.service";
 import {PageT, StorePageRequest} from "../../shared/table/table.types";
+import {EntityExists} from "../../shared/models/entity.model";
+import {
+  ContentFolder,
+  CreatedContentEntity,
+  PersistableContentBox,
+  PersistableContentPage,
+  ReadableContentBox,
+  ReadableContentPage
+} from "../models/content.model";
 
 @Injectable({
   providedIn: 'root'
@@ -10,63 +19,63 @@ export class ContentService {
   private readonly crudService = inject(CrudService);
 
 
-  getBoxes(params: StorePageRequest): Observable<PageT<any>> {
+  getBoxes(params: StorePageRequest): Observable<PageT<ReadableContentBox>> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/boxes', params);
   }
 
-  getBox(uniqueCode: string, params: any) {
+  getBox(uniqueCode: string, params: HttpParamsLike): Observable<ReadableContentBox> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/boxes/' + uniqueCode, params);
   }
 
-  checkCodeBoxExist(code: string, params: any) {
+  checkCodeBoxExist(code: string, params: HttpParamsLike): Observable<EntityExists> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/box/' + code + '/exists', params);
   }
 
-  updateBox(id: number | string, object: any, param: any) {
+  updateBox(id: number | string, object: PersistableContentBox, param: HttpParamsLike): Observable<void> {
     return this.crudService.put('/spg/merchant/api/v1/private/content/box/' + id, object, param)
 
   }
 
-  createBox(object: any) {
+  createBox(object: PersistableContentBox): Observable<CreatedContentEntity> {
     return this.crudService.post('/spg/merchant/api/v1/private/content/box', object)
   }
 
-  images() {
+  images(): Observable<ContentFolder> {
     return this.crudService.get('/spg/merchant/api/v1/content/images')
   }
 
-  deleteImage(name: string) {
+  deleteImage(name: string): Observable<void> {
     return this.crudService.delete(`/spg/merchant/api/v1/private/content/?contentType=IMAGE&name=${name}`);
   }
 
-  saveImage(formData: FormData) {
+  saveImage(formData: FormData): Observable<void> {
     return this.crudService.post(`/spg/merchant/api/v1/private/files`, formData)
 
   }
 
-  checkCodePageExist(code: string) {
+  checkCodePageExist(code: string): Observable<EntityExists> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/page/' + code + '/exists');
   }
 
-  updatePage(id: number | string, object: any) {
+  updatePage(id: number | string, object: PersistableContentPage): Observable<void> {
     return this.crudService.put('/spg/merchant/api/v1/private/content/page/' + id, object)
 
   }
 
-  createPage(object: any) {
+  createPage(object: PersistableContentPage): Observable<CreatedContentEntity> {
     return this.crudService.post('/spg/merchant/api/v1/private/content/page', object);
   }
 
-  getPage(uniqueCode: string) {
+  getPage(uniqueCode: string): Observable<ReadableContentPage> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/pages/' + uniqueCode)
 
   }
 
-  pages(params: StorePageRequest): Observable<PageT<any>> {
+  pages(params: StorePageRequest): Observable<PageT<ReadableContentPage>> {
     return this.crudService.get('/spg/merchant/api/v1/private/content/pages', params)
   }
 
-  deleteContent(id: number | string) {
+  deleteContent(id: number | string): Observable<void> {
     return this.crudService.delete('/spg/merchant/api/v1/private/content/' + id + '?id=' + id)
 
   }

@@ -8,6 +8,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {ContentService} from '../../services/content.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ContentFileItem} from '../../models/content.model';
 
 export interface FileImage extends IAlbum {
   file?: File;
@@ -47,8 +48,8 @@ export class FilesFacade {
   getFiles(): void {
     this.loader.set(true);
     this.contentService.images().subscribe({
-      next: (data: any) => {
-        const mapped = data.content.map((img: any) => {
+      next: (data) => {
+        const mapped = data.content.map((img: ContentFileItem) => {
           const src = img.path + img.name;
           return {
             path: img.path,
@@ -70,7 +71,7 @@ export class FilesFacade {
     });
   }
 
-  removeImage(e: any): void {
+  removeImage(e: string): void {
     this.dialogService.open(ShowcaseDialogComponent, {
       context: {
         title: 'Are you sure!',
@@ -107,7 +108,7 @@ export class FilesFacade {
 
   readURL(file: File): void {
     const reader = new FileReader();
-    reader.onload = (e: any) => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       const data: string = e.target.result as string;
       const item: FileImage = {
         file,

@@ -8,6 +8,9 @@ import {SelectedStoreService} from '../../../shared/services/selected-store.serv
 import {StoreService} from '../../../store-management/services/store.service';
 import {AddPageFormService} from '../services/add-page.form.service';
 import {mergeMap, of, zip} from 'rxjs';
+import {SupportedLanguageCode} from '../../../shared/services/config.service';
+import {HttpParamsLike} from '../../../shared/services/crud.service';
+import {ReadableContentPage} from '../../models/content.model';
 
 @Injectable()
 export class AddPageFacade {
@@ -23,14 +26,14 @@ export class AddPageFacade {
   readonly loader = signal<boolean>(false);
   readonly loadingList = signal<boolean>(false);
   readonly action = signal<string>('save');
-  readonly languages = signal<any[]>([]);
+  readonly languages = signal<SupportedLanguageCode[]>([]);
   readonly defaultLanguage = signal<string>('');
   readonly currentLanguage = signal<string>('');
   readonly uniqueCode = signal<string>('');
   readonly isCodeExists = signal<boolean>(false);
-  readonly content = signal<any>(null);
+  readonly content = signal<ReadableContentPage>(null);
 
-  params: any = { store: '' };
+  params: HttpParamsLike = { store: '' };
   form!: FormGroup;
 
   get code() {
@@ -91,16 +94,16 @@ export class AddPageFacade {
     this.formService.fillFormArray(this.form, this.content());
   }
 
-  focusOutFunction(event: any): void {
-    const code = event.target.value.trim();
+  focusOutFunction(event: Event): void {
+    const code = (event.target as HTMLInputElement).value.trim();
     this.contentService.checkCodePageExist(code)
       .subscribe({
-        next: (res: any) => this.isCodeExists.set(res.exists),
-        error: (err: any) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        next: (res) => this.isCodeExists.set(res.exists),
+        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
       });
   }
 
-  urlTitle(event: any, index: number): void {
+  urlTitle(event: string, index: number): void {
     this.formService.urlTitle(this.form, event, index);
   }
 
