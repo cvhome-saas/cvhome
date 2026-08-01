@@ -3,9 +3,11 @@
 ## Context
 
 The project is a Next.js 16 e-commerce monorepo under `store-pod/landing-ui/`.
-Two existing Template (`basis`, `modern`) live in `templates/` and share all business logic
-via three workspace packages in `libs/`. A new template is a **full Next.js app** that reuses
-the shared libs and only differs in visual components.
+Existing templates (`basis`, `modern`, `beauty`, `jewelery`) live in `templates/` and share all business logic
+via three workspace packages in `libs/` (`types`, `services`, `hooks`). A new template is a **full Next.js app**
+that reuses the shared libs and only differs in visual components.
+
+Use `basis` as the reference template to copy from.
 
 ---
 
@@ -350,7 +352,7 @@ import { useProductDetailedAddToCart } from '@store-front/hooks/use-product-deta
 
 ## Design Guidelines
 
-When designing the 14 shared components for your new template, follow these rules:
+When designing the 19 shared components for your new template, follow these rules:
 
 ### RTL Support
 
