@@ -1,6 +1,7 @@
 import {Component, DestroyRef, Input, OnInit, inject} from '@angular/core';
 import {NbDialogRef, NbSpinnerModule} from '@nebular/theme';
-import {BrowsableImage, ImageBrowserFacade} from './facades/image-browser.facade';
+import {ImageBrowserFacade} from './facades/image-browser.facade';
+import {ContentFileItem} from '../../../content/models/content.model';
 
 @Component({
   selector: 'ngx-image-browser',
@@ -25,7 +26,7 @@ export class ImageBrowserComponent implements OnInit {
     this.ref.close();
   }
 
-  openImage(value: BrowsableImage): void {
+  openImage(value: ContentFileItem): void {
     this.ref.close(value.path + value.name);
   }
 }

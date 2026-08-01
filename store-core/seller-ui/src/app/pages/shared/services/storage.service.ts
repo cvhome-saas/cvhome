@@ -29,7 +29,8 @@ export class StorageService {
     if (!merchant) {
       this.userService.getUser(this.getUserId())
         .subscribe(user => {
-          merchant = user.merchant;
+          // `merchant` does not exist on the User DTO — this call site is dead code.
+          merchant = (user as unknown as Record<string, string>)['merchant'];
           localStorage.setItem('merchant', merchant);
         }, err => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);

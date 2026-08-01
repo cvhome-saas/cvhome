@@ -2,14 +2,15 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ProductService} from '../../../../catalogue/products/services/product.service';
 import {ErrorService} from '../../../services/error.service';
+import {ReadableProduct} from '../../../../catalogue/products/models/product.model';
 
 @Injectable()
 export class ProductAutocompleteFacade {
   private readonly productService = inject(ProductService);
   private readonly errorService = inject(ErrorService);
 
-  readonly options = signal<any[]>([]);
-  private firstOptions: any[] = [];
+  readonly options = signal<ReadableProduct[]>([]);
+  private firstOptions: ReadableProduct[] = [];
   private store = '';
 
   init(store: string, destroyRef: DestroyRef): void {

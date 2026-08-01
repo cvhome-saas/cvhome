@@ -6,6 +6,14 @@ import {ImageUploadingFacade} from './facades/image-uploading.facade';
 
 const REMOVE_FROM_QUEUE_DELAY_MS = 2000;
 
+/** Minimal structural shape shared by the various image DTOs this generic
+ *  uploader is bound to (catalogue ReadableImage, store SliderImage, …). */
+export interface UploadedImageItem {
+  id?: number | string;
+  path?: string;
+  imageUrl?: string;
+}
+
 @Component({
   selector: 'ngx-image-uploading',
   standalone: true,
@@ -15,27 +23,28 @@ const REMOVE_FROM_QUEUE_DELAY_MS = 2000;
   providers: [ImageUploadingFacade]
 })
 export class ImageUploadingComponent {
-  @Input() images: any[] = [];
+  @Input() images: UploadedImageItem[] = [];
   @Input() addImageUrl: string;
   @Input() deleteImageUrl: string;
 
   @Output() remove = new EventEmitter<string>();
-  @Output() update = new EventEmitter<any>();
+  @Output() update = new EventEmitter<{id: string | number; position: number}>();
   @Output() uploadError = new EventEmitter<string>();
   @Output() success = new EventEmitter<string>();
-  @Output() fileAdded = new EventEmitter<any>();
+  @Output() fileAdded = new EventEmitter<boolean>();
 
   protected readonly facade = inject(ImageUploadingFacade);
   private readonly destroyRef = inject(DestroyRef);
 
-  itemTrackBy(index: number, item: any) {
+  itemTrackBy(index: number, item: UploadedImageItem) {
     return item.id;
   }
 
-  onFileSelected(event: any) {
-    const files: FileList = event.target.files;
+  onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
     this.handleFiles(files);
-    event.target.value = '';
+    target.value = '';
   }
 
   onDragOver(event: DragEvent) {
@@ -52,8 +61,8 @@ export class ImageUploadingComponent {
     }
   }
 
-  removeImage(image: any) {
-    this.remove.emit(image.id);
+  removeImage(image: UploadedImageItem) {
+    this.remove.emit(`${image.id}`);
   }
 
   private handleFiles(files: FileList) {

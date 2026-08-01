@@ -3,6 +3,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule} from '@nebular/theme';
 import {ProductAutocompleteFacade} from './facades/product-autocomplete.facade';
 import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autocomplete.constants';
+import {ReadableProduct} from '../../../catalogue/products/models/product.model';
 
 @Component({
   selector: 'ngx-product-auto-complete',
@@ -30,7 +31,7 @@ import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autoco
 export class ProductAutoCompleteComponent implements AfterViewInit {
   @Input() store: string;
   @Input() disabled = false;
-  @Output() productSelected: EventEmitter<any> = new EventEmitter<any>();
+  @Output() productSelected: EventEmitter<ReadableProduct> = new EventEmitter<ReadableProduct>();
   @ViewChild('autoInput', {static: false}) autoInput: ElementRef;
 
   protected readonly facade = inject(ProductAutocompleteFacade);
@@ -52,7 +53,7 @@ export class ProductAutoCompleteComponent implements AfterViewInit {
     }
   }
 
-  onSelectionChange(value: any): void {
+  onSelectionChange(value: ReadableProduct): void {
     this.productSelected.emit(value);
     this.autoInput.nativeElement.value = '';
     this.facade.resetToFirst();

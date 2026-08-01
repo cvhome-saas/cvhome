@@ -4,6 +4,14 @@ import {Router} from "@angular/router";
 import {Roles} from "../models/roles";
 import {CrudService} from "./crud.service";
 
+/** Raw shape of Spring Security's Authentication object as returned by
+ *  AuthController#me (declared `Object` on the Java side — genuinely
+ *  untyped; this is the default serialization of the JWT-backed principal). */
+interface AuthenticationResponse {
+  principal: {claims: AuthUser};
+  authorities: {authority: string}[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,11 +25,11 @@ export class AuthService {
     if (this.authUser) {
       return of(this.authUser)
     } else {
-      return this.crudService.get("/api/v1/auth/me")
-        .pipe(map((it: any) => {
+      return this.crudService.get<AuthenticationResponse>("/api/v1/auth/me")
+        .pipe(map((it) => {
           this.authUser = it.principal.claims;
           this.authUser.authorities = it.authorities.map(a => a.authority)
-          return it;
+          return this.authUser;
         }))
     }
   }

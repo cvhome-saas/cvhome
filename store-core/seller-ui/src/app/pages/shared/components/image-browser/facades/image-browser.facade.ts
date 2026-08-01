@@ -2,12 +2,7 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ContentService} from '../../../../content/services/content.service';
 import {ErrorService} from '../../../services/error.service';
-
-export interface BrowsableImage {
-  path: string;
-  name: string;
-  contentType?: number;
-}
+import {ContentFileItem} from '../../../../content/models/content.model';
 
 @Injectable()
 export class ImageBrowserFacade {
@@ -15,14 +10,14 @@ export class ImageBrowserFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly loading = signal<boolean>(false);
-  readonly images = signal<BrowsableImage[]>([]);
+  readonly images = signal<ContentFileItem[]>([]);
 
   init(destroyRef: DestroyRef): void {
     this.loading.set(true);
     this.contentService.images()
       .pipe(takeUntilDestroyed(destroyRef))
       .subscribe({
-        next: (data: any) => {
+        next: (data) => {
           this.images.set(data.content);
           this.loading.set(false);
         },
