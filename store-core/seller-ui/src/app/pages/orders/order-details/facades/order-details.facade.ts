@@ -13,7 +13,7 @@ import {StoreService} from "../../../store-management/services/store.service";
 import {OrderTransactionComponent} from "../../order-transaction/order-transaction";
 import {OrderInvoiceComponent} from "../../order-invoice/order-invoice";
 import {OrderHistoryComponent} from "../../order-history/order-history";
-import {CustomerAddress, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "../../models/order.model";
+import {CustomerAddress, OrderTransaction, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "../../models/order.model";
 import {ReadableMerchantStore} from "../../../store-management/models/store";
 
 @Injectable()
@@ -41,7 +41,7 @@ export class OrderDetailsFacade {
   shippingStateData = signal<ReadableZone[]>([]);
   billingStateData = signal<ReadableZone[]>([]);
   historyListData = signal<ReadableOrderStatusHistory[]>([]);
-  transactionListData = signal<unknown[]>([]);
+  transactionListData = signal<OrderTransaction[]>([]);
 
   info = signal({userName: '', language: '', emailAddress: '', datePurchased: ''});
   billing = signal<CustomerAddress>({

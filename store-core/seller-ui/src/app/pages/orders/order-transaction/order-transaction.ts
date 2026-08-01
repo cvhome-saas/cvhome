@@ -1,6 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
+import {OrderTransaction} from '../models/order.model';
 
 @Component({
   selector: 'ngx-order-transaction',
@@ -12,7 +13,7 @@ import {NbDialogRef} from '@nebular/theme';
 export class OrderTransactionComponent {
   protected readonly ref = inject(NbDialogRef<OrderTransactionComponent>);
 
-  transactionData: unknown[];
+  transactionData: OrderTransaction[];
 
   cancel() {
     this.ref.close();

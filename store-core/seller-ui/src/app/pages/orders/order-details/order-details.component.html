@@ -363,10 +363,6 @@
                       {{ 'ORDER_FORM.TERMS_CONDITIONS' | translate }}:
                       <span class="boldTxt">{{ facade.orderDetailsData().customerAgreed }}</span>
                     </span>
-                    <span>{{ 'ORDER_FORM.PAYMENT_MODE' | translate }}</span>
-                    <span class="boldTxt">
-                      {{ facade.orderDetailsData().paymentType }}-{{ facade.orderDetailsData().paymentModule }}
-                    </span>
                     <label class="status" for="status">{{ 'ORDER_FORM.SELECT_STATUS' | translate }}</label>
                     <nb-select [(ngModel)]="facade.statusFields().status" fullWidth id="status" name="status" outline
                                placeholder="{{'ORDER_FORM.SELECT_STATUS' | translate}}" required

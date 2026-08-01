@@ -20,12 +20,12 @@
                   <i class="fa fa-eye" (click)="openImage(i)"></i>
                   <i class="fa fa-trash" (click)="removeImage(images.name)"></i>
               </div> -->
-              @if (images.contentType === 1) {
+              @if (images.contentType === '1') {
                 <div class="image_box">
                   <img alt="{{images.name}}" class="banner-image" src="{{images.path}}">
                 </div>
               }
-              @if (images.contentType !== 1) {
+              @if (images.contentType !== '1') {
                 <div class="image_box">
                   <img (click)="openImage(images)" (keydown.enter)="openImage(images)" alt="{{images.name}}"
                        class="banner-image" src="{{images.path}}{{images.name}}" tabindex="0">

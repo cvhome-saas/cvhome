@@ -113,6 +113,19 @@ export interface PersistableOrderStatusHistory {
   date?: string;
 }
 
+/** Local shape of a payment transaction row shown in the order-transaction
+ *  dialog. No backend endpoint populates transactionListData anywhere in
+ *  this app (order-details.facade.ts never calls .set() on it) — typed
+ *  from the template's field usage since there is no Java contract to
+ *  verify against. */
+export interface OrderTransaction {
+  id?: number | string;
+  transactionDate?: string;
+  transactionType?: string;
+  amount?: number | string;
+  details?: string;
+}
+
 /** Mirrors reference-commons model/references/ReadableCountry -> CountryEntity -> Entity */
 export interface ReadableCountry {
   id?: number;

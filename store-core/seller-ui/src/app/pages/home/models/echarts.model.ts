@@ -11,6 +11,7 @@ export interface NbEchartsTheme {
  *  statistic components build. Not the library's own type — kept minimal
  *  and structural on purpose. */
 export interface EChartsLikeOption {
+  [key: string]: unknown;
   backgroundColor?: string;
   legend?: Record<string, unknown>;
   grid?: Record<string, unknown>;

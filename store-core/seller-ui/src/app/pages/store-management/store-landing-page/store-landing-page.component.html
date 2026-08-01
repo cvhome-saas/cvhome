@@ -28,9 +28,9 @@
     @if (!facade.loader()) {
       <form [formGroup]='facade.form'>
         <nb-select formControlName='selectedLanguage' fullWidth outline placeholder="Language" shape="rectangle">
-          @for (lan of facade.languages(); track lan.code) {
-            <nb-option [value]="lan.code">{{
-                ('LANG.' + lan.code) | translate
+          @for (lan of facade.languages(); track lan) {
+            <nb-option [value]="lan">{{
+                ('LANG.' + lan) | translate
               }}
             </nb-option>
           }
