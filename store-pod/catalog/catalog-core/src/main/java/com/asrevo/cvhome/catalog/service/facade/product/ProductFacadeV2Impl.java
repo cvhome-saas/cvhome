@@ -116,18 +116,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
             Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
 
             if (category != null) {
-                String lineage = category.getLineage();
-
-                List<Category> categories = categoryService.getListByLineage(store, lineage);
-
-                List<Long> ids = new ArrayList<>();
-                if (categories != null && !categories.isEmpty()) {
-                    for (Category c : categories) {
-                        ids.add(c.getId());
-                    }
-                }
-                ids.add(category.getId());
-                criteria.setCategoryIds(ids);
+                criteria.setCategoryIds(resolveCategoryIds(store, category));
             }
         }
 
@@ -148,6 +137,25 @@ public class ProductFacadeV2Impl implements ProductFacade {
         readableProductList.setPageNumber(all.getNumber());
 
         return readableProductList;
+    }
+
+    @SneakyThrows
+    private List<Long> resolveCategoryIds(StoreMerchantId store, Category category) {
+        String lineage = category.getLineage();
+
+        List<Category> categories = categoryService.getListByLineage(store, lineage);
+
+        List<Long> ids = new ArrayList<>();
+        if (categories == null || categories.isEmpty()) {
+            ids.add(category.getId());
+            return ids;
+        }
+
+        for (Category c : categories) {
+            ids.add(c.getId());
+        }
+        ids.add(category.getId());
+        return ids;
     }
 
 }

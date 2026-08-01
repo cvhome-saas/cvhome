@@ -20,6 +20,16 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
+    private static final String PRODUCT_TYPE_MESSAGE = "Product type [";
+
+    private static final String NOT_FOUND_FOR_STORE_MESSAGE = "] not found for store [";
+
+    private static final String BRACKET_CLOSE = "]";
+
+    private static final String SAVE_ERROR_MESSAGE = "An exception occured while saving product type";
+
+    private static final String NOT_EXIST_FOR_STORE_MESSAGE = "] does not exist for store [";
+
     private final ProductTypeService productTypeService;
 
     private final ReadableProductTypeMapper readableProductTypeMapper;
@@ -60,15 +70,16 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType type = productTypeService.getById(id, store);
 
             if (type == null) {
-                throw new ResourceNotFoundException("Product type [" + id + "] not found for store [" + store + "]");
+                throw new ResourceNotFoundException(
+                        PRODUCT_TYPE_MESSAGE + id + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
             }
 
             return readableProductTypeMapper.convert(type, store, language);
 
         } catch (Exception e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while getting product type [" + id + "] not found for store [" + store + "]",
-                    e);
+                    "An exception occured while getting product type [" + id + NOT_FOUND_FOR_STORE_MESSAGE + store
+                            + BRACKET_CLOSE, e);
         }
     }
 
@@ -79,7 +90,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
             if (this.exists(type.getCode(), store, language)) {
                 throw new OperationNotAllowedException(
-                        "Product type [" + type.getCode() + "] already exist for store [" + store + "]");
+                        PRODUCT_TYPE_MESSAGE + type.getCode() + "] already exist for store [" + store + BRACKET_CLOSE);
             }
 
             ProductType model = persistableProductTypeMapper.convert(type, store, language);
@@ -88,7 +99,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             return saved.getId();
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
         }
     }
 
@@ -100,7 +111,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
-                        "Product type [" + type.getCode() + "] does not exist for store [" + store + "]");
+                        PRODUCT_TYPE_MESSAGE + type.getCode() + NOT_EXIST_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
             }
 
             type.setId(t.getId());
@@ -111,7 +122,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             productTypeService.saveOrUpdate(model);
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
         }
     }
 
@@ -122,13 +133,13 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType t = productTypeService.getById(id, store);
             if (t == null) {
                 throw new ResourceNotFoundException(
-                        "Product type [" + id + "] does not exist for store [" + store + "]");
+                        PRODUCT_TYPE_MESSAGE + id + NOT_EXIST_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
             }
 
             productTypeService.delete(t);
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An exception occured while saving product type", e);
+            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
         }
     }
 
@@ -145,7 +156,8 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
         t = productTypeService.getByCode(code, store, language);
 
         if (t == null) {
-            throw new ResourceNotFoundException("Product type [" + code + "] not found for merchant [" + store + "]");
+            throw new ResourceNotFoundException(
+                    PRODUCT_TYPE_MESSAGE + code + "] not found for merchant [" + store + BRACKET_CLOSE);
         }
 
         return readableProductTypeMapper.convert(t, store, language);

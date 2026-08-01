@@ -37,6 +37,14 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Component
 public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
+    private static final String NOT_FOUND_FOR_STORE_MESSAGE = "] not found for store [";
+
+    private static final String BRACKET_CLOSE = "]";
+
+    private static final String PRODUCT_VARIANT_WITH_ID_MESSAGE = "productVariant with id [";
+
+    private static final String AND_PRODUCT_ID_MESSAGE = "] and productId [";
+
     private final ReadableProductVariantMapper readableProductVariantMapper;
 
     private final PersistableProductVariantMapper persistableProductVariantMapper;
@@ -67,7 +75,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (productVariant.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "Product instance + [" + instanceId + "] not found for store [" + store + "]");
+                    "Product instance + [" + instanceId + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         ProductVariant model = productVariant.get();
@@ -80,7 +88,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
         try {
             product = productCommonFacade.getProduct(store, productId, language);
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting product [" + productId + "]", e);
+            throw new ServiceRuntimeException("Error while getting product [" + productId + BRACKET_CLOSE, e);
         }
 
         return productVariantService.exist(sku, product.getId());
@@ -120,8 +128,8 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
                        LanguageCode language) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException("productVariant with id [" + instanceId + "] not found for store ["
-                    + store + "] and productId [" + productId + "]");
+            throw new ResourceNotFoundException(PRODUCT_VARIANT_WITH_ID_MESSAGE + instanceId + NOT_FOUND_FOR_STORE_MESSAGE
+                    + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE);
         }
 
         productVariant.setProductId(productId);
@@ -139,15 +147,15 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     public void delete(Long productVariant, Long productId, StoreMerchantId store) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException("productVariant with id [" + productVariant + "] not found for store ["
-                    + store + "] and productId [" + productId + "]");
+            throw new ResourceNotFoundException(PRODUCT_VARIANT_WITH_ID_MESSAGE + productVariant
+                    + NOT_FOUND_FOR_STORE_MESSAGE + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE);
         }
 
         try {
             productVariantService.delete(instanceModel.get());
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Cannot delete product instance [" + productVariant + "]  for store ["
-                    + store + "] and productId [" + productId + "]", e);
+                    + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE, e);
         }
     }
 
@@ -158,7 +166,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (product == null) {
             throw new ResourceNotFoundException(
-                    "Product with id [" + productId + "] not found for store [" + store + "]");
+                    "Product with id [" + productId + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         Page<ProductVariant> instances = productVariantService.getByProductId(store, product, language, pageable);

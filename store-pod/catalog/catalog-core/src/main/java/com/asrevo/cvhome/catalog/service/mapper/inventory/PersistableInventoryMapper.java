@@ -34,6 +34,10 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 @Component
 public class PersistableInventoryMapper implements Mapper<PersistableInventory, ProductAvailability> {
 
+    private static final String NOT_FOUND_FOR_STORE = "] not found for store [";
+
+    private static final String CLOSE_BRACKET = "]";
+
     private final ProductVariantService productVariantService;
 
     private final ProductService productService;
@@ -59,7 +63,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 product = productService.findOne(source.getProductId(), store);
                 if (product == null) {
                     throw new ResourceNotFoundException(
-                            "Product with id [" + source.getProductId() + "] not found for store [" + store + "]");
+                            "Product with id [" + source.getProductId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
                 }
                 destination.setProduct(product);
             }
@@ -88,7 +92,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             if (existing != null) {
                 if (!existing.getStoreMerchantId().equals(store)) {
                     throw new ResourceNotFoundException(
-                            "Product Inventory with id [" + source.getId() + "] not found for store [" + store + "]");
+                            "Product Inventory with id [" + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
                 }
                 destination = existing;
             }
@@ -111,7 +115,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
                 if (instance.isEmpty()) {
                     throw new ResourceNotFoundException(
-                            "productVariant with id [" + source.getVariant() + "] not found for store [" + store + "]");
+                            "productVariant with id [" + source.getVariant() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
                 }
                 destination.setSku(instance.get().getSku());
                 destination.setProductVariant(instance.get());
@@ -125,19 +129,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 
                 if (destination.getPrices() != null) {
                     for (ProductPrice pp : destination.getPrices()) {
-                        if (isPositive(priceEntity.getId())
-                                && priceEntity.getId().longValue() == pp.getId().longValue()) {
-                            price = pp;
-                            prices.add(pp);
-                        } else if (pp.isDefaultPrice() && priceEntity.isDefaultPrice()) {
-                            if (price == null) {
-                                price = pp;
-                            } else {
-                                prices.add(pp);
-                            }
-                        } else {
-                            prices.add(pp);
-                        }
+                        price = mergeExistingPrice(priceEntity, pp, price, prices);
                     }
                 }
 
@@ -178,8 +170,21 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
         }
     }
 
+    private ProductPrice mergeExistingPrice(PersistableProductPrice priceEntity, ProductPrice pp, ProductPrice price,
+            List<ProductPrice> prices) {
+        if (isPositive(priceEntity.getId()) && priceEntity.getId().longValue() == pp.getId().longValue()) {
+            prices.add(pp);
+            return pp;
+        }
+        if (pp.isDefaultPrice() && priceEntity.isDefaultPrice() && price == null) {
+            return pp;
+        }
+        prices.add(pp);
+        return price;
+    }
+
     private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-                                                                     List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
+            List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }

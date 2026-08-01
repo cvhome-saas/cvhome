@@ -26,6 +26,8 @@ import lombok.Setter;
 public class PersistableCategoryPopulator
         extends AbstractDataPopulator<PersistableCategory, StoreMerchantId, Category> {
 
+    private static final String PATH_SEPARATOR = "/";
+
     private final CategoryService categoryService;
 
     public PersistableCategoryPopulator(CategoryService categoryService) {
@@ -52,7 +54,8 @@ public class PersistableCategoryPopulator
                     || source.getParent().getId() == null) {
                 target.setParent(null);
                 target.setDepth(0);
-                target.setLineage(new StringBuilder().append("/").append(source.getId()).append("/").toString());
+                target.setLineage(
+                        new StringBuilder().append(PATH_SEPARATOR).append(source.getId()).append(PATH_SEPARATOR).toString());
             } else {
                 Category parent;
                 if (!StringUtils.isBlank(source.getParent().getCode())) {
@@ -74,7 +77,8 @@ public class PersistableCategoryPopulator
 
                     target.setDepth(depth + 1);
                     target
-                            .setLineage(new StringBuilder().append(lineage).append(target.getId()).append("/").toString());
+                            .setLineage(
+                                    new StringBuilder().append(lineage).append(target.getId()).append(PATH_SEPARATOR).toString());
                 }
             }
 
@@ -90,20 +94,7 @@ public class PersistableCategoryPopulator
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(target.getDescriptions())) {
-                    for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target
-                            .getDescriptions()) {
-                        for (CategoryDescription d : source.getDescriptions()) {
-                            if (StringUtils.isBlank(d.getLanguage().code())) {
-                                throw new ConversionException("Source category description has no language");
-                            }
-                            if (d.getLanguage().equals(description.getLanguageCode())) {
-                                description.setCategory(target);
-                                description = buildDescription(d, description);
-                                descriptions.add(description);
-                            }
-                        }
-                    }
-
+                    mergeExistingDescriptions(source, target, descriptions);
                 } else {
                     for (CategoryDescription d : source.getDescriptions()) {
                         com.asrevo.cvhome.catalog.entity.category.CategoryDescription t =
@@ -124,8 +115,26 @@ public class PersistableCategoryPopulator
         }
     }
 
-    private com.asrevo.cvhome.catalog.entity.category.CategoryDescription buildDescription(CategoryDescription source,
-                                                                                           com.asrevo.cvhome.catalog.entity.category.CategoryDescription target) {
+    private void mergeExistingDescriptions(PersistableCategory source, Category target,
+            Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions)
+            throws ConversionException {
+        for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target.getDescriptions()) {
+            for (CategoryDescription d : source.getDescriptions()) {
+                if (StringUtils.isBlank(d.getLanguage().code())) {
+                    throw new ConversionException("Source category description has no language");
+                }
+                if (d.getLanguage().equals(description.getLanguageCode())) {
+                    description.setCategory(target);
+                    description = buildDescription(d, description);
+                    descriptions.add(description);
+                }
+            }
+        }
+    }
+
+    private com.asrevo.cvhome.catalog.entity.category.CategoryDescription buildDescription(
+            CategoryDescription source,
+            com.asrevo.cvhome.catalog.entity.category.CategoryDescription target) {
         target.setCategoryHighlight(source.getHighlights());
         target.setDescription(source.getDescription());
         target.setName(source.getName());

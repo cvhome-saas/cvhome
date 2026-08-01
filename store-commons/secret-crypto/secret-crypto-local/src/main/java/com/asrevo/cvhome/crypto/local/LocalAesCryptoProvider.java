@@ -17,9 +17,9 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
     private static final int TAG_LENGTH_BIT = 128;
     private static final int IV_LENGTH_BYTE = 12;
     private static final String KEY_ALGORITHM = "AES";
+    private static final String ACTIVE_KEY_ID = "default-key";
 
     private final LocalKeyProvider keyProvider;
-    private static final String ACTIVE_KEY_ID = "default-key";
     private final SecureRandom secureRandom = new SecureRandom();
 
     public LocalAesCryptoProvider(LocalKeyProvider keyProvider) {

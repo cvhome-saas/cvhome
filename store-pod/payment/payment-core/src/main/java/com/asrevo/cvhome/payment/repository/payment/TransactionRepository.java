@@ -22,7 +22,9 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
 
-    Optional<Transaction> findTopByStoreMerchantIdAndRequestRefOrderByTransactionDateDesc(StoreMerchantId storeMerchantId, String ref );
+    String TRANSACTION_DATE_FIELD = "transactionDate";
+
+    Optional<Transaction> findTopByStoreMerchantIdAndRequestRefOrderByTransactionDateDesc(StoreMerchantId storeMerchantId, String ref);
 
     Optional<Transaction> findByStoreMerchantIdAndInternalRef(StoreMerchantId storeMerchantId, String internalRef);
 
@@ -41,13 +43,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                 predicates.add(cb.like(root.get("requestRef"), Constants.PERCENT_SYMBOL + filter.requestRef() + Constants.PERCENT_SYMBOL));
             }
             if (StringUtils.hasText(filter.internalRef())) {
-                predicates.add(cb.like(root.get("internalRef"), Constants.PERCENT_SYMBOL + filter.internalRef() + Constants.PERCENT_SYMBOL));
+                predicates.add(cb.like(root.get("internalRef"),
+                        Constants.PERCENT_SYMBOL + filter.internalRef() + Constants.PERCENT_SYMBOL));
             }
             if (Objects.nonNull(filter.transactionDateFrom())) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("transactionDate"), filter.transactionDateFrom()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get(TRANSACTION_DATE_FIELD), filter.transactionDateFrom()));
             }
             if (Objects.nonNull(filter.transactionDateTo())) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("transactionDate"), filter.transactionDateTo()));
+                predicates.add(cb.lessThanOrEqualTo(root.get(TRANSACTION_DATE_FIELD), filter.transactionDateTo()));
             }
             return cb.and(predicates.toArray(Predicate[]::new));
         }, pageable);

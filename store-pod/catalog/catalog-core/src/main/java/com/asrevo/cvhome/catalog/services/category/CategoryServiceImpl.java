@@ -55,10 +55,10 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
             // get parent category
             Category p = this.getById(parent.getId());
 
-            lineage.append(p.getLineage()).append(category.getId()).append("/");
+            lineage.append(p.getLineage()).append(category.getId()).append(Constants.SLASH);
             category.setDepth(p.getDepth() + 1);
         } else {
-            lineage.append("/").append(category.getId()).append("/");
+            lineage.append(Constants.SLASH).append(category.getId()).append(Constants.SLASH);
             category.setDepth(0);
         }
         category.setLineage(lineage.toString());
@@ -147,25 +147,29 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
             for (Product product : products) {
                 // session.evict(product);// refresh product, so we get all
                 // product categories
-                Product dbProduct = productService.getById(product.getId());
-                Set<Category> productCategories = dbProduct.getCategories();
-                if (productCategories.size() > 1) {
-                    for (Category c : categories) {
-                        productCategories.remove(c);
-                        productService.update(dbProduct);
-                    }
-
-                    if (product.getCategories() == null || product.getCategories().isEmpty()) {
-                        productService.delete(dbProduct);
-                    }
-
-                } else {
-                    productService.delete(dbProduct);
-                }
+                removeCategoriesFromProduct(product, categories);
             }
 
             Category categ = getById(category.getId(), category.getStoreMerchantId());
             categoryRepository.delete(categ);
+        }
+    }
+
+    private void removeCategoriesFromProduct(Product product, List<Category> categories) throws ServiceException {
+        Product dbProduct = productService.getById(product.getId());
+        Set<Category> productCategories = dbProduct.getCategories();
+        if (productCategories.size() <= 1) {
+            productService.delete(dbProduct);
+            return;
+        }
+
+        for (Category c : categories) {
+            productCategories.remove(c);
+            productService.update(dbProduct);
+        }
+
+        if (product.getCategories() == null || product.getCategories().isEmpty()) {
+            productService.delete(dbProduct);
         }
     }
 
@@ -182,7 +186,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
 
                 child.setParent(null);
                 child.setDepth(0);
-                child.setLineage(new StringBuilder().append("/").append(child.getId()).append("/").toString());
+                child.setLineage(new StringBuilder().append(Constants.SLASH).append(child.getId()).append(Constants.SLASH).toString());
 
             } else {
 
@@ -202,7 +206,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
 
             update(child);
             StringBuilder childLineage = new StringBuilder();
-            childLineage.append(child.getLineage()).append(child.getId()).append("/");
+            childLineage.append(child.getLineage()).append(child.getId()).append(Constants.SLASH);
             List<Category> subCategories = getListByLineage(child.getStoreMerchantId(), childLineage.toString());
 
             // ajust all sub categories lineages

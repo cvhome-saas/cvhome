@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
+    private static final String QUERY_PARAM_SEPARATOR = "?";
+
     private final OrderFacade orderFacade;
     private final OrderInventoryOrchestrator orderInventoryOrchestrator;
     private final ExternalPaymentGatewayService externalPaymentGatewayService;
@@ -91,6 +93,10 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }
                 break;
+
+            default:
+                log.warn("Unhandled payment status {} for order {}.", paymentResponse.status(), modelOrder.getId());
+                break;
         }
 
         if (paymentResponse.shouldRedirect()) {
@@ -118,7 +124,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
     }
 
     private String appendOrderId(String url, Long orderId) {
-        return url + (url.contains("?") ? "&" : "?") + "orderId=" + orderId;
+        return url + (url.contains(QUERY_PARAM_SEPARATOR) ? "&" : QUERY_PARAM_SEPARATOR) + "orderId=" + orderId;
     }
 
     private void updateOrderStatus(Order modelOrder, OrderStatus orderStatus, InventoryStatus inventoryStatus,

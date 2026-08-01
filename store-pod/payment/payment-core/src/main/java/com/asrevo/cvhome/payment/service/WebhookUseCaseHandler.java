@@ -15,7 +15,7 @@ public class WebhookUseCaseHandler {
 
     private final TransactionService transactionService;
 
-    public void handleUseCase(StoreMerchantId store,WebhookResult result) {
+    public void handleUseCase(StoreMerchantId store, WebhookResult result) {
         log.info("Handling use case: {}", result.paymentUseCase());
         switch (result.paymentUseCase()) {
             case PAYMENT_SUCCEEDED -> transactionService.completeSuccess(store, result.internalReference());

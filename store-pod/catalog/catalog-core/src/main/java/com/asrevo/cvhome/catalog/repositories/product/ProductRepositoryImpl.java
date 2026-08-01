@@ -19,6 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
+    private static final String MID_PARAM = "mid";
+    private static final String PRODUCT_ID_PARAM = "productId";
+    private static final String ID_PARAM = "id";
+
     @PersistenceContext
     private EntityManager em;
 
@@ -53,7 +57,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             q.setParameter("pid", productId);
 
             if (merchantId != null) {
-                q.setParameter("mid", ids);
+                q.setParameter(MID_PARAM, ids);
             }
 
             return (Product) q.getSingleResult();
@@ -165,7 +169,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 where p.store=:mid""";
         Query q = this.em.createQuery(hql);
 
-        q.setParameter("mid", store);
+        q.setParameter(MID_PARAM, store);
 
         @SuppressWarnings("unchecked")
         List<Product> products = q.getResultList();
@@ -253,8 +257,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     where p.id=:productId and p.store=:id""";
             Query q = this.em.createQuery(hql);
 
-            q.setParameter("productId", id);
-            q.setParameter("id", store);
+            q.setParameter(PRODUCT_ID_PARAM, id);
+            q.setParameter(ID_PARAM, store);
 
             return (Product) q.getSingleResult();
 
@@ -281,8 +285,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     where p.id=:productId and p.store=:id and pd.languageCode=:language""";
             Query q = this.em.createQuery(hql);
 
-            q.setParameter("productId", id);
-            q.setParameter("id", store);
+            q.setParameter(PRODUCT_ID_PARAM, id);
+            q.setParameter(ID_PARAM, store);
             q.setParameter("language", language);
 
             return (Product) q.getSingleResult();

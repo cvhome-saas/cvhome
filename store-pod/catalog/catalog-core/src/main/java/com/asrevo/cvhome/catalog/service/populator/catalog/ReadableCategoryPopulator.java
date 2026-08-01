@@ -17,15 +17,7 @@ public class ReadableCategoryPopulator extends AbstractDataPopulator<Category, S
         target.setLineage(source.getLineage());
         if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
 
-            CategoryDescription description = source.getDescription();
-            if (source.getDescriptions().size() > 1) {
-                for (final CategoryDescription desc : source.getDescriptions()) {
-                    if (desc.getLanguageCode().equals(language)) {
-                        description = desc;
-                        break;
-                    }
-                }
-            }
+            final CategoryDescription description = resolveDescription(source, language);
 
             if (description != null) {
                 final com.asrevo.cvhome.catalog.model.category.CategoryDescription desc =
@@ -66,6 +58,18 @@ public class ReadableCategoryPopulator extends AbstractDataPopulator<Category, S
     @Override
     protected ReadableCategory createTarget() {
         return null;
+    }
+
+    private CategoryDescription resolveDescription(final Category source, final LanguageCode language) {
+        if (source.getDescriptions().size() <= 1) {
+            return source.getDescription();
+        }
+        for (final CategoryDescription desc : source.getDescriptions()) {
+            if (desc.getLanguageCode().equals(language)) {
+                return desc;
+            }
+        }
+        return source.getDescription();
     }
 
 }

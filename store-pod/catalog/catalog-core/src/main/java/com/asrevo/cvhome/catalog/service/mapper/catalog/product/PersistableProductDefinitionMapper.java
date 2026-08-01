@@ -32,10 +32,15 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
 public class PersistableProductDefinitionMapper implements Mapper<PersistableProductDefinition, Product> {
+
+    private static final String DOES_NOT_EXIST_SUFFIX = "] does not exist";
+    private static final String INVALID_MANUFACTURER_ID_MESSAGE = "Invalid manufacturer id";
+    private static final String NOT_EXIST_SUFFIX = " does not exist";
 
     private final CategoryService categoryService;
 
@@ -85,24 +90,8 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 destination.setId(source.getId());
             }
 
-            // MANUFACTURER
-            if (!StringUtils.isBlank(source.getManufacturer())) {
-                Manufacturer manufacturer = manufacturerService.getByCode(store, source.getManufacturer());
-                if (manufacturer == null) {
-                    throw new ConversionException("Manufacturer [" + source.getManufacturer() + "] does not exist");
-                }
-                destination.setManufacturer(manufacturer);
-            }
-
-            // PRODUCT TYPE
-            if (!StringUtils.isBlank(source.getType())) {
-                ProductType type = productTypeService.getByCode(source.getType(), store, language);
-                if (type == null) {
-                    throw new ConversionException("Product type [" + source.getType() + "] does not exist");
-                }
-
-                destination.setType(type);
-            }
+            applyManufacturer(source, destination, store);
+            applyType(source, destination, store, language);
 
             if (Objects.nonNull(source.getDateAvailable())) {
                 destination.setDateAvailable(source.getDateAvailable());
@@ -110,163 +99,224 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 
             destination.setStore(store);
 
-            List<LanguageCode> languages = new ArrayList<>();
-            Set<ProductDescription> descriptions = new HashSet<>();
-            if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                for (com.asrevo.cvhome.catalog.model.product.ProductDescription description : source
-                        .getDescriptions()) {
+            List<LanguageCode> languages = applyDescriptions(source, destination);
 
-                    ProductDescription productDescription = new ProductDescription();
+            applyAvailabilityAndPrice(source, destination, store, languages);
 
-                    if (!CollectionUtils.isEmpty(destination.getDescriptions())) {
-                        for (ProductDescription desc : destination.getDescriptions()) {
-                            if (desc.getLanguageCode().equals(description.getLanguage())) {
-                                productDescription = desc;
-                                break;
-                            }
-                        }
-                    }
+            applySpecifications(source, destination, store);
 
-                    productDescription.setProduct(destination);
-                    productDescription.setDescription(description.getDescription());
-
-                    productDescription.setProductHighlight(description.getHighlights());
-
-                    productDescription.setName(description.getName());
-                    productDescription.setSeUrl(description.getFriendlyUrl());
-                    productDescription.setMetatagKeywords(description.getKeyWords());
-                    productDescription.setMetatagDescription(description.getMetaDescription());
-                    productDescription.setTitle(description.getTitle());
-
-                    languages.add(description.getLanguage());
-                    productDescription.setLanguageCode(description.getLanguage());
-                    descriptions.add(productDescription);
-                }
-            }
-
-            if (!descriptions.isEmpty()) {
-                destination.setDescriptions(descriptions);
-            }
-
-            ProductAvailability productAvailability = null;
-            ProductPrice defaultPrice = null;
-            if (!CollectionUtils.isEmpty(destination.getAvailabilities())) {
-                for (ProductAvailability avail : destination.getAvailabilities()) {
-                    Set<ProductPrice> prices = avail.getPrices();
-                    for (ProductPrice p : prices) {
-                        if (p.isDefaultPrice() && productAvailability == null) {
-                            productAvailability = avail;
-                            defaultPrice = p;
-                            productAvailability.setProductQuantity(source.getQuantity());
-                            productAvailability.setProductStatus(source.isCanBePurchased());
-                            p.setProductPriceAmount(source.getPrice());
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (productAvailability == null) { // create with default values
-                productAvailability = new ProductAvailability(destination, store);
-                destination.getAvailabilities().add(productAvailability);
-
-                productAvailability.setProductQuantity(source.getQuantity());
-                productAvailability.setProductQuantityOrderMin(1);
-                productAvailability.setProductQuantityOrderMax(1);
-                productAvailability.setRegion(Constants.ALL_REGIONS);
-                productAvailability.setAvailable(destination.isAvailable());
-                productAvailability.setProductStatus(source.isCanBePurchased());
-            }
-
-            if (defaultPrice == null) {
-
-                BigDecimal defaultPriceAmount = new BigDecimal(0);
-                if (source.getPrice() != null) {
-                    defaultPriceAmount = source.getPrice();
-                }
-
-                defaultPrice = new ProductPrice();
-                defaultPrice.setDefaultPrice(true);
-                defaultPrice.setProductPriceAmount(defaultPriceAmount);
-                defaultPrice.setCode(Constants.DEFAULT_PRICE_CODE);
-                defaultPrice.setProductAvailability(productAvailability);
-                productAvailability.getPrices().add(defaultPrice);
-                for (LanguageCode lang : languages) {
-
-                    ProductPriceDescription ppd = new ProductPriceDescription();
-                    ppd.setProductPrice(defaultPrice);
-                    ppd.setLanguageCode(lang);
-                    ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
-                    defaultPrice.getDescriptions().add(ppd);
-                }
-            }
-
-            if (source.getProductSpecifications() != null) {
-                destination.setProductHeight(source.getProductSpecifications().getHeight());
-                destination.setProductLength(source.getProductSpecifications().getLength());
-                destination.setProductWeight(source.getProductSpecifications().getWeight());
-                destination.setProductWidth(source.getProductSpecifications().getWidth());
-
-                if (source.getProductSpecifications().getManufacturer() != null) {
-
-                    Manufacturer manuf = null;
-                    if (!StringUtils.isBlank(source.getProductSpecifications().getManufacturer())) {
-                        manuf = manufacturerService.getByCode(store,
-                                source.getProductSpecifications().getManufacturer());
-                    }
-
-                    if (manuf == null) {
-                        throw new ConversionException("Invalid manufacturer id");
-                    }
-                    if (!Objects.equals(manuf.getStoreMerchantId(), store)) {
-                        throw new ConversionException("Invalid manufacturer id");
-                    }
-                    destination.setManufacturer(manuf);
-                }
-            }
             destination.setSortOrder(source.getSortOrder());
             destination.setProductVirtual(source.isVirtual());
             destination.setProductShipeable(source.isShipeable());
 
-            // attributes
-            if (source.getProperties() != null) {
-                for (PersistableProductAttribute attr : source.getProperties()) {
-                    ProductAttribute attribute = persistableProductAttributeMapper.convert(attr, store, language);
+            applyAttributes(source, destination, store, language);
+            applyCategories(source, destination, store);
 
-                    attribute.setProduct(destination);
-                    destination.getAttributes().add(attribute);
-                }
-            }
-
-            // categories
-            if (!CollectionUtils.isEmpty(source.getCategories())) {
-                for (com.asrevo.cvhome.catalog.model.category.Category categ : source.getCategories()) {
-
-                    Category c;
-                    if (!StringUtils.isBlank(categ.getCode())) {
-                        c = categoryService.getByCode(store, categ.getCode());
-                    } else {
-                        c = categoryService.getById(categ.getId(), store);
-                    }
-
-                    if (c == null) {
-                        if (!StringUtils.isBlank(categ.getCode())) {
-                            throw new ConversionException("Category code " + categ.getCode() + " does not exist");
-                        } else {
-                            throw new ConversionException("Category id " + categ.getId() + " does not exist");
-                        }
-                    }
-                    if (!Objects.equals(c.getStoreMerchantId(), store)) {
-                        throw new ConversionException("Invalid category id");
-                    }
-                    destination.getCategories().add(c);
-                }
-            }
             return destination;
 
         } catch (Exception e) {
             throw new ConversionRuntimeException("Error converting product mapper", e);
         }
+    }
+
+    private void applyManufacturer(PersistableProductDefinition source, Product destination, StoreMerchantId store)
+            throws ConversionException {
+        if (StringUtils.isBlank(source.getManufacturer())) {
+            return;
+        }
+        Manufacturer manufacturer = manufacturerService.getByCode(store, source.getManufacturer());
+        if (manufacturer == null) {
+            throw new ConversionException("Manufacturer [" + source.getManufacturer() + DOES_NOT_EXIST_SUFFIX);
+        }
+        destination.setManufacturer(manufacturer);
+    }
+
+    private void applyType(PersistableProductDefinition source, Product destination, StoreMerchantId store,
+            LanguageCode language) throws ConversionException {
+        if (StringUtils.isBlank(source.getType())) {
+            return;
+        }
+        ProductType type = productTypeService.getByCode(source.getType(), store, language);
+        if (type == null) {
+            throw new ConversionException("Product type [" + source.getType() + DOES_NOT_EXIST_SUFFIX);
+        }
+
+        destination.setType(type);
+    }
+
+    private List<LanguageCode> applyDescriptions(PersistableProductDefinition source, Product destination) {
+        List<LanguageCode> languages = new ArrayList<>();
+        Set<ProductDescription> descriptions = new HashSet<>();
+        if (!CollectionUtils.isEmpty(source.getDescriptions())) {
+            for (com.asrevo.cvhome.catalog.model.product.ProductDescription description : source.getDescriptions()) {
+                ProductDescription productDescription = resolveProductDescription(destination, description);
+
+                productDescription.setProduct(destination);
+                productDescription.setDescription(description.getDescription());
+
+                productDescription.setProductHighlight(description.getHighlights());
+
+                productDescription.setName(description.getName());
+                productDescription.setSeUrl(description.getFriendlyUrl());
+                productDescription.setMetatagKeywords(description.getKeyWords());
+                productDescription.setMetatagDescription(description.getMetaDescription());
+                productDescription.setTitle(description.getTitle());
+
+                languages.add(description.getLanguage());
+                productDescription.setLanguageCode(description.getLanguage());
+                descriptions.add(productDescription);
+            }
+        }
+
+        if (!descriptions.isEmpty()) {
+            destination.setDescriptions(descriptions);
+        }
+        return languages;
+    }
+
+    private ProductDescription resolveProductDescription(Product destination,
+            com.asrevo.cvhome.catalog.model.product.ProductDescription description) {
+        if (CollectionUtils.isEmpty(destination.getDescriptions())) {
+            return new ProductDescription();
+        }
+        for (ProductDescription desc : destination.getDescriptions()) {
+            if (desc.getLanguageCode().equals(description.getLanguage())) {
+                return desc;
+            }
+        }
+        return new ProductDescription();
+    }
+
+    private void applyAvailabilityAndPrice(PersistableProductDefinition source, Product destination, StoreMerchantId store,
+            List<LanguageCode> languages) {
+        AvailabilityAndPrice resolved = resolveExistingAvailabilityAndPrice(destination, source);
+        ProductAvailability productAvailability = resolved.availability();
+        ProductPrice defaultPrice = resolved.price();
+
+        if (productAvailability == null) { // create with default values
+            productAvailability = new ProductAvailability(destination, store);
+            destination.getAvailabilities().add(productAvailability);
+
+            productAvailability.setProductQuantity(source.getQuantity());
+            productAvailability.setProductQuantityOrderMin(1);
+            productAvailability.setProductQuantityOrderMax(1);
+            productAvailability.setRegion(Constants.ALL_REGIONS);
+            productAvailability.setAvailable(destination.isAvailable());
+            productAvailability.setProductStatus(source.isCanBePurchased());
+        }
+
+        if (defaultPrice == null) {
+            createDefaultPrice(source, productAvailability, languages);
+        }
+    }
+
+    private record AvailabilityAndPrice(ProductAvailability availability, ProductPrice price) {
+    }
+
+    private AvailabilityAndPrice resolveExistingAvailabilityAndPrice(Product destination,
+            PersistableProductDefinition source) {
+        if (CollectionUtils.isEmpty(destination.getAvailabilities())) {
+            return new AvailabilityAndPrice(null, null);
+        }
+        for (ProductAvailability avail : destination.getAvailabilities()) {
+            for (ProductPrice p : avail.getPrices()) {
+                if (p.isDefaultPrice()) {
+                    avail.setProductQuantity(source.getQuantity());
+                    avail.setProductStatus(source.isCanBePurchased());
+                    p.setProductPriceAmount(source.getPrice());
+                    return new AvailabilityAndPrice(avail, p);
+                }
+            }
+        }
+        return new AvailabilityAndPrice(null, null);
+    }
+
+    private void createDefaultPrice(PersistableProductDefinition source, ProductAvailability productAvailability,
+            List<LanguageCode> languages) {
+        BigDecimal defaultPriceAmount = new BigDecimal(0);
+        if (source.getPrice() != null) {
+            defaultPriceAmount = source.getPrice();
+        }
+
+        ProductPrice defaultPrice = new ProductPrice();
+        defaultPrice.setDefaultPrice(true);
+        defaultPrice.setProductPriceAmount(defaultPriceAmount);
+        defaultPrice.setCode(Constants.DEFAULT_PRICE_CODE);
+        defaultPrice.setProductAvailability(productAvailability);
+        productAvailability.getPrices().add(defaultPrice);
+        for (LanguageCode lang : languages) {
+            ProductPriceDescription ppd = new ProductPriceDescription();
+            ppd.setProductPrice(defaultPrice);
+            ppd.setLanguageCode(lang);
+            ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
+            defaultPrice.getDescriptions().add(ppd);
+        }
+    }
+
+    private void applySpecifications(PersistableProductDefinition source, Product destination, StoreMerchantId store)
+            throws ConversionException {
+        if (source.getProductSpecifications() == null) {
+            return;
+        }
+        destination.setProductHeight(source.getProductSpecifications().getHeight());
+        destination.setProductLength(source.getProductSpecifications().getLength());
+        destination.setProductWeight(source.getProductSpecifications().getWeight());
+        destination.setProductWidth(source.getProductSpecifications().getWidth());
+
+        if (source.getProductSpecifications().getManufacturer() == null) {
+            return;
+        }
+
+        Manufacturer manuf = null;
+        if (!StringUtils.isBlank(source.getProductSpecifications().getManufacturer())) {
+            manuf = manufacturerService.getByCode(store, source.getProductSpecifications().getManufacturer());
+        }
+
+        if (manuf == null || !Objects.equals(manuf.getStoreMerchantId(), store)) {
+            throw new ConversionException(INVALID_MANUFACTURER_ID_MESSAGE);
+        }
+        destination.setManufacturer(manuf);
+    }
+
+    private void applyAttributes(PersistableProductDefinition source, Product destination, StoreMerchantId store,
+            LanguageCode language) {
+        if (source.getProperties() == null) {
+            return;
+        }
+        for (PersistableProductAttribute attr : source.getProperties()) {
+            ProductAttribute attribute = persistableProductAttributeMapper.convert(attr, store, language);
+
+            attribute.setProduct(destination);
+            destination.getAttributes().add(attribute);
+        }
+    }
+
+    private void applyCategories(PersistableProductDefinition source, Product destination, StoreMerchantId store)
+            throws ConversionException, ServiceException {
+        if (CollectionUtils.isEmpty(source.getCategories())) {
+            return;
+        }
+        for (com.asrevo.cvhome.catalog.model.category.Category categ : source.getCategories()) {
+            Category c = resolveCategory(categ, store);
+            if (!Objects.equals(c.getStoreMerchantId(), store)) {
+                throw new ConversionException("Invalid category id");
+            }
+            destination.getCategories().add(c);
+        }
+    }
+
+    private Category resolveCategory(com.asrevo.cvhome.catalog.model.category.Category categ, StoreMerchantId store)
+            throws ConversionException, ServiceException {
+        boolean hasCode = !StringUtils.isBlank(categ.getCode());
+        Category c = hasCode ? categoryService.getByCode(store, categ.getCode()) : categoryService.getById(categ.getId(), store);
+
+        if (c != null) {
+            return c;
+        }
+        if (hasCode) {
+            throw new ConversionException("Category code " + categ.getCode() + NOT_EXIST_SUFFIX);
+        }
+        throw new ConversionException("Category id " + categ.getId() + NOT_EXIST_SUFFIX);
     }
 
 }

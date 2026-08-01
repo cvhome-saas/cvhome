@@ -24,6 +24,16 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 @Service
 public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
+    private static final String GET_PRICE_ERROR_MESSAGE = "An exception occured while getting product price for sku [";
+
+    private static final String AND_STORE_MESSAGE = "] and Store [";
+
+    private static final String BRACKET_CLOSE = "]";
+
+    private static final String FOR_PRODUCT_SKU_MESSAGE = "] for product sku [";
+
+    private static final String DELETE_PRICE_ERROR_MESSAGE = "An exception occured while deleting product price [";
+
     private final ProductPriceService productPriceService;
 
     private final PricingService pricingService;
@@ -63,8 +73,8 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
             try {
                 return this.readablePrice(p, store, language);
             } catch (ConversionException e) {
-                throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku
-                        + "] and Store [" + store + "]", e);
+                throw new ServiceRuntimeException(GET_PRICE_ERROR_MESSAGE + sku
+                        + AND_STORE_MESSAGE + store + BRACKET_CLOSE, e);
             }
         }).toList();
     }
@@ -77,8 +87,8 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
             try {
                 return this.readablePrice(p, store, language);
             } catch (ConversionException e) {
-                throw new ServiceRuntimeException("An exception occured while getting product price for sku [" + sku
-                        + "] and Store [" + store + "]", e);
+                throw new ServiceRuntimeException(GET_PRICE_ERROR_MESSAGE + sku
+                        + AND_STORE_MESSAGE + store + BRACKET_CLOSE, e);
             }
         }).toList();
     }
@@ -88,14 +98,14 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
         ProductPrice productPrice = productPriceService.findById(priceId, sku, store);
         if (productPrice == null) {
             throw new ServiceRuntimeException("An exception occured while getting product price [" + priceId
-                    + "] for product sku [" + sku + "] and Store [" + store + "]");
+                    + FOR_PRODUCT_SKU_MESSAGE + sku + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         try {
             productPriceService.delete(productPrice);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("An exception occured while deleting product price [" + priceId
-                    + "] for product sku [" + sku + "] and Store [" + store + "]", e);
+            throw new ServiceRuntimeException(DELETE_PRICE_ERROR_MESSAGE + priceId
+                    + FOR_PRODUCT_SKU_MESSAGE + sku + AND_STORE_MESSAGE + store + BRACKET_CLOSE, e);
         }
     }
 
@@ -112,14 +122,14 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
         if (price == null) {
             throw new ResourceNotFoundException("ProductPrice with id [" + productPriceId
-                    + " not found for product sku [" + sku + "] and Store [" + store + "]");
+                    + " not found for product sku [" + sku + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         try {
             return readablePrice(price, store, language);
         } catch (ConversionException e) {
-            throw new ServiceRuntimeException("An exception occured while deleting product price [" + productPriceId
-                    + "] for product sku [" + sku + "] and Store [" + store + "]", e);
+            throw new ServiceRuntimeException(DELETE_PRICE_ERROR_MESSAGE + productPriceId
+                    + FOR_PRODUCT_SKU_MESSAGE + sku + AND_STORE_MESSAGE + store + BRACKET_CLOSE, e);
         }
     }
 

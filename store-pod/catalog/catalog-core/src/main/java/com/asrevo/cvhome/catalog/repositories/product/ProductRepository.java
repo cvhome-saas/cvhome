@@ -24,6 +24,8 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 public interface ProductRepository
         extends JpaRepository<Product, Long>, ProductRepositoryCustom, JpaSpecificationExecutor<Product> {
 
+    String ID_FIELD = "id";
+
     @Query(value = """
             SELECT
             CASE WHEN COUNT(*) > 0 THEN true ELSE false END
@@ -51,10 +53,10 @@ public interface ProductRepository
                 predicates.add(cb.like(root.get("sku"), Constants.PERCENT_SYMBOL + productCriteria.getSku() + Constants.PERCENT_SYMBOL));
             }
             if (Objects.nonNull(productCriteria.getManufacturerId())) {
-                predicates.add(cb.equal(root.get("manufacturer").get("id"), productCriteria.getManufacturerId()));
+                predicates.add(cb.equal(root.get("manufacturer").get(ID_FIELD), productCriteria.getManufacturerId()));
             }
             if (productCriteria.getCategoryIds() != null && !productCriteria.getCategoryIds().isEmpty()) {
-                predicates.add(root.join("categories").get("id").in(productCriteria.getCategoryIds()));
+                predicates.add(root.join("categories").get(ID_FIELD).in(productCriteria.getCategoryIds()));
                 query.distinct(true);
             }
 

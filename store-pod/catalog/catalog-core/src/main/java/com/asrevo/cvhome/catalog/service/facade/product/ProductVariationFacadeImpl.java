@@ -24,6 +24,12 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 @Service
 public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
+    private static final String PRODUCT_VARIATION_NOT_FOUND_MESSAGE = "ProductVariation not found for id [";
+
+    private static final String AND_STORE_MESSAGE = "] and store [";
+
+    private static final String BRACKET_CLOSE = "]";
+
     private final PersistableProductVariationMapper persistableProductVariationMapper;
 
     private final ReadableProductVariationMapper readableProductVariationMapper;
@@ -43,7 +49,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         Optional<ProductVariation> variation = productVariationService.getById(store, variationId, language);
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "ProductVariation not found for id [" + variationId + "] and store [" + store + "]");
+                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         return readableProductVariationMapper.convert(variation.get(), store, language);
@@ -94,7 +100,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         Optional<ProductVariation> p = productVariationService.getById(store, variationId, language);
         if (p.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "ProductVariation not found for id [" + variationId + "] and store [" + store + "]");
+                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
 
         ProductVariation productVariant = p.get();
@@ -111,11 +117,11 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         ProductVariation opt = productVariationService.getById(variationId);
         if (opt == null) {
             throw new ResourceNotFoundException(
-                    "ProductVariation not found for id [" + variationId + "] and store [" + store + "]");
+                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
         if (!opt.getStoreMerchantId().equals(store)) {
             throw new ResourceNotFoundException(
-                    "ProductVariation not found for id [" + variationId + "] and store [" + store + "]");
+                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
         }
         try {
             productVariationService.delete(opt);

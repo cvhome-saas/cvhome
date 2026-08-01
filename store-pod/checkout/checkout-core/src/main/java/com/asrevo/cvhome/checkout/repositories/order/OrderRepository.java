@@ -26,6 +26,10 @@ import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
+    String ID_FIELD = "id";
+
+    String TELEPHONE_FIELD = "telephone";
+
     @Query("""
             select o from Order o
             join fetch o.orderProducts op
@@ -88,15 +92,15 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             }
 
             if (criteria.getId() != null) {
-                predicates.add(cb.like(cb.function("str", String.class, root.get("id")),
+                predicates.add(cb.like(cb.function("str", String.class, root.get(ID_FIELD)),
                         Constants.PERCENT_SYMBOL + criteria.getId() + Constants.PERCENT_SYMBOL));
             }
 
             if (criteria.getCustomerPhone() != null && !criteria.getCustomerPhone().isEmpty()) {
                 String likeValue = Constants.PERCENT_SYMBOL + criteria.getCustomerPhone() + Constants.PERCENT_SYMBOL;
 
-                Predicate billingPhone = cb.like(billing.get("telephone"), likeValue);
-                Predicate deliveryPhone = cb.like(root.get("delivery").get("telephone"), likeValue);
+                Predicate billingPhone = cb.like(billing.get(TELEPHONE_FIELD), likeValue);
+                Predicate deliveryPhone = cb.like(root.get("delivery").get(TELEPHONE_FIELD), likeValue);
 
                 predicates.add(cb.or(billingPhone, deliveryPhone));
             }
@@ -107,9 +111,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
             if (criteria.getOrderBy() != null) {
                 if (criteria.getOrderBy().name().equals("ASC")) {
-                    query.orderBy(cb.asc(root.get("id")));
+                    query.orderBy(cb.asc(root.get(ID_FIELD)));
                 } else {
-                    query.orderBy(cb.desc(root.get("id")));
+                    query.orderBy(cb.desc(root.get(ID_FIELD)));
                 }
             }
 

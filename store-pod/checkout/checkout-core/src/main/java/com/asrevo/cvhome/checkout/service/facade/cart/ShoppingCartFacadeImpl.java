@@ -198,20 +198,20 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             Set<ShoppingCartItem> removeItems = new HashSet<>();
             for (ShoppingCartItem anItem : items) { // take care of existing
                 // product
-                if (itemModel.getSku().equals(anItem.getSku())) {
-                    if (item.getQuantity() == 0) {
-                        // left aside item to be removed
-                        // don't add it to new list of item
-                        removeItems.add(anItem);
-                    } else {
-                        // new quantity
-                        anItem.setQuantity(item.getQuantity());
-                        newItems.add(anItem);
-                    }
-                    itemModified = true;
+                if (!itemModel.getSku().equals(anItem.getSku())) {
+                    newItems.add(anItem);
+                    continue;
+                }
+                if (item.getQuantity() == 0) {
+                    // left aside item to be removed
+                    // don't add it to new list of item
+                    removeItems.add(anItem);
                 } else {
+                    // new quantity
+                    anItem.setQuantity(item.getQuantity());
                     newItems.add(anItem);
                 }
+                itemModified = true;
             }
 
             if (!removeItems.isEmpty()) {
@@ -285,25 +285,29 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ReadableShoppingCart readableCart = null;
 
         if (cart != null) {
-
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
-
-            if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
-                if (promoDateAdded == null) {
-                    promoDateAdded = Instant.now();
-                }
-                ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
-                LocalDate date = zdt.toLocalDate();
-                // date added < date + 1 day
-                LocalDate tomorrow = LocalDate.now().plusDays(1);
-                if (date.isBefore(tomorrow)) {
-                    readableCart.setPromoCode(cart.getPromoCode());
-                }
-            }
+            applyValidPromoCode(cart, readableCart);
         }
 
         return readableCart;
+    }
+
+    private void applyValidPromoCode(ShoppingCart cart, ReadableShoppingCart readableCart) {
+        if (StringUtils.isBlank(cart.getPromoCode())) {
+            return;
+        }
+
+        Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
+        if (promoDateAdded == null) {
+            promoDateAdded = Instant.now();
+        }
+        ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
+        LocalDate date = zdt.toLocalDate();
+        // date added < date + 1 day
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        if (date.isBefore(tomorrow)) {
+            readableCart.setPromoCode(cart.getPromoCode());
+        }
     }
 
 }

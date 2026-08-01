@@ -24,6 +24,14 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
 
+    private static final String PRODUCT_VARIATION_VALUE_PREFIX = "ProductVaritionValue [";
+
+    private static final String NOT_FOUND_FOR_STORE = "] + not found for store [";
+
+    private static final String CLOSE_BRACKET = "]";
+
+    private static final String PRODUCT_PREFIX = "Product [";
+
     private final ProductVariationService productVariationService;
 
     private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
@@ -61,27 +69,15 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         if (StringUtils.isEmpty(productVariationCode)) {
 
             variation = productVariationService.getById(store, productVariation);
-            if (productVariationValue != null) {
-                variationValue = productVariationService.getById(store, productVariationValue);
-                if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue
-                            + "] + not found for store [" + store + "]");
-                }
-            }
+            variationValue = resolveVariationValueById(store, productVariationValue);
         } else {
             variation = productVariationService.getByCode(store, productVariationCode);
-            if (productVariationValueCode != null) {
-                variationValue = productVariationService.getByCode(store, productVariationValueCode);
-                if (variationValue.isEmpty()) {
-                    throw new ResourceNotFoundException("ProductVaritionValue [" + productVariationValue
-                            + "] + not found for store [" + store + "]");
-                }
-            }
+            variationValue = resolveVariationValueByCode(store, productVariationValueCode, productVariationValue);
         }
 
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "ProductVarition [" + productVariation + "] + not found for store [" + store + "]");
+                    "ProductVarition [" + productVariation + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
         }
 
         destination.setVariation(variation.get());
@@ -110,7 +106,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             try {
                 destination.setDateAvailable(source.getDateAvailable());
             } catch (Exception _) {
-                throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + "]");
+                throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + CLOSE_BRACKET);
             }
         }
 
@@ -130,23 +126,48 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
             if (product == null) {
                 throw new ResourceNotFoundException(
-                        "Product [" + source.getId() + "] + not found for store [" + store + "]");
+                        PRODUCT_PREFIX + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
             }
 
             if (!product.getStore().equals(store)) {
                 throw new ResourceNotFoundException(
-                        "Product [" + source.getId() + "] + not found for store [" + store + "]");
+                        PRODUCT_PREFIX + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
             }
 
             if (product.getSku() != null && product.getSku().equals(source.getSku())) {
                 throw new OperationNotAllowedException("Product variant sku [" + source.getSku()
-                        + "] + must be different than product instance sku [" + product.getSku() + "]");
+                        + "] + must be different than product instance sku [" + product.getSku() + CLOSE_BRACKET);
             }
 
             destination.setProduct(product);
         }
 
         return destination;
+    }
+
+    private Optional<ProductVariation> resolveVariationValueById(StoreMerchantId store, Long productVariationValue) {
+        if (productVariationValue == null) {
+            return Optional.empty();
+        }
+        Optional<ProductVariation> variationValue = productVariationService.getById(store, productVariationValue);
+        if (variationValue.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    PRODUCT_VARIATION_VALUE_PREFIX + productVariationValue + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+        }
+        return variationValue;
+    }
+
+    private Optional<ProductVariation> resolveVariationValueByCode(StoreMerchantId store, String productVariationValueCode,
+            Long productVariationValue) {
+        if (productVariationValueCode == null) {
+            return Optional.empty();
+        }
+        Optional<ProductVariation> variationValue = productVariationService.getByCode(store, productVariationValueCode);
+        if (variationValue.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    PRODUCT_VARIATION_VALUE_PREFIX + productVariationValue + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+        }
+        return variationValue;
     }
 
 }

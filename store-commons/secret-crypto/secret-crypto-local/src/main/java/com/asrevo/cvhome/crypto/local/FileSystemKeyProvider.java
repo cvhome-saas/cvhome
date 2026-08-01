@@ -17,9 +17,10 @@ import java.util.regex.Pattern;
  */
 public class FileSystemKeyProvider implements LocalKeyProvider {
 
+    private static final String DEFAULT_KEY_NAME = "default-key";
+
     private final Path keysDirectory;
     private final boolean base64Encoded;
-    private static final String DEFAULT_KEY_NAME = "default-key";
 
     public FileSystemKeyProvider(Path keysDirectory) {
         this(keysDirectory, false);

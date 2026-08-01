@@ -16,6 +16,8 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductVariationMapper implements Mapper<PersistableProductVariation, ProductVariation> {
 
+    private static final String DOES_NOT_EXIST = "] does not exists";
+
     private final ProductOptionService productOptionService;
 
     private final ProductOptionValueService productOptionValueService;
@@ -42,14 +44,14 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
 
         ProductOption option = productOptionService.getById(store, source.getOption());
         if (option == null) {
-            throw new ConversionRuntimeException("ProductOption [" + source.getOption() + "] does not exists");
+            throw new ConversionRuntimeException("ProductOption [" + source.getOption() + DOES_NOT_EXIST);
         }
         destination.setProductOption(option);
 
         ProductOptionValue optionValue = productOptionValueService.getById(store, source.getOptionValue());
         if (optionValue == null) {
             throw new ConversionRuntimeException(
-                    "ProductOptionValue [" + source.getOptionValue() + "] does not exists");
+                    "ProductOptionValue [" + source.getOptionValue() + DOES_NOT_EXIST);
         }
         destination.setProductOptionValue(optionValue);
 
