@@ -116,7 +116,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
     }
 
     private ProductDescription resolveDescription(Product source, LanguageCode language,
-            List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
+                                                  List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
         ProductDescription description = source.getProductDescription();
         if (source.getDescriptions() == null || source.getDescriptions().isEmpty()) {
             return description;
@@ -151,7 +151,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
     }
 
     private ReadableImage buildReadableImage(ProductImage img, Product source, StoreMerchantId store, String contextPath,
-            ReadableProduct target) {
+                                             ReadableProduct target) {
         ReadableImage prdImage = new ReadableImage();
         prdImage.setImageName(img.getProductImage());
         prdImage.setDefaultImage(img.isDefaultImage());

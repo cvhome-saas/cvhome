@@ -116,7 +116,7 @@ public class PersistableCategoryPopulator
     }
 
     private void mergeExistingDescriptions(PersistableCategory source, Category target,
-            Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions)
+                                           Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions)
             throws ConversionException {
         for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target.getDescriptions()) {
             for (CategoryDescription d : source.getDescriptions()) {

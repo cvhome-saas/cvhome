@@ -158,7 +158,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
     }
 
     private Optional<ProductVariation> resolveVariationValueByCode(StoreMerchantId store, String productVariationValueCode,
-            Long productVariationValue) {
+                                                                   Long productVariationValue) {
         if (productVariationValueCode == null) {
             return Optional.empty();
         }

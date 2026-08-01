@@ -171,7 +171,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     }
 
     private ProductPrice mergeExistingPrice(PersistableProductPrice priceEntity, ProductPrice pp, ProductPrice price,
-            List<ProductPrice> prices) {
+                                            List<ProductPrice> prices) {
         if (isPositive(priceEntity.getId()) && priceEntity.getId().longValue() == pp.getId().longValue()) {
             prices.add(pp);
             return pp;
@@ -184,7 +184,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     }
 
     private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-            List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
+                                                                     List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }

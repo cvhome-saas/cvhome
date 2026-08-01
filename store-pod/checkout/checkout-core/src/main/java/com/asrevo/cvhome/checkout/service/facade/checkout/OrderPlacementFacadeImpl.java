@@ -108,18 +108,18 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result, String successUrl,
                                                          String cancelUrl) {
-            PaymentRequest paymentRequest = PaymentRequest.builder()
-                    .ref(modelOrder.getId().toString())
-                    .amount(modelOrder.getTotal())
-                    .currency(modelOrder.getCurrency())
-                    .paymentType(modelOrder.getPaymentType())
-                    .expireAt(result.expireAt())
-                    .successUrl(appendOrderId(successUrl, modelOrder.getId()))
-                    .cancelUrl(appendOrderId(cancelUrl, modelOrder.getId()))
-                    .build();
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .ref(modelOrder.getId().toString())
+                .amount(modelOrder.getTotal())
+                .currency(modelOrder.getCurrency())
+                .paymentType(modelOrder.getPaymentType())
+                .expireAt(result.expireAt())
+                .successUrl(appendOrderId(successUrl, modelOrder.getId()))
+                .cancelUrl(appendOrderId(cancelUrl, modelOrder.getId()))
+                .build();
 
-            log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-            return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
+        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
 
     }
 

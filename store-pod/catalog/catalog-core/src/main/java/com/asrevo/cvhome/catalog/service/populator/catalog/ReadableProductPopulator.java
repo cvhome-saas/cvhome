@@ -147,7 +147,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private ProductDescription resolveDescription(Product source, LanguageCode language,
-            List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
+                                                  List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
         ProductDescription description = source.getProductDescription();
         if (source.getDescriptions() == null || source.getDescriptions().isEmpty()) {
             return description;
@@ -198,7 +198,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private ReadableImage buildReadableImage(ProductImage img, Product source, StoreMerchantId store, String contextPath,
-            ReadableProduct target) {
+                                             ReadableProduct target) {
         ReadableImage prdImage = new ReadableImage();
         prdImage.setImageName(img.getProductImage());
         prdImage.setDefaultImage(img.isDefaultImage());
@@ -290,7 +290,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void applyMatchingOptionName(Set<ProductOptionDescription> podescriptions, LanguageCode language,
-            ReadableProductOption readableOption) {
+                                         ReadableProductOption readableOption) {
         if (podescriptions == null || podescriptions.isEmpty()) {
             return;
         }
@@ -302,7 +302,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void applyMatchingOptionValueName(Set<ProductOptionValueDescription> povdescriptions, LanguageCode language,
-            ReadableProductPropertyValue readableOptionValue) {
+                                              ReadableProductPropertyValue readableOptionValue) {
         if (povdescriptions == null || povdescriptions.isEmpty()) {
             return;
         }
@@ -314,7 +314,8 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private Map<Long, ReadableProductOption> applySelectableAttribute(ProductAttribute attribute,
-            Map<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language)
+                                                                      Map<Long, ReadableProductOption> selectableOptions,
+                                                                      StoreMerchantId store, LanguageCode language)
             throws ServiceException {
         Map<Long, ReadableProductOption> options = selectableOptions;
         if (options == null) {
@@ -417,7 +418,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability,
-            LanguageCode lang) throws ServiceException {
+                               LanguageCode lang) throws ServiceException {
         FinalPriceCalc price = pricingService.calculateProductPrice(source);
         if (price == null) {
             return;

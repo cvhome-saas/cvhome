@@ -97,34 +97,34 @@ public class OrderApi {
             throws ServiceException {
 
         ShoppingCart cart;
-            ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
+        ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
-            if (store.isRequireLoginForOrderPlacement()) {
-                if (auth == null || !auth.isAuthenticated()) {
-                    throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
-                }
-                if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
-                    throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
-                }
+        if (store.isRequireLoginForOrderPlacement()) {
+            if (auth == null || !auth.isAuthenticated()) {
+                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
             }
-
-            cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
-
-            if (cart == null) {
-                throw new ResourceNotFoundException("Cart code " + code + " does not exist");
-            } else {
-                order.setShoppingCartId(cart.getId());
+            if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
+                throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
             }
+        }
 
-            Optional.ofNullable(auth)
-                    .filter(JwtAuthenticationToken::isAuthenticated)
-                    .flatMap(token -> Optional.ofNullable(token.getTokenAttributes().get("sub")))
-                    .map(Object::toString)
-                    .ifPresent(it -> order.getCustomer().setCuaExternalId(it));
+        cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
-            Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
-                    .orElseThrow(() -> new ServiceRuntimeException(
-                            "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+        } else {
+            order.setShoppingCartId(cart.getId());
+        }
+
+        Optional.ofNullable(auth)
+                .filter(JwtAuthenticationToken::isAuthenticated)
+                .flatMap(token -> Optional.ofNullable(token.getTokenAttributes().get("sub")))
+                .map(Object::toString)
+                .ifPresent(it -> order.getCustomer().setCuaExternalId(it));
+
+        Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
+                .orElseThrow(() -> new ServiceRuntimeException(
+                        "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
 
         String domain = new DomainResolver(request).domain();
 

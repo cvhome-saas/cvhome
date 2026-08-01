@@ -186,7 +186,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     }
 
     private ProductDescription resolveProductDescription(Product destination,
-            com.asrevo.cvhome.catalog.model.product.ProductDescription description) {
+                                                         com.asrevo.cvhome.catalog.model.product.ProductDescription description) {
         if (CollectionUtils.isEmpty(destination.getDescriptions())) {
             return new ProductDescription();
         }

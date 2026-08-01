@@ -124,7 +124,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
     }
 
     private ProductPrice resolveExistingDefaultPrice(PersistableProductPrice source, ProductAvailability availability,
-            ProductPrice destination) {
+                                                     ProductPrice destination) {
         if (availability == null || !source.isDefaultPrice()) {
             return destination;
         }
@@ -136,7 +136,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
     }
 
     private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-            List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
+                                                                     List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }

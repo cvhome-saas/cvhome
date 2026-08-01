@@ -61,6 +61,10 @@ public class StripeProcessor implements PaymentProcessor {
         }
     }
 
+    private static long toStripeUnitAmount(BigDecimal amount) {
+        return amount.longValue() * 100;
+    }
+
     @Override
     public PaymentInitiateResult initiate(String internalReference, PaymentSecret secret, PaymentRequest request)
             throws FailedPaymentInitiate {
@@ -108,13 +112,9 @@ public class StripeProcessor implements PaymentProcessor {
 
     }
 
-    private static long toStripeUnitAmount(BigDecimal amount) {
-        return amount.longValue() * 100;
-    }
-
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                       PaymentSecret configuration) throws InvalidWebhookPayload {
+                                      PaymentSecret configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
         Event event = getEvent(payload, headers, configuration);
 

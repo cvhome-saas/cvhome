@@ -43,7 +43,7 @@ public class PaymentConfigurationController {
     @PutMapping("/{paymentType}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')")
     public void updateConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType,
-                    @RequestBody PersistablePaymentConfiguration config) {
+                             @RequestBody PersistablePaymentConfiguration config) {
         service.updateConfig(merchantStore, paymentType, config);
     }
 

@@ -132,7 +132,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private void applyType(PersistableProductDefinition source, Product destination, StoreMerchantId store,
-            LanguageCode language) throws ConversionException {
+                           LanguageCode language) throws ConversionException {
         if (StringUtils.isBlank(source.getType())) {
             return;
         }
@@ -175,7 +175,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private ProductDescription resolveProductDescription(Product destination,
-            com.asrevo.cvhome.catalog.model.product.ProductDescription description) {
+                                                         com.asrevo.cvhome.catalog.model.product.ProductDescription description) {
         if (CollectionUtils.isEmpty(destination.getDescriptions())) {
             return new ProductDescription();
         }
@@ -188,7 +188,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private void applyAvailabilityAndPrice(PersistableProductDefinition source, Product destination, StoreMerchantId store,
-            List<LanguageCode> languages) {
+                                           List<LanguageCode> languages) {
         AvailabilityAndPrice resolved = resolveExistingAvailabilityAndPrice(destination, source);
         ProductAvailability productAvailability = resolved.availability();
         ProductPrice defaultPrice = resolved.price();
@@ -210,11 +210,8 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
         }
     }
 
-    private record AvailabilityAndPrice(ProductAvailability availability, ProductPrice price) {
-    }
-
     private AvailabilityAndPrice resolveExistingAvailabilityAndPrice(Product destination,
-            PersistableProductDefinition source) {
+                                                                     PersistableProductDefinition source) {
         if (CollectionUtils.isEmpty(destination.getAvailabilities())) {
             return new AvailabilityAndPrice(null, null);
         }
@@ -232,7 +229,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private void createDefaultPrice(PersistableProductDefinition source, ProductAvailability productAvailability,
-            List<LanguageCode> languages) {
+                                    List<LanguageCode> languages) {
         BigDecimal defaultPriceAmount = new BigDecimal(0);
         if (source.getPrice() != null) {
             defaultPriceAmount = source.getPrice();
@@ -279,7 +276,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private void applyAttributes(PersistableProductDefinition source, Product destination, StoreMerchantId store,
-            LanguageCode language) {
+                                 LanguageCode language) {
         if (source.getProperties() == null) {
             return;
         }
@@ -317,6 +314,9 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
             throw new ConversionException("Category code " + categ.getCode() + NOT_EXIST_SUFFIX);
         }
         throw new ConversionException("Category id " + categ.getId() + NOT_EXIST_SUFFIX);
+    }
+
+    private record AvailabilityAndPrice(ProductAvailability availability, ProductPrice price) {
     }
 
 }

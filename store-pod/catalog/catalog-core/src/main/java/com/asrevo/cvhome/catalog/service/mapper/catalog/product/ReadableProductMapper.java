@@ -213,7 +213,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populateAttributes(Product source, ReadableProduct destination,
-            TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
+                                    TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
         if (CollectionUtils.isEmpty(source.getAttributes())) {
             return;
         }
@@ -252,7 +252,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applyMatchingOptionName(Set<ProductOptionDescription> podescriptions, LanguageCode language,
-            ReadableProductOption readableOption) {
+                                         ReadableProductOption readableOption) {
         if (podescriptions == null || podescriptions.isEmpty()) {
             return;
         }
@@ -264,7 +264,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applyMatchingOptionValueName(Set<ProductOptionValueDescription> povdescriptions, LanguageCode language,
-            ReadableProductPropertyValue readableOptionValue) {
+                                              ReadableProductPropertyValue readableOptionValue) {
         if (povdescriptions == null || povdescriptions.isEmpty()) {
             return;
         }
@@ -276,7 +276,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applySelectableAttribute(ProductAttribute attribute, TreeMap<Long, ReadableProductOption> selectableOptions,
-            StoreMerchantId store, LanguageCode language) {
+                                          StoreMerchantId store, LanguageCode language) {
         ReadableProductOption opt = selectableOptions.get(attribute.getProductOption().getId());
         if (opt == null) {
             opt = createOption(attribute.getProductOption(), language);
@@ -354,7 +354,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populateVariants(Product source, ReadableProduct destination,
-            TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
+                                  TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
         if (CollectionUtils.isEmpty(source.getVariants())) {
             return;
         }
@@ -391,7 +391,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populatePrice(Product source, ReadableProduct destination, StoreMerchantId store,
-            ProductAvailability availability, LanguageCode language) {
+                               ProductAvailability availability, LanguageCode language) {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price == null) {
@@ -438,7 +438,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applyPriceDescription(ProductPrice productPrice, ReadableProductPrice readableProductPrice,
-            LanguageCode language) {
+                                       LanguageCode language) {
         readableProductPrice.setId(productPrice.getId());
         Optional<ProductPriceDescription> d = productPrice.getDescriptions()
                 .stream()
@@ -607,7 +607,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applyInstanceOptionValue(ReadableProductOption option,
-            Optional<ReadableProductOptionValue> optionValue, ProductVariant instance) {
+                                          Optional<ReadableProductOptionValue> optionValue, ProductVariant instance) {
         if (optionValue.isEmpty()) {
             return;
         }

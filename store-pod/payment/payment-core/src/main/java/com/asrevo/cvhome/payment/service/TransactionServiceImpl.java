@@ -50,6 +50,36 @@ public class TransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
+    private static PaymentStatus toTransactionStatus(PaymentInitiateStatus status) {
+        return switch (status) {
+            case PENDING -> PaymentStatus.PENDING;
+            case FAILED -> PaymentStatus.FAILED;
+            case PAID -> PaymentStatus.PAID;
+        };
+    }
+
+    private static ReadableTransaction toReadableTransaction(Transaction transaction) {
+        return ReadableTransaction.builder()
+                .id(transaction.getId())
+                .internalRef(transaction.getInternalRef())
+                .requestRef(transaction.getRequestRef())
+                .amount(transaction.getAmount())
+                .currency(transaction.getCurrency())
+                .paymentType(transaction.getPaymentType())
+                .status(transaction.getStatus())
+                .transactionDate(transaction.getTransactionDate())
+                .transactionNo(transaction.getTransactionNo())
+                .build();
+    }
+
+    private static PaymentInitiateStatus toInitiateStatus(PaymentStatus status) {
+        return switch (status) {
+            case PAID -> PaymentInitiateStatus.PAID;
+            case PENDING, PROCESSING, WAITING_VERIFICATION, AUTHORIZED -> PaymentInitiateStatus.PENDING;
+            case FAILED, EXPIRED, CANCELLED, REJECTED, REFUNDED -> PaymentInitiateStatus.FAILED;
+        };
+    }
+
     @Override
     @Transactional
     public void completeSuccess(StoreMerchantId store, String transactionInternalRef) {
@@ -93,14 +123,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-    private static PaymentStatus toTransactionStatus(PaymentInitiateStatus status) {
-        return switch (status) {
-            case PENDING -> PaymentStatus.PENDING;
-            case FAILED -> PaymentStatus.FAILED;
-            case PAID -> PaymentStatus.PAID;
-        };
-    }
-
     @Override
     @Transactional
     public void approvePayment(StoreMerchantId store, String internalRef, String transactionNo) {
@@ -130,20 +152,6 @@ public class TransactionServiceImpl implements TransactionService {
         return result;
     }
 
-    private static ReadableTransaction toReadableTransaction(Transaction transaction) {
-        return ReadableTransaction.builder()
-                .id(transaction.getId())
-                .internalRef(transaction.getInternalRef())
-                .requestRef(transaction.getRequestRef())
-                .amount(transaction.getAmount())
-                .currency(transaction.getCurrency())
-                .paymentType(transaction.getPaymentType())
-                .status(transaction.getStatus())
-                .transactionDate(transaction.getTransactionDate())
-                .transactionNo(transaction.getTransactionNo())
-                .build();
-    }
-
     @Transactional(readOnly = true)
     @Override
     public PaymentResponse status(StoreMerchantId store, String requestRef) {
@@ -163,15 +171,6 @@ public class TransactionServiceImpl implements TransactionService {
                         .status(toInitiateStatus(it.getStatus()))
                         .gatewayRef(it.getInternalRef())
                         .build());
-    }
-
-
-    private static PaymentInitiateStatus toInitiateStatus(PaymentStatus status) {
-        return switch (status) {
-            case PAID -> PaymentInitiateStatus.PAID;
-            case PENDING, PROCESSING, WAITING_VERIFICATION, AUTHORIZED -> PaymentInitiateStatus.PENDING;
-            case FAILED, EXPIRED, CANCELLED, REJECTED, REFUNDED -> PaymentInitiateStatus.FAILED;
-        };
     }
 
     private @NonNull Transaction getTransaction(StoreMerchantId store, String internalRef) {

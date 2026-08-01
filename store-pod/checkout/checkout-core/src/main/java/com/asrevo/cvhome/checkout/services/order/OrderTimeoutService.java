@@ -39,21 +39,21 @@ public class OrderTimeoutService {
 
         // For Manual Transfer: 48 hours
         processExpiredOrders(PaymentType.MANUAL_TRANSFER, Duration.ofHours(48), PaymentStatus.EXPIRED);
-        
+
         log.info("Finished cleanup of expired orders.");
     }
 
     private void processExpiredOrders(PaymentType type, Duration duration, PaymentStatus status) {
         Instant cutoff = Instant.now().minus(duration);
         List<Order> expiredOrders = orderRepository.findExpiredOrders(type, cutoff);
-        
+
         if (!expiredOrders.isEmpty()) {
             log.info("Found {} expired orders for payment type {}", expiredOrders.size(), type);
             for (Order order : expiredOrders) {
                 log.info("Expiring order {} for store {}", order.getId(), order.getStoreMerchantId());
                 try {
                     orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(
-                        order.getId(), order.getStoreMerchantId(), OrderStatus.CANCELLED, status);
+                            order.getId(), order.getStoreMerchantId(), OrderStatus.CANCELLED, status);
                 } catch (Exception e) {
                     log.error("Failed to expire order {} due to timeout", order.getId(), e);
                 }

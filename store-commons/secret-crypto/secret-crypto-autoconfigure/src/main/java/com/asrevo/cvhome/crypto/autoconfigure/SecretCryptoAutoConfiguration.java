@@ -114,7 +114,7 @@ public class SecretCryptoAutoConfiguration {
     }
 
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local,
-                                                SecretCryptoProperties.LocalProperties.KeyProviderType type) {
+                                               SecretCryptoProperties.LocalProperties.KeyProviderType type) {
         return switch (type) {
             case STATIC -> {
                 if (local.getKey() == null) {

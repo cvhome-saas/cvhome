@@ -34,7 +34,7 @@ public class ExternalOrderApi implements ExternalOrderService {
     @Override
     @PostMapping("/private/order/{orderRef}/payment-status")
     public void updatePaymentStatus(StoreMerchantId store, @PathVariable String orderRef,
-                                   @RequestParam PaymentStatus status) {
+                                    @RequestParam PaymentStatus status) {
         log.info("Updating payment status for order {} to {} for store {}", orderRef, status, store);
         Long orderId = Long.parseLong(orderRef);
 
