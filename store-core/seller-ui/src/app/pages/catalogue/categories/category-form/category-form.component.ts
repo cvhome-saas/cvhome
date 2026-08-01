@@ -12,7 +12,7 @@ import {
   NbSpinnerModule
 } from '@nebular/theme';
 import {QuillModule} from 'ngx-quill';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {CategoryFormFacade} from '../facades/category-form.facade';
 import {CategoryFormService} from '../services/category-form.service';
 import {ReadableCategory} from '../models/category.model';
@@ -39,7 +39,7 @@ import {ReadableCategory} from '../models/category.model';
 })
 export class CategoryFormComponent implements OnInit {
   @Input() category: ReadableCategory;
-  @Input() store: Store;
+  @Input() store: ReadableMerchantStore;
 
   protected readonly facade = inject(CategoryFormFacade);
 

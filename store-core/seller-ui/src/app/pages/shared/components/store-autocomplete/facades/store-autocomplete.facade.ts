@@ -2,14 +2,14 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {StoreService} from '../../../services/store.service';
 import {ErrorService} from '../../../services/error.service';
-import {ManagerStoreId, Store} from '../../../models/commons';
+import {ManagerStoreId, ManagerStore} from '../../../models/commons';
 
 @Injectable()
 export class StoreAutocompleteFacade {
   private readonly storeService = inject(StoreService);
   private readonly errorService = inject(ErrorService);
 
-  readonly stores = signal<Store[]>([]);
+  readonly stores = signal<ManagerStore[]>([]);
 
   init(destroyRef: DestroyRef): void {
     this.storeService.list()

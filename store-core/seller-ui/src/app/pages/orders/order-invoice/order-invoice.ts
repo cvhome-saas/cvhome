@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
 import {ReadableOrder} from '../models/order.model';
-import {Store} from '../../store-management/models/store';
+import {ReadableMerchantStore} from '../../store-management/models/store';
 
 @Component({
   selector: 'ngx-order-invoice',
@@ -15,7 +15,7 @@ export class OrderInvoiceComponent {
   protected readonly ref = inject(NbDialogRef<OrderInvoiceComponent>);
 
   orderData: ReadableOrder;
-  store: Store;
+  store: ReadableMerchantStore;
 
   cancel() {
     this.ref.close();

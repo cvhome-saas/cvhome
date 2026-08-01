@@ -6,6 +6,16 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {StorePaymentConfigurationFormService} from '../services/store-payment-configuration.form.service';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+
+interface PaymentConfigFormValue {
+  paymentType: string;
+  apiKey: string;
+  secretKey: string;
+  webhookSecret: string;
+  enabled: boolean;
+  exists: boolean;
+}
 
 @Injectable()
 export class StorePaymentConfigurationFacade {
@@ -16,7 +26,7 @@ export class StorePaymentConfigurationFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly isSubmited = signal<boolean>(false);
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly paymentTypes = signal<string[]>([]);
   readonly loading = signal<boolean>(false);
   readonly selectedItem = signal<string>('7');
@@ -67,7 +77,7 @@ export class StorePaymentConfigurationFacade {
     const st = this.store();
     if (!st) return;
 
-    const requests = this.form.value.configs.map((it: any) => {
+    const requests = this.form.value.configs.map((it: PaymentConfigFormValue) => {
       const payload = {
         paymentType: it.paymentType,
         apiKey: it.apiKey,

@@ -3,12 +3,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {sideMenuLinks} from '../../services/constents';
-
-export interface SliderImage {
-  priority: number;
-  name: string;
-  url: string;
-}
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+import {SliderImage} from '../../models/store';
 
 @Injectable()
 export class StoreSliderImagesFacade {
@@ -17,7 +13,7 @@ export class StoreSliderImagesFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
 
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly newImageData = signal<string | ArrayBuffer | null>(null);
   readonly sliderImages = signal<SliderImage[]>([]);
   readonly loading = signal<boolean>(false);
@@ -82,13 +78,14 @@ export class StoreSliderImagesFacade {
     e.preventDefault();
   }
 
-  newImageChange(event: any): void {
-    if (event.target.files && event.target.files[0]) {
+  newImageChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
       const reader = new FileReader();
-      reader.onload = (e: any) => {
+      reader.onload = (e: ProgressEvent<FileReader>) => {
         this.newImageData.set(e.target.result);
       };
-      reader.readAsDataURL(event.target.files[0]);
+      reader.readAsDataURL(target.files[0]);
     }
   }
 

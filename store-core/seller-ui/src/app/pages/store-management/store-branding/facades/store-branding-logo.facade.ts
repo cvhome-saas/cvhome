@@ -1,9 +1,10 @@
 import {Injectable, inject, signal} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
-import {Logo} from '../../models/logo';
+import {Logo} from '../../models/store';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreBrandingLogoFacade {
@@ -17,20 +18,20 @@ export class StoreBrandingLogoFacade {
   readonly logo = signal<Logo | null>(null);
 
   acceptedImageTypes: Record<string, boolean> = {'image/png': true, 'image/jpeg': true, 'image/gif': true};
-  logoFile: any = null;
+  logoFile: File = null;
 
   imageUpload: FormGroup = this.formBuilder.group({
     imageInput: ['', Validators.required]
   });
 
-  init(store: any): void {
+  init(store: ReadableMerchantStoreWithPod): void {
     if (store && store.logo) {
       this.logo.set(store.logo);
       this.showRemoveButton.set(true);
     }
   }
 
-  readfiles(files: any[], imageDropElement: any): void {
+  readfiles(files: File[], imageDropElement: HTMLElement): void {
     this.logoFile = files[0];
     this.showRemoveButton.set(true);
     const reader = new FileReader();
@@ -47,7 +48,7 @@ export class StoreBrandingLogoFacade {
         imageDropElement.appendChild(image);
       }
       if (this.imageUpload.controls['imageInput'].value == null) {
-        const input = this.imageUpload.controls['imageInput'] as any;
+        const input = this.imageUpload.controls['imageInput'] as FormControl & {files?: File[]};
         input.files = files;
       }
     };
@@ -58,7 +59,7 @@ export class StoreBrandingLogoFacade {
     e.preventDefault();
   }
 
-  drop(e: DragEvent, imageDropElement: any): void {
+  drop(e: DragEvent, imageDropElement: HTMLElement): void {
     e.preventDefault();
     this.imageUpload.controls['imageInput'].reset();
     if (imageDropElement) {
@@ -69,16 +70,17 @@ export class StoreBrandingLogoFacade {
     }
   }
 
-  imageChange(event: any, imageDropElement: any): void {
+  imageChange(event: Event, imageDropElement: HTMLElement): void {
     if (imageDropElement) {
       imageDropElement.innerHTML = '';
     }
-    if (event.target.files) {
-      this.checkfiles(Array.from(event.target.files), imageDropElement);
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      this.checkfiles(Array.from(target.files), imageDropElement);
     }
   }
 
-  checkfiles(files: any[], imageDropElement: any): void {
+  checkfiles(files: File[], imageDropElement: HTMLElement): void {
     if (!files || !files.length) return;
     if (this.acceptedImageTypes[files[0].type] !== true) {
       if (imageDropElement) {
@@ -107,7 +109,7 @@ export class StoreBrandingLogoFacade {
     });
   }
 
-  removeLogo(storeId: string, imageDropElement: any): void {
+  removeLogo(storeId: string, imageDropElement: HTMLElement): void {
     this.showRemoveButton.set(false);
     this.logoFile = null;
     if (imageDropElement) {

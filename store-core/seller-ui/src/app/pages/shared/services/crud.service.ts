@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from '@angular/common/http';
 import {SelectedStoreService} from "./selected-store.service";
-import {Store} from "../models/commons";
+import {ManagerStore} from "../models/commons";
 
 export type HttpParamsLike = Record<string, string | number | boolean | undefined>;
 
@@ -58,7 +58,7 @@ export class CrudService {
 
   private getParams(p?: HttpParamsLike): HttpParams {
     const params: HttpParamsLike = p ? {...p} : {};
-    let store: Store;
+    let store: ManagerStore;
 
     if (p && p.store) {
       store = this.selectedStoreService.getStore(p.store as string);

@@ -8,7 +8,7 @@ import {StoreService} from '../../../../shared/services/store.service';
 import {ErrorService} from '../../../../shared/services/error.service';
 import {SelectedStoreService} from '../../../../shared/services/selected-store.service';
 import {SelectedLanguageService} from '../../../../shared/services/selected-language.service';
-import {ManagerStoreId, Store} from '../../../../shared/models/commons';
+import {ManagerStoreId, ManagerStore} from '../../../../shared/models/commons';
 import {HeaderMenuAction, STORE_SELECT_DISABLED_ROUTE_PREFIXES} from '../constants/header.constants';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class HeaderFacade {
   readonly languages = this.selectedLanguageService.languages();
   readonly currentLanguage = signal<string>(this.selectedLanguageService.current() ?? '');
   readonly user = signal<AuthUser | null>(null);
-  readonly stores = signal<Store[]>([]);
+  readonly stores = signal<ManagerStore[]>([]);
   readonly selectedStoreId = signal<string | undefined>(undefined);
   readonly isStoreSelectDisabled = signal<boolean>(false);
 

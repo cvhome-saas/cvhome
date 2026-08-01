@@ -6,6 +6,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {StoreSocialLinksFormService} from '../services/store-social-links.form.service';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ReadableMerchantStoreWithPod, SocialLink} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreSocialLinksFacade {
@@ -16,7 +17,7 @@ export class StoreSocialLinksFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly isSubmited = signal<boolean>(false);
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly providers = signal<string[]>([]);
   readonly loading = signal<boolean>(false);
   readonly selectedItem = signal<string>('3');
@@ -62,7 +63,7 @@ export class StoreSocialLinksFacade {
     const st = this.store();
     if (!st) return;
 
-    const socialLinks: any[] = [];
+    const socialLinks: SocialLink[] = [];
     Object.keys(this.form.value).forEach((it) => {
       socialLinks.push({provider: it, url: this.form.value[it]});
     });

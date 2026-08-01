@@ -6,6 +6,14 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {StoreSocialLoginFormService} from '../services/store-social-login.form.service';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+
+interface SocialLoginConfigFormValue {
+  providerId: string;
+  appId: string;
+  appSecret: string;
+  enabled: boolean;
+}
 
 @Injectable()
 export class StoreSocialLoginFacade {
@@ -16,7 +24,7 @@ export class StoreSocialLoginFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly isSubmited = signal<boolean>(false);
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly providers = signal<string[]>([]);
   readonly loading = signal<boolean>(false);
   readonly selectedItem = signal<string>('6');
@@ -67,8 +75,8 @@ export class StoreSocialLoginFacade {
     const st = this.store();
     if (!st) return;
 
-    const configs = this.form.value.configs.map((it: any) => ({
-      id: {providerId: it.providerId},
+    const configs = this.form.value.configs.map((it: SocialLoginConfigFormValue) => ({
+      providerId: it.providerId,
       appId: it.appId,
       appSecret: it.appSecret,
       enabled: it.enabled

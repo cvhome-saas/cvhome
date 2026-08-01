@@ -4,7 +4,7 @@ import {CategoryService} from '../services/category.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
 import {ReadableCategory} from '../models/category.model';
 
@@ -17,7 +17,7 @@ export class CategoryDetailFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly category = signal<ReadableCategory | null>(null);
-  readonly store = signal<Store | null>(null);
+  readonly store = signal<ReadableMerchantStore | null>(null);
   readonly loading = signal<boolean>(false);
 
   init(): void {

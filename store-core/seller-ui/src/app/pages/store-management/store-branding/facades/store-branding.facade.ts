@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {sideMenuLinks} from '../../services/constents';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreBrandingFacade {
@@ -11,7 +12,7 @@ export class StoreBrandingFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
 
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly loading = signal<boolean>(false);
   readonly selectedItem = signal<string>('0');
   readonly sideMenuLinks = sideMenuLinks;

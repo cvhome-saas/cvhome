@@ -1,16 +1,17 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreSocialLinksFormService {
   private readonly fb = inject(FormBuilder);
 
-  createForm(store: any, providers: string[]): FormGroup {
+  createForm(store: ReadableMerchantStoreWithPod, providers: string[]): FormGroup {
     const links: Record<string, string> = {};
-    const controls: Record<string, any> = {};
+    const controls: Record<string, unknown[]> = {};
 
     if (store && store.socialLinks) {
-      store.socialLinks.forEach((it: any) => {
+      store.socialLinks.forEach((it) => {
         links[it.provider] = it.url;
       });
     }

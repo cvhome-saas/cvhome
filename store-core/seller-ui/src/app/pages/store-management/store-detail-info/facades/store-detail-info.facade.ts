@@ -2,6 +2,7 @@ import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreDetailInfoFacade {
@@ -9,7 +10,7 @@ export class StoreDetailInfoFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly errorService = inject(ErrorService);
 
-  readonly store = signal<any>(null);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
 
   init(): void {
     const storeCode = this.activatedRoute.snapshot.paramMap.get('code');

@@ -10,7 +10,7 @@ import {AddBoxFormService} from '../services/add-box.form.service';
 import {mergeMap, of, zip} from 'rxjs';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
 import {HttpParamsLike} from '../../../shared/services/crud.service';
-import {ContentDescription, PersistableContentBox, ReadableContentBox} from '../../models/content.model';
+import {ContentDescription, ReadableContentBox} from '../../models/content.model';
 
 @Injectable()
 export class AddBoxFacade {

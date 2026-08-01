@@ -6,7 +6,7 @@ import {CategoryService} from '../services/category.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
 import {CategoryDescription, ReadableCategory} from '../models/category.model';
@@ -27,9 +27,9 @@ export class CategoryFormFacade {
   readonly defaultLanguage = signal<string>('');
 
   private categoryData: ReadableCategory;
-  private storeData: Store;
+  private storeData: ReadableMerchantStore;
 
-  init(category: ReadableCategory, store: Store): void {
+  init(category: ReadableCategory, store: ReadableMerchantStore): void {
     this.categoryData = category || {};
     this.storeData = store;
     if (!store) return;

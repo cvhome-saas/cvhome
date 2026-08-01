@@ -14,7 +14,7 @@ import {OrderTransactionComponent} from "../../order-transaction/order-transacti
 import {OrderInvoiceComponent} from "../../order-invoice/order-invoice";
 import {OrderHistoryComponent} from "../../order-history/order-history";
 import {CustomerAddress, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "../../models/order.model";
-import {Store} from "../../../store-management/models/store";
+import {ReadableMerchantStore} from "../../../store-management/models/store";
 
 @Injectable()
 export class OrderDetailsFacade {
@@ -35,7 +35,7 @@ export class OrderDetailsFacade {
   // State signals
   orderDetailsData = signal<ReadableOrder>(null);
   loader = signal<boolean>(false);
-  store = signal<Store>(null);
+  store = signal<ReadableMerchantStore>(null);
   shippingCountry = signal<ReadableCountry[]>([]);
   billingCountry = signal<ReadableCountry[]>([]);
   shippingStateData = signal<ReadableZone[]>([]);

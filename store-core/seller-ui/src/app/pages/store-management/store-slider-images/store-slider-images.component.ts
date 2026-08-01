@@ -1,9 +1,7 @@
 import {Component, OnInit, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbButtonModule, NbCardModule, NbOptionModule, NbSelectModule} from '@nebular/theme';
-import {StoreSliderImagesFacade, SliderImage} from './facades/store-slider-images.facade';
-
-export type { SliderImage };
+import {StoreSliderImagesFacade} from './facades/store-slider-images.facade';
 
 @Component({
   selector: 'ngx-store-slider-images',

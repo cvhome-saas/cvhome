@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {StoreFormComponent} from '../store-form/store-form.component';
+import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
 
 @Component({
   selector: 'ngx-store-creation',
@@ -9,5 +10,5 @@ import {StoreFormComponent} from '../store-form/store-form.component';
   styleUrls: ['./store-creation.component.scss']
 })
 export class StoreCreationComponent {
-  store: any;
+  store: ReadableMerchantStoreWithPod;
 }

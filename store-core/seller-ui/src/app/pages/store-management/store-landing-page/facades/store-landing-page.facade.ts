@@ -6,6 +6,7 @@ import {ErrorService} from '../../../shared/services/error.service';
 import {StoreLandingPageFormService} from '../services/store-landing-page.form.service';
 import {forkJoin} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ReadableMerchantStoreWithPod, LandingPageContent} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreLandingPageFacade {
@@ -16,10 +17,10 @@ export class StoreLandingPageFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly loader = signal<boolean>(false);
-  readonly store = signal<any>(null);
-  readonly languages = signal<any[]>([]);
+  readonly store = signal<ReadableMerchantStoreWithPod>(null);
+  readonly languages = signal<string[]>([]);
   readonly selectedItem = signal<string>('1');
-  readonly page = signal<any>(null);
+  readonly page = signal<LandingPageContent>(null);
   readonly sideMenuLinks = sideMenuLinks;
 
   form: FormGroup = this.formService.createForm();

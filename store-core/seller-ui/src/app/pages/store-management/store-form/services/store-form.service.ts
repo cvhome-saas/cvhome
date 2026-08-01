@@ -1,6 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
+import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreFormService {
@@ -35,7 +36,7 @@ export class StoreFormService {
     }, {validators: defaultLanguageMustBeInSupportedValidator});
   }
 
-  fillForm(form: FormGroup, store: any): string[] {
+  fillForm(form: FormGroup, store: ReadableMerchantStoreWithPod): string[] {
     const supportedLanguagesSelected: string[] = [];
     if (store.supportedLanguages) {
       store.supportedLanguages.forEach((lang: string) => {

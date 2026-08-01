@@ -1,13 +1,14 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {ReadablePaymentConfiguration} from '../../models/store-service.model';
 
 @Injectable()
 export class StorePaymentConfigurationFormService {
   private readonly fb = inject(FormBuilder);
 
-  createForm(paymentTypes: string[], configs: any[]): FormGroup {
+  createForm(paymentTypes: string[], configs: ReadablePaymentConfiguration[]): FormGroup {
     const configGroups = paymentTypes.map(type => {
-      const config = configs.find(c => c.paymentType === type) || {};
+      const config: ReadablePaymentConfiguration = configs.find(c => c.paymentType === type) || {};
       return this.fb.group({
         exists: [configs.some(c => c.paymentType === type)],
         paymentType: [type],

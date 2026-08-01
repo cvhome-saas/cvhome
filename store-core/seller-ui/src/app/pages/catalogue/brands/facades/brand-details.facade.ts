@@ -5,7 +5,7 @@ import {SelectedStoreService} from '../../../shared/services/selected-store.serv
 import {StoreService} from '../../../store-management/services/store.service';
 import {BrandService} from '../services/brand.service';
 import {ErrorService} from '../../../shared/services/error.service';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
 import {ReadableManufacturer} from '../models/brand.model';
 
@@ -18,7 +18,7 @@ export class BrandDetailsFacade {
   private readonly errorService = inject(ErrorService);
 
   readonly brand = signal<ReadableManufacturer | null>(null);
-  readonly store = signal<Store | null>(null);
+  readonly store = signal<ReadableMerchantStore | null>(null);
 
   init(destroyRef: DestroyRef): void {
     zip([this.selectedStoreService.current(), this.activatedRoute.params])

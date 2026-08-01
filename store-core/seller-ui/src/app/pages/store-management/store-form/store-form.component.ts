@@ -13,6 +13,7 @@ import {
 } from '@nebular/theme';
 import {StoreFormFacade} from './facades/store-form.facade';
 import {StoreFormService} from './services/store-form.service';
+import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
 
 @Component({
   selector: 'ngx-store-form',
@@ -35,7 +36,7 @@ import {StoreFormService} from './services/store-form.service';
 })
 export class StoreFormComponent implements OnInit, OnChanges {
   @Input() title: string;
-  @Input() store: any;
+  @Input() store: ReadableMerchantStoreWithPod;
   @Input() isCancel: string;
 
   protected readonly facade = inject(StoreFormFacade);

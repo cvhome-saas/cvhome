@@ -6,7 +6,7 @@ import {BrandService} from '../services/brand.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {slugify} from '../../../shared/utils/slugifying';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
 import {ManufacturerDescription, ReadableManufacturer} from '../models/brand.model';
 
@@ -24,9 +24,9 @@ export class BrandFormFacade {
   readonly defaultLanguage = signal<string>('');
 
   private brandData: ReadableManufacturer;
-  private storeData: Store;
+  private storeData: ReadableMerchantStore;
 
-  init(brand: ReadableManufacturer, store: Store, destroyRef: DestroyRef): void {
+  init(brand: ReadableManufacturer, store: ReadableMerchantStore, destroyRef: DestroyRef): void {
     this.brandData = brand || {};
     this.storeData = store;
     if (!store) return;

@@ -5,9 +5,11 @@ import {StoreService} from '../../services/store.service';
 import {ErrorService} from '../../../shared/services/error.service';
 import {StoreDomainFormService} from '../services/store-domain.form.service';
 import {StoreDomainComponentValidatorContext} from '../store-domain.validator';
+import {DatatablePageEvent} from '../../../shared/table/table-events';
 import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ManagerStoreDomain} from '../../models/store';
 
 @Injectable()
 export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
@@ -22,7 +24,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
   readonly perPageSize = 50;
   readonly loading = signal<boolean>(false);
   readonly page = signal<PageT<never>>(EMPTY_PAGE);
-  readonly rows = signal<any[]>([]);
+  readonly rows = signal<ManagerStoreDomain[]>([]);
   readonly selectedItem = signal<string>('2');
   readonly sideMenuLinks = sideMenuLinks;
 
@@ -47,7 +49,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.router.navigate(['pages/store-management/' + link + '/', this.store()]);
   }
 
-  setPage(pageInfo: any): void {
+  setPage(pageInfo: DatatablePageEvent): void {
     const pg = { ...this.page() };
     pg.pageNumber = pageInfo.offset;
     this.page.set(pg);
@@ -88,7 +90,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     });
   }
 
-  onAccess(row: any): void {
+  onAccess(row: ManagerStoreDomain): void {
     window.open(`https://${this.generateDomain(row)}`, '_blank');
   }
 
@@ -136,7 +138,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.createDomain(object.domain);
   }
 
-  public generateDomain(row: any): string {
+  public generateDomain(row: ManagerStoreDomain): string {
     if (row.domainType === 'SUB_DOMAIN') {
       return row.domain + '.' + this.podServerDomain();
     } else {

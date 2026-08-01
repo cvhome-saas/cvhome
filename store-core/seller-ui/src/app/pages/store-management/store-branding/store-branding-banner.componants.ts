@@ -3,6 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbButtonModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
 import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade";
+import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
 
 @Component({
   selector: 'ngx-store-branding-banner',
@@ -43,7 +44,7 @@ import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade"
   providers: [StoreBrandingBannerFacade]
 })
 export class StoreBrandingBannerComponent implements OnInit {
-  @Input() store: any;
+  @Input() store: ReadableMerchantStoreWithPod;
   @ViewChild('imageDrop', {static: false}) imageDrop!: ElementRef;
 
   protected readonly facade = inject(StoreBrandingBannerFacade);

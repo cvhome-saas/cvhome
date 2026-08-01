@@ -12,6 +12,39 @@ export interface SupportedLanguageCode {
   code: string;
 }
 
+/** Static reference data served from public/assets/data/countries.json —
+ *  same shape as reference-commons' ReadableCountry/ReadableZone. */
+export interface ReferenceCountry {
+  id?: number;
+  code?: string;
+  supported?: boolean;
+  name?: string;
+  zones?: ReferenceZone[];
+}
+
+export interface ReferenceZone {
+  id?: number;
+  countryCode?: string;
+  code?: string;
+  name?: string;
+}
+
+/** Static reference data served from public/assets/data/currencies.json. */
+export interface ReferenceCurrency {
+  id?: number;
+  currency?: string;
+  supported?: boolean;
+  code?: string;
+  name?: string;
+  new?: boolean;
+}
+
+/** Static reference data served from public/assets/data/weightSizes.json. */
+export interface WeightAndSizes {
+  weights: string[];
+  measures: string[];
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -41,15 +74,15 @@ export class ConfigService {
     return languages;
   }
 
-  getListOfCountries() {
+  getListOfCountries(): Observable<ReferenceCountry[]> {
     return this.crudService.get("assets/data/countries.json");
   }
 
-  getListOfSupportedCurrency() {
+  getListOfSupportedCurrency(): Observable<ReferenceCurrency[]> {
     return this.crudService.get("assets/data/currencies.json");
   }
 
-  getWeightAndSizes() {
+  getWeightAndSizes(): Observable<WeightAndSizes> {
     return this.crudService.get("assets/data/weightSizes.json");
   }
 }

@@ -1,5 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {LandingPageContent} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreLandingPageFormService {
@@ -14,12 +15,12 @@ export class StoreLandingPageFormService {
     });
   }
 
-  addFormArray(form: FormGroup, languages: any[]): void {
+  addFormArray(form: FormGroup, languages: string[]): void {
     const control = form.controls['descriptions'] as FormArray;
     languages.forEach(lang => {
       control.push(
         this.fb.group({
-          language: [lang.code, [Validators.required]],
+          language: [lang, [Validators.required]],
           name: ['', [Validators.required]],
           metaDescription: [''],
           id: '',
@@ -30,7 +31,7 @@ export class StoreLandingPageFormService {
     });
   }
 
-  fillForm(form: FormGroup, page: any): void {
+  fillForm(form: FormGroup, page: LandingPageContent): void {
     form.patchValue({
       selectedLanguage: 'en',
     });
@@ -39,9 +40,9 @@ export class StoreLandingPageFormService {
         id: page.id
       });
       const descriptions = form.value.descriptions || [];
-      descriptions.forEach((desc: any, index: number) => {
+      descriptions.forEach((desc: {language?: string}, index: number) => {
         if (page.descriptions) {
-          page.descriptions.forEach((description: any) => {
+          page.descriptions.forEach((description) => {
             if (desc.language === description.language) {
               (form.get('descriptions') as FormArray).at(index).patchValue({
                 language: description.language,

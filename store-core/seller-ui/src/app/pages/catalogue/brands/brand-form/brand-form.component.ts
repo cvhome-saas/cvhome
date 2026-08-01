@@ -10,7 +10,7 @@ import {
   NbSpinnerModule
 } from '@nebular/theme';
 import {QuillModule} from 'ngx-quill';
-import {Store} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {BrandFormFacade} from '../facades/brand-form.facade';
 import {BrandFormService} from '../services/brand-form.service';
 import {ReadableManufacturer} from '../models/brand.model';
@@ -36,7 +36,7 @@ import {ReadableManufacturer} from '../models/brand.model';
 export class BrandFormComponent implements OnInit {
   @Input() brand: ReadableManufacturer;
   @Input() title: string;
-  @Input() store: Store;
+  @Input() store: ReadableMerchantStore;
 
   protected readonly facade = inject(BrandFormFacade);
   private readonly destroyRef = inject(DestroyRef);

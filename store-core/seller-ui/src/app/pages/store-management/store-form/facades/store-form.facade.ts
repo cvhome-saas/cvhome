@@ -9,6 +9,9 @@ import {SelectedStoreService} from '../../../shared/services/selected-store.serv
 import {StoreFormService} from '../services/store-form.service';
 import {forkJoin} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
+import {ReferenceCountry, ReferenceCurrency} from '../../../shared/services/config.service';
+import {Language} from '../../../shared/models/Language';
+import {PersistableMerchantStore, ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
 @Injectable()
 export class StoreFormFacade {
@@ -27,14 +30,14 @@ export class StoreFormFacade {
   readonly isNameUnique = signal<boolean>(true);
   readonly selectedItem = signal<string>('5');
 
-  readonly countries = signal<any[]>([]);
-  readonly supportedCurrency = signal<any[]>([]);
-  readonly supportedTheme = signal<any[]>([]);
-  readonly supportedColorThemes = signal<any[]>([]);
-  readonly weightList = signal<any[]>([]);
-  readonly sizeList = signal<any[]>([]);
+  readonly countries = signal<ReferenceCountry[]>([]);
+  readonly supportedCurrency = signal<ReferenceCurrency[]>([]);
+  readonly supportedTheme = signal<string[]>([]);
+  readonly supportedColorThemes = signal<string[]>([]);
+  readonly weightList = signal<string[]>([]);
+  readonly sizeList = signal<string[]>([]);
   readonly pods = signal<Pods>([]);
-  readonly supportedLanguagesList = signal<any[]>([]);
+  readonly supportedLanguagesList = signal<Language[]>([]);
 
   supportedLanguagesSelected: string[] = [];
   readonly sideMenuLinks = sideMenuLinks;
@@ -60,7 +63,7 @@ export class StoreFormFacade {
   get dimension() { return this.form.get('dimension'); }
   get requireLoginForOrderPlacement() { return this.form.get('requireLoginForOrderPlacement'); }
 
-  init(store?: any): void {
+  init(store?: ReadableMerchantStoreWithPod): void {
     this.loader.set(true);
     forkJoin([
       this.configService.getListOfCountries(),
@@ -92,7 +95,7 @@ export class StoreFormFacade {
     });
   }
 
-  setStore(store: any): void {
+  setStore(store: ReadableMerchantStoreWithPod): void {
     if (store && store.id) {
       this.supportedLanguagesSelected = this.formService.fillForm(this.form, store);
       this.isReadonlyName.set(true);
@@ -100,12 +103,12 @@ export class StoreFormFacade {
     }
   }
 
-  save(storeInput?: any): void {
+  save(storeInput?: ReadableMerchantStoreWithPod): void {
     this.submitted.set(true);
     if (this.form.valid) {
       this.form.controls['address'].patchValue({country: this.form.value.address.country});
       this.form.controls['address'].patchValue({stateProvince: this.form.value.address.stateProvince});
-      const storeObj = this.form.value;
+      const storeObj: PersistableMerchantStore = this.form.value;
       storeObj.supportedLanguages = this.supportedLanguagesSelected;
 
       if (storeInput && storeInput.id) {
@@ -120,7 +123,7 @@ export class StoreFormFacade {
       } else {
         this.storeService.checkIfStoreExist(this.form.value.name).subscribe({
           next: (res) => {
-            if (res.exist) {
+            if (res.exists) {
               this.errorService.success('COMMON.NAME_EXISTS');
             } else {
               this.storeService.createStore(storeObj).subscribe({
@@ -149,11 +152,11 @@ export class StoreFormFacade {
     this.form.patchValue({'supportedLanguages': this.supportedLanguagesSelected});
   }
 
-  userHasSupportedLanguage(language: any, storeInput?: any): boolean {
+  userHasSupportedLanguage(language: Language, storeInput?: ReadableMerchantStoreWithPod): boolean {
     if (!storeInput || !storeInput.supportedLanguages) {
       return false;
     }
-    return storeInput.supportedLanguages.find((l: any) => l === language.code) !== undefined;
+    return storeInput.supportedLanguages.find((l) => l === language.code) !== undefined;
   }
 
   checkName(_event: Event): void {
