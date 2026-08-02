@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import com.asrevo.cvhome.errors.web.ErrorHandlingAutoConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.CustomPermissionEvaluator;
 import com.asrevo.cvhome.s2s.config.internal.EcsInfoConfig;
 import com.asrevo.cvhome.s2s.config.internal.IssuerUriSetJwtDecoderConfiguration;
@@ -30,7 +31,7 @@ import com.asrevo.cvhome.s2s.model.TestStoreProperties;
 @Import({EcsInfoConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
         ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
         IssuerUriSetReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
-        ServletPermissionConfig.class})
+        ServletPermissionConfig.class, ErrorHandlingAutoConfiguration.class})
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,
         PodProperties.class, CdnProperties.class, StripeProperties.class, StoreProductImageProperties.class,
         CdnStorageProperties.class, IssuerUriSetConfigrationProperties.class, TestStoreProperties.class,

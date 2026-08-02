@@ -38,7 +38,7 @@ include(
         'store-pod:spg',
         'store-pod:commons:store-commons',
         'store-pod:commons:store-modules:store-cms-commons',
-//        'store-pod:landing-ui',
+        'store-pod:landing-ui',
         'store-pod:commons:reference:reference-commons',
         'store-pod:commons:reference:reference-core',
         'store-pod:commons:customer:customer-commons',
@@ -73,5 +73,5 @@ include(
         'store-core:control-plane:subscription-events',
         'store-core:control-plane:subscription-external-api',
         'store-core:control-plane:pod-external-api',
-//        'store-core:seller-ui',
+        'store-core:seller-ui',
 )

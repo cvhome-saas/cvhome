@@ -22,27 +22,4 @@ dependencies {
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok
-
-    // The custom argument resolvers reference domain types from :store-commons:commons, which is compileOnly
-    // here; a client proxy cannot be invoked at test time without them on the runtime classpath.
-    testImplementation project(':store-commons:commons')
-    // WebClientsUtils touches both client stacks, so the s2s round-trip test needs webflux on the test
-    // classpath even though production consumers only ever use one of them.
-    testImplementation libs.spring.webflux
-    testImplementation libs.spring.boot.starter.web
-    testImplementation libs.spring.boot.starter.validation
-    testImplementation libs.spring.boot.starter.security
-    testImplementation libs.spring.boot.starter.test
-    testCompileOnly libs.lombok
-    testAnnotationProcessor libs.lombok
-    // Version pinned explicitly: the shared catalog entry is versionless because every other module inherits it from
-    // the Spring Boot BOM, which this java-library module does not apply. Keep in step with the JUnit Jupiter version
-    // spring-boot-starter-test resolves to.
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.1'
-}
-
-// This module applies the plain java-library conventions rather than the Spring Boot plugin, so the JUnit Platform
-// has to be selected explicitly here instead of being configured by Boot's dependency management.
-tasks.named('test') {
-    useJUnitPlatform()
 }
