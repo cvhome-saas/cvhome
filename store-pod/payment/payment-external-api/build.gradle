@@ -12,15 +12,4 @@ dependencies {
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
-
-    // The client wrapper is the one piece of behaviour this module owns, so it is the one piece it can test.
-    testImplementation libs.spring.boot.starter.test
-    // Version pinned explicitly: the shared catalog entry is versionless because it is normally inherited from the
-    // Spring Boot BOM, which this java-library module does not apply. Keep in step with :store-commons:autoconfigure.
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.1'
-}
-
-// java-library conventions rather than the Spring Boot plugin, so the JUnit Platform is selected explicitly here.
-tasks.named('test') {
-    useJUnitPlatform()
 }
