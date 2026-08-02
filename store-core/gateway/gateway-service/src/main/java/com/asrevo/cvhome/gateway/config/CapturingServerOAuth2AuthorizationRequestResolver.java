@@ -104,8 +104,8 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
             // callback
             String state = authorizationRequest.getState();
             if (state == null || state.isEmpty()) {
-                logger.warn("OAuth2AuthorizationRequest state is null or empty. Cannot reliably store"
-                        + " captured parameters for this flow.");
+                logger.warn(
+                        "OAuth2AuthorizationRequest state is null or empty. Cannot reliably store captured parameters for this flow.");
                 return Mono.just(authorizationRequest); // Proceed without storing if
                 // state is missing
             }

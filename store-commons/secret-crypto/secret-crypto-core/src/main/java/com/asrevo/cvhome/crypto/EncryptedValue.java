@@ -25,12 +25,13 @@ public class EncryptedValue {
             return null;
         }
         if (!isEncrypted(serialized)) {
-            throw new IllegalArgumentException("Value is not encrypted or missing prefix: " + serialized);
+            throw new IllegalArgumentException(String.format("Value is not encrypted or missing prefix: %s", serialized));
         }
         String content = serialized.substring(PREFIX.length());
         String[] parts = content.split(SEPARATOR);
         if (parts.length != 5) {
-            throw new IllegalArgumentException("Invalid serialized EncryptedValue (expected 5 parts): " + serialized);
+            throw new IllegalArgumentException(
+                    String.format("Invalid serialized EncryptedValue (expected 5 parts): %s", serialized));
         }
         return EncryptedValue.builder()
                 .version(Integer.parseInt(parts[0]))

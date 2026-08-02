@@ -111,7 +111,7 @@ public class OrderApi {
         cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+            throw new ResourceNotFoundException(String.format("Cart code %s does not exist", code));
         } else {
             order.setShoppingCartId(cart.getId());
         }
@@ -124,7 +124,8 @@ public class OrderApi {
 
         Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
                 .orElseThrow(() -> new ServiceRuntimeException(
-                        "Unable to create or retrieve customer for cart placement " + cart.getCustomerId()));
+                        String.format("Unable to create or retrieve customer for cart placement %s",
+                                cart.getCustomerId())));
 
         String domain = new DomainResolver(request).domain();
 

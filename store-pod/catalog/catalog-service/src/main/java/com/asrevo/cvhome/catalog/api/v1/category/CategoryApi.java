@@ -110,9 +110,7 @@ public class CategoryApi {
      */
     @GetMapping(value = "/private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                    + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                    + " filter=[featured,visible",
+            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",
@@ -137,9 +135,7 @@ public class CategoryApi {
      */
     @GetMapping(value = "/private/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                    + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                    + " filter=[featured,visible",
+            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",
@@ -160,9 +156,7 @@ public class CategoryApi {
 
     @GetMapping(value = "/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and"
-                    + " VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ?"
-                    + " filter=[featured,visible",
+            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",

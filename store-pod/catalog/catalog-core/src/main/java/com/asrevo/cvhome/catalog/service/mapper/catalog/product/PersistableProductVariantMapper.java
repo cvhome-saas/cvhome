@@ -77,7 +77,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "ProductVarition [" + productVariation + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                    "ProductVarition [%s] + not found for store [%s]".formatted(productVariation, store));
         }
 
         destination.setVariation(variation.get());
@@ -106,7 +106,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             try {
                 destination.setDateAvailable(source.getDateAvailable());
             } catch (Exception _) {
-                throw new ServiceRuntimeException("Cant format date [" + source.getDateAvailable() + CLOSE_BRACKET);
+                throw new ServiceRuntimeException("Cant format date [%s]".formatted(source.getDateAvailable()));
             }
         }
 
@@ -135,8 +135,9 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
             }
 
             if (product.getSku() != null && product.getSku().equals(source.getSku())) {
-                throw new OperationNotAllowedException("Product variant sku [" + source.getSku()
-                        + "] + must be different than product instance sku [" + product.getSku() + CLOSE_BRACKET);
+                throw new OperationNotAllowedException(
+                        "Product variant sku [%s] + must be different than product instance sku [%s]"
+                                .formatted(source.getSku(), product.getSku()));
             }
 
             destination.setProduct(product);

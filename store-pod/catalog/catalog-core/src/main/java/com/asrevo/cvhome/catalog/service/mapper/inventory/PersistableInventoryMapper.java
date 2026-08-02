@@ -34,10 +34,6 @@ import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 @Component
 public class PersistableInventoryMapper implements Mapper<PersistableInventory, ProductAvailability> {
 
-    private static final String NOT_FOUND_FOR_STORE = "] not found for store [";
-
-    private static final String CLOSE_BRACKET = "]";
-
     private final ProductVariantService productVariantService;
 
     private final ProductService productService;
@@ -63,7 +59,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 product = productService.findOne(source.getProductId(), store);
                 if (product == null) {
                     throw new ResourceNotFoundException(
-                            "Product with id [" + source.getProductId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                            "Product with id [%s] not found for store [%s]".formatted(source.getProductId(), store));
                 }
                 destination.setProduct(product);
             }
@@ -92,7 +88,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
             if (existing != null) {
                 if (!existing.getStoreMerchantId().equals(store)) {
                     throw new ResourceNotFoundException(
-                            "Product Inventory with id [" + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                            "Product Inventory with id [%s] not found for store [%s]".formatted(source.getId(), store));
                 }
                 destination = existing;
             }
@@ -115,7 +111,7 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
                 if (instance.isEmpty()) {
                     throw new ResourceNotFoundException(
-                            "productVariant with id [" + source.getVariant() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                            "productVariant with id [%s] not found for store [%s]".formatted(source.getVariant(), store));
                 }
                 destination.setSku(instance.get().getSku());
                 destination.setProductVariant(instance.get());

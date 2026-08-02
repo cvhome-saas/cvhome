@@ -65,7 +65,8 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     @Override
     public void create(PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language) {
         if (this.exists(optionSet.getCode(), store)) {
-            throw new OperationNotAllowedException("Option set with code [" + optionSet.getCode() + "] already exist");
+            throw new OperationNotAllowedException(
+                    "Option set with code [%s] already exist".formatted(optionSet.getCode()));
         }
 
         ProductOptionSet opt = persistableProductOptionSetMapper.convert(optionSet, store, language);

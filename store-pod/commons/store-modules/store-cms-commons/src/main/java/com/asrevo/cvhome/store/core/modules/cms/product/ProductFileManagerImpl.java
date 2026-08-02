@@ -94,8 +94,9 @@ public class ProductFileManagerImpl extends ProductFileManager {
                 int largeImageWidth = Integer.parseInt(slargeImageWidth);
 
                 if (largeImageHeight <= 0 || largeImageWidth <= 0) {
-                    String sizeMsg = "Image configuration set to an invalid value" + " [PRODUCT_IMAGE_HEIGHT_SIZE] "
-                            + largeImageHeight + " , [PRODUCT_IMAGE_WIDTH_SIZE] " + largeImageWidth;
+                    String sizeMsg = String.format(
+                            "Image configuration set to an invalid value [PRODUCT_IMAGE_HEIGHT_SIZE] %s , [PRODUCT_IMAGE_WIDTH_SIZE] %s",
+                            largeImageHeight, largeImageWidth);
                     log.error(sizeMsg);
                     throw new ServiceException(sizeMsg);
                 }
@@ -106,7 +107,8 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
                 if (bufferedImage == null) {
                     log.error("Cannot read image format for {}", productImage.getProductImage());
-                    throw new Exception("Cannot read image format " + productImage.getProductImage());
+                    throw new Exception(
+                            String.format("Cannot read image format %s", productImage.getProductImage()));
                 }
 
                 // crop image
@@ -127,7 +129,7 @@ public class ProductFileManagerImpl extends ProductFileManager {
 
                 File tempLarge = File.createTempFile(
                         new StringBuilder().append(productImage.getId()).append("tmpLarge").toString(),
-                        "." + extension);
+                        String.format(".%s", extension));
                 ImageIO.write(largeResizedImage, extension, tempLarge);
 
                 try (FileInputStream isLarge = new FileInputStream(tempLarge)) {

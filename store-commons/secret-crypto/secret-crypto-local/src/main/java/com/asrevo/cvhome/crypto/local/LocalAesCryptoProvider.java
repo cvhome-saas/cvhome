@@ -32,7 +32,7 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
     @Override
     public EncryptedValue encrypt(byte[] plaintext) {
         byte[] key = keyProvider.getKey()
-                .orElseThrow(() -> new IllegalStateException("Active key not found: " + ACTIVE_KEY_ID));
+                .orElseThrow(() -> new IllegalStateException(String.format("Active key not found: %s", ACTIVE_KEY_ID)));
         byte[] iv = new byte[IV_LENGTH_BYTE];
         secureRandom.nextBytes(iv);
 
@@ -57,7 +57,8 @@ public class LocalAesCryptoProvider implements SecretCryptoProvider {
     @Override
     public byte[] decrypt(EncryptedValue encryptedValue) {
         byte[] key = keyProvider.getKey()
-                .orElseThrow(() -> new IllegalArgumentException("Key not found: " + encryptedValue.getKeyId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Key not found: %s", encryptedValue.getKeyId())));
 
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);

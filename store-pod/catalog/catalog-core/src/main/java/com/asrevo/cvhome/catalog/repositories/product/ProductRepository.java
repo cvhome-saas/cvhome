@@ -35,8 +35,7 @@ public interface ProductRepository
             WHERE (pv.sku = ?1 OR p.sku = ?1) and p.store = ?2""")
     boolean existsBySku(String sku, StoreMerchantId storeMerchantId);
 
-    @Query(value = "select p.id from Product p left join p.variants pv where (p.sku=?1 or"
-            + " pv.sku=?1) and p.store=?2")
+    @Query(value = "select p.id from Product p left join p.variants pv where (p.sku=?1 or pv.sku=?1) and p.store=?2")
     List<Long> findBySku(String sku, StoreMerchantId merchantStoreId);
 
     default Page<Product> findAll(ProductCriteria productCriteria, StoreMerchantId storeMerchantId, Pageable pageable) {

@@ -24,8 +24,6 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductAttributeMapper implements Mapper<PersistableProductAttribute, ProductAttribute> {
 
-    private static final String DOES_NOT_EXIST = " does not exist";
-
     private final ProductOptionService productOptionService;
 
     private final ProductOptionValueService productOptionValueService;
@@ -62,7 +60,8 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
         }
 
         if (productOption == null) {
-            throw new ConversionRuntimeException("Product option id " + source.getOption().getId() + DOES_NOT_EXIST);
+            throw new ConversionRuntimeException(
+                    "Product option id %s does not exist".formatted(source.getOption().getId()));
         }
 
         ProductOptionValue productOptionValue;
@@ -91,7 +90,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 
         if (productOptionValue == null && !source.isAttributeDisplayOnly()) {
             throw new ConversionRuntimeException(
-                    "Product option value id " + source.getOptionValue().getId() + DOES_NOT_EXIST);
+                    "Product option value id %s does not exist".formatted(source.getOptionValue().getId()));
         }
 
         if (!Objects.equals(productOption.getStoreMerchantId(), store)) {

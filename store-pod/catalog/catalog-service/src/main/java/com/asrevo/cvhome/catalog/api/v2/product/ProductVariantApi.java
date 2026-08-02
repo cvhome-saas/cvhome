@@ -103,8 +103,7 @@ public class ProductVariantApi {
 
     @GetMapping(value = "/private/product/{id}/variant/{variantId}", produces = "application/json")
     @Operation(method = "GET", description = "Get a productVariant by id",
-            summary = "For administration and shop purpose. Specifying ?merchant is required"
-                    + " otherwise it falls back to DEFAULT")
+            summary = "For administration and shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
     @ApiResponse(responseCode = "200", description = "Single product found",
             content = @Content(schema = @Schema(implementation = ReadableProductVariant.class)))
 

@@ -22,13 +22,13 @@ public class AdminClientClient extends AbstractAdminClient {
 
     public AdminClientClient(String baseUrl, String clientId, String clientSecret) {
         super(baseUrl, clientId, clientSecret);
-        this.clientsApiUrl = baseUrl + "/api/v1/admin/clients";
+        this.clientsApiUrl = String.format("%s/api/v1/admin/clients", baseUrl);
     }
 
     public PageResponse<ClientSummary> listClients(PageRequest pageRequest) {
         String url = clientsApiUrl;
         if (pageRequest != null) {
-            url += "?page=" + pageRequest.page() + "&size=" + pageRequest.size();
+            url += String.format("?page=%d&size=%d", pageRequest.page(), pageRequest.size());
         }
         HttpRequest request = authenticatedRequestBuilder(url).GET().build();
         return sendAndParsePage(request, new TypeReference<>() {
@@ -62,7 +62,7 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public void resetSecret(String id, String newSecret) {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + PATH_SEPARATOR + id + "/reset-secret")
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/reset-secret", clientsApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("newSecret", newSecret))))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
@@ -70,7 +70,7 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public Map<String, Object> getOptions() {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + "/options").GET().build();
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s/options", clientsApiUrl)).GET().build();
         return sendAndParse(request, new TypeReference<>() {
         });
     }

@@ -64,7 +64,7 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
                     if (ex instanceof JwtException) {
                         return ex;
                     }
-                    return new JwtException("Failed to decode JWT: " + ex.getMessage(), ex);
+                    return new JwtException(String.format("Failed to decode JWT: %s", ex.getMessage()), ex);
                 });
     }
 
@@ -78,7 +78,7 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
     private Mono<ReactiveJwtDecoder> getDecoderForIssuer(String issuer) {
         if (!this.supportedIssuerUris.contains(issuer)) {
             return Mono.error(new JwtException(String.format(
-                    "Unsupported issuer: '%s'. Issuer not in the configured list of" + " supported issuers: %s.",
+                    "Unsupported issuer: '%s'. Issuer not in the configured list of supported issuers: %s.",
                     issuer, this.supportedIssuerUris)));
         }
 
@@ -86,8 +86,9 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
 
         if (delegateDecoder == null) {
             return Mono
-                    .error(new JwtException(String.format("Decoder factory returned null for supported issuer: '%s'. This"
-                            + " indicates an issue with the factory configuration.", issuer)));
+                    .error(new JwtException(String.format(
+                            "Decoder factory returned null for supported issuer: '%s'. This indicates an issue with the factory configuration.",
+                            issuer)));
         }
         return Mono.just(delegateDecoder);
     }
@@ -110,7 +111,7 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
             }
             return issuer;
         } catch (ParseException e) {
-            throw new JwtException("Failed to parse token to extract issuer: " + e.getMessage(), e);
+            throw new JwtException(String.format("Failed to parse token to extract issuer: %s", e.getMessage()), e);
         }
     }
 

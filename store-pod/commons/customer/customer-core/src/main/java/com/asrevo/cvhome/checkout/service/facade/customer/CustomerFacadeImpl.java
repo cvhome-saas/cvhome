@@ -42,7 +42,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     public ReadableCustomer getCustomerById(Long id, final StoreMerchantId store, final LanguageCode language) {
 
         Customer customerModel = Optional.ofNullable(customerService.getById(id))
-                .orElseThrow(() -> new ResourceNotFoundException("No Customer found for ID : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("No Customer found for ID : %s", id)));
 
         return convertCustomerToReadableCustomer(customerModel, store, language);
     }

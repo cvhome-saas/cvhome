@@ -50,7 +50,7 @@ public class StripeInitServiceImpl implements StripeInitService {
         String productName = plan.name();
         ProductCreateParams productParams = ProductCreateParams.builder()
                 .setName(productName)
-                .setDescription(productName + " Plan")
+                .setDescription(String.format("%s Plan", productName))
                 .build();
         Product product = Product.create(productParams);
         return new ProductId(product.getId());
@@ -61,7 +61,7 @@ public class StripeInitServiceImpl implements StripeInitService {
     public PriceId createProductPrice(ProductPriceDetails details) {
         String productName = details.subscriptionPlan().name();
         PriceCreateParams priceParams = PriceCreateParams.builder()
-                .setNickname(productName + " " + details.recurringPlan().name())
+                .setNickname(String.format("%s %s", productName, details.recurringPlan().name()))
                 .setCurrency(details.pricePlanCost().currency())
                 .setUnitAmount(details.pricePlanCost().price())
                 .setRecurring(PriceCreateParams.Recurring.builder()

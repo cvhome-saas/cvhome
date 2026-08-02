@@ -45,9 +45,6 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductMapper implements Mapper<PersistableProduct, Product> {
 
-    private static final String DOES_NOT_EXIST_SUFFIX = "] does not exist";
-    private static final String NOT_EXIST_SUFFIX = " does not exist";
-
     private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
 
     private final PersistableProductVariantMapper persistableProductVariantMapper;
@@ -141,7 +138,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
                 source.getProductSpecifications().getManufacturer());
         if (manufacturer == null) {
             throw new ConversionException(
-                    "Manufacturer [" + source.getProductSpecifications().getManufacturer() + DOES_NOT_EXIST_SUFFIX);
+                    "Manufacturer [%s] does not exist".formatted(source.getProductSpecifications().getManufacturer()));
         }
         destination.setManufacturer(manufacturer);
     }
@@ -153,7 +150,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
         }
         ProductType type = productTypeService.getByCode(source.getType(), store, language);
         if (type == null) {
-            throw new ConversionException("Product type [" + source.getType() + DOES_NOT_EXIST_SUFFIX);
+            throw new ConversionException("Product type [%s] does not exist".formatted(source.getType()));
         }
         destination.setType(type);
     }
@@ -221,9 +218,9 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
             return c;
         }
         if (hasCode) {
-            throw new ConversionException("Category code " + categ.getCode() + NOT_EXIST_SUFFIX);
+            throw new ConversionException("Category code %s does not exist".formatted(categ.getCode()));
         }
-        throw new ConversionException("Category id " + categ.getId() + NOT_EXIST_SUFFIX);
+        throw new ConversionException("Category id %s does not exist".formatted(categ.getId()));
     }
 
     private void applyVariants(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language) {

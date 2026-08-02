@@ -75,7 +75,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (productVariant.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "Product instance + [" + instanceId + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    "Product instance + [%s] not found for store [%s]".formatted(instanceId, store));
         }
 
         ProductVariant model = productVariant.get();
@@ -88,7 +88,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
         try {
             product = productCommonFacade.getProduct(store, productId, language);
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting product [" + productId + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException("Error while getting product [%s]".formatted(productId), e);
         }
 
         return productVariantService.exist(sku, product.getId());
@@ -110,7 +110,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
             if (!differentOption) {
                 throw new ConstraintException(
-                        "Product option of instance.variant and instance.variantValue must be" + " different");
+                        "Product option of instance.variant and instance.variantValue must be different");
             }
         }
 
@@ -154,8 +154,9 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
         try {
             productVariantService.delete(instanceModel.get());
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot delete product instance [" + productVariant + "]  for store ["
-                    + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE, e);
+            throw new ServiceRuntimeException(
+                    "Cannot delete product instance [%s]  for store [%s] and productId [%s]"
+                            .formatted(productVariant, store, productId), e);
         }
     }
 
@@ -166,7 +167,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (product == null) {
             throw new ResourceNotFoundException(
-                    "Product with id [" + productId + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    "Product with id [%s] not found for store [%s]".formatted(productId, store));
         }
 
         Page<ProductVariant> instances = productVariantService.getByProductId(store, product, language, pageable);

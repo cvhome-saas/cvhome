@@ -74,7 +74,7 @@ public class StoreFacadeImpl implements StoreFacade {
         try {
             readableMerchantStorePopulator.populate(store, readable, store, language);
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Error while populating Store " + e.getMessage());
+            throw new ConversionRuntimeException(String.format("Error while populating Store %s", e.getMessage()));
         }
         return readable;
     }
@@ -82,14 +82,15 @@ public class StoreFacadeImpl implements StoreFacade {
     private MerchantStore getMerchantStoreByMerchantStoreId(StoreMerchantId storeMerchantId) {
         return Optional.ofNullable(get(storeMerchantId))
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Merchant store code [" + storeMerchantId + "] not found"));
+                        () -> new ResourceNotFoundException(
+                                String.format("Merchant store code [%s] not found", storeMerchantId)));
     }
 
     @Override
     public void create(PersistableMerchantStore store) {
         MerchantStore storeForCheck = get(new StoreMerchantId(store.getId()));
         if (storeForCheck != null) {
-            throw new ServiceRuntimeException("MerhantStore " + store.getId() + " already exists");
+            throw new ServiceRuntimeException(String.format("MerhantStore %s already exists", store.getId()));
         }
 
         MerchantStore mStore = convertPersistableMerchantStoreToMerchantStore(store, LanguageCode.defaultLanguage());
@@ -162,7 +163,7 @@ public class StoreFacadeImpl implements StoreFacade {
             merchantStoreService.delete(mStore);
         } catch (Exception e) {
             log.error("Error while deleting MerchantStore", e);
-            throw new ServiceRuntimeException("Error while deleting MerchantStore " + e.getMessage());
+            throw new ServiceRuntimeException(String.format("Error while deleting MerchantStore %s", e.getMessage()));
         }
     }
 

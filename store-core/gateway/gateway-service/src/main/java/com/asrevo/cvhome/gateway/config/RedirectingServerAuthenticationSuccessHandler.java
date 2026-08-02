@@ -55,7 +55,7 @@ public class RedirectingServerAuthenticationSuccessHandler implements ServerAuth
             Map<String, String> capturedParams = (Map<String, String>) capturedParamsObject;
             String redirectTo = capturedParams.get("redirectTo");
 
-            log.info("Retrieved captured parameters from session (key: {}):" + " {}", sessionKey, capturedParams);
+            log.info("Retrieved captured parameters from session (key: {}): {}", sessionKey, capturedParams);
             // Remove from session after use
             webSession.getAttributes().remove(sessionKey);
             log.debug("Removed captured parameters from session with key: {}", sessionKey);
@@ -65,11 +65,11 @@ public class RedirectingServerAuthenticationSuccessHandler implements ServerAuth
                 return this.redirectStrategy.sendRedirect(exchange, defaultRedirectUri);
             }
             if (!isValidRedirect(redirectTo)) {
-                log.warn("Invalid or disallowed 'redirectTo' parameter:" + " '{}'. Falling back to default.",
+                log.warn("Invalid or disallowed 'redirectTo' parameter: '{}'. Falling back to default.",
                         redirectTo);
                 return this.redirectStrategy.sendRedirect(exchange, defaultRedirectUri);
             }
-            log.info("Valid 'redirectTo' parameter found: '{}'." + " Redirecting.", redirectTo);
+            log.info("Valid 'redirectTo' parameter found: '{}'. Redirecting.", redirectTo);
             return this.redirectStrategy.sendRedirect(exchange, URI.create(redirectTo));
         });
     }

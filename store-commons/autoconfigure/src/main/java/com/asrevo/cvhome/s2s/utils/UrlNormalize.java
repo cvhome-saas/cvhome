@@ -22,7 +22,7 @@ public class UrlNormalize {
             int port = uri.getPort();
 
             if (scheme == null || host == null) {
-                throw new JwtException("Issuer URI must include scheme and host: " + uriString);
+                throw new JwtException(String.format("Issuer URI must include scheme and host: %s", uriString));
             }
 
             scheme = scheme.toLowerCase();
@@ -37,7 +37,7 @@ public class UrlNormalize {
                     .toString();
 
         } catch (URISyntaxException e) {
-            throw new JwtException("Malformed issuer URI string: " + uriString, e);
+            throw new JwtException(String.format("Malformed issuer URI string: %s", uriString), e);
         }
     }
 

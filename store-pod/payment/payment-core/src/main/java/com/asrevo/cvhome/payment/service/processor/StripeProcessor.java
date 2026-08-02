@@ -41,7 +41,8 @@ public class StripeProcessor implements PaymentProcessor {
             StripeObject stripeObject = event.getDataObjectDeserializer().deserializeUnsafe();
             return clazz.cast(stripeObject);
         } catch (ClassCastException e) {
-            throw new InvalidWebhookPayload("Stripe event data object is not of expected type: " + clazz.getSimpleName(), e);
+            throw new InvalidWebhookPayload(
+                    String.format("Stripe event data object is not of expected type: %s", clazz.getSimpleName()), e);
         } catch (EventDataObjectDeserializationException e) {
             throw new InvalidWebhookPayload("Failed to deserialize Stripe event data object", e);
         }
@@ -91,7 +92,7 @@ public class StripeProcessor implements PaymentProcessor {
                                                 .setUnitAmount(toStripeUnitAmount(request.amount()))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Order #" + request.ref())
+                                                                .setName(String.format("Order #%s", request.ref()))
                                                                 .build())
                                                 .build())
                                 .build())

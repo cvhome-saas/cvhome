@@ -36,7 +36,7 @@ public record RedirectionUrlBuilder(String schema, Integer port, ServiceDomain s
 
     public String getRedirectionUrl(String path) {
 
-        String fullUrl = schema + SCHEMA_SPLITTER + serviceDomain.domain() + ":" + port;
+        String fullUrl = String.format("%s%s%s:%s", schema, SCHEMA_SPLITTER, serviceDomain.domain(), port);
         if (!path.isEmpty() && !path.equals(URL_SPLITTER)) {
             if (path.startsWith(URL_SPLITTER)) {
                 fullUrl = fullUrl + path;

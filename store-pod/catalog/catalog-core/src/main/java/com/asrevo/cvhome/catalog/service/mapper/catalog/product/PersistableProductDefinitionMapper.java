@@ -38,9 +38,7 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductDefinitionMapper implements Mapper<PersistableProductDefinition, Product> {
 
-    private static final String DOES_NOT_EXIST_SUFFIX = "] does not exist";
     private static final String INVALID_MANUFACTURER_ID_MESSAGE = "Invalid manufacturer id";
-    private static final String NOT_EXIST_SUFFIX = " does not exist";
 
     private final CategoryService categoryService;
 
@@ -126,7 +124,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
         }
         Manufacturer manufacturer = manufacturerService.getByCode(store, source.getManufacturer());
         if (manufacturer == null) {
-            throw new ConversionException("Manufacturer [" + source.getManufacturer() + DOES_NOT_EXIST_SUFFIX);
+            throw new ConversionException("Manufacturer [%s] does not exist".formatted(source.getManufacturer()));
         }
         destination.setManufacturer(manufacturer);
     }
@@ -138,7 +136,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
         }
         ProductType type = productTypeService.getByCode(source.getType(), store, language);
         if (type == null) {
-            throw new ConversionException("Product type [" + source.getType() + DOES_NOT_EXIST_SUFFIX);
+            throw new ConversionException("Product type [%s] does not exist".formatted(source.getType()));
         }
 
         destination.setType(type);
@@ -311,9 +309,9 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
             return c;
         }
         if (hasCode) {
-            throw new ConversionException("Category code " + categ.getCode() + NOT_EXIST_SUFFIX);
+            throw new ConversionException("Category code %s does not exist".formatted(categ.getCode()));
         }
-        throw new ConversionException("Category id " + categ.getId() + NOT_EXIST_SUFFIX);
+        throw new ConversionException("Category id %s does not exist".formatted(categ.getId()));
     }
 
     private record AvailabilityAndPrice(ProductAvailability availability, ProductPrice price) {

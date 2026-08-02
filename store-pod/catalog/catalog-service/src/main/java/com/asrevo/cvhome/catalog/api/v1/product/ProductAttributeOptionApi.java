@@ -48,7 +48,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Product attributes and options / options values management resource (Product" + " Option Management Api)")
+@Tag(name = "Product attributes and options / options values management resource (Product Option Management Api)")
 public class ProductAttributeOptionApi {
 
     private final ProductOptionFacade productOptionFacade;

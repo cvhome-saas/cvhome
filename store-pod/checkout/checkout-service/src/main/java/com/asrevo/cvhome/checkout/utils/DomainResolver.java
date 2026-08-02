@@ -17,7 +17,7 @@ public record DomainResolver(HttpServletRequest request) {
         String referer = request.getHeader("Referer");
         if (referer != null && !referer.isBlank()) {
             URI refererUri = URI.create(referer);
-            return refererUri.getScheme() + "://" + refererUri.getAuthority();
+            return String.format("%s://%s", refererUri.getScheme(), refererUri.getAuthority());
         }
 
         return UriComponentsBuilder.newInstance()

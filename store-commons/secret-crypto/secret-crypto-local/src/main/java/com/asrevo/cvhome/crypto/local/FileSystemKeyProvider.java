@@ -42,7 +42,7 @@ public class FileSystemKeyProvider implements LocalKeyProvider {
             String property = matcher.group(1);
             String value = System.getProperty(property);
             if (value == null) {
-                throw new IllegalArgumentException("Unknown system property: " + property);
+                throw new IllegalArgumentException(String.format("Unknown system property: %s", property));
             }
             matcher.appendReplacement(result, Matcher.quoteReplacement(value));
         }

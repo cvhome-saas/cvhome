@@ -96,7 +96,7 @@ public class PriceUtils {
                 && !amount.contains(" ")) {
 
             if (!matchPositiveInteger(amount)) {
-                throw new ServiceException("Not a positive integer " + amount);
+                throw new ServiceException(String.format("Not a positive integer %s", amount));
             }
             BigDecimalValidator validator = CurrencyValidator.getInstance();
             BigDecimal bdamount = validator.validate(amount, Locale.US);
@@ -113,7 +113,7 @@ public class PriceUtils {
                 pat.append("\\d{1,3}(" + THOUSANDPOINT + "?\\d{3})*");
             }
 
-            pat.append("(\\" + DECIMALPOINT + "\\d{1," + DECIMALCOUNT + "})");
+            pat.append(String.format("(\\%s\\d{1,%s})", DECIMALPOINT, DECIMALCOUNT));
 
             Pattern pattern = Pattern.compile(pat.toString());
             Matcher matcher = pattern.matcher(amount);

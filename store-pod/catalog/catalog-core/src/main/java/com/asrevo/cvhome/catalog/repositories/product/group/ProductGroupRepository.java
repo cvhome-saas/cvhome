@@ -16,20 +16,16 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 @Repository
 public interface ProductGroupRepository extends JpaRepository<ProductGroup, Long> {
 
-    @Query("select p from ProductGroup p " + "left join fetch p.descriptions pd "
-            + "where p.storeMerchantId = ?1 and p.code = ?2")
+    @Query("select p from ProductGroup p left join fetch p.descriptions pd where p.storeMerchantId = ?1 and p.code = ?2")
     Optional<ProductGroup> findByStoreAndCode(StoreMerchantId store, String code);
 
-    @Query("select p from ProductGroup p " + "left join fetch p.descriptions pd "
-            + "where p.storeMerchantId = ?1 and pd.languageCode = ?2")
+    @Query("select p from ProductGroup p left join fetch p.descriptions pd where p.storeMerchantId = ?1 and pd.languageCode = ?2")
     Page<ProductGroup> findByStore(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
-    @Query("select p from ProductGroup p " + "left join fetch p.descriptions pd "
-            + "where p.storeMerchantId = ?1 and p.parentProduct.id = ?2")
+    @Query("select p from ProductGroup p left join fetch p.descriptions pd where p.storeMerchantId = ?1 and p.parentProduct.id = ?2")
     List<ProductGroup> findByStoreAndParentProduct(StoreMerchantId store, Long productId);
 
-    @Query("select p from ProductGroup p " + "left join fetch p.descriptions pd "
-            + "where p.storeMerchantId = ?1 and p.parentProduct.id = ?2 and p.code = ?3")
+    @Query("select p from ProductGroup p left join fetch p.descriptions pd where p.storeMerchantId = ?1 and p.parentProduct.id = ?2 and p.code = ?3")
     Optional<ProductGroup> findByStoreAndParentProductAndCode(StoreMerchantId store, Long productId, String code);
 
 }

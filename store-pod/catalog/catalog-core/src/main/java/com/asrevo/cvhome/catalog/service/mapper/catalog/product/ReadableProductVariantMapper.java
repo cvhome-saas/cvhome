@@ -66,7 +66,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
         Product baseProduct = source.getProduct();
         if (baseProduct == null) {
             throw new ResourceNotFoundException(
-                    "Product instances do not include the parent product [" + destination.getSku() + "]");
+                    "Product instances do not include the parent product [%s]".formatted(destination.getSku()));
         }
 
         destination.setProductShipeable(baseProduct.isProductShipeable());

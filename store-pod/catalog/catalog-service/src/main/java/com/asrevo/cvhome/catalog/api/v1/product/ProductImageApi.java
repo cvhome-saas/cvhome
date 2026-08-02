@@ -156,7 +156,8 @@ public class ProductImageApi {
                 productImageService.delete(productImage.get());
             } catch (ServiceException e) {
                 log.error(ERR_DELETING_IMAGE, e);
-                throw new ServiceRuntimeException(String.format(ERR_PRODUCT_IMAGE, imageId) + " cannot be deleted", e);
+                throw new ServiceRuntimeException(
+                        String.format("ProductImage [%s] cannot be deleted", imageId), e);
             }
         } else {
             throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
@@ -244,7 +245,7 @@ public class ProductImageApi {
 
         } catch (Exception e) {
             log.error(ERR_DELETING_IMAGE, e);
-            throw new ServiceRuntimeException(String.format(ERR_PRODUCT_IMAGE, imageId) + " cannot be edited");
+            throw new ServiceRuntimeException(String.format("ProductImage [%s] cannot be edited", imageId));
         }
     }
 

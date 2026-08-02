@@ -63,7 +63,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
         }
 
         if (!Objects.equals(category.getStoreMerchantId(), store)) {
-            throw new UnauthorizedException("Merchant [" + store + "] not authorized");
+            throw new UnauthorizedException("Merchant [%s] not authorized".formatted(store));
         }
 
         List<Manufacturer> manufacturers = manufacturerService.listByProductsInCategory(store, category, language);

@@ -79,7 +79,8 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language) {
 
         if (this.exists(variation.getCode(), store)) {
-            throw new OperationNotAllowedException("Option set with code [" + variation.getCode() + "] already exist");
+            throw new OperationNotAllowedException(
+                    "Option set with code [%s] already exist".formatted(variation.getCode()));
         }
 
         ProductVariation p = persistableProductVariationMapper.convert(variation, store, language);

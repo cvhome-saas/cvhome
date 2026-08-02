@@ -80,7 +80,7 @@ public class ContentFacadeImpl implements ContentFacade {
             return contentFolder;
 
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while getting folder " + e.getMessage(), e);
+            throw new ServiceRuntimeException(String.format("Error while getting folder %s", e.getMessage()), e);
         }
     }
 
@@ -330,13 +330,14 @@ public class ContentFacadeImpl implements ContentFacade {
     public void delete(StoreMerchantId store, Long id) {
         Content content = contentService.getById(id);
         if (content != null && !Objects.equals(content.getStoreMerchantId(), store)) {
-            throw new ResourceNotFoundException("No content found with id [" + id + "] for store [" + store + "]");
+            throw new ResourceNotFoundException(
+                    String.format("No content found with id [%s] for store [%s]", id, store));
         }
 
         try {
             contentService.delete(content);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while deleting content " + e.getMessage(), e);
+            throw new ServiceRuntimeException(String.format("Exception while deleting content %s", e.getMessage()), e);
         }
     }
 

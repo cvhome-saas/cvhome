@@ -32,7 +32,7 @@ public class StripeSubscriptionServiceImpl implements StripeSubscriptionService 
     @SneakyThrows
     private Customer findOrCreateCustomer(ManagerOrgId managerOrgId) {
         CustomerSearchParams params = CustomerSearchParams.builder()
-                .setQuery("metadata[\"orgId\"]:\"" + managerOrgId.id().toString() + "\"")
+                .setQuery(String.format("metadata[\"orgId\"]:\"%s\"", managerOrgId.id().toString()))
                 .build();
 
         CustomerSearchResult search = Customer.search(params);

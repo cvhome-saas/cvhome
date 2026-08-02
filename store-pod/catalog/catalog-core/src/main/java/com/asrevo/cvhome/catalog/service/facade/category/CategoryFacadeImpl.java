@@ -254,7 +254,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         Category category = categoryService.getBySeUrl(store, friendlyUrl, language);
 
         if (category == null) {
-            throw new ResourceNotFoundException("Category with friendlyUrl [" + friendlyUrl + "] was not found");
+            throw new ResourceNotFoundException("Category with friendlyUrl [%s] was not found".formatted(friendlyUrl));
         }
 
         ReadableCategoryPopulator categoryPopulator = new ReadableCategoryPopulator();

@@ -30,7 +30,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 
         User u = users.findByClientIdAndUsername(clientId, username)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "User not found for client " + clientId + " and username: " + username));
+                        String.format("User not found for client %s and username: %s", clientId, username)));
 
         return new SecurityUser(u);
     }

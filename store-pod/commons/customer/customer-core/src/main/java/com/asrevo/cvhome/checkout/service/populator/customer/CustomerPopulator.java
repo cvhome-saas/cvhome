@@ -154,7 +154,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     private Country resolveCountry(CountryIsoCode code, Map<CountryIsoCode, Country> countries) throws ConversionException {
         Country country = countries.get(code);
         if (country == null) {
-            throw new ConversionException("Unsupported country code " + code);
+            throw new ConversionException(String.format("Unsupported country code %s", code));
         }
         return country;
     }
@@ -162,7 +162,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     private Zone resolveZone(ZoneCode code) throws ConversionException {
         Zone zone = zoneService.getByCode(code);
         if (zone == null) {
-            throw new ConversionException("Unsupported zone code " + code);
+            throw new ConversionException(String.format("Unsupported zone code %s", code));
         }
         return zone;
     }

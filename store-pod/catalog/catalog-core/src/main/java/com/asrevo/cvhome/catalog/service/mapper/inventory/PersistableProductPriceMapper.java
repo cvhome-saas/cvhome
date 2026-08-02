@@ -61,7 +61,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                         .getById(source.getProductAvailabilityId(), store);
                 if (avail.isEmpty()) {
                     throw new ConversionRuntimeException(
-                            "Product availability with id [" + source.getProductAvailabilityId() + "] was not found");
+                            "Product availability with id [%s] was not found".formatted(source.getProductAvailabilityId()));
                 }
                 availability = avail.get();
 
@@ -76,7 +76,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                 Product product = productService.getBySku(source.getSku(), store, language);
                 if (product == null) {
                     throw new ConversionRuntimeException(
-                            "Product with sku [" + source.getSku() + "] not found for Store [" + store + "]");
+                            "Product with sku [%s] not found for Store [%s]".formatted(source.getSku(), store));
                 }
 
                 availability = new ProductAvailability();

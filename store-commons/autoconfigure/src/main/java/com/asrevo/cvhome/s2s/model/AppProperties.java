@@ -25,7 +25,7 @@ public class AppProperties {
         Set<String> hosts = new LinkedHashSet<>();
         hosts.add(domain);
         for (String s : sub) {
-            hosts.add(s + "." + domain);
+            hosts.add("%s.%s".formatted(s, domain));
         }
 
         for (String host : hosts) {

@@ -50,7 +50,7 @@ public class ShoppingCartApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/cart")
     @Operation(method = "POST",
-            description = "Add product to shopping cart when no cart exists, this will create a new cart" + " id",
+            description = "Add product to shopping cart when no cart exists, this will create a new cart id",
             summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
                     + " {\"product\":1232,\"quantity\":1}")
     @Parameter(name = "store",
@@ -66,7 +66,7 @@ public class ShoppingCartApi {
     @PutMapping(value = "/cart/{code}")
     @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
             summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
-                    + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234" + " from cart")
+                    + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",
@@ -111,7 +111,7 @@ public class ShoppingCartApi {
             ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
 
             if (cart == null) {
-                response.sendError(404, "No ShoppingCart found for customer code : " + code);
+                response.sendError(404, String.format("No ShoppingCart found for customer code : %s", code));
                 return null;
             }
 
@@ -128,8 +128,7 @@ public class ShoppingCartApi {
 
     @DeleteMapping(value = "/cart/{code}/product/{sku}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "DELETE", description = "Remove a product from a specific cart",
-            summary = "If body set to true returns remaining cart in body, empty cart gives empty"
-                    + " body. If body set to false no body ")
+            summary = "If body set to true returns remaining cart in body, empty cart gives empty body. If body set to false no body ")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",

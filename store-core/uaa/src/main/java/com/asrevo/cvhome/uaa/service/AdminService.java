@@ -60,7 +60,8 @@ public class AdminService {
     }
 
     private User findUser(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotExistException("Invalid user id " + id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotExistException(String.format("Invalid user id %s", id)));
     }
 
     public UserDto getUser(UUID id) {

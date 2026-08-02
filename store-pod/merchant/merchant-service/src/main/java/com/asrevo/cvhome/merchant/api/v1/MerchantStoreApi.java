@@ -166,7 +166,7 @@ public class MerchantStoreApi {
 
         InputContentFile cmsContentImage = createInputContentFile(file, FileContentType.SLIDER);
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String newFileName = UUID.randomUUID() + "." + extension;
+        String newFileName = String.format("%s.%s", UUID.randomUUID(), extension);
         cmsContentImage.setFileName(newFileName);
         SliderImage sliderImage = storeFacade.addStoreSliderImage(merchantStore, cmsContentImage);
         return new ReadableSliderImage(sliderImage.priority(), sliderImage.name(),

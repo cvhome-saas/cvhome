@@ -202,7 +202,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         try {
             return this.saveOrUpdate(product);
         } catch (ServiceException e) {
-            throw new ServiceException("Cannot create product [" + product.getId() + BRACKET_CLOSE, e);
+            throw new ServiceException("Cannot create product [%s]".formatted(product.getId()), e);
         }
     }
 

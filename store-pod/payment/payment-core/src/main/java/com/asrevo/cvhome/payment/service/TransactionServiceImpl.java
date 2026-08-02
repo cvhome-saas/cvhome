@@ -175,7 +175,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private @NonNull Transaction getTransaction(StoreMerchantId store, String internalRef) {
         return transactionRepository.findByStoreMerchantIdAndInternalRef(store, internalRef)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + internalRef));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Transaction not found: %s", internalRef)));
     }
 
 }

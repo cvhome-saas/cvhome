@@ -21,7 +21,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
     private static final String[] backendServices = {"control-plane", "uaa", "spg"};
 
     private static final String[] backendServicesPattern = Arrays.stream(backendServices)
-            .map(it -> "/" + it + "/**")
+            .map(it -> String.format("/%s/**", it))
             .toArray(String[]::new);
 
     private final RouteLocatorBuilder routeLocatorBuilder;
@@ -42,7 +42,8 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()
-                        .host(storeCoreGatewayDomain, "www." + storeCoreGatewayDomain, "seller-ui." + storeCoreGatewayDomain)
+                        .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain),
+                                String.format("seller-ui.%s", storeCoreGatewayDomain))
                         .uri("lb://seller-ui"))
                 .build()
                 .getRoutes();

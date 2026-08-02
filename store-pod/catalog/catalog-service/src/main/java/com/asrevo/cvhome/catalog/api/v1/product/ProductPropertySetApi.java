@@ -39,7 +39,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Product property set regroupment management resource (Product Options Set" + " Management Api)")
+@Tag(name = "Product property set regroupment management resource (Product Options Set Management Api)")
 public class ProductPropertySetApi {
 
     private final ProductOptionSetFacade productOptionSetFacade;

@@ -74,7 +74,8 @@ public class ProductFacadeV2Impl implements ProductFacade {
         Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
         if (product == null) {
-            throw new ResourceNotFoundException("Product [" + friendlyUrl + "] not found for merchant [" + store + "]");
+            throw new ResourceNotFoundException(
+                    "Product [%s] not found for merchant [%s]".formatted(friendlyUrl, store));
         }
 
         ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);

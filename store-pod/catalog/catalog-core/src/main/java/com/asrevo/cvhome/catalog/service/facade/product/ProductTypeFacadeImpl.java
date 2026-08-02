@@ -78,8 +78,8 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         } catch (Exception e) {
             throw new ServiceRuntimeException(
-                    "An exception occured while getting product type [" + id + NOT_FOUND_FOR_STORE_MESSAGE + store
-                            + BRACKET_CLOSE, e);
+                    "An exception occured while getting product type [%s] not found for store [%s]"
+                            .formatted(id, store), e);
         }
     }
 
@@ -90,7 +90,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
             if (this.exists(type.getCode(), store, language)) {
                 throw new OperationNotAllowedException(
-                        PRODUCT_TYPE_MESSAGE + type.getCode() + "] already exist for store [" + store + BRACKET_CLOSE);
+                        "Product type [%s] already exist for store [%s]".formatted(type.getCode(), store));
             }
 
             ProductType model = persistableProductTypeMapper.convert(type, store, language);
@@ -157,7 +157,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
         if (t == null) {
             throw new ResourceNotFoundException(
-                    PRODUCT_TYPE_MESSAGE + code + "] not found for merchant [" + store + BRACKET_CLOSE);
+                    "Product type [%s] not found for merchant [%s]".formatted(code, store));
         }
 
         return readableProductTypeMapper.convert(t, store, language);

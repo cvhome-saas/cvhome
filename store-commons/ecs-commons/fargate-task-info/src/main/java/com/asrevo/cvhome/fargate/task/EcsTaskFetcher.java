@@ -30,7 +30,7 @@ public class EcsTaskFetcher {
 
     public static EcsTask fetch() {
         try {
-            HttpRequest req = HttpRequest.newBuilder().uri(new URI(ECS_CONTAINER_METADATA_URI + "/task")).GET().build();
+            HttpRequest req = HttpRequest.newBuilder().uri(new URI(String.format("%s/task", ECS_CONTAINER_METADATA_URI))).GET().build();
             return client
                     .send(req, responseInfo -> HttpResponse.BodySubscribers
                             .mapping(HttpResponse.BodySubscribers.ofString(StandardCharsets.UTF_8), EcsTaskFetcher::getEcsTask))

@@ -61,8 +61,9 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ReadableProductAvailability availability = detailedProduct.availability();
 
         if (!availability.isCanBePurchased()) {
-            throw new ServiceException("Product with sku " + availability.getSku()
-                    + " is not available or is not properly configured. It contains no" + " inventory");
+            throw new ServiceException(String.format(
+                    "Product with sku %s is not available or is not properly configured. It contains no inventory",
+                    availability.getSku()));
         }
 
         FinalPriceCalc price = detailedProduct.price();
@@ -141,7 +142,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
+            throw new ResourceNotFoundException(String.format("Cart code [ %s ] not found", cartCode));
         }
 
         Set<ShoppingCartItem> items = new HashSet<>();
@@ -263,7 +264,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {
-            throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
+            throw new ResourceNotFoundException(String.format("Cart code [%s] not found", cartCode));
         }
 
         return modifyCart(cartModel, item, store, language);

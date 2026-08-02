@@ -37,7 +37,7 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
         try {
 
             target.setOneTimeCharge(source.getItemPrice());
-            target.setProductName("Product " + source.getSku());
+            target.setProductName(String.format("Product %s", source.getSku()));
             target.setProductQuantity(source.getQuantity());
             target.setSku(source.getSku());
 

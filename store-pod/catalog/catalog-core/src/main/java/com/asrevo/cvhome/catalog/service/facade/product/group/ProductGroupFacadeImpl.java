@@ -99,7 +99,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
                     .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_MESSAGE + code));
             productGroupService.delete(productGroup);
         } catch (ServiceException e) {
-            log.error("Error while deleting ProductGroup by code: " + code, e);
+            log.error("Error while deleting ProductGroup by code: {}", code, e);
             throw new ServiceRuntimeException(e);
         }
     }
@@ -135,7 +135,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
                             () -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_MESSAGE + groupCode));
             Product product = productService.getById(productId);
             if (product == null) {
-                throw new ResourceNotFoundException("Product not found for ID: " + productId);
+                throw new ResourceNotFoundException("Product not found for ID: %s".formatted(productId));
             }
             if (!group.getProducts().contains(product)) {
                 group.getProducts().add(product);
@@ -176,7 +176,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
             return productGroupService.getByParentProductAndCode(store, productId, code)
                     .map(pg -> populateReadable(pg, store, language))
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "ProductGroup not found for parent product ID: " + productId + " and code: " + code));
+                            "ProductGroup not found for parent product ID: %s and code: %s".formatted(productId, code)));
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
@@ -197,7 +197,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
             Product product = productService.getById(productId);
             if (product == null) {
-                throw new ResourceNotFoundException("Product not found: " + productId);
+                throw new ResourceNotFoundException("Product not found: %s".formatted(productId));
             }
 
             if (!group.getProducts().contains(product)) {

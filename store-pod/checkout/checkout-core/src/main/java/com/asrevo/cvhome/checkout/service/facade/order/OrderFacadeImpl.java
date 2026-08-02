@@ -106,7 +106,7 @@ public class OrderFacadeImpl implements OrderFacade {
             ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
 
             if (cart == null) {
-                throw new ServiceException("Shopping cart with id " + shoppingCartId + " does not exist");
+                throw new ServiceException(String.format("Shopping cart with id %s does not exist", shoppingCartId));
             }
 
             Optional<Order> previousOrder =
