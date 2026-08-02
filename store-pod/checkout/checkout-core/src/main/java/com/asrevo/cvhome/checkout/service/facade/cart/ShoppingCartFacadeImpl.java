@@ -191,59 +191,10 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-        boolean itemModified = false;
-        // check if existing product
-        Set<ShoppingCartItem> items = cartModel.getLineItems();
-        if (!CollectionUtils.isEmpty(items)) {
-            Set<ShoppingCartItem> newItems = new HashSet<>();
-            Set<ShoppingCartItem> removeItems = new HashSet<>();
-            for (ShoppingCartItem anItem : items) { // take care of existing
-                // product
-                if (!itemModel.getSku().equals(anItem.getSku())) {
-                    newItems.add(anItem);
-                    continue;
-                }
-                if (item.getQuantity() == 0) {
-                    // left aside item to be removed
-                    // don't add it to new list of item
-                    removeItems.add(anItem);
-                } else {
-                    // new quantity
-                    anItem.setQuantity(item.getQuantity());
-                    newItems.add(anItem);
-                }
-                itemModified = true;
-            }
-
-            if (!removeItems.isEmpty()) {
-                for (ShoppingCartItem emptyItem : removeItems) {
-                    shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
-                }
-            }
-
-            if (!itemModified) {
-                newItems.add(itemModel);
-            }
-
-            if (newItems.isEmpty()) {
-                newItems = null;
-            }
-
-            cartModel.setLineItems(newItems);
-        } else {
-            // new item
-            if (item.getQuantity() > 0) {
-                cartModel.getLineItems().add(itemModel);
-            }
-        }
-
-        // if cart items are null just return cart with no items
+        mergeCartItem(cartModel, item, itemModel);
 
         // promo code added to the cart but no promo cart exists
-        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
-            cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(Instant.now());
-        }
+        applyPromoCodeIfMissing(cartModel, item);
 
         saveShoppingCart(cartModel);
 
@@ -255,6 +206,55 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         }
 
         return readableShoppingCartMapper.convert(cartModel, store, language);
+    }
+
+    private void mergeCartItem(ShoppingCart cartModel, PersistableShoppingCartItem item, ShoppingCartItem itemModel) {
+        // check if existing product
+        Set<ShoppingCartItem> items = cartModel.getLineItems();
+        if (CollectionUtils.isEmpty(items)) {
+            // new item
+            if (item.getQuantity() > 0) {
+                cartModel.getLineItems().add(itemModel);
+            }
+            return;
+        }
+
+        boolean itemModified = false;
+        Set<ShoppingCartItem> newItems = new HashSet<>();
+        Set<ShoppingCartItem> removeItems = new HashSet<>();
+        for (ShoppingCartItem anItem : items) { // take care of existing
+            // product
+            if (!itemModel.getSku().equals(anItem.getSku())) {
+                newItems.add(anItem);
+                continue;
+            }
+            if (item.getQuantity() == 0) {
+                // left aside item to be removed
+                // don't add it to new list of item
+                removeItems.add(anItem);
+            } else {
+                // new quantity
+                anItem.setQuantity(item.getQuantity());
+                newItems.add(anItem);
+            }
+            itemModified = true;
+        }
+
+        removeItems.forEach(emptyItem -> shoppingCartService.deleteShoppingCartItem(emptyItem.getId()));
+
+        if (!itemModified) {
+            newItems.add(itemModel);
+        }
+
+        // if cart items are null just return cart with no items
+        cartModel.setLineItems(newItems.isEmpty() ? null : newItems);
+    }
+
+    private void applyPromoCodeIfMissing(ShoppingCart cartModel, PersistableShoppingCartItem item) {
+        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
+            cartModel.setPromoCode(item.getPromoCode());
+            cartModel.setPromoAdded(Instant.now());
+        }
     }
 
     @Override
