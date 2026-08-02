@@ -66,6 +66,20 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
             destination.setRatingCount(source.getProductReviewCount());
         }
 
+        applyAvailability(source, destination);
+
+        // if default instance
+
+        destination.setSku(source.getSku());
+
+        applyPrice(source, destination, store);
+
+        destination.setSortOrder(source.getSortOrder());
+
+        return destination;
+    }
+
+    private void applyAvailability(Product source, ReadableProduct destination) {
         for (ProductAvailability a : source.getAvailabilities()) {
 
             destination.setQuantity(Optional.ofNullable(a.getProductQuantity()).orElse(1));
@@ -79,11 +93,9 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
                 break;
             }
         }
+    }
 
-        // if default instance
-
-        destination.setSku(source.getSku());
-
+    private void applyPrice(Product source, ReadableProduct destination, StoreMerchantId store) {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
@@ -100,10 +112,6 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
         } catch (Exception e) {
             throw new ConversionRuntimeException("An error while converting product price", e);
         }
-
-        destination.setSortOrder(source.getSortOrder());
-
-        return destination;
     }
 
 }

@@ -68,19 +68,12 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
         try {
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions = new ArrayList<>();
-            if (language == null) {
-                target = new ReadableProductFull();
-            }
 
-            if (target == null) {
-                target = new ReadableProduct();
-            }
+            target = resolveTarget(target, language);
 
             ProductDescription description = resolveDescription(source, language, fulldescriptions);
 
-            if (target instanceof ReadableProductFull it) {
-                it.setDescriptions(fulldescriptions);
-            }
+            applyFullDescriptions(target, fulldescriptions);
 
             if (language == null) {
                 language = baseStore.getDefaultLanguage();
@@ -88,41 +81,8 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
             final LanguageCode lang = language;
 
-            target.setId(source.getId());
-            target.setAvailable(source.isAvailable());
-            target.setProductShipeable(source.isProductShipeable());
-
-            ProductSpecification specifications = new ProductSpecification();
-            specifications.setHeight(source.getProductHeight());
-            specifications.setLength(source.getProductLength());
-            specifications.setWeight(source.getProductWeight());
-            specifications.setWidth(source.getProductWidth());
-            target.setProductSpecifications(specifications);
-
-            target.setPreOrder(source.isPreOrder());
-            target.setRefSku(source.getRefSku());
-            target.setSortOrder(source.getSortOrder());
-
-            if (source.getType() != null) {
-                target.setType(this.type(source.getType(), language));
-            }
-
-            if (source.getDateAvailable() != null) {
-                target.setDateAvailable(source.getDateAvailable());
-            }
-
-            if (source.getAuditSection() != null) {
-                target.setCreationDate(source.getAuditSection().getDateCreated());
-            }
-
-
-            target.setProductVirtual(source.isProductVirtual());
-
-            if (description != null) {
-                com.asrevo.cvhome.catalog.model.product.ProductDescription tragetDescription = populateDescription(
-                        description);
-                target.setDescription(tragetDescription);
-            }
+            applyBasicFields(source, target, language);
+            applyDescription(description, target);
 
             populateManufacturer(source, target);
             populateImages(source, target, store);
@@ -135,15 +95,69 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
             populatePrice(source, target, store, availability, lang);
 
-            if (target instanceof ReadableProductFull it) {
-                it.setDescriptions(fulldescriptions);
-            }
+            applyFullDescriptions(target, fulldescriptions);
 
             return target;
 
         } catch (Exception e) {
             throw new ConversionException(e);
         }
+    }
+
+    private ReadableProduct resolveTarget(ReadableProduct target, LanguageCode language) {
+        if (language == null) {
+            return new ReadableProductFull();
+        }
+        if (target == null) {
+            return new ReadableProduct();
+        }
+        return target;
+    }
+
+    private void applyFullDescriptions(ReadableProduct target,
+                                       List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
+        if (target instanceof ReadableProductFull it) {
+            it.setDescriptions(fulldescriptions);
+        }
+    }
+
+    private void applyBasicFields(Product source, ReadableProduct target, LanguageCode language) {
+        target.setId(source.getId());
+        target.setAvailable(source.isAvailable());
+        target.setProductShipeable(source.isProductShipeable());
+
+        ProductSpecification specifications = new ProductSpecification();
+        specifications.setHeight(source.getProductHeight());
+        specifications.setLength(source.getProductLength());
+        specifications.setWeight(source.getProductWeight());
+        specifications.setWidth(source.getProductWidth());
+        target.setProductSpecifications(specifications);
+
+        target.setPreOrder(source.isPreOrder());
+        target.setRefSku(source.getRefSku());
+        target.setSortOrder(source.getSortOrder());
+
+        if (source.getType() != null) {
+            target.setType(this.type(source.getType(), language));
+        }
+
+        if (source.getDateAvailable() != null) {
+            target.setDateAvailable(source.getDateAvailable());
+        }
+
+        if (source.getAuditSection() != null) {
+            target.setCreationDate(source.getAuditSection().getDateCreated());
+        }
+
+        target.setProductVirtual(source.isProductVirtual());
+    }
+
+    private void applyDescription(ProductDescription description, ReadableProduct target) {
+        if (description == null) {
+            return;
+        }
+        com.asrevo.cvhome.catalog.model.product.ProductDescription targetDescription = populateDescription(description);
+        target.setDescription(targetDescription);
     }
 
     private ProductDescription resolveDescription(Product source, LanguageCode language,

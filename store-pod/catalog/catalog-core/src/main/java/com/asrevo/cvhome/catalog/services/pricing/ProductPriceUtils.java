@@ -172,23 +172,38 @@ public class ProductPriceUtils {
         LocalDate specialEnd = price.getProductPriceSpecialEndDate();
 
         if (specialStart == null && specialEnd == null) {
-            if (price.getProductPriceSpecialAmount() != null && price.getProductPriceSpecialAmount().doubleValue() > 0) {
-                finalPrice.setDiscountEndDate(specialEnd);
-                return Optional.of(price.getProductPriceSpecialAmount());
-            }
-            return Optional.empty();
+            return resolveUnscheduledDiscount(price, finalPrice, specialEnd);
         }
 
-        boolean discountWindowActive = specialStart != null && specialEnd != null
-                && specialStart.isBefore(today) && specialEnd.isAfter(today);
-        boolean openEndedDiscountActive = specialStart == null && specialEnd != null && specialEnd.isAfter(today);
-
-        if (discountWindowActive || openEndedDiscountActive) {
+        if (isDiscountActive(specialStart, specialEnd, today)) {
             finalPrice.setDiscountEndDate(specialEnd);
             return Optional.of(price.getProductPriceSpecialAmount());
         }
 
         return Optional.empty();
+    }
+
+    private Optional<BigDecimal> resolveUnscheduledDiscount(ProductPrice price, FinalPriceCalc finalPrice,
+            LocalDate specialEnd) {
+        if (price.getProductPriceSpecialAmount() != null && price.getProductPriceSpecialAmount().doubleValue() > 0) {
+            finalPrice.setDiscountEndDate(specialEnd);
+            return Optional.of(price.getProductPriceSpecialAmount());
+        }
+        return Optional.empty();
+    }
+
+    private boolean isDiscountActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return isDiscountWindowActive(specialStart, specialEnd, today)
+                || isOpenEndedDiscountActive(specialStart, specialEnd, today);
+    }
+
+    private boolean isDiscountWindowActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return specialStart != null && specialEnd != null
+                && specialStart.isBefore(today) && specialEnd.isAfter(today);
+    }
+
+    private boolean isOpenEndedDiscountActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return specialStart == null && specialEnd != null && specialEnd.isAfter(today);
     }
 
     private SimpleProductPrice toSimpleProductPrice(ProductPrice price) {

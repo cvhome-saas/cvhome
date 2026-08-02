@@ -46,23 +46,13 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
     @Override
     public ReadableMinimalProduct merge(Product source, ReadableMinimalProduct destination, StoreMerchantId store,
                                         LanguageCode language) {
-        for (ProductDescription desc : source.getDescriptions()) {
-            if (Objects.equals(desc.getLanguageCode(), language)) {
-                destination.setDescription(this.description(desc));
-                break;
-            }
-        }
+        applyDescription(source, destination, language);
 
         destination.setId(source.getId());
         destination.setAvailable(source.isAvailable());
         destination.setProductShipeable(source.isProductShipeable());
 
-        ProductSpecification specifications = new ProductSpecification();
-        specifications.setHeight(source.getProductHeight());
-        specifications.setLength(source.getProductLength());
-        specifications.setWeight(source.getProductWeight());
-        specifications.setWidth(source.getProductWidth());
-        destination.setProductSpecifications(specifications);
+        destination.setProductSpecifications(buildSpecifications(source));
 
         destination.setPreOrder(source.isPreOrder());
         destination.setRefSku(source.getRefSku());
@@ -73,23 +63,49 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
             destination.setDateAvailable(source.getDateAvailable());
         }
 
-        if (source.getProductReviewAvg() != null) {
-            double avg = source.getProductReviewAvg().doubleValue();
-            double rating = Math.round(avg * 2) / 2.0f;
-            destination.setRating(rating);
-        }
+        applyRating(source, destination);
 
         destination.setProductVirtual(source.isProductVirtual());
         if (source.getProductReviewCount() != null) {
             destination.setRatingCount(source.getProductReviewCount());
         }
 
-        // price
+        applyPrice(source, destination, store);
+        applyImages(source, destination, store);
 
+        return destination;
+    }
+
+    private void applyDescription(Product source, ReadableMinimalProduct destination, LanguageCode language) {
+        for (ProductDescription desc : source.getDescriptions()) {
+            if (Objects.equals(desc.getLanguageCode(), language)) {
+                destination.setDescription(this.description(desc));
+                break;
+            }
+        }
+    }
+
+    private ProductSpecification buildSpecifications(Product source) {
+        ProductSpecification specifications = new ProductSpecification();
+        specifications.setHeight(source.getProductHeight());
+        specifications.setLength(source.getProductLength());
+        specifications.setWeight(source.getProductWeight());
+        specifications.setWidth(source.getProductWidth());
+        return specifications;
+    }
+
+    private void applyRating(Product source, ReadableMinimalProduct destination) {
+        if (source.getProductReviewAvg() != null) {
+            double avg = source.getProductReviewAvg().doubleValue();
+            double rating = Math.round(avg * 2) / 2.0f;
+            destination.setRating(rating);
+        }
+    }
+
+    private void applyPrice(Product source, ReadableMinimalProduct destination, StoreMerchantId store) {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
-
                 destination.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
                 destination.setPrice(price.getFinalPrice());
                 destination.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
@@ -97,40 +113,42 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         } catch (ServiceException e) {
             throw new ConversionRuntimeException("An error occured during price calculation", e);
         }
+    }
 
-        // image
+    private void applyImages(Product source, ReadableMinimalProduct destination, StoreMerchantId store) {
         Set<ProductImage> images = source.getImages();
-        if (images != null && !images.isEmpty()) {
-            List<ReadableImage> imageList = new ArrayList<>();
-
-            String contextPath = imageUtils.getContextPath();
-
-            for (ProductImage img : images) {
-                ReadableImage prdImage = new ReadableImage();
-                prdImage.setImageName(img.getProductImage());
-                prdImage.setDefaultImage(img.isDefaultImage());
-
-                prdImage.setImageUrl(
-                        contextPath + imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
-                prdImage.setId(img.getId());
-                prdImage.setImageType(img.getImageType());
-                if (img.getProductImageUrl() != null) {
-                    prdImage.setExternalUrl(img.getProductImageUrl());
-                }
-                if (img.getImageType() == 1 && img.getProductImageUrl() != null) { // video
-                    prdImage.setVideoUrl(img.getProductImageUrl());
-                }
-
-                if (prdImage.isDefaultImage()) {
-                    destination.setImage(prdImage);
-                }
-
-                imageList.add(prdImage);
-            }
-            destination.setImages(imageList);
+        if (images == null || images.isEmpty()) {
+            return;
         }
+        List<ReadableImage> imageList = new ArrayList<>();
+        String contextPath = imageUtils.getContextPath();
 
-        return destination;
+        for (ProductImage img : images) {
+            ReadableImage prdImage = buildImage(source, store, contextPath, img);
+            if (prdImage.isDefaultImage()) {
+                destination.setImage(prdImage);
+            }
+            imageList.add(prdImage);
+        }
+        destination.setImages(imageList);
+    }
+
+    private ReadableImage buildImage(Product source, StoreMerchantId store, String contextPath, ProductImage img) {
+        ReadableImage prdImage = new ReadableImage();
+        prdImage.setImageName(img.getProductImage());
+        prdImage.setDefaultImage(img.isDefaultImage());
+
+        prdImage.setImageUrl(
+                contextPath + imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
+        prdImage.setId(img.getId());
+        prdImage.setImageType(img.getImageType());
+        if (img.getProductImageUrl() != null) {
+            prdImage.setExternalUrl(img.getProductImageUrl());
+        }
+        if (img.getImageType() == 1 && img.getProductImageUrl() != null) { // video
+            prdImage.setVideoUrl(img.getProductImageUrl());
+        }
+        return prdImage;
     }
 
     private ReadableDescription description(ProductDescription description) {

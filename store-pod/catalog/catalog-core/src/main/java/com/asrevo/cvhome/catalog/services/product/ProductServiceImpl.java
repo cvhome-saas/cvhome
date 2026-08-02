@@ -124,55 +124,53 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         Set<ProductImage> images = product.getImages();
 
         try {
-
-            if (images != null && !images.isEmpty()) {
-                for (ProductImage image : images) {
-                    if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
-                        image.setProduct(product);
-
-                        InputStream inputStream = image.getImage();
-                        ImageContentFile cmsContentImage = new ImageContentFile();
-                        cmsContentImage.setFileName(image.getProductImage());
-                        cmsContentImage.setFile(inputStream);
-                        cmsContentImage.setFileContentType(FileContentType.PRODUCT);
-
-                        productImageService.addProductImage(product, image, cmsContentImage);
-                        newImageIds.add(image.getId());
-                    } else {
-                        if (image.getId() != null) {
-                            productImageService.save(image);
-                            newImageIds.add(image.getId());
-                        }
-                    }
-                }
-            }
-
-            // cleanup old and new images
-            for (ProductImage image : originalProductImages) {
-
-                if (image.getImage() != null && image.getId() == null) {
-                    image.setProduct(product);
-
-                    InputStream inputStream = image.getImage();
-                    ImageContentFile cmsContentImage = new ImageContentFile();
-                    cmsContentImage.setFileName(image.getProductImage());
-                    cmsContentImage.setFile(inputStream);
-                    cmsContentImage.setFileContentType(FileContentType.PRODUCT);
-
-                    productImageService.addProductImage(product, image, cmsContentImage);
-                    newImageIds.add(image.getId());
-                } else {
-                    if (!newImageIds.contains(image.getId())) {
-                        productImageService.delete(image);
-                    }
-                }
-            }
-
+            addNewImages(product, images, newImageIds);
+            cleanupImages(product, originalProductImages, newImageIds);
         } catch (Exception e) {
             log.error("Cannot save images {}", e.getMessage());
         }
 
         return product;
+    }
+
+    private void addNewImages(Product product, Set<ProductImage> images, List<Long> newImageIds) throws ServiceException {
+        if (images == null || images.isEmpty()) {
+            return;
+        }
+        for (ProductImage image : images) {
+            if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
+                addProductImage(product, image);
+                newImageIds.add(image.getId());
+            } else if (image.getId() != null) {
+                productImageService.save(image);
+                newImageIds.add(image.getId());
+            }
+        }
+    }
+
+    private void cleanupImages(Product product, Set<ProductImage> originalProductImages, List<Long> newImageIds)
+            throws ServiceException {
+        // cleanup old and new images
+        for (ProductImage image : originalProductImages) {
+            if (image.getImage() != null && image.getId() == null) {
+                addProductImage(product, image);
+                newImageIds.add(image.getId());
+            } else if (!newImageIds.contains(image.getId())) {
+                productImageService.delete(image);
+            }
+        }
+    }
+
+    private void addProductImage(Product product, ProductImage image) throws ServiceException {
+        image.setProduct(product);
+
+        InputStream inputStream = image.getImage();
+        ImageContentFile cmsContentImage = new ImageContentFile();
+        cmsContentImage.setFileName(image.getProductImage());
+        cmsContentImage.setFile(inputStream);
+        cmsContentImage.setFileContentType(FileContentType.PRODUCT);
+
+        productImageService.addProductImage(product, image, cmsContentImage);
     }
 
     @Override
