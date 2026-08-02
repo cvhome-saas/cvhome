@@ -2,7 +2,7 @@ package com.asrevo.cvhome.store.core.utils;
 
 import java.util.Date;
 
-public class CloneUtils {
+public final class CloneUtils {
 
     private CloneUtils() {
     }

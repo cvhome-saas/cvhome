@@ -228,7 +228,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String fileType = "IMAGE";
         String mimetype = URLConnection.guessContentTypeFromName(fileName);
         String type = mimetype.split("/")[0];
-        if (!type.equals("image")) {
+        if (!"image".equals(type)) {
             fileType = "STATIC_FILE";
         }
 

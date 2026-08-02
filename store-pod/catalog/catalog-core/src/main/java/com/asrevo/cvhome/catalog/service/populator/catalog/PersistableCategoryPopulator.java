@@ -125,8 +125,9 @@ public class PersistableCategoryPopulator
                 }
                 if (d.getLanguage().equals(description.getLanguageCode())) {
                     description.setCategory(target);
-                    description = buildDescription(d, description);
-                    descriptions.add(description);
+                    com.asrevo.cvhome.catalog.entity.category.CategoryDescription merged =
+                            buildDescription(d, description);
+                    descriptions.add(merged);
                 }
             }
         }

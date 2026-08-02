@@ -17,7 +17,7 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
 
-public class PriceUtils {
+public final class PriceUtils {
 
     private static final String CANNOT_PARSE_TEMPLATE = "Cannot parse %s";
 

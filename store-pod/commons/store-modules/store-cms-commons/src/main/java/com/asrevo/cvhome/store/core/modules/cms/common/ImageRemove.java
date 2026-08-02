@@ -4,6 +4,6 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ImageRemove {
 
-    void removeImages(final String merchantStoreCode) throws ServiceException;
+    void removeImages(String merchantStoreCode) throws ServiceException;
 
 }

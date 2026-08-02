@@ -273,7 +273,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private FileContentType getFileContentType(String type) {
         FileContentType fileType = FileContentType.STATIC_FILE;
-        if (type.equals("image")) { // for now we consider this route from api
+        if ("image".equals(type)) { // for now we consider this route from api
             // only
             fileType = FileContentType.API_IMAGE;
         }

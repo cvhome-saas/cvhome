@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 import org.springframework.security.oauth2.jwt.JwtException;
 
-public class UrlNormalize {
+public final class UrlNormalize {
 
     private UrlNormalize() {
     }
@@ -28,7 +28,7 @@ public class UrlNormalize {
             scheme = scheme.toLowerCase();
             host = host.toLowerCase();
 
-            if (("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443)) {
+            if ("http".equals(scheme) && port == 80 || "https".equals(scheme) && port == 443) {
                 port = -1;
             }
 

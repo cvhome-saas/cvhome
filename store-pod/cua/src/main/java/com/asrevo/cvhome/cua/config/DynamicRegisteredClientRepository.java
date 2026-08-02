@@ -35,7 +35,7 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 
         StringBuilder dynamicUri = new StringBuilder();
         dynamicUri.append(scheme).append("://").append(serverName);
-        if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
+        if ("http".equals(scheme) && serverPort != 80 || "https".equals(scheme) && serverPort != 443) {
             dynamicUri.append(":").append(serverPort);
         }
         if (useLang) {

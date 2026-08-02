@@ -37,7 +37,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         String action = (String) permission;
         return switch (action) {
             // store-pod
-            case "STORE-POD.MERCHANT.STORE-CREATE" -> checker.hasAccessOnStoreCreate(authentication, ((String) targetId), this.pod);
+            case "STORE-POD.MERCHANT.STORE-CREATE" -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
             case "STORE-POD.CATALOG.RESERVE" -> checker.isSameStorePod(authentication,
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
@@ -50,14 +50,14 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()));
 
             // store-core
-            case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, ((ManagerStoreId) targetId));
+            case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, (ManagerStoreId) targetId);
 
-            case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, ((ManagerStoreId) targetId));
-            case "STORE-CORE.USERS.CREATE" -> checker.hasAccessOnStoreUsersCreate(authentication, ((ManagerStoreId) targetId));
-            case "STORE-CORE.USERS.UPDATE" -> checker.hasAccessOnStoreUsersUpdate(authentication, ((ManagerStoreId) targetId));
-            case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, ((ManagerStoreId) targetId));
-            case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, ((ManagerStoreId) targetId));
-            case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, ((ManagerStoreId) targetId));
+            case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.CREATE" -> checker.hasAccessOnStoreUsersCreate(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.UPDATE" -> checker.hasAccessOnStoreUsersUpdate(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, (ManagerStoreId) targetId);
             default -> false;
         };
     }

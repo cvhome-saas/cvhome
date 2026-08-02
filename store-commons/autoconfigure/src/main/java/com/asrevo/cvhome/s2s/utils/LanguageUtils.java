@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 
-public class LanguageUtils {
+public final class LanguageUtils {
 
     public static final String LANG = "lang";
 

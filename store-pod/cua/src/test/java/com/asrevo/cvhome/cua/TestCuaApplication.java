@@ -2,7 +2,7 @@ package com.asrevo.cvhome.cua;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestCuaApplication {
+public final class TestCuaApplication {
 
     private TestCuaApplication() {
     }

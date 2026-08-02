@@ -17,13 +17,13 @@ public interface FilePut {
     /**
      * Add file to folder
      */
-    void addFile(final String merchantStoreCode, Optional<String> path, InputContentFile inputStaticContentData)
+    void addFile(String merchantStoreCode, Optional<String> path, InputContentFile inputStaticContentData)
             throws ServiceException;
 
     /**
      * Add files to folder
      */
-    void addFiles(final String merchantStoreCode, Optional<String> path,
+    void addFiles(String merchantStoreCode, Optional<String> path,
                   List<InputContentFile> inputStaticContentDataList) throws ServiceException;
 
 }

@@ -8,7 +8,7 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LocaleUtils {
+public final class LocaleUtils {
     private static final Locale[] locales = Locale.getAvailableLocales();
 
     private LocaleUtils() {

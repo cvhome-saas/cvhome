@@ -39,7 +39,7 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * servlet
      */
     OutputContentFile getProductImage(String storeCode, String productCode, String fileName,
-                                      final ProductImageSize size) throws ServiceException;
+                                      ProductImageSize size) throws ServiceException;
 
     void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException;
 

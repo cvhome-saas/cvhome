@@ -13,7 +13,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 
-public class SecurityUtils {
+public final class SecurityUtils {
 
     public static final String CLAIMS_ORG_KEY = "org";
 
@@ -73,12 +73,12 @@ public class SecurityUtils {
             return new UserOrgStoreIdentity(null, WILD_CARD_STORE_ACCESS, roles);
         } else if (hasOrgAdminRole(authentication)) {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
             return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), WILD_CARD_STORE_ACCESS, roles);
         } else {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
-            String adminStore = ((String) claims.get(CLAIMS_STORE_KEY));
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
+            String adminStore = (String) claims.get(CLAIMS_STORE_KEY);
             return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), adminStore, roles);
         }
     }

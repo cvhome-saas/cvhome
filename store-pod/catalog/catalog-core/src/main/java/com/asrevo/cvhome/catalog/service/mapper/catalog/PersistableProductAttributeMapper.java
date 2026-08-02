@@ -78,7 +78,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
             productOptionValue.setStoreMerchantId(store);
         }
 
-        if (!CollectionUtils.isEmpty((source.getOptionValue().getDescriptions()))) {
+        if (!CollectionUtils.isEmpty(source.getOptionValue().getDescriptions())) {
             productOptionValue = persistableProductOptionValueMapper.merge(source.getOptionValue(), productOptionValue,
                     store, language);
             try {

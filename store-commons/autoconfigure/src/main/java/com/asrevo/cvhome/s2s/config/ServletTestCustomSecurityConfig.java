@@ -29,7 +29,7 @@ import com.nimbusds.jwt.SignedJWT;
 
 @Configuration
 @Profile("signer")
-public class ServletTestCustomSecurityConfig {
+public final class ServletTestCustomSecurityConfig {
     private ServletTestCustomSecurityConfig() {
     }
 

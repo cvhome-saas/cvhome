@@ -78,6 +78,29 @@
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
 
+        <module name="EqualsAvoidNull"/>
+        <module name="InnerAssignment"/>
+        <module name="ModifiedControlVariable"/>
+        <module name="CovariantEquals"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="IllegalCatch">
+            <property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error"/>
+        </module>
+        <module name="IllegalThrows">
+            <property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error"/>
+        </module>
+        <module name="NoFinalizer"/>
+        <module name="UnusedLocalVariable"/>
+        <module name="CyclomaticComplexity"/>
+        <module name="BooleanExpressionComplexity"/>
+        <module name="NestedTryDepth"/>
+        <module name="UnnecessaryParentheses"/>
+        <module name="DefaultComesLast"/>
+        <module name="RedundantModifier"/>
+        <module name="FinalClass"/>
+        <module name="InterfaceIsType"/>
+
         <module name="RegexpSinglelineJava">
             <property name="format" value="&quot;[^&quot;\\]*&quot;\s*\+|\+\s*&quot;[^&quot;\\]*&quot;"/>
             <property name="ignoreComments" value="true"/>

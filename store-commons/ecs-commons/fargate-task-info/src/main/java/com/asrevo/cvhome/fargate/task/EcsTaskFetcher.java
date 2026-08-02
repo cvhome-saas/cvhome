@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 
-public class EcsTaskFetcher {
+public final class EcsTaskFetcher {
 
     private static final String ECS_CONTAINER_METADATA_URI = System.getenv("ECS_CONTAINER_METADATA_URI_V4");
 

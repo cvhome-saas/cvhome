@@ -2,7 +2,7 @@ package com.asrevo.cvhome.payment;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestPaymentApplication {
+public final class TestPaymentApplication {
     private TestPaymentApplication() {
     }
 

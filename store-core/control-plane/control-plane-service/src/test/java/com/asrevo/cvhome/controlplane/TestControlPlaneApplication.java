@@ -2,7 +2,7 @@ package com.asrevo.cvhome.controlplane;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestControlPlaneApplication {
+public final class TestControlPlaneApplication {
 
     private TestControlPlaneApplication() {
 

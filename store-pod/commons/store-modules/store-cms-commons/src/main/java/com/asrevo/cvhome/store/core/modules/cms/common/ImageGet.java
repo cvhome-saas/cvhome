@@ -8,7 +8,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ImageGet {
 
-    List<OutputContentFile> getImages(final String merchantStoreCode, FileContentType imageContentType)
+    List<OutputContentFile> getImages(String merchantStoreCode, FileContentType imageContentType)
             throws ServiceException;
 
 }

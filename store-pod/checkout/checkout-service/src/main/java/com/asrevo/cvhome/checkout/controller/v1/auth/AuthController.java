@@ -31,7 +31,7 @@ public class AuthController {
     @GetMapping("me")
 
     public JwtAuthenticationToken me() {
-        return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication());
+        return (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
     }
 
 }

@@ -2,7 +2,7 @@ package com.asrevo.cvhome.commons.utils;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
-public class DefaultStoresConstants {
+public final class DefaultStoresConstants {
 
     public static final String DEFAULT_ORG1_STORE1_STR = "65f023632bc46470c104b76f";
 

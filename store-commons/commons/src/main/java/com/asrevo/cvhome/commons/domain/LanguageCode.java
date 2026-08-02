@@ -7,15 +7,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public record LanguageCode(String code) implements Serializable, Comparable<LanguageCode> {
     public static LanguageCode defaultLanguage() {
-        return new LanguageCode(("en"));
+        return new LanguageCode("en");
     }
 
     public static LanguageCode nonLanguage() {
-        return new LanguageCode(("_non"));
+        return new LanguageCode("_non");
     }
 
     public static LanguageCode allLanguage() {
-        return new LanguageCode(("_all"));
+        return new LanguageCode("_all");
     }
 
     public static boolean isNonLanguage(LanguageCode languageCode) {
