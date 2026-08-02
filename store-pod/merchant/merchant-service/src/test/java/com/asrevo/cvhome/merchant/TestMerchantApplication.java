@@ -2,7 +2,7 @@ package com.asrevo.cvhome.merchant;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestMerchantApplication {
+public final class TestMerchantApplication {
     private TestMerchantApplication() {
 
     }

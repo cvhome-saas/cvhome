@@ -31,6 +31,27 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
         return desc;
     }
 
+    private ProductOptionValueDescription findMatchingDescription(
+            com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription desc,
+            ProductOptionValue destination) {
+        if (CollectionUtils.isEmpty(destination.getDescriptions())) {
+            return null;
+        }
+        for (ProductOptionValueDescription d : destination.getDescriptions()) {
+            if (StringUtils.isBlank(desc.getLanguage().code()) || !desc.getLanguage().equals(d.getLanguageCode())) {
+                continue;
+            }
+            d.setDescription(desc.getDescription());
+            d.setName(desc.getName());
+            d.setTitle(desc.getTitle());
+            if (StringUtils.isBlank(d.getName())) {
+                d.setName(d.getDescription());
+            }
+            return d;
+        }
+        return null;
+    }
+
     @Override
     public ProductOptionValue merge(PersistableProductOptionValue source, ProductOptionValue destination,
                                     StoreMerchantId store, LanguageCode language) {
@@ -47,23 +68,7 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionValueDescription desc : source
                         .getDescriptions()) {
-                    ProductOptionValueDescription description = null;
-                    if (!CollectionUtils.isEmpty(destination.getDescriptions())) {
-                        for (ProductOptionValueDescription d : destination.getDescriptions()) {
-                            if (!StringUtils.isBlank(desc.getLanguage().code())
-                                    && desc.getLanguage().equals(d.getLanguageCode())) {
-
-                                d.setDescription(desc.getDescription());
-                                d.setName(desc.getName());
-                                d.setTitle(desc.getTitle());
-                                if (StringUtils.isBlank(d.getName())) {
-                                    d.setName(d.getDescription());
-                                }
-                                description = d;
-                                break;
-                            }
-                        }
-                    }
+                    ProductOptionValueDescription description = findMatchingDescription(desc, destination);
                     if (description == null) {
                         description = description(desc);
                         description.setProductOptionValue(destination);

@@ -18,17 +18,19 @@ public class AdminClientClient extends AbstractAdminClient {
 
     private static final String PATH_SEPARATOR = "/";
 
+    private static final String PATH_WITH_ID_TEMPLATE = "%s%s%s";
+
     private final String clientsApiUrl;
 
     public AdminClientClient(String baseUrl, String clientId, String clientSecret) {
         super(baseUrl, clientId, clientSecret);
-        this.clientsApiUrl = baseUrl + "/api/v1/admin/clients";
+        this.clientsApiUrl = String.format("%s/api/v1/admin/clients", baseUrl);
     }
 
     public PageResponse<ClientSummary> listClients(PageRequest pageRequest) {
         String url = clientsApiUrl;
         if (pageRequest != null) {
-            url += "?page=" + pageRequest.page() + "&size=" + pageRequest.size();
+            url += String.format("?page=%d&size=%d", pageRequest.page(), pageRequest.size());
         }
         HttpRequest request = authenticatedRequestBuilder(url).GET().build();
         return sendAndParsePage(request, new TypeReference<>() {
@@ -36,7 +38,8 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public ClientDetails getClient(String id) {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + PATH_SEPARATOR + id).GET().build();
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id)).GET().build();
         return sendAndParse(request, ClientDetails.class);
     }
 
@@ -49,7 +52,7 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public ClientDetails updateClient(String id, ClientDetails req) {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + PATH_SEPARATOR + id)
+        HttpRequest request = authenticatedRequestBuilder(String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id))
                 .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
@@ -57,12 +60,13 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public void deleteClient(String id) {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + PATH_SEPARATOR + id).DELETE().build();
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id)).DELETE().build();
         sendAndVerify(request);
     }
 
     public void resetSecret(String id, String newSecret) {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + PATH_SEPARATOR + id + "/reset-secret")
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s/reset-secret", clientsApiUrl, PATH_SEPARATOR, id))
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("newSecret", newSecret))))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
@@ -70,7 +74,7 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public Map<String, Object> getOptions() {
-        HttpRequest request = authenticatedRequestBuilder(clientsApiUrl + "/options").GET().build();
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s/options", clientsApiUrl)).GET().build();
         return sendAndParse(request, new TypeReference<>() {
         });
     }

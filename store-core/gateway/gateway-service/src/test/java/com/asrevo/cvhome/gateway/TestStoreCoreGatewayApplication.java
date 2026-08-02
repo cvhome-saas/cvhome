@@ -2,7 +2,7 @@ package com.asrevo.cvhome.gateway;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestStoreCoreGatewayApplication {
+public final class TestStoreCoreGatewayApplication {
 
     private TestStoreCoreGatewayApplication() {
     }

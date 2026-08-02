@@ -27,8 +27,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Product definition resource (Create update and delete product definition. Serves"
-        + " api v1 and v2 with backward compatibility)")
+@Tag(name = "Product definition resource (Create update and delete product definition. Serves api v1 and v2 with backward compatibility)")
 @Slf4j
 @AllArgsConstructor
 public class ExternalProductApi implements ExternalProductService {

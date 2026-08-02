@@ -34,6 +34,8 @@ public class ProductAttribute extends SalesManagerEntity<Long, ProductAttribute>
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String ZERO_STRING = "0";
+
     @Id
     @Column(name = "PRODUCT_ATTRIBUTE_ID", unique = true, nullable = false)
     @TableGenerator(name = "TABLE_GEN", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
@@ -82,19 +84,19 @@ public class ProductAttribute extends SalesManagerEntity<Long, ProductAttribute>
      * This transient object property is a utility used only to submit from a free text
      */
     @Transient
-    private String attributePrice = "0";
+    private String attributePrice = ZERO_STRING;
 
     /**
      * This transient object property is a utility used only to submit from a free text
      */
     @Transient
-    private String attributeSortOrder = "0";
+    private String attributeSortOrder = ZERO_STRING;
 
     /**
      * This transient object property is a utility used only to submit from a free text
      */
     @Transient
-    private String attributeAdditionalWeight = "0";
+    private String attributeAdditionalWeight = ZERO_STRING;
 
     @ManyToOne(targetEntity = Product.class)
     @JoinColumn(name = "PRODUCT_ID", nullable = false)

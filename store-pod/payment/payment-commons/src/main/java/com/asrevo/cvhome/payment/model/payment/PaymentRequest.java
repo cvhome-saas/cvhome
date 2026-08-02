@@ -17,7 +17,7 @@ public record PaymentRequest(String ref, BigDecimal amount, CurrencyCode currenc
             throw new IllegalArgumentException("Payment request ref invalid");
         }
         if (Objects.isNull(amount)) {
-            throw new IllegalArgumentException("Payment request currency invalid");
+            throw new IllegalArgumentException("Payment request amount invalid");
         }
         if (Objects.isNull(currency)) {
             throw new IllegalArgumentException("Payment request currency invalid");

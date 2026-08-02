@@ -38,6 +38,27 @@ import com.asrevo.cvhome.store.utils.PriceUtils;
 @Service("productCommonFacade")
 public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
+    private static final String PRODUCT_NOT_FOUND_TEMPLATE = "Product [%s] not found";
+
+    private static final String PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE = "Product [%s] not found for store [%s]";
+
+    private static final String ERROR_CONVERTING_PRODUCT_TEMPLATE = "Error converting product [%s]";
+
+    private static final String CATEGORY_ALREADY_ATTACHED_TEMPLATE =
+            "Category with id [%s] already attached to product [%s]";
+
+    private static final String ADDING_PRODUCT_TO_CATEGORY_ERROR_TEMPLATE =
+            "Exception when adding product [%s] to category [%s]";
+
+    private static final String INVALID_PRICE_FORMAT_MESSAGE = "Invalid product price format";
+
+    private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s not found";
+
+    private static final String PRODUCT_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE =
+            "Product with id [%s not found for store [%s]";
+
+    private static final String DELETING_PTODUCT_ERROR_TEMPLATE = "Error while deleting ptoduct with id [%s]";
+
     private final ProductService productService;
 
     private final PricingService pricingService;
@@ -84,11 +105,11 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         Product product = productService.findOne(id, store);
         if (product == null) {
-            throw new ResourceNotFoundException("Product [" + id + "] not found");
+            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_TEMPLATE.formatted(id));
         }
 
         if (!product.getStore().equals(store)) {
-            throw new ResourceNotFoundException("Product [" + id + "] not found for store [" + store + "]");
+            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
         }
 
         ReadableProduct readableProduct = new ReadableProduct();
@@ -97,7 +118,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         try {
             readableProduct = populator.populate(product, readableProduct, store, language);
         } catch (ConversionException e) {
-            throw new ConversionRuntimeException("Error converting product [" + id + "]", e);
+            throw new ConversionRuntimeException(ERROR_CONVERTING_PRODUCT_TEMPLATE.formatted(id), e);
         }
 
         return readableProduct;
@@ -111,8 +132,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                 .toList();
 
         if (!assigned.isEmpty()) {
-            throw new OperationNotAllowedException("Category with id [" + category.getId()
-                    + "] already attached to product [" + product.getId() + "]");
+            throw new OperationNotAllowedException(
+                    CATEGORY_ALREADY_ATTACHED_TEMPLATE.formatted(category.getId(), product.getId()));
         }
 
         product.getCategories().add(category);
@@ -128,8 +149,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Exception when adding product [" + product.getId() + "] to category [" + category.getId() + "]",
-                    e);
+                    ADDING_PRODUCT_TO_CATEGORY_ERROR_TEMPLATE.formatted(product.getId(), category.getId()), e);
         }
 
         return readableProduct;
@@ -168,7 +188,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                         try {
                             price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
                         } catch (ServiceException _) {
-                            throw new ServiceRuntimeException("Invalid product price format");
+                            throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
                         }
                     }
                 }
@@ -189,17 +209,17 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
         Product p = productService.getById(id);
 
         if (p == null) {
-            throw new ResourceNotFoundException("Product with id [" + id + " not found");
+            throw new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE.formatted(id));
         }
 
         if (!Objects.equals(p.getStore(), store)) {
-            throw new ResourceNotFoundException("Product with id [" + id + " not found for store [" + store + "]");
+            throw new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
         }
 
         try {
             productService.delete(p);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while deleting ptoduct with id [" + id + "]", e);
+            throw new ServiceRuntimeException(DELETING_PTODUCT_ERROR_TEMPLATE.formatted(id), e);
         }
     }
 
@@ -253,7 +273,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                     try {
                         price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
                     } catch (ServiceException _) {
-                        throw new ServiceRuntimeException("Invalid product price format");
+                        throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
                     }
                 }
             }

@@ -51,11 +51,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @RestController
 @RequestMapping("/api/v2")
-@Tags(value = @Tag(name = "Product display and management resource (Product display and"
-        + " Management Api such as adding a product to category. Serves"
-        + " api v1 and v2 with backward compatibility)"))
+@Tags(value = @Tag(name = ProductApiV2.TAG_NAME))
 @Slf4j
 public class ProductApiV2 {
+
+    static final String TAG_NAME = """
+            Product display and management resource (Product display and Management Api such as adding a product \
+            to category. Serves api v1 and v2 with backward compatibility)""";
 
     private final ProductDefinitionFacade productDefinitionFacade;
 
@@ -127,7 +129,7 @@ public class ProductApiV2 {
 
     @GetMapping(value = {"/product/name/{friendlyUrl}", "/product/friendly/{friendlyUrl}"})
     @Operation(method = "GET", description = "Get a product by friendlyUrl (slug) version 2",
-            summary = "For shop purpose. Specifying ?merchant is " + "required otherwise it falls back to DEFAULT")
+            summary = "For shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
     @ApiResponse(responseCode = "200", description = "Single product found",
             content = @Content(schema = @Schema(implementation = ReadableProduct.class)))
 
@@ -144,7 +146,7 @@ public class ProductApiV2 {
         ReadableProduct product = productFacadeV2.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
         if (product == null) {
-            response.sendError(404, "Product not fount for id " + friendlyUrl);
+            response.sendError(404, "Product not fount for id %s".formatted(friendlyUrl));
             return null;
         }
 

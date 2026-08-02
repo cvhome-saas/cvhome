@@ -49,7 +49,7 @@ public class AuthorizationServerConfig {
         Pod pod = properties.pod();
         AuthorizationServerSettings.Builder builder = AuthorizationServerSettings.builder();
         if (Objects.nonNull(pod) && Objects.nonNull(pod.endpoint()) && Objects.nonNull(pod.endpoint().endpoint())) {
-            builder.issuer(pod.endpoint().endpoint() + "/cua");
+            builder.issuer(String.format("%s/cua", pod.endpoint().endpoint()));
         }
         return builder.build();
     }

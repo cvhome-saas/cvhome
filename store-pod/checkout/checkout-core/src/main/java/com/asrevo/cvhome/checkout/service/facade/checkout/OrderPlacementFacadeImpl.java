@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
+    private static final String QUERY_PARAM_SEPARATOR = "?";
+
     private final OrderFacade orderFacade;
     private final OrderInventoryOrchestrator orderInventoryOrchestrator;
     private final ExternalPaymentGatewayService externalPaymentGatewayService;
@@ -91,6 +93,10 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }
                 break;
+
+            default:
+                log.warn("Unhandled payment status {} for order {}.", paymentResponse.status(), modelOrder.getId());
+                break;
         }
 
         if (paymentResponse.shouldRedirect()) {
@@ -102,23 +108,24 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result, String successUrl,
                                                          String cancelUrl) {
-            PaymentRequest paymentRequest = PaymentRequest.builder()
-                    .ref(modelOrder.getId().toString())
-                    .amount(modelOrder.getTotal())
-                    .currency(modelOrder.getCurrency())
-                    .paymentType(modelOrder.getPaymentType())
-                    .expireAt(result.expireAt())
-                    .successUrl(appendOrderId(successUrl, modelOrder.getId()))
-                    .cancelUrl(appendOrderId(cancelUrl, modelOrder.getId()))
-                    .build();
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .ref(modelOrder.getId().toString())
+                .amount(modelOrder.getTotal())
+                .currency(modelOrder.getCurrency())
+                .paymentType(modelOrder.getPaymentType())
+                .expireAt(result.expireAt())
+                .successUrl(appendOrderId(successUrl, modelOrder.getId()))
+                .cancelUrl(appendOrderId(cancelUrl, modelOrder.getId()))
+                .build();
 
-            log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-            return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+        log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
+        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
 
     }
 
     private String appendOrderId(String url, Long orderId) {
-        return url + (url.contains("?") ? "&" : "?") + "orderId=" + orderId;
+        String separator = url.contains(QUERY_PARAM_SEPARATOR) ? "&" : QUERY_PARAM_SEPARATOR;
+        return "%s%sorderId=%d".formatted(url, separator, orderId);
     }
 
     private void updateOrderStatus(Order modelOrder, OrderStatus orderStatus, InventoryStatus inventoryStatus,

@@ -25,6 +25,7 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
@@ -53,18 +54,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 target = new ReadableProduct();
             }
 
-            ProductDescription description = source.getProductDescription();
-
-            if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
-                for (ProductDescription desc : source.getDescriptions()) {
-                    if (language != null && Objects.equals(desc.getLanguageCode(), language)) {
-                        description = desc;
-                        break;
-                    } else {
-                        fulldescriptions.add(populateDescription(desc));
-                    }
-                }
-            }
+            ProductDescription description = resolveDescription(source, language, fulldescriptions);
 
             if (target instanceof ReadableProductFull it) {
                 it.setDescriptions(fulldescriptions);
@@ -100,95 +90,13 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
                 target.setDescription(tragetDescription);
             }
 
-            Set<ProductImage> images = source.getImages();
-            if (images != null && !images.isEmpty()) {
-                List<ReadableImage> imageList = new ArrayList<>();
+            populateImages(source, target, store);
 
-                String contextPath = imageUtils.getContextPath();
-
-                for (ProductImage img : images) {
-                    ReadableImage prdImage = new ReadableImage();
-                    prdImage.setImageName(img.getProductImage());
-                    prdImage.setDefaultImage(img.isDefaultImage());
-                    prdImage.setOrder(img.getSortOrder() != null ? img.getSortOrder() : 0);
-
-                    if (img.getImageType() == 1 && img.getProductImageUrl() != null) {
-                        prdImage.setImageUrl(img.getProductImageUrl());
-                    } else {
-                        StringBuilder imgPath = new StringBuilder();
-                        imgPath.append(contextPath)
-                                .append(imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
-
-                        prdImage.setImageUrl(imgPath.toString());
-                    }
-                    prdImage.setId(img.getId());
-                    prdImage.setImageType(img.getImageType());
-                    if (img.getProductImageUrl() != null) {
-                        prdImage.setExternalUrl(img.getProductImageUrl());
-                    }
-                    if (img.getImageType() == 1 && img.getProductImageUrl() != null) { // video
-                        prdImage.setVideoUrl(img.getProductImageUrl());
-                    }
-
-                    if (prdImage.isDefaultImage()) {
-                        target.setImage(prdImage);
-                    }
-
-                    imageList.add(prdImage);
-                }
-                imageList = imageList.stream()
-                        .sorted(Comparator.comparingInt(ReadableImage::getOrder))
-                        .toList();
-
-                target.setImages(imageList);
-            }
-
-            ProductAvailability availability = null;
-            for (ProductAvailability a : source.getAvailabilities()) {
-                availability = a;
-                target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
-                target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
-                        : availability.getProductQuantityOrderMax());
-                target.setQuantityOrderMinimum(availability.getProductQuantityOrderMin() == null ? 1
-                        : availability.getProductQuantityOrderMin());
-                if (availability.getProductQuantity() > 0 && target.isAvailable()) {
-                    target.setCanBePurchased(true);
-                }
-            }
+            ProductAvailability availability = populateAvailability(source, target);
 
             target.setSku(source.getSku());
 
-            FinalPriceCalc price = pricingService.calculateProductPrice(source);
-
-            if (price != null) {
-
-                target.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
-                target.setPrice(price.getFinalPrice());
-                target.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
-
-                if (price.isDiscounted()) {
-                    target.setDiscounted(true);
-                }
-
-                // price appender
-                if (availability != null) {
-                    Set<ProductPrice> prices = availability.getPrices();
-                    if (!CollectionUtils.isEmpty(prices)) {
-                        ReadableProductPrice readableProductPrice = new ReadableProductPrice();
-                        readableProductPrice.setDiscounted(target.isDiscounted());
-                        readableProductPrice.setFinalPrice(target.getFinalPrice());
-                        readableProductPrice.setOriginalPrice(target.getOriginalPrice());
-
-                        Optional<ProductPrice> pr = prices.stream()
-                                .filter(p -> p.getCode().equals(ProductPrice.DEFAULT_PRICE_CODE))
-                                .findFirst();
-
-                        target.setProductPrice(readableProductPrice);
-
-                        pr.ifPresent(productPrice -> readableProductPrice.setId(productPrice.getId()));
-                    }
-                }
-            }
+            populatePrice(source, target, store, availability);
 
             if (target instanceof ReadableProductFull it) {
                 it.setDescriptions(fulldescriptions);
@@ -205,6 +113,130 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
     protected ReadableProduct createTarget() {
 
         return null;
+    }
+
+    private ProductDescription resolveDescription(Product source, LanguageCode language,
+                                                  List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions) {
+        ProductDescription description = source.getProductDescription();
+        if (source.getDescriptions() == null || source.getDescriptions().isEmpty()) {
+            return description;
+        }
+        for (ProductDescription desc : source.getDescriptions()) {
+            if (language != null && Objects.equals(desc.getLanguageCode(), language)) {
+                description = desc;
+                break;
+            } else {
+                fulldescriptions.add(populateDescription(desc));
+            }
+        }
+        return description;
+    }
+
+    private void populateImages(Product source, ReadableProduct target, StoreMerchantId store) {
+        Set<ProductImage> images = source.getImages();
+        if (images == null || images.isEmpty()) {
+            return;
+        }
+
+        String contextPath = imageUtils.getContextPath();
+        List<ReadableImage> imageList = new ArrayList<>();
+        for (ProductImage img : images) {
+            imageList.add(buildReadableImage(img, source, store, contextPath, target));
+        }
+        imageList = imageList.stream()
+                .sorted(Comparator.comparingInt(ReadableImage::getOrder))
+                .toList();
+
+        target.setImages(imageList);
+    }
+
+    private ReadableImage buildReadableImage(ProductImage img, Product source, StoreMerchantId store, String contextPath,
+                                             ReadableProduct target) {
+        ReadableImage prdImage = new ReadableImage();
+        prdImage.setImageName(img.getProductImage());
+        prdImage.setDefaultImage(img.isDefaultImage());
+        prdImage.setOrder(img.getSortOrder() != null ? img.getSortOrder() : 0);
+
+        if (img.getImageType() == 1 && img.getProductImageUrl() != null) {
+            prdImage.setImageUrl(img.getProductImageUrl());
+        } else {
+            StringBuilder imgPath = new StringBuilder();
+            imgPath.append(contextPath)
+                    .append(imageUtils.buildProductImageUtils(store, source.getSku(), img.getProductImage()));
+
+            prdImage.setImageUrl(imgPath.toString());
+        }
+        prdImage.setId(img.getId());
+        prdImage.setImageType(img.getImageType());
+        if (img.getProductImageUrl() != null) {
+            prdImage.setExternalUrl(img.getProductImageUrl());
+        }
+        if (img.getImageType() == 1 && img.getProductImageUrl() != null) { // video
+            prdImage.setVideoUrl(img.getProductImageUrl());
+        }
+
+        if (prdImage.isDefaultImage()) {
+            target.setImage(prdImage);
+        }
+
+        return prdImage;
+    }
+
+    private ProductAvailability populateAvailability(Product source, ReadableProduct target) {
+        ProductAvailability availability = null;
+        for (ProductAvailability a : source.getAvailabilities()) {
+            availability = a;
+            target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
+            target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
+                    : availability.getProductQuantityOrderMax());
+            target.setQuantityOrderMinimum(availability.getProductQuantityOrderMin() == null ? 1
+                    : availability.getProductQuantityOrderMin());
+            if (availability.getProductQuantity() > 0 && target.isAvailable()) {
+                target.setCanBePurchased(true);
+            }
+        }
+        return availability;
+    }
+
+    private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability)
+            throws ServiceException {
+        FinalPriceCalc price = pricingService.calculateProductPrice(source);
+        if (price == null) {
+            return;
+        }
+
+        target.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
+        target.setPrice(price.getFinalPrice());
+        target.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
+
+        if (price.isDiscounted()) {
+            target.setDiscounted(true);
+        }
+
+        // price appender
+        appendProductPrice(target, availability);
+    }
+
+    private void appendProductPrice(ReadableProduct target, ProductAvailability availability) {
+        if (availability == null) {
+            return;
+        }
+        Set<ProductPrice> prices = availability.getPrices();
+        if (CollectionUtils.isEmpty(prices)) {
+            return;
+        }
+        ReadableProductPrice readableProductPrice = new ReadableProductPrice();
+        readableProductPrice.setDiscounted(target.isDiscounted());
+        readableProductPrice.setFinalPrice(target.getFinalPrice());
+        readableProductPrice.setOriginalPrice(target.getOriginalPrice());
+
+        Optional<ProductPrice> pr = prices.stream()
+                .filter(p -> p.getCode().equals(ProductPrice.DEFAULT_PRICE_CODE))
+                .findFirst();
+
+        target.setProductPrice(readableProductPrice);
+
+        pr.ifPresent(productPrice -> readableProductPrice.setId(productPrice.getId()));
     }
 
     com.asrevo.cvhome.catalog.model.product.ProductDescription populateDescription(ProductDescription description) {

@@ -42,14 +42,14 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
 
         ProductOption option = productOptionService.getById(store, source.getOption());
         if (option == null) {
-            throw new ConversionRuntimeException("ProductOption [" + source.getOption() + "] does not exists");
+            throw new ConversionRuntimeException("ProductOption [%s] does not exists".formatted(source.getOption()));
         }
         destination.setProductOption(option);
 
         ProductOptionValue optionValue = productOptionValueService.getById(store, source.getOptionValue());
         if (optionValue == null) {
             throw new ConversionRuntimeException(
-                    "ProductOptionValue [" + source.getOptionValue() + "] does not exists");
+                    "ProductOptionValue [%s] does not exists".formatted(source.getOptionValue()));
         }
         destination.setProductOptionValue(optionValue);
 

@@ -2,7 +2,7 @@ package com.asrevo.cvhome.catalog;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestCatalogApplication {
+public final class TestCatalogApplication {
     private TestCatalogApplication() {
     }
 

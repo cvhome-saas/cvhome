@@ -2,7 +2,7 @@ package com.asrevo.cvhome.checkout;
 
 import org.springframework.boot.SpringApplication;
 
-public class TestCheckoutApplication {
+public final class TestCheckoutApplication {
     private TestCheckoutApplication() {
     }
 

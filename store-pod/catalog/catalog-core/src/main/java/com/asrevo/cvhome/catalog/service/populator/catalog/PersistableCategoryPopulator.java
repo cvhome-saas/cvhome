@@ -15,6 +15,7 @@ import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -25,6 +26,8 @@ import lombok.Setter;
 @Component
 public class PersistableCategoryPopulator
         extends AbstractDataPopulator<PersistableCategory, StoreMerchantId, Category> {
+
+    private static final String PATH_SEPARATOR = "/";
 
     private final CategoryService categoryService;
 
@@ -48,74 +51,9 @@ public class PersistableCategoryPopulator
                 target.getCategories().clear();
             }
 
-            if (source.getParent() == null || (StringUtils.isBlank(source.getParent().getCode()))
-                    || source.getParent().getId() == null) {
-                target.setParent(null);
-                target.setDepth(0);
-                target.setLineage(new StringBuilder().append("/").append(source.getId()).append("/").toString());
-            } else {
-                Category parent;
-                if (!StringUtils.isBlank(source.getParent().getCode())) {
-                    parent = categoryService.getByCode(store, source.getParent().getCode());
-                } else if (source.getParent().getId() != null) {
-                    parent = categoryService.getById(source.getParent().getId(), store);
-                } else {
-                    throw new ConversionException("Category parent needs at least an id or a code for reference");
-                }
-                if (parent != null && !Objects.equals(parent.getStoreMerchantId(), store)) {
-                    throw new ConversionException("Store id does not belong to specified parent id");
-                }
-
-                if (parent != null) {
-                    target.setParent(parent);
-
-                    String lineage = parent.getLineage();
-                    int depth = parent.getDepth();
-
-                    target.setDepth(depth + 1);
-                    target
-                            .setLineage(new StringBuilder().append(lineage).append(target.getId()).append("/").toString());
-                }
-            }
-
-            if (!CollectionUtils.isEmpty(source.getChildren())) {
-
-                for (PersistableCategory cat : source.getChildren()) {
-
-                    Category persistCategory = this.populate(cat, new Category(), store, language);
-                    target.getCategories().add(persistCategory);
-                }
-            }
-
-            if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions = new HashSet<>();
-                if (CollectionUtils.isNotEmpty(target.getDescriptions())) {
-                    for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target
-                            .getDescriptions()) {
-                        for (CategoryDescription d : source.getDescriptions()) {
-                            if (StringUtils.isBlank(d.getLanguage().code())) {
-                                throw new ConversionException("Source category description has no language");
-                            }
-                            if (d.getLanguage().equals(description.getLanguageCode())) {
-                                description.setCategory(target);
-                                description = buildDescription(d, description);
-                                descriptions.add(description);
-                            }
-                        }
-                    }
-
-                } else {
-                    for (CategoryDescription d : source.getDescriptions()) {
-                        com.asrevo.cvhome.catalog.entity.category.CategoryDescription t =
-                                new com.asrevo.cvhome.catalog.entity.category.CategoryDescription();
-
-                        this.buildDescription(d, t);
-                        t.setCategory(target);
-                        descriptions.add(t);
-                    }
-                }
-                target.setDescriptions(descriptions);
-            }
+            applyParent(source, target, store);
+            applyChildren(source, target, store, language);
+            applyDescriptions(source, target);
 
             return target;
 
@@ -124,8 +62,97 @@ public class PersistableCategoryPopulator
         }
     }
 
-    private com.asrevo.cvhome.catalog.entity.category.CategoryDescription buildDescription(CategoryDescription source,
-                                                                                           com.asrevo.cvhome.catalog.entity.category.CategoryDescription target) {
+    private void applyParent(PersistableCategory source, Category target, StoreMerchantId store)
+            throws ConversionException, ServiceException {
+        if (source.getParent() == null || StringUtils.isBlank(source.getParent().getCode())
+                || source.getParent().getId() == null) {
+            target.setParent(null);
+            target.setDepth(0);
+            target.setLineage(
+                    new StringBuilder().append(PATH_SEPARATOR).append(source.getId()).append(PATH_SEPARATOR).toString());
+            return;
+        }
+
+        Category parent = resolveParent(source, store);
+        if (parent != null && !Objects.equals(parent.getStoreMerchantId(), store)) {
+            throw new ConversionException("Store id does not belong to specified parent id");
+        }
+
+        if (parent != null) {
+            target.setParent(parent);
+
+            String lineage = parent.getLineage();
+            int depth = parent.getDepth();
+
+            target.setDepth(depth + 1);
+            target.setLineage(
+                    new StringBuilder().append(lineage).append(target.getId()).append(PATH_SEPARATOR).toString());
+        }
+    }
+
+    private Category resolveParent(PersistableCategory source, StoreMerchantId store)
+            throws ConversionException, ServiceException {
+        if (!StringUtils.isBlank(source.getParent().getCode())) {
+            return categoryService.getByCode(store, source.getParent().getCode());
+        }
+        if (source.getParent().getId() != null) {
+            return categoryService.getById(source.getParent().getId(), store);
+        }
+        throw new ConversionException("Category parent needs at least an id or a code for reference");
+    }
+
+    private void applyChildren(PersistableCategory source, Category target, StoreMerchantId store, LanguageCode language)
+            throws ConversionException {
+        if (CollectionUtils.isEmpty(source.getChildren())) {
+            return;
+        }
+        for (PersistableCategory cat : source.getChildren()) {
+            Category persistCategory = this.populate(cat, new Category(), store, language);
+            target.getCategories().add(persistCategory);
+        }
+    }
+
+    private void applyDescriptions(PersistableCategory source, Category target) throws ConversionException {
+        if (CollectionUtils.isEmpty(source.getDescriptions())) {
+            return;
+        }
+        Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(target.getDescriptions())) {
+            mergeExistingDescriptions(source, target, descriptions);
+        } else {
+            for (CategoryDescription d : source.getDescriptions()) {
+                com.asrevo.cvhome.catalog.entity.category.CategoryDescription t =
+                        new com.asrevo.cvhome.catalog.entity.category.CategoryDescription();
+
+                this.buildDescription(d, t);
+                t.setCategory(target);
+                descriptions.add(t);
+            }
+        }
+        target.setDescriptions(descriptions);
+    }
+
+    private void mergeExistingDescriptions(PersistableCategory source, Category target,
+                                           Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions)
+            throws ConversionException {
+        for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target.getDescriptions()) {
+            for (CategoryDescription d : source.getDescriptions()) {
+                if (StringUtils.isBlank(d.getLanguage().code())) {
+                    throw new ConversionException("Source category description has no language");
+                }
+                if (d.getLanguage().equals(description.getLanguageCode())) {
+                    description.setCategory(target);
+                    com.asrevo.cvhome.catalog.entity.category.CategoryDescription merged =
+                            buildDescription(d, description);
+                    descriptions.add(merged);
+                }
+            }
+        }
+    }
+
+    private com.asrevo.cvhome.catalog.entity.category.CategoryDescription buildDescription(
+            CategoryDescription source,
+            com.asrevo.cvhome.catalog.entity.category.CategoryDescription target) {
         target.setCategoryHighlight(source.getHighlights());
         target.setDescription(source.getDescription());
         target.setName(source.getName());

@@ -13,6 +13,7 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -40,46 +41,54 @@ public class ReadableProductPricePopulator
 
             target.setDefaultPrice(source.isDefaultPrice());
 
-            FinalPriceCalc finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
-
-            target.setOriginalPrice(pricingService.getDisplayAmount(source.getProductPriceAmount(), store));
-            if (finalPrice.isDiscounted()) {
-                target.setDiscounted(true);
-                target.setFinalPrice(pricingService.getDisplayAmount(source.getProductPriceSpecialAmount(), store));
-            } else {
-                target.setFinalPrice(pricingService.getDisplayAmount(finalPrice.getOriginalPrice(), store));
-            }
-
-            if (source.getDescriptions() != null && !source.getDescriptions().isEmpty()) {
-                List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> fulldescriptions = new ArrayList<>();
-
-                Set<ProductPriceDescription> descriptions = source.getDescriptions();
-                ProductPriceDescription description = null;
-                for (ProductPriceDescription desc : descriptions) {
-                    if (desc.getLanguageCode().equals(language)) {
-                        description = desc;
-                        break;
-                    } else {
-                        fulldescriptions.add(populateDescription(desc));
-                    }
-                }
-
-                if (description != null) {
-                    com.asrevo.cvhome.catalog.model.product.ProductPriceDescription d = populateDescription(
-                            description);
-                    target.setDescription(d);
-                }
-
-                if (target instanceof ReadableProductPriceFull it) {
-                    it.setDescriptions(fulldescriptions);
-                }
-            }
+            applyFinalPrice(source, target, store);
+            applyDescriptions(source, target, language);
 
         } catch (Exception e) {
             throw new ConversionException("Exception while converting to ReadableProductPrice", e);
         }
 
         return target;
+    }
+
+    private void applyFinalPrice(ProductPrice source, ReadableProductPrice target, StoreMerchantId store)
+            throws ServiceException {
+        FinalPriceCalc finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
+
+        target.setOriginalPrice(pricingService.getDisplayAmount(source.getProductPriceAmount(), store));
+        if (finalPrice.isDiscounted()) {
+            target.setDiscounted(true);
+            target.setFinalPrice(pricingService.getDisplayAmount(source.getProductPriceSpecialAmount(), store));
+        } else {
+            target.setFinalPrice(pricingService.getDisplayAmount(finalPrice.getOriginalPrice(), store));
+        }
+    }
+
+    private void applyDescriptions(ProductPrice source, ReadableProductPrice target, LanguageCode language) {
+        if (source.getDescriptions() == null || source.getDescriptions().isEmpty()) {
+            return;
+        }
+        List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> fulldescriptions = new ArrayList<>();
+
+        Set<ProductPriceDescription> descriptions = source.getDescriptions();
+        ProductPriceDescription description = null;
+        for (ProductPriceDescription desc : descriptions) {
+            if (desc.getLanguageCode().equals(language)) {
+                description = desc;
+                break;
+            } else {
+                fulldescriptions.add(populateDescription(desc));
+            }
+        }
+
+        if (description != null) {
+            com.asrevo.cvhome.catalog.model.product.ProductPriceDescription d = populateDescription(description);
+            target.setDescription(d);
+        }
+
+        if (target instanceof ReadableProductPriceFull it) {
+            it.setDescriptions(fulldescriptions);
+        }
     }
 
     @Override

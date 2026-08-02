@@ -17,9 +17,10 @@ import java.util.regex.Pattern;
  */
 public class FileSystemKeyProvider implements LocalKeyProvider {
 
+    private static final String DEFAULT_KEY_NAME = "default-key";
+
     private final Path keysDirectory;
     private final boolean base64Encoded;
-    private static final String DEFAULT_KEY_NAME = "default-key";
 
     public FileSystemKeyProvider(Path keysDirectory) {
         this(keysDirectory, false);
@@ -41,7 +42,7 @@ public class FileSystemKeyProvider implements LocalKeyProvider {
             String property = matcher.group(1);
             String value = System.getProperty(property);
             if (value == null) {
-                throw new IllegalArgumentException("Unknown system property: " + property);
+                throw new IllegalArgumentException(String.format("Unknown system property: %s", property));
             }
             matcher.appendReplacement(result, Matcher.quoteReplacement(value));
         }

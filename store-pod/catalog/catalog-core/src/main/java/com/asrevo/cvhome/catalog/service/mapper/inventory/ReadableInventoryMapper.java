@@ -54,18 +54,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             destination.setRegion(source.getRegion());
             destination.setRegionVariant(source.getRegionVariant());
             destination.setStore(externalMerchantStoreService.getStore(store));
-            if (source.getAvailable() != null) {
-                if (source.getProductDateAvailable() != null) {
-                    boolean isAfter = LocalDate.now()
-                            .isAfter(source.getProductDateAvailable());
-                    if (isAfter && source.getAvailable()) {
-                        destination.setAvailable(true);
-                    }
-                    destination.setDateAvailable(source.getProductDateAvailable());
-                } else {
-                    destination.setAvailable(source.getAvailable());
-                }
-            }
+            applyAvailability(source, destination);
 
             if (source.getAuditSection() != null && source.getAuditSection().getDateCreated() != null) {
                 destination.setCreationDate(source.getAuditSection().getDateCreated());
@@ -90,6 +79,21 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
         }
 
         return destination;
+    }
+
+    private void applyAvailability(ProductAvailability source, ReadableInventory destination) {
+        if (source.getAvailable() == null) {
+            return;
+        }
+        if (source.getProductDateAvailable() == null) {
+            destination.setAvailable(source.getAvailable());
+            return;
+        }
+        boolean isAfter = LocalDate.now().isAfter(source.getProductDateAvailable());
+        if (isAfter && source.getAvailable()) {
+            destination.setAvailable(true);
+        }
+        destination.setDateAvailable(source.getProductDateAvailable());
     }
 
     private List<ReadableProductPrice> prices(ProductAvailability source, StoreMerchantId store, LanguageCode language)

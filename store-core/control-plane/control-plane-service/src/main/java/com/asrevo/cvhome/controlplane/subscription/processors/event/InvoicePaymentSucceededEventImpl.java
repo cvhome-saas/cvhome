@@ -26,7 +26,8 @@ public class InvoicePaymentSucceededEventImpl implements EventImpl<InvoicePaymen
     public void process(InvoicePaymentSucceededEvent event) {
         log.info("Invoice payment succeeded event: {} from outbox", event);
         SubscriptionPlanOption option = subscriptionPlanTablesService.getSubscriptionPlanOption(event.priceId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid subscription price id: " + event.priceId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Invalid subscription price id: %s".formatted(event.priceId())));
         subscriptionService.renew(event.org(), option.subscriptionPlan(), event.startDate(), event.endDate(),
                 option.recurringPlan());
     }

@@ -54,44 +54,8 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     public ProductAvailability merge(PersistableInventory source, ProductAvailability destination,
                                      StoreMerchantId store, LanguageCode language) {
         try {
-            Product product = null;
-            if (source.getProductId() != null && source.getProductId() > 0) {
-                product = productService.findOne(source.getProductId(), store);
-                if (product == null) {
-                    throw new ResourceNotFoundException(
-                            "Product with id [" + source.getProductId() + "] not found for store [" + store + "]");
-                }
-                destination.setProduct(product);
-            }
-
-            Set<ProductAvailability> existingAvailability = Optional.ofNullable(product)
-                    .map(Product::getAvailabilities)
-                    .orElse(Set.of());
-            ProductAvailability existing;
-            // determine product availability to be used
-            if (source.getId() != null && source.getId() > 0) {
-                existing = destination;
-            } else {
-                existing = existingAvailability.stream()
-                        .filter(a -> (source.getProductId() != null
-                                && (a.getProduct().getId().longValue() == source.getProductId().longValue())
-                                && a.getStoreMerchantId().equals(store)
-                                && (source.getVariant() == null && a.getProductVariant() == null)
-                                || (a.getProductVariant() != null && source.getVariant() != null
-                                && a.getProductVariant().getId().longValue() == source.getVariant().longValue())
-                                && (source.getRegionVariant() == null && a.getRegionVariant() == null)
-                                || (a.getRegionVariant() != null && source.getRegionVariant() != null
-                                && a.getRegionVariant().equals(source.getRegionVariant()))))
-                        .findAny()
-                        .orElse(null);
-            }
-            if (existing != null) {
-                if (!existing.getStoreMerchantId().equals(store)) {
-                    throw new ResourceNotFoundException(
-                            "Product Inventory with id [" + source.getId() + "] not found for store [" + store + "]");
-                }
-                destination = existing;
-            }
+            Product product = resolveProduct(source, destination, store);
+            destination = applyExistingAvailability(source, destination, product, store);
 
             destination.setProductQuantity(source.getQuantity());
             destination.setProductQuantityOrderMin(source.getProductQuantityOrderMax());
@@ -107,67 +71,8 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 destination.setProductDateAvailable(source.getDateAvailable());
             }
 
-            if (source.getVariant() != null && source.getVariant() > 0) {
-                Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
-                if (instance.isEmpty()) {
-                    throw new ResourceNotFoundException(
-                            "productVariant with id [" + source.getVariant() + "] not found for store [" + store + "]");
-                }
-                destination.setSku(instance.get().getSku());
-                destination.setProductVariant(instance.get());
-            }
-
-            // merge with existing or replace
-            List<ProductPrice> prices = new ArrayList<>();
-            for (PersistableProductPrice priceEntity : source.getPrices()) {
-
-                ProductPrice price = null;
-
-                if (destination.getPrices() != null) {
-                    for (ProductPrice pp : destination.getPrices()) {
-                        if (isPositive(priceEntity.getId())
-                                && priceEntity.getId().longValue() == pp.getId().longValue()) {
-                            price = pp;
-                            prices.add(pp);
-                        } else if (pp.isDefaultPrice() && priceEntity.isDefaultPrice()) {
-                            if (price == null) {
-                                price = pp;
-                            } else {
-                                prices.add(pp);
-                            }
-                        } else {
-                            prices.add(pp);
-                        }
-                    }
-                }
-
-                if (price == null) {
-                    price = new ProductPrice();
-                }
-
-                prices.add(price);
-
-                price.setProductAvailability(destination);
-                price.setDefaultPrice(priceEntity.isDefaultPrice());
-                price.setProductPriceAmount(priceEntity.getPrice());
-                price.setDefaultPrice(priceEntity.isDefaultPrice());
-                price.setCode(priceEntity.getCode());
-                price.setProductPriceSpecialAmount(priceEntity.getDiscountedPrice());
-
-                if (Objects.nonNull(priceEntity.getDiscountStartDate())) {
-                    LocalDate startDate = priceEntity.getDiscountStartDate();
-                    price.setProductPriceSpecialStartDate(startDate);
-                }
-                if (Objects.nonNull(priceEntity.getDiscountEndDate())) {
-                    LocalDate endDate = priceEntity.getDiscountEndDate();
-                    price.setProductPriceSpecialEndDate(endDate);
-                }
-
-                Set<ProductPriceDescription> descs = getProductPriceDescriptions(price, priceEntity.getDescriptions());
-                price.setDescriptions(descs);
-
-                destination.setPrices(new HashSet<>(prices));
-            }
+            applyVariant(source, destination, store);
+            mergePrices(source, destination);
 
             return destination;
 
@@ -178,8 +83,151 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
         }
     }
 
+    private Product resolveProduct(PersistableInventory source, ProductAvailability destination, StoreMerchantId store) {
+        if (source.getProductId() == null || source.getProductId() <= 0) {
+            return null;
+        }
+        Product product = productService.findOne(source.getProductId(), store);
+        if (product == null) {
+            throw new ResourceNotFoundException(
+                    "Product with id [%s] not found for store [%s]".formatted(source.getProductId(), store));
+        }
+        destination.setProduct(product);
+        return product;
+    }
+
+    private ProductAvailability applyExistingAvailability(PersistableInventory source, ProductAvailability destination,
+            Product product, StoreMerchantId store) {
+        ProductAvailability existing = findExistingAvailability(source, destination, product, store);
+        if (existing == null) {
+            return destination;
+        }
+        if (!existing.getStoreMerchantId().equals(store)) {
+            throw new ResourceNotFoundException(
+                    "Product Inventory with id [%s] not found for store [%s]".formatted(source.getId(), store));
+        }
+        return existing;
+    }
+
+    private ProductAvailability findExistingAvailability(PersistableInventory source, ProductAvailability destination,
+            Product product, StoreMerchantId store) {
+        if (source.getId() != null && source.getId() > 0) {
+            return destination;
+        }
+        Set<ProductAvailability> existingAvailability = Optional.ofNullable(product)
+                .map(Product::getAvailabilities)
+                .orElse(Set.of());
+        return existingAvailability.stream()
+                .filter(a -> matchesExistingAvailability(source, a, store))
+                .findAny()
+                .orElse(null);
+    }
+
+    private boolean matchesExistingAvailability(PersistableInventory source, ProductAvailability a, StoreMerchantId store) {
+        return matchesByProduct(source, a, store) || matchesByVariant(source, a) || matchesByRegionVariant(source, a);
+    }
+
+    private boolean matchesByProduct(PersistableInventory source, ProductAvailability a, StoreMerchantId store) {
+        return sameProductAndStore(source, a, store) && bothVariantsNull(source, a);
+    }
+
+    private boolean sameProductAndStore(PersistableInventory source, ProductAvailability a, StoreMerchantId store) {
+        return source.getProductId() != null
+                && a.getProduct().getId().longValue() == source.getProductId().longValue()
+                && a.getStoreMerchantId().equals(store);
+    }
+
+    private boolean bothVariantsNull(PersistableInventory source, ProductAvailability a) {
+        return source.getVariant() == null && a.getProductVariant() == null;
+    }
+
+    private boolean matchesByVariant(PersistableInventory source, ProductAvailability a) {
+        return bothVariantsPresentAndMatch(source, a) && bothRegionVariantsNull(source, a);
+    }
+
+    private boolean bothVariantsPresentAndMatch(PersistableInventory source, ProductAvailability a) {
+        return a.getProductVariant() != null && source.getVariant() != null
+                && a.getProductVariant().getId().longValue() == source.getVariant().longValue();
+    }
+
+    private boolean bothRegionVariantsNull(PersistableInventory source, ProductAvailability a) {
+        return source.getRegionVariant() == null && a.getRegionVariant() == null;
+    }
+
+    private boolean matchesByRegionVariant(PersistableInventory source, ProductAvailability a) {
+        return a.getRegionVariant() != null && source.getRegionVariant() != null
+                && a.getRegionVariant().equals(source.getRegionVariant());
+    }
+
+    private void applyVariant(PersistableInventory source, ProductAvailability destination, StoreMerchantId store) {
+        if (source.getVariant() == null || source.getVariant() <= 0) {
+            return;
+        }
+        Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
+        if (instance.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "productVariant with id [%s] not found for store [%s]".formatted(source.getVariant(), store));
+        }
+        destination.setSku(instance.get().getSku());
+        destination.setProductVariant(instance.get());
+    }
+
+    private void mergePrices(PersistableInventory source, ProductAvailability destination) {
+        List<ProductPrice> prices = new ArrayList<>();
+        for (PersistableProductPrice priceEntity : source.getPrices()) {
+
+            ProductPrice price = null;
+
+            if (destination.getPrices() != null) {
+                for (ProductPrice pp : destination.getPrices()) {
+                    price = mergeExistingPrice(priceEntity, pp, price, prices);
+                }
+            }
+
+            if (price == null) {
+                price = new ProductPrice();
+            }
+
+            prices.add(price);
+
+            price.setProductAvailability(destination);
+            price.setDefaultPrice(priceEntity.isDefaultPrice());
+            price.setProductPriceAmount(priceEntity.getPrice());
+            price.setDefaultPrice(priceEntity.isDefaultPrice());
+            price.setCode(priceEntity.getCode());
+            price.setProductPriceSpecialAmount(priceEntity.getDiscountedPrice());
+
+            if (Objects.nonNull(priceEntity.getDiscountStartDate())) {
+                LocalDate startDate = priceEntity.getDiscountStartDate();
+                price.setProductPriceSpecialStartDate(startDate);
+            }
+            if (Objects.nonNull(priceEntity.getDiscountEndDate())) {
+                LocalDate endDate = priceEntity.getDiscountEndDate();
+                price.setProductPriceSpecialEndDate(endDate);
+            }
+
+            Set<ProductPriceDescription> descs = getProductPriceDescriptions(price, priceEntity.getDescriptions());
+            price.setDescriptions(descs);
+
+            destination.setPrices(new HashSet<>(prices));
+        }
+    }
+
+    private ProductPrice mergeExistingPrice(PersistableProductPrice priceEntity, ProductPrice pp, ProductPrice price,
+                                            List<ProductPrice> prices) {
+        if (isPositive(priceEntity.getId()) && priceEntity.getId().longValue() == pp.getId().longValue()) {
+            prices.add(pp);
+            return pp;
+        }
+        if (pp.isDefaultPrice() && priceEntity.isDefaultPrice() && price == null) {
+            return pp;
+        }
+        prices.add(pp);
+        return price;
+    }
+
     private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-                                                                     List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
+            List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }

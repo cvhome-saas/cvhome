@@ -31,7 +31,7 @@ public class StorePodClientFactory {
 
     private MerchantStorePodClient createMerchantStorePodClient(PodId podId) {
         Pod pod = serviceDomainProperties.getPodByPodId(podId)
-                .orElseThrow(() -> new IllegalArgumentException("Pod not found for id: " + podId));
+                .orElseThrow(() -> new IllegalArgumentException("Pod not found for id: %s".formatted(podId)));
         return restClientBuilder.buildClient(pod, "merchant", MerchantStorePodClient.class);
     }
 

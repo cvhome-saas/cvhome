@@ -41,7 +41,8 @@ public class StripeProcessor implements PaymentProcessor {
             StripeObject stripeObject = event.getDataObjectDeserializer().deserializeUnsafe();
             return clazz.cast(stripeObject);
         } catch (ClassCastException e) {
-            throw new InvalidWebhookPayload("Stripe event data object is not of expected type: " + clazz.getSimpleName(), e);
+            throw new InvalidWebhookPayload(
+                    String.format("Stripe event data object is not of expected type: %s", clazz.getSimpleName()), e);
         } catch (EventDataObjectDeserializationException e) {
             throw new InvalidWebhookPayload("Failed to deserialize Stripe event data object", e);
         }
@@ -59,6 +60,10 @@ public class StripeProcessor implements PaymentProcessor {
             log.error("Signature verification failed for Stripe webhook", e);
             throw new InvalidWebhookPayload(e.getMessage(), e);
         }
+    }
+
+    private static long toStripeUnitAmount(BigDecimal amount) {
+        return amount.longValue() * 100;
     }
 
     @Override
@@ -87,7 +92,7 @@ public class StripeProcessor implements PaymentProcessor {
                                                 .setUnitAmount(toStripeUnitAmount(request.amount()))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Order #" + request.ref())
+                                                                .setName(String.format("Order #%s", request.ref()))
                                                                 .build())
                                                 .build())
                                 .build())
@@ -108,13 +113,9 @@ public class StripeProcessor implements PaymentProcessor {
 
     }
 
-    private static long toStripeUnitAmount(BigDecimal amount) {
-        return amount.longValue() * 100;
-    }
-
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                       PaymentSecret configuration) throws InvalidWebhookPayload {
+                                      PaymentSecret configuration) throws InvalidWebhookPayload {
         log.info("Handling Stripe webhook for store {}", storeMerchantId);
         Event event = getEvent(payload, headers, configuration);
 

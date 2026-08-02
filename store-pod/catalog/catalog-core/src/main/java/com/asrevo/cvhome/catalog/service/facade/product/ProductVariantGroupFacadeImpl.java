@@ -85,7 +85,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
                 Optional<ProductVariant> p = productVariantService.getById(instance.getId(), store);
                 if (p.isEmpty()) {
                     throw new ResourceNotFoundException(
-                            "Product instance [" + instance.getId() + " not found for store [" + store + "]");
+                            "Product instance [%s not found for store [%s]".formatted(instance.getId(), store));
                 }
                 instance.setProductVariantGroup(null);
                 productVariantService.save(instance);
@@ -95,7 +95,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
             productVariantGroupService.delete(group);
         } catch (ServiceException _) {
             throw new ServiceRuntimeException(
-                    "Cannot remove product instance group [" + productVariantGroup + "] for store [" + store + "]");
+                    "Cannot remove product instance group [%s] for store [%s]".formatted(productVariantGroup, store));
         }
     }
 
@@ -116,7 +116,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
     private ProductVariantGroup group(Long productOptionGroupId, StoreMerchantId store) {
         Optional<ProductVariantGroup> group = productVariantGroupService.getById(productOptionGroupId, store);
         if (group.isEmpty()) {
-            throw new ResourceNotFoundException("Product instance group [" + productOptionGroupId + "] not found");
+            throw new ResourceNotFoundException("Product instance group [%s] not found".formatted(productOptionGroupId));
         }
 
         return group.get();

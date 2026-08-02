@@ -13,7 +13,7 @@ public interface ExternalOrderService {
 
     @PostExchange("/{orderRef}/payment-status")
     void updatePaymentStatus(StoreMerchantId store, @PathVariable("orderRef") String orderRef,
-                            @RequestParam("status") PaymentStatus status);
+                             @RequestParam("status") PaymentStatus status);
 
     @PostExchange("/{orderRef}/reservation-expired")
     void handleReservationExpired(StoreMerchantId store, @PathVariable("orderRef") String orderRef);

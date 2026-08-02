@@ -124,7 +124,7 @@ public class ProductManufacturerApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @Operation(method = "GET", description = "List manufacturers by store",
-            summary = "This request supports paging or not. Paging supports page number and request" + " count",
+            summary = "This request supports paging or not. Paging supports page number and request count",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
@@ -145,7 +145,7 @@ public class ProductManufacturerApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @Operation(method = "GET", description = "List manufacturers by store",
-            summary = "This request supports paging or not. Paging supports page number and request" + " count",
+            summary = "This request supports paging or not. Paging supports page number and request count",
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
     public ReadableManufacturerList list(StoreMerchantId merchantStore, LanguageCode language,

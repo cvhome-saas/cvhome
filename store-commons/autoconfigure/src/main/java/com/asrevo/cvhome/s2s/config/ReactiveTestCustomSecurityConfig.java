@@ -29,7 +29,7 @@ import com.nimbusds.jwt.SignedJWT;
 
 @Configuration
 @Profile("signer")
-public class ReactiveTestCustomSecurityConfig {
+public final class ReactiveTestCustomSecurityConfig {
     private ReactiveTestCustomSecurityConfig() {
     }
 

@@ -22,7 +22,7 @@ public class MinioS3Config {
     @Bean
     DynamicPropertyRegistrar dynamicPropertyRegistrar(MinIOContainer container) {
         return registry -> {
-            Supplier<Object> getUiURL = () -> container.getS3URL() + "/" + DEFAULT_BUCKET;
+            Supplier<Object> getUiURL = () -> "%s/%s".formatted(container.getS3URL(), DEFAULT_BUCKET);
             registry.add("com.asrevo.cvhome.cdn.basePath", getUiURL);
             registry.add("com.asrevo.cvhome.cdn.storage.bucket", () -> DEFAULT_BUCKET);
             registry.add("com.asrevo.cvhome.cdn.storage.provider", () -> StorageProviderType.MINIO);

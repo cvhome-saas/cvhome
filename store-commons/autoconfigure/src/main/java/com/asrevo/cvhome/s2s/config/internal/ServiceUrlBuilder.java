@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public record ServiceUrlBuilder(ServiceDomainProperties serviceDomainProperties, Environment environment) {
     private static final String LB_PREFIX = "lb://";
+    private static final String EXTERNAL_URL_TEMPLATE = "%s%s.%s/%s";
+    private static final String SUB_PATH_TEMPLATE = "%s/%s";
+    private static final String INTERNAL_SPG_TEMPLATE = "%sspg.%s";
 
     public String getServiceUrl(String serviceName) {
         ServiceDomain requestedService = serviceDomainProperties.getService(serviceName);
@@ -23,19 +26,19 @@ public record ServiceUrlBuilder(ServiceDomainProperties serviceDomainProperties,
             ServiceDomain gateway = serviceDomainProperties.getService(requestedService.gatewayServiceName());
             log.info("will create external client for {} using gateway {} in namespace {}", serviceName, gateway.name(),
                     gateway.namespace());
-            return LB_PREFIX + gateway.name() + "." + gateway.namespace() + "/" + serviceName;
+            return EXTERNAL_URL_TEMPLATE.formatted(LB_PREFIX, gateway.name(), gateway.namespace(), serviceName);
         }
     }
 
     public String getServiceUrl(Pod pod) {
         return switch (pod.endpoint().type()) {
-            case INTERNAL -> LB_PREFIX + "spg." + pod.endpoint().endpoint();
+            case INTERNAL -> INTERNAL_SPG_TEMPLATE.formatted(LB_PREFIX, pod.endpoint().endpoint());
             case EXTERNAL -> pod.endpoint().endpoint();
             case null -> pod.endpoint().endpoint();
         };
     }
 
     public String getServiceUrl(Pod pod, String sub) {
-        return getServiceUrl(pod) + "/" + sub;
+        return SUB_PATH_TEMPLATE.formatted(getServiceUrl(pod), sub);
     }
 }

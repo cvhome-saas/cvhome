@@ -37,19 +37,7 @@ public class PersistableManufacturerPopulator
                 Set<com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription> descriptions = new HashSet<>();
                 for (ManufacturerDescription description : source.getDescriptions()) {
                     com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription desc =
-                            new com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription();
-                    if (desc.getId() != null && desc.getId() > 0) {
-                        desc.setId(description.getId());
-                    }
-                    if (target.getDescriptions() != null) {
-                        for (com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription d : target
-                                .getDescriptions()) {
-                            if (d.getLanguageCode().equals(description.getLanguage())
-                                    || desc.getId() != null && d.getId().longValue() == desc.getId().longValue()) {
-                                desc = d;
-                            }
-                        }
-                    }
+                            resolveDescription(description, target);
 
                     desc.setManufacturer(target);
                     desc.setDescription(description.getDescription());
@@ -65,6 +53,25 @@ public class PersistableManufacturerPopulator
         }
 
         return target;
+    }
+
+    private com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription resolveDescription(
+            ManufacturerDescription description, Manufacturer target) {
+        com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription desc =
+                new com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription();
+        if (desc.getId() != null && desc.getId() > 0) {
+            desc.setId(description.getId());
+        }
+        if (target.getDescriptions() == null) {
+            return desc;
+        }
+        for (com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription d : target.getDescriptions()) {
+            if (d.getLanguageCode().equals(description.getLanguage())
+                    || desc.getId() != null && d.getId().longValue() == desc.getId().longValue()) {
+                desc = d;
+            }
+        }
+        return desc;
     }
 
     @Override

@@ -115,6 +115,21 @@ public class ProductReservationServiceImpl implements ProductReservationService 
         return productReservationRepository.save(reservation);
     }
 
+    private ProductReservationCommitResult tryEarlyCommitOutcome(ProductReservation res, String ref) {
+        if (res.getStatus() == ProductReservationStatus.COMPLETED) {
+            log.info("Reservation for ref {} already committed", ref);
+            return ProductReservationCommitResult.builder().status(true).reservationId(res.getId())
+                    .expireAt(res.getExpireAt()).build();
+        }
+        if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED && res.getExpireAt().isBefore(Instant.now())) {
+            log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
+            // Optional: auto-release here or leave for cleanup service
+            return ProductReservationCommitResult.builder().status(false).reservationId(res.getId())
+                    .expireAt(res.getExpireAt()).build();
+        }
+        return null;
+    }
+
     @Transactional
     @Override
     public ProductReservationCommitResult commit(StoreMerchantId store, String ref) {
@@ -123,24 +138,17 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                     productReservationRepository.findAllByRef(ref, store);
             ProductReservation committedRes = null;
             for (ProductReservation res : reservations) {
-                if (Objects.equals(res.getStoreMerchantId(), store)) {
-                    if (res.getStatus() == ProductReservationStatus.COMPLETED) {
-                        log.info("Reservation for ref {} already committed", ref);
-                        return ProductReservationCommitResult.builder().status(true).reservationId(res.getId())
-                                .expireAt(res.getExpireAt()).build();
-                    }
-                    if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                        if (res.getExpireAt().isBefore(Instant.now())) {
-                            log.error("Cannot commit reservation for ref {} because it has expired at {}", ref, res.getExpireAt());
-                            // Optional: auto-release here or leave for cleanup service
-                            return ProductReservationCommitResult.builder().status(false).reservationId(res.getId())
-                                    .expireAt(res.getExpireAt()).build();
-                        }
-
-                        res.setStatus(ProductReservationStatus.COMPLETED);
-                        committedRes = productReservationRepository.save(res);
-                        log.info("Committed reservation for ref {}", ref);
-                    }
+                if (!Objects.equals(res.getStoreMerchantId(), store)) {
+                    continue;
+                }
+                ProductReservationCommitResult earlyOutcome = tryEarlyCommitOutcome(res, ref);
+                if (earlyOutcome != null) {
+                    return earlyOutcome;
+                }
+                if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+                    res.setStatus(ProductReservationStatus.COMPLETED);
+                    committedRes = productReservationRepository.save(res);
+                    log.info("Committed reservation for ref {}", ref);
                 }
             }
             if (committedRes != null) {
@@ -154,6 +162,25 @@ public class ProductReservationServiceImpl implements ProductReservationService 
         }
     }
 
+    private ProductReservationReleaseResult tryEarlyReleaseOutcome(ProductReservation res, String ref) {
+        if (res.getStatus() == ProductReservationStatus.ROLLBACK) {
+            log.info("Reservation for ref {} already released", ref);
+            return ProductReservationReleaseResult.builder().status(true).reservationId(res.getId())
+                    .expireAt(res.getExpireAt()).build();
+        }
+        return null;
+    }
+
+    private void restoreAvailabilities(ProductReservation res) {
+        for (ProductReservationLine line : res.getLines()) {
+            var availability = line.getProductAvailability();
+            if (availability != null) {
+                availability.setProductQuantity(availability.getProductQuantity() + line.getQuantity());
+                productAvailabilityRepository.save(availability);
+            }
+        }
+    }
+
     @Transactional
     @Override
     public ProductReservationReleaseResult release(StoreMerchantId store, String ref) {
@@ -162,26 +189,20 @@ public class ProductReservationServiceImpl implements ProductReservationService 
                     productReservationRepository.findAllByRef(ref, store);
             ProductReservation releasedRes = null;
             for (ProductReservation res : reservations) {
-                if (Objects.equals(res.getStoreMerchantId(), store)) {
-                    if (res.getStatus() == ProductReservationStatus.ROLLBACK) {
-                        log.info("Reservation for ref {} already released", ref);
-                        return ProductReservationReleaseResult.builder().status(true).reservationId(res.getId())
-                                .expireAt(res.getExpireAt()).build();
-                    }
-                    if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
-                        for (ProductReservationLine line : res.getLines()) {
-                            var availability = line.getProductAvailability();
-                            if (availability != null) {
-                                availability.setProductQuantity(availability.getProductQuantity() + line.getQuantity());
-                                productAvailabilityRepository.save(availability);
-                            }
-                        }
+                if (!Objects.equals(res.getStoreMerchantId(), store)) {
+                    continue;
+                }
+                ProductReservationReleaseResult earlyOutcome = tryEarlyReleaseOutcome(res, ref);
+                if (earlyOutcome != null) {
+                    return earlyOutcome;
+                }
+                if (res.getStatus() == ProductReservationStatus.TEMPORARY_RESERVED) {
+                    restoreAvailabilities(res);
 
-                        // Mark as rollback
-                        res.setStatus(ProductReservationStatus.ROLLBACK);
-                        releasedRes = productReservationRepository.save(res);
-                        log.info("Released reservation for ref {}. Status was {}", ref, res.getStatus());
-                    }
+                    // Mark as rollback
+                    res.setStatus(ProductReservationStatus.ROLLBACK);
+                    releasedRes = productReservationRepository.save(res);
+                    log.info("Released reservation for ref {}. Status was {}", ref, res.getStatus());
                 }
             }
             if (releasedRes != null) {

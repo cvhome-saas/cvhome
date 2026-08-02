@@ -67,11 +67,11 @@ public class PaymentConfigurationMapper {
 
     private String decrypt(String value) {
         if (EncryptedValue.isEncrypted(value)) {
-                try {
-                    byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(value));
-                    return new String(decrypted, StandardCharsets.UTF_8);
-                } catch (Exception _) {
-                    log.error("Failed to decrypt value: {}", value);
+            try {
+                byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(value));
+                return new String(decrypted, StandardCharsets.UTF_8);
+            } catch (Exception _) {
+                log.error("Failed to decrypt value: {}", value);
             }
         }
         return null;

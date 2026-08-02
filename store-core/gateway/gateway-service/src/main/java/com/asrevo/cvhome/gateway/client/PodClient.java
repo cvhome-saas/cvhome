@@ -63,11 +63,11 @@ public class PodClient implements RouteDefinitionRepository {
         ServiceUrlBuilder serviceUrlBuilder = new ServiceUrlBuilder(serviceDomainProperties, environment);
         return getPods().map(pod -> {
             RouteDefinition rd = new RouteDefinition();
-            rd.setId("pod-" + pod.shortenPodId());
+            rd.setId(String.format("pod-%s", pod.shortenPodId()));
             rd.setUri(URI.create(serviceUrlBuilder.getServiceUrl(pod)));
 
             var predicates = new ArrayList<>(commonPredicates);
-            predicates.add(new PredicateDefinition("Query=pod," + pod.id().id()));
+            predicates.add(new PredicateDefinition(String.format("Query=pod,%s", pod.id().id())));
             rd.setPredicates(predicates);
 
             rd.setFilters(commonFilters);

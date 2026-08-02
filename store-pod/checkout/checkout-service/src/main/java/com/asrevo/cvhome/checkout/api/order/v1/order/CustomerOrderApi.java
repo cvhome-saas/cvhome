@@ -50,7 +50,7 @@ public class CustomerOrderApi {
     private static @NonNull Supplier<ResourceNotFoundException> buildCustomerNotFoundException(
             StoreMerchantId merchantStore, String cuaExternalId) {
         return () -> new ResourceNotFoundException(
-                "Customer not found for sub : " + cuaExternalId + " in store " + merchantStore);
+                String.format("Customer not found for sub : %s in store %s", cuaExternalId, merchantStore));
     }
 
     @GetMapping(value = {"/private/customer/orders"})

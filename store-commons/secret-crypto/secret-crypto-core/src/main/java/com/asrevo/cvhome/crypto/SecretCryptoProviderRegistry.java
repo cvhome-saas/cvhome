@@ -29,8 +29,8 @@ public class SecretCryptoProviderRegistry implements SecretCryptoProvider {
         return providers.stream()
                 .filter(p -> p.providerId().equals(encryptedValue.getAlgorithm()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "No SecretCryptoProvider available to decrypt algorithm: " + encryptedValue.getAlgorithm()))
+                .orElseThrow(() -> new IllegalStateException(String.format(
+                        "No SecretCryptoProvider available to decrypt algorithm: %s", encryptedValue.getAlgorithm())))
                 .decrypt(encryptedValue);
     }
 

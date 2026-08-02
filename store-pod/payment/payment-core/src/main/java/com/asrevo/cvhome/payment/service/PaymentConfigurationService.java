@@ -22,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentConfigurationService {
 
+    private static final String PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE = "PaymentConfiguration not found with id: %s";
+
     private final PaymentConfigurationRepository repository;
     private final PaymentConfigurationMapper mapper;
 
@@ -46,7 +48,7 @@ public class PaymentConfigurationService {
     public void updateConfig(StoreMerchantId merchantStore, PaymentType paymentType, PersistablePaymentConfiguration dto) {
         PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("PaymentConfiguration not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE.formatted(id)));
 
         mapper.updateEntity(entity, dto);
         repository.save(entity);
@@ -56,7 +58,7 @@ public class PaymentConfigurationService {
     public void deleteConfig(StoreMerchantId merchantStore, PaymentType paymentType) {
         PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("PaymentConfiguration not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE.formatted(id)));
 
         repository.delete(entity);
     }

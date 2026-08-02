@@ -20,7 +20,7 @@ public class AskTlsService {
 
     public boolean ask(Domain domain) {
         log.info("Ask for TLS for domain: {}", domain);
-        if (domain.equals(podInfoProperties.pod().domain())) {
+        if (domain.matches(podInfoProperties.pod().domain())) {
             return true;
         }
         return merchantRepository.findByDomain(domain.domain(), podInfoProperties.pod().domain()).isPresent();

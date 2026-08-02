@@ -24,7 +24,7 @@ import static com.asrevo.cvhome.commons.domain.SubscriptionPlanFeatureCode.PERFO
 import static com.asrevo.cvhome.commons.domain.SubscriptionPlanFeatureCode.PERFORMANCE_STORES;
 import static com.asrevo.cvhome.commons.domain.SubscriptionPlanFeatureCode.PERFORMANCE_VISITORS;
 
-public class SubscriptionPlanFeatureConstants {
+public final class SubscriptionPlanFeatureConstants {
 
     public static final SubscriptionPlanFeatureList FREE_FEATURE = new SubscriptionPlanFeatureList(
             List.of(of(FREE_STORES), of(FREE_ORDERS), of(FREE_PRODUCTS), of(FREE_VISITORS), of(FREE_ACCOUNTS)));

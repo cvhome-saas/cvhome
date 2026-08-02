@@ -52,7 +52,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
     public static final String FILE_CONTENT_DELIMITER = "/";
 
-    private static final String NO_PAGE_FOUND = "No page found : ";
+    private static final String NO_PAGE_FOUND_TEMPLATE = "No page found : %s";
     private static final String ERR_ALREADY_EXIST = "%s with code [%s] already exist for store [%s]";
     private static final String ERR_DOES_NOT_EXIST = "Page with id [%s] does not exist for store [%s]";
 
@@ -80,7 +80,7 @@ public class ContentFacadeImpl implements ContentFacade {
             return contentFolder;
 
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while getting folder " + e.getMessage(), e);
+            throw new ServiceRuntimeException(String.format("Error while getting folder %s", e.getMessage()), e);
         }
     }
 
@@ -213,7 +213,7 @@ public class ContentFacadeImpl implements ContentFacade {
         } else {
             content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store));
         }
-        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + code));
+        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(code)));
     }
 
     @SneakyThrows
@@ -273,7 +273,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
     private FileContentType getFileContentType(String type) {
         FileContentType fileType = FileContentType.STATIC_FILE;
-        if (type.equals("image")) { // for now we consider this route from api
+        if ("image".equals(type)) { // for now we consider this route from api
             // only
             fileType = FileContentType.API_IMAGE;
         }
@@ -330,13 +330,14 @@ public class ContentFacadeImpl implements ContentFacade {
     public void delete(StoreMerchantId store, Long id) {
         Content content = contentService.getById(id);
         if (content != null && !Objects.equals(content.getStoreMerchantId(), store)) {
-            throw new ResourceNotFoundException("No content found with id [" + id + "] for store [" + store + "]");
+            throw new ResourceNotFoundException(
+                    String.format("No content found with id [%s] for store [%s]", id, store));
         }
 
         try {
             contentService.delete(content);
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while deleting content " + e.getMessage(), e);
+            throw new ServiceRuntimeException(String.format("Exception while deleting content %s", e.getMessage()), e);
         }
     }
 
@@ -344,7 +345,7 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language) {
         Content content = contentService.findBySeUrl(store, name, language)
-                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + name));
+                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(name)));
 
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         return populator.populate(content, store, language);

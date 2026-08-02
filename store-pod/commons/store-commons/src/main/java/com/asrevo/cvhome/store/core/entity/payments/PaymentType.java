@@ -12,15 +12,9 @@ public enum PaymentType {
 
     MANUAL_TRANSFER(),
 
-    STRIPE(List.of(
-            requiredString("clientId"),
-            requiredString("secretKey")
-    )),
+    STRIPE(clientIdAndSecretKeyAttrs()),
 
-    PAYPAL(List.of(
-            requiredString("clientId"),
-            requiredString("secretKey")
-    ));
+    PAYPAL(clientIdAndSecretKeyAttrs());
 
     private final List<Attr> attrs;
 
@@ -30,6 +24,13 @@ public enum PaymentType {
 
     PaymentType(List<Attr> attrs) {
         this.attrs = List.copyOf(attrs);
+    }
+
+    private static List<Attr> clientIdAndSecretKeyAttrs() {
+        return List.of(
+                requiredString("clientId"),
+                requiredString("secretKey")
+        );
     }
 
     private static Attr requiredString(String name) {

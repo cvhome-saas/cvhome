@@ -61,32 +61,14 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                         .getById(source.getProductAvailabilityId(), store);
                 if (avail.isEmpty()) {
                     throw new ConversionRuntimeException(
-                            "Product availability with id [" + source.getProductAvailabilityId() + "] was not found");
+                            "Product availability with id [%s] was not found".formatted(source.getProductAvailabilityId()));
                 }
                 availability = avail.get();
 
             } else {
 
-                List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
-
-                if (!CollectionUtils.isEmpty(existing)) {
-                    Optional<ProductAvailability> avail = existing.stream()
-                            .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
-                            .findAny();
-                    if (avail.isPresent()) {
-                        availability = avail.get();
-
-                        if (source.isDefaultPrice()) {
-                            Optional<ProductPrice> defaultPrice = availability.getPrices()
-                                    .stream()
-                                    .filter(ProductPrice::isDefaultPrice)
-                                    .findAny();
-                            if (defaultPrice.isPresent()) {
-                                destination = defaultPrice.get();
-                            }
-                        }
-                    }
-                }
+                availability = findAvailabilityByAllRegionSku(source, store);
+                destination = resolveExistingDefaultPrice(source, availability, destination);
             }
 
             if (availability == null) {
@@ -94,7 +76,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                 Product product = productService.getBySku(source.getSku(), store, language);
                 if (product == null) {
                     throw new ConversionRuntimeException(
-                            "Product with sku [" + source.getSku() + "] not found for Store [" + store + "]");
+                            "Product with sku [%s] not found for Store [%s]".formatted(source.getSku(), store));
                 }
 
                 availability = new ProductAvailability();
@@ -130,8 +112,31 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
         return destination;
     }
 
+    private ProductAvailability findAvailabilityByAllRegionSku(PersistableProductPrice source, StoreMerchantId store) {
+        List<ProductAvailability> existing = productAvailabilityService.getBySku(source.getSku(), store);
+        if (CollectionUtils.isEmpty(existing)) {
+            return null;
+        }
+        return existing.stream()
+                .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
+                .findAny()
+                .orElse(null);
+    }
+
+    private ProductPrice resolveExistingDefaultPrice(PersistableProductPrice source, ProductAvailability availability,
+                                                     ProductPrice destination) {
+        if (availability == null || !source.isDefaultPrice()) {
+            return destination;
+        }
+        Optional<ProductPrice> defaultPrice = availability.getPrices()
+                .stream()
+                .filter(ProductPrice::isDefaultPrice)
+                .findAny();
+        return defaultPrice.orElse(destination);
+    }
+
     private Set<ProductPriceDescription> getProductPriceDescriptions(ProductPrice price,
-                                                                     List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
+            List<com.asrevo.cvhome.catalog.model.product.ProductPriceDescription> descriptions) {
         if (CollectionUtils.isEmpty(descriptions)) {
             return Collections.emptySet();
         }

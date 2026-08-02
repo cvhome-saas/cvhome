@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpExchangeAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-public class WebClientsUtils {
+public final class WebClientsUtils {
 
     private WebClientsUtils() {
     }

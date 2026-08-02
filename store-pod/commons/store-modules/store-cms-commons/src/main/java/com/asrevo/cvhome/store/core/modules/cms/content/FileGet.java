@@ -14,13 +14,13 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
  */
 public interface FileGet {
 
-    OutputContentFile getFile(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType,
+    OutputContentFile getFile(String merchantStoreCode, Optional<String> path, FileContentType fileContentType,
                               String contentName) throws ServiceException;
 
-    List<String> getFileNames(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
+    List<String> getFileNames(String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
             throws ServiceException;
 
-    List<OutputContentFile> getFiles(final String merchantStoreCode, Optional<String> path,
+    List<OutputContentFile> getFiles(String merchantStoreCode, Optional<String> path,
                                      FileContentType fileContentType) throws ServiceException;
 
 }

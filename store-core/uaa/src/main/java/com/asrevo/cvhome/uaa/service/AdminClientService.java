@@ -61,7 +61,7 @@ public class AdminClientService {
     public ClientDetails findById(String id) {
         RegisteredClient client = this.clients.findById(id);
         if (Objects.isNull(client)) {
-            throw new ResourceNotExistException("Client not found with id " + id);
+            throw new ResourceNotExistException(String.format("Client not found with id %s", id));
         }
         return ClientClientDetailsMapper.toClientDetails(client);
     }

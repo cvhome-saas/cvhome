@@ -56,22 +56,22 @@ public class SocialLoginConfigMapper {
 
         // Decrypt appId
         if (EncryptedValue.isEncrypted(entity.getAppId())) {
-                try {
-                    byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppId()));
-                    dto.setAppId(new String(decrypted, StandardCharsets.UTF_8));
-                } catch (Exception _) {
-                    log.error("Failed to decrypt appId for social login config with id: {}", entity.getId());
-                }
+            try {
+                byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppId()));
+                dto.setAppId(new String(decrypted, StandardCharsets.UTF_8));
+            } catch (Exception _) {
+                log.error("Failed to decrypt appId for social login config with id: {}", entity.getId());
+            }
         }
 
         // Decrypt appSecret
         if (EncryptedValue.isEncrypted(entity.getAppSecret())) {
-                try {
-                    byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppSecret()));
-                    dto.setAppSecret(new String(decrypted, StandardCharsets.UTF_8));
-                } catch (Exception _) {
-                    log.error("Failed to decrypt appSecret for social login config with id: {}", entity.getId());
-                }
+            try {
+                byte[] decrypted = cryptoProvider.decrypt(EncryptedValue.deserialize(entity.getAppSecret()));
+                dto.setAppSecret(new String(decrypted, StandardCharsets.UTF_8));
+            } catch (Exception _) {
+                log.error("Failed to decrypt appSecret for social login config with id: {}", entity.getId());
+            }
         }
         return dto;
     }

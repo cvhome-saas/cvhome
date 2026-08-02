@@ -33,7 +33,7 @@ public abstract class AbstractAdminClient {
     protected HttpRequest.Builder authenticatedRequestBuilder(String url) {
         return HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("Authorization", "Bearer " + tokenManager.getAccessToken());
+                .header("Authorization", String.format("Bearer %s", tokenManager.getAccessToken()));
     }
 
     protected <T> T sendAndParse(HttpRequest request, Class<T> responseType) {
@@ -92,7 +92,7 @@ public abstract class AbstractAdminClient {
 
     protected void verifyResponse(HttpResponse<String> response) {
         if (response.statusCode() >= 400) {
-            throw new ApiException("API call failed with status " + response.statusCode() + ": " + response.body());
+            throw new ApiException(String.format("API call failed with status %d: %s", response.statusCode(), response.body()));
         }
     }
 

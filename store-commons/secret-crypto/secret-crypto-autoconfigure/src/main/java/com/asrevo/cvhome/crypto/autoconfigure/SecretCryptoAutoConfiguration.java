@@ -45,9 +45,9 @@ public class SecretCryptoAutoConfiguration {
         SecretCryptoProvider activeProvider = providers.stream()
                 .filter(p -> p.providerId().equals(activeProviderId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Configured active crypto provider type " + properties.getType() + " is not available"
-                                + " (failed to construct or missing configuration)"));
+                .orElseThrow(() -> new IllegalStateException(String.format(
+                        "Configured active crypto provider type %s is not available"
+                                .concat(" (failed to construct or missing configuration)"), properties.getType())));
 
         SecretCryptoProvider registry = new SecretCryptoProviderRegistry(providers, activeProvider);
         return new CachingSecretCryptoProvider(registry, properties.getCache().getDuration());
@@ -108,13 +108,14 @@ public class SecretCryptoAutoConfiguration {
             return fileProvider;
         }
 
-        log.warn("No com.asrevo.cvhome.crypto.local.keyProviderType configured and no key found via ENV or FILE,"
-                + " falling back to RANDOM key provider");
+        log.warn("No com.asrevo.cvhome.crypto.local.keyProviderType configured and no key found via ENV or FILE, "
+                .concat("falling back to RANDOM key provider"));
+
         return new RandomKeyProvider();
     }
 
     private LocalKeyProvider createKeyProvider(SecretCryptoProperties.LocalProperties local,
-                                                SecretCryptoProperties.LocalProperties.KeyProviderType type) {
+                                               SecretCryptoProperties.LocalProperties.KeyProviderType type) {
         return switch (type) {
             case STATIC -> {
                 if (local.getKey() == null) {

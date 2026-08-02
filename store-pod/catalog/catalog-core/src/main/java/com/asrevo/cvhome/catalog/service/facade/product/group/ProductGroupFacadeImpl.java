@@ -32,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
+    private static final String PRODUCT_GROUP_NOT_FOUND_FOR_CODE_TEMPLATE = "ProductGroup not found for code: %s";
+
     private final ProductGroupService productGroupService;
 
     private final ProductService productService;
@@ -55,7 +57,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
         try {
             return productGroupService.getByCode(store, code)
                     .map(pg -> populateReadable(pg, store, language))
-                    .orElseThrow(() -> new ResourceNotFoundException("ProductGroup not found for code: " + code));
+                    .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_TEMPLATE.formatted(code)));
         } catch (ServiceException e) {
             log.error("Error while fetching ProductGroup by code: {}", code, e);
             throw new ServiceRuntimeException(e);
@@ -94,10 +96,10 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     public void delete(StoreMerchantId store, String code) {
         try {
             ProductGroup productGroup = productGroupService.getByCode(store, code)
-                    .orElseThrow(() -> new ResourceNotFoundException("ProductGroup not found for code: " + code));
+                    .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_TEMPLATE.formatted(code)));
             productGroupService.delete(productGroup);
         } catch (ServiceException e) {
-            log.error("Error while deleting ProductGroup by code: " + code, e);
+            log.error("Error while deleting ProductGroup by code: {}", code, e);
             throw new ServiceRuntimeException(e);
         }
     }
@@ -129,10 +131,11 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     public void addProductToGroup(StoreMerchantId store, String groupCode, Long productId) {
         try {
             ProductGroup group = productGroupService.getByCode(store, groupCode)
-                    .orElseThrow(() -> new ResourceNotFoundException("ProductGroup not found for code: " + groupCode));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_TEMPLATE.formatted(groupCode)));
             Product product = productService.getById(productId);
             if (product == null) {
-                throw new ResourceNotFoundException("Product not found for ID: " + productId);
+                throw new ResourceNotFoundException("Product not found for ID: %s".formatted(productId));
             }
             if (!group.getProducts().contains(product)) {
                 group.getProducts().add(product);
@@ -148,7 +151,8 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     public void removeProductFromGroup(StoreMerchantId store, String groupCode, Long productId) {
         try {
             ProductGroup group = productGroupService.getByCode(store, groupCode)
-                    .orElseThrow(() -> new ResourceNotFoundException("ProductGroup not found for code: " + groupCode));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(PRODUCT_GROUP_NOT_FOUND_FOR_CODE_TEMPLATE.formatted(groupCode)));
             group.getProducts().removeIf(p -> p.getId().equals(productId));
             productGroupService.saveOrUpdate(group);
         } catch (ServiceException e) {
@@ -172,7 +176,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
             return productGroupService.getByParentProductAndCode(store, productId, code)
                     .map(pg -> populateReadable(pg, store, language))
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "ProductGroup not found for parent product ID: " + productId + " and code: " + code));
+                            "ProductGroup not found for parent product ID: %s and code: %s".formatted(productId, code)));
         } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
@@ -193,7 +197,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
             Product product = productService.getById(productId);
             if (product == null) {
-                throw new ResourceNotFoundException("Product not found: " + productId);
+                throw new ResourceNotFoundException("Product not found: %s".formatted(productId));
             }
 
             if (!group.getProducts().contains(product)) {

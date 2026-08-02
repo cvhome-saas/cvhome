@@ -2,6 +2,7 @@ package com.asrevo.cvhome.catalog.model.product.attribute;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -43,35 +44,13 @@ public class ReadableProductVariantValue implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         ReadableProductVariantValue other = (ReadableProductVariantValue) obj;
-        if (code == null) {
-            if (other.code != null) {
-                return false;
-            }
-        } else if (!code.equals(other.code)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (option == null) {
-            if (other.option != null) {
-                return false;
-            }
-        } else if (!option.equals(other.option)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(code, other.code)
+                && Objects.equals(name, other.name)
+                && Objects.equals(option, other.option);
     }
 
 }

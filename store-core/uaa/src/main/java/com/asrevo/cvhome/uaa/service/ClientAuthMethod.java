@@ -31,7 +31,7 @@ public enum ClientAuthMethod {
         try {
             return ClientAuthMethod.from(s.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unknown client auth method: " + s, e);
+            throw new IllegalArgumentException(String.format("Unknown client auth method: %s", s), e);
         }
     }
 

@@ -61,8 +61,9 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ReadableProductAvailability availability = detailedProduct.availability();
 
         if (!availability.isCanBePurchased()) {
-            throw new ServiceException("Product with sku " + availability.getSku()
-                    + " is not available or is not properly configured. It contains no" + " inventory");
+            throw new ServiceException(String.format(
+                    "Product with sku %s is not available or is not properly configured. It contains no inventory",
+                    availability.getSku()));
         }
 
         FinalPriceCalc price = detailedProduct.price();
@@ -141,7 +142,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
+            throw new ResourceNotFoundException(String.format("Cart code [ %s ] not found", cartCode));
         }
 
         Set<ShoppingCartItem> items = new HashSet<>();
@@ -190,59 +191,10 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-        boolean itemModified = false;
-        // check if existing product
-        Set<ShoppingCartItem> items = cartModel.getLineItems();
-        if (!CollectionUtils.isEmpty(items)) {
-            Set<ShoppingCartItem> newItems = new HashSet<>();
-            Set<ShoppingCartItem> removeItems = new HashSet<>();
-            for (ShoppingCartItem anItem : items) { // take care of existing
-                // product
-                if (itemModel.getSku().equals(anItem.getSku())) {
-                    if (item.getQuantity() == 0) {
-                        // left aside item to be removed
-                        // don't add it to new list of item
-                        removeItems.add(anItem);
-                    } else {
-                        // new quantity
-                        anItem.setQuantity(item.getQuantity());
-                        newItems.add(anItem);
-                    }
-                    itemModified = true;
-                } else {
-                    newItems.add(anItem);
-                }
-            }
-
-            if (!removeItems.isEmpty()) {
-                for (ShoppingCartItem emptyItem : removeItems) {
-                    shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
-                }
-            }
-
-            if (!itemModified) {
-                newItems.add(itemModel);
-            }
-
-            if (newItems.isEmpty()) {
-                newItems = null;
-            }
-
-            cartModel.setLineItems(newItems);
-        } else {
-            // new item
-            if (item.getQuantity() > 0) {
-                cartModel.getLineItems().add(itemModel);
-            }
-        }
-
-        // if cart items are null just return cart with no items
+        mergeCartItem(cartModel, item, itemModel);
 
         // promo code added to the cart but no promo cart exists
-        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
-            cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(Instant.now());
-        }
+        applyPromoCodeIfMissing(cartModel, item);
 
         saveShoppingCart(cartModel);
 
@@ -256,6 +208,55 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         return readableShoppingCartMapper.convert(cartModel, store, language);
     }
 
+    private void mergeCartItem(ShoppingCart cartModel, PersistableShoppingCartItem item, ShoppingCartItem itemModel) {
+        // check if existing product
+        Set<ShoppingCartItem> items = cartModel.getLineItems();
+        if (CollectionUtils.isEmpty(items)) {
+            // new item
+            if (item.getQuantity() > 0) {
+                cartModel.getLineItems().add(itemModel);
+            }
+            return;
+        }
+
+        boolean itemModified = false;
+        Set<ShoppingCartItem> newItems = new HashSet<>();
+        Set<ShoppingCartItem> removeItems = new HashSet<>();
+        for (ShoppingCartItem anItem : items) { // take care of existing
+            // product
+            if (!itemModel.getSku().equals(anItem.getSku())) {
+                newItems.add(anItem);
+                continue;
+            }
+            if (item.getQuantity() == 0) {
+                // left aside item to be removed
+                // don't add it to new list of item
+                removeItems.add(anItem);
+            } else {
+                // new quantity
+                anItem.setQuantity(item.getQuantity());
+                newItems.add(anItem);
+            }
+            itemModified = true;
+        }
+
+        removeItems.forEach(emptyItem -> shoppingCartService.deleteShoppingCartItem(emptyItem.getId()));
+
+        if (!itemModified) {
+            newItems.add(itemModel);
+        }
+
+        // if cart items are null just return cart with no items
+        cartModel.setLineItems(newItems.isEmpty() ? null : newItems);
+    }
+
+    private void applyPromoCodeIfMissing(ShoppingCart cartModel, PersistableShoppingCartItem item) {
+        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
+            cartModel.setPromoCode(item.getPromoCode());
+            cartModel.setPromoAdded(Instant.now());
+        }
+    }
+
     @Override
     // KEEP
     public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
@@ -263,7 +264,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {
-            throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
+            throw new ResourceNotFoundException(String.format("Cart code [%s] not found", cartCode));
         }
 
         return modifyCart(cartModel, item, store, language);
@@ -285,25 +286,29 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         ReadableShoppingCart readableCart = null;
 
         if (cart != null) {
-
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
-
-            if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
-                if (promoDateAdded == null) {
-                    promoDateAdded = Instant.now();
-                }
-                ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
-                LocalDate date = zdt.toLocalDate();
-                // date added < date + 1 day
-                LocalDate tomorrow = LocalDate.now().plusDays(1);
-                if (date.isBefore(tomorrow)) {
-                    readableCart.setPromoCode(cart.getPromoCode());
-                }
-            }
+            applyValidPromoCode(cart, readableCart);
         }
 
         return readableCart;
+    }
+
+    private void applyValidPromoCode(ShoppingCart cart, ReadableShoppingCart readableCart) {
+        if (StringUtils.isBlank(cart.getPromoCode())) {
+            return;
+        }
+
+        Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
+        if (promoDateAdded == null) {
+            promoDateAdded = Instant.now();
+        }
+        ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
+        LocalDate date = zdt.toLocalDate();
+        // date added < date + 1 day
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        if (date.isBefore(tomorrow)) {
+            readableCart.setPromoCode(cart.getPromoCode());
+        }
     }
 
 }

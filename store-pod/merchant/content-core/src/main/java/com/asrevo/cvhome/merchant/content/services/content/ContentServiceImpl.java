@@ -228,7 +228,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
         String fileType = "IMAGE";
         String mimetype = URLConnection.guessContentTypeFromName(fileName);
         String type = mimetype.split("/")[0];
-        if (!type.equals("image")) {
+        if (!"image".equals(type)) {
             fileType = "STATIC_FILE";
         }
 
@@ -313,7 +313,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     @Override
     public void addFolder(StoreMerchantId store, Optional<String> path, String folderName) throws ServiceException {
         if (path.isPresent() && !this.isValidLinuxDirectory(path.get())) {
-            throw new ServiceException("Path format [" + path.get() + "] not a valid directory format");
+            throw new ServiceException(String.format("Path format [%s] not a valid directory format", path.get()));
         }
         assetsManager.addFolder(store.getId(), folderName, path);
     }
@@ -341,7 +341,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
         if (file == null) {
             throw new ServiceException(
-                    "File name [" + originalName + "] not found for merchant [" + merchantStoreCode + "]");
+                    String.format("File name [%s] not found for merchant [%s]", originalName, merchantStoreCode));
         }
 
         ByteArrayOutputStream os = file.getFile();

@@ -33,6 +33,15 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
+    private static final String PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE =
+            "Product with id [%s] and inventory id [%s] not found for store id [%s]";
+
+    private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s] not found";
+
+    private static final String PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE = "Product with instance [%s] not found";
+
+    private static final String INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE = "Inventory with id [%s] not found";
+
     private final ProductAvailabilityService productAvailabilityService;
 
     private final ProductService productService;
@@ -65,12 +74,12 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                 if (availability.get().getProduct().getId().equals(productId)) {
                     productAvailabilityService.delete(availability.get());
                 } else {
-                    throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id ["
-                            + inventoryId + "] not found for store id [" + store + "]");
+                    throw new ResourceNotFoundException(
+                            PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
                 }
             } else {
-                throw new ResourceNotFoundException("Product with id [" + productId + "] and inventory id ["
-                        + inventoryId + "] not found for store id [" + store + "]");
+                throw new ResourceNotFoundException(
+                        PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
             }
         } catch (ServiceException e) {
             throw new ServiceRuntimeException("Error while deleting inventory", e);
@@ -79,12 +88,13 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     private Product getProductById(Long productId, StoreMerchantId store) {
         return productService.retrieveById(productId, store)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id [" + productId + "] not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE.formatted(productId)));
     }
 
     private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store) {
         return productVariantService.getById(instanceId, store)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with instance [" + instanceId + "] not found"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE.formatted(instanceId)));
     }
 
     @Override
@@ -114,7 +124,8 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     public ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language) {
 
         ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory with id [" + inventoryId + "] not found"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventoryId)));
         return readableInventoryMapper.convert(availability, store, language);
     }
 
@@ -138,7 +149,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                 .flatMap(it -> it.stream().filter(a -> a.getId().equals(inventory.getId())).findAny())
                 .orElse(null);
         if (avail == null) {
-            throw new ResourceNotFoundException("Inventory with id [" + inventory.getId() + "] not found");
+            throw new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventory.getId()));
         }
 
         if (product != null) {
@@ -165,7 +176,8 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                     availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
                 }
             } catch (ServiceException e) {
-                throw new ServiceRuntimeException("An error occured while getting product with sku " + sku, e);
+                throw new ServiceRuntimeException(
+                        "An error occured while getting product with sku %s".formatted(sku), e);
             }
         }
 

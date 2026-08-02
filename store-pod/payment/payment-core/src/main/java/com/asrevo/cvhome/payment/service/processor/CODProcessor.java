@@ -30,7 +30,7 @@ public class CODProcessor implements PaymentProcessor {
 
     @Override
     public WebhookResult parseWebhook(StoreMerchantId storeMerchantId, String payload, Map<String, String> headers,
-                                       PaymentSecret config) {
+                                      PaymentSecret config) {
         return WebhookResult.noneUseCase();
     }
 

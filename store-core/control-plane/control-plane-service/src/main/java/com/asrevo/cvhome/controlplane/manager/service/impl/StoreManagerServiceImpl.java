@@ -50,7 +50,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     @Override
     public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request) {
         PodId prefaredPodId = Optional.ofNullable(request.get(POD_KEY))
-                .map(it -> ((Map<String, String>) it))
+                .map(it -> (Map<String, String>) it)
                 .filter(it -> it.containsKey(ID_KEY))
                 .map(it -> it.get(ID_KEY))
                 .filter(it -> !it.trim().isEmpty())

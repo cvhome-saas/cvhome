@@ -43,7 +43,7 @@ public class OAuth2TokenManager {
     private Instant expiryTime;
 
     public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret) {
-        this.tokenEndpoint = baseUrl + "/oauth2/token";
+        this.tokenEndpoint = String.format("%s/oauth2/token", baseUrl);
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.httpClient = HttpClient.newBuilder().build();
@@ -66,8 +66,8 @@ public class OAuth2TokenManager {
         // admin-sdk uses client_credentials
         // V2 says client_secret_post for admin-sdk
 
-        String form = "grant_type=client_credentials&scope=super_admin&client_id=" + clientId + "&client_secret="
-                + clientSecret;
+        String form = String.format("grant_type=client_credentials&scope=super_admin&client_id=%s&client_secret=%s", clientId,
+                clientSecret);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(tokenEndpoint))
@@ -80,14 +80,14 @@ public class OAuth2TokenManager {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
                 // Try Basic Auth as fallback
-                String auth = clientId + ":" + clientSecret;
+                String auth = String.format("%s:%s", clientId, clientSecret);
                 String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
                 String fallbackForm = "grant_type=client_credentials&scope=super_admin";
                 HttpRequest fallbackRequest = HttpRequest.newBuilder()
                         .uri(URI.create(tokenEndpoint))
                         .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_X_WWW_FORM_URL_ENCODED)
-                        .header(AUTHORIZATION_HEADER, "Basic " + encodedAuth)
+                        .header(AUTHORIZATION_HEADER, String.format("Basic %s", encodedAuth))
                         .header(ACCEPT_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                         .POST(HttpRequest.BodyPublishers.ofString(fallbackForm))
                         .build();
@@ -96,7 +96,7 @@ public class OAuth2TokenManager {
             }
 
             if (response.statusCode() != 200) {
-                throw new ApiException("Failed to get token: " + response.body());
+                throw new ApiException(String.format("Failed to get token: %s", response.body()));
             }
             currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
             expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());

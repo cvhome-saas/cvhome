@@ -149,8 +149,7 @@ public class ProductApi {
      */
     @GetMapping(value = {"/product/{friendlyUrl}", "/product/friendly/{friendlyUrl}"})
     @Operation(method = "GET", description = "Get a product by friendlyUrl (slug)",
-            summary = "For administration and shop purpose. Specifying ?merchant is "
-                    + "required otherwise it falls back to DEFAULT")
+            summary = "For administration and shop purpose. Specifying ?merchant is required otherwise it falls back to DEFAULT")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Single product found")})
 
 
@@ -165,7 +164,7 @@ public class ProductApi {
         ReadableProduct product = productFacade.getProductBySeUrl(merchantStore, friendlyUrl, language);
 
         if (product == null) {
-            response.sendError(404, "Product not fount for id " + friendlyUrl);
+            response.sendError(404, "Product not fount for id %s".formatted(friendlyUrl));
             return null;
         }
 

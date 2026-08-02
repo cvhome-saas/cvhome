@@ -53,7 +53,7 @@ public final class UaaJwtGrantedAuthoritiesConverter implements Converter<Jwt, C
     private static Collection<String> getClaimAsList(Object claim) {
         if (claim instanceof String sc) {
             if (StringUtils.hasText(sc)) {
-                return Arrays.asList((sc).split(DEFAULT_AUTHORITIES_CLAIM_DELIMITER));
+                return Arrays.asList(sc.split(DEFAULT_AUTHORITIES_CLAIM_DELIMITER));
             }
             return Collections.emptyList();
         }

@@ -37,6 +37,9 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Component
 public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
+    private static final String PRODUCT_VARIANT_NOT_FOUND_TEMPLATE =
+            "productVariant with id [%s] not found for store [%s] and productId [%s]";
+
     private final ReadableProductVariantMapper readableProductVariantMapper;
 
     private final PersistableProductVariantMapper persistableProductVariantMapper;
@@ -67,7 +70,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (productVariant.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "Product instance + [" + instanceId + "] not found for store [" + store + "]");
+                    "Product instance [%s] not found for store [%s]".formatted(instanceId, store));
         }
 
         ProductVariant model = productVariant.get();
@@ -80,7 +83,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
         try {
             product = productCommonFacade.getProduct(store, productId, language);
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting product [" + productId + "]", e);
+            throw new ServiceRuntimeException("Error while getting product [%s]".formatted(productId), e);
         }
 
         return productVariantService.exist(sku, product.getId());
@@ -102,7 +105,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
             if (!differentOption) {
                 throw new ConstraintException(
-                        "Product option of instance.variant and instance.variantValue must be" + " different");
+                        "Product option of instance.variant and instance.variantValue must be different");
             }
         }
 
@@ -120,8 +123,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
                        LanguageCode language) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException("productVariant with id [" + instanceId + "] not found for store ["
-                    + store + "] and productId [" + productId + "]");
+            throw new ResourceNotFoundException(PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(instanceId, store, productId));
         }
 
         productVariant.setProductId(productId);
@@ -139,15 +141,16 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     public void delete(Long productVariant, Long productId, StoreMerchantId store) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException("productVariant with id [" + productVariant + "] not found for store ["
-                    + store + "] and productId [" + productId + "]");
+            throw new ResourceNotFoundException(
+                    PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(productVariant, store, productId));
         }
 
         try {
             productVariantService.delete(instanceModel.get());
         } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot delete product instance [" + productVariant + "]  for store ["
-                    + store + "] and productId [" + productId + "]", e);
+            throw new ServiceRuntimeException(
+                    "Cannot delete product instance [%s]  for store [%s] and productId [%s]"
+                            .formatted(productVariant, store, productId), e);
         }
     }
 
@@ -158,7 +161,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (product == null) {
             throw new ResourceNotFoundException(
-                    "Product with id [" + productId + "] not found for store [" + store + "]");
+                    "Product with id [%s] not found for store [%s]".formatted(productId, store));
         }
 
         Page<ProductVariant> instances = productVariantService.getByProductId(store, product, language, pageable);

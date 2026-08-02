@@ -34,6 +34,24 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
         return merge(source, destination, store, language);
     }
 
+    private ProductOptionDescription findMatchingDescription(
+            com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription desc,
+            ProductOption destination) {
+        if (CollectionUtils.isEmpty(destination.getDescriptions())) {
+            return null;
+        }
+        for (ProductOptionDescription d : destination.getDescriptions()) {
+            if (StringUtils.isBlank(desc.getLanguage().code()) || !desc.getLanguage().equals(d.getLanguageCode())) {
+                continue;
+            }
+            d.setDescription(desc.getDescription());
+            d.setName(desc.getName());
+            d.setTitle(desc.getTitle());
+            return d;
+        }
+        return null;
+    }
+
     @Override
     public ProductOption merge(PersistableProductOptionEntity source, ProductOption destination, StoreMerchantId store,
                                LanguageCode language) {
@@ -46,19 +64,7 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
             if (!CollectionUtils.isEmpty(source.getDescriptions())) {
                 for (com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription desc : source
                         .getDescriptions()) {
-                    ProductOptionDescription description = null;
-                    if (!CollectionUtils.isEmpty(destination.getDescriptions())) {
-                        for (ProductOptionDescription d : destination.getDescriptions()) {
-                            if (!StringUtils.isBlank(desc.getLanguage().code())
-                                    && desc.getLanguage().equals(d.getLanguageCode())) {
-                                d.setDescription(desc.getDescription());
-                                d.setName(desc.getName());
-                                d.setTitle(desc.getTitle());
-                                description = d;
-                                break;
-                            }
-                        }
-                    }
+                    ProductOptionDescription description = findMatchingDescription(desc, destination);
                     if (description == null) {
                         description = description(desc);
                         description.setProductOption(destination);

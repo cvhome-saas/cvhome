@@ -12,6 +12,7 @@ public class StaticKeyProvider implements LocalKeyProvider {
     public StaticKeyProvider(byte[] key) {
         this.key = key;
     }
+
     @Override
     public Optional<byte[]> getKey() {
         return Optional.ofNullable(this.key);

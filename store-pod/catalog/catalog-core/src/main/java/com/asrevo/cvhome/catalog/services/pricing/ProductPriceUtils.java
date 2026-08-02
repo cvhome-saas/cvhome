@@ -3,6 +3,7 @@ package com.asrevo.cvhome.catalog.services.pricing;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProductPriceUtils {
+
+    private static final String NO_INVENTORY_MESSAGE =
+            "No inventory available to calculate the price. Availability should contain at least a region set to *";
 
     public FinalPriceCalc getFinalPrice(Product product) throws ServiceException {
 
@@ -66,9 +70,22 @@ public class ProductPriceUtils {
 
     private FinalPriceCalc calculateFinalPrice(Product product) throws ServiceException {
 
-        FinalPriceCalc finalPrice = null;
-        List<FinalPriceCalc> otherPrices = null;
+        Set<ProductAvailability> availabilities = resolveApplicableAvailabilities(product);
 
+        List<ProductPrice> applicablePrices = new ArrayList<>();
+        for (ProductAvailability availability : availabilities) {
+            if (!isAllRegionsAvailability(availability)) {
+                continue;
+            }
+            applicablePrices.addAll(availability.getPrices());
+        }
+
+        FinalPriceCalc finalPrice = buildFinalPriceFromPrices(applicablePrices);
+        finalPrice.setSku(product.getSku());
+        return finalPrice;
+    }
+
+    private Set<ProductAvailability> resolveApplicableAvailabilities(Product product) throws ServiceException {
         Set<ProductAvailability> availabilities = null;
         if (!CollectionUtils.isEmpty(product.getVariants())) {
             Optional<ProductVariant> variants = product.getVariants()
@@ -76,84 +93,51 @@ public class ProductPriceUtils {
                     .filter(ProductVariant::isDefaultSelection)
                     .findFirst();
             if (variants.isPresent()) {
-                availabilities = variants.get().getAvailabilities();
-                availabilities = this.applicableAvailabilities(availabilities);
+                availabilities = this.applicableAvailabilities(variants.get().getAvailabilities());
             }
         }
 
         if (CollectionUtils.isEmpty(availabilities)) {
-            availabilities = product.getAvailabilities();
-            availabilities = this.applicableAvailabilities(availabilities);
+            availabilities = this.applicableAvailabilities(product.getAvailabilities());
         }
+        return availabilities;
+    }
 
-        for (ProductAvailability availability : availabilities) {
-            if (!StringUtils.isEmpty(availability.getRegion())
-                    && availability.getRegion().equals(Constants.ALL_REGIONS)) { // TODO
-
-                Set<ProductPrice> prices = availability.getPrices();
-                for (ProductPrice price : prices) {
-
-                    FinalPriceCalc p = finalPrice(price);
-                    if (price.isDefaultPrice()) {
-                        finalPrice = p;
-                    } else {
-                        if (otherPrices == null) {
-                            otherPrices = new ArrayList<>();
-                        }
-                        otherPrices.add(p);
-                    }
-                }
-            }
-        }
-
-        if (finalPrice != null) {
-            finalPrice.setAdditionalPrices(otherPrices);
-        } else {
-            if (otherPrices != null) {
-                finalPrice = otherPrices.getFirst();
-            }
-        }
-
-        if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at"
-                            + " least a region set to *");
-        }
-        finalPrice.setSku(product.getSku());
-        return finalPrice;
+    private boolean isAllRegionsAvailability(ProductAvailability availability) {
+        return !StringUtils.isEmpty(availability.getRegion()) // TODO
+                && availability.getRegion().equals(Constants.ALL_REGIONS);
     }
 
     private FinalPriceCalc calculateFinalPrice(ProductAvailability availability) throws ServiceException {
+        return buildFinalPriceFromPrices(availability.getPrices());
+    }
+
+    private FinalPriceCalc buildFinalPriceFromPrices(Collection<ProductPrice> prices) throws ServiceException {
 
         FinalPriceCalc finalPrice = null;
         List<FinalPriceCalc> otherPrices = null;
 
-        Set<ProductPrice> prices = availability.getPrices();
         for (ProductPrice price : prices) {
 
             FinalPriceCalc p = finalPrice(price);
             if (price.isDefaultPrice()) {
                 finalPrice = p;
-            } else {
-                if (otherPrices == null) {
-                    otherPrices = new ArrayList<>();
-                }
-                otherPrices.add(p);
+                continue;
             }
+            if (otherPrices == null) {
+                otherPrices = new ArrayList<>();
+            }
+            otherPrices.add(p);
         }
 
         if (finalPrice != null) {
             finalPrice.setAdditionalPrices(otherPrices);
-        } else {
-            if (otherPrices != null) {
-                finalPrice = otherPrices.getFirst();
-            }
+        } else if (otherPrices != null) {
+            finalPrice = otherPrices.getFirst();
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No inventory available to calculate the price. Availability should contain at"
-                            + " least a region set to *");
+            throw new ServiceException(ServiceException.EXCEPTION_ERROR, NO_INVENTORY_MESSAGE);
         }
 
         return finalPrice;
@@ -162,42 +146,12 @@ public class ProductPriceUtils {
     private FinalPriceCalc finalPrice(ProductPrice price) {
 
         FinalPriceCalc finalPrice = new FinalPriceCalc();
-        BigDecimal fPrice = price.getProductPriceAmount();
         BigDecimal oPrice = price.getProductPriceAmount();
-
         LocalDate today = LocalDate.now();
+
         // calculate discount price
-        boolean hasDiscount = false;
-        if (price.getProductPriceSpecialStartDate() != null || price.getProductPriceSpecialEndDate() != null) {
-
-            if (price.getProductPriceSpecialStartDate() != null) {
-                if (price.getProductPriceSpecialStartDate().isBefore(today)) {
-                    if (price.getProductPriceSpecialEndDate() != null) {
-                        if (price.getProductPriceSpecialEndDate().isAfter(today)) {
-                            hasDiscount = true;
-                            fPrice = price.getProductPriceSpecialAmount();
-                            finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-                        }
-                    }
-                }
-            }
-
-            if (!hasDiscount && price.getProductPriceSpecialStartDate() == null
-                    && price.getProductPriceSpecialEndDate() != null) {
-                if (price.getProductPriceSpecialEndDate().isAfter(today)) {
-                    hasDiscount = true;
-                    fPrice = price.getProductPriceSpecialAmount();
-                    finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-                }
-            }
-        } else {
-            if (price.getProductPriceSpecialAmount() != null
-                    && price.getProductPriceSpecialAmount().doubleValue() > 0) {
-                hasDiscount = true;
-                fPrice = price.getProductPriceSpecialAmount();
-                finalPrice.setDiscountEndDate(price.getProductPriceSpecialEndDate());
-            }
-        }
+        Optional<BigDecimal> discountedAmount = resolveDiscountedAmount(price, today, finalPrice);
+        BigDecimal fPrice = discountedAmount.orElse(price.getProductPriceAmount());
 
         finalPrice.setProductPrice(toSimpleProductPrice(price));
         finalPrice.setFinalPrice(fPrice);
@@ -206,11 +160,50 @@ public class ProductPriceUtils {
         if (price.isDefaultPrice()) {
             finalPrice.setDefaultPrice(true);
         }
-        if (hasDiscount) {
+        if (discountedAmount.isPresent()) {
             discountPrice(finalPrice);
         }
 
         return finalPrice;
+    }
+
+    private Optional<BigDecimal> resolveDiscountedAmount(ProductPrice price, LocalDate today, FinalPriceCalc finalPrice) {
+        LocalDate specialStart = price.getProductPriceSpecialStartDate();
+        LocalDate specialEnd = price.getProductPriceSpecialEndDate();
+
+        if (specialStart == null && specialEnd == null) {
+            return resolveUnscheduledDiscount(price, finalPrice, specialEnd);
+        }
+
+        if (isDiscountActive(specialStart, specialEnd, today)) {
+            finalPrice.setDiscountEndDate(specialEnd);
+            return Optional.of(price.getProductPriceSpecialAmount());
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<BigDecimal> resolveUnscheduledDiscount(ProductPrice price, FinalPriceCalc finalPrice,
+            LocalDate specialEnd) {
+        if (price.getProductPriceSpecialAmount() != null && price.getProductPriceSpecialAmount().doubleValue() > 0) {
+            finalPrice.setDiscountEndDate(specialEnd);
+            return Optional.of(price.getProductPriceSpecialAmount());
+        }
+        return Optional.empty();
+    }
+
+    private boolean isDiscountActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return isDiscountWindowActive(specialStart, specialEnd, today)
+                || isOpenEndedDiscountActive(specialStart, specialEnd, today);
+    }
+
+    private boolean isDiscountWindowActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return specialStart != null && specialEnd != null
+                && specialStart.isBefore(today) && specialEnd.isAfter(today);
+    }
+
+    private boolean isOpenEndedDiscountActive(LocalDate specialStart, LocalDate specialEnd, LocalDate today) {
+        return specialStart == null && specialEnd != null && specialEnd.isAfter(today);
     }
 
     private SimpleProductPrice toSimpleProductPrice(ProductPrice price) {

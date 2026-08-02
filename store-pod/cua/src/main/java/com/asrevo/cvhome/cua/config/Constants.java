@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.cua.config;
 
-public class Constants {
+public final class Constants {
 
     public static final String EMAIL_KEY = "email";
 

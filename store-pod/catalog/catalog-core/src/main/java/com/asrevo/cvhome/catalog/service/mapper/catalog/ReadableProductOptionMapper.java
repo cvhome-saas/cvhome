@@ -36,15 +36,7 @@ public class ReadableProductOptionMapper implements Mapper<ProductOption, Readab
             ((ReadableProductOptionFull) readableProductOption).setDescriptions(descriptions);
         } else {
             readableProductOption = new ReadableProductOptionEntity();
-            if (!CollectionUtils.isEmpty(source.getDescriptions())) {
-                for (ProductOptionDescription desc : source.getDescriptions()) {
-                    if (desc != null && desc.getLanguageCode().equals(language)) {
-                        com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription d = this
-                                .description(desc);
-                        readableProductOption.setDescription(d);
-                    }
-                }
-            }
+            applyLanguageDescription(source, readableProductOption, language);
         }
 
         readableProductOption.setCode(source.getCode());
@@ -52,6 +44,19 @@ public class ReadableProductOptionMapper implements Mapper<ProductOption, Readab
         readableProductOption.setType(source.getProductOptionType());
 
         return readableProductOption;
+    }
+
+    private void applyLanguageDescription(ProductOption source, ReadableProductOptionEntity target, LanguageCode language) {
+        if (CollectionUtils.isEmpty(source.getDescriptions())) {
+            return;
+        }
+        for (ProductOptionDescription desc : source.getDescriptions()) {
+            if (desc == null || !desc.getLanguageCode().equals(language)) {
+                continue;
+            }
+            com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription d = this.description(desc);
+            target.setDescription(d);
+        }
     }
 
     com.asrevo.cvhome.catalog.model.product.attribute.ProductOptionDescription description(

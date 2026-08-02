@@ -105,11 +105,11 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
         ProductImage pi = new ProductImage();
         String imageName = productImage.getProductImage();
         if (size == ProductImageSize.LARGE) {
-            imageName = "L-" + imageName;
+            imageName = "L-%s".formatted(imageName);
         }
 
         if (size == ProductImageSize.SMALL) {
-            imageName = "S-" + imageName;
+            imageName = "S-%s".formatted(imageName);
         }
 
         pi.setProductImage(imageName);

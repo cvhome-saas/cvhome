@@ -25,12 +25,13 @@ public class EncryptedValue {
             return null;
         }
         if (!isEncrypted(serialized)) {
-            throw new IllegalArgumentException("Value is not encrypted or missing prefix: " + serialized);
+            throw new IllegalArgumentException(String.format("Value is not encrypted or missing prefix: %s", serialized));
         }
         String content = serialized.substring(PREFIX.length());
         String[] parts = content.split(SEPARATOR);
         if (parts.length != 5) {
-            throw new IllegalArgumentException("Invalid serialized EncryptedValue (expected 5 parts): " + serialized);
+            throw new IllegalArgumentException(
+                    String.format("Invalid serialized EncryptedValue (expected 5 parts): %s", serialized));
         }
         return EncryptedValue.builder()
                 .version(Integer.parseInt(parts[0]))
@@ -45,8 +46,8 @@ public class EncryptedValue {
         EncryptedValue value = this;
         String ciphertextB64 = Base64.getEncoder().encodeToString(value.getCiphertext());
         String ivB64 = Base64.getEncoder().encodeToString(value.getIv());
-        return PREFIX + String.format("%d%s%s%s%s%s%s%s%s",
-                value.getVersion(), SEPARATOR,
+        return String.format("%s%d%s%s%s%s%s%s%s%s",
+                PREFIX, value.getVersion(), SEPARATOR,
                 value.getKeyId(), SEPARATOR,
                 value.getAlgorithm(), SEPARATOR,
                 ivB64, SEPARATOR,
