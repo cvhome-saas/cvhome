@@ -46,8 +46,8 @@ public class EncryptedValue {
         EncryptedValue value = this;
         String ciphertextB64 = Base64.getEncoder().encodeToString(value.getCiphertext());
         String ivB64 = Base64.getEncoder().encodeToString(value.getIv());
-        return PREFIX + String.format("%d%s%s%s%s%s%s%s%s",
-                value.getVersion(), SEPARATOR,
+        return String.format("%s%d%s%s%s%s%s%s%s%s",
+                PREFIX, value.getVersion(), SEPARATOR,
                 value.getKeyId(), SEPARATOR,
                 value.getAlgorithm(), SEPARATOR,
                 ivB64, SEPARATOR,

@@ -59,7 +59,7 @@ public class AdminUserClient extends AbstractAdminClient {
     }
 
     public UserDto getUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id).GET().build();
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", usersApiUrl, PATH_SEPARATOR, id)).GET().build();
         return sendAndParse(request, UserDto.class);
     }
 
@@ -72,7 +72,7 @@ public class AdminUserClient extends AbstractAdminClient {
     }
 
     public UserDto updateUser(String id, UpdateUserRequest req) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id)
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", usersApiUrl, PATH_SEPARATOR, id))
                 .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
@@ -100,7 +100,7 @@ public class AdminUserClient extends AbstractAdminClient {
     }
 
     public void deleteUser(String id) {
-        HttpRequest request = authenticatedRequestBuilder(usersApiUrl + PATH_SEPARATOR + id).DELETE().build();
+        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", usersApiUrl, PATH_SEPARATOR, id)).DELETE().build();
         sendAndVerify(request);
     }
 

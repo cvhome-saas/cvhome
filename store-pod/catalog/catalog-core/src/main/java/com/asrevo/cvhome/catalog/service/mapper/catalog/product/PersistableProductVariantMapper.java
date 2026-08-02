@@ -24,13 +24,10 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 @Component
 public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
 
-    private static final String PRODUCT_VARIATION_VALUE_PREFIX = "ProductVaritionValue [";
+    private static final String PRODUCT_VARIATION_VALUE_NOT_FOUND_FOR_STORE_TEMPLATE =
+            "ProductVaritionValue [%s] + not found for store [%s]";
 
-    private static final String NOT_FOUND_FOR_STORE = "] + not found for store [";
-
-    private static final String CLOSE_BRACKET = "]";
-
-    private static final String PRODUCT_PREFIX = "Product [";
+    private static final String PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE = "Product [%s] + not found for store [%s]";
 
     private final ProductVariationService productVariationService;
 
@@ -126,12 +123,12 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
             if (product == null) {
                 throw new ResourceNotFoundException(
-                        PRODUCT_PREFIX + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                        PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(source.getId(), store));
             }
 
             if (!product.getStore().equals(store)) {
                 throw new ResourceNotFoundException(
-                        PRODUCT_PREFIX + source.getId() + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                        PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(source.getId(), store));
             }
 
             if (product.getSku() != null && product.getSku().equals(source.getSku())) {
@@ -153,7 +150,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         Optional<ProductVariation> variationValue = productVariationService.getById(store, productVariationValue);
         if (variationValue.isEmpty()) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_VALUE_PREFIX + productVariationValue + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                    PRODUCT_VARIATION_VALUE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(productVariationValue, store));
         }
         return variationValue;
     }
@@ -166,7 +163,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
         Optional<ProductVariation> variationValue = productVariationService.getByCode(store, productVariationValueCode);
         if (variationValue.isEmpty()) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_VALUE_PREFIX + productVariationValue + NOT_FOUND_FOR_STORE + store + CLOSE_BRACKET);
+                    PRODUCT_VARIATION_VALUE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(productVariationValue, store));
         }
         return variationValue;
     }

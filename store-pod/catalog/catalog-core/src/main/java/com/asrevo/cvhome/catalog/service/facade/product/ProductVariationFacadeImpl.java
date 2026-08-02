@@ -24,11 +24,8 @@ import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 @Service
 public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
-    private static final String PRODUCT_VARIATION_NOT_FOUND_MESSAGE = "ProductVariation not found for id [";
-
-    private static final String AND_STORE_MESSAGE = "] and store [";
-
-    private static final String BRACKET_CLOSE = "]";
+    private static final String PRODUCT_VARIATION_NOT_FOUND_TEMPLATE =
+            "ProductVariation not found for id [%s] and store [%s]";
 
     private final PersistableProductVariationMapper persistableProductVariationMapper;
 
@@ -49,7 +46,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         Optional<ProductVariation> variation = productVariationService.getById(store, variationId, language);
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
         }
 
         return readableProductVariationMapper.convert(variation.get(), store, language);
@@ -101,7 +98,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         Optional<ProductVariation> p = productVariationService.getById(store, variationId, language);
         if (p.isEmpty()) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
         }
 
         ProductVariation productVariant = p.get();
@@ -118,11 +115,11 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         ProductVariation opt = productVariationService.getById(variationId);
         if (opt == null) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
         }
         if (!opt.getStoreMerchantId().equals(store)) {
             throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_MESSAGE + variationId + AND_STORE_MESSAGE + store + BRACKET_CLOSE);
+                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
         }
         try {
             productVariationService.delete(opt);

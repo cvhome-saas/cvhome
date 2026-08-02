@@ -38,8 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
 
-    private static final String BRACKET_CLOSE = "]";
-    private static final String CANNOT_GET_PRODUCT_WITH_SKU_MESSAGE = "Cannot get product with sku [";
+    private static final String CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE = "Cannot get product with sku [%s]";
 
     private final ProductRepository productRepository;
 
@@ -213,7 +212,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             Long productId = findProductIdByCode(productCode, merchant);
             return productRepository.getMinimalProductById(productId, merchant, language);
         } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_MESSAGE + productCode + BRACKET_CLOSE, e);
+            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
         }
     }
 
@@ -225,7 +224,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             Long productId = findProductIdByCode(productCode, merchant);
             return productRepository.getById(productId, merchant, language);
         } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_MESSAGE + productCode + BRACKET_CLOSE, e);
+            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
         }
     }
 
@@ -235,14 +234,14 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             Long productId = findProductIdByCode(productCode, merchant);
             return this.findOne(productId, merchant);
         } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_MESSAGE + productCode + BRACKET_CLOSE, e);
+            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
         }
     }
 
     private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
         List<Long> products = productRepository.findBySku(productCode, merchant);
         if (products.isEmpty()) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_MESSAGE + productCode + BRACKET_CLOSE);
+            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode));
         }
         return products.getFirst();
     }

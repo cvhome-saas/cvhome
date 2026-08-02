@@ -52,7 +52,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
     public static final String FILE_CONTENT_DELIMITER = "/";
 
-    private static final String NO_PAGE_FOUND = "No page found : ";
+    private static final String NO_PAGE_FOUND_TEMPLATE = "No page found : %s";
     private static final String ERR_ALREADY_EXIST = "%s with code [%s] already exist for store [%s]";
     private static final String ERR_DOES_NOT_EXIST = "Page with id [%s] does not exist for store [%s]";
 
@@ -213,7 +213,7 @@ public class ContentFacadeImpl implements ContentFacade {
         } else {
             content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store));
         }
-        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + code));
+        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(code)));
     }
 
     @SneakyThrows
@@ -345,7 +345,7 @@ public class ContentFacadeImpl implements ContentFacade {
     @Override
     public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language) {
         Content content = contentService.findBySeUrl(store, name, language)
-                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND + name));
+                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(name)));
 
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         return populator.populate(content, store, language);

@@ -39,9 +39,9 @@ public record RedirectionUrlBuilder(String schema, Integer port, ServiceDomain s
         String fullUrl = String.format("%s%s%s:%s", schema, SCHEMA_SPLITTER, serviceDomain.domain(), port);
         if (!path.isEmpty() && !path.equals(URL_SPLITTER)) {
             if (path.startsWith(URL_SPLITTER)) {
-                fullUrl = fullUrl + path;
+                fullUrl = "%s%s".formatted(fullUrl, path);
             } else {
-                fullUrl = fullUrl + URL_SPLITTER + path;
+                fullUrl = "%s%s%s".formatted(fullUrl, URL_SPLITTER, path);
             }
         }
         return fullUrl;

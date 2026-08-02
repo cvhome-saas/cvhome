@@ -42,8 +42,8 @@ public class RedirectingServerAuthenticationSuccessHandler implements ServerAuth
                 return this.redirectStrategy.sendRedirect(exchange, defaultRedirectUri);
             }
 
-            String sessionKey = CapturingServerOAuth2AuthorizationRequestResolver.CAPTURED_PARAMETERS_SESSION_KEY_PREFIX
-                    + stateFromCallback;
+            String sessionKey = "%s%s".formatted(
+                    CapturingServerOAuth2AuthorizationRequestResolver.CAPTURED_PARAMETERS_SESSION_KEY_PREFIX, stateFromCallback);
             Object capturedParamsObject = webSession.getAttributes().get(sessionKey);
 
             if (!(capturedParamsObject instanceof Map)) {

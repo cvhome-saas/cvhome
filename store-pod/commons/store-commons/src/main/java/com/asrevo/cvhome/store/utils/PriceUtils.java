@@ -19,7 +19,7 @@ import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
 
 public class PriceUtils {
 
-    private static final String CANNOT_PARSE = "Cannot parse ";
+    private static final String CANNOT_PARSE_TEMPLATE = "Cannot parse %s";
 
     private static final char DECIMALCOUNT = '2';
 
@@ -89,7 +89,7 @@ public class PriceUtils {
         try {
             Integer.parseInt(newAmount.toString());
         } catch (Exception e) {
-            throw new ServiceException(CANNOT_PARSE + amount, e);
+            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount), e);
         }
 
         if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
@@ -101,7 +101,7 @@ public class PriceUtils {
             BigDecimalValidator validator = CurrencyValidator.getInstance();
             BigDecimal bdamount = validator.validate(amount, Locale.US);
             if (bdamount == null) {
-                throw new ServiceException(CANNOT_PARSE + amount);
+                throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
             }
             return bdamount;
 
@@ -110,7 +110,7 @@ public class PriceUtils {
             StringBuilder pat = new StringBuilder();
 
             if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
-                pat.append("\\d{1,3}(" + THOUSANDPOINT + "?\\d{3})*");
+                pat.append(String.format("\\d{1,3}(%s?\\d{3})*", THOUSANDPOINT));
             }
 
             pat.append(String.format("(\\%s\\d{1,%s})", DECIMALPOINT, DECIMALCOUNT));
@@ -125,7 +125,7 @@ public class PriceUtils {
 
                 return validator.validate(amount, locale);
             } else {
-                throw new ServiceException(CANNOT_PARSE + amount);
+                throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
             }
         }
     }

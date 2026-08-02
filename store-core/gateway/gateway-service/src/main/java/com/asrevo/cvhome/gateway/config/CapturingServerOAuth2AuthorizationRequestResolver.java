@@ -110,7 +110,7 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 // state is missing
             }
 
-            String sessionKey = CAPTURED_PARAMETERS_SESSION_KEY_PREFIX + state;
+            String sessionKey = "%s%s".formatted(CAPTURED_PARAMETERS_SESSION_KEY_PREFIX, state);
             logger.info("Storing captured parameters in session with key '{}': {}", sessionKey, capturedParamsMap);
 
             return exchange.getSession().map(webSession -> {

@@ -21,6 +21,6 @@ public record SocialLoginConfigId(@Embedded StoreMerchantId storeMerchantId,
     }
 
     public String toRegistrationId() {
-        return storeMerchantId.getId() + PROVIDER_SPLITTER + providerId.name().toLowerCase();
+        return "%s%s%s".formatted(storeMerchantId.getId(), PROVIDER_SPLITTER, providerId.name().toLowerCase());
     }
 }

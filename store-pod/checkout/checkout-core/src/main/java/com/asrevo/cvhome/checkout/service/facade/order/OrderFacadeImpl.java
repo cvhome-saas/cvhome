@@ -69,8 +69,8 @@ public class OrderFacadeImpl implements OrderFacade {
     private static final String ERROR_WHILE_GETTING_ORDER_MESSAGE = "Error while getting order [{}]";
     private static final String ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE = "Order id [{}] not found for merchand [{}]";
     private static final String ORDER_DOES_NOT_EXIST_FOR_MERCHANT_MESSAGE = "Order with id [{}] does not exist for merchant [{}]";
+    private static final String ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE = "Order not found with id {} for customer {}";
     private static final String PLACEHOLDER = "{}";
-    private static final String FOR_CUSTOMER_SUFFIX = " for customer ";
 
     private final ShoppingCartService shoppingCartService;
 
@@ -308,7 +308,8 @@ public class OrderFacadeImpl implements OrderFacade {
         }
         if (modelOrder.getCustomerId() == null || !modelOrder.getCustomerId().equals(customerId)) {
             throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_BY_ID_MESSAGE.replace(PLACEHOLDER, orderId.toString()) + FOR_CUSTOMER_SUFFIX + customerId);
+                    ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE.replace(PLACEHOLDER, orderId.toString())
+                            .replace(PLACEHOLDER, customerId.toString()));
         }
 
         ReadableOrder readableOrder = new ReadableOrder();
@@ -366,7 +367,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
         if (order.getCustomerId() == null || !order.getCustomerId().equals(customerId)) {
             throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_BY_ID_MESSAGE.replace(PLACEHOLDER, orderId.toString()) + FOR_CUSTOMER_SUFFIX + customerId);
+                    ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE.replace(PLACEHOLDER, orderId.toString())
+                            .replace(PLACEHOLDER, customerId.toString()));
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();

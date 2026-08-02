@@ -34,8 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductPriceUtils {
 
     private static final String NO_INVENTORY_MESSAGE =
-            "No inventory available to calculate the price. Availability should contain at";
-    private static final String LEAST_REGION_MESSAGE = " least a region set to *";
+            "No inventory available to calculate the price. Availability should contain at least a region set to *";
 
     public FinalPriceCalc getFinalPrice(Product product) throws ServiceException {
 
@@ -138,7 +137,7 @@ public class ProductPriceUtils {
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR, NO_INVENTORY_MESSAGE + LEAST_REGION_MESSAGE);
+            throw new ServiceException(ServiceException.EXCEPTION_ERROR, NO_INVENTORY_MESSAGE);
         }
 
         return finalPrice;

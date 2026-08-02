@@ -20,15 +20,11 @@ import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
-    private static final String PRODUCT_TYPE_MESSAGE = "Product type [";
-
-    private static final String NOT_FOUND_FOR_STORE_MESSAGE = "] not found for store [";
-
-    private static final String BRACKET_CLOSE = "]";
+    private static final String NOT_FOUND_FOR_STORE_TEMPLATE = "Product type [%s] not found for store [%s]";
 
     private static final String SAVE_ERROR_MESSAGE = "An exception occured while saving product type";
 
-    private static final String NOT_EXIST_FOR_STORE_MESSAGE = "] does not exist for store [";
+    private static final String NOT_EXIST_FOR_STORE_TEMPLATE = "Product type [%s] does not exist for store [%s]";
 
     private final ProductTypeService productTypeService;
 
@@ -70,8 +66,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
             ProductType type = productTypeService.getById(id, store);
 
             if (type == null) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_TYPE_MESSAGE + id + NOT_FOUND_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
             }
 
             return readableProductTypeMapper.convert(type, store, language);
@@ -110,8 +105,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
             ProductType t = productTypeService.getById(id, store);
             if (t == null) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_TYPE_MESSAGE + type.getCode() + NOT_EXIST_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(NOT_EXIST_FOR_STORE_TEMPLATE.formatted(type.getCode(), store));
             }
 
             type.setId(t.getId());
@@ -132,8 +126,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
             ProductType t = productTypeService.getById(id, store);
             if (t == null) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_TYPE_MESSAGE + id + NOT_EXIST_FOR_STORE_MESSAGE + store + BRACKET_CLOSE);
+                throw new ResourceNotFoundException(NOT_EXIST_FOR_STORE_TEMPLATE.formatted(id, store));
             }
 
             productTypeService.delete(t);

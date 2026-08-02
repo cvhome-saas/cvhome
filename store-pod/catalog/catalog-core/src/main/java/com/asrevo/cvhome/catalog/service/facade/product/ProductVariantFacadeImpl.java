@@ -37,13 +37,8 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 @Component
 public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
-    private static final String NOT_FOUND_FOR_STORE_MESSAGE = "] not found for store [";
-
-    private static final String BRACKET_CLOSE = "]";
-
-    private static final String PRODUCT_VARIANT_WITH_ID_MESSAGE = "productVariant with id [";
-
-    private static final String AND_PRODUCT_ID_MESSAGE = "] and productId [";
+    private static final String PRODUCT_VARIANT_NOT_FOUND_TEMPLATE =
+            "productVariant with id [%s] not found for store [%s] and productId [%s]";
 
     private final ReadableProductVariantMapper readableProductVariantMapper;
 
@@ -128,8 +123,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
                        LanguageCode language) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException(PRODUCT_VARIANT_WITH_ID_MESSAGE + instanceId + NOT_FOUND_FOR_STORE_MESSAGE
-                    + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(instanceId, store, productId));
         }
 
         productVariant.setProductId(productId);
@@ -147,8 +141,8 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     public void delete(Long productVariant, Long productId, StoreMerchantId store) {
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException(PRODUCT_VARIANT_WITH_ID_MESSAGE + productVariant
-                    + NOT_FOUND_FOR_STORE_MESSAGE + store + AND_PRODUCT_ID_MESSAGE + productId + BRACKET_CLOSE);
+            throw new ResourceNotFoundException(
+                    PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(productVariant, store, productId));
         }
 
         try {
