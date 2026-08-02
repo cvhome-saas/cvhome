@@ -78,56 +78,70 @@ public final class PriceUtils {
     }
 
     public static BigDecimal getAmount(String amount) throws ServiceException {
+        String newAmount = stripSeparators(amount);
+        validateNumeric(newAmount, amount);
 
+        if (isPlainInteger(amount)) {
+            return parsePlainInteger(amount);
+        }
+        return parseDecimal(amount);
+    }
+
+    private static String stripSeparators(String amount) {
         StringBuilder newAmount = new StringBuilder();
         for (int i = 0; i < amount.length(); i++) {
             if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {
                 newAmount.append(amount.charAt(i));
             }
         }
+        return newAmount.toString();
+    }
 
+    private static void validateNumeric(String newAmount, String originalAmount) throws ServiceException {
         try {
-            Integer.parseInt(newAmount.toString());
+            Integer.parseInt(newAmount);
         } catch (Exception e) {
-            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount), e);
+            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(originalAmount), e);
+        }
+    }
+
+    private static boolean isPlainInteger(String amount) {
+        return !amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
+                && !amount.contains(" ");
+    }
+
+    private static BigDecimal parsePlainInteger(String amount) throws ServiceException {
+        if (!matchPositiveInteger(amount)) {
+            throw new ServiceException(String.format("Not a positive integer %s", amount));
+        }
+        BigDecimalValidator validator = CurrencyValidator.getInstance();
+        BigDecimal bdamount = validator.validate(amount, Locale.US);
+        if (bdamount == null) {
+            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
+        }
+        return bdamount;
+    }
+
+    private static BigDecimal parseDecimal(String amount) throws ServiceException {
+        Pattern pattern = Pattern.compile(buildDecimalPattern());
+        Matcher matcher = pattern.matcher(amount);
+
+        if (!matcher.matches()) {
+            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
         }
 
-        if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
-                && !amount.contains(" ")) {
+        Locale locale = Constants.DEFAULT_LOCALE;
+        BigDecimalValidator validator = CurrencyValidator.getInstance();
+        return validator.validate(amount, locale);
+    }
 
-            if (!matchPositiveInteger(amount)) {
-                throw new ServiceException(String.format("Not a positive integer %s", amount));
-            }
-            BigDecimalValidator validator = CurrencyValidator.getInstance();
-            BigDecimal bdamount = validator.validate(amount, Locale.US);
-            if (bdamount == null) {
-                throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
-            }
-            return bdamount;
-
-        } else {
-
-            StringBuilder pat = new StringBuilder();
-
-            if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
-                pat.append(String.format("\\d{1,3}(%s?\\d{3})*", THOUSANDPOINT));
-            }
-
-            pat.append(String.format("(\\%s\\d{1,%s})", DECIMALPOINT, DECIMALCOUNT));
-
-            Pattern pattern = Pattern.compile(pat.toString());
-            Matcher matcher = pattern.matcher(amount);
-
-            if (matcher.matches()) {
-
-                Locale locale = Constants.DEFAULT_LOCALE;
-                BigDecimalValidator validator = CurrencyValidator.getInstance();
-
-                return validator.validate(amount, locale);
-            } else {
-                throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
-            }
+    private static String buildDecimalPattern() {
+        StringBuilder pat = new StringBuilder();
+        if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
+            pat.append(String.format("\\d{1,3}(%s?\\d{3})*", THOUSANDPOINT));
         }
+        pat.append(String.format("(\\%s\\d{1,%s})", DECIMALPOINT, DECIMALCOUNT));
+        return pat.toString();
     }
 
     public static boolean matchPositiveInteger(String amount) {

@@ -37,6 +37,18 @@ public class PersistableMerchantStorePopulator
             target = new MerchantStore();
         }
 
+        applyBasics(source, target, store);
+        applyLanguages(source, target);
+        applyAddress(source, target);
+
+        if (source.getTemplate() != null && !source.getTemplate().trim().isEmpty()) {
+            target.setStoreTemplate(source.getTemplate());
+        }
+
+        return target;
+    }
+
+    private void applyBasics(PersistableMerchantStore source, MerchantStore target, MerchantStore store) {
         if (source.getId() != null) {
             target.setId(new StoreMerchantId(source.getId()));
         }
@@ -81,7 +93,9 @@ public class PersistableMerchantStorePopulator
         target.setStoreEmailAddress(source.getEmail());
         target.setUseCache(source.isUseCache());
         target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
+    }
 
+    private void applyLanguages(PersistableMerchantStore source, MerchantStore target) throws ConversionException {
         try {
 
             if (source.getDefaultLanguage().code() != null && !source.getDefaultLanguage().code().trim().isEmpty()) {
@@ -100,23 +114,20 @@ public class PersistableMerchantStorePopulator
         } catch (Exception e) {
             throw new ConversionException(e);
         }
+    }
 
+    private void applyAddress(PersistableMerchantStore source, MerchantStore target) {
         // address population
         PersistableBaseAddress address = source.getAddress();
-        if (address != null) {
-            target.setZone(address.getStateProvince());
-            target.setStorestateprovince(address.getStateProvince());
-            target.setStoreaddress(address.getAddress());
-            target.setStorecity(address.getCity());
-            target.setCountry(address.getCountry());
-            target.setStorepostalcode(address.getPostalCode());
+        if (address == null) {
+            return;
         }
-
-        if (source.getTemplate() != null && !source.getTemplate().trim().isEmpty()) {
-            target.setStoreTemplate(source.getTemplate());
-        }
-
-        return target;
+        target.setZone(address.getStateProvince());
+        target.setStorestateprovince(address.getStateProvince());
+        target.setStoreaddress(address.getAddress());
+        target.setStorecity(address.getCity());
+        target.setCountry(address.getCountry());
+        target.setStorepostalcode(address.getPostalCode());
     }
 
     @Override
