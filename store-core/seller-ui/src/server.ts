@@ -13,7 +13,9 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const indexHtml = resolve(browserDistFolder, 'index.csr.html');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: ['localhost', 'gateway.com'],
+});
 
 // Add the routes you want to be server-side rendered here.
 const ssrRoutes = ['/', "/signup", '/terms', '/privacy-policy'];
