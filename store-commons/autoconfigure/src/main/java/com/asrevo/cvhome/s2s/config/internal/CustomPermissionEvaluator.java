@@ -18,6 +18,16 @@ import com.asrevo.cvhome.s2s.services.PermissionAccessChecker;
 @Configuration
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
+    private static final String STORE_CREATE = "STORE-POD.MERCHANT.STORE-CREATE";
+    private static final String CATALOG_RESERVE = "STORE-POD.CATALOG.RESERVE";
+    private static final String MERCHANT_ALL = "STORE-POD.MERCHANT.*";
+    private static final String CONTENT_ALL = "STORE-POD.CONTENT.*";
+    private static final String CATALOG_ALL = "STORE-POD.CATALOG.*";
+    private static final String CHECKOUT_ALL = "STORE-POD.CHECKOUT.*";
+    private static final String CUA_ALL = "STORE-POD.CUA.*";
+    private static final String PAYMENT_ALL = "STORE-POD.PAYMENT.*";
+    private static final String CUSTOMER_ALL = "STORE-POD.CUSTOMER.*";
+
     private final PermissionAccessChecker checker = new PermissionAccessChecker();
 
     private final Pod pod;
@@ -36,20 +46,32 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                                  Object permission) {
         String action = (String) permission;
         return switch (action) {
-            // store-pod
-            case "STORE-POD.MERCHANT.STORE-CREATE" -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
+            case STORE_CREATE, CATALOG_RESERVE, MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
+                 CUA_ALL, PAYMENT_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
+            default -> hasStoreCorePermission(authentication, targetId, action);
+        };
+    }
 
-            case "STORE-POD.CATALOG.RESERVE" -> checker.isSameStorePod(authentication,
+    private boolean hasStorePodPermission(Authentication authentication, Serializable targetId, String action) {
+        return switch (action) {
+            case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
+
+            case CATALOG_RESERVE -> checker.isSameStorePod(authentication,
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
 
-            case "STORE-POD.MERCHANT.*", "STORE-POD.CONTENT.*", "STORE-POD.CATALOG.*", "STORE-POD.CHECKOUT.*",
-                 "STORE-POD.CUA.*", "STORE-POD.PAYMENT.*" -> checker.hasManageAccessOnStore(authentication,
+            case MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
+                 CUA_ALL, PAYMENT_ALL -> checker.hasManageAccessOnStore(authentication,
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
 
-            case "STORE-POD.CUSTOMER.*" -> checker.isCustomerInSameStore(authentication,
+            case CUSTOMER_ALL -> checker.isCustomerInSameStore(authentication,
                     new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()));
 
-            // store-core
+            default -> false;
+        };
+    }
+
+    private boolean hasStoreCorePermission(Authentication authentication, Serializable targetId, String action) {
+        return switch (action) {
             case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, (ManagerStoreId) targetId);
 
             case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, (ManagerStoreId) targetId);

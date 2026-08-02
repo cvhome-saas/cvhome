@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.api.v1.product;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -89,49 +90,12 @@ public class ProductImageApi {
                             StoreMerchantId merchantStore, LanguageCode language) {
 
         try {
-
             // get the product
-            Product product = productService.getById(id);
-            if (product == null) {
-                throw new ResourceNotFoundException("Product not found");
-            }
+            Product product = resolveAuthorizedProduct(id, merchantStore);
 
-            // security validation
-            // product belongs to merchant store
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException("Resource not authorized for this merchant");
-            }
+            boolean hasDefaultImage = hasExistingDefaultImage(product, defaultImage);
 
-            boolean hasDefaultImage = false;
-            Set<ProductImage> images = product.getImages();
-
-            if (!defaultImage && !CollectionUtils.isEmpty(images)) {
-                for (ProductImage image : images) {
-                    if (image.isDefaultImage()) {
-                        hasDefaultImage = true;
-                        break;
-                    }
-                }
-            }
-
-            List<ProductImage> contentImagesList = new ArrayList<>();
-            int sortOrder = position;
-            for (MultipartFile multipartFile : files) {
-                if (!multipartFile.isEmpty()) {
-                    ProductImage productImage = new ProductImage();
-                    productImage.setImage(multipartFile.getInputStream());
-                    productImage.setProductImage(multipartFile.getOriginalFilename());
-                    productImage.setProduct(product);
-
-                    if (!hasDefaultImage) {
-                        productImage.setDefaultImage(true);
-                        hasDefaultImage = true;
-                    }
-                    productImage.setSortOrder(sortOrder);
-                    position++;
-                    contentImagesList.add(productImage);
-                }
-            }
+            List<ProductImage> contentImagesList = buildContentImages(product, files, position, hasDefaultImage);
 
             if (CollectionUtils.isNotEmpty(contentImagesList)) {
                 productImageService.addProductImages(product, contentImagesList);
@@ -141,6 +105,56 @@ public class ProductImageApi {
             log.error("Error while creating ProductImage", e);
             throw new ServiceRuntimeException("Error while creating image");
         }
+    }
+
+    private Product resolveAuthorizedProduct(Long id, StoreMerchantId merchantStore) {
+        Product product = productService.getById(id);
+        if (product == null) {
+            throw new ResourceNotFoundException("Product not found");
+        }
+
+        // security validation
+        // product belongs to merchant store
+        if (!Objects.equals(product.getStore(), merchantStore)) {
+            throw new UnauthorizedException("Resource not authorized for this merchant");
+        }
+        return product;
+    }
+
+    private boolean hasExistingDefaultImage(Product product, boolean defaultImage) {
+        Set<ProductImage> images = product.getImages();
+        if (defaultImage || CollectionUtils.isEmpty(images)) {
+            return false;
+        }
+        for (ProductImage image : images) {
+            if (image.isDefaultImage()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<ProductImage> buildContentImages(Product product, MultipartFile[] files, int position,
+            boolean hasDefaultImage) throws IOException {
+        List<ProductImage> contentImagesList = new ArrayList<>();
+        int sortOrder = position;
+        for (MultipartFile multipartFile : files) {
+            if (!multipartFile.isEmpty()) {
+                ProductImage productImage = new ProductImage();
+                productImage.setImage(multipartFile.getInputStream());
+                productImage.setProductImage(multipartFile.getOriginalFilename());
+                productImage.setProduct(product);
+
+                if (!hasDefaultImage) {
+                    productImage.setDefaultImage(true);
+                    hasDefaultImage = true;
+                }
+                productImage.setSortOrder(sortOrder);
+                position++;
+                contentImagesList.add(productImage);
+            }
+        }
+        return contentImagesList;
     }
 
     @ResponseStatus(HttpStatus.OK)

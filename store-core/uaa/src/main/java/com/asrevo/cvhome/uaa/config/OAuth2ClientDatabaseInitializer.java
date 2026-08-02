@@ -50,27 +50,43 @@ public class OAuth2ClientDatabaseInitializer {
         log.info("Updating OAuth2 client '{}' from configuration", clientId);
         RegisteredClient.Builder builder = RegisteredClient.from(client);
 
+        applySecret(clientInfo, builder);
+        applyRedirectUris(clientInfo, builder);
+        applyPostLogoutRedirectUris(clientInfo, builder);
+        applyScopes(clientInfo, builder);
+        applyGrantTypes(clientInfo, builder);
+
+        registeredClientRepository.save(builder.build());
+    }
+
+    private void applySecret(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.secret() != null && !clientInfo.secret().isBlank()) {
             builder.clientSecret(passwordEncoder.encode(clientInfo.secret()));
         }
+    }
 
+    private void applyRedirectUris(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.redirectUriPaths() != null && !clientInfo.redirectUriPaths().isEmpty()) {
             constructRedirectUris(clientInfo.redirectUriPaths()).forEach(builder::redirectUri);
         }
+    }
 
+    private void applyPostLogoutRedirectUris(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.postLogoutRedirectUriPaths() != null && !clientInfo.postLogoutRedirectUriPaths().isEmpty()) {
             constructRedirectUris(clientInfo.postLogoutRedirectUriPaths()).forEach(builder::postLogoutRedirectUri);
         }
+    }
 
+    private void applyScopes(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.scopes() != null && !clientInfo.scopes().isEmpty()) {
             clientInfo.scopes().forEach(builder::scope);
         }
+    }
 
+    private void applyGrantTypes(OAuth2ClientProperties.ClientInfo clientInfo, RegisteredClient.Builder builder) {
         if (clientInfo.grantTypes() != null && !clientInfo.grantTypes().isEmpty()) {
             clientInfo.grantTypes().forEach(grantType -> builder.authorizationGrantType(new AuthorizationGrantType(grantType)));
         }
-
-        registeredClientRepository.save(builder.build());
     }
 
     private Set<String> constructRedirectUris(Set<String> redirectUriPaths) {
