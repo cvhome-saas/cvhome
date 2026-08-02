@@ -25,9 +25,9 @@ import com.asrevo.cvhome.store.core.mapper.Mapper;
 public class PersistableProductVariantMapper implements Mapper<PersistableProductVariant, ProductVariant> {
 
     private static final String PRODUCT_VARIATION_VALUE_NOT_FOUND_FOR_STORE_TEMPLATE =
-            "ProductVaritionValue [%s] + not found for store [%s]";
+            "ProductVaritionValue [%s] not found for store [%s]";
 
-    private static final String PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE = "Product [%s] + not found for store [%s]";
+    private static final String PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE = "Product [%s] not found for store [%s]";
 
     private final ProductVariationService productVariationService;
 
@@ -74,7 +74,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
         if (variation.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "ProductVarition [%s] + not found for store [%s]".formatted(productVariation, store));
+                    "ProductVarition [%s] not found for store [%s]".formatted(productVariation, store));
         }
 
         destination.setVariation(variation.get());
@@ -133,7 +133,7 @@ public class PersistableProductVariantMapper implements Mapper<PersistableProduc
 
             if (product.getSku() != null && product.getSku().equals(source.getSku())) {
                 throw new OperationNotAllowedException(
-                        "Product variant sku [%s] + must be different than product instance sku [%s]"
+                        "Product variant sku [%s] must be different than product instance sku [%s]"
                                 .formatted(source.getSku(), product.getSku()));
             }
 

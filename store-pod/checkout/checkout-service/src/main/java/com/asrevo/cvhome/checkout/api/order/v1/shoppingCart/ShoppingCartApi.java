@@ -51,8 +51,7 @@ public class ShoppingCartApi {
     @PostMapping(value = "/cart")
     @Operation(method = "POST",
             description = "Add product to shopping cart when no cart exists, this will create a new cart id",
-            summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
-                    + " {\"product\":1232,\"quantity\":1}")
+            summary = "No customer ID in scope. Add to cart for non authenticated users")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",
@@ -65,8 +64,7 @@ public class ShoppingCartApi {
 
     @PutMapping(value = "/cart/{code}")
     @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
-            summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
-                    + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234 from cart")
+            summary = "No customer ID in scope. Modify cart for non authenticated users")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",

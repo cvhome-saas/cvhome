@@ -70,7 +70,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
         if (productVariant.isEmpty()) {
             throw new ResourceNotFoundException(
-                    "Product instance + [%s] not found for store [%s]".formatted(instanceId, store));
+                    "Product instance [%s] not found for store [%s]".formatted(instanceId, store));
         }
 
         ProductVariant model = productVariant.get();
