@@ -70,92 +70,99 @@ public class ProductFileManagerImpl extends ProductFileManager {
             contentImage.setMimeType(mimeType);
             uploadImage.addProductImage(productImage, contentImage);
 
-
-            String slargeImageHeight = height;
-            String slargeImageWidth = width;
-
-
             // Resizes
-            if (!StringUtils.isBlank(slargeImageHeight) && !StringUtils.isBlank(slargeImageWidth)) {
-
-                FileNameMap fileNameMap = URLConnection.getFileNameMap();
-
-                String contentType = fileNameMap.getContentTypeFor(contentImage.getFileName());
-                String extension = null;
-                if (contentType != null) {
-                    extension = contentType.substring(contentType.indexOf('/') + 1);
-                }
-
-                if (extension == null) {
-                    extension = "jpeg";
-                }
-
-                int largeImageHeight = Integer.parseInt(slargeImageHeight);
-                int largeImageWidth = Integer.parseInt(slargeImageWidth);
-
-                if (largeImageHeight <= 0 || largeImageWidth <= 0) {
-                    String sizeMsg = String.format(
-                            "Image configuration set to an invalid value [PRODUCT_IMAGE_HEIGHT_SIZE] %s , [PRODUCT_IMAGE_WIDTH_SIZE] %s",
-                            largeImageHeight, largeImageWidth);
-                    log.error(sizeMsg);
-                    throw new ServiceException(sizeMsg);
-                }
-
-                InputStream is2 = new ByteArrayInputStream(byteArray);
-
-                BufferedImage bufferedImage = ImageIO.read(is2);
-
-                if (bufferedImage == null) {
-                    log.error("Cannot read image format for {}", productImage.getProductImage());
-                    throw new Exception(
-                            String.format("Cannot read image format %s", productImage.getProductImage()));
-                }
-
-                // crop image
-                ProductImageCropUtils utils = new ProductImageCropUtils(bufferedImage, largeImageWidth,
-                        largeImageHeight);
-                if (cropUploads && utils.isCropeable()) {
-                    bufferedImage = utils.getCroppedImage();
-                }
-
-
-                BufferedImage largeResizedImage;
-                if (bufferedImage.getWidth() > largeImageWidth || bufferedImage.getHeight() > largeImageHeight) {
-                    largeResizedImage = ProductImageSizeUtils.resizeWithRatio(bufferedImage, largeImageWidth,
-                            largeImageHeight);
-                } else {
-                    largeResizedImage = bufferedImage;
-                }
-
-                File tempLarge = File.createTempFile(
-                        new StringBuilder().append(productImage.getId()).append("tmpLarge").toString(),
-                        String.format(".%s", extension));
-                ImageIO.write(largeResizedImage, extension, tempLarge);
-
-                try (FileInputStream isLarge = new FileInputStream(tempLarge)) {
-
-                    ImageContentFile largeContentImage = new ImageContentFile();
-                    largeContentImage.setFileContentType(FileContentType.PRODUCT);
-                    largeContentImage.setFileName(productImage.getProductImage());
-                    largeContentImage.setFile(isLarge);
-
-
-                    uploadImage.addProductImage(productImage, largeContentImage);
-
-
-                    Files.delete(tempLarge.toPath());
-
-                }
+            if (!StringUtils.isBlank(height) && !StringUtils.isBlank(width)) {
+                uploadResizedImage(productImage, contentImage, byteArray);
             } else {
-                contentImage.setFileContentType(FileContentType.PRODUCT);
-                InputStream is2 = new ByteArrayInputStream(byteArray);
-                contentImage.setFile(is2);
-                uploadImage.addProductImage(productImage, contentImage);
+                uploadOriginalAsProductImage(productImage, contentImage, byteArray);
             }
 
         } catch (Exception e) {
             throw new ServiceException(e);
         }
+    }
+
+    private void uploadOriginalAsProductImage(CmsProductImage productImage, ImageContentFile contentImage,
+            byte[] byteArray) throws Exception {
+        contentImage.setFileContentType(FileContentType.PRODUCT);
+        InputStream is2 = new ByteArrayInputStream(byteArray);
+        contentImage.setFile(is2);
+        uploadImage.addProductImage(productImage, contentImage);
+    }
+
+    private void uploadResizedImage(CmsProductImage productImage, ImageContentFile contentImage, byte[] byteArray)
+            throws Exception {
+        String extension = resolveExtension(contentImage);
+
+        int largeImageHeight = Integer.parseInt(height);
+        int largeImageWidth = Integer.parseInt(width);
+
+        if (largeImageHeight <= 0 || largeImageWidth <= 0) {
+            String sizeMsg = String.format(
+                    "Image configuration set to an invalid value [PRODUCT_IMAGE_HEIGHT_SIZE] %s , [PRODUCT_IMAGE_WIDTH_SIZE] %s",
+                    largeImageHeight, largeImageWidth);
+            log.error(sizeMsg);
+            throw new ServiceException(sizeMsg);
+        }
+
+        BufferedImage largeResizedImage = buildResizedImage(productImage, byteArray, largeImageWidth, largeImageHeight);
+
+        File tempLarge = File.createTempFile(
+                new StringBuilder().append(productImage.getId()).append("tmpLarge").toString(),
+                String.format(".%s", extension));
+        ImageIO.write(largeResizedImage, extension, tempLarge);
+
+        try (FileInputStream isLarge = new FileInputStream(tempLarge)) {
+
+            ImageContentFile largeContentImage = new ImageContentFile();
+            largeContentImage.setFileContentType(FileContentType.PRODUCT);
+            largeContentImage.setFileName(productImage.getProductImage());
+            largeContentImage.setFile(isLarge);
+
+            uploadImage.addProductImage(productImage, largeContentImage);
+
+            Files.delete(tempLarge.toPath());
+
+        }
+    }
+
+    private String resolveExtension(ImageContentFile contentImage) {
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+
+        String contentType = fileNameMap.getContentTypeFor(contentImage.getFileName());
+        String extension = null;
+        if (contentType != null) {
+            extension = contentType.substring(contentType.indexOf('/') + 1);
+        }
+
+        if (extension == null) {
+            extension = "jpeg";
+        }
+        return extension;
+    }
+
+    private BufferedImage buildResizedImage(CmsProductImage productImage, byte[] byteArray, int largeImageWidth,
+            int largeImageHeight) throws Exception {
+        InputStream is2 = new ByteArrayInputStream(byteArray);
+
+        BufferedImage bufferedImage = ImageIO.read(is2);
+
+        if (bufferedImage == null) {
+            log.error("Cannot read image format for {}", productImage.getProductImage());
+            throw new Exception(
+                    String.format("Cannot read image format %s", productImage.getProductImage()));
+        }
+
+        // crop image
+        ProductImageCropUtils utils = new ProductImageCropUtils(bufferedImage, largeImageWidth, largeImageHeight);
+        if (cropUploads && utils.isCropeable()) {
+            bufferedImage = utils.getCroppedImage();
+        }
+
+        if (bufferedImage.getWidth() > largeImageWidth || bufferedImage.getHeight() > largeImageHeight) {
+            return ProductImageSizeUtils.resizeWithRatio(bufferedImage, largeImageWidth, largeImageHeight);
+        }
+        return bufferedImage;
     }
 
     public OutputContentFile getProductImage(CmsProductImage productImage) throws ServiceException {
