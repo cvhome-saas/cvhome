@@ -14,12 +14,11 @@ import org.apache.commons.validator.routines.CurrencyValidator;
 import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
+import com.asrevo.cvhome.store.errors.NonPositivePriceException;
+import com.asrevo.cvhome.store.errors.PriceNotParseableException;
 
 public final class PriceUtils {
-
-    private static final String CANNOT_PARSE_TEMPLATE = "Cannot parse %s";
 
     private static final char DECIMALCOUNT = '2';
 
@@ -77,7 +76,13 @@ public final class PriceUtils {
         return currencyInstance.format(amount.doubleValue());
     }
 
-    public static BigDecimal getAmount(String amount) throws ServiceException {
+    /**
+     * Parses a price as entered by a seller.
+     *
+     * @throws PriceNotParseableException the text is not a number this parser understands
+     * @throws NonPositivePriceException  the text is a number, but not a positive one
+     */
+    public static BigDecimal getAmount(String amount) throws PriceNotParseableException, NonPositivePriceException {
         String newAmount = stripSeparators(amount);
         validateNumeric(newAmount, amount);
 
@@ -97,11 +102,11 @@ public final class PriceUtils {
         return newAmount.toString();
     }
 
-    private static void validateNumeric(String newAmount, String originalAmount) throws ServiceException {
+    private static void validateNumeric(String newAmount, String originalAmount) throws PriceNotParseableException {
         try {
             Integer.parseInt(newAmount);
-        } catch (Exception e) {
-            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(originalAmount), e);
+        } catch (NumberFormatException e) {
+            throw PriceNotParseableException.of(originalAmount, e);
         }
     }
 
@@ -110,24 +115,25 @@ public final class PriceUtils {
                 && !amount.contains(" ");
     }
 
-    private static BigDecimal parsePlainInteger(String amount) throws ServiceException {
+    private static BigDecimal parsePlainInteger(String amount)
+            throws PriceNotParseableException, NonPositivePriceException {
         if (!matchPositiveInteger(amount)) {
-            throw new ServiceException(String.format("Not a positive integer %s", amount));
+            throw NonPositivePriceException.of(amount);
         }
         BigDecimalValidator validator = CurrencyValidator.getInstance();
         BigDecimal bdamount = validator.validate(amount, Locale.US);
         if (bdamount == null) {
-            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
+            throw PriceNotParseableException.of(amount);
         }
         return bdamount;
     }
 
-    private static BigDecimal parseDecimal(String amount) throws ServiceException {
+    private static BigDecimal parseDecimal(String amount) throws PriceNotParseableException {
         Pattern pattern = Pattern.compile(buildDecimalPattern());
         Matcher matcher = pattern.matcher(amount);
 
         if (!matcher.matches()) {
-            throw new ServiceException(CANNOT_PARSE_TEMPLATE.formatted(amount));
+            throw PriceNotParseableException.of(amount);
         }
 
         Locale locale = Constants.DEFAULT_LOCALE;

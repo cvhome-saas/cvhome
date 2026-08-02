@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
@@ -32,7 +33,7 @@ public class StorePodClientFactory {
     private MerchantStorePodClient createMerchantStorePodClient(PodId podId) {
         Pod pod = serviceDomainProperties.getPodByPodId(podId)
                 .orElseThrow(() -> new IllegalArgumentException("Pod not found for id: %s".formatted(podId)));
-        return restClientBuilder.buildClient(pod, "merchant", MerchantStorePodClient.class);
+        return restClientBuilder.buildClient(pod, "merchant", MerchantStorePodClient.class, RemoteErrorCatalog.none());
     }
 
 }

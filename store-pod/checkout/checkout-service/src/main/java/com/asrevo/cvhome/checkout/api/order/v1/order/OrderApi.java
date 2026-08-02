@@ -37,6 +37,7 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
+import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -94,7 +95,7 @@ public class OrderApi {
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
-            throws ServiceException {
+            throws ServiceException, PaymentApiUnavailableException {
 
         ShoppingCart cart;
         ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);

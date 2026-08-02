@@ -2,6 +2,16 @@ package com.asrevo.cvhome.store.controller.exception;
 
 import java.io.Serial;
 
+import com.asrevo.cvhome.errors.BaseException;
+import com.asrevo.cvhome.errors.ErrorCode;
+import com.asrevo.cvhome.store.errors.LegacyErrors;
+
+/**
+ * Reports {@link LegacyErrors#CONVERSION} — an un-migrated parse or conversion failure.
+ *
+ * @deprecated use the typed subclasses of {@link BaseException}; removed once every module is migrated.
+ */
+@Deprecated(since = "error-handling-refactor")
 public class ConversionRuntimeException extends GenericRuntimeException {
 
     /**
@@ -30,4 +40,9 @@ public class ConversionRuntimeException extends GenericRuntimeException {
         super(errorCode, message, exception);
     }
 
+
+    @Override
+    protected ErrorCode legacyErrorCode() {
+        return LegacyErrors.CONVERSION;
+    }
 }

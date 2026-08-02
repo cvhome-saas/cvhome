@@ -13,6 +13,8 @@ import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrato
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
+import com.asrevo.cvhome.payment.api.errors.PaymentGatewayRejectedException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
@@ -43,7 +45,8 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                                            Locale locale, String successUrl, String cancelUrl) throws ServiceException {
+                                            Locale locale, String successUrl, String cancelUrl)
+            throws ServiceException, PaymentApiUnavailableException {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
@@ -106,8 +109,23 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
+    /**
+     * Starts the payment, translating a refusal into a FAILED result.
+     *
+     * <p>
+     * A refusal is a definitive answer, so it takes the FAILED path, which releases the reservation this method's
+     * caller has already taken. Before the payment API declared it, this call had no error handling at all: any failure
+     * escaped {@code placeOrder} with the reservation still held, and it stayed held until the cleanup job expired it.
+     * </p>
+     *
+     * <p>
+     * {@link PaymentApiUnavailableException} is deliberately <em>not</em> caught. Nothing was decided, so cancelling
+     * the order would be a guess that could contradict a payment that did start; it propagates and leaves the order
+     * reserved and pending.
+     * </p>
+     */
     private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result, String successUrl,
-                                                         String cancelUrl) {
+                                                         String cancelUrl) throws PaymentApiUnavailableException {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .ref(modelOrder.getId().toString())
                 .amount(modelOrder.getTotal())
@@ -119,8 +137,13 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                 .build();
 
         log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
-
+        try {
+            return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+        } catch (PaymentGatewayRejectedException e) {
+            log.warn("Payment refused for order {} [{} / remote {}]: {}", modelOrder.getId(), e.errorCode().code(),
+                    e.remoteCode(), e.getMessage());
+            return PaymentInitiateResult.failed();
+        }
     }
 
     private String appendOrderId(String url, Long orderId) {

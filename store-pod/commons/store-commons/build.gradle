@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(':store-commons:commons')
+    api project(':store-commons:errors')
     compileOnly libs.jakarta.persistence.api
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.databind
@@ -12,4 +13,15 @@ dependencies {
     compileOnly libs.lombok
     implementation libs.commons.validator
     annotationProcessor libs.lombok
+
+    testImplementation libs.spring.boot.starter.test
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+    // Versioned explicitly: the catalog entry relies on the Spring Boot BOM, which this java-library module does not
+    // apply. Keep in step with the JUnit Jupiter version spring-boot-starter-test resolves to.
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.1'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

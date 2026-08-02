@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    api project(':store-commons:errors')
     api libs.mongodb.bson
     compileOnly libs.jackson.databind
     compileOnly libs.spring.data.commons

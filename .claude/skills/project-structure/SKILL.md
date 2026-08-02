@@ -52,7 +52,7 @@ catalog). See `references/build-system.md`.
 | `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, plus a `content` sub-domain (CMS pages/boxes). APIs: `MerchantStoreApi`, `ContentApi`, `ExternalMerchantStoreApi`. |
 | `store-pod/catalog` | **BE** | 8122 | **Products & categories**: product CRUD, inventory, pricing, images, attributes/options, product types, groups, manufacturers, relationships, reservations. APIs: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi`, `ExternalProductReservationApi`. |
 | `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
-| `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
+| `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `IPaymentGatewayApi`. Uses Stripe. |
 | `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
 | `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. Next.js 16 / React 19 inside an npm-workspaces monorepo, with a **multi-template theming system** — one Next.js app per visual theme (`basis`, `modern`, `beauty`, `jewelery`), all sharing business logic from `libs/`. An Express server picks the template per request from the store's `theme` header. See `references/landing-ui.md`. |
 
@@ -190,8 +190,8 @@ Two sanctioned mechanisms — pick by whether the caller needs an answer now:
 
 - **Synchronous:** a `@HttpExchange` interface in the provider's `-external-api` module. The provider's
   `External*Api` controller *implements* that same interface; the consumer builds a proxy with
-  `RestClientBuilder.buildClient("catalog", Iface.class)`. Never depend on another pod's `-core` or `-service`.
-  → `references/service-to-service.md`
+  `RestClientBuilder.buildClient("catalog", Iface.class, errorCatalog)`. Never depend on another pod's `-core` or
+  `-service`. → `references/service-to-service.md`, and `references/error-handling.md` for the error contract.
 - **Asynchronous:** a domain event registered on an aggregate root (`registerEvent(...)` via
   `AbstractAggregateRoot`) and delivered by the **namastack transactional outbox** to an `@OutboxHandler`.
   Used in `control-plane-service` and `payment-service`. Put event types in their own **`-events` module**
@@ -298,6 +298,7 @@ See `references/frontends.md`.
 - `references/configuration.md` — the shared config slices, the composition rule, the service registry.
 - `references/gateways-and-local-domains.md` — port vs gateway-path addressing, both edges' routing tables, the local Docker/`/etc/hosts` setup.
 - `references/service-to-service.md` — `@HttpExchange` contracts, `RestClientBuilder`, URL/namespace resolution.
+- `references/error-handling.md` — the `BaseException` hierarchy and its rules, the ProblemDetail wire format, the shared advice, and typed service-to-service errors.
 - `references/service-discovery.md` — `lb://` resolution, simple discovery locally vs `ecs-service-discoveryclient` / Cloud Map on Fargate.
 - `references/uaa-client.md` — the UAA admin SDK: creating/reading users in `uaa`, tenant metadata, wiring.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.

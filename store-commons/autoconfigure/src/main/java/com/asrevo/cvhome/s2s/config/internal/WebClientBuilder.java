@@ -3,6 +3,7 @@ package com.asrevo.cvhome.s2s.config.internal;
 import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +26,13 @@ public class WebClientBuilder {
         this.serviceDomainProperties = serviceDomainProperties;
     }
 
-    public <T> T buildClient(String serviceName, Class<T> tClass) {
+    /**
+     * @param errors the called API's error contract, so its failures arrive as the types it names — usually a constant
+     *               from its {@code -external-api} module. Pass {@code null} for an API that names none
+     */
+    public <T> T buildClient(String serviceName, Class<T> tClass, RemoteErrorCatalog errors) {
         String url = new ServiceUrlBuilder(serviceDomainProperties, environment).getServiceUrl(serviceName);
-        return build(defaultMicroServiceBuilder, url, tClass);
+        return build(defaultMicroServiceBuilder, url, tClass, errors);
     }
 
 }

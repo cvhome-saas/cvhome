@@ -57,16 +57,22 @@ public class ClientsConfig {
 
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder b) {
-        return b.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class);
+        // third argument is the called API's error contract — null when it names none of its failures
+        return b.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, null);
     }
 
     @Bean
     public ExternalProductService externalProductService(RestClientBuilder b) {
         // decorated with a caching layer
-        return new CachedExternalProductService(b.buildClient(CATALOG_SERVICE_NAME, ExternalProductService.class));
+        return new CachedExternalProductService(
+                b.buildClient(CATALOG_SERVICE_NAME, ExternalProductService.class, null));
     }
 }
 ```
+
+Checkout's payment bean is the one client with a contract today:
+`b.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class, PaymentApiErrors.CATALOG)`, which makes
+its failures arrive as types checkout can branch on. See `error-handling.md`.
 
 Business code then injects the interface like any local bean —
 `checkout-core`'s `OrderInventoryOrchestratorImpl` takes an `ExternalProductReservationService` in its
@@ -96,8 +102,8 @@ Note the two builder flavours in `WebClientServicesConfig`: `buildClient(String,
 `microService*` builder (so it can speak `lb://`), while `buildClient(Pod, …)` uses the plain `default*` builder,
 because an `EXTERNAL` pod endpoint is an absolute URL. Both carry the `s2s` OAuth2 interceptor.
 
-There is a second overload, `buildClient(Pod pod, String serviceName, Class<T>)`, for calls into a **specific
-tenant pod** where the target is data, not config. `ServiceUrlBuilder.getServiceUrl(Pod)` switches on
+There is a second overload, `buildClient(Pod pod, String serviceName, Class<T>, RemoteErrorCatalog)`, for calls
+into a **specific tenant pod** where the target is data, not config. `ServiceUrlBuilder.getServiceUrl(Pod)` switches on
 `pod.endpoint().type()`: `INTERNAL` → `lb://spg.<endpoint>`, `EXTERNAL` → the raw endpoint URL — which is what
 lets a pod live in another region or account. `StorePodClientFactory` uses it to build (and cache per `PodId`) a
 `MerchantStorePodClient` when provisioning a store into a chosen pod. See `multi-tenancy.md`.
@@ -129,7 +135,9 @@ in its `application.yml` (see `authentication.md`).
 2. Implement it on the provider's `External*Api` controller (it already `implements` the interface, so the
    compiler tells you).
 3. In the consumer: `implementation project(':store-pod:<domain>:<domain>-external-api')`.
-4. Add a `@Bean` in the consumer's `ClientsConfig` via `restClientBuilder.buildClient(SERVICE_NAME, Iface.class)`.
+4. Add a `@Bean` in the consumer's `ClientsConfig` via
+   `restClientBuilder.buildClient(SERVICE_NAME, Iface.class, errorCatalog)` — pass the provider's
+   `*ApiErrors.CATALOG` constant if it publishes one, otherwise `null`. See `error-handling.md`.
 5. Inject the interface where you need it.
 
 **Never** depend on another pod's `-core` or `-service`. `-external-api` (which drags in only `-commons` and

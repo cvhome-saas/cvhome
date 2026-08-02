@@ -20,6 +20,7 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException;
@@ -27,6 +28,8 @@ import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.errors.NonPositivePriceException;
+import com.asrevo.cvhome.store.errors.PriceNotParseableException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
@@ -49,8 +52,6 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     private static final String ADDING_PRODUCT_TO_CATEGORY_ERROR_TEMPLATE =
             "Exception when adding product [%s] to category [%s]";
-
-    private static final String INVALID_PRICE_FORMAT_MESSAGE = "Invalid product price format";
 
     private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s not found";
 
@@ -187,8 +188,10 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                     if (price.isDefaultPrice()) {
                         try {
                             price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                        } catch (ServiceException _) {
-                            throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
+                        } catch (PriceNotParseableException | NonPositivePriceException e) {
+                            // Carried unchecked because this method cannot declare it yet; the advice unwraps the
+                            // carrier, so the precise price code survives instead of collapsing into a generic one.
+                            throw new UncheckedBaseException(e);
                         }
                     }
                 }
@@ -272,8 +275,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                 if (price.isDefaultPrice()) {
                     try {
                         price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                    } catch (ServiceException _) {
-                        throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
+                    } catch (PriceNotParseableException | NonPositivePriceException e) {
+                        throw new UncheckedBaseException(e);
                     }
                 }
             }
