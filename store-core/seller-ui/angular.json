@@ -56,6 +56,12 @@
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
+            },
+            "security": {
+              "allowedHosts": [
+                "gateway.com",
+                "localhost"
+              ]
             }
           },
           "configurations": {
@@ -88,6 +94,10 @@
             "port": 8010,
             "host": "0.0.0.0",
             "disableHostCheck": true,
+            "allowedHosts": [
+              "gateway.com",
+              "localhost"
+            ],
             "hmr": true
           },
           "configurations": {
