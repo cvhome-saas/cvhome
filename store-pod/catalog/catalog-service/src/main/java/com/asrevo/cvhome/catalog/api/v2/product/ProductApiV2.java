@@ -51,9 +51,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @RestController
 @RequestMapping("/api/v2")
-@Tags(value = @Tag(name = "Product display and management resource (Product display and Management Api such as adding a product to category. Serves api v1 and v2 with backward compatibility)"))
+@Tags(value = @Tag(name = ProductApiV2.TAG_NAME))
 @Slf4j
 public class ProductApiV2 {
+
+    static final String TAG_NAME = """
+            Product display and management resource (Product display and Management Api such as adding a product \
+            to category. Serves api v1 and v2 with backward compatibility)""";
 
     private final ProductDefinitionFacade productDefinitionFacade;
 

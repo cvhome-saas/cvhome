@@ -50,6 +50,10 @@ public class CategoryApi {
 
     private static final int DEFAULT_CATEGORY_DEPTH = 0;
 
+    private static final String CATEGORY_HIERARCHY_DESCRIPTION = """
+            Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding \
+            ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible""";
+
     private final CategoryFacade categoryFacade;
 
     public CategoryApi(CategoryFacade categoryFacade) {
@@ -110,7 +114,7 @@ public class CategoryApi {
      */
     @GetMapping(value = "/private/category", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
+            description = CATEGORY_HIERARCHY_DESCRIPTION,
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",
@@ -135,7 +139,7 @@ public class CategoryApi {
      */
     @GetMapping(value = "/private/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
+            description = CATEGORY_HIERARCHY_DESCRIPTION,
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",
@@ -156,7 +160,7 @@ public class CategoryApi {
 
     @GetMapping(value = "/category-hierarchy", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "GET",
-            description = "Get category hierarchy from root. Supports filtering FEATURED_CATEGORIES and VISIBLE ONLY by adding ?filter=[featured] or ?filter=[visible] or ? filter=[featured,visible",
+            description = CATEGORY_HIERARCHY_DESCRIPTION,
             summary = "Does not return any product attached")
 
     @Parameter(name = "store",

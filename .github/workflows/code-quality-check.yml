@@ -32,9 +32,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run Check with Gradle
-        run: ./gradlew checkstyleMain
-        continue-on-error: true
-        id: checkstyle
+        run: ./gradlew checkstyleMain checkstyleTest
 
       - name: Upload Checkstyle reports
         if: always()
@@ -44,7 +42,3 @@ jobs:
           path: build/reports/checkstyle/*
           if-no-files-found: error
           retention-days: 14
-
-      - name: Fail if Checkstyle found violations
-        if: steps.checkstyle.outcome == 'failure'
-        run: exit 1

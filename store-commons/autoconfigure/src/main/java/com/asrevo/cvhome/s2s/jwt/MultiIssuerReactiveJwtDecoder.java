@@ -85,10 +85,9 @@ public class MultiIssuerReactiveJwtDecoder implements ReactiveJwtDecoder {
         ReactiveJwtDecoder delegateDecoder = this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
 
         if (delegateDecoder == null) {
-            return Mono
-                    .error(new JwtException(String.format(
-                            "Decoder factory returned null for supported issuer: '%s'. This indicates an issue with the factory configuration.",
-                            issuer)));
+            String message =
+                    "Decoder factory returned null for supported issuer: '%s'. This indicates an issue with the factory configuration.";
+            return Mono.error(new JwtException(String.format(message, issuer)));
         }
         return Mono.just(delegateDecoder);
     }

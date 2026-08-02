@@ -18,6 +18,8 @@ public class AdminClientClient extends AbstractAdminClient {
 
     private static final String PATH_SEPARATOR = "/";
 
+    private static final String PATH_WITH_ID_TEMPLATE = "%s%s%s";
+
     private final String clientsApiUrl;
 
     public AdminClientClient(String baseUrl, String clientId, String clientSecret) {
@@ -36,7 +38,8 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public ClientDetails getClient(String id) {
-        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", clientsApiUrl, PATH_SEPARATOR, id)).GET().build();
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id)).GET().build();
         return sendAndParse(request, ClientDetails.class);
     }
 
@@ -49,7 +52,7 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public ClientDetails updateClient(String id, ClientDetails req) {
-        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", clientsApiUrl, PATH_SEPARATOR, id))
+        HttpRequest request = authenticatedRequestBuilder(String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id))
                 .PUT(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(req)))
                 .header(CONTENT_TYPE_HEADER, CONTENT_TYPE_APPLICATION_JSON)
                 .build();
@@ -57,7 +60,8 @@ public class AdminClientClient extends AbstractAdminClient {
     }
 
     public void deleteClient(String id) {
-        HttpRequest request = authenticatedRequestBuilder(String.format("%s%s%s", clientsApiUrl, PATH_SEPARATOR, id)).DELETE().build();
+        HttpRequest request = authenticatedRequestBuilder(
+                String.format(PATH_WITH_ID_TEMPLATE, clientsApiUrl, PATH_SEPARATOR, id)).DELETE().build();
         sendAndVerify(request);
     }
 
