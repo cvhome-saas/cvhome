@@ -33,7 +33,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @Tag(name = "Payment Gateway")
 @Slf4j
 @AllArgsConstructor
-public class IPaymentGatewayApi implements IPaymentGatewayService {
+public class ExternalPaymentGatewayApi implements IPaymentGatewayService {
 
     private final PaymentGatewayService paymentGatewayService;
 

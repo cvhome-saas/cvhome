@@ -56,7 +56,7 @@ Evidence: `MerchantStorePodClient`, `ExternalMerchantStoreService`. Real consume
 `build.gradle` has `implementation project(':store-pod:merchant:merchant-external-api')`.
 
 These are `@HttpExchange` interfaces, and the mirror image lives inside `-service`: an `External*Api` controller
-(e.g. `ExternalMerchantStoreApi`, `ExternalProductApi`, `ExternalOrderApi`, `IPaymentGatewayApi`)
+(e.g. `ExternalMerchantStoreApi`, `ExternalProductApi`, `ExternalOrderApi`, `ExternalPaymentGatewayApi`)
 **implements the same interface**, so the route and the client contract cannot drift. `Public*` prefixes mark
 unauthenticated endpoints (e.g. `PublicPaymentWebhookApi`).
 
@@ -104,7 +104,7 @@ APIs under `api/order/v1/` and `v2/`: `ShoppingCartApi`, `OrderApi`, `CustomerOr
 
 `PaymentConfigurationController` (per-store gateway setup), `PrivatePaymentApi`,
 `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi` (provider callbacks),
-`IPaymentGatewayApi`. Stripe is the integrated provider.
+`ExternalPaymentGatewayApi`. Stripe is the integrated provider.
 
 This is the one pod using the **transactional outbox**: the `Transaction` aggregate registers
 `PaymentPaidEvent` / `PaymentFailedEvent` / `PaymentCanceledEvent`, and `PaymentOutboxHandler` /
