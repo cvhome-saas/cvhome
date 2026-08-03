@@ -14,8 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -28,6 +32,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -55,34 +60,43 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
     @Override
     public OutputContentFile getFile(String merchantStoreCode, Optional<String> folderPath,
-                                     FileContentType fileContentType, String contentName) throws ServiceException {
+                                     FileContentType fileContentType, String contentName)
+            throws AssetNotFoundException, AssetReadFailedException {
+
+        String key = nodePath(merchantStoreCode, fileContentType) + contentName;
         try {
             // get buckets
             String bucketName = bucketName();
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(nodePath(merchantStoreCode, fileContentType) + contentName)
+                    .key(key)
                     .build();
             ResponseInputStream<GetObjectResponse> o = s3.getObject(getObjectRequest);
 
             log.info("Content getFile");
             return getOutputContentFile(IOUtils.toByteArray(o));
+        } catch (final NoSuchKeyException e) {
+            // Split out of the catch-all below: a deleted image and an unreachable bucket used to be the same 500,
+            // so a caller could neither report it usefully nor decide whether a retry was worth anything.
+            throw AssetNotFoundException.of(key, e);
         } catch (final Exception e) {
             log.error("Error while getting file", e);
-            throw new ServiceException(e);
+            throw AssetReadFailedException.of(key, e);
         }
     }
 
     @Override
     public List<String> getFileNames(String merchantStoreCode, Optional<String> folderPath,
-                                     FileContentType fileContentType) throws ServiceException {
+                                     FileContentType fileContentType) throws AssetListFailedException {
+
+        String prefix = nodePath(merchantStoreCode, fileContentType);
         try {
             // get buckets
             String bucketName = bucketName();
 
             ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
                     .bucket(bucketName)
-                    .prefix(nodePath(merchantStoreCode, fileContentType))
+                    .prefix(prefix)
                     .build();
 
             List<String> fileNames = null;
@@ -107,20 +121,22 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
             return fileNames;
         } catch (final Exception e) {
             log.error("Error while getting file names", e);
-            throw new ServiceException(e);
+            throw AssetListFailedException.of(prefix, e);
         }
     }
 
     @Override
     public List<OutputContentFile> getFiles(String merchantStoreCode, Optional<String> folderPath,
-                                            FileContentType fileContentType) throws ServiceException {
+                                            FileContentType fileContentType) throws AssetListFailedException {
+
+        String prefix = nodePath(merchantStoreCode, fileContentType);
         try {
             // get buckets
             String bucketName = bucketName();
 
             ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
                     .bucket(bucketName)
-                    .prefix(nodePath(merchantStoreCode, fileContentType))
+                    .prefix(prefix)
                     .build();
 
             List<OutputContentFile> files = null;
@@ -148,23 +164,23 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
             return files;
         } catch (final Exception e) {
             log.error("Error while getting files", e);
-            throw new ServiceException(e);
+            throw AssetListFailedException.of(prefix, e);
         }
     }
 
     @Override
     public void addFile(String merchantStoreCode, Optional<String> folderPath, InputContentFile inputStaticContentData)
-            throws ServiceException {
+            throws AssetUploadFailedException {
 
+        String key = nodePath(merchantStoreCode, inputStaticContentData.getFileContentType())
+                + inputStaticContentData.getFileName();
         try {
             // get buckets
             String bucketName = bucketName();
 
-            String nodePath = nodePath(merchantStoreCode, inputStaticContentData.getFileContentType());
-
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(nodePath + inputStaticContentData.getFileName())
+                    .key(key)
                     .metadata(Map.of("content-type", inputStaticContentData.getMimeType()))
                     .build();
 
@@ -174,13 +190,13 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
             log.info("Content add file");
         } catch (final Exception e) {
             log.error("Error while adding file", e);
-            throw new ServiceException(e);
+            throw AssetUploadFailedException.of(key, e);
         }
     }
 
     @Override
     public void addFiles(String merchantStoreCode, Optional<String> folderPath,
-                         List<InputContentFile> inputStaticContentDataList) throws ServiceException {
+                         List<InputContentFile> inputStaticContentDataList) throws AssetUploadFailedException {
 
         if (inputStaticContentDataList != null && !inputStaticContentDataList.isEmpty()) {
             for (InputContentFile inputFile : inputStaticContentDataList) {
@@ -191,37 +207,39 @@ public class S3StaticContentAssetsManagerImpl implements ContentAssetsManager {
 
     @Override
     public void removeFile(String merchantStoreCode, FileContentType staticContentType, String fileName,
-                           Optional<String> folderPath) throws ServiceException {
+                           Optional<String> folderPath) throws AssetDeleteFailedException {
 
+        String key = nodePath(merchantStoreCode, staticContentType) + fileName;
         try {
             // get buckets
             String bucketName = bucketName();
 
             s3.deleteObject(DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(nodePath(merchantStoreCode, staticContentType) + fileName)
+                    .key(key)
                     .build());
 
             log.info("Remove file");
         } catch (final Exception e) {
             log.error("Error while removing file", e);
-            throw new ServiceException(e);
+            throw AssetDeleteFailedException.of(key, e);
         }
     }
 
     @Override
-    public void removeFiles(String merchantStoreCode, Optional<String> folderPath) throws ServiceException {
+    public void removeFiles(String merchantStoreCode, Optional<String> folderPath) throws AssetDeleteFailedException {
 
+        String key = nodePath(merchantStoreCode);
         try {
             // get buckets
             String bucketName = bucketName();
 
-            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(nodePath(merchantStoreCode)).build());
+            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
 
             log.info("Remove folder");
         } catch (final Exception e) {
             log.error("Error while removing folder", e);
-            throw new ServiceException(e);
+            throw AssetDeleteFailedException.of(key, e);
         }
     }
 

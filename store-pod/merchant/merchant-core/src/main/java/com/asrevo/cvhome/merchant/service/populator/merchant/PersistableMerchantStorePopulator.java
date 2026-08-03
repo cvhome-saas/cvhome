@@ -10,7 +10,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
 import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.PersistableBaseAddress;
 
@@ -29,9 +28,19 @@ public class PersistableMerchantStorePopulator
         this.merchantStoreService = merchantStoreService;
     }
 
+    /**
+     * Narrows the inherited two-argument form, which declares the shared category base so that a migrated populator
+     * can name its own conditions. This one maps validated request data onto an entity and cannot fail, so it declares
+     * nothing.
+     */
+    @Override
+    public MerchantStore populate(PersistableMerchantStore source, MerchantStore store, LanguageCode language) {
+        return populate(source, createTarget(), store, language);
+    }
+
     @Override
     public MerchantStore populate(PersistableMerchantStore source, MerchantStore target, MerchantStore store,
-                                  LanguageCode language) throws ConversionException {
+                                  LanguageCode language) {
 
         if (target == null) {
             target = new MerchantStore();
@@ -95,24 +104,22 @@ public class PersistableMerchantStorePopulator
         target.setRequireLoginForOrderPlacement(source.isRequireLoginForOrderPlacement());
     }
 
-    private void applyLanguages(PersistableMerchantStore source, MerchantStore target) throws ConversionException {
-        try {
+    /**
+     * Declares no failure: every statement here is a null-check and a setter over already-validated request data. The
+     * blanket {@code catch (Exception) -> ConversionException} this replaces reported an NPE in our own mapping code
+     * as a 400, telling the seller their input was wrong when the fault was ours.
+     */
+    private void applyLanguages(PersistableMerchantStore source, MerchantStore target) {
 
-            if (source.getDefaultLanguage().code() != null && !source.getDefaultLanguage().code().trim().isEmpty()) {
-                target.setDefaultLanguageCode(source.getDefaultLanguage());
-            }
+        if (source.getDefaultLanguage().code() != null && !source.getDefaultLanguage().code().trim().isEmpty()) {
+            target.setDefaultLanguageCode(source.getDefaultLanguage());
+        }
 
-            target.setCurrency(source.getCurrency());
+        target.setCurrency(source.getCurrency());
 
-            List<LanguageCode> languages = source.getSupportedLanguages().stream().map(LanguageCode::new).toList();
-            if (!languages.isEmpty()) {
-                for (LanguageCode lang : languages) {
-                    target.getLanguages().add(lang);
-                }
-            }
-
-        } catch (Exception e) {
-            throw new ConversionException(e);
+        List<LanguageCode> languages = source.getSupportedLanguages().stream().map(LanguageCode::new).toList();
+        for (LanguageCode lang : languages) {
+            target.getLanguages().add(lang);
         }
     }
 

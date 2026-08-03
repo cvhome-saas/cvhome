@@ -29,6 +29,7 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.SneakyThrows;
@@ -92,7 +93,15 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         Set<ProductImage> images = product.getImages();
 
         for (ProductImage image : images) {
-            productImageService.removeProductImage(image);
+            try {
+                productImageService.removeProductImage(image);
+            } catch (AssetDeleteFailedException e) {
+                // The only place in this migration where a typed failure has to be flattened again: this method
+                // overrides SalesManagerEntityService.delete, whose throws clause is ServiceException, and Java
+                // forbids an override from widening it. The wrapper goes when catalog is migrated in Step 7 and the
+                // legacy root contract is deleted in Step 8.
+                throw new ServiceException(e);
+            }
         }
 
         product.setImages(null);

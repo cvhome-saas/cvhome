@@ -7,40 +7,38 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableCustomerPopulator extends AbstractDataPopulator<Customer, StoreMerchantId, ReadableCustomer> {
 
+    /**
+     * Declares no failure, because reading a stored customer out into a DTO has none: every branch below is a
+     * null-check and a setter. The blanket {@code catch (Exception) -> ConversionException} this replaces reported an
+     * NPE in our own mapping code as a 400, blaming the caller's input for our bug.
+     */
     @Override
     public ReadableCustomer populate(Customer source, ReadableCustomer target, StoreMerchantId store,
-                                     LanguageCode language) throws ConversionException {
+                                     LanguageCode language) {
 
-        try {
-
-            if (target == null) {
-                target = new ReadableCustomer();
-            }
-
-            if (source.getId() != null && source.getId() > 0) {
-                target.setId(source.getId());
-            }
-            target.setEmailAddress(source.getEmailAddress());
-
-            if (StringUtils.isNotEmpty(source.getUsername())) {
-                target.setUsername(source.getUsername());
-            }
-
-            if (StringUtils.isNotEmpty(source.getCuaExternalId())) {
-                target.setCuaExternalId(source.getCuaExternalId());
-            }
-
-            applyBilling(source, target);
-            applyDelivery(source, target);
-
-        } catch (Exception e) {
-            throw new ConversionException(e);
+        if (target == null) {
+            target = new ReadableCustomer();
         }
+
+        if (source.getId() != null && source.getId() > 0) {
+            target.setId(source.getId());
+        }
+        target.setEmailAddress(source.getEmailAddress());
+
+        if (StringUtils.isNotEmpty(source.getUsername())) {
+            target.setUsername(source.getUsername());
+        }
+
+        if (StringUtils.isNotEmpty(source.getCuaExternalId())) {
+            target.setCuaExternalId(source.getCuaExternalId());
+        }
+
+        applyBilling(source, target);
+        applyDelivery(source, target);
 
         return target;
     }

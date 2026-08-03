@@ -12,6 +12,16 @@ import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableContentPagePopulator extends AbstractDataPopulator<Content, StoreMerchantId, ReadableContentPage> {
 
+    /**
+     * Narrows the inherited two-argument form, which declares the shared category base so that a migrated
+     * populator can name its own conditions. This one converts a stored entity into a DTO and cannot fail, so
+     * it declares nothing.
+     */
+    @Override
+    public ReadableContentPage populate(Content source, StoreMerchantId store, LanguageCode language) {
+        return populate(source, createTarget(), store, language);
+    }
+
     @Override
     public ReadableContentPage populate(Content source, ReadableContentPage target, StoreMerchantId store,
                                         LanguageCode language) {

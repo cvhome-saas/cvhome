@@ -2,6 +2,7 @@ package com.asrevo.cvhome.merchant.content.services.content;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.entity.content.Content;
+import com.asrevo.cvhome.merchant.content.errors.ContentFileNotFoundException;
+import com.asrevo.cvhome.merchant.content.errors.InvalidFolderPathException;
 import com.asrevo.cvhome.merchant.content.repositories.content.ContentRepository;
 import com.asrevo.cvhome.merchant.content.repositories.content.PageContentRepository;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
@@ -25,6 +28,11 @@ import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service("contentService")
 @Slf4j
 public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Content> implements ContentService {
-
-    private static final String ERR_CONVERT_IMAGE = "Error while trying to convert input stream to buffered image";
 
     private final ContentAssetsManager assetsManager;
 
@@ -99,10 +105,11 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      *
      * @param merchantStoreCode Merchant store
      * @param contentFile       {@link InputContentFile} being stored
-     * @throws ServiceException service exception
+     * @throws AssetUploadFailedException when the object store refuses the write
      */
     @Override
-    public void addContentFile(String merchantStoreCode, InputContentFile contentFile) throws ServiceException {
+    public void addContentFile(String merchantStoreCode, InputContentFile contentFile)
+            throws AssetUploadFailedException {
 
         String mimeType = URLConnection.guessContentTypeFromName(contentFile.getFileName());
         contentFile.setMimeType(mimeType);
@@ -122,50 +129,44 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage) throws AssetUploadFailedException {
         cmsContentImage.setFileContentType(FileContentType.LOGO);
         addImage(merchantStoreCode, cmsContentImage);
     }
 
     @Override
-    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage) throws AssetUploadFailedException {
 
         cmsContentImage.setFileContentType(FileContentType.BANNER);
         addImage(merchantStoreCode, cmsContentImage);
     }
 
     @Override
-    public void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage) throws ServiceException {
+    public void addOptionImage(String merchantStoreCode, InputContentFile cmsContentImage)
+            throws AssetUploadFailedException {
 
         cmsContentImage.setFileContentType(FileContentType.PROPERTY);
         addImage(merchantStoreCode, cmsContentImage);
     }
 
-    private void addImage(String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
+    private void addImage(String merchantStoreCode, InputContentFile contentImage) throws AssetUploadFailedException {
 
         try {
             log.info("Adding content image for merchant id {}", merchantStoreCode);
 
             String p = contentImage.getPath();
             Optional<String> path = Optional.ofNullable(p);
+            // The blanket catch that used to sit here re-flattened AssetUploadFailedException, which already names the
+            // key that failed, back into an untyped ServiceException. Letting it through is the whole point of Step 4.
             assetsManager.addFile(merchantStoreCode, path, contentImage);
 
-        } catch (Exception e) {
-            log.error(ERR_CONVERT_IMAGE, e);
-            throw new ServiceException(e);
-
         } finally {
-
-            try {
-                if (contentImage.getFile() != null) {
-                    contentImage.getFile().close();
-                }
-            } catch (Exception _) {
-            }
+            closeQuietly(contentImage);
         }
     }
 
-    private void addFile(final String merchantStoreCode, InputContentFile contentImage) throws ServiceException {
+    private void addFile(final String merchantStoreCode, InputContentFile contentImage)
+            throws AssetUploadFailedException {
 
         try {
             log.info("Adding content file for merchant id {}", merchantStoreCode);
@@ -173,40 +174,37 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
             assetsManager.addFile(merchantStoreCode, path, contentImage);
 
-        } catch (Exception e) {
-            log.error(ERR_CONVERT_IMAGE, e);
-            throw new ServiceException(e);
-
         } finally {
+            closeQuietly(contentImage);
+        }
+    }
 
-            try {
-                if (contentImage.getFile() != null) {
-                    contentImage.getFile().close();
-                }
-            } catch (Exception _) {
+    /**
+     * Closes an upload stream without letting a close failure mask the outcome. The upload has already either
+     * succeeded or thrown by this point, so a failure here is not the caller's business.
+     */
+    private void closeQuietly(InputContentFile contentImage) {
+        try {
+            if (contentImage.getFile() != null) {
+                contentImage.getFile().close();
             }
+        } catch (IOException e) {
+            log.warn("Could not close the upload stream for {}", contentImage.getFileName(), e);
         }
     }
 
     @Override
     public void addContentFiles(String merchantStoreCode, List<InputContentFile> contentFilesList)
-            throws ServiceException {
-
+            throws AssetUploadFailedException {
 
         Optional<String> path = Optional.empty();
 
         log.info("Adding content images for merchant....");
         assetsManager.addFiles(merchantStoreCode, path, contentFilesList);
 
-        try {
-            for (InputContentFile file : contentFilesList) {
-                if (file.getFile() != null) {
-                    file.getFile().close();
-                }
-            }
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+        // Was: a close failure here failed the whole call, so a seller whose files all uploaded was told the upload
+        // failed. Its two sibling methods already swallowed the same failure; this makes all three agree.
+        contentFilesList.forEach(this::closeQuietly);
     }
 
     /**
@@ -215,7 +213,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      */
     @Override
     public void removeFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
-            throws ServiceException {
+            throws AssetDeleteFailedException {
 
         Optional<String> path = Optional.empty();
 
@@ -223,7 +221,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void removeFile(String storeCode, String fileName) throws ServiceException {
+    public void removeFile(String storeCode, String fileName) throws AssetDeleteFailedException {
 
         String fileType = "IMAGE";
         String mimetype = URLConnection.guessContentTypeFromName(fileName);
@@ -242,7 +240,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      * input and will remove all images associated with given merchant store.
      */
     @Override
-    public void removeFiles(String merchantStoreCode) throws ServiceException {
+    public void removeFiles(String merchantStoreCode) throws AssetDeleteFailedException {
 
         Optional<String> path = Optional.empty();
 
@@ -259,7 +257,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      */
     @Override
     public OutputContentFile getContentFile(String merchantStoreCode, FileContentType fileContentType, String fileName)
-            throws ServiceException {
+            throws AssetNotFoundException, AssetReadFailedException {
 
         Optional<String> path = Optional.empty();
 
@@ -276,7 +274,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      */
     @Override
     public List<OutputContentFile> getContentFiles(String merchantStoreCode, FileContentType fileContentType)
-            throws ServiceException {
+            throws AssetListFailedException {
         Optional<String> path = Optional.empty();
         return assetsManager.getFiles(merchantStoreCode, path, fileContentType);
     }
@@ -288,7 +286,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
      */
     @Override
     public List<String> getContentFilesNames(String merchantStoreCode, FileContentType fileContentType)
-            throws ServiceException {
+            throws AssetListFailedException {
         Optional<String> path = Optional.empty();
 
         return assetsManager.getFileNames(merchantStoreCode, path, fileContentType);
@@ -311,9 +309,10 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void addFolder(StoreMerchantId store, Optional<String> path, String folderName) throws ServiceException {
+    public void addFolder(StoreMerchantId store, Optional<String> path, String folderName)
+            throws InvalidFolderPathException {
         if (path.isPresent() && !this.isValidLinuxDirectory(path.get())) {
-            throw new ServiceException(String.format("Path format [%s] not a valid directory format", path.get()));
+            throw InvalidFolderPathException.of(path.get());
         }
         assetsManager.addFolder(store.getId(), folderName, path);
     }
@@ -335,13 +334,13 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
 
     @Override
     public void renameFile(String merchantStoreCode, FileContentType fileContentType, Optional<String> path,
-                           String originalName, String newName) throws ServiceException {
+                           String originalName, String newName) throws ContentFileNotFoundException,
+            AssetNotFoundException, AssetReadFailedException, AssetDeleteFailedException, AssetUploadFailedException {
 
         OutputContentFile file = assetsManager.getFile(merchantStoreCode, path, fileContentType, originalName);
 
         if (file == null) {
-            throw new ServiceException(
-                    String.format("File name [%s] not found for merchant [%s]", originalName, merchantStoreCode));
+            throw ContentFileNotFoundException.of(originalName, merchantStoreCode);
         }
 
         ByteArrayOutputStream os = file.getFile();

@@ -19,6 +19,9 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.content.entity.content.Content;
 import com.asrevo.cvhome.merchant.content.entity.content.ContentDescription;
+import com.asrevo.cvhome.merchant.content.errors.ContentFileUnreadableException;
+import com.asrevo.cvhome.merchant.content.errors.ContentNotFoundException;
+import com.asrevo.cvhome.merchant.content.errors.DuplicateContentCodeException;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
 import com.asrevo.cvhome.merchant.content.model.content.ContentImage;
@@ -31,18 +34,17 @@ import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage
 import com.asrevo.cvhome.merchant.content.service.populator.content.ReadableContentBoxPopulator;
 import com.asrevo.cvhome.merchant.content.service.populator.content.ReadableContentPagePopulator;
 import com.asrevo.cvhome.merchant.content.services.content.ContentService;
-import com.asrevo.cvhome.store.controller.exception.ConstraintException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Component("contentFacade")
@@ -52,36 +54,30 @@ public class ContentFacadeImpl implements ContentFacade {
 
     public static final String FILE_CONTENT_DELIMITER = "/";
 
-    private static final String NO_PAGE_FOUND_TEMPLATE = "No page found : %s";
-    private static final String ERR_ALREADY_EXIST = "%s with code [%s] already exist for store [%s]";
-    private static final String ERR_DOES_NOT_EXIST = "Page with id [%s] does not exist for store [%s]";
+    private static final String PAGE = "Page";
+    private static final String CONTENT_BOX = "Content box";
 
     private final ContentService contentService;
 
     private final ImageFilePath imageUtils;
 
     @Override
-    public ContentFolder getContentFolder(String folder, StoreMerchantId store) {
-        try {
-            List<String> imageNames = Optional
-                    .ofNullable(contentService.getContentFilesNames(store.getId(), FileContentType.IMAGE))
-                    .orElseGet(List::of);
+    public ContentFolder getContentFolder(String folder, StoreMerchantId store) throws AssetListFailedException {
+        List<String> imageNames = Optional
+                .ofNullable(contentService.getContentFilesNames(store.getId(), FileContentType.IMAGE))
+                .orElseGet(List::of);
 
-            // images from CMS
-            List<ContentImage> contentImages = imageNames.stream()
-                    .map(name -> convertToContentImage(name, store))
-                    .toList();
+        // images from CMS
+        List<ContentImage> contentImages = imageNames.stream()
+                .map(name -> convertToContentImage(name, store))
+                .toList();
 
-            ContentFolder contentFolder = new ContentFolder();
-            if (folder != null && !folder.trim().isEmpty()) {
-                contentFolder.setPath(URLEncoder.encode(folder, StandardCharsets.UTF_8));
-            }
-            contentFolder.getContent().addAll(contentImages);
-            return contentFolder;
-
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(String.format("Error while getting folder %s", e.getMessage()), e);
+        ContentFolder contentFolder = new ContentFolder();
+        if (folder != null && !folder.trim().isEmpty()) {
+            contentFolder.setPath(URLEncoder.encode(folder, StandardCharsets.UTF_8));
         }
+        contentFolder.getContent().addAll(contentImages);
+        return contentFolder;
     }
 
     private ContentImage convertToContentImage(String name, StoreMerchantId store) {
@@ -100,13 +96,9 @@ public class ContentFacadeImpl implements ContentFacade {
     }
 
     @Override
-    public void delete(StoreMerchantId store, String fileName, String fileType) {
-        try {
-            FileContentType t = FileContentType.valueOf(fileType);
-            contentService.removeFile(store.getId(), t, fileName);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+    public void delete(StoreMerchantId store, String fileName, String fileType) throws AssetDeleteFailedException {
+        FileContentType t = FileContentType.valueOf(fileType);
+        contentService.removeFile(store.getId(), t, fileName);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,13 +113,9 @@ public class ContentFacadeImpl implements ContentFacade {
         items.setTotalElements(contentPages.getTotalElements());
         items.setPageNumber(contentPages.getNumber());
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
-        List<ReadableContentPage> pages = contentPages.getContent().stream().map(content -> {
-            try {
-                return populator.populate(content, store, language);
-            } catch (ConversionException _) {
-                return null;
-            }
-        }).filter(Objects::nonNull).toList();
+        List<ReadableContentPage> pages = contentPages.getContent().stream()
+                .map(content -> populator.populate(content, store, language))
+                .toList();
 
         items.setContent(pages);
         return items;
@@ -203,7 +191,8 @@ public class ContentFacadeImpl implements ContentFacade {
         return descriptions;
     }
 
-    private Content getContent(String code, StoreMerchantId store, LanguageCode language) {
+    private Content getContent(String code, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException {
         Optional<Content> content;
 
         if (LanguageCode.isLanguage(language)) {
@@ -213,12 +202,12 @@ public class ContentFacadeImpl implements ContentFacade {
         } else {
             content = Optional.ofNullable(contentService.getByCodeFetchNonLanguages(code, store));
         }
-        return content.orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(code)));
+        return content.orElseThrow(() -> ContentNotFoundException.byCode(code, store));
     }
 
-    @SneakyThrows
     @Override
-    public ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language) {
+    public ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException {
         Content content = getContent(code, store, language);
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         return populator.populate(content, store, language);
@@ -235,20 +224,17 @@ public class ContentFacadeImpl implements ContentFacade {
         items.setTotalElements(contentBoxes.getTotalElements());
         items.setPageNumber(contentBoxes.getNumber());
         ReadableContentBoxPopulator readableContentBoxPopulator = new ReadableContentBoxPopulator();
-        List<ReadableContentBox> boxes = contentBoxes.getContent().stream().map(content -> {
-            try {
-                return readableContentBoxPopulator.populate(content, store, language);
-            } catch (ConversionException _) {
-                return null;
-            }
-        }).filter(Objects::nonNull).toList();
+        List<ReadableContentBox> boxes = contentBoxes.getContent().stream()
+                .map(content -> readableContentBoxPopulator.populate(content, store, language))
+                .toList();
         items.setContent(boxes);
 
         return items;
     }
 
     @Override
-    public void addContentFile(ContentFile file, String merchantStoreCode) {
+    public void addContentFile(ContentFile file, String merchantStoreCode)
+            throws ContentFileUnreadableException, AssetUploadFailedException {
         try {
             byte[] payload = file.getFile();
             String fileName = file.getName();
@@ -266,8 +252,8 @@ public class ContentFacadeImpl implements ContentFacade {
 
                 contentService.addContentFile(merchantStoreCode, cmsContent);
             }
-        } catch (ServiceException | IOException e) {
-            throw new ServiceRuntimeException(e);
+        } catch (IOException e) {
+            throw ContentFileUnreadableException.of(file.getName(), e);
         }
     }
 
@@ -280,58 +266,57 @@ public class ContentFacadeImpl implements ContentFacade {
         return fileType;
     }
 
-    @SneakyThrows
     @Override
-    public ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language) {
+    public ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException {
         Content content = getContent(code, store, language);
         ReadableContentBoxPopulator populator = new ReadableContentBoxPopulator();
         return populator.populate(content, store, language);
     }
 
     @Override
-    public Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language) {
+    public Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language)
+            throws DuplicateContentCodeException {
+
+        Content content = contentService.getByCodeFetchAllLanguages(page.getCode(), merchantStore);
+        if (content != null) {
+            // The catch (Exception) that used to wrap this block swallowed the duplicate check it contains, so the
+            // 409 never left the facade and every outcome here looked like the same generic failure.
+            throw DuplicateContentCodeException.of(PAGE, page.getCode(), merchantStore);
+        }
+
+        content = convertContentPageToContent(merchantStore, content, page);
         try {
-            Content content;
-
-            content = contentService.getByCodeFetchAllLanguages(page.getCode(), merchantStore);
-            if (content != null) {
-                throw new ConstraintException(
-                        String.format(ERR_ALREADY_EXIST, "Page", page.getCode(), merchantStore));
-            }
-
-            content = convertContentPageToContent(merchantStore, content, page);
             contentService.saveOrUpdate(content);
-            return content.getId();
-        } catch (Exception e) {
+        } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
+        return content.getId();
     }
 
     @Override
-    public Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language) {
-        try {
-            Content content;
+    public Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language)
+            throws DuplicateContentCodeException {
 
-            content = contentService.getByCodeFetchAllLanguages(box.getCode(), merchantStore);
-            if (content != null) {
-                throw new ConstraintException(
-                        String.format(ERR_ALREADY_EXIST, "Content box", box.getCode(), merchantStore));
-            }
-            box.setId(null);
-            content = convertContentBoxToContent(merchantStore, content, box);
+        Content content = contentService.getByCodeFetchAllLanguages(box.getCode(), merchantStore);
+        if (content != null) {
+            throw DuplicateContentCodeException.of(CONTENT_BOX, box.getCode(), merchantStore);
+        }
+        box.setId(null);
+        content = convertContentBoxToContent(merchantStore, content, box);
+        try {
             contentService.saveOrUpdate(content);
-            return content.getId();
-        } catch (Exception e) {
+        } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
+        return content.getId();
     }
 
     @Override
-    public void delete(StoreMerchantId store, Long id) {
+    public void delete(StoreMerchantId store, Long id) throws ContentNotFoundException {
         Content content = contentService.getById(id);
         if (content != null && !Objects.equals(content.getStoreMerchantId(), store)) {
-            throw new ResourceNotFoundException(
-                    String.format("No content found with id [%s] for store [%s]", id, store));
+            throw ContentNotFoundException.byId(id, store);
         }
 
         try {
@@ -341,11 +326,11 @@ public class ContentFacadeImpl implements ContentFacade {
         }
     }
 
-    @SneakyThrows
     @Override
-    public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language) {
+    public ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException {
         Content content = contentService.findBySeUrl(store, name, language)
-                .orElseThrow(() -> new ResourceNotFoundException(NO_PAGE_FOUND_TEMPLATE.formatted(name)));
+                .orElseThrow(() -> ContentNotFoundException.byName(name, store));
 
         ReadableContentPagePopulator populator = new ReadableContentPagePopulator();
         return populator.populate(content, store, language);
@@ -353,42 +338,37 @@ public class ContentFacadeImpl implements ContentFacade {
 
     @Override
     public void updateContentPage(Long id, PersistableContentPage page, StoreMerchantId merchantStore,
-                                  LanguageCode language) {
+                                  LanguageCode language) throws ContentNotFoundException {
+
+        Content content = contentService.getById(id, merchantStore);
+        if (content == null) {
+            // Was a ConstraintException, i.e. a 409, for a row that simply is not there.
+            throw ContentNotFoundException.byId(id, merchantStore);
+        }
+
+        page.setId(id);
+        content = convertContentPageToContent(merchantStore, content, page);
         try {
-            Content content;
-
-            content = contentService.getById(id, merchantStore);
-            if (content == null) {
-                throw new ConstraintException(
-                        String.format(ERR_DOES_NOT_EXIST, id, merchantStore));
-            }
-
-            page.setId(id);
-            content = convertContentPageToContent(merchantStore, content, page);
             contentService.saveOrUpdate(content);
-
-        } catch (Exception e) {
+        } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
     }
 
     @Override
     public void updateContentBox(Long id, PersistableContentBox box, StoreMerchantId merchantStore,
-                                 LanguageCode language) {
+                                 LanguageCode language) throws ContentNotFoundException {
+
+        Content content = contentService.getById(id, merchantStore);
+        if (content == null) {
+            throw ContentNotFoundException.byId(id, merchantStore);
+        }
+
+        box.setId(id);
+        content = convertContentBoxToContent(merchantStore, content, box);
         try {
-            Content content;
-
-            content = contentService.getById(id, merchantStore);
-            if (content == null) {
-                throw new ConstraintException(
-                        String.format(ERR_DOES_NOT_EXIST, id, merchantStore));
-            }
-
-            box.setId(id);
-            content = convertContentBoxToContent(merchantStore, content, box);
             contentService.saveOrUpdate(content);
-
-        } catch (Exception e) {
+        } catch (ServiceException e) {
             throw new ServiceRuntimeException(e);
         }
     }

@@ -17,6 +17,9 @@ import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
@@ -100,7 +103,8 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException {
+    public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
+            throws ServiceException, AssetNotFoundException, AssetReadFailedException {
 
         ProductImage pi = new ProductImage();
         String imageName = productImage.getProductImage();
@@ -123,12 +127,13 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public OutputContentFile getProductImage(final String storeCode, final String productCode, final String fileName,
-                                             final ProductImageSize size) throws ServiceException {
+                                             final ProductImageSize size)
+            throws ServiceException, AssetNotFoundException, AssetReadFailedException {
         return productFileManager.getProductImage(storeCode, productCode, fileName, size);
     }
 
     @Override
-    public void removeProductImage(ProductImage productImage) throws ServiceException {
+    public void removeProductImage(ProductImage productImage) throws ServiceException, AssetDeleteFailedException {
 
         if (!StringUtils.isBlank(productImage.getProductImage())) {
             CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),

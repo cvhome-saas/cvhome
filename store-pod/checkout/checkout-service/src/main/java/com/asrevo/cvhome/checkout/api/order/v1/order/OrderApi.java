@@ -35,6 +35,8 @@ import com.asrevo.cvhome.checkout.utils.DomainResolver;
 import com.asrevo.cvhome.checkout.utils.RedirectUriConfirmation;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
+import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
@@ -95,7 +97,8 @@ public class OrderApi {
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
-            throws ServiceException, PaymentApiUnavailableException {
+            throws ServiceException, PaymentApiUnavailableException, UnsupportedCountryCodeException,
+            UnsupportedZoneCodeException {
 
         ShoppingCart cart;
         ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);

@@ -16,12 +16,13 @@ import com.asrevo.cvhome.checkout.service.populator.customer.ReadableCustomerPop
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
+import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,25 +50,34 @@ public class CustomerFacadeImpl implements CustomerFacade {
 
     @Override
     public Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store,
-                                                  LanguageCode language) {
+                                                  LanguageCode language)
+            throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
         log.info("Starting to populate customer model from customer data");
 
-        return Optional.ofNullable(customer.getCuaExternalId())
-                .flatMap(customerService::getByCuaExternalId)
-                .or(() -> populateNewCustomer(customer, store, language));
-
+        // Deliberately not Optional.or(...): a Supplier cannot throw checked, so routing the create branch through one
+        // would force the conversion failures into an Unchecked carrier for no gain. A plain short-circuit keeps the
+        // same laziness and lets them stay on the signature, which is where a caller reads them.
+        Optional<Customer> existing = Optional.ofNullable(customer.getCuaExternalId())
+                .flatMap(customerService::getByCuaExternalId);
+        if (existing.isPresent()) {
+            return existing;
+        }
+        return populateNewCustomer(customer, store, language);
     }
 
     private Optional<Customer> populateNewCustomer(PersistableCustomer customer, StoreMerchantId store,
-                                                   LanguageCode language) {
-        Customer customerModel = new Customer();
+                                                   LanguageCode language)
+            throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
+
+        // Conversion failures are no longer swallowed into an empty Optional: "we could not create the customer" and
+        // "the country code you sent does not exist" were the same silent result, so the caller had nothing to report.
+        Customer customerModel = customerPopulator.populate(customer, new Customer(), store, language);
 
         try {
-            customerModel = customerPopulator.populate(customer, customerModel, store, language);
             log.info("About to persist customer to database.");
             customerService.saveOrUpdate(customerModel);
             return Optional.ofNullable(customerModel);
-        } catch (Exception e) {
+        } catch (ServiceException e) {
             log.error("Error while persisting customer", e);
             return Optional.empty();
         }
@@ -96,11 +106,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
     private ReadableCustomer convertCustomerToReadableCustomer(Customer customer, StoreMerchantId store,
                                                                LanguageCode language) {
         ReadableCustomerPopulator populator = new ReadableCustomerPopulator();
-        try {
-            return populator.populate(customer, new ReadableCustomer(), store, language);
-        } catch (ConversionException e) {
-            throw new ConversionRuntimeException(e);
-        }
+        return populator.populate(customer, new ReadableCustomer(), store, language);
     }
 
     @Override
