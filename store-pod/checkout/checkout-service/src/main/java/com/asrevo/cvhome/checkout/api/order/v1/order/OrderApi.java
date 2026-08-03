@@ -51,7 +51,6 @@ import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,10 +102,11 @@ public class OrderApi {
     public ReadableOrderConfirmation checkout(@PathVariable String code,
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
-            throws ServiceException, PaymentApiUnavailableException, UnsupportedCountryCodeException,
+            throws PaymentApiUnavailableException, UnsupportedCountryCodeException,
             UnsupportedZoneCodeException, CatalogApiUnavailableException, OrderLoginRequiredException,
             ForeignStoreTokenException, ShoppingCartNotFoundException, OrderCustomerUnresolvedException,
-            OrderNotConvertibleException, OrderProductNotConvertibleException, OrderProductPriceMissingException {
+            OrderNotConvertibleException, OrderProductNotConvertibleException,
+            OrderProductPriceMissingException, PriceNotFormattableException {
 
         ShoppingCart cart;
         ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);

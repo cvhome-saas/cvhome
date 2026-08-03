@@ -47,7 +47,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,10 +105,11 @@ public class ProductApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProduct product, StoreMerchantId merchantStore,
                          LanguageCode language)
-            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
-            CategoryReferenceUnresolvableException, ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException, InventoryNotConvertibleException,
-            ProductNotPersistedException {
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ProductNotPersistedException {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
         Entity returnEntity = new Entity();
@@ -145,7 +145,7 @@ public class ProductApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductNotFoundException, ServiceException {
+            throws ProductNotFoundException {
 
         productCommonFacade.deleteProduct(id, merchantStore);
     }

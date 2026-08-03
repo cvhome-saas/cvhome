@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.repositories.product.attribute.PageableProductO
 import com.asrevo.cvhome.catalog.repositories.product.attribute.ProductOptionRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productOptionService")
@@ -37,7 +36,7 @@ public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long
     }
 
     @Override
-    public void saveOrUpdate(ProductOption entity) throws ServiceException {
+    public void saveOrUpdate(ProductOption entity) {
 
         // save or update (persist and attach entities
         if (entity.getId() != null && entity.getId() > 0) {
@@ -48,7 +47,7 @@ public class ProductOptionServiceImpl extends SalesManagerEntityServiceImpl<Long
     }
 
     @Override
-    public void delete(ProductOption entity) throws ServiceException {
+    public void delete(ProductOption entity) {
 
         // remove all attributes having this option
         List<ProductAttribute> attributes = productAttributeService.getByOptionId(entity.getStoreMerchantId(),

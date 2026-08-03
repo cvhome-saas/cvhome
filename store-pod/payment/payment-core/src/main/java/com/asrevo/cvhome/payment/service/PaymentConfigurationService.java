@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfiguration;
 import com.asrevo.cvhome.payment.entity.payment.PaymentConfigurationId;
+import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.mapper.PaymentConfigurationMapper;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.payment.repository.payment.PaymentConfigurationRepository;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PaymentConfigurationService {
-
-    private static final String PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE = "PaymentConfiguration not found with id: %s";
 
     private final PaymentConfigurationRepository repository;
     private final PaymentConfigurationMapper mapper;
@@ -45,20 +43,22 @@ public class PaymentConfigurationService {
     }
 
     @Transactional
-    public void updateConfig(StoreMerchantId merchantStore, PaymentType paymentType, PersistablePaymentConfiguration dto) {
+    public void updateConfig(StoreMerchantId merchantStore, PaymentType paymentType, PersistablePaymentConfiguration dto)
+            throws PaymentConfigurationNotFoundException {
         PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE.formatted(id)));
+                .orElseThrow(() -> PaymentConfigurationNotFoundException.of(paymentType, merchantStore));
 
         mapper.updateEntity(entity, dto);
         repository.save(entity);
     }
 
     @Transactional
-    public void deleteConfig(StoreMerchantId merchantStore, PaymentType paymentType) {
+    public void deleteConfig(StoreMerchantId merchantStore, PaymentType paymentType)
+            throws PaymentConfigurationNotFoundException {
         PaymentConfigurationId id = new PaymentConfigurationId(merchantStore, paymentType);
         PaymentConfiguration entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(PAYMENT_CONFIGURATION_NOT_FOUND_TEMPLATE.formatted(id)));
+                .orElseThrow(() -> PaymentConfigurationNotFoundException.of(paymentType, merchantStore));
 
         repository.delete(entity);
     }

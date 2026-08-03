@@ -53,13 +53,13 @@ import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +97,7 @@ public class OrderFacadeImpl implements OrderFacade {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language)
-            throws ServiceException, ShoppingCartNotFoundException, OrderNotConvertibleException,
+            throws ShoppingCartNotFoundException, OrderNotConvertibleException,
             OrderProductNotConvertibleException, OrderProductPriceMissingException {
 
         Long shoppingCartId = order.getShoppingCartId();
@@ -174,7 +174,8 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
-                                                       LanguageCode language) {
+                                                       LanguageCode language)
+            throws PriceNotFormattableException {
 
         ReadableOrderConfirmation orderConfirmation = new ReadableOrderConfirmation();
 
@@ -184,11 +185,14 @@ public class OrderFacadeImpl implements OrderFacade {
 
         ReadableTotal readableTotal = new ReadableTotal();
 
-        Set<OrderTotal> totals = order.getOrderTotal();
-        List<ReadableOrderTotal> readableTotals = totals.stream()
-                .sorted(Comparator.comparingInt(OrderTotal::getSortOrder))
-                .map(tot -> readableOrderTotalMapper.convert(tot, store, language))
-                .toList();
+        // Plain loops rather than stream().map(...): both order mappers declare a checked failure now, and a lambda
+        // cannot carry it out to this method's signature.
+        List<OrderTotal> sortedTotals = new ArrayList<>(order.getOrderTotal());
+        sortedTotals.sort(Comparator.comparingInt(OrderTotal::getSortOrder));
+        List<ReadableOrderTotal> readableTotals = new ArrayList<>();
+        for (OrderTotal tot : sortedTotals) {
+            readableTotals.add(readableOrderTotalMapper.convert(tot, store, language));
+        }
 
         readableTotal.setTotals(readableTotals);
 
@@ -199,10 +203,10 @@ public class OrderFacadeImpl implements OrderFacade {
         grandTotal.ifPresent(readableOrderTotal -> readableTotal.setGrandTotal(readableOrderTotal.getText()));
         orderConfirmation.setTotal(readableTotal);
 
-        List<ReadableOrderProduct> products = order.getOrderProducts()
-                .stream()
-                .map(pr -> readableOrderProductMapper.convert(pr, store, language))
-                .toList();
+        List<ReadableOrderProduct> products = new ArrayList<>();
+        for (OrderProduct pr : order.getOrderProducts()) {
+            products.add(readableOrderProductMapper.convert(pr, store, language));
+        }
         orderConfirmation.setProducts(products);
 
         orderConfirmation.setId(order.getId());
@@ -264,12 +268,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         Long customerId = modelOrder.getCustomerId();
         if (customerId != null) {
-            ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
-            if (readableCustomer == null) {
-                log.warn(CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE, customerId, orderId);
-            } else {
-                readableOrder.setCustomer(readableCustomer);
-            }
+            attachCustomer(readableOrder, customerId, orderId, store, language);
         }
 
         readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
@@ -301,12 +300,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
         ReadableOrder readableOrder = new ReadableOrder();
 
-        ReadableCustomer readableCustomer = customerFacade.getCustomerById(customerId, store, language);
-        if (readableCustomer == null) {
-            log.warn(CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE, customerId, orderId);
-        } else {
-            readableOrder.setCustomer(readableCustomer);
-        }
+        attachCustomer(readableOrder, customerId, orderId, store, language);
 
         readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
@@ -322,6 +316,20 @@ public class OrderFacadeImpl implements OrderFacade {
         readableOrder.setProducts(orderProducts);
 
         return readableOrder;
+    }
+
+    /**
+     * An order outlives the customer row it names, so a missing customer leaves the rest of the order readable — the
+     * lookup used to return {@code null} for that case and this keeps the same outcome now that it is typed. Only
+     * this one condition is caught: anything else the lookup raises still travels.
+     */
+    private void attachCustomer(ReadableOrder readableOrder, Long customerId, Long orderId, StoreMerchantId store,
+                                LanguageCode language) {
+        try {
+            readableOrder.setCustomer(customerFacade.getCustomerById(customerId, store, language));
+        } catch (CustomerNotFoundException e) {
+            log.warn(CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE, customerId, orderId);
+        }
     }
 
     @Override
@@ -368,7 +376,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store)
-            throws OrderNotFoundException, ServiceException, CatalogApiUnavailableException {
+            throws OrderNotFoundException, CatalogApiUnavailableException {
         Order order = orderService.getOrder(id, store);
         if (order == null) {
             throw OrderNotFoundException.of(id, store);

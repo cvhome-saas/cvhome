@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.repositories.product.manufacturer.ManufacturerR
 import com.asrevo.cvhome.catalog.repositories.product.manufacturer.PageableManufacturerRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void delete(Manufacturer manufacturer) throws ServiceException {
+    public void delete(Manufacturer manufacturer) {
         manufacturer = this.getById(manufacturer.getId());
         super.delete(manufacturer);
     }
@@ -52,7 +51,7 @@ public class ManufacturerServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void saveOrUpdate(Manufacturer manufacturer) throws ServiceException {
+    public void saveOrUpdate(Manufacturer manufacturer) {
 
         log.debug("Creating Manufacturer");
 

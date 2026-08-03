@@ -24,7 +24,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface OrderFacade {
 
@@ -35,15 +34,14 @@ public interface OrderFacade {
      * @throws OrderNotConvertibleException        the payload could not be assembled into an order
      * @throws OrderProductNotConvertibleException a cart line could not be turned into an order line
      * @throws OrderProductPriceMissingException   the catalog returned no price for a cart line
-     * @throws ServiceException                    residue of {@code SalesManagerEntityService}, whose persistence
      *                                             methods still declare it; it disappears when that root is retired
      */
     Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language)
-            throws ServiceException, ShoppingCartNotFoundException, OrderNotConvertibleException,
+            throws ShoppingCartNotFoundException, OrderNotConvertibleException,
             OrderProductNotConvertibleException, OrderProductPriceMissingException;
 
     ReadableOrderConfirmation orderConfirmation(Order order, Customer customer, StoreMerchantId store,
-                                                LanguageCode language);
+                                                LanguageCode language) throws PriceNotFormattableException;
 
     ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store);
 
@@ -72,7 +70,7 @@ public interface OrderFacade {
      *                                        change itself is already recorded
      */
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store)
-            throws OrderNotFoundException, ServiceException, CatalogApiUnavailableException;
+            throws OrderNotFoundException, CatalogApiUnavailableException;
 
     void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
 

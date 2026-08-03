@@ -13,7 +13,6 @@ import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResu
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface OrderPlacementFacade {
 
@@ -44,7 +43,7 @@ public interface OrderPlacementFacade {
      */
     OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                                      Locale locale, String successUrl, String cancelUrl)
-            throws ServiceException, PaymentApiUnavailableException, CatalogApiUnavailableException,
+            throws PaymentApiUnavailableException, CatalogApiUnavailableException,
             ShoppingCartNotFoundException, OrderNotConvertibleException, OrderProductNotConvertibleException,
             OrderProductPriceMissingException;
 }

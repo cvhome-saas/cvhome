@@ -10,7 +10,6 @@ import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductGroupFacade {
 
@@ -20,16 +19,15 @@ public interface ProductGroupFacade {
     ReadableProductGroupListV2 list(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
     void delete(StoreMerchantId store, String code)
-            throws ProductGroupNotFoundException, ServiceException;
+            throws ProductGroupNotFoundException;
 
-    PersistableProductGroup saveProductGroup(StoreMerchantId store, PersistableProductGroup productGroup)
-            throws ServiceException;
+    PersistableProductGroup saveProductGroup(StoreMerchantId store, PersistableProductGroup productGroup);
 
     void addProductToGroup(StoreMerchantId store, String groupCode, Long productId)
-            throws ProductGroupNotFoundException, ProductNotFoundException, ServiceException;
+            throws ProductGroupNotFoundException, ProductNotFoundException;
 
     void removeProductFromGroup(StoreMerchantId store, String groupCode, Long productId)
-            throws ProductGroupNotFoundException, ServiceException;
+            throws ProductGroupNotFoundException;
 
     boolean existByCode(StoreMerchantId store, String code);
 
@@ -37,9 +35,9 @@ public interface ProductGroupFacade {
             throws ProductGroupNotFoundException, ProductNotConvertibleException;
 
     void addProductToGroupForParent(StoreMerchantId store, Long parentProductId, String code, Long productId)
-            throws ProductNotFoundException, ServiceException;
+            throws ProductNotFoundException;
 
     void removeProductFromGroupForParent(StoreMerchantId store, Long parentProductId, String code, Long productId)
-            throws ProductGroupNotFoundException, ServiceException;
+            throws ProductGroupNotFoundException;
 
 }

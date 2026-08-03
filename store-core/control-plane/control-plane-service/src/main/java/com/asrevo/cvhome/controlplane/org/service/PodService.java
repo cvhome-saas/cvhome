@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.controlplane.errors.PodNotFoundException;
 
 public interface PodService {
 
@@ -23,6 +24,6 @@ public interface PodService {
 
     void delete(PodId podId);
 
-    Pod update(PodId id, Pod pod);
+    Pod update(PodId id, Pod pod) throws PodNotFoundException;
 
 }

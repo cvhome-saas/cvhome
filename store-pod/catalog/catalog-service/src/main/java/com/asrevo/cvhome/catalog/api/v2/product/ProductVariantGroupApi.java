@@ -26,7 +26,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -96,7 +95,7 @@ public class ProductVariantGroupApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException, ServiceException {
+            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException {
         productVariantGroupFacade.delete(id, id, merchantStore);
     }
 

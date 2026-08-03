@@ -25,7 +25,6 @@ import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 @Service("manufacturerFacade")
@@ -79,7 +78,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     @Override
     public void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, StoreMerchantId store,
                                          LanguageCode language)
-            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException, ServiceException {
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException {
 
         PersistableManufacturerPopulator populator = new PersistableManufacturerPopulator();
 
@@ -100,7 +99,7 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public void deleteManufacturer(Manufacturer manufacturer) throws ServiceException {
+    public void deleteManufacturer(Manufacturer manufacturer) {
         manufacturerService.delete(manufacturer);
     }
 

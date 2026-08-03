@@ -10,7 +10,6 @@ import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProduc
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 public interface ProductVariantGroupFacade {
@@ -25,7 +24,7 @@ public interface ProductVariantGroupFacade {
             throws ProductVariantGroupNotFoundException;
 
     void delete(Long productVariant, Long productId, StoreMerchantId store)
-            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException, ServiceException;
+            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException;
 
     ReadableEntityList<ReadableProductVariantGroup> list(Long productId, StoreMerchantId store, LanguageCode language,
                                                          Pageable pageable)

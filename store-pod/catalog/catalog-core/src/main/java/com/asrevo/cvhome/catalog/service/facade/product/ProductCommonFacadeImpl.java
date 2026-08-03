@@ -34,7 +34,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.errors.NonPositivePriceException;
 import com.asrevo.cvhome.store.errors.PriceNotParseableException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -180,7 +179,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public void deleteProduct(Long id, StoreMerchantId store) throws ProductNotFoundException, ServiceException {
+    public void deleteProduct(Long id, StoreMerchantId store) throws ProductNotFoundException {
         Product p = productService.getById(id);
 
         if (p == null || !Objects.equals(p.getStore(), store)) {

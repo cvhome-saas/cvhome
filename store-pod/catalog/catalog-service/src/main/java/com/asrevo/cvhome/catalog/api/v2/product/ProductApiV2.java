@@ -42,7 +42,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -106,7 +105,7 @@ public class ProductApiV2 {
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException,
-            ProductNotPersistedException, ProductNotFoundException, ServiceException {
+            ProductNotPersistedException, ProductNotFoundException {
 
         // make sure product id is null
         product.setId(null);
@@ -132,7 +131,7 @@ public class ProductApiV2 {
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException,
-            ProductNotPersistedException, ProductNotFoundException, ServiceException {
+            ProductNotPersistedException, ProductNotFoundException {
 
         productDefinitionFacade.update(id, product, merchantStore, language);
     }

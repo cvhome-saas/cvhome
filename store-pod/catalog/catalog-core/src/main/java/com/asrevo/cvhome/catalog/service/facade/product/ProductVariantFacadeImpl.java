@@ -32,7 +32,6 @@ import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.catalog.services.product.variation.ProductVariationService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
@@ -98,7 +97,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
             throws ProductVariationOptionsIdenticalException, ProductVariationReferenceUnresolvableException,
             ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException {
+            InventoryNotConvertibleException {
         if (productVariant.getVariation() != null && productVariant.getVariation() > 0
                 && productVariant.getVariationValue() != null && productVariant.getVariationValue() > 0) {
 
@@ -129,7 +128,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
                        LanguageCode language)
             throws ProductVariantNotFoundException, ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException {
+            InventoryNotConvertibleException {
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
             throw ProductVariantNotFoundException.of(instanceId, store);
@@ -148,7 +147,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
     @Override
     public void delete(Long productVariant, Long productId, StoreMerchantId store)
-            throws ProductVariantNotFoundException, ServiceException {
+            throws ProductVariantNotFoundException {
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
             throw ProductVariantNotFoundException.of(productVariant, store);

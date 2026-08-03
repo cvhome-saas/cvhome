@@ -43,7 +43,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
@@ -77,7 +76,7 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductOptionEntity createOption(@Valid @RequestBody PersistableProductOptionEntity option,
                                                     StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException {
 
         return productOptionFacade.saveOption(option, merchantStore, language);
     }
@@ -126,7 +125,7 @@ public class ProductAttributeOptionApi {
     public ReadableProductOptionValue createOptionValue(@Valid @RequestBody PersistableProductOptionValue optionValue,
                                                         // @RequestParam(name = "file", required = false) MultipartFile file,
                                                         StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException {
 
         return productOptionFacade.saveOptionValue(optionValue, merchantStore, language);
     }
@@ -173,7 +172,7 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateOption(@Valid @RequestBody PersistableProductOptionEntity option, @PathVariable Long optionId,
                              StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException {
         option.setId(optionId);
         productOptionFacade.saveOption(option, merchantStore, language);
     }
@@ -184,7 +183,7 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteOption(@PathVariable Long optionId, StoreMerchantId merchantStore)
-            throws ProductOptionNotFoundException, ServiceException {
+            throws ProductOptionNotFoundException {
 
         productOptionFacade.deleteOption(optionId, merchantStore);
     }
@@ -199,7 +198,7 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateOptionValue(@PathVariable Long id, @Valid @RequestBody PersistableProductOptionValue optionValue,
                                   StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException {
 
         optionValue.setId(id);
         productOptionFacade.saveOptionValue(optionValue, merchantStore, language);
@@ -211,7 +210,7 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteOptionValue(@PathVariable Long id, StoreMerchantId merchantStore)
-            throws ProductOptionValueNotFoundException, ServiceException {
+            throws ProductOptionValueNotFoundException {
 
         productOptionFacade.deleteOptionValue(id, merchantStore);
     }
@@ -355,7 +354,7 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, StoreMerchantId merchantStore)
-            throws ProductAttributeNotFoundException, ServiceException {
+            throws ProductAttributeNotFoundException {
 
         productOptionFacade.deleteAttribute(id, attributeId, merchantStore);
     }

@@ -23,7 +23,6 @@ public interface ProductGroupService extends SalesManagerEntityService<Long, Pro
 
     List<ProductGroup> listByParentProduct(StoreMerchantId store, Long productId);
 
-    Optional<ProductGroup> getByParentProductAndCode(StoreMerchantId store, Long productId, String code)
-            ;
+    Optional<ProductGroup> getByParentProductAndCode(StoreMerchantId store, Long productId, String code);
 
 }

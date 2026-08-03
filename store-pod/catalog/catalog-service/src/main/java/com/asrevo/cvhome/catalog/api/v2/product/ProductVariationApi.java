@@ -44,7 +44,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -164,7 +163,7 @@ public class ProductVariationApi {
                          LanguageCode language)
 
             throws DuplicateProductVariationException, ProductOptionReferenceUnresolvableException,
-            ProductOptionValueReferenceUnresolvableException, ServiceException {
+            ProductOptionValueReferenceUnresolvableException {
 
         Long variantId = productVariationFacade.create(variation, merchantStore, language);
         return new Entity(variantId);
@@ -230,7 +229,7 @@ public class ProductVariationApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long variationId, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductVariationNotFoundException, ServiceException {
+            throws ProductVariationNotFoundException {
 
         productVariationFacade.delete(variationId, merchantStore);
     }

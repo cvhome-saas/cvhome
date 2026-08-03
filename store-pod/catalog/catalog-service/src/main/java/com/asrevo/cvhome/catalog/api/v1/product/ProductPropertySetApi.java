@@ -29,7 +29,6 @@ import com.asrevo.cvhome.catalog.service.facade.product.ProductOptionSetFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,7 +61,7 @@ public class ProductPropertySetApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void create(@Valid @RequestBody PersistableProductOptionSet optionSet, StoreMerchantId merchantStore,
                        LanguageCode language)
-            throws DuplicateProductOptionSetException, ServiceException {
+            throws DuplicateProductOptionSetException {
 
         productOptionSetFacade.create(optionSet, merchantStore, language);
     }
@@ -124,7 +123,7 @@ public class ProductPropertySetApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductOptionSetNotFoundException, ServiceException {
+            throws ProductOptionSetNotFoundException {
 
         productOptionSetFacade.delete(id, merchantStore);
     }

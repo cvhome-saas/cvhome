@@ -14,6 +14,8 @@ public class CustomerNotFoundException extends ResourceNotFoundException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String STORE_PARAM = "store";
+
     protected CustomerNotFoundException(ErrorPayload payload, Throwable cause) {
         super(payload, cause);
     }
@@ -26,7 +28,19 @@ public class CustomerNotFoundException extends ResourceNotFoundException {
         return new ErrorBuilder<>(CustomerErrors.CUSTOMER_NOT_FOUND, CustomerNotFoundException::new)
                 .detail("No customer for sub %s in store %s.", cuaExternalId, store)
                 .param("cuaExternalId", cuaExternalId)
-                .param("store", store)
+                .param(STORE_PARAM, store)
+                .build();
+    }
+
+    /**
+     * No customer carries this id. It was a {@code ResourceNotFoundException} carrying a formatted sentence and no
+     * code, so the seller UI could not tell it apart from any other 404.
+     */
+    public static CustomerNotFoundException byId(Object customerId, Object store) {
+        return new ErrorBuilder<>(CustomerErrors.CUSTOMER_NOT_FOUND, CustomerNotFoundException::new)
+                .detail("No customer %s in store %s.", customerId, store)
+                .param("customerId", customerId)
+                .param(STORE_PARAM, store)
                 .build();
     }
 

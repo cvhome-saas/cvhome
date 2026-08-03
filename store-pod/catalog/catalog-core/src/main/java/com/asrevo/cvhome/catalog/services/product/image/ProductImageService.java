@@ -10,7 +10,6 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
@@ -28,14 +27,14 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Get the image ByteArrayOutputStream and content description from CMS
      */
     OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
-            throws ServiceException, AssetNotFoundException, AssetReadFailedException;
+            throws AssetNotFoundException, AssetReadFailedException;
 
     /**
      * Get a product image by name for a given product id
      */
     Optional<ProductImage> getProductImage(Long imageId, Long productId, StoreMerchantId store);
 
-    void removeProductImage(ProductImage productImage) throws ServiceException, AssetDeleteFailedException;
+    void removeProductImage(ProductImage productImage) throws AssetDeleteFailedException;
 
     ProductImage saveOrUpdate(ProductImage productImage);
 
@@ -44,7 +43,7 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * servlet
      */
     OutputContentFile getProductImage(String storeCode, String productCode, String fileName, ProductImageSize size)
-            throws ServiceException, AssetNotFoundException, AssetReadFailedException;
+            throws AssetNotFoundException, AssetReadFailedException;
 
     void addProductImages(Product product, List<ProductImage> productImages)
             throws ProductImageNotPersistedException;

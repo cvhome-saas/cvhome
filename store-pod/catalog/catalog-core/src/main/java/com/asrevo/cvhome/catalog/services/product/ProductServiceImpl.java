@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +30,9 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
@@ -89,7 +90,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public void delete(Product product) throws ServiceException {
+    public void delete(Product product) {
         product = this.getById(product.getId());
         product.setCategories(null);
 
@@ -99,11 +100,10 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
             try {
                 productImageService.removeProductImage(image);
             } catch (AssetDeleteFailedException e) {
-                // The only place in this migration where a typed failure has to be flattened again: this method
-                // overrides SalesManagerEntityService.delete, whose throws clause is ServiceException, and Java
-                // forbids an override from widening it. The wrapper goes when catalog is migrated in Step 7 and the
-                // legacy root contract is deleted in Step 8.
-                throw new ServiceException(e);
+                // delete(E) is the root entity contract and declares nothing checked, and Java forbids an override
+                // from widening a throws clause. The carrier is how a typed failure crosses that boundary: the
+                // advice unwraps it, so the asset's own code and status still reach the client.
+                throw new UncheckedBaseException(e);
             }
         }
 
@@ -114,16 +114,16 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public void create(Product product) throws ServiceException {
+    public void create(Product product) {
         saveOrUpdate(product);
     }
 
     @Override
-    public void update(Product product) throws ServiceException {
+    public void update(Product product) {
         saveOrUpdate(product);
     }
 
-    private Product saveOrUpdate(Product product) throws ServiceException {
+    private Product saveOrUpdate(Product product) {
         Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
 
         if (product.getId() != null && product.getId() > 0) {
@@ -162,7 +162,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     private void cleanupImages(Product product, Set<ProductImage> originalProductImages, List<Long> newImageIds)
-            throws ProductImageNotPersistedException, ServiceException {
+            throws ProductImageNotPersistedException {
         // cleanup old and new images
         for (ProductImage image : originalProductImages) {
             if (image.getImage() != null && image.getId() == null) {
@@ -211,7 +211,9 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     public Product saveProduct(Product product) throws ProductNotPersistedException {
         try {
             return this.saveOrUpdate(product);
-        } catch (ServiceException e) {
+        } catch (DataAccessException e) {
+            // The legacy root wrapped every persistence failure into ServiceException; the store now raises its own
+            // unchecked type, and this is the one place that still owes the caller a named condition.
             throw ProductNotPersistedException.of(product.getId(), e);
         }
     }

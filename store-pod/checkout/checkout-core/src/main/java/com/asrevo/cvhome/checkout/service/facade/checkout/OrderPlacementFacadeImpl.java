@@ -27,7 +27,6 @@ import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,7 +51,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                                             Locale locale, String successUrl, String cancelUrl)
-            throws ServiceException, PaymentApiUnavailableException, CatalogApiUnavailableException,
+            throws PaymentApiUnavailableException, CatalogApiUnavailableException,
             ShoppingCartNotFoundException, OrderNotConvertibleException, OrderProductNotConvertibleException,
             OrderProductPriceMissingException {
 

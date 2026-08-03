@@ -12,7 +12,6 @@ import com.asrevo.cvhome.catalog.repositories.product.type.PageableProductTypeRe
 import com.asrevo.cvhome.catalog.repositories.product.type.ProductTypeRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productTypeService")
@@ -42,7 +41,7 @@ public class ProductTypeServiceImpl extends SalesManagerEntityServiceImpl<Long, 
     }
 
     @Override
-    public ProductType saveOrUpdate(ProductType productType) throws ServiceException {
+    public ProductType saveOrUpdate(ProductType productType) {
         if (productType.getId() != null && productType.getId() > 0) {
             this.update(productType);
         } else {

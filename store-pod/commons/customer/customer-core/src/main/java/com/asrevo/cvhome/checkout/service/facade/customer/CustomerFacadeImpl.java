@@ -16,13 +16,12 @@ import com.asrevo.cvhome.checkout.service.populator.customer.ReadableCustomerPop
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,10 +39,11 @@ public class CustomerFacadeImpl implements CustomerFacade {
     }
 
     @Override
-    public ReadableCustomer getCustomerById(Long id, final StoreMerchantId store, final LanguageCode language) {
+    public ReadableCustomer getCustomerById(Long id, final StoreMerchantId store, final LanguageCode language)
+            throws CustomerNotFoundException {
 
         Customer customerModel = Optional.ofNullable(customerService.getById(id))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("No Customer found for ID : %s", id)));
+                .orElseThrow(() -> CustomerNotFoundException.byId(id, store));
 
         return convertCustomerToReadableCustomer(customerModel, store, language);
     }
@@ -73,14 +73,12 @@ public class CustomerFacadeImpl implements CustomerFacade {
         // "the country code you sent does not exist" were the same silent result, so the caller had nothing to report.
         Customer customerModel = customerPopulator.populate(customer, new Customer(), store, language);
 
-        try {
-            log.info("About to persist customer to database.");
-            customerService.saveOrUpdate(customerModel);
-            return Optional.ofNullable(customerModel);
-        } catch (ServiceException e) {
-            log.error("Error while persisting customer", e);
-            return Optional.empty();
-        }
+        log.info("About to persist customer to database.");
+        // A persistence failure is an unchecked DataAccessException the shared advice renders as a 500 with a
+        // traceId. It used to be swallowed into an empty Optional, so the caller could not tell "the database is
+        // down" from "there is no such customer".
+        customerService.saveOrUpdate(customerModel);
+        return Optional.ofNullable(customerModel);
     }
 
     @Override

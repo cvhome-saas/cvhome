@@ -16,7 +16,6 @@ import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartItemRepo
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +45,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      * Save or update a {@link ShoppingCart} for a given customer
      */
     @Override
-    public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
+    public void saveOrUpdate(ShoppingCart shoppingCart) {
 
         if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
             super.create(shoppingCart);
@@ -78,8 +77,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      */
     @Override
     @Transactional
-    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store, LanguageCode languageCode)
-            throws ServiceException {
+    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store, LanguageCode languageCode) {
 
         try {
             ShoppingCart shoppingCart = shoppingCartRepository.findByCode(store, code);
@@ -100,7 +98,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     private ShoppingCart getPopulatedShoppingCart(final ShoppingCart shoppingCart, StoreMerchantId store,
-                                                  LanguageCode language) throws ServiceException {
+                                                  LanguageCode language) {
 
         boolean cartIsObsolete = false;
         if (shoppingCart != null) {

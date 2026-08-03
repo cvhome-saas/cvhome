@@ -27,7 +27,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -114,7 +113,7 @@ public class ProductTypeApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@RequestBody PersistableProductType type, StoreMerchantId merchantStore,
                          LanguageCode language)
-            throws DuplicateProductTypeException, ServiceException {
+            throws DuplicateProductTypeException {
 
         Long id = productTypeFacade.save(type, merchantStore, LanguageCode.allLanguage());
         Entity entity = new Entity();
@@ -133,7 +132,7 @@ public class ProductTypeApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@RequestBody PersistableProductType type, @PathVariable Long id, StoreMerchantId merchantStore,
                        LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException {
+            throws ProductTypeNotFoundException {
 
         productTypeFacade.update(type, id, merchantStore, language);
     }
@@ -148,7 +147,7 @@ public class ProductTypeApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException {
+            throws ProductTypeNotFoundException {
 
         productTypeFacade.delete(id, merchantStore, language);
     }

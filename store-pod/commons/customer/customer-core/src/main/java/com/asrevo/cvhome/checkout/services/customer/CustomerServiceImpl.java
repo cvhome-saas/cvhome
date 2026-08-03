@@ -10,7 +10,6 @@ import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.repositories.customer.CustomerRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ public class CustomerServiceImpl extends SalesManagerEntityServiceImpl<Long, Cus
     }
 
     @Override
-    public void saveOrUpdate(Customer customer) throws ServiceException {
+    public void saveOrUpdate(Customer customer) {
 
         log.debug("Creating Customer");
 

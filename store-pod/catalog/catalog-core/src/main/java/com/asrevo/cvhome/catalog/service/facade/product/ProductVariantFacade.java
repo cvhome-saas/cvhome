@@ -16,7 +16,6 @@ import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProduc
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 public interface ProductVariantFacade {
@@ -34,16 +33,16 @@ public interface ProductVariantFacade {
             throws ProductVariationOptionsIdenticalException, ProductVariationReferenceUnresolvableException,
             ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException;
+            InventoryNotConvertibleException;
 
     void update(Long instanceId, PersistableProductVariant instance, Long productId, StoreMerchantId store,
                 LanguageCode language)
             throws ProductVariantNotFoundException, ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException;
+            InventoryNotConvertibleException;
 
     void delete(Long productVariant, Long productId, StoreMerchantId store)
-            throws ProductVariantNotFoundException, ServiceException;
+            throws ProductVariantNotFoundException;
 
     ReadableEntityList<ReadableProductVariant> list(Long productId, StoreMerchantId store, LanguageCode language,
                                                     Pageable pageable)

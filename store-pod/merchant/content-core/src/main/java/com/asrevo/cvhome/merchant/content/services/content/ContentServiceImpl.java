@@ -26,7 +26,6 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
@@ -58,7 +57,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void delete(Content content) throws ServiceException {
+    public void delete(Content content) {
 
         Content c = this.getById(content.getId());
         super.delete(c);
@@ -82,7 +81,7 @@ public class ContentServiceImpl extends SalesManagerEntityServiceImpl<Long, Cont
     }
 
     @Override
-    public void saveOrUpdate(final Content content) throws ServiceException {
+    public void saveOrUpdate(final Content content) {
 
         // save or update (persist and attach entities
         if (content.getId() != null && content.getId() > 0) {

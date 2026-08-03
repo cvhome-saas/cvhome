@@ -36,7 +36,6 @@ import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -156,7 +155,7 @@ public class ProductImageApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteImage(@PathVariable Long id, @PathVariable Long imageId, StoreMerchantId merchantStore,
                             LanguageCode language)
-            throws ProductImageNotFoundException, ServiceException {
+            throws ProductImageNotFoundException {
 
         Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
 

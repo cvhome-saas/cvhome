@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.checkout.api.order.v1.customer;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +15,7 @@ import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomerList;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -57,12 +60,15 @@ public class CustomerApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
     public ReadableCustomer getCustomerInfo(StoreMerchantId merchantStore, LanguageCode language,
-                                            JwtAuthenticationToken auth) {
+                                            JwtAuthenticationToken auth) throws CustomerNotFoundException {
 
         String cuaExternalId = (String) auth.getTokenAttributes().get("sub");
-        return customerFacade.getCustomerByCuaExternalId(cuaExternalId)
-                .map(it -> customerFacade.getCustomerById(it.getId(), merchantStore, language))
-                .orElseGet(ReadableCustomer::new);
+        // Not a map(...): the lookup names a checked condition now, and a Function cannot carry one.
+        Optional<ReadableCustomer> known = customerFacade.getCustomerByCuaExternalId(cuaExternalId);
+        if (known.isEmpty()) {
+            return new ReadableCustomer();
+        }
+        return customerFacade.getCustomerById(known.get().getId(), merchantStore, language);
     }
 
 }

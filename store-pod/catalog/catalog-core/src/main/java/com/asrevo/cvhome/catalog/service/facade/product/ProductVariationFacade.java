@@ -10,7 +10,6 @@ import com.asrevo.cvhome.catalog.model.product.variation.PersistableProductVaria
 import com.asrevo.cvhome.catalog.model.product.variation.ReadableProductVariation;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 public interface ProductVariationFacade {
@@ -23,7 +22,7 @@ public interface ProductVariationFacade {
     Long create(PersistableProductVariation optionSet, StoreMerchantId store, LanguageCode language)
 
             throws DuplicateProductVariationException, ProductOptionReferenceUnresolvableException,
-            ProductOptionValueReferenceUnresolvableException, ServiceException;
+            ProductOptionValueReferenceUnresolvableException;
 
     void update(Long variationId, PersistableProductVariation variation, StoreMerchantId store, LanguageCode language)
 
@@ -31,7 +30,7 @@ public interface ProductVariationFacade {
             ProductOptionValueReferenceUnresolvableException;
 
     void delete(Long variation, StoreMerchantId store)
-            throws ProductVariationNotFoundException, ServiceException;
+            throws ProductVariationNotFoundException;
 
     ReadableEntityList<ReadableProductVariation> list(StoreMerchantId store, LanguageCode language, Pageable pageable);
 

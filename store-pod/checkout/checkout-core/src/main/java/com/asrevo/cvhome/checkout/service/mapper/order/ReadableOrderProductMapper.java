@@ -11,16 +11,15 @@ import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductAttribute;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProductAttribute;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
-import lombok.SneakyThrows;
 
 @Component
 public class ReadableOrderProductMapper implements Mapper<OrderProduct, ReadableOrderProduct> {
@@ -36,15 +35,15 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
     }
 
     @Override
-    public ReadableOrderProduct convert(OrderProduct source, StoreMerchantId store, LanguageCode language) {
+    public ReadableOrderProduct convert(OrderProduct source, StoreMerchantId store, LanguageCode language)
+            throws PriceNotFormattableException {
         ReadableOrderProduct orderProduct = new ReadableOrderProduct();
         return this.merge(source, orderProduct, store, language);
     }
 
-    @SneakyThrows
     @Override
     public ReadableOrderProduct merge(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
-                                      LanguageCode language) {
+                                      LanguageCode language) throws PriceNotFormattableException {
 
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
@@ -52,7 +51,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
             target.setPrice(PriceUtils.getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store),
                     source.getOneTimeCharge()));
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Cannot convert price", e);
+            throw PriceNotFormattableException.of(source.getOneTimeCharge(), e);
         }
         target.setProductName(source.getProductName());
         target.setSku(source.getSku());
@@ -66,7 +65,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
                     .getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store), subTotal);
             target.setSubTotal(subTotalPrice);
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Cannot format price", e);
+            throw PriceNotFormattableException.of(subTotal, e);
         }
 
         if (source.getOrderAttributes() != null) {

@@ -15,7 +15,6 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
@@ -30,7 +29,7 @@ public interface ContentService extends SalesManagerEntityService<Long, Content>
 
     Content getByCodeFetchNonLanguages(String code, StoreMerchantId store);
 
-    void saveOrUpdate(Content content) throws ServiceException;
+    void saveOrUpdate(Content content);
 
     boolean exists(String code, ContentType type, StoreMerchantId store);
 

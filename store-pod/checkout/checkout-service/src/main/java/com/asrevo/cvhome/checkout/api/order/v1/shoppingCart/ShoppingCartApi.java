@@ -23,7 +23,6 @@ import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -75,7 +74,7 @@ public class ShoppingCartApi {
                                                            @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                                            StoreMerchantId merchantStore,
                                                            LanguageCode language)
-            throws ServiceException, ShoppingCartNotFoundException, ProductNotPurchasableException {
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
 
         ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 
@@ -96,7 +95,7 @@ public class ShoppingCartApi {
 
     public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
                                           LanguageCode language)
-            throws ServiceException, ShoppingCartNotFoundException {
+            throws ShoppingCartNotFoundException {
 
         ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
 
@@ -122,7 +121,7 @@ public class ShoppingCartApi {
                                                                @PathVariable("sku") String sku, StoreMerchantId merchantStore,
                                                                LanguageCode language,
                                                                @RequestParam(defaultValue = "false") boolean body)
-            throws ServiceException, ShoppingCartNotFoundException {
+            throws ShoppingCartNotFoundException {
 
         ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
                 language, body);

@@ -26,7 +26,6 @@ import com.asrevo.cvhome.catalog.service.facade.product.group.ProductGroupFacade
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -117,8 +116,7 @@ public class ProductGroupApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public PersistableProductGroup saveProductGroup(@RequestBody @Valid PersistableProductGroup group,
-                                                    StoreMerchantId merchantStore)
-            throws ServiceException {
+                                                    StoreMerchantId merchantStore) {
         return productGroupFacade.saveProductGroup(merchantStore, group);
     }
 
@@ -129,7 +127,7 @@ public class ProductGroupApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteProductGroup(@PathVariable String code, StoreMerchantId merchantStore)
-            throws ProductGroupNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException {
         productGroupFacade.delete(merchantStore, code);
     }
 
@@ -141,7 +139,7 @@ public class ProductGroupApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToGroup(@PathVariable String code, @PathVariable Long productId,
                                   StoreMerchantId merchantStore)
-            throws ProductGroupNotFoundException, ProductNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException, ProductNotFoundException {
         productGroupFacade.addProductToGroup(merchantStore, code, productId);
     }
 
@@ -153,7 +151,7 @@ public class ProductGroupApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromGroup(@PathVariable String code, @PathVariable Long productId,
                                        StoreMerchantId merchantStore)
-            throws ProductGroupNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException {
         productGroupFacade.removeProductFromGroup(merchantStore, code, productId);
     }
 

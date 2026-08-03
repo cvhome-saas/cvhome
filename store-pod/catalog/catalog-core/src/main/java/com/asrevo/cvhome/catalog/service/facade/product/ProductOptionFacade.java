@@ -24,7 +24,6 @@ import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOpti
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValueList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 
 /*
@@ -40,11 +39,11 @@ public interface ProductOptionFacade {
 
     ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, StoreMerchantId store,
                                            LanguageCode language)
-            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException;
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException;
 
     ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue, StoreMerchantId store,
                                                LanguageCode language)
-            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException;
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException;
 
     List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
                                       StoreMerchantId store)
@@ -57,10 +56,10 @@ public interface ProductOptionFacade {
     boolean optionValueExists(String code, StoreMerchantId store);
 
     void deleteOption(Long optionId, StoreMerchantId store)
-            throws ProductOptionNotFoundException, ServiceException;
+            throws ProductOptionNotFoundException;
 
     void deleteOptionValue(Long optionValueId, StoreMerchantId store)
-            throws ProductOptionValueNotFoundException, ServiceException;
+            throws ProductOptionValueNotFoundException;
 
     ReadableProductOptionList options(StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
@@ -84,6 +83,6 @@ public interface ProductOptionFacade {
             throws ProductNotFoundException, ProductAttributeNotConvertibleException;
 
     void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store)
-            throws ProductAttributeNotFoundException, ServiceException;
+            throws ProductAttributeNotFoundException;
 
 }

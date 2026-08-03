@@ -18,7 +18,6 @@ import com.asrevo.cvhome.catalog.service.facade.product.group.ProductGroupFacade
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -68,7 +67,7 @@ public class ProductRelationshipApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToRelationship(@PathVariable Long id, @PathVariable Long productId,
                                          StoreMerchantId merchantStore)
-            throws ProductNotFoundException, ServiceException {
+            throws ProductNotFoundException {
         productGroupFacade.addProductToGroupForParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, productId);
     }
 
@@ -80,7 +79,7 @@ public class ProductRelationshipApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromRelationship(@PathVariable Long id, @PathVariable Long productId,
                                               StoreMerchantId merchantStore)
-            throws ProductGroupNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException {
         productGroupFacade.removeProductFromGroupForParent(merchantStore, id, DEFAULT_RELATIONSHIP_CODE, productId);
     }
 

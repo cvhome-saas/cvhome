@@ -21,7 +21,10 @@ public enum ControlPlaneErrors implements ErrorCode {
     USER_FOREIGN_ORG("CONTROL_PLANE.USER.FOREIGN_ORG", ErrorCategory.FORBIDDEN),
 
     /** The requested user belongs to a different store than the request targeted. */
-    USER_FOREIGN_STORE("CONTROL_PLANE.USER.FOREIGN_STORE", ErrorCategory.FORBIDDEN);
+    USER_FOREIGN_STORE("CONTROL_PLANE.USER.FOREIGN_STORE", ErrorCategory.FORBIDDEN),
+
+    /** No pod is registered under the requested id. */
+    POD_NOT_FOUND("CONTROL_PLANE.POD.NOT_FOUND", ErrorCategory.NOT_FOUND);
 
     private final String code;
 

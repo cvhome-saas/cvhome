@@ -18,7 +18,6 @@ import com.asrevo.cvhome.catalog.model.category.ReadableCategoryList;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 public interface CategoryFacade {
@@ -43,7 +42,7 @@ public interface CategoryFacade {
      * @return PersistableCategory
      */
     PersistableCategory saveCategory(StoreMerchantId store, PersistableCategory category)
-            throws ServiceException, CategoryNotConvertibleException,
+            throws CategoryNotConvertibleException,
             CategoryReferenceUnresolvableException, CategoryDescriptionLanguageMissingException;
 
     /**
@@ -61,7 +60,7 @@ public interface CategoryFacade {
     Category getByCode(String code, StoreMerchantId store);
 
     void deleteCategory(Long categoryId, StoreMerchantId store)
-            throws CategoryNotFoundException, ServiceException;
+            throws CategoryNotFoundException;
 
     /**
      * List product options variations for a given category
@@ -79,13 +78,13 @@ public interface CategoryFacade {
      */
     void move(Long child, Long parent, StoreMerchantId store)
             throws CategoryNotFoundException, CategoryIdentifiersInconsistentException,
-            CategoryReferenceUnresolvableException, ServiceException;
+            CategoryReferenceUnresolvableException;
 
     /**
      * Set category visible or not
      */
     void setVisible(PersistableCategory category, StoreMerchantId store)
-            throws CategoryNotFoundException, ForeignStoreProductAccessException, ServiceException;
+            throws CategoryNotFoundException, ForeignStoreProductAccessException;
 
     /**
      * List category by product

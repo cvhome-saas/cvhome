@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.repositories.product.attribute.PageableProductA
 import com.asrevo.cvhome.catalog.repositories.product.attribute.ProductAttributeRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productAttributeService")
@@ -72,7 +71,7 @@ public class ProductAttributeServiceImpl extends SalesManagerEntityServiceImpl<L
     }
 
     @Override
-    public void delete(ProductAttribute attribute) throws ServiceException {
+    public void delete(ProductAttribute attribute) {
 
         // override method, this allows the error that we try to remove a detached
         // variant

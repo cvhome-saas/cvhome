@@ -19,7 +19,6 @@ import com.asrevo.cvhome.catalog.services.product.price.ProductPriceService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 
@@ -89,7 +88,7 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
 
     @Override
     public void delete(Long priceId, String sku, StoreMerchantId store)
-            throws ProductPriceNotFoundException, ServiceException {
+            throws ProductPriceNotFoundException {
         ProductPrice productPrice = productPriceService.findById(priceId, sku, store);
         if (productPrice == null) {
             // Was a ServiceRuntimeException reporting LEGACY.SERVICE_ERROR — a 500 for a price id that simply does

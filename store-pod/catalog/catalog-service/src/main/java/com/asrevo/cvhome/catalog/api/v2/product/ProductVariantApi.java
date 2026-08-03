@@ -34,7 +34,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -83,7 +82,7 @@ public class ProductVariantApi {
 
             throws ProductVariationOptionsIdenticalException, ProductVariationReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException {
+            InventoryNotConvertibleException {
         Long id = productVariantFacade.create(variant, productId, merchantStore, language);
         return new Entity(id);
     }
@@ -99,7 +98,7 @@ public class ProductVariantApi {
 
             throws ProductVariantNotFoundException, ProductVariationReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ServiceException {
+            InventoryNotConvertibleException {
         productVariantFacade.update(variantId, variant, id, merchantStore, language);
     }
 
@@ -167,7 +166,7 @@ public class ProductVariantApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, @PathVariable Long variantId, StoreMerchantId merchantStore,
                        LanguageCode language)
-            throws ProductVariantNotFoundException, ServiceException {
+            throws ProductVariantNotFoundException {
 
         productVariantFacade.delete(variantId, id, merchantStore);
     }

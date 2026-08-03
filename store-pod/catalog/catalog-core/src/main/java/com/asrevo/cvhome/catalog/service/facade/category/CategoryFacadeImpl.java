@@ -41,7 +41,6 @@ import com.asrevo.cvhome.catalog.services.product.attribute.ProductAttributeServ
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 import lombok.AllArgsConstructor;
@@ -137,7 +136,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public PersistableCategory saveCategory(StoreMerchantId store, PersistableCategory category)
-            throws ServiceException, CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
+            throws CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
             CategoryDescriptionLanguageMissingException {
 
             Long categoryId = category.getId();
@@ -162,7 +161,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         return persistableCatagoryPopulator.populate(category, target, store, defaultLanguage);
     }
 
-    private void saveCategory(StoreMerchantId store, Category category, Category parent) throws ServiceException {
+    private void saveCategory(StoreMerchantId store, Category category, Category parent) {
 
         if (parent != null) {
             category.setParent(category);
@@ -229,7 +228,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
         return readableCategory;
     }
 
-    private void deleteCategory(Category category) throws ServiceException {
+    private void deleteCategory(Category category) {
         categoryService.delete(category);
     }
 
@@ -266,7 +265,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public void deleteCategory(Long categoryId, StoreMerchantId store)
-            throws CategoryNotFoundException, ServiceException {
+            throws CategoryNotFoundException {
         Category category = getOne(categoryId, store);
         deleteCategory(category);
     }
@@ -289,85 +288,83 @@ public class CategoryFacadeImpl implements CategoryFacade {
             throw CategoryNotFoundException.of(categoryId, store);
         }
 
-        {
-            List<ProductAttribute> attributes = productAttributeService.getProductAttributesByCategoryLineage(store,
-                    category.getLineage(), language);
+        List<ProductAttribute> attributes = productAttributeService.getProductAttributesByCategoryLineage(store,
+                category.getLineage(), language);
 
-            Map<String, List<ProductOptionValue>> rawFacet = new HashMap<>();
-            Map<String, ProductOption> references = new HashMap<>();
-            for (ProductAttribute attr : attributes) {
-                references.put(attr.getProductOption().getCode(), attr.getProductOption());
-                List<ProductOptionValue> values = rawFacet.computeIfAbsent(attr.getProductOption().getCode(),
-                        k -> new ArrayList<>());
+        Map<String, List<ProductOptionValue>> rawFacet = new HashMap<>();
+        Map<String, ProductOption> references = new HashMap<>();
+        for (ProductAttribute attr : attributes) {
+            references.put(attr.getProductOption().getCode(), attr.getProductOption());
+            List<ProductOptionValue> values = rawFacet.computeIfAbsent(attr.getProductOption().getCode(),
+                    k -> new ArrayList<>());
 
-                if (attr.getProductOptionValue() != null) {
-                    Optional<ProductOptionValueDescription> desc = attr.getProductOptionValue()
-                            .getDescriptions()
-                            .stream()
-                            .filter(o -> o.getLanguageCode().equals(language))
-                            .findFirst();
-
-                    ProductOptionValue val = new ProductOptionValue();
-                    val.setCode(attr.getProductOption().getCode());
-                    String order = attr.getAttributeSortOrder();
-                    val.setSortOrder(
-                            order == null ? attr.getId().intValue() : Integer.parseInt(attr.getAttributeSortOrder()));
-                    if (desc.isPresent()) {
-                        val.setName(desc.get().getName());
-                    } else {
-                        val.setName(attr.getProductOption().getCode());
-                    }
-                    values.add(val);
-                }
-            }
-
-            // for each reference set Option
-            for (Entry<String, ProductOption> pair : references.entrySet()) {
-                ProductOption option = pair.getValue();
-                List<ProductOptionValue> values = rawFacet.get(option.getCode());
-
-                ReadableProductVariant productVariant = new ReadableProductVariant();
-                Optional<ProductOptionDescription> optionDescription = option.getDescriptions()
+            if (attr.getProductOptionValue() != null) {
+                Optional<ProductOptionValueDescription> desc = attr.getProductOptionValue()
+                        .getDescriptions()
                         .stream()
                         .filter(o -> o.getLanguageCode().equals(language))
                         .findFirst();
-                if (optionDescription.isPresent()) {
-                    productVariant.setName(optionDescription.get().getName());
-                    productVariant.setId(optionDescription.get().getId());
-                    productVariant.setCode(optionDescription.get().getProductOption().getCode());
-                    List<ReadableProductVariantValue> optionValues = new ArrayList<>();
-                    for (ProductOptionValue value : values) {
-                        ReadableProductVariantValue v = new ReadableProductVariantValue();
-                        v.setCode(value.getCode());
-                        v.setName(value.getName());
-                        v.setDescription(value.getName());
-                        v.setOption(option.getId());
-                        v.setValue(value.getId());
-                        v.setOrder(option.getProductOptionSortOrder());
-                        optionValues.add(v);
-                    }
 
-
-                    List<ReadableProductVariantValue> readableValues;
-
-                    // sort by name
-                    // remove duplicates
-                    readableValues = optionValues.stream().distinct().toList();
-                    readableValues.sort(Comparator.comparing(ReadableProductVariantValue::getName));
-
-                    productVariant.setOptions(readableValues);
-                    variants.add(productVariant);
+                ProductOptionValue val = new ProductOptionValue();
+                val.setCode(attr.getProductOption().getCode());
+                String order = attr.getAttributeSortOrder();
+                val.setSortOrder(
+                        order == null ? attr.getId().intValue() : Integer.parseInt(attr.getAttributeSortOrder()));
+                if (desc.isPresent()) {
+                    val.setName(desc.get().getName());
+                } else {
+                    val.setName(attr.getProductOption().getCode());
                 }
+                values.add(val);
             }
-
-            return variants;
         }
+
+        // for each reference set Option
+        for (Entry<String, ProductOption> pair : references.entrySet()) {
+            ProductOption option = pair.getValue();
+            List<ProductOptionValue> values = rawFacet.get(option.getCode());
+
+            ReadableProductVariant productVariant = new ReadableProductVariant();
+            Optional<ProductOptionDescription> optionDescription = option.getDescriptions()
+                    .stream()
+                    .filter(o -> o.getLanguageCode().equals(language))
+                    .findFirst();
+            if (optionDescription.isPresent()) {
+                productVariant.setName(optionDescription.get().getName());
+                productVariant.setId(optionDescription.get().getId());
+                productVariant.setCode(optionDescription.get().getProductOption().getCode());
+                List<ReadableProductVariantValue> optionValues = new ArrayList<>();
+                for (ProductOptionValue value : values) {
+                    ReadableProductVariantValue v = new ReadableProductVariantValue();
+                    v.setCode(value.getCode());
+                    v.setName(value.getName());
+                    v.setDescription(value.getName());
+                    v.setOption(option.getId());
+                    v.setValue(value.getId());
+                    v.setOrder(option.getProductOptionSortOrder());
+                    optionValues.add(v);
+                }
+
+
+                List<ReadableProductVariantValue> readableValues;
+
+                // sort by name
+                // remove duplicates
+                readableValues = optionValues.stream().distinct().toList();
+                readableValues.sort(Comparator.comparing(ReadableProductVariantValue::getName));
+
+                productVariant.setOptions(readableValues);
+                variants.add(productVariant);
+            }
+        }
+
+        return variants;
     }
 
     @Override
     public void move(Long child, Long parent, StoreMerchantId store)
             throws CategoryNotFoundException, CategoryIdentifiersInconsistentException,
-            CategoryReferenceUnresolvableException, ServiceException {
+            CategoryReferenceUnresolvableException {
 
             Category c = categoryService.getById(child, store);
 
@@ -405,7 +402,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 
     @Override
     public void setVisible(PersistableCategory category, StoreMerchantId store)
-            throws CategoryNotFoundException, ForeignStoreProductAccessException, ServiceException {
+            throws CategoryNotFoundException, ForeignStoreProductAccessException {
         Category c = this.getById(store, category.getId());
         c.setVisible(category.isVisible());
         categoryService.saveOrUpdate(c);

@@ -9,7 +9,6 @@ import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductTypeFacade {
 
@@ -22,13 +21,13 @@ public interface ProductTypeFacade {
             throws ProductTypeNotFoundException;
 
     Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language)
-            throws DuplicateProductTypeException, ServiceException;
+            throws DuplicateProductTypeException;
 
     void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException;
+            throws ProductTypeNotFoundException;
 
     void delete(Long id, StoreMerchantId store, LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException;
+            throws ProductTypeNotFoundException;
 
     boolean exists(String code, StoreMerchantId store, LanguageCode language);
 

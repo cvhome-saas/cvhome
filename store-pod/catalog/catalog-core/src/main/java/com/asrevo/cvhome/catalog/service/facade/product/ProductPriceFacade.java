@@ -10,7 +10,6 @@ import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 /**
  * Product price management api
@@ -30,7 +29,7 @@ public interface ProductPriceFacade {
      * Product price deletion
      */
     void delete(Long priceId, String sku, StoreMerchantId store)
-            throws ProductPriceNotFoundException, ServiceException;
+            throws ProductPriceNotFoundException;
 
     /**
      * List product prices by product and inventory (product and variants)

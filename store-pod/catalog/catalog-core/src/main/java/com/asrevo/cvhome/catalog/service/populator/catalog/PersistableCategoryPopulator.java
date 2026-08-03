@@ -17,7 +17,6 @@ import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -66,7 +65,7 @@ public class PersistableCategoryPopulator
     }
 
     private void applyParent(PersistableCategory source, Category target, StoreMerchantId store)
-            throws CategoryReferenceUnresolvableException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (source.getParent() == null || StringUtils.isBlank(source.getParent().getCode())
                 || source.getParent().getId() == null) {
             target.setParent(null);
@@ -96,7 +95,7 @@ public class PersistableCategoryPopulator
     }
 
     private Category resolveParent(PersistableCategory source, StoreMerchantId store)
-            throws CategoryReferenceUnresolvableException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (!StringUtils.isBlank(source.getParent().getCode())) {
             return categoryService.getByCode(store, source.getParent().getCode());
         }
@@ -108,7 +107,7 @@ public class PersistableCategoryPopulator
 
     private void applyChildren(PersistableCategory source, Category target, StoreMerchantId store, LanguageCode language)
             throws CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
-            CategoryDescriptionLanguageMissingException, ServiceException {
+            CategoryDescriptionLanguageMissingException {
         if (CollectionUtils.isEmpty(source.getChildren())) {
             return;
         }

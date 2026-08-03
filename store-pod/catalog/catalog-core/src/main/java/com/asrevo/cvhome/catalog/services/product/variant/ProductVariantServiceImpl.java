@@ -14,7 +14,6 @@ import com.asrevo.cvhome.catalog.repositories.product.variant.PageableProductVar
 import com.asrevo.cvhome.catalog.repositories.product.variant.ProductVariantRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productVariantService")
@@ -75,7 +74,7 @@ public class ProductVariantServiceImpl extends SalesManagerEntityServiceImpl<Lon
     }
 
     @Override
-    public void delete(ProductVariant instance) throws ServiceException {
+    public void delete(ProductVariant instance) {
         super.delete(instance);
     }
 

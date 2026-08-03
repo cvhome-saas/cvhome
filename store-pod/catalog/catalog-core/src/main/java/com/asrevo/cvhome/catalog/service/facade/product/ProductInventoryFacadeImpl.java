@@ -30,7 +30,6 @@ import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
@@ -64,7 +63,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
 
     @Override
     public void delete(Long productId, Long inventoryId, StoreMerchantId store)
-            throws InventoryNotFoundException, ServiceException {
+            throws InventoryNotFoundException {
         ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
                 .filter(it -> it.getProduct().getId().equals(productId))
                 .orElseThrow(() -> InventoryNotFoundException.of(inventoryId, store));
@@ -85,7 +84,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     @Override
     public ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
             throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
-            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException, ServiceException {
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
 
         // add inventory to the product
@@ -114,7 +113,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     public void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
             throws InventoryNotFoundException, InventoryNotConvertibleException,
             InventoryReferenceUnresolvableException, ProductNotFoundException, ProductReferenceUnresolvableException,
-            ProductVariantNotFoundException, ProductVariantReferenceUnresolvableException, ServiceException {
+            ProductVariantNotFoundException, ProductVariantReferenceUnresolvableException {
         Set<ProductAvailability> originAvailability = null;
         Product product = null;
 

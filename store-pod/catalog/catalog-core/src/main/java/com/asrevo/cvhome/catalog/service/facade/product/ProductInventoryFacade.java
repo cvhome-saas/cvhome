@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.model.product.inventory.PersistableInventory;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 public interface ProductInventoryFacade {
@@ -27,15 +26,15 @@ public interface ProductInventoryFacade {
 
     ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
             throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
-            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException, ServiceException;
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException;
 
     void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
             throws InventoryNotFoundException, InventoryNotConvertibleException,
             InventoryReferenceUnresolvableException, ProductNotFoundException, ProductReferenceUnresolvableException,
-            ProductVariantNotFoundException, ProductVariantReferenceUnresolvableException, ServiceException;
+            ProductVariantNotFoundException, ProductVariantReferenceUnresolvableException;
 
     void delete(Long productId, Long inventoryId, StoreMerchantId store)
-            throws InventoryNotFoundException, ServiceException;
+            throws InventoryNotFoundException;
 
     ReadableEntityList<ReadableInventory> get(Long productId, StoreMerchantId store, LanguageCode language,
                                               Pageable pageable)

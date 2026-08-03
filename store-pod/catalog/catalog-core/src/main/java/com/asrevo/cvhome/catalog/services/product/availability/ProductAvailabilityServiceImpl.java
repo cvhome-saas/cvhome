@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.repositories.product.availability.PageableProductAvailabilityRepository;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductAvailabilityRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 /**
@@ -38,7 +37,7 @@ public class ProductAvailabilityServiceImpl extends SalesManagerEntityServiceImp
     }
 
     @Override
-    public ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException {
+    public ProductAvailability saveOrUpdate(ProductAvailability availability) {
         if (isPositive(availability.getId())) {
             update(availability);
         } else {

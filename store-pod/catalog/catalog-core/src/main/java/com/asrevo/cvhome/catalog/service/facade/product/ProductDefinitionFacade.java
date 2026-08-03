@@ -16,7 +16,6 @@ import com.asrevo.cvhome.catalog.model.product.product.definition.PersistablePro
 import com.asrevo.cvhome.catalog.model.product.product.definition.ReadableProductDefinition;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductDefinitionFacade {
 
@@ -29,7 +28,7 @@ public interface ProductDefinitionFacade {
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
             ProductOptionNotConvertibleException, ProductNotPersistedException,
-            ProductNotFoundException, ServiceException;
+            ProductNotFoundException;
 
     /**
      *
@@ -40,7 +39,7 @@ public interface ProductDefinitionFacade {
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
             ProductOptionNotConvertibleException, ProductNotPersistedException,
-            ProductNotFoundException, ServiceException;
+            ProductNotFoundException;
 
     /**
      *

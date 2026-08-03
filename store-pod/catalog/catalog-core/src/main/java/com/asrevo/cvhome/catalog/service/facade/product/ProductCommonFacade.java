@@ -19,7 +19,6 @@ import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductCommonFacade {
 
@@ -54,7 +53,7 @@ public interface ProductCommonFacade {
      * Delete product
      */
     void deleteProduct(Long id, StoreMerchantId store)
-            throws ProductNotFoundException, ServiceException;
+            throws ProductNotFoundException;
 
     /**
      * Adds a product to a category

@@ -40,7 +40,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -310,7 +309,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private void applyCategories(PersistableProductDefinition source, Product destination, StoreMerchantId store)
-            throws CategoryReferenceUnresolvableException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (CollectionUtils.isEmpty(source.getCategories())) {
             return;
         }
@@ -324,7 +323,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
     }
 
     private Category resolveCategory(com.asrevo.cvhome.catalog.model.category.Category categ, StoreMerchantId store)
-            throws CategoryReferenceUnresolvableException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         boolean hasCode = !StringUtils.isBlank(categ.getCode());
         Category c = hasCode ? categoryService.getByCode(store, categ.getCode()) : categoryService.getById(categ.getId(), store);
 

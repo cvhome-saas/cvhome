@@ -25,10 +25,8 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.populator.merchant.PersistableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.service.populator.merchant.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
@@ -120,11 +118,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     private void updateMerchantStore(MerchantStore mStore) {
-        try {
-            merchantStoreService.update(mStore);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        merchantStoreService.update(mStore);
     }
 
     private MerchantStore mergePersistableMerchantStoreToMerchantStore(PersistableMerchantStore store,
@@ -154,12 +148,10 @@ public class StoreFacadeImpl implements StoreFacade {
 
         MerchantStore mStore = getMerchantStoreByMerchantStoreId(storeMerchantId);
 
-        try {
-            merchantStoreService.delete(mStore);
-        } catch (Exception e) {
-            log.error("Error while deleting MerchantStore", e);
-            throw new ServiceRuntimeException(String.format("Error while deleting MerchantStore %s", e.getMessage()));
-        }
+        // The catch (Exception) here flattened a constraint violation — a store still referenced by orders — and a
+        // store outage into the same message. Both are unchecked now: DataIntegrityErrorHandler renders the first as
+        // a 409 and the shared advice renders the second as a 500 with a traceId.
+        merchantStoreService.delete(mStore);
     }
 
     private MerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId)

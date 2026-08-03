@@ -34,11 +34,9 @@ import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage
 import com.asrevo.cvhome.merchant.content.service.populator.content.ReadableContentBoxPopulator;
 import com.asrevo.cvhome.merchant.content.service.populator.content.ReadableContentPagePopulator;
 import com.asrevo.cvhome.merchant.content.services.content.ContentService;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.content.ContentType;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
@@ -286,11 +284,7 @@ public class ContentFacadeImpl implements ContentFacade {
         }
 
         content = convertContentPageToContent(merchantStore, content, page);
-        try {
-            contentService.saveOrUpdate(content);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        contentService.saveOrUpdate(content);
         return content.getId();
     }
 
@@ -304,11 +298,7 @@ public class ContentFacadeImpl implements ContentFacade {
         }
         box.setId(null);
         content = convertContentBoxToContent(merchantStore, content, box);
-        try {
-            contentService.saveOrUpdate(content);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        contentService.saveOrUpdate(content);
         return content.getId();
     }
 
@@ -319,11 +309,7 @@ public class ContentFacadeImpl implements ContentFacade {
             throw ContentNotFoundException.byId(id, store);
         }
 
-        try {
-            contentService.delete(content);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(String.format("Exception while deleting content %s", e.getMessage()), e);
-        }
+        contentService.delete(content);
     }
 
     @Override
@@ -348,11 +334,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
         page.setId(id);
         content = convertContentPageToContent(merchantStore, content, page);
-        try {
-            contentService.saveOrUpdate(content);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        contentService.saveOrUpdate(content);
     }
 
     @Override
@@ -366,11 +348,7 @@ public class ContentFacadeImpl implements ContentFacade {
 
         box.setId(id);
         content = convertContentBoxToContent(merchantStore, content, box);
-        try {
-            contentService.saveOrUpdate(content);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        contentService.saveOrUpdate(content);
     }
 
     @Override

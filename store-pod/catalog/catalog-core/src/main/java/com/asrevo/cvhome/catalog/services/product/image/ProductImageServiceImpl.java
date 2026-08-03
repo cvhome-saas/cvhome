@@ -17,7 +17,6 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
 import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
@@ -106,7 +105,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     public OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
-            throws ServiceException, AssetNotFoundException, AssetReadFailedException {
+            throws AssetNotFoundException, AssetReadFailedException {
 
         ProductImage pi = new ProductImage();
         String imageName = productImage.getProductImage();
@@ -130,12 +129,12 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     @Override
     public OutputContentFile getProductImage(final String storeCode, final String productCode, final String fileName,
                                              final ProductImageSize size)
-            throws ServiceException, AssetNotFoundException, AssetReadFailedException {
+            throws AssetNotFoundException, AssetReadFailedException {
         return productFileManager.getProductImage(storeCode, productCode, fileName, size);
     }
 
     @Override
-    public void removeProductImage(ProductImage productImage) throws ServiceException, AssetDeleteFailedException {
+    public void removeProductImage(ProductImage productImage) throws AssetDeleteFailedException {
 
         if (!StringUtils.isBlank(productImage.getProductImage())) {
             CmsProductImage cmsProductImage = new CmsProductImage(productImage.getProduct().getId(),

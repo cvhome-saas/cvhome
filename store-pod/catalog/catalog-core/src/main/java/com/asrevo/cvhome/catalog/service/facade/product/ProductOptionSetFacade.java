@@ -9,7 +9,6 @@ import com.asrevo.cvhome.catalog.model.product.attribute.optionset.PersistablePr
 import com.asrevo.cvhome.catalog.model.product.attribute.optionset.ReadableProductOptionSet;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 public interface ProductOptionSetFacade {
 
@@ -24,12 +23,12 @@ public interface ProductOptionSetFacade {
             throws ProductTypeNotFoundException;
 
     void create(PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language)
-            throws DuplicateProductOptionSetException, ServiceException;
+            throws DuplicateProductOptionSetException;
 
     void update(Long id, PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language)
             throws ProductOptionSetNotFoundException;
 
     void delete(Long id, StoreMerchantId store)
-            throws ProductOptionSetNotFoundException, ServiceException;
+            throws ProductOptionSetNotFoundException;
 
 }

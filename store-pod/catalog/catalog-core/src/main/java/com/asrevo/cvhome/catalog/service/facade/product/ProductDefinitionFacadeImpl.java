@@ -24,7 +24,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductD
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Service("productDefinitionFacade")
@@ -55,7 +54,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
             ProductOptionNotConvertibleException, ProductNotPersistedException,
-            ProductNotFoundException, ServiceException {
+            ProductNotFoundException {
 
         Product target;
         if (product.getId() != null && product.getId() > 0) {
@@ -83,7 +82,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
             ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
             ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
             ProductOptionNotConvertibleException, ProductNotPersistedException,
-            ProductNotFoundException, ServiceException {
+            ProductNotFoundException {
         product.setId(id);
         this.saveProductDefinition(merchant, product, language);
     }

@@ -22,7 +22,6 @@ import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionService
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -105,11 +104,7 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
         if (!CollectionUtils.isEmpty(source.getOptionValue().getDescriptions())) {
             productOptionValue = persistableProductOptionValueMapper.merge(source.getOptionValue(), productOptionValue,
                     store, language);
-            try {
-                productOptionValueService.saveOrUpdate(productOptionValue);
-            } catch (ServiceException e) {
-                throw ProductAttributeNotConvertibleException.of(e);
-            }
+            productOptionValueService.saveOrUpdate(productOptionValue);
         }
         return productOptionValue;
     }

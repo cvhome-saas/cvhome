@@ -9,7 +9,7 @@ import com.asrevo.cvhome.errors.ConversionException;
 /*
  * The one place a category base is declared deliberately: a populator SPI generic over three type parameters has no
  * condition to name, and every implementation narrows to its own — CustomerPopulator to
- * UnsupportedCountryCodeException, un-migrated ones to the deprecated store.core.exception.ConversionException. That
+ * UnsupportedCountryCodeException, PersistableCategoryPopulator to CategoryReferenceUnresolvableException. That
  * narrowing is what callers compile against, so the base never reaches a call site.
  */
 public interface DataPopulator<S, M, T> {

@@ -22,7 +22,6 @@ import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantGroupSer
 import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableList;
@@ -79,7 +78,7 @@ public class ProductVariantGroupFacadeImpl implements ProductVariantGroupFacade 
 
     @Override
     public void delete(Long productVariantGroup, Long productId, StoreMerchantId store)
-            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException, ServiceException {
+            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException {
 
         ProductVariantGroup group = this.group(productVariantGroup, store);
 

@@ -8,12 +8,11 @@ import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductAvailabilityService extends SalesManagerEntityService<Long, ProductAvailability> {
 
-    ProductAvailability saveOrUpdate(ProductAvailability availability) throws ServiceException;
+    ProductAvailability saveOrUpdate(ProductAvailability availability);
 
     Page<ProductAvailability> listByProduct(Long productId, StoreMerchantId store, Pageable pageable);
 

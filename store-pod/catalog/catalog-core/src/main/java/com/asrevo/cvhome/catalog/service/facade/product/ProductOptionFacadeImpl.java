@@ -42,7 +42,6 @@ import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionService
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -74,7 +73,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, StoreMerchantId store,
                                                   LanguageCode language)
-            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException {
         ProductOption optionModel = new ProductOption();
         if (option.getId() != null && option.getId() > 0) {
             optionModel = productOptionService.getById(store, option.getId());
@@ -92,7 +91,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public void deleteOption(Long optionId, StoreMerchantId store)
-            throws ProductOptionNotFoundException, ServiceException {
+            throws ProductOptionNotFoundException {
         ProductOption optionModel = productOptionService.getById(store, optionId);
         if (optionModel == null) {
             throw ProductOptionNotFoundException.of(optionId, store);
@@ -102,7 +101,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public void deleteOptionValue(Long optionValueId, StoreMerchantId store)
-            throws ProductOptionValueNotFoundException, ServiceException {
+            throws ProductOptionValueNotFoundException {
         ProductOptionValue optionModel = productOptionValueService.getById(store, optionValueId);
         if (optionModel == null) {
             throw ProductOptionValueNotFoundException.of(optionValueId, store);
@@ -185,7 +184,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     @Override
     public ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue, StoreMerchantId store,
                                                       LanguageCode language)
-            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException {
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException {
         ProductOptionValue value = new ProductOptionValue();
         if (optionValue.getId() != null && optionValue.getId() > 0) {
             value = productOptionValueService.getById(store, optionValue.getId());
@@ -315,7 +314,7 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store)
-            throws ProductAttributeNotFoundException, ServiceException {
+            throws ProductAttributeNotFoundException {
         productAttributeService.delete(requireAttribute(productId, attributeId, store));
     }
 

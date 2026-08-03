@@ -20,7 +20,6 @@ import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,7 +63,7 @@ public class OrderStatusHistoryApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
                        StoreMerchantId merchantStore)
-            throws OrderNotFoundException, ServiceException, CatalogApiUnavailableException {
+            throws OrderNotFoundException, CatalogApiUnavailableException {
         orderFacade.createOrderStatus(history, id, merchantStore);
     }
 

@@ -27,7 +27,6 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -165,7 +164,7 @@ public class ProductPriceApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable String sku, @PathVariable Long priceId, StoreMerchantId merchantStore,
                        LanguageCode language)
-            throws ProductPriceNotFoundException, ServiceException {
+            throws ProductPriceNotFoundException {
 
         productPriceFacade.delete(priceId, sku, merchantStore);
     }

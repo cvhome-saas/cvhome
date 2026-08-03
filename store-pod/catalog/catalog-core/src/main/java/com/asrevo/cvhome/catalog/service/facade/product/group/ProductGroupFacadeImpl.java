@@ -23,7 +23,6 @@ import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -88,7 +87,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     }
 
     @Override
-    public void delete(StoreMerchantId store, String code) throws ProductGroupNotFoundException, ServiceException {
+    public void delete(StoreMerchantId store, String code) throws ProductGroupNotFoundException {
         ProductGroup productGroup = productGroupService.getByCode(store, code)
                 .orElseThrow(() -> ProductGroupNotFoundException.of(code, store));
         productGroupService.delete(productGroup);
@@ -96,8 +95,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
 
     @Override
     @Transactional
-    public PersistableProductGroup saveProductGroup(StoreMerchantId store, PersistableProductGroup productGroup)
-            throws ServiceException {
+    public PersistableProductGroup saveProductGroup(StoreMerchantId store, PersistableProductGroup productGroup) {
         ProductGroup target = null;
         if (productGroup.getId() != null && productGroup.getId() > 0) {
             target = productGroupService.getById(productGroup.getId());
@@ -116,7 +114,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     @Override
     @Transactional
     public void addProductToGroup(StoreMerchantId store, String groupCode, Long productId)
-            throws ProductGroupNotFoundException, ProductNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException, ProductNotFoundException {
         ProductGroup group = productGroupService.getByCode(store, groupCode)
                 .orElseThrow(() -> ProductGroupNotFoundException.of(groupCode, store));
         Product product = productService.getById(productId);
@@ -132,7 +130,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     @Override
     @Transactional
     public void removeProductFromGroup(StoreMerchantId store, String groupCode, Long productId)
-            throws ProductGroupNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException {
         ProductGroup group = productGroupService.getByCode(store, groupCode)
                 .orElseThrow(() -> ProductGroupNotFoundException.of(groupCode, store));
         group.getProducts().removeIf(p -> p.getId().equals(productId));
@@ -156,7 +154,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     @Override
     @Transactional
     public void addProductToGroupForParent(StoreMerchantId store, Long parentProductId, String code, Long productId)
-            throws ProductNotFoundException, ServiceException {
+            throws ProductNotFoundException {
             ProductGroup group = productGroupService.getByParentProductAndCode(store, parentProductId, code)
                     .orElseGet(() -> {
                         ProductGroup newGroup = new ProductGroup();
@@ -181,7 +179,7 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     @Transactional
     public void removeProductFromGroupForParent(StoreMerchantId store, Long parentProductId, String code,
                                                 Long productId)
-            throws ProductGroupNotFoundException, ServiceException {
+            throws ProductGroupNotFoundException {
         ProductGroup group = productGroupService.getByParentProductAndCode(store, parentProductId, code)
                 .orElseThrow(() -> ProductGroupNotFoundException.of(code, store));
         group.getProducts().removeIf(p -> p.getId().equals(productId));

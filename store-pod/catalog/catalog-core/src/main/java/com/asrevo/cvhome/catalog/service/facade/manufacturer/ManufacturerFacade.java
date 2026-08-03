@@ -14,7 +14,6 @@ import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 /**
@@ -37,14 +36,13 @@ public interface ManufacturerFacade {
      * @throws ManufacturerNotFoundException the id given matches no manufacturer in this store
      */
     void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, StoreMerchantId store, LanguageCode language)
-            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException, ServiceException;
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException;
 
     /**
      * Deletes a manufacturer.
      *
-     * @throws ServiceException residue of {@code SalesManagerEntityService.delete}, retired in Step 8
      */
-    void deleteManufacturer(Manufacturer manufacturer) throws ServiceException;
+    void deleteManufacturer(Manufacturer manufacturer);
 
     /**
      * Get a Manufacturer by id.

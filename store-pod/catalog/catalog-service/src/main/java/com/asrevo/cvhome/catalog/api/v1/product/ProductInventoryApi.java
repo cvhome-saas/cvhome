@@ -30,7 +30,6 @@ import com.asrevo.cvhome.catalog.service.facade.product.ProductInventoryFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,7 +64,7 @@ public class ProductInventoryApi {
                                     StoreMerchantId merchantStore, LanguageCode language)
 
             throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
-            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException, ServiceException {
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         inventory.setProductId(productId);
         return productInventoryFacade.add(inventory, merchantStore, language);
     }
@@ -83,7 +82,7 @@ public class ProductInventoryApi {
 
             throws InventoryNotFoundException, InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
             ProductNotFoundException, ProductReferenceUnresolvableException, ProductVariantNotFoundException,
-            ProductVariantReferenceUnresolvableException, ServiceException {
+            ProductVariantReferenceUnresolvableException {
         inventory.setId(id);
         inventory.setProductId(inventory.getProductId());
         inventory.setVariant(inventory.getVariant());
@@ -101,7 +100,7 @@ public class ProductInventoryApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long productId, @PathVariable Long id, StoreMerchantId merchantStore,
                        LanguageCode language)
-            throws InventoryNotFoundException, ServiceException {
+            throws InventoryNotFoundException {
 
         productInventoryFacade.delete(productId, id, merchantStore);
     }

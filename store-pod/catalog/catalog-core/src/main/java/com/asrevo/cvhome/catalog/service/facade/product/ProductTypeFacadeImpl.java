@@ -15,7 +15,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductTypeMappe
 import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
@@ -69,7 +68,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language)
-            throws DuplicateProductTypeException, ServiceException {
+            throws DuplicateProductTypeException {
 
         if (this.exists(type.getCode(), store, language)) {
             throw DuplicateProductTypeException.of(type.getCode(), store);
@@ -83,7 +82,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException {
+            throws ProductTypeNotFoundException {
 
         ProductType t = productTypeService.getById(id, store);
         if (t == null) {
@@ -100,7 +99,7 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
 
     @Override
     public void delete(Long id, StoreMerchantId store, LanguageCode language)
-            throws ProductTypeNotFoundException, ServiceException {
+            throws ProductTypeNotFoundException {
 
         ProductType t = productTypeService.getById(id, store);
         if (t == null) {

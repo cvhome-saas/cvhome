@@ -10,6 +10,7 @@ import com.asrevo.cvhome.checkout.entity.customer.CustomerCriteria;
 import com.asrevo.cvhome.checkout.services.customer.CustomerService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
@@ -31,7 +32,8 @@ public interface CustomerFacade {
     /**
      * Creates a ReadableCustomer
      */
-    ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language);
+    ReadableCustomer getCustomerById(Long id, StoreMerchantId store, LanguageCode language)
+            throws CustomerNotFoundException;
 
     Optional<Customer> getOrCreateCustomer(PersistableCustomer customer, StoreMerchantId store, LanguageCode language)
             throws UnsupportedCountryCodeException, UnsupportedZoneCodeException;

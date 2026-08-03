@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.controlplane.errors.PodNotFoundException;
 import com.asrevo.cvhome.controlplane.org.entity.PodEntity;
 import com.asrevo.cvhome.controlplane.org.repository.PodRepository;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +63,8 @@ public class PodServiceImpl implements PodService {
 
     @Transactional
     @Override
-    public Pod update(PodId id, Pod pod) {
-        PodEntity entity = podRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pod not found"));
+    public Pod update(PodId id, Pod pod) throws PodNotFoundException {
+        PodEntity entity = podRepository.findById(id).orElseThrow(() -> PodNotFoundException.of(id));
         if (pod.name() != null) {
             entity.setName(pod.name());
         }

@@ -16,7 +16,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductOptionSet
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionSetService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 @Service
 public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
@@ -61,7 +60,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
 
     @Override
     public void create(PersistableProductOptionSet optionSet, StoreMerchantId store, LanguageCode language)
-            throws DuplicateProductOptionSetException, ServiceException {
+            throws DuplicateProductOptionSetException {
         if (this.exists(optionSet.getCode(), store)) {
             throw DuplicateProductOptionSetException.of(optionSet.getCode(), store);
         }
@@ -87,7 +86,7 @@ public class ProductOptionSetFacadeImpl implements ProductOptionSetFacade {
     }
 
     @Override
-    public void delete(Long id, StoreMerchantId store) throws ProductOptionSetNotFoundException, ServiceException {
+    public void delete(Long id, StoreMerchantId store) throws ProductOptionSetNotFoundException {
         ProductOptionSet opt = productOptionSetService.getById(id);
         if (opt == null || !opt.getStoreMerchantId().equals(store)) {
             throw ProductOptionSetNotFoundException.of(id, store);

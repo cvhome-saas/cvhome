@@ -42,7 +42,14 @@ public enum PaymentErrors implements ErrorCode {
     PROCESSOR_UNSUPPORTED("PAYMENT.PROCESSOR.UNSUPPORTED", ErrorCategory.UNPROCESSABLE),
 
     /** The store has no enabled configuration for the requested payment type. */
-    CONFIGURATION_MISSING("PAYMENT.CONFIGURATION.MISSING", ErrorCategory.UNPROCESSABLE);
+    CONFIGURATION_MISSING("PAYMENT.CONFIGURATION.MISSING", ErrorCategory.UNPROCESSABLE),
+
+    /**
+     * The configuration row a seller asked to change is not there. Distinct from {@link #CONFIGURATION_MISSING}: that
+     * one refuses a payment because nothing is enabled (422), this one answers a management call for a row that does
+     * not exist (404).
+     */
+    CONFIGURATION_NOT_FOUND("PAYMENT.CONFIGURATION.NOT_FOUND", ErrorCategory.NOT_FOUND);
 
     private final String code;
 

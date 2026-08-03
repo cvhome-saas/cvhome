@@ -10,7 +10,6 @@ import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 /**
  * </p>
@@ -25,7 +24,7 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
  */
 public interface ShoppingCartFacade {
 
-    void saveOrUpdateShoppingCart(ShoppingCart cart) throws ServiceException;
+    void saveOrUpdateShoppingCart(ShoppingCart cart);
 
     /**
      * Modify an item in an existing cart; the quantity of the line item reflects {@code item.getQuantity()}.
@@ -35,7 +34,7 @@ public interface ShoppingCartFacade {
      */
     ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
                                     LanguageCode language)
-            throws ServiceException, ShoppingCartNotFoundException, ProductNotPurchasableException;
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException;
 
     /**
      * Add an item to a new shopping cart.
@@ -53,11 +52,11 @@ public interface ShoppingCartFacade {
      */
     ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
                                                 LanguageCode language, boolean returnCart)
-            throws ServiceException, ShoppingCartNotFoundException;
+            throws ShoppingCartNotFoundException;
 
     /**
      * Retrieves a shopping cart, or {@code null} when there is none for that code.
      */
-    ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws ServiceException;
+    ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language);
 
 }

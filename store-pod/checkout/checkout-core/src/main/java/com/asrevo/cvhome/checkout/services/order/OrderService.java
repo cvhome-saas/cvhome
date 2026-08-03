@@ -16,17 +16,15 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus; // Import OrderStatus
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface OrderService extends SalesManagerEntityService<Long, Order> {
 
-    void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException;
+    void addOrderStatusHistory(Order order, OrderStatusHistory history);
 
     OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store);
 
-    Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
-            throws ServiceException;
+    Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store);
 
     Order getOrder(Long orderId, StoreMerchantId store);
 

@@ -19,7 +19,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductVariation
 import com.asrevo.cvhome.catalog.services.product.variation.ProductVariationService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 @Service
@@ -70,7 +69,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language)
 
             throws DuplicateProductVariationException, ProductOptionReferenceUnresolvableException,
-            ProductOptionValueReferenceUnresolvableException, ServiceException {
+            ProductOptionValueReferenceUnresolvableException {
 
         if (this.exists(variation.getCode(), store)) {
             // 409 rather than the legacy 400: the request is well-formed, the code is simply taken, and a client that
@@ -107,7 +106,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
 
     @Override
     public void delete(Long variationId, StoreMerchantId store)
-            throws ProductVariationNotFoundException, ServiceException {
+            throws ProductVariationNotFoundException {
         ProductVariation opt = productVariationService.getById(variationId);
         if (opt == null || !opt.getStoreMerchantId().equals(store)) {
             throw ProductVariationNotFoundException.of(variationId, store);
