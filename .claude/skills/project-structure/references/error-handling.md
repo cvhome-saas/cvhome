@@ -31,6 +31,7 @@ completion gate.
 | `store-commons/autoconfigure` | `errors/web/` — the advice, `ProblemDetailFactory`, autoconfiguration. `s2s/error/` — `S2sErrorHandler`, `RemoteProblemTranslator` |
 | `<domain>-commons/.../errors/` | Per-context `ErrorCode` enum + the condition-named exceptions that service throws |
 | `<domain>-external-api/.../api/errors/` | The client SDK's caller-side types + its `RemoteErrorCatalog` constant |
+| `<domain>-external-api/.../services/` | The two HTTP interfaces: `I<Domain>Service` (server vocabulary, implemented by the controller) and `External<Domain>Service` (`@HttpExchange`, caller vocabulary, what the proxy is built from) |
 
 Keeping `store-commons:errors` dependency-free is load-bearing: it is why an `-external-api` module can declare an
 error contract without depending on `autoconfigure`, and why adding a logging framework there was rejected in
@@ -159,25 +160,42 @@ may have started. Collapsing the two is how orders get cancelled after being cha
 Stripe's SDK decodes its error body into `CardException`, `RateLimitException`, `ApiConnectionException` so a
 caller branches on type. Ours does the same.
 
-**Two roles, two interfaces.** The `@HttpExchange` interface is implemented by the *server's controller*, so its
-`throws` clause carries the **server's** vocabulary. A hand-written wrapper beside it carries the **caller's**.
-One signature cannot be honest about both.
+**Two roles, two interfaces — and an exception list is what forces the split.** The two sides of a call fail in
+different vocabularies: the server's exceptions describe *its* conversation (with Stripe, with its database), the
+caller's describe *"payment refused us"*. A `throws` clause can only say one of those, so when an API names its
+failures the `-external-api` module declares the operations twice, both interfaces living side by side in
+`<domain>-external-api/.../services/`:
 
 ```java
-// the wire contract — implemented by ExternalPaymentGatewayApi. Server vocabulary.
-public interface ExternalPaymentGatewayService {
-    PaymentInitiateResult initiatePayment(...)
+// IPaymentGatewayService — server vocabulary. Plain interface, no @HttpExchange.
+// ExternalPaymentGatewayApi (the controller) implements it; the routes are @PostMapping on the controller.
+public interface IPaymentGatewayService {
+    PaymentInitiateResult initiatePayment(StoreMerchantId store, @RequestBody PaymentRequest req)
             throws PaymentInitiateRejectedException, PaymentProviderUnavailableException;
 }
 
-// what callers depend on. Caller vocabulary.
-public interface PaymentGatewayClient {
-    PaymentInitiateResult initiatePayment(...)
+// ExternalPaymentGatewayService — caller vocabulary. This one carries @HttpExchange and is what
+// buildClient(...) generates the proxy from, and what business code injects.
+@HttpExchange("/api/v1/private")
+public interface ExternalPaymentGatewayService {
+    @PostExchange("/payments/initiate")
+    PaymentInitiateResult initiatePayment(StoreMerchantId store, @RequestBody PaymentRequest req)
             throws PaymentGatewayRejectedException, PaymentApiUnavailableException;
 }
 ```
 
-`ClientsConfig` exposes the **wrapper** as the bean, never the raw proxy.
+The client interface is **not** implemented by anything: `declaredOrCarrier` reads the invoked proxy method's
+declared types, so putting the caller-side types there is exactly what makes them arrive narrowed. No hand-written
+wrapper is involved — the earlier `PaymentGatewayClient` / `RestPaymentGatewayClient` wrapper class is gone, and
+`ClientsConfig` exposes the generated proxy directly.
+
+The two halves also do not have to line up one-for-one. `PaymentApiUnavailableException` has **no** server-side
+counterpart, because a service that could not be reached never threw anything; conversely a `status(...)` that names
+nothing on the server still declares `PaymentApiUnavailableException` on the client.
+
+**When an API names no failures, keep the single `@HttpExchange` interface** — that is the majority
+(`ExternalProductService`, `ExternalProductReservationService`, `ExternalMerchantStoreService`). Split only when you
+add the first caller-side type.
 
 **The error contract is a constant, passed explicitly.**
 
@@ -189,9 +207,15 @@ public static final RemoteErrorCatalog CATALOG = RemoteErrorCatalog.builder()
         .unreachable(PaymentApiUnavailableException::from)
         .build();
 
-// checkout ClientsConfig — third argument is nullable; null means "this API names none of its failures"
+// checkout ClientsConfig — pass the client interface, never the server one
 restClientBuilder.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class, PaymentApiErrors.CATALOG);
+
+// an API that names none of its failures says so with RemoteErrorCatalog.none()
+restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductService.class, RemoteErrorCatalog.none());
 ```
+
+`null` is still tolerated by `S2sErrorHandler` and means the same thing, but `RemoteErrorCatalog.none()` is what the
+call sites use — it states the absence rather than leaving it to be inferred.
 
 Mappings are keyed by `ErrorCode`, not by string, so renaming a code cannot silently orphan an entry. Unmapped
 codes fall back to `UnmappedRemoteFailureException`, which still carries the remote's code and status — the name is
@@ -205,6 +229,11 @@ generated proxy in a JDK dynamic proxy whose rule is `S2sErrorHandler.declaredOr
 declared exception types are the authority.** A declared cause is rethrown as itself; anything undeclared stays in
 the carrier and the shared advice renders it at the edge. A client that declares nothing behaves exactly as it did
 before typed errors existed.
+
+That rule is the whole reason the caller-side types belong on the `@HttpExchange` interface: they are declared on
+the method the proxy is invoked through, so `PaymentGatewayRejectedException` arrives as itself and
+`OrderPlacementFacadeImpl` catches it as ordinary Java. Put them on the server interface instead and the proxy
+would have nothing to narrow into — and the controller's signature would name failures it can never produce.
 
 The reactive `WebClient` path gets translation but **not** unwrapping — the failure travels inside a `Mono`, where
 no proxy can rethrow it as a declared checked type. A reactive caller uses `onErrorMap`.
@@ -255,6 +284,12 @@ discovery only for a genuinely open set of providers.
 which had been catching `ServiceException` and rethrowing a generic runtime type — discarding the distinction the
 parser had just made. A two-line collateral change downstream is the normal price, and it is cheapest early.
 
+**A second interface is cheaper than a wrapper class.** The caller-side vocabulary first arrived as a hand-written
+`PaymentGatewayClient` wrapping the generated proxy, whose whole body was catch-the-carrier-and-rethrow — code that
+existed only to restate what a `throws` clause already says, and one more thing to keep in step every time a method
+was added. Declaring the caller's types on the `@HttpExchange` interface itself makes `declaredOrCarrier` do it,
+because that method is the one the proxy is invoked through. The wrapper and its bean are gone.
+
 **Stale javadoc survives every compiler.** After renaming `PaymentErrorCatalog` → `PaymentApiErrors`, seven doc
 comments still named the deleted class, two of them also describing behaviour that had been reversed a session
 earlier. Prose compiles fine while actively misleading. Grep for deleted type names, not just for code references.
@@ -269,13 +304,16 @@ earlier. Prose compiles fine while actively misleading. Grep for deleted type na
    with a static factory naming its inputs.
 3. Declare it on the method that throws it, by name. Fix the compile errors that follow — that is the design
    working.
-4. If callers over HTTP need to branch on it, add a caller-side type and a `.map(...)` entry to that
-   `-external-api` module's catalog constant.
+4. Declare it on the server interface (`I<Domain>Service`) too, if the method is exposed over HTTP.
+5. If callers over HTTP need to branch on it, add a caller-side type in `-external-api/.../api/errors/`, a
+   `.map(...)` entry in that module's catalog constant, **and** the type to the matching method's `throws` clause on
+   the `@HttpExchange` interface — the mapping alone gets the exception built, the `throws` clause is what gets it
+   delivered narrowed instead of inside the carrier. If that module still has one combined interface, split it first.
 
 **Adding a cross-service call** — see `service-to-service.md` for the transport side. For errors: decide whether the
-called API names any failures. If not, pass `null` as the third argument to `buildClient`. If it does, pass its
-`*ApiErrors.CATALOG` constant, and remember the caller-side types are deliberately absent from the wire interface's
-`throws` clause, so the wrapper opens the carrier.
+called API names any failures. If not, pass `RemoteErrorCatalog.none()` as the third argument to `buildClient`. If
+it does, pass its `*ApiErrors.CATALOG` constant and build the client from the `External*Service` interface, whose
+`throws` clauses are already in your vocabulary.
 
 ## Verification patterns
 

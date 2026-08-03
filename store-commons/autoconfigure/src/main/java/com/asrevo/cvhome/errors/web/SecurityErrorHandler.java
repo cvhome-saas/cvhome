@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * </p>
  */
 @Slf4j
-@Order()
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class SecurityErrorHandler {
 

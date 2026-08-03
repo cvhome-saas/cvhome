@@ -31,6 +31,19 @@ public interface ExternalProductReservationService {
 Note `StoreMerchantId store` carries **no annotation**. It is serialized by a custom argument resolver (below) —
 tenant context travels on every call automatically.
 
+**One interface, until the API names its failures.** An API whose methods declare no exceptions keeps a single
+interface, implemented by the controller and proxied by the caller. As soon as it declares some, the two sides need
+different `throws` clauses — the server's exceptions describe its conversation with Stripe, the caller's describe
+"payment refused us" — and the module declares the operations twice. `payment-external-api` is the one that has:
+
+| | Implemented by | `throws` |
+|---|---|---|
+| `IPaymentGatewayService` — plain interface, no `@HttpExchange` | `ExternalPaymentGatewayApi`, the controller | server-side types (`PaymentInitiateRejectedException`, …) |
+| `ExternalPaymentGatewayService` — carries `@HttpExchange` | nothing; it is what `buildClient` proxies | caller-side types (`PaymentGatewayRejectedException`, `PaymentApiUnavailableException`) |
+
+Both live in `<domain>-external-api/.../services/`, and both must be edited together when a method is added. Full
+rationale in `error-handling.md`.
+
 ### 2. The provider implements it as its controller
 
 `catalog-service` makes its REST controller **implement the same interface**, so the server route and the client
@@ -45,6 +58,12 @@ Same idea across the repo: `ExternalProductApi implements ExternalProductService
 `ExternalMerchantStoreApi implements ExternalMerchantStoreService`. The `/private` path prefix and the
 `External*` naming mark these as service-to-service endpoints, distinct from the public/customer APIs.
 
+Where the interfaces are split, the controller implements the **server-side** one
+(`ExternalPaymentGatewayApi implements IPaymentGatewayService`) and carries the routes as its own
+`@PostMapping`/`@GetMapping`, since the `@HttpExchange`/`@PostExchange` annotations sit on the other interface. That
+is the one place the two can drift, so keep the paths identical by eye — `/api/v1` + `/private/payments/initiate` on
+the controller matches `@HttpExchange("/api/v1/private")` + `@PostExchange("/payments/initiate")` on the client.
+
 ### 3. The consumer builds a proxy from it
 
 The caller depends on `catalog-external-api` and declares beans in its own `ClientsConfig`.
@@ -57,22 +76,25 @@ public class ClientsConfig {
 
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder b) {
-        // third argument is the called API's error contract — null when it names none of its failures
-        return b.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, null);
+        // third argument is the called API's error contract — none() when it names no failures of its own
+        return b.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, RemoteErrorCatalog.none());
     }
 
     @Bean
     public ExternalProductService externalProductService(RestClientBuilder b) {
         // decorated with a caching layer
         return new CachedExternalProductService(
-                b.buildClient(CATALOG_SERVICE_NAME, ExternalProductService.class, null));
+                b.buildClient(CATALOG_SERVICE_NAME, ExternalProductService.class, RemoteErrorCatalog.none()));
     }
 }
 ```
 
 Checkout's payment bean is the one client with a contract today:
-`b.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class, PaymentApiErrors.CATALOG)`, which makes
-its failures arrive as types checkout can branch on. See `error-handling.md`.
+`b.buildClient(PAYMENT_SERVICE_NAME, ExternalPaymentGatewayService.class, PaymentApiErrors.CATALOG)` — the
+**client-side** interface, whose `throws` clauses are already in checkout's vocabulary, so
+`OrderPlacementFacadeImpl` catches `PaymentGatewayRejectedException` directly off the injected proxy. Never build a
+client from the `I*Service` half; nothing outside the payment service should see its server-side types. See
+`error-handling.md`.
 
 Business code then injects the interface like any local bean —
 `checkout-core`'s `OrderInventoryOrchestratorImpl` takes an `ExternalProductReservationService` in its
@@ -131,13 +153,16 @@ in its `application.yml` (see `authentication.md`).
 
 ## Adding a new cross-service call — checklist
 
-1. Add the method to the provider's `<domain>-external-api` interface (DTOs must live in `<domain>-commons`).
-2. Implement it on the provider's `External*Api` controller (it already `implements` the interface, so the
-   compiler tells you).
+1. Add the method to the provider's `<domain>-external-api` interface (DTOs must live in `<domain>-commons`). If
+   that module has the split pair, add it to **both** — server `throws` on `I*Service`, caller `throws` on
+   `External*Service` — and keep the `@PostExchange` path and the controller's `@PostMapping` path in step.
+2. Implement it on the provider's `External*Api` controller (it already `implements` the server-side interface, so
+   the compiler tells you).
 3. In the consumer: `implementation project(':store-pod:<domain>:<domain>-external-api')`.
 4. Add a `@Bean` in the consumer's `ClientsConfig` via
-   `restClientBuilder.buildClient(SERVICE_NAME, Iface.class, errorCatalog)` — pass the provider's
-   `*ApiErrors.CATALOG` constant if it publishes one, otherwise `null`. See `error-handling.md`.
+   `restClientBuilder.buildClient(SERVICE_NAME, External*Service.class, errorCatalog)` — pass the provider's
+   `*ApiErrors.CATALOG` constant if it publishes one, otherwise `RemoteErrorCatalog.none()`. See
+   `error-handling.md`.
 5. Inject the interface where you need it.
 
 **Never** depend on another pod's `-core` or `-service`. `-external-api` (which drags in only `-commons` and
