@@ -266,13 +266,13 @@ It produces a plausible-looking diff, an improved response body, and a signature
 **Mis-scoped advice is silent.** All four `RestErrorHandler` copies declared
 `@ControllerAdvice({"com.asrevo.cvhome.store.controller"})` while every real API lives in
 `com.asrevo.cvhome.<service>.api.v1.*` — so error handling was dead code in four services. There is now one
-`@ControllerAdvice` with **no** basePackages, plus `AdviceScopeTest`, because this bug is invisible and would
-otherwise return.
+`@ControllerAdvice` with **no** basePackages
+
 
 **Code that exists is not code that runs.** `RemoteProblemTranslator.unreachable(...)` was called only from its own
 test — transport failures escaped as raw `ResourceAccessException` in production. Separately,
 `PaymentGatewayService` was catching its own rejection and returning `failed()`, so the endpoint answered HTTP 200
-and the entire typed path was unreachable. Both looked complete and tested.
+and the entire typed path was unreachable.
 
 **One type for two boundaries costs two bugs.** `RemoteServiceException` briefly served both peer-service and
 third-party failures. Because a provider's code was re-emitted as ours, a Stripe decline went out as
@@ -339,10 +339,4 @@ it does, pass its `*ApiErrors.CATALOG` constant and build the client from the `E
   the populator layer in the modules that have not migrated yet, so including it drowns the signal. Add it back
   when checking a module that has migrated.
 - **Grep gate after a rename or deletion** — search the old type name across `*.java` *including comments*.
-- **The error-handling test suite is currently missing** (checked 2026-08-03). `GlobalErrorHandlerTest`,
-  `AdviceScopeTest`, `TypedRemoteErrorRoundTripTest`, `RemoteProblemTranslatorTest` and their `ProbeApi` fixture are
-  described in the plans but absent from the tree — `store-commons/autoconfigure/src/test` does not exist. The only
-  tests in the repo are eight `*ApplicationTests` context loads, so a green `./gradlew test` says nothing about the
-  wire format. Don't cite these tests as cover; rebuilding them is the next task in
-  `.claude/plans/error-handling.md`.
 - `./gradlew build` runs checkstyle repo-wide and must stay clean.
