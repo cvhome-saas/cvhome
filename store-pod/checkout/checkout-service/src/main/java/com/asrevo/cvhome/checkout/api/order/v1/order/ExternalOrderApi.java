@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrator;
 import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 
@@ -25,6 +27,17 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "External Order API", description = "API for external services to interact with orders")
 @Slf4j
 @AllArgsConstructor
+/**
+ * Checkout's private API for peer services — payment's outbox and catalog's reservation-expiry job.
+ *
+ * <p>
+ * {@link ExternalOrderService} is a single interface: the controller implements it and callers proxy it, so its
+ * {@code throws} clauses cannot name {@link CatalogApiUnavailableException} without putting catalog's vocabulary into
+ * a signature payment reads — payment called checkout, not catalog. The failure travels in
+ * {@link UncheckedBaseException} instead, the carrier the shared advice unwraps before rendering. Callers still see
+ * the truth: a 502 naming catalog as the remote, which is a retryable answer their outbox already handles.
+ * </p>
+ */
 public class ExternalOrderApi implements ExternalOrderService {
 
     private final OrderFacade orderFacade;
@@ -54,12 +67,16 @@ public class ExternalOrderApi implements ExternalOrderService {
             return;
         }
 
-        if (status == PaymentStatus.PAID) {
-            orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(orderId, store, OrderStatus.CONFIRMED, status);
-        } else if (status == PaymentStatus.FAILED || status == PaymentStatus.EXPIRED || status == PaymentStatus.CANCELLED) {
-            orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(orderId, store, OrderStatus.CANCELLED, status);
-        } else {
-            orderFacade.updateOrderStatus(orderId, null, null, status);
+        try {
+            if (status == PaymentStatus.PAID) {
+                orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(orderId, store, OrderStatus.CONFIRMED, status);
+            } else if (status == PaymentStatus.FAILED || status == PaymentStatus.EXPIRED || status == PaymentStatus.CANCELLED) {
+                orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(orderId, store, OrderStatus.CANCELLED, status);
+            } else {
+                orderFacade.updateOrderStatus(orderId, null, null, status);
+            }
+        } catch (CatalogApiUnavailableException e) {
+            throw new UncheckedBaseException(e);
         }
     }
 
@@ -68,6 +85,11 @@ public class ExternalOrderApi implements ExternalOrderService {
     public void handleReservationExpired(StoreMerchantId store, @PathVariable String orderRef) {
         log.info("Handling reservation expired for order {} for store {}", orderRef, store);
         Long orderId = Long.parseLong(orderRef);
-        orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(orderId, store, OrderStatus.CANCELLED, PaymentStatus.EXPIRED);
+        try {
+            orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(orderId, store, OrderStatus.CANCELLED,
+                    PaymentStatus.EXPIRED);
+        } catch (CatalogApiUnavailableException e) {
+            throw new UncheckedBaseException(e);
+        }
     }
 }

@@ -91,60 +91,50 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             if (shoppingCart.isObsolete()) {
                 delete(shoppingCart);
                 return null;
-            } else {
-                return shoppingCart;
             }
+            return shoppingCart;
 
         } catch (jakarta.persistence.NoResultException _) {
             return null;
-        } catch (Exception e) {
-            throw new ServiceException(e);
         }
     }
 
     private ShoppingCart getPopulatedShoppingCart(final ShoppingCart shoppingCart, StoreMerchantId store,
-                                                  LanguageCode language) throws Exception {
+                                                  LanguageCode language) throws ServiceException {
 
-        try {
+        boolean cartIsObsolete = false;
+        if (shoppingCart != null) {
 
-            boolean cartIsObsolete = false;
-            if (shoppingCart != null) {
-
-                Set<ShoppingCartItem> items = shoppingCart.getLineItems();
-                if (items == null || items.isEmpty()) {
-                    shoppingCart.setObsolete(true);
-                    return shoppingCart;
-                }
-
-                for (ShoppingCartItem item : items) {
-                    log.debug("Populate item {}", item.getId());
-                    ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
-                            language);
-                    item.setItemPrice(detailedProduct.price().getFinalPrice());
-
-                    BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
-                    item.setSubTotal(subTotal);
-
-                    log.debug("Obsolete item ? {}", item.isObsolete());
-                    if (item.isObsolete()) {
-                        cartIsObsolete = true;
-                    }
-                }
-
-                Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
-
-                shoppingCart.setLineItems(refreshedItems);
-                update(shoppingCart);
-
-                if (cartIsObsolete) {
-                    shoppingCart.setObsolete(true);
-                }
+            Set<ShoppingCartItem> items = shoppingCart.getLineItems();
+            if (items == null || items.isEmpty()) {
+                shoppingCart.setObsolete(true);
                 return shoppingCart;
             }
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ServiceException(e);
+            for (ShoppingCartItem item : items) {
+                log.debug("Populate item {}", item.getId());
+                ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
+                        language);
+                item.setItemPrice(detailedProduct.price().getFinalPrice());
+
+                BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
+                item.setSubTotal(subTotal);
+
+                log.debug("Obsolete item ? {}", item.isObsolete());
+                if (item.isObsolete()) {
+                    cartIsObsolete = true;
+                }
+            }
+
+            Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
+
+            shoppingCart.setLineItems(refreshedItems);
+            update(shoppingCart);
+
+            if (cartIsObsolete) {
+                shoppingCart.setObsolete(true);
+            }
+            return shoppingCart;
         }
 
         return shoppingCart;

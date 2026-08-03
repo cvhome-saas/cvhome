@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.EmptyReservationException;
+import com.asrevo.cvhome.catalog.errors.InsufficientInventoryException;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationCommitResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReleaseResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
+import com.asrevo.cvhome.catalog.services.product.IProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ProductReservationService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
@@ -24,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
@@ -34,7 +35,7 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @Tag(name = "Product definition resource (Create update and delete product definition. Serves api v1 and v2 with backward compatibility)")
 @Slf4j
 @AllArgsConstructor
-public class ExternalProductReservationApi implements ExternalProductReservationService {
+public class ExternalProductReservationApi implements IProductReservationService {
 
     private final ProductReservationService productReservationService;
 
@@ -49,10 +50,10 @@ public class ExternalProductReservationApi implements ExternalProductReservation
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.RESERVE')")
-    @SneakyThrows
     public ProductReservationReserveResult reserve(StoreMerchantId merchantStore,
                                                    @PathVariable String ref,
-                                                   @RequestBody ProductReservationList productReservation) {
+                                                   @RequestBody ProductReservationList productReservation)
+            throws InsufficientInventoryException, EmptyReservationException {
         return productReservationService.reserve(merchantStore, ref, productReservation);
     }
 

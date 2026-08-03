@@ -23,7 +23,7 @@ public interface OrderService extends SalesManagerEntityService<Long, Order> {
 
     void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException;
 
-    OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) throws ServiceException;
+    OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store);
 
     Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
             throws ServiceException;

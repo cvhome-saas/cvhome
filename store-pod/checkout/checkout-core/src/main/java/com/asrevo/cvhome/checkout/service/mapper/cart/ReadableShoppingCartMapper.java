@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.checkout.service.mapper.cart;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,7 +32,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.PriceUtils;
@@ -68,23 +68,18 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         destination.setCode(source.getShoppingCartCode());
         destination.setCustomer(source.getCustomerId());
 
-        try {
-            applyPromoCode(source, destination);
+        applyPromoCode(source, destination);
 
-            ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
-            int cartQuantity = applyItems(source, destination, store, language, merchantStore);
+        ReadableMerchantStore merchantStore = externalMerchantStoreService.getStore(store);
+        int cartQuantity = applyItems(source, destination, store, language, merchantStore);
 
-            applyTotals(source, destination, store, merchantStore);
+        applyTotals(source, destination, store, merchantStore);
 
-            destination.setQuantity(cartQuantity);
-            destination.setId(source.getId());
+        destination.setQuantity(cartQuantity);
+        destination.setId(source.getId());
 
-            if (source.getOrderId() != null) {
-                destination.setOrder(source.getOrderId());
-            }
-
-        } catch (Exception e) {
-            throw new ConversionRuntimeException("An error occurred while converting ReadableShoppingCart", e);
+        if (source.getOrderId() != null) {
+            destination.setOrder(source.getOrderId());
         }
 
         return destination;
@@ -108,7 +103,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
     }
 
     private int applyItems(ShoppingCart source, ReadableShoppingCart destination, StoreMerchantId store,
-            LanguageCode language, ReadableMerchantStore merchantStore) throws Exception {
+            LanguageCode language, ReadableMerchantStore merchantStore) {
         int cartQuantity = 0;
         Set<ShoppingCartItem> items = Optional.ofNullable(source.getLineItems()).orElse(Set.of());
 
@@ -119,7 +114,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
                 continue;
             }
             ReadableShoppingCartItem shoppingCartItem = new ReadableShoppingCartItem();
-            BeanUtils.copyProperties(shoppingCartItem, minimalProduct);
+            copyProductProperties(shoppingCartItem, minimalProduct);
 
             shoppingCartItem.setPrice(item.getItemPrice());
             shoppingCartItem.setFinalPrice(
@@ -140,8 +135,27 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         return cartQuantity;
     }
 
+    /**
+     * Reflectively copies the product's properties onto the cart line.
+     *
+     * <p>
+     * The two checked exceptions {@code BeanUtils} declares mean our own DTOs cannot be introspected — a bug in this
+     * code, not a condition a caller can act on, so it gets no named type and falls to the advice's internal-error
+     * fallback: a 500 with a {@code traceId} that leads to the stack trace. It used to become
+     * {@code ConversionRuntimeException}, reporting {@code LEGACY.CONVERSION} and a 400, which blamed the caller for
+     * it.
+     * </p>
+     */
+    private void copyProductProperties(ReadableShoppingCartItem target, ReadableMinimalProduct source) {
+        try {
+            BeanUtils.copyProperties(target, source);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("Could not copy product properties onto the cart line", e);
+        }
+    }
+
     private void applyTotals(ShoppingCart source, ReadableShoppingCart destination, StoreMerchantId store,
-            ReadableMerchantStore merchantStore) throws Exception {
+            ReadableMerchantStore merchantStore) {
         // OrdetTotalSummary contains all calculations
 
         OrderSummary summary = new OrderSummary();

@@ -31,7 +31,6 @@ import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -55,12 +54,8 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) throws ServiceException {
-        try {
-            return calculateOrder(orderSummary, store);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) {
+        return calculateOrder(orderSummary, store);
     }
 
     @Override
@@ -108,7 +103,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return order;
     }
 
-    @SneakyThrows
     private OrderTotalSummary calculateOrder(OrderSummary summary, StoreMerchantId store) {
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();

@@ -16,7 +16,12 @@ public enum CustomerErrors implements ErrorCode {
     /**
      * The submitted zone (state or province) code is not one this store's reference data knows.
      */
-    UNSUPPORTED_ZONE_CODE("CUSTOMER.ZONE.UNSUPPORTED", ErrorCategory.CONVERSION);
+    UNSUPPORTED_ZONE_CODE("CUSTOMER.ZONE.UNSUPPORTED", ErrorCategory.CONVERSION),
+
+    /**
+     * No customer in this store matches the identity on the request.
+     */
+    CUSTOMER_NOT_FOUND("CUSTOMER.NOT_FOUND", ErrorCategory.NOT_FOUND);
 
     private final String code;
 

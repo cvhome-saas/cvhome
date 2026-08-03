@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
@@ -22,6 +23,12 @@ import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
+import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.history.PersistableOrderStatusHistory;
@@ -47,8 +54,6 @@ import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
@@ -64,13 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OrderFacadeImpl implements OrderFacade {
 
-    private static final String ORDER_NOT_FOUND_BY_ID_MESSAGE = "Order not found with id {}";
     private static final String CUSTOMER_ID_NOT_FOUND_IN_ORDER_LOG_MESSAGE = "Customer id {} not found in order {}";
-    private static final String ERROR_WHILE_GETTING_ORDER_MESSAGE = "Error while getting order [{}]";
-    private static final String ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE = "Order id [{}] not found for merchand [{}]";
-    private static final String ORDER_DOES_NOT_EXIST_FOR_MERCHANT_MESSAGE = "Order with id [{}] does not exist for merchant [{}]";
-    private static final String ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE = "Order not found with id {} for customer {}";
-    private static final String PLACEHOLDER = "{}";
 
     private final ShoppingCartService shoppingCartService;
 
@@ -98,82 +97,79 @@ public class OrderFacadeImpl implements OrderFacade {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order saveOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language)
-            throws ServiceException {
-        try {
+            throws ServiceException, ShoppingCartNotFoundException, OrderNotConvertibleException,
+            OrderProductNotConvertibleException, OrderProductPriceMissingException {
 
-            Long shoppingCartId = order.getShoppingCartId();
+        Long shoppingCartId = order.getShoppingCartId();
 
-            ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
+        ShoppingCart cart = shoppingCartService.findCart(shoppingCartId, store);
 
-            if (cart == null) {
-                throw new ServiceException(String.format("Shopping cart with id %s does not exist", shoppingCartId));
-            }
-
-            Optional<Order> previousOrder =
-                    orderService.findOrderByShoppingCartCodeAndStoreMerchantId(cart.getShoppingCartCode(), store);
-
-            if (previousOrder.isPresent()) {
-                log.info("Returning existing order {} for shopping cart code {}", previousOrder.get().getId(), cart.getShoppingCartCode());
-                return previousOrder.get();
-            }
-
-            Order modelOrder = new Order();
-
-            persistableOrderApiPopulator.populate(order, modelOrder, store, language);
-
-            modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
-
-            Delivery delivery = customer.getDelivery();
-            modelOrder.setDelivery(delivery);
-
-            Billing billing = customer.getBilling();
-            modelOrder.setBilling(billing);
-
-            List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
-
-            Set<OrderProduct> orderProducts = new LinkedHashSet<>();
-
-            for (ShoppingCartItem item : shoppingCartItems) {
-                OrderProduct orderProduct = new OrderProduct();
-                orderProduct = orderProductPopulator.populate(item, orderProduct, store, language);
-                orderProduct.setOrder(modelOrder);
-                orderProducts.add(orderProduct);
-            }
-
-            modelOrder.setOrderProducts(orderProducts);
-
-            OrderSummary orderSummary = new OrderSummary();
-
-            orderSummary.setProducts(shoppingCartItems);
-
-            OrderTotalSummary orderTotalSummary = orderService.calculateOrderTotal(orderSummary, store);
-
-            modelOrder.setTotal(orderTotalSummary.getTotal());
-            List<OrderTotal> totals = orderTotalSummary.getTotals();
-            Set<OrderTotal> set = new HashSet<>();
-
-            if (!CollectionUtils.isEmpty(totals)) {
-                for (OrderTotal total : totals) {
-                    total.setOrder(modelOrder);
-                    set.add(total);
-                }
-            }
-            modelOrder.setOrderTotal(set);
-
-            modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
-            modelOrder = orderService.process(modelOrder, customer, shoppingCartItems, orderTotalSummary, store);
-
-            modelOrder.setStatus(OrderStatus.CREATED);
-            modelOrder.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
-            modelOrder.setPaymentStatus(PaymentStatus.PENDING);
-            orderService.save(modelOrder);
-            cart.setOrderId(modelOrder.getId());
-            shoppingCartFacade.saveOrUpdateShoppingCart(cart);
-
-            return modelOrder;
-        } catch (Exception e) {
-            throw new ServiceException(e);
+        if (cart == null) {
+            throw ShoppingCartNotFoundException.byId(shoppingCartId);
         }
+
+        Optional<Order> previousOrder =
+                orderService.findOrderByShoppingCartCodeAndStoreMerchantId(cart.getShoppingCartCode(), store);
+
+        if (previousOrder.isPresent()) {
+            log.info("Returning existing order {} for shopping cart code {}", previousOrder.get().getId(), cart.getShoppingCartCode());
+            return previousOrder.get();
+        }
+
+        Order modelOrder = new Order();
+
+        persistableOrderApiPopulator.populate(order, modelOrder, store, language);
+
+        modelOrder.setCustomerEmailAddress(customer.getEmailAddress());
+
+        Delivery delivery = customer.getDelivery();
+        modelOrder.setDelivery(delivery);
+
+        Billing billing = customer.getBilling();
+        modelOrder.setBilling(billing);
+
+        List<ShoppingCartItem> shoppingCartItems = new ArrayList<>(cart.getLineItems());
+
+        Set<OrderProduct> orderProducts = new LinkedHashSet<>();
+
+        for (ShoppingCartItem item : shoppingCartItems) {
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct = orderProductPopulator.populate(item, orderProduct, store, language);
+            orderProduct.setOrder(modelOrder);
+            orderProducts.add(orderProduct);
+        }
+
+        modelOrder.setOrderProducts(orderProducts);
+
+        OrderSummary orderSummary = new OrderSummary();
+
+        orderSummary.setProducts(shoppingCartItems);
+
+        OrderTotalSummary orderTotalSummary = orderService.calculateOrderTotal(orderSummary, store);
+
+        modelOrder.setTotal(orderTotalSummary.getTotal());
+        List<OrderTotal> totals = orderTotalSummary.getTotals();
+        Set<OrderTotal> set = new HashSet<>();
+
+        if (!CollectionUtils.isEmpty(totals)) {
+            for (OrderTotal total : totals) {
+                total.setOrder(modelOrder);
+                set.add(total);
+            }
+        }
+        modelOrder.setOrderTotal(set);
+
+        modelOrder.setShoppingCartCode(cart.getShoppingCartCode());
+        modelOrder = orderService.process(modelOrder, customer, shoppingCartItems, orderTotalSummary, store);
+
+        modelOrder.setStatus(OrderStatus.CREATED);
+        modelOrder.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
+        modelOrder.setPaymentStatus(PaymentStatus.PENDING);
+        orderService.save(modelOrder);
+        cart.setOrderId(modelOrder.getId());
+        shoppingCartFacade.saveOrUpdateShoppingCart(cart);
+
+        return modelOrder;
     }
 
     @Override
@@ -218,38 +214,33 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public ReadableOrderList getReadableOrderList(OrderCriteria criteria, StoreMerchantId store) {
-        try {
-            Page<Order> ordersList = orderService.getOrders(criteria, store);
+        Page<Order> ordersList = orderService.getOrders(criteria, store);
 
-            List<Order> orders = ordersList.getContent();
-            ReadableOrderList returnList = new ReadableOrderList();
+        List<Order> orders = ordersList.getContent();
+        ReadableOrderList returnList = new ReadableOrderList();
 
-            List<ReadableOrder> readableOrders = new ArrayList<>();
-            for (Order order : orders) {
-                ReadableOrder readableOrder = new ReadableOrder();
-                readableOrderPopulator.populate(order, readableOrder, null, null);
-                readableOrders.add(readableOrder);
-            }
-            returnList.setContent(readableOrders);
-
-            returnList.setTotalElements(ordersList.getTotalElements());
-            returnList.setTotalPages(ordersList.getTotalPages());
-            returnList.setSize(ordersList.getSize());
-            returnList.setRecordsFiltered(ordersList.getSize());
-            returnList.setPageNumber(ordersList.getNumber());
-
-            return returnList;
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting orders", e);
+        List<ReadableOrder> readableOrders = new ArrayList<>();
+        for (Order order : orders) {
+            ReadableOrder readableOrder = new ReadableOrder();
+            readableOrderPopulator.populate(order, readableOrder, null, null);
+            readableOrders.add(readableOrder);
         }
+        returnList.setContent(readableOrders);
+
+        returnList.setTotalElements(ordersList.getTotalElements());
+        returnList.setTotalPages(ordersList.getTotalPages());
+        returnList.setSize(ordersList.getSize());
+        returnList.setRecordsFiltered(ordersList.getSize());
+        returnList.setPageNumber(ordersList.getNumber());
+
+        return returnList;
     }
 
     @Override
-    public ReadableOrderStatus getOrderStatus(Long orderId, StoreMerchantId store) {
+    public ReadableOrderStatus getOrderStatus(Long orderId, StoreMerchantId store) throws OrderNotFoundException {
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
-            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace(PLACEHOLDER, String.valueOf(orderId)));
+            throw OrderNotFoundException.of(orderId, store);
         }
 
         ReadableOrderStatus readableOrderStatus = new ReadableOrderStatus();
@@ -262,10 +253,11 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language) {
+    public ReadableOrder getReadableOrder(Long orderId, StoreMerchantId store, LanguageCode language)
+            throws OrderNotFoundException, PriceNotFormattableException {
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
-            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace(PLACEHOLDER, orderId.toString()));
+            throw OrderNotFoundException.of(orderId, store);
         }
 
         ReadableOrder readableOrder = new ReadableOrder();
@@ -280,36 +272,31 @@ public class OrderFacadeImpl implements OrderFacade {
             }
         }
 
-        try {
-            readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
+        readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
-            // order products
-            List<ReadableOrderProduct> orderProducts = new ArrayList<>();
-            for (OrderProduct p : modelOrder.getOrderProducts()) {
+        // order products
+        List<ReadableOrderProduct> orderProducts = new ArrayList<>();
+        for (OrderProduct p : modelOrder.getOrderProducts()) {
 
-                ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-                readableOrderProductPopulator.populate(p, orderProduct, store, language);
-                orderProducts.add(orderProduct);
-            }
-
-            readableOrder.setProducts(orderProducts);
-        } catch (Exception _) {
-            throw new ServiceRuntimeException(ERROR_WHILE_GETTING_ORDER_MESSAGE.replace(PLACEHOLDER, orderId.toString()));
+            ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+            readableOrderProductPopulator.populate(p, orderProduct, store, language);
+            orderProducts.add(orderProduct);
         }
+
+        readableOrder.setProducts(orderProducts);
 
         return readableOrder;
     }
 
     @Override
-    public ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language) {
+    public ReadableOrder getReadableOrder(Long orderId, Long customerId, StoreMerchantId store, LanguageCode language)
+            throws OrderNotFoundException, PriceNotFormattableException {
         Order modelOrder = orderService.getOrder(orderId, store);
         if (modelOrder == null) {
-            throw new ResourceNotFoundException(ORDER_NOT_FOUND_BY_ID_MESSAGE.replace(PLACEHOLDER, orderId.toString()));
+            throw OrderNotFoundException.of(orderId, store);
         }
         if (modelOrder.getCustomerId() == null || !modelOrder.getCustomerId().equals(customerId)) {
-            throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE.replace(PLACEHOLDER, orderId.toString())
-                            .replace(PLACEHOLDER, customerId.toString()));
+            throw OrderNotFoundException.forCustomer(orderId, customerId);
         }
 
         ReadableOrder readableOrder = new ReadableOrder();
@@ -321,34 +308,29 @@ public class OrderFacadeImpl implements OrderFacade {
             readableOrder.setCustomer(readableCustomer);
         }
 
-        try {
-            readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
+        readableOrderPopulator.populate(modelOrder, readableOrder, store, language);
 
-            // order products
-            List<ReadableOrderProduct> orderProducts = new ArrayList<>();
-            for (OrderProduct p : modelOrder.getOrderProducts()) {
+        // order products
+        List<ReadableOrderProduct> orderProducts = new ArrayList<>();
+        for (OrderProduct p : modelOrder.getOrderProducts()) {
 
-                ReadableOrderProduct orderProduct = new ReadableOrderProduct();
-                readableOrderProductPopulator.populate(p, orderProduct, store, language);
-                orderProducts.add(orderProduct);
-            }
-
-            readableOrder.setProducts(orderProducts);
-        } catch (Exception _) {
-            throw new ServiceRuntimeException(ERROR_WHILE_GETTING_ORDER_MESSAGE.replace(PLACEHOLDER, orderId.toString()));
+            ReadableOrderProduct orderProduct = new ReadableOrderProduct();
+            readableOrderProductPopulator.populate(p, orderProduct, store, language);
+            orderProducts.add(orderProduct);
         }
+
+        readableOrder.setProducts(orderProducts);
 
         return readableOrder;
     }
 
     @Override
     public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, StoreMerchantId store,
-                                                                    LanguageCode language) {
+                                                                    LanguageCode language) throws OrderNotFoundException {
 
         Order order = orderService.getOrder(orderId, store);
         if (order == null) {
-            throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE.replace(PLACEHOLDER, orderId.toString()).replace(PLACEHOLDER, store.toString()));
+            throw OrderNotFoundException.of(orderId, store);
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
@@ -357,18 +339,16 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public List<ReadableOrderStatusHistory> getReadableOrderHistory(Long orderId, Long customerId,
-                                                                    StoreMerchantId store, LanguageCode language) {
+                                                                    StoreMerchantId store, LanguageCode language)
+            throws OrderNotFoundException {
 
         Order order = orderService.getOrder(orderId, store);
         if (order == null) {
-            throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_FOR_MERCHANT_MESSAGE.replace(PLACEHOLDER, orderId.toString()).replace(PLACEHOLDER, store.toString()));
+            throw OrderNotFoundException.of(orderId, store);
         }
 
         if (order.getCustomerId() == null || !order.getCustomerId().equals(customerId)) {
-            throw new ResourceNotFoundException(
-                    ORDER_NOT_FOUND_FOR_CUSTOMER_MESSAGE.replace(PLACEHOLDER, orderId.toString())
-                            .replace(PLACEHOLDER, customerId.toString()));
+            throw OrderNotFoundException.forCustomer(orderId, customerId);
         }
 
         Set<OrderStatusHistory> historyList = order.getOrderHistory();
@@ -387,34 +367,29 @@ public class OrderFacadeImpl implements OrderFacade {
     }
 
     @Override
-    public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store) {
+    public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store)
+            throws OrderNotFoundException, ServiceException, CatalogApiUnavailableException {
         Order order = orderService.getOrder(id, store);
         if (order == null) {
-            throw new ResourceNotFoundException(
-                    ORDER_DOES_NOT_EXIST_FOR_MERCHANT_MESSAGE.replace(PLACEHOLDER, id.toString()).replace(PLACEHOLDER, store.toString()));
+            throw OrderNotFoundException.of(id, store);
         }
 
-        try {
-            OrderStatusHistory history = new OrderStatusHistory();
-            history.setComments(status.getComments());
-            history.setDateAdded(status.getDate());
-            history.setOrder(order);
-            history.setStatus(status.getOrderStatus());
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setComments(status.getComments());
+        history.setDateAdded(status.getDate());
+        history.setOrder(order);
+        history.setStatus(status.getOrderStatus());
 
-            orderService.addOrderStatusHistory(order, history);
+        orderService.addOrderStatusHistory(order, history);
 
-            if ((status.getOrderStatus() == OrderStatus.DELIVERED || status.getOrderStatus() == OrderStatus.COMPLETED)
-                    && order.getInventoryStatus() == InventoryStatus.RESERVED) {
-                log.info("Order {} reached {} status. Committing inventory for store {}", id, status.getOrderStatus(), store);
-                orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(id, store, status.getOrderStatus(), PaymentStatus.PAID);
-            } else if (status.getOrderStatus() == OrderStatus.CANCELLED && order.getInventoryStatus() == InventoryStatus.RESERVED) {
-                log.info("Order {} cancelled. Releasing inventory for store {}", id, store);
-                orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(id, store, status.getOrderStatus(),
-                        PaymentStatus.CANCELLED);
-            }
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("An error occured while converting orderstatushistory", e);
+        if ((status.getOrderStatus() == OrderStatus.DELIVERED || status.getOrderStatus() == OrderStatus.COMPLETED)
+                && order.getInventoryStatus() == InventoryStatus.RESERVED) {
+            log.info("Order {} reached {} status. Committing inventory for store {}", id, status.getOrderStatus(), store);
+            orderInventoryOrchestrator.updateOrderStatusWithReservationCommit(id, store, status.getOrderStatus(), PaymentStatus.PAID);
+        } else if (status.getOrderStatus() == OrderStatus.CANCELLED && order.getInventoryStatus() == InventoryStatus.RESERVED) {
+            log.info("Order {} cancelled. Releasing inventory for store {}", id, store);
+            orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(id, store, status.getOrderStatus(),
+                    PaymentStatus.CANCELLED);
         }
     }
 

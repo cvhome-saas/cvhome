@@ -4,10 +4,13 @@
 package com.asrevo.cvhome.checkout.service.facade.cart;
 
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
+import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 /**
  * </p>
@@ -22,54 +25,39 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  */
 public interface ShoppingCartFacade {
 
-    void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception;
+    void saveOrUpdateShoppingCart(ShoppingCart cart) throws ServiceException;
 
     /**
-     * Modify an item to an existing cart, quantity of line item will reflect
-     * item.getQuantity
+     * Modify an item in an existing cart; the quantity of the line item reflects {@code item.getQuantity()}.
      *
-     * @param cartCode
-     * @param item
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
+     * @throws ShoppingCartNotFoundException  no cart with that code in this store
+     * @throws ProductNotPurchasableException the product cannot be bought
      */
     ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
-                                    LanguageCode language) throws Exception;
+                                    LanguageCode language)
+            throws ServiceException, ShoppingCartNotFoundException, ProductNotPurchasableException;
 
     /**
-     * Add item to shopping cart
+     * Add an item to a new shopping cart.
      *
-     * @param item
-     * @param store
-     * @param language
+     * @throws ProductNotPurchasableException the product cannot be bought
      */
-    ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store, LanguageCode language);
+    ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException;
 
     /**
-     * Removes a shopping cart item
+     * Removes a shopping cart item.
      *
-     * @param cartCode
-     * @param sku
-     * @param merchant
-     * @param language
-     * @param returnCart
-     * @return ReadableShoppingCart or NULL
-     * @throws Exception
+     * @return the remaining cart when {@code returnCart} is set and items remain, otherwise {@code null}
+     * @throws ShoppingCartNotFoundException no cart with that code in this store
      */
     ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
-                                                LanguageCode language, boolean returnCart) throws Exception;
+                                                LanguageCode language, boolean returnCart)
+            throws ServiceException, ShoppingCartNotFoundException;
 
     /**
-     * Retrieves a shopping cart
-     *
-     * @param code
-     * @param store
-     * @param language
-     * @return
-     * @throws Exception
+     * Retrieves a shopping cart, or {@code null} when there is none for that code.
      */
-    ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws Exception;
+    ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws ServiceException;
 
 }

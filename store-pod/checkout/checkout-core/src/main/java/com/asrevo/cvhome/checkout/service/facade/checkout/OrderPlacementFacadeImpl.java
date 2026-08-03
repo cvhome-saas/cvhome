@@ -4,9 +4,15 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
+import com.asrevo.cvhome.catalog.api.errors.ProductReservationRejectedException;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrator;
@@ -46,11 +52,23 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                                             Locale locale, String successUrl, String cancelUrl)
-            throws ServiceException, PaymentApiUnavailableException {
+            throws ServiceException, PaymentApiUnavailableException, CatalogApiUnavailableException,
+            ShoppingCartNotFoundException, OrderNotConvertibleException, OrderProductNotConvertibleException,
+            OrderProductPriceMissingException {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        ProductReservationReserveResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        ProductReservationReserveResult result;
+        try {
+            result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        } catch (ProductReservationRejectedException e) {
+            // Catalog looked and said no. A decision, so the order can be resolved on it — and, since nothing was
+            // reserved, there is nothing to release.
+            log.info("Reservation refused for order {} [{} / remote {}]: {}", modelOrder.getId(), e.errorCode().code(),
+                    e.remoteCode(), e.getMessage());
+            updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
+            return new OrderProcessingResult(modelOrder);
+        }
 
         if (!result.status()) {
             updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
@@ -70,7 +88,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CONFIRMED);
                     modelOrder.setInventoryStatus(InventoryStatus.COMMITTED);
                     modelOrder.setPaymentStatus(PaymentStatus.PAID);
-                } catch (Exception e) {
+                } catch (CatalogApiUnavailableException e) {
                     log.error("Failed to commit reservation for PAID order {}. Manual intervention required.", modelOrder.getId(), e);
                     // Ensure local status reflects payment even if catalog commit failed
                     updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PAID);
@@ -91,7 +109,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CANCELLED);
                     modelOrder.setInventoryStatus(InventoryStatus.RELEASED);
                     modelOrder.setPaymentStatus(PaymentStatus.FAILED);
-                } catch (Exception e) {
+                } catch (CatalogApiUnavailableException e) {
                     log.error("Failed to release reservation for FAILED order {}.", modelOrder.getId(), e);
                     updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }

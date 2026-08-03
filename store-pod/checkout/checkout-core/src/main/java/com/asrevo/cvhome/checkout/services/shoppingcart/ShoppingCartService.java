@@ -23,8 +23,7 @@ public interface ShoppingCartService extends SalesManagerEntityService<Long, Sho
      * Populates a ShoppingCartItem from a Product and attributes if any. Calculate price
      * based on availability
      */
-    ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store)
-            throws ServiceException;
+    ShoppingCartItem populateShoppingCartItem(String sku, BigDecimal price, StoreMerchantId store);
 
     /**
      * Removes a shopping cart item

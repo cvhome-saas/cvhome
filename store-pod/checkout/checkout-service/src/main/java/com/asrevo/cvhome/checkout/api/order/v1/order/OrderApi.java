@@ -18,8 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
+import com.asrevo.cvhome.checkout.errors.ForeignStoreTokenException;
+import com.asrevo.cvhome.checkout.errors.OrderCustomerUnresolvedException;
+import com.asrevo.cvhome.checkout.errors.OrderLoginRequiredException;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
+import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrderList;
@@ -40,8 +50,6 @@ import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
@@ -61,8 +69,6 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 public class OrderApi {
 
     private static final String CLIENT_ID_ATTRIBUTE = "clientId";
-
-    private static final String INVALID_CLIENT_ID_MESSAGE = "HTTP 401 Unauthorized - Invalid clientId";
 
     private final OrderFacade orderFacade;
 
@@ -98,24 +104,19 @@ public class OrderApi {
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
             throws ServiceException, PaymentApiUnavailableException, UnsupportedCountryCodeException,
-            UnsupportedZoneCodeException {
+            UnsupportedZoneCodeException, CatalogApiUnavailableException, OrderLoginRequiredException,
+            ForeignStoreTokenException, ShoppingCartNotFoundException, OrderCustomerUnresolvedException,
+            OrderNotConvertibleException, OrderProductNotConvertibleException, OrderProductPriceMissingException {
 
         ShoppingCart cart;
         ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
-        if (store.isRequireLoginForOrderPlacement()) {
-            if (auth == null || !auth.isAuthenticated()) {
-                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required for order placement");
-            }
-            if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
-                throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
-            }
-        }
+        requireShopperOf(store, auth, merchantStore);
 
         cart = shoppingCartService.loadCartByCode(code, merchantStore, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException(String.format("Cart code %s does not exist", code));
+            throw ShoppingCartNotFoundException.byCode(code);
         } else {
             order.setShoppingCartId(cart.getId());
         }
@@ -127,9 +128,7 @@ public class OrderApi {
                 .ifPresent(it -> order.getCustomer().setCuaExternalId(it));
 
         Customer customer = customerFacade.getOrCreateCustomer(order.getCustomer(), merchantStore, language)
-                .orElseThrow(() -> new ServiceRuntimeException(
-                        String.format("Unable to create or retrieve customer for cart placement %s",
-                                cart.getCustomerId())));
+                .orElseThrow(() -> OrderCustomerUnresolvedException.of(code));
 
         String domain = new DomainResolver(request).domain();
 
@@ -156,19 +155,36 @@ public class OrderApi {
     @ResponseStatus(HttpStatus.OK)
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
-    public ReadableOrderStatus orderStatus(@PathVariable Long orderId, JwtAuthenticationToken auth, StoreMerchantId merchantStore) {
+    public ReadableOrderStatus orderStatus(@PathVariable Long orderId, JwtAuthenticationToken auth, StoreMerchantId merchantStore)
+            throws OrderLoginRequiredException, ForeignStoreTokenException, OrderNotFoundException {
         ReadableMerchantStore store = externalMerchantStoreService.getStore(merchantStore);
 
-        if (store.isRequireLoginForOrderPlacement()) {
-            if (auth == null || !auth.isAuthenticated()) {
-                throw new ServiceRuntimeException("HTTP 401 Unauthorized - Login required to view order status");
-            }
-            if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
-                throw new ServiceRuntimeException(INVALID_CLIENT_ID_MESSAGE);
-            }
-        }
+        requireShopperOf(store, auth, merchantStore);
 
         return orderFacade.getOrderStatus(orderId, merchantStore);
+    }
+
+    /**
+     * Enforces the store's login requirement, if it has one.
+     *
+     * <p>
+     * The two failures are deliberately different types. "No token" is a 401 and tells the storefront to send the
+     * shopper to log in; "a token for another store" is a 403, because logging in again would produce the same token
+     * and the same answer. Both used to be a {@code ServiceRuntimeException} whose message said 401 while the response
+     * said 400 — the storefront could act on neither.
+     * </p>
+     */
+    private void requireShopperOf(ReadableMerchantStore store, JwtAuthenticationToken auth, StoreMerchantId merchantStore)
+            throws OrderLoginRequiredException, ForeignStoreTokenException {
+        if (!store.isRequireLoginForOrderPlacement()) {
+            return;
+        }
+        if (auth == null || !auth.isAuthenticated()) {
+            throw OrderLoginRequiredException.of(merchantStore);
+        }
+        if (!merchantStore.getId().equals(auth.getTokenAttributes().get(CLIENT_ID_ATTRIBUTE))) {
+            throw ForeignStoreTokenException.of(merchantStore);
+        }
     }
 
     @GetMapping(value = {"/private/orders"})
@@ -202,7 +218,8 @@ public class OrderApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
-    public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language) {
+    public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language)
+            throws OrderNotFoundException, PriceNotFormattableException {
 
         return orderFacade.getReadableOrder(id, merchantStore, language);
     }

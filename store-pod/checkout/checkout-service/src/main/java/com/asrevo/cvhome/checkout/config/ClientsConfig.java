@@ -3,6 +3,7 @@ package com.asrevo.cvhome.checkout.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiErrors;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
@@ -34,9 +35,19 @@ public class ClientsConfig {
         return new CachedExternalProductService(externalProductService);
     }
 
+    /**
+     * Built from {@code ExternalProductReservationService}, the caller-side half of catalog's reservation contract —
+     * never from {@code IProductReservationService}, whose {@code throws} clauses are catalog's own vocabulary.
+     *
+     * <p>
+     * {@code CatalogApiErrors.CATALOG} is what makes a refusal for lack of stock arrive as a different type from a
+     * catalog that could not be answered by, which is the distinction the order flow turns into "cancel the order" or
+     * "leave it recoverable".
+     * </p>
+     */
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, RemoteErrorCatalog.none());
+        return restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, CatalogApiErrors.CATALOG);
     }
 
     /**
