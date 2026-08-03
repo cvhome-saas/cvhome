@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
 import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
@@ -142,7 +145,8 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         return product;
     }
 
-    private void addNewImages(Product product, Set<ProductImage> images, List<Long> newImageIds) throws ServiceException {
+    private void addNewImages(Product product, Set<ProductImage> images, List<Long> newImageIds)
+            throws ProductImageNotPersistedException {
         if (images == null || images.isEmpty()) {
             return;
         }
@@ -158,7 +162,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     private void cleanupImages(Product product, Set<ProductImage> originalProductImages, List<Long> newImageIds)
-            throws ServiceException {
+            throws ProductImageNotPersistedException, ServiceException {
         // cleanup old and new images
         for (ProductImage image : originalProductImages) {
             if (image.getImage() != null && image.getId() == null) {
@@ -170,7 +174,7 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
         }
     }
 
-    private void addProductImage(Product product, ProductImage image) throws ServiceException {
+    private void addProductImage(Product product, ProductImage image) throws ProductImageNotPersistedException {
         image.setProduct(product);
 
         InputStream inputStream = image.getImage();
@@ -204,51 +208,42 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
     }
 
     @Override
-    public Product saveProduct(Product product) throws ServiceException {
+    public Product saveProduct(Product product) throws ProductNotPersistedException {
         try {
             return this.saveOrUpdate(product);
         } catch (ServiceException e) {
-            throw new ServiceException("Cannot create product [%s]".formatted(product.getId()), e);
+            throw ProductNotPersistedException.of(product.getId(), e);
         }
     }
 
     public Product getMinimalProductBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
-            throws ServiceException {
+            throws ProductNotFoundException {
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return productRepository.getMinimalProductById(productId, merchant, language);
-        } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
-        }
+        Long productId = findProductIdByCode(productCode, merchant);
+        return productRepository.getMinimalProductById(productId, merchant, language);
     }
 
     @Override
     public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
-            throws ServiceException {
+            throws ProductNotFoundException {
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return productRepository.getById(productId, merchant, language);
-        } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
-        }
+        // The try/catch that used to wrap these three lookups turned "no such sku" and "the query failed" into one
+        // ServiceException. The first is now a 404 naming the sku; the second stays an unchecked DataAccessException
+        // and renders as a 500 with a traceId, which is what it is.
+        Long productId = findProductIdByCode(productCode, merchant);
+        return productRepository.getById(productId, merchant, language);
     }
 
-    public Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException {
+    public Product getBySku(String productCode, StoreMerchantId merchant) throws ProductNotFoundException {
 
-        try {
-            Long productId = findProductIdByCode(productCode, merchant);
-            return this.findOne(productId, merchant);
-        } catch (Exception e) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode), e);
-        }
+        Long productId = findProductIdByCode(productCode, merchant);
+        return this.findOne(productId, merchant);
     }
 
-    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ServiceException {
+    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ProductNotFoundException {
         List<Long> products = productRepository.findBySku(productCode, merchant);
         if (products.isEmpty()) {
-            throw new ServiceException(CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE.formatted(productCode));
+            throw ProductNotFoundException.of(productCode, merchant);
         }
         return products.getFirst();
     }

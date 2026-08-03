@@ -5,11 +5,16 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotFoundException;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 /**
@@ -19,29 +24,41 @@ import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
  */
 public interface ManufacturerFacade {
 
-    List<ReadableManufacturer> getByProductInCategory(StoreMerchantId store, LanguageCode language, Long categoryId);
+    /**
+     * @throws CategoryNotFoundException          no such category in this store
+     * @throws ForeignStoreProductAccessException the category belongs to another store
+     */
+    List<ReadableManufacturer> getByProductInCategory(StoreMerchantId store, LanguageCode language, Long categoryId)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException, ManufacturerNotConvertibleException;
 
     /**
-     * Creates or saves a manufacturer
+     * Creates or saves a manufacturer.
+     *
+     * @throws ManufacturerNotFoundException the id given matches no manufacturer in this store
      */
     void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, StoreMerchantId store, LanguageCode language)
-            throws Exception;
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException, ServiceException;
 
     /**
-     * Deletes a manufacturer
+     * Deletes a manufacturer.
+     *
+     * @throws ServiceException residue of {@code SalesManagerEntityService.delete}, retired in Step 8
      */
-    void deleteManufacturer(Manufacturer manufacturer) throws Exception;
+    void deleteManufacturer(Manufacturer manufacturer) throws ServiceException;
 
     /**
-     * Get a Manufacturer by id
+     * Get a Manufacturer by id.
+     *
+     * @throws ManufacturerNotFoundException no such manufacturer in this store
      */
-    ReadableManufacturer getManufacturer(Long id, StoreMerchantId store, LanguageCode language);
+    ReadableManufacturer getManufacturer(Long id, StoreMerchantId store, LanguageCode language)
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException;
 
     /**
      * List manufacturers by a specific store
      */
     ReadableManufacturerList listByStore(StoreMerchantId store, LanguageCode language, ListCriteria criteria,
-                                         Pageable pageable);
+                                         Pageable pageable) throws ManufacturerNotConvertibleException;
 
     /**
      * Determines if manufacturer code already exists

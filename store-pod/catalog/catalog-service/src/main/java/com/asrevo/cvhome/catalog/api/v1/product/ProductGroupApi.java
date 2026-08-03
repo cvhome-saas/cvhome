@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.ProductGroupNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
@@ -23,6 +26,7 @@ import com.asrevo.cvhome.catalog.service.facade.product.group.ProductGroupFacade
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +62,8 @@ public class ProductGroupApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public ReadableProductGroup getProductGroup(@PathVariable String code, StoreMerchantId merchantStore,
-                                                LanguageCode language) {
+                                                LanguageCode language)
+            throws ProductGroupNotFoundException, ProductNotConvertibleException {
         return productGroupFacade.getByCode(merchantStore, code, LanguageCode.allLanguage());
     }
 
@@ -72,7 +77,8 @@ public class ProductGroupApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public ReadableProductGroup getPublicProductGroup(@PathVariable String code, StoreMerchantId merchantStore,
-                                                      LanguageCode language) {
+                                                      LanguageCode language)
+            throws ProductGroupNotFoundException, ProductNotConvertibleException {
         return productGroupFacade.getByCode(merchantStore, code, language);
     }
 
@@ -111,7 +117,8 @@ public class ProductGroupApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public PersistableProductGroup saveProductGroup(@RequestBody @Valid PersistableProductGroup group,
-                                                    StoreMerchantId merchantStore) {
+                                                    StoreMerchantId merchantStore)
+            throws ServiceException {
         return productGroupFacade.saveProductGroup(merchantStore, group);
     }
 
@@ -121,7 +128,8 @@ public class ProductGroupApi {
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void deleteProductGroup(@PathVariable String code, StoreMerchantId merchantStore) {
+    public void deleteProductGroup(@PathVariable String code, StoreMerchantId merchantStore)
+            throws ProductGroupNotFoundException, ServiceException {
         productGroupFacade.delete(merchantStore, code);
     }
 
@@ -132,7 +140,8 @@ public class ProductGroupApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToGroup(@PathVariable String code, @PathVariable Long productId,
-                                  StoreMerchantId merchantStore) {
+                                  StoreMerchantId merchantStore)
+            throws ProductGroupNotFoundException, ProductNotFoundException, ServiceException {
         productGroupFacade.addProductToGroup(merchantStore, code, productId);
     }
 
@@ -143,7 +152,8 @@ public class ProductGroupApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromGroup(@PathVariable String code, @PathVariable Long productId,
-                                       StoreMerchantId merchantStore) {
+                                       StoreMerchantId merchantStore)
+            throws ProductGroupNotFoundException, ServiceException {
         productGroupFacade.removeProductFromGroup(merchantStore, code, productId);
     }
 

@@ -23,6 +23,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.DuplicateProductVariationException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariantValue;
@@ -39,6 +44,7 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -138,7 +144,8 @@ public class ProductVariationApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public List<ReadableProductVariant> categoryVariantList(@PathVariable final Long id, // category
                                                             // id
-                                                            StoreMerchantId merchantStore, LanguageCode language) {
+                                                            StoreMerchantId merchantStore, LanguageCode language)
+            throws CategoryNotFoundException {
 
         return categoryFacade.categoryProductVariants(id, merchantStore, language);
     }
@@ -154,7 +161,10 @@ public class ProductVariationApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProductVariation variation, StoreMerchantId merchantStore,
-                         LanguageCode language) {
+                         LanguageCode language)
+
+            throws DuplicateProductVariationException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException, ServiceException {
 
         Long variantId = productVariationFacade.create(variation, merchantStore, language);
         return new Entity(variantId);
@@ -187,7 +197,8 @@ public class ProductVariationApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 
     public ReadableProductVariation get(@PathVariable Long variationId, StoreMerchantId merchantStore,
-                                        LanguageCode language) {
+                                        LanguageCode language)
+            throws ProductVariationNotFoundException {
 
         return productVariationFacade.get(variationId, merchantStore, language);
     }
@@ -201,7 +212,10 @@ public class ProductVariationApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@Valid @RequestBody PersistableProductVariation variation, @PathVariable Long variationId,
-                       StoreMerchantId merchantStore, LanguageCode language) {
+                       StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductVariationNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException {
 
         variation.setId(variationId);
         productVariationFacade.update(variationId, variation, merchantStore, language);
@@ -215,7 +229,8 @@ public class ProductVariationApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void delete(@PathVariable Long variationId, StoreMerchantId merchantStore, LanguageCode language) {
+    public void delete(@PathVariable Long variationId, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductVariationNotFoundException, ServiceException {
 
         productVariationFacade.delete(variationId, merchantStore);
     }

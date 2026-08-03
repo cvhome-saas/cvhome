@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
 import com.asrevo.cvhome.catalog.repositories.product.image.ProductImageRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
@@ -46,7 +47,8 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException {
+    public void addProductImages(Product product, List<ProductImage> productImages)
+            throws ProductImageNotPersistedException {
 
         try {
             for (ProductImage productImage : productImages) {
@@ -60,13 +62,13 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
             }
 
         } catch (Exception e) {
-            throw new ServiceException(e);
+            throw ProductImageNotPersistedException.of(product.getSku(), e);
         }
     }
 
     @Override
     public void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
-            throws ServiceException {
+            throws ProductImageNotPersistedException {
 
         productImage.setProduct(product);
 
@@ -82,7 +84,7 @@ public class ProductImageServiceImpl extends SalesManagerEntityServiceImpl<Long,
             saveOrUpdate(productImage);
 
         } catch (Exception e) {
-            throw new ServiceException(e);
+            throw ProductImageNotPersistedException.of(productImage.getProduct().getSku(), e);
         } finally {
             try {
 

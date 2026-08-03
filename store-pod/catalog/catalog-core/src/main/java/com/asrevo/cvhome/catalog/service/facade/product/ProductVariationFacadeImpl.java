@@ -8,6 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
+import com.asrevo.cvhome.catalog.errors.DuplicateProductVariationException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.variation.PersistableProductVariation;
 import com.asrevo.cvhome.catalog.model.product.variation.ReadableProductVariation;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.PersistableProductVariationMapper;
@@ -15,17 +19,11 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductVariation
 import com.asrevo.cvhome.catalog.services.product.variation.ProductVariationService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
 @Service
 public class ProductVariationFacadeImpl implements ProductVariationFacade {
-
-    private static final String PRODUCT_VARIATION_NOT_FOUND_TEMPLATE =
-            "ProductVariation not found for id [%s] and store [%s]";
 
     private final PersistableProductVariationMapper persistableProductVariationMapper;
 
@@ -42,11 +40,11 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     }
 
     @Override
-    public ReadableProductVariation get(Long variationId, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductVariation get(Long variationId, StoreMerchantId store, LanguageCode language)
+            throws ProductVariationNotFoundException {
         Optional<ProductVariation> variation = productVariationService.getById(store, variationId, language);
         if (variation.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
+            throw ProductVariationNotFoundException.of(variationId, store);
         }
 
         return readableProductVariationMapper.convert(variation.get(), store, language);
@@ -57,7 +55,7 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
                                                              Pageable pageable) {
         Page<ProductVariation> vars = productVariationService.getByMerchant(store, language, null, pageable);
         List<ReadableProductVariation> variations = vars.stream()
-                .map(opt -> this.convert(opt, store, language))
+                .map(opt -> readableProductVariationMapper.convert(opt, store, language))
                 .toList();
         ReadableEntityList<ReadableProductVariation> returnList = new ReadableEntityList<>();
         returnList.setContent(variations);
@@ -68,37 +66,34 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
         return returnList;
     }
 
-    private ReadableProductVariation convert(ProductVariation variation, StoreMerchantId store, LanguageCode language) {
-        return readableProductVariationMapper.convert(variation, store, language);
-    }
-
     @Override
-    public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language) {
+    public Long create(PersistableProductVariation variation, StoreMerchantId store, LanguageCode language)
+
+            throws DuplicateProductVariationException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException, ServiceException {
 
         if (this.exists(variation.getCode(), store)) {
-            throw new OperationNotAllowedException(
-                    "Option set with code [%s] already exist".formatted(variation.getCode()));
+            // 409 rather than the legacy 400: the request is well-formed, the code is simply taken, and a client that
+            // wants to offer "try another code" needs to tell those apart.
+            throw DuplicateProductVariationException.of(variation.getCode(), store);
         }
 
         ProductVariation p = persistableProductVariationMapper.convert(variation, store, language);
         p.setStoreMerchantId(store);
-        try {
-            productVariationService.saveOrUpdate(p);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while creating ProductOptionSet", e);
-        }
+        productVariationService.saveOrUpdate(p);
 
         return p.getId();
     }
 
     @Override
     public void update(Long variationId, PersistableProductVariation variation, StoreMerchantId store,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws ProductVariationNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException {
 
         Optional<ProductVariation> p = productVariationService.getById(store, variationId, language);
         if (p.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
+            throw ProductVariationNotFoundException.of(variationId, store);
         }
 
         ProductVariation productVariant = p.get();
@@ -111,21 +106,13 @@ public class ProductVariationFacadeImpl implements ProductVariationFacade {
     }
 
     @Override
-    public void delete(Long variationId, StoreMerchantId store) {
+    public void delete(Long variationId, StoreMerchantId store)
+            throws ProductVariationNotFoundException, ServiceException {
         ProductVariation opt = productVariationService.getById(variationId);
-        if (opt == null) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
+        if (opt == null || !opt.getStoreMerchantId().equals(store)) {
+            throw ProductVariationNotFoundException.of(variationId, store);
         }
-        if (!opt.getStoreMerchantId().equals(store)) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_VARIATION_NOT_FOUND_TEMPLATE.formatted(variationId, store));
-        }
-        try {
-            productVariationService.delete(opt);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while deleting ProductVariation", e);
-        }
+        productVariationService.delete(opt);
     }
 
     @Override

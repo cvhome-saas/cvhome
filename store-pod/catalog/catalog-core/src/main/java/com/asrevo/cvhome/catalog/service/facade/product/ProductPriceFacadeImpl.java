@@ -1,10 +1,15 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.service.mapper.inventory.PersistableProductPriceMapper;
@@ -14,27 +19,12 @@ import com.asrevo.cvhome.catalog.services.product.price.ProductPriceService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import static com.asrevo.cvhome.store.utils.NumberUtils.isPositive;
 
 @Service
 public class ProductPriceFacadeImpl implements ProductPriceFacade {
-
-    private static final String GET_PRICE_ERROR_TEMPLATE =
-            "An exception occured while getting product price for sku [%s] and Store [%s]";
-
-    private static final String GET_PRICE_BY_ID_ERROR_TEMPLATE =
-            "An exception occured while getting product price [%s] for product sku [%s] and Store [%s]";
-
-    private static final String DELETE_PRICE_ERROR_TEMPLATE =
-            "An exception occured while deleting product price [%s] for product sku [%s] and Store [%s]";
-
-    private static final String PRODUCT_PRICE_NOT_FOUND_TEMPLATE =
-            "ProductPrice with id [%s not found for product sku [%s] and Store [%s]";
 
     private final ProductPriceService productPriceService;
 
@@ -54,7 +44,9 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
     }
 
     @Override
-    public Long save(PersistableProductPrice price, StoreMerchantId store) {
+    public Long save(PersistableProductPrice price, StoreMerchantId store)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException {
         LanguageCode defaultLanguage = externalMerchantStoreService.getStore(store).getDefaultLanguage();
 
         ProductPrice productPrice = persistableProductPriceMapper.convert(price, store, defaultLanguage);
@@ -68,65 +60,63 @@ public class ProductPriceFacadeImpl implements ProductPriceFacade {
     }
 
     @Override
-    public List<ReadableProductPrice> list(String sku, Long inventoryId, StoreMerchantId store, LanguageCode language) {
+    public List<ReadableProductPrice> list(String sku, Long inventoryId, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         List<ProductPrice> prices = productPriceService.findByInventoryId(inventoryId, sku, store);
 
-        return prices.stream().map(p -> {
-            try {
-                return this.readablePrice(p, store, language);
-            } catch (ConversionException e) {
-                throw new ServiceRuntimeException(GET_PRICE_ERROR_TEMPLATE.formatted(sku, store), e);
-            }
-        }).toList();
+        // A plain loop rather than stream().map(...): the price populator declares a checked failure, and the lambda
+        // could only swallow it into a message-only runtime wrapper.
+        List<ReadableProductPrice> readable = new ArrayList<>();
+        for (ProductPrice p : prices) {
+            readable.add(this.readablePrice(p, store, language));
+        }
+        return readable;
     }
 
     @Override
-    public List<ReadableProductPrice> list(String sku, StoreMerchantId store, LanguageCode language) {
+    public List<ReadableProductPrice> list(String sku, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         List<ProductPrice> prices = productPriceService.findByProductSku(sku, store);
 
-        return prices.stream().map(p -> {
-            try {
-                return this.readablePrice(p, store, language);
-            } catch (ConversionException e) {
-                throw new ServiceRuntimeException(GET_PRICE_ERROR_TEMPLATE.formatted(sku, store), e);
-            }
-        }).toList();
+        // A plain loop rather than stream().map(...): the price populator declares a checked failure, and the lambda
+        // could only swallow it into a message-only runtime wrapper.
+        List<ReadableProductPrice> readable = new ArrayList<>();
+        for (ProductPrice p : prices) {
+            readable.add(this.readablePrice(p, store, language));
+        }
+        return readable;
     }
 
     @Override
-    public void delete(Long priceId, String sku, StoreMerchantId store) {
+    public void delete(Long priceId, String sku, StoreMerchantId store)
+            throws ProductPriceNotFoundException, ServiceException {
         ProductPrice productPrice = productPriceService.findById(priceId, sku, store);
         if (productPrice == null) {
-            throw new ServiceRuntimeException(GET_PRICE_BY_ID_ERROR_TEMPLATE.formatted(priceId, sku, store));
+            // Was a ServiceRuntimeException reporting LEGACY.SERVICE_ERROR — a 500 for a price id that simply does
+            // not exist.
+            throw ProductPriceNotFoundException.of(priceId, store);
         }
 
-        try {
-            productPriceService.delete(productPrice);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(DELETE_PRICE_ERROR_TEMPLATE.formatted(priceId, sku, store), e);
-        }
+        productPriceService.delete(productPrice);
     }
 
     private ReadableProductPrice readablePrice(ProductPrice price, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws ProductPriceNotConvertibleException {
         ReadableProductPricePopulator populator = new ReadableProductPricePopulator();
         populator.setPricingService(pricingService);
         return populator.populate(price, store, language);
     }
 
     @Override
-    public ReadableProductPrice get(String sku, Long productPriceId, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductPrice get(String sku, Long productPriceId, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotFoundException, ProductPriceNotConvertibleException {
         ProductPrice price = productPriceService.findById(productPriceId, sku, store);
 
         if (price == null) {
-            throw new ResourceNotFoundException(PRODUCT_PRICE_NOT_FOUND_TEMPLATE.formatted(productPriceId, sku, store));
+            throw ProductPriceNotFoundException.of(productPriceId, store);
         }
 
-        try {
-            return readablePrice(price, store, language);
-        } catch (ConversionException e) {
-            throw new ServiceRuntimeException(DELETE_PRICE_ERROR_TEMPLATE.formatted(productPriceId, sku, store), e);
-        }
+        return readablePrice(price, store, language);
     }
 
 }

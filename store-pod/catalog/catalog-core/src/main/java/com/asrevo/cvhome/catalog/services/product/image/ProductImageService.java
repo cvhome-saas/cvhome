@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
@@ -21,7 +22,7 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Add a ProductImage to the persistence and an entry to the CMS
      */
     void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
-            throws ServiceException;
+            throws ProductImageNotPersistedException;
 
     /**
      * Get the image ByteArrayOutputStream and content description from CMS
@@ -45,7 +46,8 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
     OutputContentFile getProductImage(String storeCode, String productCode, String fileName, ProductImageSize size)
             throws ServiceException, AssetNotFoundException, AssetReadFailedException;
 
-    void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException;
+    void addProductImages(Product product, List<ProductImage> productImages)
+            throws ProductImageNotPersistedException;
 
     void updateProductImage(Product product, ProductImage productImage);
 

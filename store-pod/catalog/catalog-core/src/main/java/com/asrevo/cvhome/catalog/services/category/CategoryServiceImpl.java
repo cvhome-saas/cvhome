@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.category.CategoryDescription;
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.repositories.category.CategoryDescriptionRepository;
 import com.asrevo.cvhome.catalog.repositories.category.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.category.PageableCategoryRepository;
@@ -77,12 +78,11 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public List<Category> getListByLineage(StoreMerchantId store, String lineage) throws ServiceException {
-        try {
-            return categoryRepository.findByLineage(store, lineage);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public List<Category> getListByLineage(StoreMerchantId store, String lineage) {
+        // No try/catch: a Spring Data repository signals infrastructure failure with an unchecked DataAccessException,
+        // which the shared advice already renders as a 500 with a traceId. The ServiceException wrapper that used to
+        // sit here added a checked type to every caller's signature and told them nothing they could act on.
+        return categoryRepository.findByLineage(store, lineage);
     }
 
     @Override
@@ -91,13 +91,8 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public Category getByCode(StoreMerchantId storeCode, String code) throws ServiceException {
-
-        try {
-            return categoryRepository.findByCode(storeCode, code);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public Category getByCode(StoreMerchantId storeCode, String code) {
+        return categoryRepository.findByCode(storeCode, code);
     }
 
     @Override
@@ -174,10 +169,11 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public void addChild(Category parent, Category child) throws ServiceException {
+    public void addChild(Category parent, Category child)
+            throws ServiceException, CategoryReferenceUnresolvableException {
 
         if (child == null || child.getStoreMerchantId() == null) {
-            throw new ServiceException("Child category and merchant store should not be null");
+            throw CategoryReferenceUnresolvableException.incomplete();
         }
 
         try {
@@ -217,6 +213,8 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
                     }
                 }
             }
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException(e);
         }

@@ -25,15 +25,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductImageMapper;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 
@@ -54,9 +55,6 @@ import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG
 @Slf4j
 public class ProductImageApi {
 
-    private static final String ERR_DELETING_IMAGE = "Error while deleting ProductImage";
-    private static final String ERR_IMAGE_NOT_FOUND = "Product image [%s] not found for product id [%s] and merchant [%s]";
-    private static final String ERR_IMAGES_NOT_FOUND = "Product images not found for product id [%s] and merchant [%s]";
     private static final String ERR_PRODUCT_IMAGE = "ProductImage [%s]";
 
     private final ProductImageService productImageService;
@@ -87,36 +85,32 @@ public class ProductImageApi {
     public void uploadImage(@PathVariable Long id, @RequestParam(value = "file") MultipartFile[] files,
                             @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
                             @RequestParam(value = "defaultImage", required = false, defaultValue = "false") boolean defaultImage,
-                            StoreMerchantId merchantStore, LanguageCode language) {
+                            StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductImageNotPersistedException, IOException, ProductNotFoundException, ForeignStoreProductAccessException {
 
-        try {
-            // get the product
-            Product product = resolveAuthorizedProduct(id, merchantStore);
+        // get the product
+        Product product = resolveAuthorizedProduct(id, merchantStore);
 
-            boolean hasDefaultImage = hasExistingDefaultImage(product, defaultImage);
+        boolean hasDefaultImage = hasExistingDefaultImage(product, defaultImage);
 
-            List<ProductImage> contentImagesList = buildContentImages(product, files, position, hasDefaultImage);
+        List<ProductImage> contentImagesList = buildContentImages(product, files, position, hasDefaultImage);
 
-            if (CollectionUtils.isNotEmpty(contentImagesList)) {
-                productImageService.addProductImages(product, contentImagesList);
-            }
-
-        } catch (Exception e) {
-            log.error("Error while creating ProductImage", e);
-            throw new ServiceRuntimeException("Error while creating image");
+        if (CollectionUtils.isNotEmpty(contentImagesList)) {
+            productImageService.addProductImages(product, contentImagesList);
         }
     }
 
-    private Product resolveAuthorizedProduct(Long id, StoreMerchantId merchantStore) {
+    private Product resolveAuthorizedProduct(Long id, StoreMerchantId merchantStore)
+            throws ProductNotFoundException, ForeignStoreProductAccessException {
         Product product = productService.getById(id);
         if (product == null) {
-            throw new ResourceNotFoundException("Product not found");
+            throw ProductNotFoundException.of(id, merchantStore);
         }
 
-        // security validation
-        // product belongs to merchant store
+        // security validation: the product belongs to this merchant store. A 403, replacing the 401 the legacy
+        // UnauthorizedException produced — the caller is authenticated and passed @PreAuthorize.
         if (!Objects.equals(product.getStore(), merchantStore)) {
-            throw new UnauthorizedException("Resource not authorized for this merchant");
+            throw ForeignStoreProductAccessException.of(id, merchantStore);
         }
         return product;
     }
@@ -161,21 +155,15 @@ public class ProductImageApi {
     @DeleteMapping(value = {"/private/product/{id}/image/{imageId}"})
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void deleteImage(@PathVariable Long id, @PathVariable Long imageId, StoreMerchantId merchantStore,
-                            LanguageCode language) {
+                            LanguageCode language)
+            throws ProductImageNotFoundException, ServiceException {
 
         Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
 
-        if (productImage.isPresent()) {
-            try {
-                productImageService.delete(productImage.get());
-            } catch (ServiceException e) {
-                log.error(ERR_DELETING_IMAGE, e);
-                throw new ServiceRuntimeException(
-                        String.format("ProductImage [%s] cannot be deleted", imageId), e);
-            }
-        } else {
-            throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
+        if (productImage.isEmpty()) {
+            throw ProductImageNotFoundException.of(imageId, merchantStore);
         }
+        productImageService.delete(productImage.get());
     }
 
     /**
@@ -192,16 +180,13 @@ public class ProductImageApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public List<ReadableImage> images(@PathVariable Long productId, StoreMerchantId merchantStore,
-                                      LanguageCode language) {
+                                      LanguageCode language)
+            throws ProductNotFoundException {
 
         Product p = productService.getById(productId);
 
-        if (p == null) {
-            throw new ResourceNotFoundException(String.format(ERR_IMAGES_NOT_FOUND, productId, merchantStore));
-        }
-
-        if (!p.getStore().equals(merchantStore)) {
-            throw new ResourceNotFoundException(String.format(ERR_IMAGES_NOT_FOUND, productId, merchantStore));
+        if (p == null || !p.getStore().equals(merchantStore)) {
+            throw ProductNotFoundException.of(productId, merchantStore);
         }
 
         List<ReadableImage> target = new ArrayList<>();
@@ -234,33 +219,22 @@ public class ProductImageApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void imageDetails(@PathVariable Long id, @PathVariable Long imageId,
                              @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-                             StoreMerchantId merchantStore, LanguageCode language) {
+                             StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductImageNotFoundException, ProductNotFoundException {
 
-        try {
+        Product p = productService.getById(id);
 
-            Product p = productService.getById(id);
-
-            if (p == null) {
-                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
-            }
-
-            if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
-            }
-
-            Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
-
-            if (productImage.isPresent()) {
-                productImage.get().setSortOrder(position);
-                productImageService.updateProductImage(p, productImage.get());
-            } else {
-                throw new ResourceNotFoundException(String.format(ERR_IMAGE_NOT_FOUND, imageId, id, merchantStore));
-            }
-
-        } catch (Exception e) {
-            log.error(ERR_DELETING_IMAGE, e);
-            throw new ServiceRuntimeException(String.format("ProductImage [%s] cannot be edited", imageId));
+        if (p == null || !p.getStore().equals(merchantStore)) {
+            throw ProductNotFoundException.of(id, merchantStore);
         }
+
+        Optional<ProductImage> productImage = productImageService.getProductImage(imageId, id, merchantStore);
+
+        if (productImage.isEmpty()) {
+            throw ProductImageNotFoundException.of(imageId, merchantStore);
+        }
+        productImage.get().setSortOrder(position);
+        productImageService.updateProductImage(p, productImage.get());
     }
 
 }

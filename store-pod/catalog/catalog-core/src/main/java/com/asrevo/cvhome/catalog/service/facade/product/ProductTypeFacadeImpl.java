@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
+import com.asrevo.cvhome.catalog.errors.DuplicateProductTypeException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeList;
@@ -13,18 +15,10 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductTypeMappe
 import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 @Service("productTypeFacade")
 public class ProductTypeFacadeImpl implements ProductTypeFacade {
-
-    private static final String NOT_FOUND_FOR_STORE_TEMPLATE = "Product type [%s] not found for store [%s]";
-
-    private static final String SAVE_ERROR_MESSAGE = "An exception occured while saving product type";
-
-    private static final String NOT_EXIST_FOR_STORE_TEMPLATE = "Product type [%s] does not exist for store [%s]";
 
     private final ProductTypeService productTypeService;
 
@@ -60,80 +54,60 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
     }
 
     @Override
-    public ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language) {
-        try {
+    public ReadableProductType get(StoreMerchantId store, Long id, LanguageCode language)
+            throws ProductTypeNotFoundException {
+        // The try/catch that used to wrap this caught the ResourceNotFoundException thrown three lines above it and
+        // re-emitted it as a 500 — the 404 could never reach a caller.
+        ProductType type = productTypeService.getById(id, store);
 
-            ProductType type = productTypeService.getById(id, store);
-
-            if (type == null) {
-                throw new ResourceNotFoundException(NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
-            }
-
-            return readableProductTypeMapper.convert(type, store, language);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(
-                    "An exception occured while getting product type [%s] not found for store [%s]"
-                            .formatted(id, store), e);
+        if (type == null) {
+            throw ProductTypeNotFoundException.of(id, store);
         }
+
+        return readableProductTypeMapper.convert(type, store, language);
     }
 
     @Override
-    public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language) {
+    public Long save(PersistableProductType type, StoreMerchantId store, LanguageCode language)
+            throws DuplicateProductTypeException, ServiceException {
 
-        try {
-
-            if (this.exists(type.getCode(), store, language)) {
-                throw new OperationNotAllowedException(
-                        "Product type [%s] already exist for store [%s]".formatted(type.getCode(), store));
-            }
-
-            ProductType model = persistableProductTypeMapper.convert(type, store, language);
-            model.setStoreMerchantId(store);
-            ProductType saved = productTypeService.saveOrUpdate(model);
-            return saved.getId();
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
+        if (this.exists(type.getCode(), store, language)) {
+            throw DuplicateProductTypeException.of(type.getCode(), store);
         }
+
+        ProductType model = persistableProductTypeMapper.convert(type, store, language);
+        model.setStoreMerchantId(store);
+        ProductType saved = productTypeService.saveOrUpdate(model);
+        return saved.getId();
     }
 
     @Override
-    public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language) {
+    public void update(PersistableProductType type, Long id, StoreMerchantId store, LanguageCode language)
+            throws ProductTypeNotFoundException, ServiceException {
 
-        try {
-
-            ProductType t = productTypeService.getById(id, store);
-            if (t == null) {
-                throw new ResourceNotFoundException(NOT_EXIST_FOR_STORE_TEMPLATE.formatted(type.getCode(), store));
-            }
-
-            type.setId(t.getId());
-            type.setCode(t.getCode());
-
-            ProductType model = persistableProductTypeMapper.merge(type, t, store, language);
-            model.setStoreMerchantId(store);
-            productTypeService.saveOrUpdate(model);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
+        ProductType t = productTypeService.getById(id, store);
+        if (t == null) {
+            throw ProductTypeNotFoundException.of(id, store);
         }
+
+        type.setId(t.getId());
+        type.setCode(t.getCode());
+
+        ProductType model = persistableProductTypeMapper.merge(type, t, store, language);
+        model.setStoreMerchantId(store);
+        productTypeService.saveOrUpdate(model);
     }
 
     @Override
-    public void delete(Long id, StoreMerchantId store, LanguageCode language) {
-        try {
+    public void delete(Long id, StoreMerchantId store, LanguageCode language)
+            throws ProductTypeNotFoundException, ServiceException {
 
-            ProductType t = productTypeService.getById(id, store);
-            if (t == null) {
-                throw new ResourceNotFoundException(NOT_EXIST_FOR_STORE_TEMPLATE.formatted(id, store));
-            }
-
-            productTypeService.delete(t);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(SAVE_ERROR_MESSAGE, e);
+        ProductType t = productTypeService.getById(id, store);
+        if (t == null) {
+            throw ProductTypeNotFoundException.of(id, store);
         }
+
+        productTypeService.delete(t);
     }
 
     @Override
@@ -144,13 +118,13 @@ public class ProductTypeFacadeImpl implements ProductTypeFacade {
     }
 
     @Override
-    public ReadableProductType get(StoreMerchantId store, String code, LanguageCode language) {
+    public ReadableProductType get(StoreMerchantId store, String code, LanguageCode language)
+            throws ProductTypeNotFoundException {
         ProductType t;
         t = productTypeService.getByCode(code, store, language);
 
         if (t == null) {
-            throw new ResourceNotFoundException(
-                    "Product type [%s] not found for merchant [%s]".formatted(code, store));
+            throw ProductTypeNotFoundException.of(code, store);
         }
 
         return readableProductTypeMapper.convert(t, store, language);

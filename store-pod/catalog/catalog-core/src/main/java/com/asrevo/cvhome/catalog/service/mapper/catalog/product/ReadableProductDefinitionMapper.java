@@ -14,6 +14,7 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
@@ -63,14 +64,15 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
     }
 
     @Override
-    public ReadableProductDefinition convert(Product source, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductDefinition convert(Product source, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException {
         ReadableProductDefinition target = new ReadableProductDefinition();
         return this.merge(source, target, store, language);
     }
 
     @Override
     public ReadableProductDefinition merge(Product source, ReadableProductDefinition target, StoreMerchantId store,
-                                           LanguageCode language) {
+                                           LanguageCode language) throws InventoryNotConvertibleException {
         target.setIdentifier(source.getSku());
         target.setId(source.getId());
         target.setVisible(source.isAvailable());

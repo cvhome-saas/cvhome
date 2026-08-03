@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValueDescription;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -54,7 +54,8 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
 
     @Override
     public ProductOptionValue merge(PersistableProductOptionValue source, ProductOptionValue destination,
-                                    StoreMerchantId store, LanguageCode language) {
+                                    StoreMerchantId store, LanguageCode language)
+            throws ProductOptionNotConvertibleException {
         if (destination == null) {
             destination = new ProductOptionValue();
         }
@@ -83,13 +84,13 @@ public class PersistableProductOptionValueMapper implements Mapper<PersistablePr
 
             return destination;
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while converting product option", e);
+            throw ProductOptionNotConvertibleException.of(e);
         }
     }
 
     @Override
     public ProductOptionValue convert(PersistableProductOptionValue source, StoreMerchantId store,
-                                      LanguageCode language) {
+                                      LanguageCode language) throws ProductOptionNotConvertibleException {
         ProductOptionValue destination = new ProductOptionValue();
         return merge(source, destination, store, language);
     }

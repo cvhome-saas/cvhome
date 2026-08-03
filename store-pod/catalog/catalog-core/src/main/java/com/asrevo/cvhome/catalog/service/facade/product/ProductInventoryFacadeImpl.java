@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.inventory.PersistableInventory;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.service.mapper.inventory.PersistableInventoryMapper;
@@ -23,8 +30,6 @@ import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -32,15 +37,6 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
 
 @Service("productInventoryFacade")
 public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
-
-    private static final String PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE =
-            "Product with id [%s] and inventory id [%s] not found for store id [%s]";
-
-    private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s] not found";
-
-    private static final String PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE = "Product with instance [%s] not found";
-
-    private static final String INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE = "Inventory with id [%s] not found";
 
     private final ProductAvailabilityService productAvailabilityService;
 
@@ -67,70 +63,58 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
     }
 
     @Override
-    public void delete(Long productId, Long inventoryId, StoreMerchantId store) {
-        Optional<ProductAvailability> availability = productAvailabilityService.getById(inventoryId, store);
-        try {
-            if (availability.isPresent()) {
-                if (availability.get().getProduct().getId().equals(productId)) {
-                    productAvailabilityService.delete(availability.get());
-                } else {
-                    throw new ResourceNotFoundException(
-                            PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
-                }
-            } else {
-                throw new ResourceNotFoundException(
-                        PRODUCT_INVENTORY_NOT_FOUND_TEMPLATE.formatted(productId, inventoryId, store));
-            }
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Error while deleting inventory", e);
-        }
+    public void delete(Long productId, Long inventoryId, StoreMerchantId store)
+            throws InventoryNotFoundException, ServiceException {
+        ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
+                .filter(it -> it.getProduct().getId().equals(productId))
+                .orElseThrow(() -> InventoryNotFoundException.of(inventoryId, store));
+        productAvailabilityService.delete(availability);
     }
 
-    private Product getProductById(Long productId, StoreMerchantId store) {
+    private Product getProductById(Long productId, StoreMerchantId store) throws ProductNotFoundException {
         return productService.retrieveById(productId, store)
-                .orElseThrow(() -> new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE.formatted(productId)));
+                .orElseThrow(() -> ProductNotFoundException.of(productId, store));
     }
 
-    private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store) {
+    private ProductVariant getProductByInstance(Long instanceId, StoreMerchantId store)
+            throws ProductVariantNotFoundException {
         return productVariantService.getById(instanceId, store)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(PRODUCT_WITH_INSTANCE_NOT_FOUND_TEMPLATE.formatted(instanceId)));
+                .orElseThrow(() -> ProductVariantNotFoundException.of(instanceId, store));
     }
 
     @Override
-    public ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
+    public ReadableInventory add(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException, ServiceException {
         ProductAvailability availability = getProductAvailabilityToSave(inventory, store);
 
         // add inventory to the product
 
-        saveOrUpdate(availability);
+        productAvailabilityService.saveOrUpdate(availability);
         return readableInventoryMapper.convert(availability, store, language);
     }
 
-    private void saveOrUpdate(ProductAvailability availability) {
-        try {
-            productAvailabilityService.saveOrUpdate(availability);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot create Inventory", e);
-        }
-    }
-
-    private ProductAvailability getProductAvailabilityToSave(PersistableInventory inventory, StoreMerchantId store) {
+    private ProductAvailability getProductAvailabilityToSave(PersistableInventory inventory, StoreMerchantId store)
+            throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         LanguageCode defaultLanguage = externalMerchantStoreService.getStore(store).getDefaultLanguage();
         return productInventoryMapper.convert(inventory, store, defaultLanguage);
     }
 
     @Override
-    public ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language) {
+    public ReadableInventory get(Long inventoryId, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotFoundException, InventoryNotConvertibleException {
 
         ProductAvailability availability = productAvailabilityService.getById(inventoryId, store)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventoryId)));
+                .orElseThrow(() -> InventoryNotFoundException.of(inventoryId, store));
         return readableInventoryMapper.convert(availability, store, language);
     }
 
     @Override
-    public void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language) {
+    public void update(PersistableInventory inventory, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotFoundException, InventoryNotConvertibleException,
+            InventoryReferenceUnresolvableException, ProductNotFoundException, ProductReferenceUnresolvableException,
+            ProductVariantNotFoundException, ProductVariantReferenceUnresolvableException, ServiceException {
         Set<ProductAvailability> originAvailability = null;
         Product product = null;
 
@@ -149,7 +133,7 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
                 .flatMap(it -> it.stream().filter(a -> a.getId().equals(inventory.getId())).findAny())
                 .orElse(null);
         if (avail == null) {
-            throw new ResourceNotFoundException(INVENTORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(inventory.getId()));
+            throw InventoryNotFoundException.of(inventory.getId(), store);
         }
 
         if (product != null) {
@@ -160,46 +144,46 @@ public class ProductInventoryFacadeImpl implements ProductInventoryFacade {
         avail = productInventoryMapper.merge(inventory, avail, store, language);
         avail.setProduct(product);
         avail.setStoreMerchantId(store);
-        saveOrUpdate(avail);
+        productAvailabilityService.saveOrUpdate(avail);
     }
 
     @Override
     public ReadableEntityList<ReadableInventory> get(String sku, StoreMerchantId store, LanguageCode language,
-                                                     Pageable pageable) {
+                                                     Pageable pageable)
+            throws ProductNotFoundException, InventoryNotConvertibleException {
         Page<ProductAvailability> availabilities = productAvailabilityService.getBySku(sku, pageable);
 
         if (availabilities.isEmpty()) {
-            // get parent product
-            try {
-                Product singleProduct = productService.getBySku(sku, store);
-                if (singleProduct != null) {
-                    availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
-                }
-            } catch (ServiceException e) {
-                throw new ServiceRuntimeException(
-                        "An error occured while getting product with sku %s".formatted(sku), e);
+            // get parent product; an unknown sku is now a 404 naming it, rather than the 500 the ServiceException
+            // wrapper produced
+            Product singleProduct = productService.getBySku(sku, store);
+            if (singleProduct != null) {
+                availabilities = new PageImpl<>(new ArrayList<>(singleProduct.getAvailabilities()));
             }
         }
 
-        List<ReadableInventory> returnList = availabilities.getContent()
-                .stream()
-                .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .toList();
-
-        return createReadableList(availabilities, returnList);
+        return createReadableList(availabilities, toReadable(availabilities, store, language));
     }
 
     @Override
     public ReadableEntityList<ReadableInventory> get(Long productId, StoreMerchantId store, LanguageCode language,
-                                                     Pageable pageable) {
+                                                     Pageable pageable) throws InventoryNotConvertibleException {
         Page<ProductAvailability> availabilities = productAvailabilityService.listByProduct(productId, store, pageable);
 
-        List<ReadableInventory> returnList = availabilities.getContent()
-                .stream()
-                .map(i -> this.readableInventoryMapper.convert(i, store, language))
-                .toList();
+        return createReadableList(availabilities, toReadable(availabilities, store, language));
+    }
 
-        return createReadableList(availabilities, returnList);
+    /**
+     * Plain loops rather than {@code stream().map(...)}: the inventory mapper declares a checked failure now, and a
+     * lambda cannot carry it out to the caller's signature.
+     */
+    private List<ReadableInventory> toReadable(Page<ProductAvailability> availabilities, StoreMerchantId store,
+                                               LanguageCode language) throws InventoryNotConvertibleException {
+        List<ReadableInventory> readable = new ArrayList<>();
+        for (ProductAvailability availability : availabilities.getContent()) {
+            readable.add(readableInventoryMapper.convert(availability, store, language));
+        }
+        return readable;
     }
 
 }

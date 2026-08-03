@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotFoundException;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
@@ -95,7 +99,8 @@ public class ProductManufacturerApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public ReadableManufacturer get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language,
-                                    HttpServletResponse response) {
+                                    HttpServletResponse response)
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException {
 
         return manufacturerFacade.getManufacturer(id, merchantStore, language);
     }
@@ -110,7 +115,8 @@ public class ProductManufacturerApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableManufacturer getBrand(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language,
-                                         HttpServletResponse response) {
+                                         HttpServletResponse response)
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException {
 
         return manufacturerFacade.getManufacturer(id, merchantStore, LanguageCode.allLanguage());
     }
@@ -129,7 +135,8 @@ public class ProductManufacturerApi {
                     content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableManufacturerList listByStore(StoreMerchantId merchantStore, LanguageCode language,
-                                                @RequestParam(value = "name", required = false) String name, Pageable pageable) {
+                                                @RequestParam(value = "name", required = false) String name, Pageable pageable)
+            throws ManufacturerNotConvertibleException {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
@@ -149,7 +156,8 @@ public class ProductManufacturerApi {
             responses = @ApiResponse(
                     content = @Content(schema = @Schema(implementation = ReadableManufacturerList.class))))
     public ReadableManufacturerList list(StoreMerchantId merchantStore, LanguageCode language,
-                                         @RequestParam(value = "name", required = false) String name, Pageable pageable) {
+                                         @RequestParam(value = "name", required = false) String name, Pageable pageable)
+            throws ManufacturerNotConvertibleException {
 
         ListCriteria listCriteria = new ListCriteria();
         listCriteria.setName(name);
@@ -216,7 +224,8 @@ public class ProductManufacturerApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     public List<ReadableManufacturer> list(@PathVariable final Long id, // category
                                            // id
-                                           StoreMerchantId merchantStore, LanguageCode language) {
+                                           StoreMerchantId merchantStore, LanguageCode language)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException, ManufacturerNotConvertibleException {
         return manufacturerFacade.getByProductInCategory(merchantStore, language, id);
     }
 

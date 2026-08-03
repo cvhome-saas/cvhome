@@ -18,6 +18,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
@@ -30,6 +42,7 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -87,7 +100,13 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity createV2(@Valid @RequestBody PersistableProductDefinition product, StoreMerchantId merchantStore,
-                           LanguageCode language) {
+                           LanguageCode language)
+
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException,
+            ProductNotPersistedException, ProductNotFoundException, ServiceException {
 
         // make sure product id is null
         product.setId(null);
@@ -107,7 +126,13 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateV2(@PathVariable Long id, @Valid @RequestBody PersistableProductDefinition product,
-                         StoreMerchantId merchantStore, LanguageCode language) {
+                         StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException,
+            ProductNotPersistedException, ProductNotFoundException, ServiceException {
 
         productDefinitionFacade.update(id, product, merchantStore, language);
     }
@@ -122,7 +147,8 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductDefinition getV2(@PathVariable Long id, StoreMerchantId merchantStore,
-                                           LanguageCode language) {
+                                           LanguageCode language)
+            throws InventoryNotConvertibleException {
 
         return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
     }
@@ -163,7 +189,8 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductList tiny(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
-                                    LanguageCode language, Pageable pageable) {
+                                    LanguageCode language, Pageable pageable)
+            throws ProductNotConvertibleException {
 
         searchCriteria.setPageable(pageable);
         searchCriteria.setLanguage(language);
@@ -181,7 +208,8 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductList base(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
-                                    LanguageCode language, Pageable pageable) {
+                                    LanguageCode language, Pageable pageable)
+            throws ProductNotConvertibleException {
 
         searchCriteria.setPageable(pageable);
         searchCriteria.setLanguage(language);
@@ -198,7 +226,8 @@ public class ProductApiV2 {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableProductList getList(ProductCriteria searchCriteria, StoreMerchantId merchantStore,
-                                       LanguageCode language, Pageable pageable) {
+                                       LanguageCode language, Pageable pageable)
+            throws ProductNotConvertibleException {
 
         searchCriteria.setPageable(pageable);
         searchCriteria.setLanguage(language);
@@ -221,7 +250,8 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable String sku, @Valid @RequestBody LightPersistableProduct product,
-                       StoreMerchantId merchantStore, LanguageCode language) {
+                       StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductNotFoundException, ProductNotPersistedException {
         productCommonFacade.update(sku, product, merchantStore, language);
     }
 

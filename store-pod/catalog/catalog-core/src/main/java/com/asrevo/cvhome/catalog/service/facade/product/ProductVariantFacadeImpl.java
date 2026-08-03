@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,16 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationOptionsIdenticalException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
@@ -21,9 +32,6 @@ import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.catalog.services.product.variation.ProductVariationService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConstraintException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -36,9 +44,6 @@ import static com.asrevo.cvhome.store.utils.ReadableEntityUtil.createReadableLis
  */
 @Component
 public class ProductVariantFacadeImpl implements ProductVariantFacade {
-
-    private static final String PRODUCT_VARIANT_NOT_FOUND_TEMPLATE =
-            "productVariant with id [%s] not found for store [%s] and productId [%s]";
 
     private final ReadableProductVariantMapper readableProductVariantMapper;
 
@@ -65,12 +70,12 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     }
 
     @Override
-    public ReadableProductVariant get(Long instanceId, Long productId, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductVariant get(Long instanceId, Long productId, StoreMerchantId store, LanguageCode language)
+            throws ProductVariantNotFoundException, ProductVariantParentMissingException, InventoryNotConvertibleException {
         Optional<ProductVariant> productVariant = this.getproductVariant(instanceId, productId, store);
 
         if (productVariant.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "Product instance [%s] not found for store [%s]".formatted(instanceId, store));
+            throw ProductVariantNotFoundException.of(instanceId, store);
         }
 
         ProductVariant model = productVariant.get();
@@ -78,20 +83,22 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     }
 
     @Override
-    public boolean exists(String sku, StoreMerchantId store, Long productId, LanguageCode language) {
-        ReadableProduct product;
-        try {
-            product = productCommonFacade.getProduct(store, productId, language);
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while getting product [%s]".formatted(productId), e);
-        }
-
+    public boolean exists(String sku, StoreMerchantId store, Long productId, LanguageCode language)
+            throws ProductNotFoundException, ProductNotConvertibleException,
+            ProductPriceNotConvertibleException, ProductVariantParentMissingException,
+            InventoryNotConvertibleException {
+        ReadableProduct product = productCommonFacade.getProduct(store, productId, language);
         return productVariantService.exist(sku, product.getId());
     }
 
     @Override
     public Long create(PersistableProductVariant productVariant, Long productId, StoreMerchantId store,
-                       LanguageCode language) {
+                       LanguageCode language)
+
+            throws ProductVariationOptionsIdenticalException, ProductVariationReferenceUnresolvableException,
+            ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ServiceException {
         if (productVariant.getVariation() != null && productVariant.getVariation() > 0
                 && productVariant.getVariationValue() != null && productVariant.getVariationValue() > 0) {
 
@@ -104,8 +111,7 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
                     .count() > 1;
 
             if (!differentOption) {
-                throw new ConstraintException(
-                        "Product option of instance.variant and instance.variantValue must be different");
+                throw ProductVariationOptionsIdenticalException.of(productVariant.getVariation());
             }
         }
 
@@ -120,10 +126,13 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
 
     @Override
     public void update(Long instanceId, PersistableProductVariant productVariant, Long productId, StoreMerchantId store,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws ProductVariantNotFoundException, ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ServiceException {
         Optional<ProductVariant> instanceModel = this.getproductVariant(instanceId, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException(PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(instanceId, store, productId));
+            throw ProductVariantNotFoundException.of(instanceId, store);
         }
 
         productVariant.setProductId(productId);
@@ -138,37 +147,33 @@ public class ProductVariantFacadeImpl implements ProductVariantFacade {
     }
 
     @Override
-    public void delete(Long productVariant, Long productId, StoreMerchantId store) {
+    public void delete(Long productVariant, Long productId, StoreMerchantId store)
+            throws ProductVariantNotFoundException, ServiceException {
         Optional<ProductVariant> instanceModel = this.getproductVariant(productVariant, productId, store);
         if (instanceModel.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    PRODUCT_VARIANT_NOT_FOUND_TEMPLATE.formatted(productVariant, store, productId));
+            throw ProductVariantNotFoundException.of(productVariant, store);
         }
 
-        try {
-            productVariantService.delete(instanceModel.get());
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(
-                    "Cannot delete product instance [%s]  for store [%s] and productId [%s]"
-                            .formatted(productVariant, store, productId), e);
-        }
+        productVariantService.delete(instanceModel.get());
     }
 
     @Override
     public ReadableEntityList<ReadableProductVariant> list(Long productId, StoreMerchantId store, LanguageCode language,
-                                                           Pageable pageable) {
+                                                           Pageable pageable)
+            throws ProductNotFoundException, ProductVariantParentMissingException, InventoryNotConvertibleException {
         Product product = productFacade.getProduct(productId, store);
 
         if (product == null) {
-            throw new ResourceNotFoundException(
-                    "Product with id [%s] not found for store [%s]".formatted(productId, store));
+            throw ProductNotFoundException.of(productId, store);
         }
 
         Page<ProductVariant> instances = productVariantService.getByProductId(store, product, language, pageable);
 
-        List<ReadableProductVariant> readableInstances = instances.stream()
-                .map(rp -> this.readableProductVariantMapper.convert(rp, store, language))
-                .toList();
+        // A plain loop rather than stream().map(...): the variant mapper declares checked failures now.
+        List<ReadableProductVariant> readableInstances = new ArrayList<>();
+        for (ProductVariant variant : instances) {
+            readableInstances.add(readableProductVariantMapper.convert(variant, store, language));
+        }
 
         return createReadableList(instances, readableInstances);
     }

@@ -1,11 +1,11 @@
 package com.asrevo.cvhome.catalog.service.populator.catalog;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ public class ReadableTinyProductPopulator extends AbstractDataPopulator<Product,
 
     @Override
     public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
-                                    LanguageCode language) throws ConversionException {
+                                    LanguageCode language) throws ProductNotConvertibleException {
 
         try {
 
@@ -53,7 +53,7 @@ public class ReadableTinyProductPopulator extends AbstractDataPopulator<Product,
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw ProductNotConvertibleException.of(e);
         }
     }
 

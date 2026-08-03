@@ -5,12 +5,20 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
+import com.asrevo.cvhome.catalog.errors.CategoryDescriptionLanguageMissingException;
+import com.asrevo.cvhome.catalog.errors.CategoryFriendlyUrlNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryIdentifiersInconsistentException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategoryList;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 public interface CategoryFacade {
@@ -34,26 +42,32 @@ public interface CategoryFacade {
     /**
      * @return PersistableCategory
      */
-    PersistableCategory saveCategory(StoreMerchantId store, PersistableCategory category);
+    PersistableCategory saveCategory(StoreMerchantId store, PersistableCategory category)
+            throws ServiceException, CategoryNotConvertibleException,
+            CategoryReferenceUnresolvableException, CategoryDescriptionLanguageMissingException;
 
     /**
      * @return ReadableCategory
      */
-    ReadableCategory getById(StoreMerchantId store, Long id, LanguageCode language);
+    ReadableCategory getById(StoreMerchantId store, Long id, LanguageCode language)
+            throws CategoryNotFoundException, CategoryNotConvertibleException;
 
     /**
      * Get a Category by the Search Engine friendly URL slug
      */
-    ReadableCategory getCategoryByFriendlyUrl(StoreMerchantId merchantStore, String friendlyUrl, LanguageCode language);
+    ReadableCategory getCategoryByFriendlyUrl(StoreMerchantId merchantStore, String friendlyUrl, LanguageCode language)
+            throws CategoryFriendlyUrlNotFoundException;
 
     Category getByCode(String code, StoreMerchantId store);
 
-    void deleteCategory(Long categoryId, StoreMerchantId store);
+    void deleteCategory(Long categoryId, StoreMerchantId store)
+            throws CategoryNotFoundException, ServiceException;
 
     /**
      * List product options variations for a given category
      */
-    List<ReadableProductVariant> categoryProductVariants(Long categoryId, StoreMerchantId store, LanguageCode language);
+    List<ReadableProductVariant> categoryProductVariants(Long categoryId, StoreMerchantId store, LanguageCode language)
+            throws CategoryNotFoundException;
 
     /**
      * Check if category code already exists
@@ -63,16 +77,20 @@ public interface CategoryFacade {
     /**
      * Move a Category from a node to another node
      */
-    void move(Long child, Long parent, StoreMerchantId store);
+    void move(Long child, Long parent, StoreMerchantId store)
+            throws CategoryNotFoundException, CategoryIdentifiersInconsistentException,
+            CategoryReferenceUnresolvableException, ServiceException;
 
     /**
      * Set category visible or not
      */
-    void setVisible(PersistableCategory category, StoreMerchantId store);
+    void setVisible(PersistableCategory category, StoreMerchantId store)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException, ServiceException;
 
     /**
      * List category by product
      */
-    ReadableCategoryList listByProduct(StoreMerchantId store, Long product, LanguageCode language);
+    ReadableCategoryList listByProduct(StoreMerchantId store, Long product, LanguageCode language)
+            throws CategoryNotConvertibleException;
 
 }

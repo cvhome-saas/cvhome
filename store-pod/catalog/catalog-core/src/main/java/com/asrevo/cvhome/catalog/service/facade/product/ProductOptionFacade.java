@@ -4,6 +4,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.PersistableProductOptionEntity;
@@ -15,6 +24,7 @@ import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOpti
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValueList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 
 /*
@@ -22,26 +32,35 @@ import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
  */
 public interface ProductOptionFacade {
 
-    ReadableProductOptionEntity getOption(Long optionId, StoreMerchantId store, LanguageCode language);
+    ReadableProductOptionEntity getOption(Long optionId, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionNotFoundException;
 
-    ReadableProductOptionValue getOptionValue(Long optionValueId, StoreMerchantId store, LanguageCode language);
+    ReadableProductOptionValue getOptionValue(Long optionValueId, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionValueNotFoundException;
 
     ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, StoreMerchantId store,
-                                           LanguageCode language);
+                                           LanguageCode language)
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException;
 
     ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue, StoreMerchantId store,
-                                               LanguageCode language);
+                                               LanguageCode language)
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException;
 
     List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
-                                      StoreMerchantId store);
+                                      StoreMerchantId store)
+            throws ProductNotFoundException, ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
+            ProductOptionNotConvertibleException;
 
     boolean optionExists(String code, StoreMerchantId store);
 
     boolean optionValueExists(String code, StoreMerchantId store);
 
-    void deleteOption(Long optionId, StoreMerchantId store);
+    void deleteOption(Long optionId, StoreMerchantId store)
+            throws ProductOptionNotFoundException, ServiceException;
 
-    void deleteOptionValue(Long optionValueId, StoreMerchantId store);
+    void deleteOptionValue(Long optionValueId, StoreMerchantId store)
+            throws ProductOptionValueNotFoundException, ServiceException;
 
     ReadableProductOptionList options(StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
@@ -49,14 +68,22 @@ public interface ProductOptionFacade {
                                                 Pageable pageable);
 
     ReadableProductAttributeEntity saveAttribute(Long productId, PersistableProductAttribute attribute,
-                                                 StoreMerchantId store, LanguageCode language);
+                                                 StoreMerchantId store, LanguageCode language)
+
+            throws ProductAttributeNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
+            ProductOptionNotConvertibleException;
 
     ReadableProductAttributeEntity getAttribute(Long productId, Long attributeId, StoreMerchantId store,
-                                                LanguageCode language);
+                                                LanguageCode language)
+            throws ProductAttributeNotFoundException, ProductAttributeNotConvertibleException;
 
     ReadableProductAttributeList getAttributesList(Long productId, StoreMerchantId store, LanguageCode language,
-                                                   Pageable pageable);
+                                                   Pageable pageable)
+            throws ProductNotFoundException, ProductAttributeNotConvertibleException;
 
-    void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store);
+    void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store)
+            throws ProductAttributeNotFoundException, ServiceException;
 
 }

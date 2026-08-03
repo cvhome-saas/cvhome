@@ -21,6 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.CategoryDescriptionLanguageMissingException;
+import com.asrevo.cvhome.catalog.errors.CategoryFriendlyUrlNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryIdentifiersInconsistentException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategoryList;
@@ -28,6 +35,7 @@ import com.asrevo.cvhome.catalog.service.facade.category.CategoryFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
@@ -72,7 +80,8 @@ public class CategoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategory get(@PathVariable(name = "id") Long categoryId, StoreMerchantId merchantStore,
-                                LanguageCode language) {
+                                LanguageCode language)
+            throws CategoryNotFoundException, CategoryNotConvertibleException {
         return categoryFacade.getById(merchantStore, categoryId, LanguageCode.allLanguage());
     }
 
@@ -87,7 +96,8 @@ public class CategoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableCategory getByFriendlyUrl(@PathVariable(name = "friendlyUrl") String friendlyUrl,
-                                             StoreMerchantId merchantStore, LanguageCode language) {
+                                             StoreMerchantId merchantStore, LanguageCode language)
+            throws CategoryFriendlyUrlNotFoundException {
         return categoryFacade.getCategoryByFriendlyUrl(merchantStore, friendlyUrl, language);
     }
 
@@ -188,7 +198,8 @@ public class CategoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableCategoryList list(@PathVariable(name = "productId") Long productId, StoreMerchantId merchantStore,
-                                     LanguageCode lang) {
+                                     LanguageCode lang)
+            throws CategoryNotConvertibleException {
 
         return categoryFacade.listByProduct(merchantStore, productId, LanguageCode.nonLanguage());
     }
@@ -199,7 +210,10 @@ public class CategoryApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public PersistableCategory create(@Valid @RequestBody PersistableCategory category, StoreMerchantId merchantStore) {
+    public PersistableCategory create(@Valid @RequestBody PersistableCategory category, StoreMerchantId merchantStore)
+
+            throws ServiceException, CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
+            CategoryDescriptionLanguageMissingException {
         return categoryFacade.saveCategory(merchantStore, category);
     }
 
@@ -209,7 +223,10 @@ public class CategoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public PersistableCategory update(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-                                      StoreMerchantId merchantStore) {
+                                      StoreMerchantId merchantStore)
+
+            throws ServiceException, CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
+            CategoryDescriptionLanguageMissingException {
         category.setId(id);
         return categoryFacade.saveCategory(merchantStore, category);
     }
@@ -220,7 +237,8 @@ public class CategoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateVisible(@PathVariable Long id, @Valid @RequestBody PersistableCategory category,
-                              StoreMerchantId merchantStore) {
+                              StoreMerchantId merchantStore)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException, ServiceException {
 
         category.setId(id);
         categoryFacade.setVisible(category, merchantStore);
@@ -233,7 +251,10 @@ public class CategoryApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void move(@PathVariable Long id, @PathVariable Long parent, StoreMerchantId merchantStore) {
+    public void move(@PathVariable Long id, @PathVariable Long parent, StoreMerchantId merchantStore)
+
+            throws CategoryNotFoundException, CategoryIdentifiersInconsistentException, CategoryReferenceUnresolvableException,
+            ServiceException {
         categoryFacade.move(id, parent, merchantStore);
     }
 
@@ -241,7 +262,8 @@ public class CategoryApi {
     @ResponseStatus(OK)
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void delete(@PathVariable("id") Long categoryId, StoreMerchantId merchantStore) {
+    public void delete(@PathVariable("id") Long categoryId, StoreMerchantId merchantStore)
+            throws CategoryNotFoundException, ServiceException {
         categoryFacade.deleteCategory(categoryId, merchantStore);
     }
 

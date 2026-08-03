@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
@@ -17,8 +19,6 @@ import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.entity.ReadableDescription;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -36,7 +36,8 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
     }
 
     @Override
-    public ReadableMinimalProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
+    public ReadableMinimalProduct convert(Product source, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
 
         ReadableMinimalProduct minimal = new ReadableMinimalProduct();
         this.merge(source, minimal, store, language);
@@ -45,7 +46,7 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
 
     @Override
     public ReadableMinimalProduct merge(Product source, ReadableMinimalProduct destination, StoreMerchantId store,
-                                        LanguageCode language) {
+                                        LanguageCode language) throws ProductPriceNotConvertibleException {
         applyDescription(source, destination, language);
 
         destination.setId(source.getId());
@@ -102,7 +103,8 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
         }
     }
 
-    private void applyPrice(Product source, ReadableMinimalProduct destination, StoreMerchantId store) {
+    private void applyPrice(Product source, ReadableMinimalProduct destination, StoreMerchantId store)
+            throws ProductPriceNotConvertibleException {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
@@ -110,8 +112,11 @@ public class ReadableMinimalProductMapper implements Mapper<Product, ReadableMin
                 destination.setPrice(price.getFinalPrice());
                 destination.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
             }
-        } catch (ServiceException e) {
-            throw new ConversionRuntimeException("An error occured during price calculation", e);
+        } catch (NoApplicableInventoryException e) {
+            // A product with no priced inventory is a merchant configuration gap, not a broken conversion — but this
+            // mapper has no way to render a price without one, so it reports the conversion it could not do and keeps
+            // the 422 cause attached for the log.
+            throw ProductPriceNotConvertibleException.of(e);
         }
     }
 

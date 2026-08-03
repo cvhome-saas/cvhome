@@ -17,6 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationOptionsIdenticalException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductVariantFacade;
@@ -24,6 +34,7 @@ import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -68,7 +79,11 @@ public class ProductVariantApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProductVariant variant, @PathVariable Long productId,
-                         StoreMerchantId merchantStore, LanguageCode language) {
+                         StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductVariationOptionsIdenticalException, ProductVariationReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ServiceException {
         Long id = productVariantFacade.create(variant, productId, merchantStore, language);
         return new Entity(id);
     }
@@ -80,7 +95,11 @@ public class ProductVariantApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable Long id, @PathVariable Long variantId,
                        @Valid @RequestBody PersistableProductVariant variant, StoreMerchantId merchantStore,
-                       LanguageCode language) {
+                       LanguageCode language)
+
+            throws ProductVariantNotFoundException, ProductVariationReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ServiceException {
         productVariantFacade.update(variantId, variant, id, merchantStore, language);
     }
 
@@ -95,7 +114,10 @@ public class ProductVariantApi {
             responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class)))})
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ResponseEntity<EntityExists> exists(@PathVariable Long id, @PathVariable String sku,
-                                               StoreMerchantId merchantStore, LanguageCode language) {
+                                               StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductNotFoundException, ProductNotConvertibleException, ProductPriceNotConvertibleException,
+            ProductVariantParentMissingException, InventoryNotConvertibleException {
 
         boolean exist = productVariantFacade.exists(sku, merchantStore, id, language);
         return new ResponseEntity<>(new EntityExists(exist), HttpStatus.OK);
@@ -114,7 +136,8 @@ public class ProductVariantApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductVariant get(@PathVariable final Long id, @PathVariable Long variantId,
                                       @RequestParam(value = "lang", required = false) String lang, StoreMerchantId merchantStore,
-                                      LanguageCode language) {
+                                      LanguageCode language)
+            throws ProductVariantNotFoundException, ProductVariantParentMissingException, InventoryNotConvertibleException {
 
         return productVariantFacade.get(variantId, id, merchantStore, language);
     }
@@ -128,7 +151,8 @@ public class ProductVariantApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableProductVariant> list(@PathVariable final Long id, StoreMerchantId merchantStore,
-                                                           LanguageCode language, Pageable pageable) {
+                                                           LanguageCode language, Pageable pageable)
+            throws ProductNotFoundException, ProductVariantParentMissingException, InventoryNotConvertibleException {
 
         return productVariantFacade.list(id, merchantStore, language, pageable);
     }
@@ -142,7 +166,8 @@ public class ProductVariantApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long id, @PathVariable Long variantId, StoreMerchantId merchantStore,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws ProductVariantNotFoundException, ServiceException {
 
         productVariantFacade.delete(variantId, id, merchantStore);
     }

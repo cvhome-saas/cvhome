@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +12,15 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.PersistableProductOptionEntity;
@@ -32,8 +42,6 @@ import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionService
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.entity.CodeEntity;
 
@@ -42,44 +50,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProductOptionFacadeImpl implements ProductOptionFacade {
-
-    private static final String PRODUCT_OPTION_NOT_FOUND_FOR_IF_TEMPLATE = "ProductOption not found for if [%s] and store [%s]";
-
-    private static final String PRODUCT_OPTION_NOT_FOUND_TEMPLATE = "ProductOption not found for [%s] and store [%s]";
-
-    private static final String DELETING_PRODUCT_OPTION_ERROR_TEMPLATE = "An exception occured while deleting ProductOption [%s]";
-
-    private static final String PRODUCT_OPTION_VALUE_NOT_FOUND_TEMPLATE = "ProductOptionValue not found for  [%s] and store [%s]";
-
-    private static final String DELETING_PRODUCT_OPTION_VALUE_ERROR_TEMPLATE =
-            "An exception occured while deleting ProductOptionValue [%s]";
-
-    private static final String OPTION_ID_NOT_FOUND_TEMPLATE = "Option id [%s] not found";
-
-    private static final String PRODUCT_OPTION_VALUE_DOES_NOT_EXIST_TEMPLATE =
-            "ProductOptionValue [%s] does not exists for store [%s]";
-
-    private static final String OPTION_VALUE_ID_NOT_FOUND_TEMPLATE = "OptionValue id [%s] not found";
-
-    private static final String PRODUCT_ATTRIBUTE_NOT_FOUND_TEMPLATE = "Product attribute [%s] not found";
-
-    private static final String PRODUCT_ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE =
-            "Product attribute [%s] not found for product [%s]";
-
-    private static final String ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE = "ProductAttribute not found for [%s] and store [%s]";
-
-    private static final String ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE =
-            "ProductAttribute not found for [%s] and product [%s]";
-
-    private static final String ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE =
-            "ProductAttribute not found for [%s] and product [%s] and store [%s]";
-
-    private static final String PRODUCT_NOT_FOUND_FOR_ID_TEMPLATE = "Productnot found for id [%s]";
-
-    private static final String PRODUCT_NOT_FOUND_ID_FOR_STORE_TEMPLATE = "Productnot found id [%s] for store [%s]";
-
-    private static final String DELETING_PRODUCT_ATTRIBUTE_ERROR_TEMPLATE =
-            "An exception occured while deleting ProductAttribute [%s]";
 
     private final ProductOptionService productOptionService;
 
@@ -103,51 +73,41 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductOptionEntity saveOption(PersistableProductOptionEntity option, StoreMerchantId store,
-                                                  LanguageCode language) {
+                                                  LanguageCode language)
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException, ServiceException {
         ProductOption optionModel = new ProductOption();
         if (option.getId() != null && option.getId() > 0) {
             optionModel = productOptionService.getById(store, option.getId());
             if (optionModel == null) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_OPTION_NOT_FOUND_FOR_IF_TEMPLATE.formatted(option.getId(), store));
+                throw ProductOptionNotFoundException.of(option.getId(), store);
             }
         }
 
         optionModel = persistableeMapper.merge(option, optionModel, store, language);
-        try {
-            productOptionService.saveOrUpdate(optionModel);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("An exception occured while saving ProductOption", e);
-        }
+        productOptionService.saveOrUpdate(optionModel);
 
         optionModel = productOptionService.getById(store, optionModel.getId());
         return readableMapper.convert(optionModel, store, language);
     }
 
     @Override
-    public void deleteOption(Long optionId, StoreMerchantId store) {
+    public void deleteOption(Long optionId, StoreMerchantId store)
+            throws ProductOptionNotFoundException, ServiceException {
         ProductOption optionModel = productOptionService.getById(store, optionId);
         if (optionModel == null) {
-            throw new ResourceNotFoundException(PRODUCT_OPTION_NOT_FOUND_TEMPLATE.formatted(optionId, store));
+            throw ProductOptionNotFoundException.of(optionId, store);
         }
-        try {
-            productOptionService.delete(optionModel);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(DELETING_PRODUCT_OPTION_ERROR_TEMPLATE.formatted(optionId), e);
-        }
+        productOptionService.delete(optionModel);
     }
 
     @Override
-    public void deleteOptionValue(Long optionValueId, StoreMerchantId store) {
+    public void deleteOptionValue(Long optionValueId, StoreMerchantId store)
+            throws ProductOptionValueNotFoundException, ServiceException {
         ProductOptionValue optionModel = productOptionValueService.getById(store, optionValueId);
         if (optionModel == null) {
-            throw new ResourceNotFoundException(PRODUCT_OPTION_VALUE_NOT_FOUND_TEMPLATE.formatted(optionValueId, store));
+            throw ProductOptionValueNotFoundException.of(optionValueId, store);
         }
-        try {
-            productOptionValueService.delete(optionModel);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(DELETING_PRODUCT_OPTION_VALUE_ERROR_TEMPLATE.formatted(optionValueId), e);
-        }
+        productOptionValueService.delete(optionModel);
     }
 
     @Override
@@ -191,11 +151,12 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionEntity getOption(Long optionId, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductOptionEntity getOption(Long optionId, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionNotFoundException {
         ProductOption option = productOptionService.getById(store, optionId);
 
         if (option == null) {
-            throw new ResourceNotFoundException(OPTION_ID_NOT_FOUND_TEMPLATE.formatted(optionId));
+            throw ProductOptionNotFoundException.of(optionId, store);
         }
 
         return readableMapper.convert(option, store, language);
@@ -223,23 +184,19 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductOptionValue saveOptionValue(PersistableProductOptionValue optionValue, StoreMerchantId store,
-                                                      LanguageCode language) {
+                                                      LanguageCode language)
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException, ServiceException {
         ProductOptionValue value = new ProductOptionValue();
         if (optionValue.getId() != null && optionValue.getId() > 0) {
             value = productOptionValueService.getById(store, optionValue.getId());
             if (value == null) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_OPTION_VALUE_DOES_NOT_EXIST_TEMPLATE.formatted(optionValue.getId(), store));
+                throw ProductOptionValueNotFoundException.of(optionValue.getId(), store);
             }
         }
 
         value = persistableOptionValueMapper.merge(optionValue, value, store, language);
 
-        try {
-            productOptionValueService.saveOrUpdate(value);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Exception while saving option value", e);
-        }
+        productOptionValueService.saveOrUpdate(value);
 
         ProductOptionValue optValue = productOptionValueService.getById(store, value.getId());
 
@@ -252,12 +209,13 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public ReadableProductOptionValue getOptionValue(Long optionValueId, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductOptionValue getOptionValue(Long optionValueId, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionValueNotFoundException {
 
         ProductOptionValue optionValue = productOptionValueService.getById(store, optionValueId);
 
         if (optionValue == null) {
-            throw new ResourceNotFoundException(OPTION_VALUE_ID_NOT_FOUND_TEMPLATE.formatted(optionValueId));
+            throw ProductOptionValueNotFoundException.of(optionValueId, store);
         }
 
         return readableOptionValueMapper.convert(optionValue, store, language);
@@ -265,18 +223,18 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductAttributeEntity saveAttribute(Long productId, PersistableProductAttribute attribute,
-                                                        StoreMerchantId store, LanguageCode language) {
+                                                        StoreMerchantId store, LanguageCode language)
+
+            throws ProductAttributeNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
+            ProductOptionNotConvertibleException {
         attribute.setProductId(productId);
         ProductAttribute attr = new ProductAttribute();
         if (attribute.getId() != null && attribute.getId() > 0) {
             attr = productAttributeService.getById(attribute.getId());
-            if (attr == null) {
-                throw new ResourceNotFoundException(PRODUCT_ATTRIBUTE_NOT_FOUND_TEMPLATE.formatted(attribute.getId()));
-            }
-
-            if (productId != attr.getProduct().getId().longValue()) {
-                throw new ResourceNotFoundException(
-                        PRODUCT_ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attribute.getId(), productId));
+            if (attr == null || productId != attr.getProduct().getId().longValue()) {
+                throw ProductAttributeNotFoundException.of(attribute.getId(), store);
             }
         }
 
@@ -292,36 +250,33 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductAttributeEntity getAttribute(Long productId, Long attributeId, StoreMerchantId store,
-                                                       LanguageCode language) {
+                                                       LanguageCode language)
+            throws ProductAttributeNotFoundException, ProductAttributeNotConvertibleException {
 
-        ProductAttribute attr = productAttributeService.getById(attributeId);
-
-        if (attr == null) {
-            throw new ResourceNotFoundException(ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(attributeId, store));
-        }
-
-        if (attr.getProduct().getId().longValue() != productId) {
-            throw new ResourceNotFoundException(
-                    ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attributeId, productId));
-        }
-
-        if (!Objects.equals(attr.getProduct().getStore(), store)) {
-            throw new ResourceNotFoundException(
-                    ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE.formatted(attributeId, productId, store));
-        }
-
+        ProductAttribute attr = requireAttribute(productId, attributeId, store);
         return readableProductAttributeMapper.convert(attr, store, language);
     }
 
-    private Product product(long id, StoreMerchantId store) {
+    /**
+     * The three checks the old code repeated at every call site, with three near-identical messages: the attribute
+     * exists, belongs to that product, and that product belongs to this store. All three now answer the same 404,
+     * because to a caller they are one question.
+     */
+    private ProductAttribute requireAttribute(Long productId, Long attributeId, StoreMerchantId store)
+            throws ProductAttributeNotFoundException {
+        ProductAttribute attr = productAttributeService.getById(attributeId);
+        if (attr == null || attr.getProduct().getId().longValue() != productId
+                || !Objects.equals(attr.getProduct().getStore(), store)) {
+            throw ProductAttributeNotFoundException.of(attributeId, store);
+        }
+        return attr;
+    }
+
+    private Product product(long id, StoreMerchantId store) throws ProductNotFoundException {
         Product product = productService.getById(id);
 
-        if (product == null) {
-            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_FOR_ID_TEMPLATE.formatted(id));
-        }
-
-        if (!Objects.equals(product.getStore(), store)) {
-            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_ID_FOR_STORE_TEMPLATE.formatted(id, store));
+        if (product == null || !Objects.equals(product.getStore(), store)) {
+            throw ProductNotFoundException.of(id, store);
         }
 
         return product;
@@ -329,7 +284,8 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
 
     @Override
     public ReadableProductAttributeList getAttributesList(Long productId, StoreMerchantId store, LanguageCode language,
-                                                          Pageable pageable) {
+                                                          Pageable pageable)
+            throws ProductNotFoundException, ProductAttributeNotConvertibleException {
 
         Product product = this.product(productId, store);
 
@@ -346,10 +302,11 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
         attrList.setTotalPages(attr.getTotalPages());
         attrList.setPageNumber(attr.getNumber());
 
-        List<ReadableProductAttributeEntity> values = attr.getContent()
-                .stream()
-                .map(attribute -> readableProductAttributeMapper.convert(attribute, store, language))
-                .toList();
+        // A plain loop rather than stream().map(...): the attribute mapper declares a checked failure now.
+        List<ReadableProductAttributeEntity> values = new ArrayList<>();
+        for (ProductAttribute attribute : attr.getContent()) {
+            values.add(readableProductAttributeMapper.convert(attribute, store, language));
+        }
 
         attrList.setContent(values);
 
@@ -357,40 +314,24 @@ public class ProductOptionFacadeImpl implements ProductOptionFacade {
     }
 
     @Override
-    public void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store) {
-        try {
-
-            ProductAttribute attr = productAttributeService.getById(attributeId);
-            if (attr == null) {
-                throw new ResourceNotFoundException(
-                        ATTRIBUTE_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(attributeId, store));
-            }
-
-            if (attr.getProduct().getId().longValue() != productId) {
-                throw new ResourceNotFoundException(
-                        ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_TEMPLATE.formatted(attributeId, productId));
-            }
-
-            if (!Objects.equals(attr.getProduct().getStore(), store)) {
-                throw new ResourceNotFoundException(
-                        ATTRIBUTE_NOT_FOUND_FOR_PRODUCT_AND_STORE_TEMPLATE.formatted(attributeId, productId, store));
-            }
-
-            productAttributeService.delete(attr);
-
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(DELETING_PRODUCT_ATTRIBUTE_ERROR_TEMPLATE.formatted(attributeId), e);
-        }
+    public void deleteAttribute(Long productId, Long attributeId, StoreMerchantId store)
+            throws ProductAttributeNotFoundException, ServiceException {
+        productAttributeService.delete(requireAttribute(productId, attributeId, store));
     }
 
 
     @Override
     public List<CodeEntity> createAttributes(List<PersistableProductAttribute> attributes, Long productId,
-                                             StoreMerchantId store) {
+                                             StoreMerchantId store)
+            throws ProductNotFoundException, ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductAttributeNotConvertibleException,
+            ProductOptionNotConvertibleException {
 
-        List<ProductAttribute> modelAttributes = attributes.stream()
-                .map(attr -> persistableProductAttributeMapper.convert(attr, store, null))
-                .toList();
+        // A plain loop rather than stream().map(...): the attribute mapper declares checked failures now.
+        List<ProductAttribute> modelAttributes = new ArrayList<>();
+        for (PersistableProductAttribute attr : attributes) {
+            modelAttributes.add(persistableProductAttributeMapper.convert(attr, store, null));
+        }
 
         productAttributeService.saveAll(modelAttributes);
 

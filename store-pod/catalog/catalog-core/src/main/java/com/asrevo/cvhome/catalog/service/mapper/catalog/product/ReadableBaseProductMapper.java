@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 /**
@@ -30,14 +30,15 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
     }
 
     @Override
-    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
+    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         ReadableProduct product = new ReadableProduct();
         return this.merge(source, product, store, language);
     }
 
     @Override
     public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
-                                 LanguageCode language) {
+                                 LanguageCode language) throws ProductPriceNotConvertibleException {
 
         destination.setSku(source.getSku());
         destination.setRefSku(source.getRefSku());
@@ -95,7 +96,8 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
         }
     }
 
-    private void applyPrice(Product source, ReadableProduct destination, StoreMerchantId store) {
+    private void applyPrice(Product source, ReadableProduct destination, StoreMerchantId store)
+            throws ProductPriceNotConvertibleException {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price != null) {
@@ -110,7 +112,7 @@ public class ReadableBaseProductMapper implements Mapper<Product, ReadableProduc
             }
 
         } catch (Exception e) {
-            throw new ConversionRuntimeException("An error while converting product price", e);
+            throw ProductPriceNotConvertibleException.of(e);
         }
     }
 

@@ -1,12 +1,12 @@
 package com.asrevo.cvhome.catalog.service.populator.catalog;
 
 
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class ReadableFinalPricePopulator
 
     @Override
     public ReadableProductPrice populate(FinalPriceCalc source, ReadableProductPrice target, StoreMerchantId store,
-                                         LanguageCode language) throws ConversionException {
+                                         LanguageCode language) throws ProductPriceNotConvertibleException {
         try {
 
             target.setOriginalPrice(pricingService.getDisplayAmount(source.getOriginalPrice(), store));
@@ -33,7 +33,7 @@ public class ReadableFinalPricePopulator
             }
 
         } catch (Exception e) {
-            throw new ConversionException("Exception while converting to ReadableProductPrice", e);
+            throw ProductPriceNotConvertibleException.of(e);
         }
 
         return target;

@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProductInventory;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
@@ -28,13 +28,14 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
 
     @Override
     public ProductAvailability convert(PersistableProductInventory source, StoreMerchantId store,
-                                       LanguageCode language) {
+                                       LanguageCode language) throws InventoryNotConvertibleException {
         return this.merge(source, new ProductAvailability(), store, language);
     }
 
     @Override
     public ProductAvailability merge(PersistableProductInventory source, ProductAvailability destination,
-                                     StoreMerchantId store, LanguageCode language) {
+                                     StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException {
 
         try {
 
@@ -92,7 +93,7 @@ public class PersistableProductAvailabilityMapper implements Mapper<PersistableP
             }
 
         } catch (Exception e) {
-            throw new ServiceRuntimeException("An error occured while mapping product availability", e);
+            throw InventoryNotConvertibleException.of(e);
         }
 
         return destination;
