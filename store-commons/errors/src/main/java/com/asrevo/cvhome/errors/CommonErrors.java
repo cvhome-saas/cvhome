@@ -97,6 +97,17 @@ public enum CommonErrors implements ErrorCode {
     ASSET_NOT_FOUND("COMMON.ASSET_NOT_FOUND", ErrorCategory.NOT_FOUND),
 
     /**
+     * The database refused the write on a constraint — most often a row still referenced by another table.
+     *
+     * <p>
+     * A last resort, not a design: a service that knows <em>which</em> rule was broken should check it first and throw
+     * a condition-named {@link DuplicateResourceException} or {@link OperationNotAllowedException} instead. This code
+     * exists so that the one that did not still answers 409 rather than 500.
+     * </p>
+     */
+    DATA_INTEGRITY_VIOLATION("COMMON.DATA_INTEGRITY_VIOLATION", ErrorCategory.CONFLICT),
+
+    /**
      * A downstream service returned an error with no problem body to interpret.
      */
     REMOTE_CALL_FAILED("COMMON.REMOTE_CALL_FAILED", ErrorCategory.REMOTE_SERVICE),

@@ -18,7 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.controlplane.errors.ForeignOrgUserAccessException;
+import com.asrevo.cvhome.controlplane.errors.ForeignStoreUserAccessException;
+import com.asrevo.cvhome.controlplane.errors.ManagedUserNotFoundException;
 import com.asrevo.cvhome.controlplane.manager.service.ManagedUserAccountService;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
+import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
+import com.asrevo.cvhome.uaa.api.errors.UaaOperationForbiddenException;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
@@ -37,7 +43,8 @@ public class UserAccountController {
 
     @GetMapping("current")
 
-    public ReadableUser current(@AuthenticationPrincipal Principal principal) {
+    public ReadableUser current(@AuthenticationPrincipal Principal principal)
+            throws ManagedUserNotFoundException, UaaApiUnavailableException {
         return managedUserAccountService.findOne(principal.getName());
     }
 
@@ -46,7 +53,7 @@ public class UserAccountController {
 
     public ReadableUserList list(@AuthenticationPrincipal Principal principal,
                                  @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                                 Pageable pageable) {
+                                 Pageable pageable) throws UaaApiUnavailableException {
         return managedUserAccountService.list(identity, store, pageable);
     }
 
@@ -54,13 +61,15 @@ public class UserAccountController {
     // @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
 
     public ReadableUser findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                @RequestParam ManagerStoreId store, @RequestParam String userId) {
+                                @RequestParam ManagerStoreId store, @RequestParam String userId)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaApiUnavailableException {
         return managedUserAccountService.findOne(identity, store, userId);
     }
 
     @GetMapping("assignable-roles")
 
-    public Set<String> assignableRoles() {
+    public Set<String> assignableRoles() throws UaaApiUnavailableException {
         return managedUserAccountService.getAssignableRoles();
     }
 
@@ -68,7 +77,8 @@ public class UserAccountController {
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.CREATE')")
 
     public ReadableUser create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user)
+            throws UaaConflictException, UaaApiUnavailableException {
         return managedUserAccountService.createUser(identity, store, user);
     }
 
@@ -76,7 +86,9 @@ public class UserAccountController {
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.UPDATE')")
 
     public ReadableUser update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user) {
+                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaConflictException, UaaApiUnavailableException {
         return managedUserAccountService.updateUser(identity, store, user);
     }
 
@@ -85,7 +97,9 @@ public class UserAccountController {
 
     public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                               @RequestParam ManagerStoreId store, @RequestParam String userId,
-                              @RequestBody UserPassword passwordRequestDto) {
+                              @RequestBody UserPassword passwordRequestDto)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaApiUnavailableException {
         managedUserAccountService.resetPassword(identity, store, userId, passwordRequestDto);
     }
 
@@ -93,7 +107,9 @@ public class UserAccountController {
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DELETE')")
 
     public void delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                       @RequestParam String userId) {
+                       @RequestParam String userId)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaOperationForbiddenException, UaaApiUnavailableException {
         managedUserAccountService.deleteUser(identity, store, userId);
     }
 
@@ -101,7 +117,9 @@ public class UserAccountController {
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.ENABLE')")
 
     public void enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                       @RequestParam String userId) {
+                       @RequestParam String userId)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaOperationForbiddenException, UaaApiUnavailableException {
         managedUserAccountService.enableUser(identity, store, userId);
     }
 
@@ -109,7 +127,9 @@ public class UserAccountController {
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DISABLE')")
 
     public void disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
-                        @RequestParam String userId) {
+                        @RequestParam String userId)
+            throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
+            UaaOperationForbiddenException, UaaApiUnavailableException {
         managedUserAccountService.disableUser(identity, store, userId);
     }
 

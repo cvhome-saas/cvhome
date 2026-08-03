@@ -40,13 +40,14 @@ public class ClientsConfig {
     }
 
     /**
-     * Exposes the wrapper, not the raw proxy: callers depend on the payment API's caller-side vocabulary, and the
-     * proxy's own signature carries the payment service's instead.
+     * Built from {@code ExternalPaymentGatewayService}, the caller-side half of payment's contract — never from
+     * {@code IPaymentGatewayService}, whose {@code throws} clauses are the payment service's own vocabulary and mean
+     * nothing here.
      *
      * <p>
-     * The only client here with an error contract, so a payment failure arrives as a type checkout can branch on
-     * rather than as an opaque remote error. The other three APIs name none of their failures yet; passing
-     * {@code null} is how that is stated.
+     * The only client with an error contract, so a payment failure arrives as a type checkout can branch on rather
+     * than as an opaque remote error. The other three APIs name none of their failures yet, which
+     * {@link RemoteErrorCatalog#none()} is how to state.
      * </p>
      */
     @Bean

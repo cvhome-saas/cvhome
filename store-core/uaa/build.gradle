@@ -47,6 +47,9 @@ dependencies {
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 
     implementation project(':store-commons:commons')
+    // UaaErrors and the condition types it names live here, shared with the admin SDK: the client catalog keys on the
+    // enum constants, so server and client must compile against the same ones.
+    implementation project(':store-commons:uaa-client')
     implementation project(':store-commons:autoconfigure')
 
     compileOnly libs.lombok

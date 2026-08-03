@@ -17,8 +17,8 @@ import com.asrevo.cvhome.uaa.dto.CreateUserRequest;
 import com.asrevo.cvhome.uaa.dto.ResetUserPasswordRequest;
 import com.asrevo.cvhome.uaa.dto.UpdateUserRequest;
 import com.asrevo.cvhome.uaa.dto.UserDto;
-import com.asrevo.cvhome.uaa.exception.ForbiddenOperationException;
-import com.asrevo.cvhome.uaa.exception.ResourceNotExistException;
+import com.asrevo.cvhome.uaa.errors.SuperAdminImmutableException;
+import com.asrevo.cvhome.uaa.errors.UserNotFoundException;
 import com.asrevo.cvhome.uaa.repo.RoleRepository;
 import com.asrevo.cvhome.uaa.repo.UserRepository;
 import com.asrevo.cvhome.uaa.repo.UserSpecifications;
@@ -59,19 +59,22 @@ public class AdminService {
         return spec;
     }
 
-    private User findUser(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotExistException(String.format("Invalid user id %s", id)));
+    // orElseThrow is generic over the thrown type, so a checked exception needs no Unchecked wrapper here.
+    private User findUser(UUID id) throws UserNotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> UserNotFoundException.of(id));
     }
 
-    public UserDto getUser(UUID id) {
+    public UserDto getUser(UUID id) throws UserNotFoundException {
         User u = findUser(id);
         return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(), u.isEnabled(),
                 u.getRoles().stream().map(Role::getName).collect(toSet()), u.getMetadata());
     }
 
     @Transactional
-    public UserDto createUser(CreateUserRequest req) {
+    // Declares both because it delegates to assignRoles and getUser. Neither can fire in practice — the user was
+    // created a line earlier and is not the super admin — but the signature states what the code path can produce
+    // rather than what the author expects, which is what keeps it true when the delegates change.
+    public UserDto createUser(CreateUserRequest req) throws UserNotFoundException, SuperAdminImmutableException {
         String username = req.username();
         String email = req.email();
         User u = new User();
@@ -90,7 +93,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void assignRoles(UUID id, Set<String> roleNames) {
+    public void assignRoles(UUID id, Set<String> roleNames) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         var assignableRoles = getAssignableRoles();
         if (roleNames != null) {
@@ -105,7 +108,7 @@ public class AdminService {
     }
 
     @Transactional
-    public UserDto updateUser(UUID id, UpdateUserRequest req) {
+    public UserDto updateUser(UUID id, UpdateUserRequest req) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         if (req.firstName() != null) {
             u.setFirstName(req.firstName());
@@ -128,7 +131,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void removeRoles(UUID id, Set<String> roleNames) {
+    public void removeRoles(UUID id, Set<String> roleNames) throws UserNotFoundException, SuperAdminImmutableException {
         if (roleNames == null || roleNames.isEmpty()) {
             return;
         }
@@ -137,7 +140,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void resetPassword(UUID userId, ResetUserPasswordRequest req) {
+    public void resetPassword(UUID userId, ResetUserPasswordRequest req) throws UserNotFoundException {
         User u = findUser(userId);
         if (req.password() != null && !req.password().isBlank()) {
             u.setPasswordHash(passwordEncoder.encode(req.password()));
@@ -151,27 +154,27 @@ public class AdminService {
     }
 
     @Transactional
-    public void enableUser(UUID id) {
+    public void enableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         u.setEnabled(true);
     }
 
     @Transactional
-    public void disableUser(UUID id) {
+    public void disableUser(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         u.setEnabled(false);
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public void delete(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User u = getNonSuperAdmin(id);
         userRepository.deleteById(u.getId());
     }
 
-    private User getNonSuperAdmin(UUID id) {
+    private User getNonSuperAdmin(UUID id) throws UserNotFoundException, SuperAdminImmutableException {
         User user = findUser(id);
         if ("super-admin@mail.com".equals(user.getEmail())) {
-            throw new ForbiddenOperationException("Cannot mutate admin user");
+            throw SuperAdminImmutableException.of(id);
         }
         return user;
     }

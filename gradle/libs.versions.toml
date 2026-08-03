@@ -80,6 +80,7 @@ spring-security-test = { module = "org.springframework.security:spring-security-
 spring-web = { module = "org.springframework:spring-web", version.ref = "springWeb" }
 spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "springWeb" }
 spring-webflux = { module = "org.springframework:spring-webflux", version.ref = "springWeb" }
+spring-tx = { module = "org.springframework:spring-tx", version.ref = "springWeb" }
 spring-data-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springDataCommons" }
 spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "springDataCommons" }
 spring-data-relational = { module = "org.springframework.data:spring-data-relational", version.ref = "springDataCommons" }

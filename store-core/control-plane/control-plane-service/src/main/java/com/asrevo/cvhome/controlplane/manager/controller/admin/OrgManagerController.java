@@ -17,6 +17,9 @@ import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.InternalOrgService;
 import com.asrevo.cvhome.controlplane.manager.service.InternalStoreService;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
+import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
+import com.asrevo.cvhome.uaa.api.errors.UaaUserNotFoundException;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.UserPassword;
 import com.asrevo.cvhome.uaa.service.UserAccountService;
@@ -56,14 +59,16 @@ public class OrgManagerController {
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("create")
 
-    public ReadableUser create(@RequestBody CreateOrgRequest request) {
+    public ReadableUser create(@RequestBody CreateOrgRequest request)
+            throws UaaConflictException, UaaApiUnavailableException {
         return signupService.createOrgUser(request);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("change-password")
 
-    public void changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request) {
+    public void changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request)
+            throws UaaUserNotFoundException, UaaApiUnavailableException {
         userAccountService.changePassword(id.toString(), request);
     }
 

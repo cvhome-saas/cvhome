@@ -221,6 +221,14 @@ Mappings are keyed by `ErrorCode`, not by string, so renaming a code cannot sile
 codes fall back to `UnmappedRemoteFailureException`, which still carries the remote's code and status — the name is
 the point: seeing one in a log is the signal that a code deserves an entry.
 
+**The decoding is shared with clients that have no Spring.** `RemoteFailures` in `store-commons:errors` owns
+everything that decides *which* exception to build — `contextOf(Map, service, path, status, cause)`,
+`resolve(catalog, context)` and `unreachable(catalog, service, path, cause)` — and takes the problem body as a plain
+`Map`, which is how the module keeps its zero dependencies. Each transport supplies that map with the JSON library it
+already has: `RemoteProblemTranslator` for the Spring clients, `AbstractAdminClient` for the uaa admin SDK, which
+speaks plain `java.net.http`. Its contract is `UaaApiErrors.CATALOG` in `store-commons:uaa-client`, and it needs only
+**one** interface (`UserAccountService`) because no server controller implements it — see `uaa-client.md`.
+
 **How the type reaches the caller.** `S2sErrorHandler` owns both failure paths — an error response
 (`defaultStatusHandler`) and no response at all (`requestInterceptor`, which is the only place a refused connection
 or read timeout can be caught). The translated exception is checked, but Spring's hooks may only throw
@@ -331,13 +339,10 @@ it does, pass its `*ApiErrors.CATALOG` constant and build the client from the `E
   the populator layer in the modules that have not migrated yet, so including it drowns the signal. Add it back
   when checking a module that has migrated.
 - **Grep gate after a rename or deletion** — search the old type name across `*.java` *including comments*.
-- **Wire-format tests** — `GlobalErrorHandlerTest` (10 cases) pins `code`/`category`/`status`/`traceId`, that
-  `detail` leaks no root cause, and the three who-failed shapes. `ProbeApi` is the fixture that lets a probe
-  exception be thrown through a real controller.
-- **Round-trip test** — `TypedRemoteErrorRoundTripTest` (5 cases, `MockRestServiceServer`) is the only thing
-  covering `@HttpExchange` → handler → carrier → declared type. It includes the case that a method declaring
-  nothing is unaffected, and that a `null` catalog degrades rather than NPEs.
-- **Pure-refactor discipline** — `RemoteProblemTranslatorTest` (9 cases) is the decoder's behaviour pin. When a
-  change is meant to be a move rather than a rewrite, *no assertion in it may change*; if one does, the refactor
-  changed behaviour.
+- **The error-handling test suite is currently missing** (checked 2026-08-03). `GlobalErrorHandlerTest`,
+  `AdviceScopeTest`, `TypedRemoteErrorRoundTripTest`, `RemoteProblemTranslatorTest` and their `ProbeApi` fixture are
+  described in the plans but absent from the tree — `store-commons/autoconfigure/src/test` does not exist. The only
+  tests in the repo are eight `*ApplicationTests` context loads, so a green `./gradlew test` says nothing about the
+  wire format. Don't cite these tests as cover; rebuilding them is the next task in
+  `.claude/plans/error-handling.md`.
 - `./gradlew build` runs checkstyle repo-wide and must stay clean.
