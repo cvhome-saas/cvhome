@@ -52,7 +52,10 @@ public class ExternalPaymentGatewayApi implements IPaymentGatewayService {
         return paymentGatewayService.initiatePayment(store, paymentRequest);
     }
 
-    @GetMapping("/payments/{requestRef}/status")
+    // The path must stay in step with ExternalPaymentGatewayService's @HttpExchange("/api/v1/private") +
+    // @GetExchange("/payments/{ref}/status") by hand: the client half is a separate interface, so nothing checks the
+    // two agree. This one had lost its /private segment, which no caller had noticed because status() has none yet.
+    @GetMapping("/private/payments/{requestRef}/status")
     @Operation(method = "GET", description = "Payment Status",
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PaymentResponse.class))))
     @Parameter(name = "store",

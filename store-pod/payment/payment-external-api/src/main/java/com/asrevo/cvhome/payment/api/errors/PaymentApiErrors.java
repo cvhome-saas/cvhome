@@ -2,6 +2,7 @@ package com.asrevo.cvhome.payment.api.errors;
 
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
 import com.asrevo.cvhome.payment.errors.PaymentErrors;
+import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.payment.services.payment.IPaymentGatewayService;
 
 /**
@@ -17,10 +18,11 @@ import com.asrevo.cvhome.payment.services.payment.IPaymentGatewayService;
  * </p>
  *
  * <p>
- * Because neither type appears in {@link IPaymentGatewayService}'s {@code throws} clauses — those name the
- * server's exceptions, for the controller's sake — the client proxy cannot narrow into them, and they reach
- * {@code RestPaymentGatewayClient} inside the carrier. That wrapper opens it, which is where the mapping from "what
- * happened" to "what it means to you" stays readable as ordinary Java.
+ * Both types are declared on {@link ExternalPaymentGatewayService}, the interface the client proxy is generated from —
+ * never on {@link IPaymentGatewayService}, whose {@code throws} clauses name the server's exceptions for the
+ * controller's sake. That placement is load-bearing: {@code S2sErrorHandler.declaredOrCarrier} narrows the carrier
+ * only into types the invoked method declares, so it is what delivers a rebuilt exception to the caller as itself
+ * rather than wrapped.
  * </p>
  *
  * <p>
