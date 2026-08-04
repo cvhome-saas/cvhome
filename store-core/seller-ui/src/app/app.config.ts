@@ -1,7 +1,7 @@
-import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, ErrorHandler, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
 
 import {routes} from './app.routes';
-import {provideHttpClient, withFetch} from '@angular/common/http';
+import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
 import {
   NbChatModule,
   NbDatepickerModule,
@@ -22,6 +22,8 @@ import {provideServerRendering, withRoutes} from "@angular/ssr";
 import {serverRoutes} from "./app.routes.server";
 import {provideRouter} from "@angular/router";
 import {provideClientHydration} from "@angular/platform-browser";
+import {apiErrorInterceptor} from "./core/errors/api-error.interceptor";
+import {GlobalErrorHandler} from "./core/errors/global-error-handler";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,7 +31,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(),
     provideServerRendering(withRoutes(serverRoutes)),
-    provideHttpClient(withFetch()),
+    // Every HTTP failure leaves this client as an ApiError, so no call site ever sees an
+    // HttpErrorResponse again. Presentation stays a call-site decision; the interceptor never toasts.
+    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
+    {provide: ErrorHandler, useClass: GlobalErrorHandler},
     provideAnimationsAsync(),
     provideTranslateService({
       fallbackLang: 'en',

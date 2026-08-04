@@ -9,6 +9,8 @@ import {ProductService} from '../services/product.service';
 import {ManufactureService} from '../../brands/services/manufacture.service';
 import {ConfigService} from '../../../shared/services/config.service';
 import {ErrorService} from '../../../shared/services/error.service';
+import {ApiError} from '../../../../core/errors/api-error';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {slugify} from '../../../shared/utils/slugifying';
@@ -29,6 +31,7 @@ export class ProductFormFacade {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly loader = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
@@ -191,12 +194,13 @@ export class ProductFormFacade {
           this.goToBack();
         }
       },
-      error: (err) => {
+      error: (err: ApiError) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        if (!this.productData?.id && err?.error?.message) {
-          this.errorService.error(err.error.message, err);
-        }
+        // Migrated ahead of the rest: this site used to read `err.error.message` off the raw
+        // HttpErrorResponse and toast it untranslated. That field no longer exists now that the
+        // interceptor normalises, and the backend message was developer text we should not have been
+        // rendering anyway.
+        this.apiErrors.notify(err);
       }
     });
   }
