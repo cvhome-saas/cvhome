@@ -54,6 +54,17 @@ export class NotificationService {
     this.toastr.danger(message, options?.title, this.config(options));
   }
 
+  /**
+   * Red toast for a message this app owns, not one a backend sent — "fill the required fields", "that code
+   * is already used". Kept separate from {@link danger} so the distinction stays visible: `danger` takes
+   * resolved text because only `ApiErrorService` may build error copy from a response.
+   *
+   * @param key an i18n key, not a message
+   */
+  dangerKey(key: string, params?: Record<string, unknown>, options?: NotificationOptions): void {
+    this.toastr.danger(this.translate.instant(key, params), options?.title, this.config(options));
+  }
+
   private config(options?: NotificationOptions) {
     return {
       duration: options?.duration ?? 5000,

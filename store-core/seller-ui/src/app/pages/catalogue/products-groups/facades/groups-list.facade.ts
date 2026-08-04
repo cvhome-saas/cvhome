@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {ProductGroupsService} from '../services/product-groups.service';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
@@ -17,7 +17,7 @@ export class GroupsListFacade {
   private readonly router = inject(Router);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   readonly tableState = inject(TableStateService<ReadableProductGroup, StorePageRequest>);
 
   readonly store = signal<string>('');
@@ -34,7 +34,7 @@ export class GroupsListFacade {
             this.loadPage();
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -68,7 +68,7 @@ export class GroupsListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -102,7 +102,7 @@ export class GroupsListFacade {
           next: () => {
             this.loadPage();
           },
-          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+          error: (err) => this.apiErrors.notify(err)
         });
       }
     });

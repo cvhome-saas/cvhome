@@ -3,7 +3,8 @@ import {Router} from '@angular/router';
 import {CategoryService} from '../services/category.service';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
@@ -17,7 +18,8 @@ export class CategoriesListFacade {
   private readonly router = inject(Router);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   readonly tableState = inject(TableStateService<ReadableCategory, StorePageRequest>);
 
   readonly store = signal<string>('');
@@ -32,7 +34,7 @@ export class CategoriesListFacade {
             this.loadPage();
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -53,7 +55,7 @@ export class CategoriesListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -84,10 +86,10 @@ export class CategoriesListFacade {
       if (res) {
         this.categoryService.deleteCategory(row.id).subscribe({
           next: () => {
-            this.errorService.success('CATEGORY.CATEGORY_REMOVED');
+            this.notify.success('CATEGORY.CATEGORY_REMOVED');
             this.loadPage();
           },
-          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+          error: (err) => this.apiErrors.notify(err)
         });
       }
     });

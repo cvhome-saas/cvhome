@@ -8,9 +8,9 @@ import {ProductFormService} from '../services/product-form.service';
 import {ProductService} from '../services/product.service';
 import {ManufactureService} from '../../brands/services/manufacture.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
-import {ApiError} from '../../../../core/errors/api-error';
 import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
+import {ApiError} from '../../../../core/errors/api-error';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {slugify} from '../../../shared/utils/slugifying';
@@ -30,8 +30,8 @@ export class ProductFormFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
-  private readonly errorService = inject(ErrorService);
   private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
@@ -54,7 +54,7 @@ export class ProductFormFacade {
       .pipe(takeUntilDestroyed(destroyRef))
       .subscribe({
         next: (store) => this.loadFormContext(store),
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -86,7 +86,7 @@ export class ProductFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -111,7 +111,7 @@ export class ProductFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -152,7 +152,7 @@ export class ProductFormFacade {
     }
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || productObject.sku === '' || productObject.manufacturer === '') {
-      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
       this.loader.set(false);
       return;
     }
@@ -187,7 +187,7 @@ export class ProductFormFacade {
     request$.subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success(this.translate.instant(
+        this.notify.success(this.translate.instant(
           this.productData?.id ? 'PRODUCT.PRODUCT_UPDATED' : 'PRODUCT.PRODUCT_CREATED'
         ));
         if (!this.productData?.id) {
@@ -218,7 +218,10 @@ export class ProductFormFacade {
       }
     }
     if (invalid.length > 0) {
-      this.errorService.error(this.translate.instant('COMMON.FILL_REQUIRED_FIELDS') + ' [' + invalid + ' ]', null);
+      // The list of invalid control names used to be appended to the toast; it is diagnostic, so it
+      // goes to the console and the seller gets the message on its own.
+      console.warn('Invalid controls on submit:', invalid);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
     }
     return invalid;
   }

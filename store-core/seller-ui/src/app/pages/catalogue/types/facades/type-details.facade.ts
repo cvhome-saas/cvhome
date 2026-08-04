@@ -4,7 +4,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {TypeFormService} from '../services/type-form.service';
 import {TypesService} from '../services/types.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {Observable, zip} from 'rxjs';
@@ -22,7 +23,8 @@ export class TypeDetailsFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
@@ -44,7 +46,7 @@ export class TypeDetailsFacade {
         },
         error: (err) => {
           this.loaded.set(true);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }
@@ -68,7 +70,7 @@ export class TypeDetailsFacade {
       },
       error: (err) => {
         this.loaded.set(true);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -83,7 +85,7 @@ export class TypeDetailsFacade {
       },
       error: (err) => {
         this.loaded.set(true);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -96,7 +98,7 @@ export class TypeDetailsFacade {
     this.isValidCode.set(true);
     this.typesService.checkCode(code).subscribe({
       next: (res) => this.isCodeExist.set(res.exists),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -121,7 +123,7 @@ export class TypeDetailsFacade {
     request$.subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success(this.translate.instant(
+        this.notify.success(this.translate.instant(
           this.typeData?.id ? 'PRODUCT_TYPE.PRODUCT_TYPE_UPDATED' : 'PRODUCT_TYPE.PRODUCT_TYPE_CREATED'
         ));
         if (!this.typeData?.id) {
@@ -130,7 +132,7 @@ export class TypeDetailsFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

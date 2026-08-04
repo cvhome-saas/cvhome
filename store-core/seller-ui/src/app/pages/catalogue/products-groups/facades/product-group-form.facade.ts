@@ -5,7 +5,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ProductGroupFormService} from '../services/product-group-form.service';
 import {ProductGroupsService} from '../services/product-groups.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
@@ -20,7 +21,8 @@ export class ProductGroupFormFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly isCodeUnique = signal<boolean>(true);
@@ -65,7 +67,7 @@ export class ProductGroupFormFacade {
           this.loadGroup();
         }
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -80,7 +82,7 @@ export class ProductGroupFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -93,7 +95,7 @@ export class ProductGroupFormFacade {
     if (!code || this.action === 'edit') return;
     this.productGroupsService.checkCode(code).subscribe({
       next: (res) => this.isCodeUnique.set(!res.exists),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -110,7 +112,7 @@ export class ProductGroupFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -126,11 +128,11 @@ export class ProductGroupFormFacade {
       next: () => {
         this.loader.set(false);
         this.setRows([...this.rows(), item]);
-        this.errorService.success('PRODUCT_GROUP.PRODUCT_ADDED');
+        this.notify.success('PRODUCT_GROUP.PRODUCT_ADDED');
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -142,11 +144,11 @@ export class ProductGroupFormFacade {
       next: () => {
         this.loader.set(false);
         this.setRows(this.rows().filter((it) => it.id !== item.id));
-        this.errorService.success('PRODUCT_GROUP.PRODUCT_REMOVED');
+        this.notify.success('PRODUCT_GROUP.PRODUCT_REMOVED');
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

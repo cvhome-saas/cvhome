@@ -4,7 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
 import {BrandService} from '../services/brand.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
 import {ReadableManufacturer} from '../models/brand.model';
@@ -15,7 +15,7 @@ export class BrandDetailsFacade {
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly storeService = inject(StoreService);
   private readonly brandService = inject(BrandService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly brand = signal<ReadableManufacturer | null>(null);
   readonly store = signal<ReadableMerchantStore | null>(null);
@@ -33,21 +33,21 @@ export class BrandDetailsFacade {
           this.loadBrand(id);
         }
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
   private loadStore(storeCode: string): void {
     this.storeService.getStore(storeCode).subscribe({
       next: (store) => this.store.set(store),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
   private loadBrand(id: string): void {
     this.brandService.getBrandById(id).subscribe({
       next: (brand) => this.brand.set(brand),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 }

@@ -1,6 +1,7 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {CategoryService} from '../services/category.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {NgcxTreeNode} from '@cluetec/ngcx-tree';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -10,7 +11,8 @@ import {CategoryTreeMoveEvent, ReadableCategory} from '../models/category.model'
 export class CategoriesHierarchyFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly nodes = signal<NgcxTreeNode[]>([]);
   readonly loader = signal<boolean>(false);
@@ -27,7 +29,7 @@ export class CategoriesHierarchyFacade {
             this.loadHierarchy(onComplete);
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -45,7 +47,7 @@ export class CategoriesHierarchyFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -54,9 +56,9 @@ export class CategoriesHierarchyFacade {
     const parentId = event.parent === undefined ? -1 : event.parent.id;
     this.categoryService.updateHierarchy(event.node.id, parentId).subscribe({
       next: () => {
-        this.errorService.success('CATEGORY.HIERARCHY_UPDATED');
+        this.notify.success('CATEGORY.HIERARCHY_UPDATED');
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
