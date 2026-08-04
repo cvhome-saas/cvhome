@@ -7,7 +7,8 @@ import {OrderDetailsMapper} from '../services/order-details.mapper';
 import {AsYouType} from 'libphonenumber-js';
 import {LANGUAGES, ORDER_STATUS_LIST, OrderDialogType} from '../constants/order-details.constants';
 import {OrdersService} from "../../services/orders.service";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {StoreService} from "../../../store-management/services/store.service";
 import {OrderTransactionComponent} from "../../order-transaction/order-transaction";
@@ -21,7 +22,8 @@ export class OrderDetailsFacade {
   private readonly ordersService = inject(OrdersService);
   private readonly storeService = inject(StoreService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly dialogService = inject(NbDialogService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -79,7 +81,7 @@ export class OrderDetailsFacade {
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }
@@ -94,7 +96,7 @@ export class OrderDetailsFacade {
   private getStore(storeID: string) {
     this.storeService.getStore(storeID).subscribe({
       next: (data) => this.store.set(data),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -104,7 +106,7 @@ export class OrderDetailsFacade {
         this.shippingCountry.set(data);
         this.billingCountry.set(data);
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -128,7 +130,7 @@ export class OrderDetailsFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -136,7 +138,7 @@ export class OrderDetailsFacade {
   private getHistory() {
     this.ordersService.getHistory(this.orderID()).subscribe({
       next: (data) => this.historyListData.set(data),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -150,7 +152,7 @@ export class OrderDetailsFacade {
           this.billing.update(b => ({...b, zone: ''}));
         }
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -164,7 +166,7 @@ export class OrderDetailsFacade {
           this.shipping.update(s => ({...s, zone: ''}));
         }
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -174,12 +176,12 @@ export class OrderDetailsFacade {
     this.ordersService.addHistory(this.orderID(), param).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success("History Status has been submitted successfully");
+        this.notify.success("History Status has been submitted successfully");
         this.statusFields.set({comments: '', status: ''});
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -190,11 +192,11 @@ export class OrderDetailsFacade {
     this.ordersService.updateOrder(this.orderID(), param).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success("Order has been updated successfully");
+        this.notify.success("Order has been updated successfully");
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       },
     });
   }
@@ -212,11 +214,11 @@ export class OrderDetailsFacade {
     this.ordersService.refundOrder(this.orderID()).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success("Order has been refunded successfully");
+        this.notify.success("Order has been refunded successfully");
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -226,11 +228,11 @@ export class OrderDetailsFacade {
     this.ordersService.captureOrder(this.orderID()).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success("Order has been captured successfully");
+        this.notify.success("Order has been captured successfully");
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

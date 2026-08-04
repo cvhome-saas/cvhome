@@ -2,7 +2,7 @@ import {DestroyRef, inject, Injectable, signal} from '@angular/core';
 import {CustomersService} from '../services/customer.service';
 import {SelectedStoreService} from '../../shared/services/selected-store.service';
 import {TableStateService} from '../../shared/table/table-state.service';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 import {StorePageRequest} from '../../shared/table/table.types';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -12,7 +12,7 @@ import {ReadableCustomer} from '../../orders/models/order.model';
 export class CustomerListFacade {
   private readonly customersService = inject(CustomersService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   readonly tableState = inject(TableStateService<ReadableCustomer, StorePageRequest>);
 
   readonly store = signal<string>('');
@@ -27,7 +27,7 @@ export class CustomerListFacade {
             this.loadPage();
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -45,7 +45,7 @@ export class CustomerListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

@@ -2,7 +2,8 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {ContentService} from "../../services/content.service";
 import {SelectedStoreService} from "../../../shared/services/selected-store.service";
 import {TableStateService} from "../../../shared/table/table-state.service";
@@ -17,7 +18,8 @@ import {ReadableContentPage} from "../../models/content.model";
 export class PagesFacade {
   private readonly contentService = inject(ContentService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
   public readonly tableState = inject(TableStateService<ReadableContentPage, StorePageRequest>);
@@ -36,7 +38,7 @@ export class PagesFacade {
             this.refresh();
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -73,7 +75,7 @@ export class PagesFacade {
         next: () => this.tableState.setLoading(false),
         error: (err) => {
           this.tableState.setLoading(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       })
     );
@@ -103,11 +105,11 @@ export class PagesFacade {
         this.contentService.deleteContent(event.id)
           .subscribe({
             next: () => {
-              this.errorService.success('Content page deleted successfully');
+              this.notify.success('Content page deleted successfully');
               this.refresh();
             },
             error: (err) => {
-              this.errorService.error('ERROR.SYSTEM_ERROR', err);
+              this.apiErrors.notify(err);
             }
           });
       }

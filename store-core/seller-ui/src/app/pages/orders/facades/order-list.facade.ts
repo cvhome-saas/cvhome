@@ -4,10 +4,10 @@ import {SelectedStoreService} from "../../shared/services/selected-store.service
 import {TableStateService} from "../../shared/table/table-state.service";
 import {Observable, tap} from "rxjs";
 import {StorePageRequest, PageT} from "../../shared/table/table.types";
-import {ErrorService} from "../../shared/services/error.service";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ReadableOrder} from "../models/order.model";
+import {ApiErrorService} from "../../../core/errors/api-error.service";
 
 export interface OrderFilterPageRequest extends StorePageRequest {
   phone?: string;
@@ -20,7 +20,7 @@ export interface OrderFilterPageRequest extends StorePageRequest {
 export class OrderListFacade {
   private readonly ordersService = inject(OrdersService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   readonly tableState = inject(TableStateService<ReadableOrder, OrderFilterPageRequest>);
 
   readonly store = signal<string>('');
@@ -35,7 +35,9 @@ export class OrderListFacade {
             this.refresh();
           }
         },
-        error: (err) => this.errorService.handleError(err)
+        // Was errorService.handleError, i.e. a bare console.error: the seller saw an empty list
+        // and no reason for it. GlobalErrorHandler still logs; this says why on screen.
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -74,7 +76,6 @@ export class OrderListFacade {
         next: () => this.tableState.setLoading(false),
         error: (err) => {
           this.tableState.setLoading(false);
-          this.errorService.handleError(err);
         }
       })
     );

@@ -1,14 +1,14 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {DateRangeStateService} from '../state/date-range.state';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 import {EMPTY_STATISTIC_LIST, StatisticApiService, StatisticList, StatisticsParams} from '../services/statistic.api.service';
 
 @Injectable()
 export class AdminDashboardFacade {
   private readonly dateRangeState = inject(DateRangeStateService);
   private readonly statisticApi = inject(StatisticApiService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly fromDate = this.dateRangeState.fromDate;
   readonly toDate = this.dateRangeState.toDate;
@@ -51,7 +51,7 @@ export class AdminDashboardFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

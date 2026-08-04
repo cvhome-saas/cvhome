@@ -2,14 +2,14 @@ import {Injectable, inject, signal} from '@angular/core';
 import {zip} from 'rxjs';
 import {SubscriptionDetails, SubscriptionService} from '../services/subscription.service';
 import {Table} from '../../shared/models/subscription.model';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 import {PRICING_CARD_ACCENTS} from '../constants/subscription.constants';
 import {Pricing, toFreePricing, toPricing} from '../mappers/subscription.mapper';
 
 @Injectable()
 export class SubscriptionFacade {
   private readonly subscriptionService = inject(SubscriptionService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly loading = signal<boolean>(false);
   readonly currentSubscriptionDetails = signal<SubscriptionDetails | undefined>(undefined);
@@ -33,7 +33,7 @@ export class SubscriptionFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
