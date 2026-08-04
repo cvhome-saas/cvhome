@@ -189,5 +189,57 @@
   "PRODUCT": {},
   "CHECKOUT": {},
   "CONTENT": {},
-  "CATEGORY": {}
+  "CATEGORY": {},
+  "ERRORS": {
+    "CODE": {
+      "CATALOG_PRODUCT_NOT_FOUND": "Este producto ya no está disponible.",
+      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "Solo quedan {available} de {sku}. Reduce la cantidad.",
+      "CATALOG_RESERVATION_EMPTY": "Tu carrito no tiene artículos que reservar.",
+      "CHECKOUT_CART_NOT_FOUND": "No encontramos tu carrito. Es posible que haya caducado.",
+      "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "Este producto no se puede comprar en este momento.",
+      "CHECKOUT_ORDER_NOT_FOUND": "No encontramos este pedido.",
+      "CHECKOUT_ORDER_LOGIN_REQUIRED": "Inicia sesión para realizar tu pedido.",
+      "CHECKOUT_ORDER_CLIENT_MISMATCH": "Este pedido pertenece a otra tienda.",
+      "PAYMENT_INITIATE_REJECTED": "Tu pago fue rechazado. Prueba con otro método de pago.",
+      "PAYMENT_INITIATE_FAILED": "Seguimos confirmando tu pago. No vuelvas a pagar: consulta tus pedidos en unos minutos.",
+      "PAYMENT_CONFIGURATION_MISSING": "Esta tienda no acepta pagos en este momento.",
+      "PAYMENT_PROCESSOR_UNSUPPORTED": "Ese método de pago no está disponible en esta tienda.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "Ya existe una cuenta con este correo electrónico.",
+      "CUA_REGISTRATION_USERNAME_TAKEN": "Este nombre de usuario ya está en uso.",
+      "CUSTOMER_COUNTRY_UNSUPPORTED": "No realizamos envíos al país seleccionado.",
+      "CUSTOMER_ZONE_UNSUPPORTED": "La provincia o región seleccionada no es válida para este país.",
+      "COMMON_UNAUTHENTICATED": "Inicia sesión para continuar.",
+      "COMMON_VALIDATION_FAILED": "Revisa los campos marcados e inténtalo de nuevo.",
+      "COMMON_REMOTE_UNAVAILABLE": "No podemos contactar con ese servicio ahora mismo. Inténtalo en unos momentos.",
+      "COMMON_REMOTE_TIMEOUT": "La operación tardó demasiado. Inténtalo de nuevo.",
+      "CLIENT_NETWORK_UNAVAILABLE": "Parece que no tienes conexión. Comprueba tu red e inténtalo de nuevo.",
+      "CLIENT_CART_EMPTY": "Tu carrito está vacío."
+    },
+    "CATEGORY": {
+      "VALIDATION": "Revisa la información que has introducido e inténtalo de nuevo.",
+      "MALFORMED": "No pudimos leer esa solicitud. Inténtalo de nuevo.",
+      "CONVERSION": "Parte de la información que has introducido no es válida.",
+      "UNAUTHENTICATED": "Inicia sesión para continuar.",
+      "FORBIDDEN": "No tienes acceso a eso.",
+      "NOT_FOUND": "No encontramos lo que has solicitado.",
+      "CONFLICT": "Eso entra en conflicto con algo que ya existe.",
+      "PAYLOAD_TOO_LARGE": "El archivo es demasiado grande.",
+      "UNPROCESSABLE": "No pudimos completar esa solicitud.",
+      "STORAGE": "No pudimos acceder a los archivos almacenados. Inténtalo de nuevo.",
+      "INTERNAL": "Algo salió mal por nuestra parte. Inténtalo de nuevo.",
+      "REMOTE_SERVICE": "Un servicio del que dependemos no responde. Inténtalo en unos momentos.",
+      "TIMEOUT": "La operación tardó demasiado. Inténtalo de nuevo.",
+      "NETWORK": "Parece que no tienes conexión. Comprueba tu red e inténtalo de nuevo.",
+      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "GENERIC": "Algo salió mal. Inténtalo de nuevo.",
+    "TRACE": "Referencia: {traceId}",
+    "UI": {
+      "TITLE": "Algo salió mal",
+      "RETRY": "Reintentar",
+      "GO_HOME": "Volver al inicio",
+      "NOT_FOUND_TITLE": "Página no encontrada",
+      "NOT_FOUND_MESSAGE": "La página que buscas no existe o se ha movido."
+    }
+  }
 }
