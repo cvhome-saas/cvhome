@@ -1,12 +1,14 @@
 import {Injectable, inject} from '@angular/core';
 import {ProductGroupsService} from '../services/product-groups.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {ReadableProductGroup} from '../models/product-group.model';
 
 @Injectable()
 export class ActiveButtonFacade {
   private readonly productGroupsService = inject(ProductGroupsService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   toggleActive(rowData: ReadableProductGroup, currentValue: boolean): boolean {
     const newValue = !currentValue;
@@ -16,9 +18,9 @@ export class ActiveButtonFacade {
     };
     this.productGroupsService.updateGroupActiveValue(group).subscribe({
       next: () => {
-        this.errorService.success('PRODUCT_GROUP.GROUP_ACTIVATION');
+        this.notify.success('PRODUCT_GROUP.GROUP_ACTIVATION');
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
     return newValue;
   }

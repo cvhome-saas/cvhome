@@ -4,7 +4,8 @@ import {ActivatedRoute} from '@angular/router';
 import {zip} from 'rxjs';
 import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
 import {ProductRelationshipService} from '../product-related/services/product-relationship.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {DatatablePageEvent} from '../../../shared/table/table-events';
 import {ProductGroupItem} from '../../products-groups/models/product-group.model';
@@ -14,7 +15,8 @@ export class ProductRelatedFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly productRelationshipService = inject(ProductRelationshipService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly store = signal<string>('');
   readonly rows = signal<ProductGroupItem[]>([]);
@@ -31,14 +33,14 @@ export class ProductRelatedFacade {
           this.product = params['code'];
           this.loadRelationships();
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
   private loadRelationships(): void {
     this.productRelationshipService.getRelationships(this.product).subscribe({
       next: (group) => this.setRows(group.products || []),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -46,9 +48,9 @@ export class ProductRelatedFacade {
     this.productRelationshipService.addProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows([...this.rows(), item]);
-        this.errorService.success('PRODUCT_GROUP.PRODUCT_ADDED');
+        this.notify.success('PRODUCT_GROUP.PRODUCT_ADDED');
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -56,9 +58,9 @@ export class ProductRelatedFacade {
     this.productRelationshipService.removeProduct(this.product, item.id).subscribe({
       next: () => {
         this.setRows(this.rows().filter((it) => it.id !== item.id));
-        this.errorService.success('PRODUCT_GROUP.PRODUCT_REMOVED');
+        this.notify.success('PRODUCT_GROUP.PRODUCT_REMOVED');
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 

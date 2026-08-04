@@ -4,7 +4,8 @@ import {NbDialogService} from '@nebular/theme';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {ProductService} from '../services/product.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {StorePageRequest} from '../../../shared/table/table.types';
@@ -23,7 +24,8 @@ export class ProductsListFacade {
   private readonly router = inject(Router);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   readonly tableState = inject(TableStateService<ReadableProduct, ProductFilterPageRequest>);
 
   init(): void {
@@ -43,7 +45,7 @@ export class ProductsListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -82,10 +84,10 @@ export class ProductsListFacade {
       if (res) {
         this.productService.deleteProduct(row.id).subscribe({
           next: () => {
-            this.errorService.success('PRODUCT.PRODUCT_REMOVED');
+            this.notify.success('PRODUCT.PRODUCT_REMOVED');
             this.loadPage();
           },
-          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+          error: (err) => this.apiErrors.notify(err)
         });
       }
     });
@@ -102,8 +104,8 @@ export class ProductsListFacade {
       price: `${row.price}`,
       quantity: row.quantity
     }).subscribe({
-      next: () => this.errorService.success('PRODUCT.PRODUCT_UPDATED'),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      next: () => this.notify.success('PRODUCT.PRODUCT_UPDATED'),
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 }

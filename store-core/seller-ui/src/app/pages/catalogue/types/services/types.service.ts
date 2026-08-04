@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
-import {StorageService} from '../../../shared/services/storage.service';
 import {PageT, StorePageRequest} from '../../../shared/table/table.types';
 import {EntityExists} from '../../../shared/models/entity.model';
 import {CreatedEntity, PersistableProductType, ReadableProductType} from '../models/product-type.model';
@@ -12,7 +11,6 @@ import {CreatedEntity, PersistableProductType, ReadableProductType} from '../mod
 })
 export class TypesService {
   private crudService = inject(CrudService);
-  private storageService = inject(StorageService);
 
 
 

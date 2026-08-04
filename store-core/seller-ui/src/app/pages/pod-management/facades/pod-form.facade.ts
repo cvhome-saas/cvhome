@@ -2,14 +2,14 @@ import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {PodFormService} from '../services/pod-form.service';
 import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 
 @Injectable()
 export class PodFormFacade {
   readonly formService = inject(PodFormService);
   private readonly podService = inject(PodService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly loader = signal<boolean>(false);
 
@@ -39,7 +39,7 @@ export class PodFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

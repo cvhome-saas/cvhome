@@ -2,14 +2,14 @@ import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {validators} from '../../../shared/validation/validators';
 import {slugify} from '../../../shared/utils/slugifying';
-import {ErrorService} from '../../../shared/services/error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
 import {ContentDescription, ReadableContentPage} from '../../models/content.model';
 
 @Injectable()
 export class AddPageFormService {
   private readonly fb = inject(FormBuilder);
-  private readonly errorService = inject(ErrorService);
+  private readonly notify = inject(NotificationService);
 
   createForm(defaultLanguage: string): FormGroup {
     return this.fb.group({
@@ -86,7 +86,7 @@ export class AddPageFormService {
       }
     }
     if (invalid.length > 0) {
-      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
     }
     return invalid;
   }

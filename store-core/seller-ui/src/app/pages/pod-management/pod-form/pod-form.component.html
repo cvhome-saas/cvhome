@@ -27,21 +27,12 @@
       <div class="form-group row">
         <label class="label col-sm-3 col-form-label" for="name">{{ 'POD_FORM.NAME' | translate }}</label>
         <div class="col-sm-9">
-          <input [status]="facade.formService.name.invalid && (facade.formService.name.dirty || facade.formService.name.touched) ? 'danger' : 'basic'"
-                 formControlName="name"
-                 fullWidth id="name" nbInput
+          <input formControlName="name"
+                 fullWidth id="name" nbInput ngxControlStatus
                  placeholder="{{ 'POD_FORM.NAME' | translate }}"
                  type="text">
-          @if (facade.formService.name.invalid && (facade.formService.name.dirty || facade.formService.name.touched)) {
-            <div class="caption status-danger mt-1">
-              @if (facade.formService.name.errors?.['required']) {
-                <div>{{ 'POD_FORM.NAME_REQUIRED' | translate }}</div>
-              }
-              @if (facade.formService.name.errors?.['pattern']) {
-                <div>{{ 'POD_FORM.NAME_PATTERN' | translate }}</div>
-              }
-            </div>
-          }
+          <ngx-field-error [control]="facade.formService.name"
+                           [messages]="{required: 'POD_FORM.NAME_REQUIRED', pattern: 'POD_FORM.NAME_PATTERN'}"/>
         </div>
       </div>
 
@@ -49,20 +40,11 @@
         <div class="form-group row">
           <label class="label col-sm-3 col-form-label" for="endpoint">{{ 'POD_FORM.ENDPOINT_URL' | translate }}</label>
           <div class="col-sm-9">
-            <input [status]="facade.formService.endpointUrl.invalid && (facade.formService.endpointUrl.dirty || facade.formService.endpointUrl.touched) ? 'danger' : 'basic'"
-                   formControlName="endpoint" fullWidth id="endpoint" nbInput
+            <input formControlName="endpoint" fullWidth id="endpoint" nbInput ngxControlStatus
                    placeholder="{{ 'POD_FORM.ENDPOINT_URL' | translate }}"
                    type="text">
-            @if (facade.formService.endpointUrl.invalid && (facade.formService.endpointUrl.dirty || facade.formService.endpointUrl.touched)) {
-              <div class="caption status-danger mt-1">
-                @if (facade.formService.endpointUrl.errors?.['required']) {
-                  <div>{{ 'POD_FORM.ENDPOINT_URL_REQUIRED' | translate }}</div>
-                }
-                @if (facade.formService.endpointUrl.errors?.['pattern']) {
-                  <div>{{ 'POD_FORM.ENDPOINT_URL_PATTERN' | translate }}</div>
-                }
-              </div>
-            }
+            <ngx-field-error [control]="facade.formService.endpointUrl"
+                             [messages]="{required: 'POD_FORM.ENDPOINT_URL_REQUIRED', pattern: 'POD_FORM.ENDPOINT_URL_PATTERN'}"/>
           </div>
         </div>
         <div class="form-group row">

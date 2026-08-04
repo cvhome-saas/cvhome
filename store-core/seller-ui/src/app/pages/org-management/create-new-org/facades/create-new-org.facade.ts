@@ -1,7 +1,8 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {OrgService} from '../../services/org.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {CreateNewOrgFormService} from '../services/create-new-org-form.service';
 
 @Injectable()
@@ -9,7 +10,8 @@ export class CreateNewOrgFacade {
   private readonly formService = inject(CreateNewOrgFormService);
   private readonly orgService = inject(OrgService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly subscriptionPlans = signal<string[]>([]);
@@ -25,7 +27,7 @@ export class CreateNewOrgFacade {
         this.formService.setSubscriptionPlans(plans);
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -35,11 +37,11 @@ export class CreateNewOrgFacade {
     this.orgService.createOrg(this.form.value).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success('ORG_FORM.ORG_CREATED');
+        this.notify.success('ORG_FORM.ORG_CREATED');
         this.goToBack();
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
         this.loader.set(false);
       }
     });

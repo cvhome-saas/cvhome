@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {Logo} from '../../models/store';
 import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
@@ -11,7 +12,8 @@ export class StoreBrandingLogoFacade {
   private readonly formBuilder = inject(FormBuilder);
   private readonly storeService = inject(StoreService);
   private readonly translate = inject(TranslateService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loadingButton = signal<boolean>(false);
   readonly showRemoveButton = signal<boolean>(false);
@@ -99,12 +101,12 @@ export class StoreBrandingLogoFacade {
     this.loadingButton.set(true);
     this.storeService.addStoreLogo(storeId, this.logoFile).subscribe({
       next: () => {
-        this.errorService.success('STORE_BRANDING.LOGO_SAVED');
+        this.notify.success('STORE_BRANDING.LOGO_SAVED');
         this.loadingButton.set(false);
       },
       error: (err) => {
         this.loadingButton.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -123,10 +125,10 @@ export class StoreBrandingLogoFacade {
     }
     this.storeService.removeStoreLogo(storeId).subscribe({
       next: () => {
-        this.errorService.success('STORE_BRANDING.LOGO_REMOVED');
+        this.notify.success('STORE_BRANDING.LOGO_REMOVED');
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

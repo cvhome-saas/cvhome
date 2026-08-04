@@ -1,7 +1,8 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {UserService} from '../../../shared/services/user.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {UserFormFormService} from '../services/user-form-form.service';
 import {User} from '../../../shared/models/user';
 import {NEW_USER_SIDE_MENU_LINKS, USER_DETAILS_SIDE_MENU_LINKS} from '../../constants/user-management.constants';
@@ -10,7 +11,8 @@ import {NEW_USER_SIDE_MENU_LINKS, USER_DETAILS_SIDE_MENU_LINKS} from '../../cons
 export class UserFormFacade {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly formService = inject(UserFormFormService);
 
   readonly loader = signal<boolean>(false);
@@ -75,7 +77,7 @@ export class UserFormFacade {
         }
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
 
@@ -101,7 +103,7 @@ export class UserFormFacade {
     const userData = this.form.value;
 
     if (newRoles.length === 0) {
-      this.errorService.warning('COMMON.ADDING_USER_ROLES_ERROR');
+      this.notify.warning('COMMON.ADDING_USER_ROLES_ERROR');
       this.loader.set(false);
       return;
     }
@@ -110,11 +112,11 @@ export class UserFormFacade {
       userData.id = user.id;
       this.userService.updateUser(userData, store).subscribe({
         next: () => {
-          this.errorService.success('USER_FORM.USER_UPDATED');
+          this.notify.success('USER_FORM.USER_UPDATED');
           this.loader.set(false);
         },
         error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
           this.loader.set(false);
         }
       });
@@ -122,11 +124,11 @@ export class UserFormFacade {
       this.userService.createUser(userData, store).subscribe({
         next: () => {
           this.loader.set(false);
-          this.errorService.success('USER_FORM.USER_CREATED');
+          this.notify.success('USER_FORM.USER_CREATED');
           this.router.navigate(['pages/user-management/users']);
         },
         error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
           this.loader.set(false);
         }
       });

@@ -1,5 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {map, Observable, of} from "rxjs";
+import {ApiError} from "../../../core/errors/api-error";
+import {CLIENT_ERROR_CODES} from "../../../core/errors/problem-detail.model";
 import {Router} from "@angular/router";
 import {Roles} from "../models/roles";
 import {CrudService} from "./crud.service";
@@ -27,6 +29,18 @@ export class AuthService {
     } else {
       return this.crudService.get<AuthenticationResponse>("/api/v1/auth/me")
         .pipe(map((it) => {
+          // uaa answers this endpoint with 200 and an *empty body* when nobody is signed in, not a 401.
+          // Reading `it.principal` then threw a TypeError, and the guard's catch-all treated that as
+          // "redirect to login" — the login flow worked by accident. Naming the condition makes it a
+          // typed failure the guard can branch on, and keeps a genuine 500 from being read as a logout.
+          if (!it?.principal?.claims) {
+            throw new ApiError({
+              code: CLIENT_ERROR_CODES.SESSION_MISSING,
+              category: 'UNAUTHENTICATED',
+              status: 401,
+              url: "/api/v1/auth/me",
+            });
+          }
           this.authUser = it.principal.claims;
           this.authUser.authorities = it.authorities.map(a => a.authority)
           return this.authUser;

@@ -5,7 +5,7 @@ import {filter, map} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AuthService, AuthUser} from '../../../../shared/services/auth.service';
 import {StoreService} from '../../../../shared/services/store.service';
-import {ErrorService} from '../../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../../core/errors/api-error.service';
 import {SelectedStoreService} from '../../../../shared/services/selected-store.service';
 import {SelectedLanguageService} from '../../../../shared/services/selected-language.service';
 import {ManagerStoreId, ManagerStore} from '../../../../shared/models/commons';
@@ -17,7 +17,7 @@ export class HeaderFacade {
   private readonly menuService = inject(NbMenuService);
   private readonly authService = inject(AuthService);
   private readonly storeService = inject(StoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly selectedLanguageService = inject(SelectedLanguageService);
 
@@ -51,7 +51,7 @@ export class HeaderFacade {
       .pipe(takeUntilDestroyed(destroyRef))
       .subscribe({
         next: (page) => this.stores.set(page.content),
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
 
     this.menuService.onItemClick()

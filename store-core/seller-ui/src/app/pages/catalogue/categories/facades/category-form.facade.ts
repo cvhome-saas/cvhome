@@ -4,7 +4,8 @@ import {FormArray, FormGroup} from '@angular/forms';
 import {CategoryFormService} from '../services/category-form.service';
 import {CategoryService} from '../services/category.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {zip} from 'rxjs';
@@ -17,7 +18,8 @@ export class CategoryFormFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly configService = inject(ConfigService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly loading = signal<boolean>(false);
@@ -72,7 +74,7 @@ export class CategoryFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -109,7 +111,7 @@ export class CategoryFormFacade {
       next: (res) => {
         this.isCodeUnique.set(!(res.exists && (this.categoryData.code !== code)));
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -139,7 +141,7 @@ export class CategoryFormFacade {
     });
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || categoryObject.code === '') {
-      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
       this.loading.set(false);
       return;
     }
@@ -168,14 +170,14 @@ export class CategoryFormFacade {
     });
 
     if (!this.isCodeUnique()) {
-      this.errorService.error('COMMON.CODE_EXISTS', null);
+      this.notify.dangerKey('COMMON.CODE_EXISTS');
       this.loading.set(false);
       return;
     }
 
     const invalidControls = this.findInvalidControls();
     if (invalidControls.length > 0) {
-      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
       this.loading.set(false);
       return;
     }
@@ -184,23 +186,23 @@ export class CategoryFormFacade {
       this.categoryService.updateCategory(this.categoryData.id, categoryObject).subscribe({
         next: () => {
           this.loading.set(false);
-          this.errorService.success('CATEGORY_FORM.CATEGORY_UPDATED');
+          this.notify.success('CATEGORY_FORM.CATEGORY_UPDATED');
         },
         error: (err) => {
           this.loading.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
     } else {
       this.categoryService.addCategory(categoryObject).subscribe({
         next: () => {
           this.loading.set(false);
-          this.errorService.success('CATEGORY_FORM.CATEGORY_CREATED');
+          this.notify.success('CATEGORY_FORM.CATEGORY_CREATED');
           this.router.navigate(['pages/catalogue/categories/categories-list']);
         },
         error: (err) => {
           this.loading.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
     }

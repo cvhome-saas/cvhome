@@ -5,7 +5,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {PaymentService} from '../services/payment.service';
 import {SelectedStoreService} from '../../shared/services/selected-store.service';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
+import {NotificationService} from '../../../core/notifications/notification.service';
 import {TableStateService} from '../../shared/table/table-state.service';
 import {StorePageRequest, PageT} from '../../shared/table/table.types';
 import {PaymentApproveComponent} from '../payment-approve/payment-approve';
@@ -28,7 +29,8 @@ export interface PaymentFilterPageRequest extends StorePageRequest, PaymentFilte
 export class PaymentListFacade {
   private readonly paymentService = inject(PaymentService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly dialogService = inject(NbDialogService);
   readonly tableState = inject(TableStateService<PaymentTransaction, PaymentFilterPageRequest>);
 
@@ -48,7 +50,7 @@ export class PaymentListFacade {
             this.refresh();
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -77,10 +79,10 @@ export class PaymentListFacade {
       }
       this.paymentService.approveTransaction(row.internalRef, {transactionNo}).subscribe({
         next: () => {
-          this.errorService.success('TRANSACTION.APPROVE_SUCCESS');
+          this.notify.success('TRANSACTION.APPROVE_SUCCESS');
           this.refresh();
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
     });
   }
@@ -88,10 +90,10 @@ export class PaymentListFacade {
   reject(row: PaymentTransaction): void {
     this.paymentService.rejectTransaction(row.internalRef).subscribe({
       next: () => {
-        this.errorService.success('TRANSACTION.REJECT_SUCCESS');
+        this.notify.success('TRANSACTION.REJECT_SUCCESS');
         this.refresh();
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -106,11 +108,11 @@ export class PaymentListFacade {
   private loadFilterOptions(): void {
     this.paymentService.getSupportedPaymentTypes().subscribe({
       next: (types) => this.paymentTypes.set(types),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
     this.paymentService.getSupportedPaymentStatuses().subscribe({
       next: (statuses) => this.paymentStatuses.set(statuses),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -131,7 +133,7 @@ export class PaymentListFacade {
         next: () => this.tableState.setLoading(false),
         error: (err) => {
           this.tableState.setLoading(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       })
     );

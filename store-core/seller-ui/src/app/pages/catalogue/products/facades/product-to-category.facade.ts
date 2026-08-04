@@ -4,7 +4,8 @@ import {ActivatedRoute} from '@angular/router';
 import {forkJoin, zip} from 'rxjs';
 import {CategoryService} from '../../categories/services/category.service';
 import {ProductService} from '../services/product.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {ReadableCategory} from '../../categories/models/category.model';
 
@@ -16,7 +17,8 @@ export class ProductToCategoryFacade {
   private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loading = signal<boolean>(false);
   readonly categories = signal<{ id: string; name: string }[]>([]);
@@ -34,7 +36,7 @@ export class ProductToCategoryFacade {
           this.uniqueCode = params['code'];
           this.load();
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -52,20 +54,20 @@ export class ProductToCategoryFacade {
   private addProductToCategory(categoryId: string): void {
     this.productService.addProductToCategory(this.uniqueCode, categoryId).subscribe({
       next: () => {
-        this.errorService.success('PRODUCT.PRODUCT_TO_CATEGORY_ADDED');
+        this.notify.success('PRODUCT.PRODUCT_TO_CATEGORY_ADDED');
         this.load();
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
   private removeProductFromCategory(categoryId: string): void {
     this.productService.removeProductFromCategory(this.uniqueCode, categoryId).subscribe({
       next: () => {
-        this.errorService.success('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED');
+        this.notify.success('PRODUCT.PRODUCT_TO_CATEGORY_REMOVED');
         this.load();
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -84,7 +86,7 @@ export class ProductToCategoryFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

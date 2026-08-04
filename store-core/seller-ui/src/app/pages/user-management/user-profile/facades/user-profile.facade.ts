@@ -1,12 +1,12 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {UserService} from '../../../shared/services/user.service';
 import {User} from '../../../shared/models/user';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 
 @Injectable()
 export class UserProfileFacade {
   private readonly userService = inject(UserService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly user = signal<User | null>(null);
   readonly loading = signal<boolean>(false);
@@ -20,7 +20,7 @@ export class UserProfileFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

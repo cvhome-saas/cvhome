@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StorePaymentConfigurationFormService} from '../services/store-payment-configuration.form.service';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
@@ -23,7 +24,8 @@ export class StorePaymentConfigurationFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly isSubmited = signal<boolean>(false);
   readonly store = signal<ReadableMerchantStoreWithPod>(null);
@@ -56,7 +58,7 @@ export class StorePaymentConfigurationFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -95,11 +97,11 @@ export class StorePaymentConfigurationFacade {
 
     zip(...requests).subscribe({
       next: () => {
-        this.errorService.success('STORE.PAYMENT_CONFIGURATION_UPDATED');
+        this.notify.success('STORE.PAYMENT_CONFIGURATION_UPDATED');
         this.init();
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

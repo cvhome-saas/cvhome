@@ -2,7 +2,8 @@ import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ErrorService} from "../../../shared/services/error.service";
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreService} from "../../services/store.service";
 import {TableStateService} from "../../../shared/table/table-state.service";
 import {PageT, StorePageRequest} from "../../../shared/table/table.types";
@@ -14,7 +15,8 @@ export class StoresListFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   public readonly tableState = inject(TableStateService<ManagerStore, StorePageRequest>);
 
   init(): void {
@@ -43,7 +45,7 @@ export class StoresListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -62,11 +64,11 @@ export class StoresListFacade {
       if (res) {
         this.storeService.deleteStore(row.id.id).subscribe({
           next: () => {
-            this.errorService.success('USER_FORM.USER_REMOVED');
+            this.notify.success('USER_FORM.USER_REMOVED');
             this.loadStores();
           },
           error: (err) => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            this.apiErrors.notify(err);
           }
         });
       }

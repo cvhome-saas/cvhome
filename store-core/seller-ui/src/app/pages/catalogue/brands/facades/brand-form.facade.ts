@@ -4,7 +4,8 @@ import {Router} from '@angular/router';
 import {BrandFormService} from '../services/brand-form.service';
 import {BrandService} from '../services/brand.service';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {slugify} from '../../../shared/utils/slugifying';
 import {ReadableMerchantStore} from '../../../store-management/models/store';
 import {SupportedLanguageCode} from '../../../shared/services/config.service';
@@ -16,7 +17,8 @@ export class BrandFormFacade {
   private readonly brandService = inject(BrandService);
   private readonly configService = inject(ConfigService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly isCodeUnique = signal<boolean>(true);
@@ -49,7 +51,7 @@ export class BrandFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -68,7 +70,7 @@ export class BrandFormFacade {
       next: (res) => {
         this.isCodeUnique.set(!(res.exists && (this.brandData.code !== code)));
       },
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -96,7 +98,7 @@ export class BrandFormFacade {
     });
 
     if (tmpObj.name === '' || tmpObj.friendlyUrl === '' || brandObject.code === '') {
-      this.errorService.error('COMMON.FILL_REQUIRED_FIELDS', null);
+      this.notify.dangerKey('COMMON.FILL_REQUIRED_FIELDS');
       return;
     }
 
@@ -124,7 +126,7 @@ export class BrandFormFacade {
     });
 
     if (!this.isCodeUnique()) {
-      this.errorService.error('COMMON.CODE_EXISTS', null);
+      this.notify.dangerKey('COMMON.CODE_EXISTS');
       return;
     }
 
@@ -134,23 +136,23 @@ export class BrandFormFacade {
       this.brandService.updateBrand(this.brandData.id, brandObject).subscribe({
         next: () => {
           this.loader.set(false);
-          this.errorService.success('BRAND.BRAND_UPDATED');
+          this.notify.success('BRAND.BRAND_UPDATED');
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
     } else {
       this.brandService.createBrand(brandObject).subscribe({
         next: () => {
           this.loader.set(false);
-          this.errorService.success('BRAND.BRAND_CREATED');
+          this.notify.success('BRAND.BRAND_CREATED');
           this.router.navigate(['pages/catalogue/brands/brands-list']);
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
     }

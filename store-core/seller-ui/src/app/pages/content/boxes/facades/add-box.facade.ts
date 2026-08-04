@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../../shared/services/config.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {ContentService} from '../../services/content.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreService} from '../../../store-management/services/store.service';
@@ -19,7 +20,8 @@ export class AddBoxFacade {
   private readonly router = inject(Router);
   private readonly configService = inject(ConfigService);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly storeService = inject(StoreService);
 
@@ -82,7 +84,7 @@ export class AddBoxFacade {
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }
@@ -97,7 +99,7 @@ export class AddBoxFacade {
     this.contentService.checkCodeBoxExist(code, this.params)
       .subscribe({
         next: (res) => this.isCodeExists.set(res.exists),
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -154,11 +156,11 @@ export class AddBoxFacade {
         .subscribe({
           next: () => {
             this.loader.set(false);
-            this.errorService.success('CONTENT.CONTENT_UPDATED');
+            this.notify.success('CONTENT.CONTENT_UPDATED');
             this.router.navigate(['/pages/content/boxes/list']);
           },
           error: (err) => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            this.apiErrors.notify(err);
             this.loader.set(false);
           }
         });
@@ -167,11 +169,11 @@ export class AddBoxFacade {
         .subscribe({
           next: () => {
             this.loader.set(false);
-            this.errorService.success('PRODUCT.PRODUCT_UPDATED');
+            this.notify.success('PRODUCT.PRODUCT_UPDATED');
             this.router.navigate(['/pages/content/boxes/list']);
           },
           error: (err) => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            this.apiErrors.notify(err);
             this.loader.set(false);
           }
         });
@@ -188,7 +190,7 @@ export class AddBoxFacade {
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }

@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {Banner} from '../../models/store';
 import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
@@ -11,7 +12,8 @@ export class StoreBrandingBannerFacade {
   private readonly formBuilder = inject(FormBuilder);
   private readonly storeService = inject(StoreService);
   private readonly translate = inject(TranslateService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loadingButton = signal<boolean>(false);
   readonly showRemoveButton = signal<boolean>(false);
@@ -99,12 +101,12 @@ export class StoreBrandingBannerFacade {
     this.loadingButton.set(true);
     this.storeService.addStoreBanner(storeId, this.bannerFile).subscribe({
       next: () => {
-        this.errorService.success('STORE_BRANDING.BANNER_SAVED');
+        this.notify.success('STORE_BRANDING.BANNER_SAVED');
         this.loadingButton.set(false);
       },
       error: (err) => {
         this.loadingButton.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -123,10 +125,10 @@ export class StoreBrandingBannerFacade {
     }
     this.storeService.removeStoreBanner(storeId).subscribe({
       next: () => {
-        this.errorService.success('STORE_BRANDING.BANNER_REMOVED');
+        this.notify.success('STORE_BRANDING.BANNER_REMOVED');
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

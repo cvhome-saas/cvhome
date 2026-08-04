@@ -4,7 +4,7 @@ import {Lightbox} from 'ngx-lightbox';
 import {IAlbum} from 'ngx-lightbox/lightbox-event.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
 import {FileSystemFileEntry, NgxFileDropEntry} from 'ngx-file-drop';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {ContentService} from '../../services/content.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -20,7 +20,7 @@ export interface FileImage extends IAlbum {
 export class FilesFacade {
   private readonly contentService = inject(ContentService);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly lightbox = inject(Lightbox);
 
@@ -37,7 +37,7 @@ export class FilesFacade {
           this.store.set(it);
         },
         error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         },
         complete: () => {
           this.getFiles();
@@ -63,7 +63,7 @@ export class FilesFacade {
       error: (err) => {
         this.images.set([]);
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       },
       complete: () => {
         this.loader.set(false);
@@ -87,7 +87,7 @@ export class FilesFacade {
           },
           error: (err) => {
             this.loader.set(false);
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            this.apiErrors.notify(err);
           },
         });
       } else {
@@ -148,7 +148,7 @@ export class FilesFacade {
         },
         error: (err) => {
           this.loader.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         },
       });
     }

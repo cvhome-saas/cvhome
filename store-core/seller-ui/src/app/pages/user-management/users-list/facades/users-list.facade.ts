@@ -3,7 +3,8 @@ import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UserService} from '../../../shared/services/user.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
@@ -16,7 +17,8 @@ export class UsersListFacade {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(NbDialogService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   readonly tableState = inject(TableStateService<User, StorePageRequest>);
 
@@ -52,7 +54,7 @@ export class UsersListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -80,11 +82,11 @@ export class UsersListFacade {
         const store = this.store();
         this.userService.deleteUser(row.id, store).subscribe({
           next: () => {
-            this.errorService.success('USER_FORM.USER_REMOVED');
+            this.notify.success('USER_FORM.USER_REMOVED');
             this.loadData();
           },
           error: (err) => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
+            this.apiErrors.notify(err);
           }
         });
       }

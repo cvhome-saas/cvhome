@@ -3,7 +3,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {zip} from 'rxjs';
 import {ProductImageService} from '../services/product-image.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {ReadableImage} from '../models/product.model';
 
@@ -12,7 +13,8 @@ export class ProductsImagesFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly productImageService = inject(ProductImageService);
   private readonly selectedStoreService = inject(SelectedStoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly images = signal<ReadableImage[]>(null);
   readonly loading = signal<boolean>(false);
@@ -32,7 +34,7 @@ export class ProductsImagesFacade {
           this.deleteImageUrl.set(this.productImageService.removeImageUrl(this.uniqueCode));
           this.load();
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
@@ -46,7 +48,7 @@ export class ProductsImagesFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -56,11 +58,11 @@ export class ProductsImagesFacade {
     this.productImageService.removeImage(this.uniqueCode, imageId).subscribe({
       next: () => {
         this.load();
-        this.errorService.success('PRODUCT.PRODUCT_UPDATED');
+        this.notify.success('PRODUCT.PRODUCT_UPDATED');
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -71,18 +73,18 @@ export class ProductsImagesFacade {
       next: () => this.load(),
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
 
   errorImage(event: string): void {
-    this.errorService.error('COMMON.' + event, null);
+    this.notify.dangerKey('COMMON.' + event);
   }
 
   addedImage(): void {
     this.load();
-    this.errorService.success('PRODUCT.PRODUCT_UPDATED');
+    this.notify.success('PRODUCT.PRODUCT_UPDATED');
   }
 
   fileAdded(): void {

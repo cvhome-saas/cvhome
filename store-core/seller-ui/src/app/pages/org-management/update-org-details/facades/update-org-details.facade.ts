@@ -3,7 +3,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OrgService} from '../../services/org.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {UpdateOrgDetailsFormService} from '../services/update-org-details-form.service';
 import {Org} from '../../model/org';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
@@ -14,7 +15,8 @@ export class UpdateOrgDetailsFacade {
   private readonly orgService = inject(OrgService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly loadingInfo = signal<boolean>(false);
@@ -40,13 +42,13 @@ export class UpdateOrgDetailsFacade {
       },
       error: (err) => {
         this.loadingInfo.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
 
     this.orgService.getSubscriptionPlans().subscribe({
       next: (plans) => this.subscriptionPlans.set(plans),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 
@@ -57,11 +59,11 @@ export class UpdateOrgDetailsFacade {
     this.loader.set(true);
     this.orgService.updateOrg(currentOrg.id.id, this.form.value).subscribe({
       next: () => {
-        this.errorService.success('ORG_FORM.ORG_UPDATED');
+        this.notify.success('ORG_FORM.ORG_UPDATED');
         this.loader.set(false);
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
         this.loader.set(false);
       }
     });

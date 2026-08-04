@@ -12,6 +12,8 @@ import {
 import {Pod} from '../../store-management/services/pod.service';
 import {PodFormFacade} from '../facades/pod-form.facade';
 import {PodFormService} from '../services/pod-form.service';
+import {ControlStatusDirective} from '../../shared/components/field-error/control-status.directive';
+import {FieldErrorComponent} from '../../shared/components/field-error/field-error.component';
 
 @Component({
   selector: 'ngx-pod-form',
@@ -24,7 +26,9 @@ import {PodFormService} from '../services/pod-form.service';
     NbInputModule,
     NbOptionModule,
     NbSelectModule,
-    NbSpinnerModule
+    NbSpinnerModule,
+    ControlStatusDirective,
+    FieldErrorComponent
   ],
   templateUrl: './pod-form.component.html',
   styleUrls: ['./pod-form.component.scss'],

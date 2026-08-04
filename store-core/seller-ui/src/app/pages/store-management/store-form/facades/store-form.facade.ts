@@ -3,7 +3,8 @@ import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {ConfigService} from '../../../shared/services/config.service';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {Pods, PodService} from '../../services/pod.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {StoreFormService} from '../services/store-form.service';
@@ -19,7 +20,8 @@ export class StoreFormFacade {
   private readonly configService = inject(ConfigService);
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly podService = inject(PodService);
 
@@ -90,7 +92,7 @@ export class StoreFormFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -115,28 +117,28 @@ export class StoreFormFacade {
         storeObj.id = storeInput.id;
         this.storeService.updateStore(storeObj).subscribe({
           next: () => {
-            this.errorService.success('STORE_FORM.STORE_UPDATED');
+            this.notify.success('STORE_FORM.STORE_UPDATED');
             this.router.navigate(['pages/store-management/stores-list']);
           },
-          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+          error: (err) => this.apiErrors.notify(err)
         });
       } else {
         this.storeService.checkIfStoreExist(this.form.value.name).subscribe({
           next: (res) => {
             if (res.exists) {
-              this.errorService.success('COMMON.NAME_EXISTS');
+              this.notify.success('COMMON.NAME_EXISTS');
             } else {
               this.storeService.createStore(storeObj).subscribe({
                 next: (createdStore) => {
                   this.selectedStoreService.newStore(createdStore);
-                  this.errorService.success('STORE_FORM.STORE_CREATED');
+                  this.notify.success('STORE_FORM.STORE_CREATED');
                   this.router.navigate(['pages/store-management/stores-list']);
                 },
-                error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+                error: (err) => this.apiErrors.notify(err)
               });
             }
           },
-          error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+          error: (err) => this.apiErrors.notify(err)
         });
       }
     }
@@ -162,7 +164,7 @@ export class StoreFormFacade {
   checkName(_event: Event): void {
     this.storeService.checkIfStoreExist(this.form.value.name).subscribe({
       next: (res) => this.isNameUnique.set(!res.exists),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 

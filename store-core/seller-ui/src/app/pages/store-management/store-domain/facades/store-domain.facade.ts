@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreDomainFormService} from '../services/store-domain.form.service';
 import {StoreDomainComponentValidatorContext} from '../store-domain.validator';
 import {DatatablePageEvent} from '../../../shared/table/table-events';
@@ -17,7 +18,8 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly isSubmited = signal<boolean>(false);
   readonly store = signal<string>('');
@@ -82,7 +84,7 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       },
       complete: () => {
         this.loading.set(false);
@@ -99,12 +101,12 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.storeService.removeDomain(this.store(), domainStr).subscribe({
       next: () => {
         this.loading.set(false);
-        this.errorService.success('STORE.DOMAIN_REMOVED');
+        this.notify.success('STORE.DOMAIN_REMOVED');
         this.getAllocations();
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -114,12 +116,12 @@ export class StoreDomainFacade implements StoreDomainComponentValidatorContext {
     this.storeService.allocateDomain(this.store(), domainStr).subscribe({
       next: () => {
         this.loading.set(false);
-        this.errorService.success('STORE.DOMAIN_CREATED');
+        this.notify.success('STORE.DOMAIN_CREATED');
         this.getAllocations();
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       },
       complete: () => {
         this.form.reset();

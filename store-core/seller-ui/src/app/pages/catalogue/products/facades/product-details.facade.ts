@@ -2,7 +2,7 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {ProductService} from '../services/product.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {SelectedStoreService} from '../../../shared/services/selected-store.service';
 import {zip} from 'rxjs';
 import {ReadableProductDefinition} from '../models/product.model';
@@ -11,7 +11,7 @@ import {ReadableProductDefinition} from '../models/product.model';
 export class ProductDetailsFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly productService = inject(ProductService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
 
   readonly product = signal<ReadableProductDefinition>({});
@@ -28,14 +28,14 @@ export class ProductDetailsFacade {
             this.loadProduct(uniqueCode);
           }
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 
   private loadProduct(code: string): void {
     this.productService.getProductDefinitionById(code).subscribe({
       next: (product) => this.product.set(product),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 }

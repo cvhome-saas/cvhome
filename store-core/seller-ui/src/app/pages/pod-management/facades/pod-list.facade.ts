@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 import {TableStateService} from '../../shared/table/table-state.service';
 import {PageRequest} from '../../shared/table/table.types';
 import {DatatablePageEvent} from '../../shared/table/table-events';
@@ -10,7 +10,7 @@ import {DatatablePageEvent} from '../../shared/table/table-events';
 export class PodListFacade {
   private readonly podService = inject(PodService);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
   readonly tableState = inject(TableStateService<Pod, PageRequest>);
 
   init(): void {
@@ -26,7 +26,7 @@ export class PodListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -43,7 +43,7 @@ export class PodListFacade {
   onDelete(row: Pod): void {
     this.podService.delete(row.id.id).subscribe({
       next: () => this.loadPage(),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 }

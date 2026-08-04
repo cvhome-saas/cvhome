@@ -3,7 +3,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OrgService} from '../../services/org.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {OrgChangePasswordFormService} from '../services/org-change-password-form.service';
 import {Org} from '../../model/org';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
@@ -14,7 +15,8 @@ export class OrgChangePasswordFacade {
   private readonly orgService = inject(OrgService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly org = signal<Org | null>(null);
@@ -35,7 +37,7 @@ export class OrgChangePasswordFacade {
         this.org.set(res);
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -51,11 +53,11 @@ export class OrgChangePasswordFacade {
 
     this.orgService.changeOrgPassword(currentOrg.id.id, passwords).subscribe({
       next: () => {
-        this.errorService.success('ORG_FORM.PASSWORD_CHANGED_SUCCESSFULLY');
+        this.notify.success('ORG_FORM.PASSWORD_CHANGED_SUCCESSFULLY');
         this.loader.set(false);
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
         this.loader.set(false);
       }
     });

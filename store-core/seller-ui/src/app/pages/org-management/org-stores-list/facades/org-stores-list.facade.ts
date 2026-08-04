@@ -4,7 +4,7 @@ import {map, mergeMap} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {TableStateService} from '../../../shared/table/table-state.service';
 import {OrgService} from '../../services/org.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {Org} from '../../model/org';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
 import {PageT, StorePageRequest} from '../../../shared/table/table.types';
@@ -17,7 +17,7 @@ export class OrgStoresListFacade {
   private readonly orgService = inject(OrgService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly org = signal<Org | null>(null);
   readonly selectedItem = signal<string>('2');
@@ -34,7 +34,7 @@ export class OrgStoresListFacade {
         this.loadStores();
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -63,7 +63,7 @@ export class OrgStoresListFacade {
       },
       error: (err) => {
         this.tableState.setLoading(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
