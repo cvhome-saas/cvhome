@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {ConfigService} from './config.service';
 import {Language} from '../models/Language';
 
@@ -7,9 +7,10 @@ import {Language} from '../models/Language';
 })
 export class SelectedLanguageService {
   public static LANGUAGE_ID_KEY = "lang";
+  private readonly configService = inject(ConfigService);
   private _languages: Language[] = [];
 
-  constructor(private configService: ConfigService) {
+  constructor() {
     this._languages = this.configService.getListOfGlobalLanguages();
     if (this.current() == undefined || this.current() == '') {
       this.select(this._languages[0].code)

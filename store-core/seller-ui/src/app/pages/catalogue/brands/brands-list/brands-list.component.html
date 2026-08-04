@@ -8,27 +8,26 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button [disabled]="params.store==undefined||params.store==''"
-                [routerLink]="['/pages/catalogue/brands/create-brand']" nbButton
+        <button (click)="facade.createBrand()" [disabled]="!facade.store()" nbButton
                 status="success">
-          <label>{{ 'COMPONENTS.CREATE_BRAND' | translate }}</label>
+          <span>{{ 'COMPONENTS.CREATE_BRAND' | translate }}</span>
         </button>
 
       </div>
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <ngx-datatable
-      (page)="onPageEvent($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="page.content"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
       class="material"
       rowHeight="auto">
 
@@ -51,10 +50,10 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary">
+          <button (click)="facade.onEdit(row)" nbButton shape="round" size="small" status="primary">
             <nb-icon icon="edit"></nb-icon>
           </button>
-          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
+          <button (click)="facade.onDelete(row)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"></nb-icon>
           </button>
         </ng-template>

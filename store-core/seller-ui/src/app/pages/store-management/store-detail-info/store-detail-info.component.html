@@ -1,1 +1,3 @@
-<ngx-store-form *ngIf="store" [store]="store" title="STORE.STORE_INFORMATION"></ngx-store-form>
+@if (facade.store()) {
+  <ngx-store-form [store]="facade.store()" title="STORE.STORE_INFORMATION"></ngx-store-form>
+}

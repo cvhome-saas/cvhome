@@ -13,6 +13,6 @@ import {SignUpFormComponent} from "../components/sign-up-form/sign-up-form.compo
   styleUrl: './sign-up.component.css'
 })
 export class SignUpComponent {
-  title: string = 'Create an account!';
-  desc: string = 'Its just a few steps and you will be one of our amazing clients.';
+  title = 'Create an account!';
+  desc = 'Its just a few steps and you will be one of our amazing clients.';
 }

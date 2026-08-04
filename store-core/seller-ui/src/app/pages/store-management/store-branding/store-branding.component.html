@@ -8,9 +8,11 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
-          </nb-option>
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          @for (item of facade.sideMenuLinks; track item.id) {
+            <nb-option (click)="facade.route(item.link)" [value]="item.id">{{ item.title }}
+            </nb-option>
+          }
         </nb-select>
       </div>
       <div class="col col-lg-2">
@@ -18,7 +20,9 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <ngx-store-branding-logo *ngIf="store" [store]="store"/>
-    <ngx-store-branding-banner *ngIf="store" [store]="store"/>
+    @if (facade.store()) {
+      <ngx-store-branding-logo [store]="facade.store()"/>
+      <ngx-store-branding-banner [store]="facade.store()"/>
+    }
   </nb-card-body>
 </nb-card>

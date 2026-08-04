@@ -1,50 +1,56 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CrudService} from '../../shared/services/crud.service';
+import {PageT, StorePageRequest} from '../../shared/table/table.types';
+import {
+  PersistableOrderStatusHistory,
+  ReadableCountry,
+  ReadableOrder,
+  ReadableOrderStatusHistory,
+  ReadableZone,
+  UpdateOrderPayload
+} from '../models/order.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrdersService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService
-  ) {
-  }
 
-  getOrders(params): Observable<any> {
+  getOrders(params: StorePageRequest): Observable<PageT<ReadableOrder>> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders`, params);
   }
 
-  getOrderDetails(orderID): Observable<any> {
+  getOrderDetails(orderID: number | string): Observable<ReadableOrder> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}`);
   }
 
-  getCountry(): Observable<any> {
+  getCountry(): Observable<ReadableCountry[]> {
     return this.crudService.get(`/spg/checkout/api/v1/country`)
   }
 
-  getBillingZone(value): Observable<any> {
+  getBillingZone(value: string): Observable<ReadableZone[]> {
     return this.crudService.get(`/spg/checkout/api/v1/zones?code=${value}`)
   }
 
-  getHistory(orderID): Observable<any> {
+  getHistory(orderID: number | string): Observable<ReadableOrderStatusHistory[]> {
     return this.crudService.get(`/spg/checkout/api/v1/private/orders/${orderID}/history`)
   }
 
-  addHistory(orderID, param): Observable<any> {
+  addHistory(orderID: number | string, param: PersistableOrderStatusHistory): Observable<void> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/history`, param);
   }
 
-  updateOrder(orderID, param): Observable<any> {
+  updateOrder(orderID: number | string, param: UpdateOrderPayload): Observable<void> {
     return this.crudService.patch(`/spg/checkout/api/v1/private/orders/${orderID}/customer`, param);
   }
 
-  refundOrder(orderID): Observable<any> {
+  refundOrder(orderID: number | string): Observable<void> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/refund`, {});
   }
 
-  captureOrder(orderID): Observable<any> {
+  captureOrder(orderID: number | string): Observable<void> {
     return this.crudService.post(`/spg/checkout/api/v1/private/orders/${orderID}/capture`, {});
   }
 

@@ -1,14 +1,16 @@
-<div [nbSpinner]="loading" nbSpinnerSize="large" nbSpinnerStatus="primary">
-  <p *ngIf="loaded" class="top-20">
-    <ngx-image-uploading
-      (error)="errorImage($event)"
-      (fileAdded)="fileAdded($event)"
-      (remove)="removeImage($event)"
-      (success)="addedImage($event)"
-      (update)="updateImage($event)"
-      [addImageUrl]="addImageUrl"
-      [deleteImageUrl]="deleteImageUrl"
-      [images]="images">
-    </ngx-image-uploading>
-  </p>
+<div [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  @if (facade.loaded()) {
+    <p class="top-20">
+      <ngx-image-uploading
+        (uploadError)="facade.errorImage($event)"
+        (fileAdded)="facade.fileAdded()"
+        (remove)="facade.removeImage($event)"
+        (success)="facade.addedImage()"
+        (update)="facade.updateImage($event)"
+        [addImageUrl]="facade.addImageUrl()"
+        [deleteImageUrl]="facade.deleteImageUrl()"
+        [images]="facade.images()">
+      </ngx-image-uploading>
+    </p>
+  }
 </div>

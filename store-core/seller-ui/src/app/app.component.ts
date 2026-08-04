@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {NbIconLibraries} from "@nebular/theme";
 
@@ -10,9 +10,11 @@ import {NbIconLibraries} from "@nebular/theme";
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  private iconLibraries = inject(NbIconLibraries);
+
   title = 'seller-ui';
 
-  constructor(private iconLibraries: NbIconLibraries) {
+  constructor() {
     this.iconLibraries.registerFontPack('font-awesome', {packClass: 'fa', iconClassPrefix: 'fa'});
     this.iconLibraries.setDefaultPack('font-awesome');
   }

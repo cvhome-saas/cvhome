@@ -1,20 +1,12 @@
-import {Component, DoCheck, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'ngx-org-management',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './org-management.component.html',
   styleUrls: ['./org-management.component.scss']
 })
-export class OrgManagementComponent implements OnInit, DoCheck {
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-
-  ngDoCheck() {
-  }
-
+export class OrgManagementComponent {
 }

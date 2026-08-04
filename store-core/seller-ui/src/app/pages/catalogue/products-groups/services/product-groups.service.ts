@@ -1,39 +1,41 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
+import {EntityExists} from '../../../shared/models/entity.model';
+import {PersistableProductGroup, ReadableProductGroup} from '../models/product-group.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductGroupsService {
-  constructor(private crudService: CrudService) {
+  private readonly crudService = inject(CrudService);
+
+  getListOfProductGroups(params: StorePageRequest): Observable<PageT<ReadableProductGroup>> {
+    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups`, params);
   }
 
-  getListOfProductGroups(param): Observable<any> {
-    return this.crudService.get(`/spg/catalog/api/v1/private/products/groups`, param);
-  }
-
-  createProductGroup(group): Observable<any> {
+  createProductGroup(group: PersistableProductGroup): Observable<PersistableProductGroup> {
     return this.crudService.post(`/spg/catalog/api/v1/private/products/groups`, group);
   }
 
-  getProductGroup(code, params?): Observable<any> {
+  getProductGroup(code: string, params?: Record<string, string>): Observable<ReadableProductGroup> {
     return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/${code}`, params);
   }
 
-  checkCode(code: string): Observable<any> {
+  checkCode(code: string): Observable<EntityExists> {
     return this.crudService.get(`/spg/catalog/api/v1/private/products/groups/unique`, {code});
   }
 
-  updateGroupActiveValue(group): Observable<any> {
+  updateGroupActiveValue(group: ReadableProductGroup): Observable<PersistableProductGroup> {
     return this.getProductGroup(group.code).pipe(
       switchMap(current => {
-        const updated = {
+        const updated: PersistableProductGroup = {
           code: current.code,
           active: group.active,
-          descriptions: (current.descriptions || []).map((d: any) => ({
+          descriptions: (current.descriptions || []).map((d) => ({
             language: d.language,
             name: d.name,
           }))
@@ -43,15 +45,15 @@ export class ProductGroupsService {
     );
   }
 
-  addProductToGroup(productId, groupCode): Observable<any> {
+  addProductToGroup(productId: number | string, groupCode: string): Observable<void> {
     return this.crudService.post(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`, {});
   }
 
-  removeProductFromGroup(productId, groupCode) {
+  removeProductFromGroup(productId: number | string, groupCode: string): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}/product/${productId}`);
   }
 
-  removeProductGroup(groupCode) {
+  removeProductGroup(groupCode: string): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/products/groups/${groupCode}`);
   }
 }

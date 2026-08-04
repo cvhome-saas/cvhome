@@ -1,96 +1,24 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../shared/services/error.service";
-import {ColumnMode} from "@swimlane/ngx-datatable";
-import {Page} from "../../../shared/models/Page";
-import {ProductRelationshipService} from "./services/product-relationship.service";
-import {zip} from "rxjs";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
+import {AfterViewInit, Component, DestroyRef, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule} from '@nebular/theme';
+import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {ProductRelatedFacade} from '../facades/product-related.facade';
+import {ProductAutoCompleteComponent} from '../../../shared/components/product-autocomplete/product-auto-complete.component';
 
 @Component({
-  selector: 'ngx-product-to-category',
-  standalone: false,
+  selector: 'ngx-product-related',
+  standalone: true,
+  imports: [TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NgxDatatableModule, ProductAutoCompleteComponent],
   templateUrl: './product-related.component.html',
-  styleUrls: ['./product-related.component.scss']
+  styleUrls: ['./product-related.component.scss'],
+  providers: [ProductRelatedFacade]
 })
-export class ProductRelatedComponent implements OnInit, AfterViewInit {
-
-  product: string;
-  perPageSize = 50;
-  params: any;
-  rows: Array<any> = [];
-  store: string;
-  page: Page = new Page();
+export class ProductRelatedComponent implements AfterViewInit {
   protected readonly ColumnMode = ColumnMode;
-
-  constructor(
-    private productRelationshipService: ProductRelationshipService,
-    private activatedRoute: ActivatedRoute,
-    private errorService: ErrorService,
-    private toastr: NbToastrService,
-    private translate: TranslateService,
-    private selectedStoreService: SelectedStoreService,
-  ) {
-    this.params = {store: '', count: this.perPageSize, page: 0};
-  }
-
-  ngOnInit() {
-  }
+  protected readonly facade = inject(ProductRelatedFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngAfterViewInit(): void {
-    zip([this.selectedStoreService.current(), this.activatedRoute.parent.params]).subscribe({
-      next: ([selectedStore, params]) => {
-        this.params.store = selectedStore;
-        this.product = params['code'];
-        this.loadRelationships();
-      }
-    });
-  }
-
-  loadRelationships() {
-    this.productRelationshipService.getRelationships(this.product)
-      .subscribe({
-        next: (group) => {
-          this.rows = group.products || [];
-          this.page.totalPages = 1;
-          this.page.totalElements = this.rows.length;
-          this.page.size = this.rows.length;
-        },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err),
-      });
-  }
-
-  onItemSelect(item: any) {
-    this.productRelationshipService.addProduct(this.product, item.id)
-      .subscribe({
-        next: () => {
-          this.rows = [...this.rows, item];
-          this.page.totalPages = 1;
-          this.page.totalElements = this.rows.length;
-          this.page.size = this.rows.length;
-          this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_ADDED'));
-        },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err),
-      });
-  }
-
-  onItemDeSelect(item: any) {
-    this.productRelationshipService.removeProduct(this.product, item.id)
-      .subscribe({
-        next: () => {
-          this.rows = this.rows.filter(it => it.id !== item.id);
-          this.page.totalPages = 1;
-          this.page.totalElements = this.rows.length;
-          this.page.size = this.rows.length;
-          this.toastr.success(this.translate.instant('PRODUCT_GROUP.PRODUCT_REMOVED'));
-        },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err),
-      });
-  }
-
-  setPage(pageInfo: any) {
-    this.page.pageNumber = pageInfo.offset;
+    this.facade.init(this.destroyRef);
   }
 }

@@ -1,31 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {StoreService} from '../services/store.service';
-import {ErrorService} from "../../shared/services/error.service";
+import {Component, OnInit, inject} from '@angular/core';
+import {StoreDetailInfoFacade} from './facades/store-detail-info.facade';
+import {StoreFormComponent} from '../store-form/store-form.component';
 
 @Component({
   selector: 'ngx-store-detail-info',
-  standalone: false,
+  standalone: true,
+  imports: [StoreFormComponent],
   templateUrl: './store-detail-info.component.html',
-  styleUrls: ['./store-detail-info.component.scss']
+  styleUrls: ['./store-detail-info.component.scss'],
+  providers: [StoreDetailInfoFacade]
 })
 export class StoreDetailInfoComponent implements OnInit {
-  store;
-
-  constructor(
-    private storeService: StoreService,
-    private activatedRoute: ActivatedRoute,
-    private errorService: ErrorService
-  ) {
-  }
+  protected readonly facade = inject(StoreDetailInfoFacade);
 
   ngOnInit() {
-    const store = this.activatedRoute.snapshot.paramMap.get('code');
-    this.storeService.getStore(store)
-      .subscribe(res => {
-        this.store = res;
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+    this.facade.init();
   }
 }

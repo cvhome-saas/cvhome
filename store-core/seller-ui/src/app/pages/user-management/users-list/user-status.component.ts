@@ -1,46 +1,18 @@
-import {Component, Input} from '@angular/core';
-
-import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from "@nebular/theme";
-import {UserService} from "../../shared/services/user.service";
-import {ErrorService} from "../../shared/services/error.service";
+import {Component, Input, inject} from '@angular/core';
+import {NbCheckboxModule} from '@nebular/theme';
+import {UserStatusFacade} from './facades/user-status.facade';
+import {User} from '../../shared/models/user';
 
 @Component({
   selector: 'ngx-user-status',
-  standalone: false,
+  standalone: true,
+  imports: [NbCheckboxModule],
   template: `
-    <nb-checkbox [checked]="rowData.active" (checkedChange)="clicked()"/>`,
+    <nb-checkbox [checked]="rowData?.active" (checkedChange)="facade.toggleStatus(rowData, store)"/>`,
+  providers: [UserStatusFacade]
 })
 export class UserStatusComponent {
   @Input() store: string;
-  @Input() rowData: any;
-
-  constructor(
-    private userService: UserService,
-    private translate: TranslateService,
-    private toastr: NbToastrService,
-    private errorService: ErrorService
-  ) {
-  }
-
-
-  clicked() {
-    if (this.rowData.active) {
-      this.userService.disable(this.rowData.id, this.store)
-        .subscribe(data => {
-          this.toastr.success(this.translate.instant('USER_FORM.USER_DISABLED'));
-        }, err => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        });
-    } else {
-      this.userService.enable(this.rowData.id, this.store)
-        .subscribe(data => {
-          this.toastr.success(this.translate.instant('USER_FORM.USER_ENABLED'));
-        }, err => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        });
-    }
-    this.rowData.active = !this.rowData.active;
-
-  }
+  @Input() rowData: User;
+  protected readonly facade = inject(UserStatusFacade);
 }

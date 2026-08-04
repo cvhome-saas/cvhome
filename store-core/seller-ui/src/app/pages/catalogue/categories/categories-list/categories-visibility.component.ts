@@ -1,38 +1,20 @@
-import {Component, Input} from '@angular/core';
-
-import {CategoryService} from '../services/category.service';
-import {TranslateService} from '@ngx-translate/core';
-import {NbToastrService} from "@nebular/theme";
-import {ErrorService} from "../../../shared/services/error.service";
+import {Component, Input, inject} from '@angular/core';
+import {NbCheckboxModule} from '@nebular/theme';
+import {CategoriesVisibilityFacade} from '../facades/categories-visibility.facade';
+import {PersistableCategory} from '../models/category.model';
 
 @Component({
   selector: 'ngx-categories-visibility',
-  standalone: false,
-
+  standalone: true,
+  imports: [NbCheckboxModule],
   template: `
-    <nb-checkbox [checked]="value" (checkedChange)="clicked()"/>`,
+    <nb-checkbox [checked]="value" (checkedChange)="facade.toggleVisibility(rowData, value)"/>`,
+  providers: [CategoriesVisibilityFacade]
 })
 export class CategoriesVisibilityComponent {
   @Input() value: boolean;
   @Input() store: string;
-  @Input() rowData: any;
+  @Input() rowData: PersistableCategory;
 
-  constructor(
-    private categoryService: CategoryService,
-    private translate: TranslateService,
-    private toastr: NbToastrService,
-    private errorService: ErrorService
-  ) {
-  }
-
-  clicked() {
-    this.rowData.visible = !this.value;
-    this.categoryService.updateCategoryVisibility(this.rowData)
-      .subscribe(res => {
-        this.toastr.success(this.translate.instant('CATEGORY.CATEGORY_VISIBILITY'));
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
-  }
-
+  protected readonly facade = inject(CategoriesVisibilityFacade);
 }

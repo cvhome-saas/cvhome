@@ -59,14 +59,12 @@ const COMPONENTS = [
 ]
 
 @NgModule({
-  declarations: [
-    ...COMPONENTS,
-  ],
   imports: [
     CommonModule,
     TranslateModule,
     NbThemeModule,
-    ...MODULES
+    ...MODULES,
+    ...COMPONENTS,
   ],
   exports: [
     ...COMPONENTS,

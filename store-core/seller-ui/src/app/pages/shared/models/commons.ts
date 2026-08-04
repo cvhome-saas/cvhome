@@ -12,7 +12,8 @@ export interface CreateStoreRequest {
   email?: Email;
 }
 
-export interface Store {
+/** Mirrors control-plane manager/commons/dto/ManagerStoreDto (record) */
+export interface ManagerStore {
   id: ManagerStoreId
   name: string
   orgId: IdentityId

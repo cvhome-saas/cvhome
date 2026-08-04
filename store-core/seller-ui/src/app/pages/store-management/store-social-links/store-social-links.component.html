@@ -7,13 +7,15 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
-          </nb-option>
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          @for (item of facade.sideMenuLinks; track item.id) {
+            <nb-option (click)="facade.route(item.link)" [value]="item.id">{{ item.title }}
+            </nb-option>
+          }
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button (click)="save()" nbButton status="success"
+        <button (click)="facade.save()" nbButton status="success"
                 type="submit">
           {{ 'COMMON.SAVE'  | translate }}
         </button>
@@ -22,33 +24,36 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form (ngSubmit)="save()" *ngIf="store" [formGroup]='form' class="mt-4">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-md-8">
-            <div *ngFor="let provider of providers" class="card shadow-sm mb-3 rounded-3 border-0 hover-shadow">
-              <div class="card-body py-3 px-4">
-                <div class="form-group">
-                  <div class="d-flex align-items-center mb-2">
-                    <i class="fab fa-{{provider.toLowerCase()}} fa-lg text-primary me-2"></i>
-                    <label [for]="'input_' + provider"
-                           class="h6 mb-0 text-primary">{{ 'STORE.SOCIAL_LINKS_PROVIDER_' + provider | translate }}</label>
-                  </div>
-                  <div class="input-group">
-                    <input [formControlName]="provider" [id]="'input_' + provider"
-                           [placeholder]="'Enter your ' + provider + ' profile link'"
-                           class="form-control"
-                           fullWidth
-                           nbInput
-                           type="text">
+    @if (facade.store()) {
+      <form (ngSubmit)="facade.save()" [formGroup]='facade.form' class="mt-4">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              @for (provider of facade.providers(); track provider) {
+                <div class="card shadow-sm mb-3 rounded-3 border-0 hover-shadow">
+                  <div class="card-body py-3 px-4">
+                    <div class="form-group">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="fab fa-{{provider.toLowerCase()}} fa-lg text-primary me-2"></i>
+                        <label [for]="'input_' + provider"
+                               class="h6 mb-0 text-primary">{{ 'STORE.SOCIAL_LINKS_PROVIDER_' + provider | translate }}</label>
+                      </div>
+                      <div class="input-group">
+                        <input [formControlName]="provider" [id]="'input_' + provider"
+                               [placeholder]="'Enter your ' + provider + ' profile link'"
+                               class="form-control"
+                               fullWidth
+                               nbInput
+                               type="text">
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    }
   </nb-card-body>
 </nb-card>
-

@@ -1,60 +1,48 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {ManagerStoreId, Store} from "../../models/commons";
-import {NbSelectComponent} from "@nebular/theme";
-import {StoreService} from "../../services/store.service";
-import {ErrorService} from "../../services/error.service";
+import {ChangeDetectorRef, Component, DestroyRef, EventEmitter, Input, Output, ViewChild, effect, inject} from '@angular/core';
+import {ManagerStoreId} from '../../models/commons';
+import {NbOptionModule, NbSelectComponent, NbSelectModule} from '@nebular/theme';
+import {StoreAutocompleteFacade} from './facades/store-autocomplete.facade';
 
 @Component({
   selector: 'ngx-store-autocomplete',
-  standalone: false,
+  standalone: true,
+  imports: [NbSelectModule, NbOptionModule],
   templateUrl: './store-autocomplete.component.html',
-  styleUrls: ['./store-autocomplete.component.scss']
+  styleUrls: ['./store-autocomplete.component.scss'],
+  providers: [StoreAutocompleteFacade]
 })
-export class StoreAutocompleteComponent implements AfterViewInit {
+export class StoreAutocompleteComponent {
   @ViewChild(NbSelectComponent)
   routeSelect: NbSelectComponent;
   @Output()
-  onStore: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>()
+  storeSelected: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>();
   @Input()
   selectedItem: ManagerStoreId | undefined;
   @Input()
-  selectable: boolean = true
-  stores: Store[] | undefined;
+  selectable = true;
+
+  protected readonly facade = inject(StoreAutocompleteFacade);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
   private lastStore: ManagerStoreId | undefined;
 
-  constructor(private cdr: ChangeDetectorRef, private storeService: StoreService, private errorService: ErrorService) {
+  constructor() {
+    this.facade.init(this.destroyRef);
+
+    effect(() => {
+      const stores = this.facade.stores();
+      if (stores.length > 0) {
+        this.selectedItem = this.facade.resolveSelection(this.selectedItem);
+        this.cdr.detectChanges();
+        this.changed(this.selectedItem);
+      }
+    });
   }
 
-  changed($event: ManagerStoreId) {
-    if ($event != undefined && $event.id != undefined && (this.lastStore == undefined || this.lastStore.id != $event.id)) {
-      this.onStore.emit($event)
+  changed(event: ManagerStoreId | undefined): void {
+    if (event != undefined && event.id != undefined && (this.lastStore == undefined || this.lastStore.id != event.id)) {
+      this.storeSelected.emit(event);
     }
-    this.lastStore = $event
-  }
-
-  ngAfterViewInit(): void {
-    this.storeService.list()
-      .subscribe({
-        next: (it) => {
-          this.stores = it.content;
-          if (this.stores.length > 0) {
-            if (this.selectedItem == undefined) {
-              this.selectedItem = this.stores[0].id
-            } else {
-              let filtered: Store[] = this.stores.filter(it => it.id.id == this.selectedItem.id);
-              if (filtered.length > 0) {
-                this.selectedItem = filtered[0].id
-              } else {
-                this.selectedItem = undefined;
-              }
-            }
-            this.cdr.detectChanges();
-            this.changed(this.selectedItem)
-          }
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      });
+    this.lastStore = event;
   }
 }

@@ -1,17 +1,16 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import { Injectable, inject } from '@angular/core';
 import {Observable} from "rxjs";
 import {SignUpForm, SignUpResponse} from "../domain/types";
+import {CrudService} from "../../pages/shared/services/crud.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignUpService {
+  private readonly crudService = inject(CrudService);
 
-  constructor(private httpClient: HttpClient) {
-  }
 
   signUp(signUpForm: SignUpForm): Observable<SignUpResponse> {
-    return this.httpClient.post<SignUpResponse>("/control-plane/api/v1/user-account/public/create", signUpForm);
+    return this.crudService.post("/control-plane/api/v1/user-account/public/create", signUpForm);
   }
 }

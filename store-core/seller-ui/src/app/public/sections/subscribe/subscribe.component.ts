@@ -11,12 +11,11 @@ import {FormsModule} from "@angular/forms";
   styleUrl: './subscribe.component.css'
 })
 export class SubscribeComponent {
-  title: string = 'Subscribe to get updates';
-  message: string = 'By subscribing you will get newsleter, promotions';
-  email: string = '';
+  title = 'Subscribe to get updates';
+  message = 'By subscribing you will get newsleter, promotions';
+  email = '';
 
   public sub() {
-    console.log("sub " + this.email)
     this.email = '';
   }
 }

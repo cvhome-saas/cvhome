@@ -1,55 +1,20 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-
-import {CategoryService} from '../services/category.service';
-import {ErrorService} from "../../../shared/services/error.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {mergeMap, of, zip} from "rxjs";
-import {StoreService} from "../../../store-management/services/store.service";
-import {Store} from "../../../store-management/models/store";
+import {Component, OnInit, inject} from '@angular/core';
+import {NbSpinnerModule} from '@nebular/theme';
+import {CategoryDetailFacade} from '../facades/category-detail.facade';
+import {CategoryFormComponent} from '../category-form/category-form.component';
 
 @Component({
   selector: 'ngx-category-detail',
-  standalone: false,
+  standalone: true,
+  imports: [NbSpinnerModule, CategoryFormComponent],
   templateUrl: './category-detail.component.html',
-  styleUrls: ['./category-detail.component.scss']
+  styleUrls: ['./category-detail.component.scss'],
+  providers: [CategoryDetailFacade]
 })
 export class CategoryDetailComponent implements OnInit {
-  category: any = {};
-  loadingInfo = false;
-  loading: boolean = false;
-  store: Store
+  protected readonly facade = inject(CategoryDetailFacade);
 
-  constructor(
-    private categoryService: CategoryService,
-    private activatedRoute: ActivatedRoute,
-    private errorService: ErrorService,
-    private selectedStoreService: SelectedStoreService,
-    private storeService: StoreService
-  ) {
+  ngOnInit(): void {
+    this.facade.init();
   }
-
-  ngOnInit() {
-    this.loadingInfo = true;
-    zip([this.selectedStoreService.current(), this.activatedRoute.params])
-      .pipe(mergeMap(([selectedStore, params]) => {
-        return zip(of(selectedStore), of(params), this.storeService.getStore(selectedStore), this.categoryService.getCategoryById(params['id']));
-      }))
-      .subscribe({
-        next: ([selectedStore, params, store, category]) => {
-          this.store = store;
-          this.loadingInfo = false;
-          this.category = category;
-        },
-        error: (err) => {
-          this.loadingInfo = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-        complete: () => {
-          this.loadingInfo = false;
-        },
-      });
-
-  }
-
 }

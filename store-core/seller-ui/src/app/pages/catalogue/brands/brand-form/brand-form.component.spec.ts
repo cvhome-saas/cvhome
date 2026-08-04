@@ -8,7 +8,7 @@ describe('BrandFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [BrandFormComponent]
+      imports: [BrandFormComponent]
     })
       .compileComponents();
   }));

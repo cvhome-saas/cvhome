@@ -1,3 +1,5 @@
 <div>
-  <ngx-brand-form *ngIf="store&&brand" [brand]="brand" [store]="store" title="COMPONENTS.BRAND"></ngx-brand-form>
+  @if (facade.store() && facade.brand()) {
+    <ngx-brand-form [brand]="facade.brand()" [store]="facade.store()" title="COMPONENTS.BRAND"></ngx-brand-form>
+  }
 </div>

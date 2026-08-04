@@ -13,11 +13,12 @@
             <p class="mt-2 mb-3">{{ message }}</p>
             <!-- Social Icons -->
             <div class="social-icons d-flex">
-              <a *ngFor="let l of socialLinks" [href]="l.url" [ngClass]="l.class">
-                <i [ngClass]="l.icon" class="fab"></i>
-                <i [ngClass]="l.icon" class="fab"></i>
-              </a>
-
+              @for (l of socialLinks; track l.url) {
+                <a [href]="l.url" [ngClass]="l.class">
+                  <i [ngClass]="l.icon" class="fab"></i>
+                  <i [ngClass]="l.icon" class="fab"></i>
+                </a>
+              }
             </div>
           </div>
         </div>
@@ -27,9 +28,11 @@
             <!-- Footer Title -->
             <h3 class="footer-title mb-2">Useful Links</h3>
             <ul>
-              <li *ngFor="let l of usefulLinks" class="py-2">
-                <a [href]="l.url">{{ l.name }}</a>
-              </li>
+              @for (l of usefulLinks; track l.url) {
+                <li class="py-2">
+                  <a [href]="l.url">{{ l.name }}</a>
+                </li>
+              }
             </ul>
           </div>
         </div>
@@ -39,9 +42,11 @@
             <!-- Footer Title -->
             <h3 class="footer-title mb-2">Product Help</h3>
             <ul>
-              <li *ngFor="let l of productHelp" class="py-2">
-                <a [href]="l.url">{{ l.name }}</a>
-              </li>
+              @for (l of productHelp; track l.url) {
+                <li class="py-2">
+                  <a [href]="l.url">{{ l.name }}</a>
+                </li>
+              }
             </ul>
           </div>
         </div>

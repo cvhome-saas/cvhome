@@ -1,0 +1,55 @@
+<nb-card accent="info" status="basic">
+  <nb-card-header>
+    <div class="row">
+      <h1 class="page_title">{{ 'CUSTOMERS.CUSTOMER_LIST' | translate }}</h1>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
+    <ngx-datatable
+      (page)="facade.onPageChange($event)"
+      [columnMode]="ColumnMode.force"
+      [count]="facade.tableState.page().totalElements"
+      [externalPaging]="true"
+      [footerHeight]="50"
+      [headerHeight]="50"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
+      class="material"
+      rowHeight="auto">
+
+      <ngx-datatable-column name="Id">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ID' |translate }}</ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="firstName">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.FIRST_NAME' |translate }}
+        </ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="lastName">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'ORDER_FORM.LAST_NAME' |translate }}
+        </ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="emailAddress">
+        <ng-template let-column="column" ngx-datatable-header-template> {{ 'USER_FORM.EMAIL_ADDRESS' |translate }}
+        </ng-template>
+        <ng-template let-value="value" ngx-datatable-cell-template>
+          <strong>{{ value }}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+
+  </nb-card-body>
+</nb-card>

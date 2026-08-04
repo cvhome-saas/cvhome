@@ -1,17 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'ngx-products-groups',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './products-groups.component.html',
   styleUrls: ['./products-groups.component.scss']
 })
-export class ProductsGroupsComponent implements OnInit {
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+export class ProductsGroupsComponent {
 }

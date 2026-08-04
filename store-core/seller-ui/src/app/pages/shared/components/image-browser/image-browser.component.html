@@ -4,29 +4,36 @@
     <span class="titleBar">
         <span></span>
         <span class="title_text">Image Gallery</span>
-        <button (click)="cancel()" class="close" type="button"></button>
+        <button (click)="cancel()" aria-label="Close" class="close" type="button">&times;</button>
     </span>
-  <div [nbSpinner]="loadingList" class="row" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <div [nbSpinner]="facade.loading()" class="row" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
       <ul class="gallery_listing_main">
 
-        <li *ngFor="let images of uploadedFiles;let i=index">
-          <div class="gallery_listing_box">
-            <!-- <div class="image-title-main">
-                <p class="image-title">{{images.name}}</p>
-            </div> -->
-            <!-- <div class="close_main">
-                <i class="fa fa-eye" (click)="openImage(i)"></i>
-                <i class="fa fa-trash" (click)="removeImage(images.name)"></i>
-            </div> -->
-            <div *ngIf="images.contentType == 1" class="image_box">
-              <img class="banner-image" src="{{images.path}}">
+        @for (images of facade.images(); track images.name) {
+          <li>
+            <div class="gallery_listing_box">
+              <!-- <div class="image-title-main">
+                  <p class="image-title">{{images.name}}</p>
+              </div> -->
+              <!-- <div class="close_main">
+                  <i class="fa fa-eye" (click)="openImage(i)"></i>
+                  <i class="fa fa-trash" (click)="removeImage(images.name)"></i>
+              </div> -->
+              @if (images.contentType === '1') {
+                <div class="image_box">
+                  <img alt="{{images.name}}" class="banner-image" src="{{images.path}}">
+                </div>
+              }
+              @if (images.contentType !== '1') {
+                <div class="image_box">
+                  <img (click)="openImage(images)" (keydown.enter)="openImage(images)" alt="{{images.name}}"
+                       class="banner-image" src="{{images.path}}{{images.name}}" tabindex="0">
+                </div>
+              }
             </div>
-            <div *ngIf="images.contentType != 1" class="image_box">
-              <img (click)="openImage(images)" class="banner-image" src="{{images.path}}{{images.name}}">
-            </div>
-          </div>
-        </li>
+          </li>
+        }
       </ul>
     </div>
   </div>

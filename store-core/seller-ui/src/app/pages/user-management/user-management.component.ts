@@ -1,53 +1,19 @@
-import {Component, DoCheck, OnInit} from '@angular/core';
-
-import {TranslateService} from '@ngx-translate/core';
+import {Component, DoCheck, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {UserManagementFacade} from './facades/user-management.facade';
 
 @Component({
   selector: 'ngx-user-management',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './user-management.component.html',
-  styleUrls: ['./user-management.component.scss']
+  styleUrls: ['./user-management.component.scss'],
+  providers: [UserManagementFacade]
 })
-export class UserManagementComponent implements OnInit, DoCheck {
-
-  sidemenuTitle = 'User profile';
-  sidemenuValue = 'admin';
-  sidemenuLinks = [
-    {
-      title: 'COMPONENTS.MY_PROFILE',
-      key: 'COMPONENTS.MY_PROFILE',
-      link: 'profile'
-    },
-    {
-      title: 'COMPONENTS.CHANGE_PASSWORD',
-      key: 'COMPONENTS.CHANGE_PASSWORD',
-      link: 'change-password'
-    }
-  ];
-  showSide = false;
-
-  constructor(
-    private translate: TranslateService
-  ) {
-    this.translateArray(this.sidemenuLinks);
-    this.translate.onLangChange.subscribe((event) => {
-      this.translateArray(this.sidemenuLinks);
-    });
-  }
-
-  ngOnInit() {
-  }
-
-  translateArray(array) {
-    array.forEach((el) => {
-      el.title = this.translate.instant(el.key);
-    });
-  }
+export class UserManagementComponent implements DoCheck {
+  protected readonly facade = inject(UserManagementFacade);
 
   ngDoCheck() {
-    this.showSide =
-      window.location.hash.indexOf('users') === -1 &&
-      window.location.hash.indexOf('create-user') === -1;
+    this.facade.checkHash();
   }
-
 }

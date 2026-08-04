@@ -7,28 +7,28 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <input [formControl]="fromDateControl" [nbDatepicker]="fromDatePicker" [readOnly]="true"
+        <input [formControl]="formService.fromDateControl" [nbDatepicker]="fromDatePicker" [readOnly]="true"
                class="form-control has-person-icon inputText" fullWidth
                nbInput placeholder="Form Picker">
         <nb-datepicker #fromDatePicker (dateChange)="onFromDateChanged($event)"
-                       [max]="fromMaxDates"/>
+                       [max]="facade.fromMaxDate"/>
       </div>
       <div class="col col-lg-2">
-        <input [formControl]="toDateControl" [nbDatepicker]="toDatePicker" [readOnly]="true"
+        <input [formControl]="formService.toDateControl" [nbDatepicker]="toDatePicker" [readOnly]="true"
                class="form-control has-person-icon inputText" fullWidth
                nbInput placeholder="To Picker">
-        <nb-datepicker #toDatePicker (dateChange)="onToDateChanged($event)" [max]="toMaxDates"/>
+        <nb-datepicker #toDatePicker (dateChange)="onToDateChanged($event)" [max]="facade.toMaxDate"/>
       </div>
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="row">
       <div class="col-lg-4">
         <nb-card accent="info" status="control">
           <nb-card-header>{{ 'STATISTICS.SUBSCRIPTIONS' | translate }}</nb-card-header>
           <nb-card-body>
-            <ngx-subscription-statistic [paramsEmitter]="paramsEmitter"></ngx-subscription-statistic>
+            <ngx-subscription-statistic [data]="facade.subscriptionData()"></ngx-subscription-statistic>
           </nb-card-body>
         </nb-card>
       </div>
@@ -36,7 +36,7 @@
         <nb-card accent="info" status="control">
           <nb-card-header>{{ 'STATISTICS.NEW_ORG_JOINER' | translate }}</nb-card-header>
           <nb-card-body>
-            <ngx-new-org-joiner-statistic [paramsEmitter]="paramsEmitter"></ngx-new-org-joiner-statistic>
+            <ngx-new-org-joiner-statistic [data]="facade.newOrgJoinerData()"></ngx-new-org-joiner-statistic>
           </nb-card-body>
         </nb-card>
       </div>
@@ -44,7 +44,7 @@
         <nb-card accent="info" status="control">
           <nb-card-header>{{ 'STATISTICS.NEW_STORE_CREATED' | translate }}</nb-card-header>
           <nb-card-body>
-            <ngx-new-store-created-statistic [paramsEmitter]="paramsEmitter"></ngx-new-store-created-statistic>
+            <ngx-new-store-created-statistic [data]="facade.newStoreCreatedData()"></ngx-new-store-created-statistic>
           </nb-card-body>
         </nb-card>
       </div>

@@ -1,9 +1,13 @@
-import {Component} from '@angular/core';
-import {Router} from "@angular/router";
+import {Component, inject} from '@angular/core';
+import {NbCardModule} from '@nebular/theme';
+import {TranslateModule} from '@ngx-translate/core';
+import {PublicNavigationFacade} from '../../shared/facades/public-navigation.facade';
 
 @Component({
   selector: 'app-seller-ui-success-subscription',
-  standalone: false,
+  standalone: true,
+  imports: [NbCardModule, TranslateModule],
+  providers: [PublicNavigationFacade],
   styles: `
       .flex-centered {
         margin: auto;
@@ -47,12 +51,9 @@ import {Router} from "@angular/router";
     `,
 })
 export class SuccessSubscriptionComponent {
+  private readonly facade = inject(PublicNavigationFacade);
 
-  constructor(private router: Router) {
-    console.log('ngx-success-subscription');
-  }
-
-  goToHome() {
-    this.router.navigate(['/']);
+  goToHome(): void {
+    this.facade.goHome();
   }
 }

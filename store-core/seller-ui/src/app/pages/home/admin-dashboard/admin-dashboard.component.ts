@@ -1,53 +1,45 @@
-import {AfterViewInit, Component, EventEmitter} from '@angular/core';
-import {StatisticsParams} from "../service/statistic.service";
-import {FormControl} from "@angular/forms";
+import {Component, OnInit, inject} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbCardModule, NbDatepickerModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
+import {AdminDashboardFacade} from '../facades/admin-dashboard.facade';
+import {DashboardFilterFormService} from '../services/dashboard-filter-form.service';
+import {DateRangeStateService} from '../state/date-range.state';
+import {SubscriptionStatisticComponent} from '../charts/subscription/subscription-statistic.component';
+import {NewOrgJoinerStatisticComponent} from '../charts/new-org-joiner/new-org-joiner-statistic.component';
+import {NewStoreCreatedStatisticComponent} from '../charts/new-store-created/new-store-created-statistic.component';
 
 @Component({
   selector: 'ngx-admin-dashboard',
-  standalone: false,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    NbCardModule,
+    NbDatepickerModule,
+    NbInputModule,
+    NbSpinnerModule,
+    SubscriptionStatisticComponent,
+    NewOrgJoinerStatisticComponent,
+    NewStoreCreatedStatisticComponent
+  ],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss'
+  styleUrl: './admin-dashboard.component.scss',
+  providers: [AdminDashboardFacade, DateRangeStateService, DashboardFilterFormService]
 })
-export class AdminDashboardComponent implements AfterViewInit {
-  loading = false;
-  loader: boolean = false;
-  params: StatisticsParams;
-  paramsEmitter: EventEmitter<StatisticsParams> = new EventEmitter();
-  fromDateControl: FormControl<Date>;
-  toDateControl: FormControl<Date>;
-  fromMaxDates: Date = new Date();
-  toMaxDates: Date = new Date();
+export class AdminDashboardComponent implements OnInit {
+  protected readonly facade = inject(AdminDashboardFacade);
+  protected readonly formService = inject(DashboardFilterFormService);
 
-
-  constructor() {
-    this.fromDateControl = new FormControl(this.previousDays(7));
-    this.toDateControl = new FormControl(new Date());
-    this.params = {
-      store: "",
-      fromDate: this.fromDateControl.value,
-      toDate: this.toDateControl.value
-    }
+  ngOnInit(): void {
+    this.facade.init();
   }
 
-  previousDays(days: number) {
-    let d = new Date();
-    d.setDate(d.getDate() - days);
-    return d;
+  onFromDateChanged(date: Date): void {
+    this.facade.onFromDateChange(date);
   }
 
-  ngAfterViewInit(): void {
-    this.paramsEmitter.emit(this.params)
+  onToDateChanged(date: Date): void {
+    this.facade.onToDateChange(date);
   }
-
-  onFromDateChanged(e: Date) {
-    this.params.fromDate = e;
-    this.paramsEmitter.emit(this.params)
-  }
-
-  onToDateChanged(e: Date) {
-    this.params.toDate = e;
-    this.paramsEmitter.emit(this.params)
-  }
-
-
 }

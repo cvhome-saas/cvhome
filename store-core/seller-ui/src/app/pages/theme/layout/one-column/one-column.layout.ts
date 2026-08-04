@@ -1,8 +1,12 @@
 import {Component} from '@angular/core';
+import {NbLayoutModule, NbSidebarModule} from '@nebular/theme';
+import {FooterComponent} from '../../components/footer/footer.component';
+import {HeaderComponent} from '../../components/header/header.component';
 
 @Component({
   selector: 'ngx-one-column-layout',
-  standalone: false,
+  standalone: true,
+  imports: [NbLayoutModule, NbSidebarModule, HeaderComponent, FooterComponent],
   styleUrls: ['./one-column.layout.scss'],
   template: `
     <nb-layout>

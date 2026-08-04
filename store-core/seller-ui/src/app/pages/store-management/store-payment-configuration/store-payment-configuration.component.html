@@ -7,13 +7,15 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sideMenuLinks" [value]="item.id">{{ item.title }}
-          </nb-option>
+        <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+          @for (item of facade.sideMenuLinks; track item.id) {
+            <nb-option (click)="facade.route(item.link)" [value]="item.id">{{ item.title }}
+            </nb-option>
+          }
         </nb-select>
       </div>
       <div class="col col-lg-2">
-        <button (click)="save()" nbButton status="success"
+        <button (click)="facade.save()" nbButton status="success"
                 type="submit">
           {{ 'COMMON.SAVE'  | translate }}
         </button>
@@ -21,37 +23,41 @@
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form (ngSubmit)="save()" *ngIf="form" [formGroup]="form">
-      <div formArrayName="configs">
-        <div *ngFor="let config of configForms.controls; let i=index" [formGroupName]="i" class="provider-config mb-4">
-          <h6>{{ config.value.paymentType }}</h6>
-          <div class="row">
-            <div class="col-sm-3">
-              <div class="form-group">
-                <label class="label">{{ 'STORE.PAYMENT_API_KEY' | translate }}</label>
-                <input formControlName="apiKey" fullWidth nbInput type="text">
+    @if (facade.form) {
+      <form (ngSubmit)="facade.save()" [formGroup]="facade.form">
+        <div formArrayName="configs">
+          @for (config of facade.configForms.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="provider-config mb-4">
+              <h6>{{ config.value.paymentType }}</h6>
+              <div class="row">
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label [attr.for]="'apiKey-' + i" class="label">{{ 'STORE.PAYMENT_API_KEY' | translate }}</label>
+                    <input [id]="'apiKey-' + i" formControlName="apiKey" fullWidth nbInput type="text">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label [attr.for]="'secretKey-' + i" class="label">{{ 'STORE.PAYMENT_SECRET_KEY' | translate }}</label>
+                    <input [id]="'secretKey-' + i" formControlName="secretKey" fullWidth nbInput type="password">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label [attr.for]="'webhookSecret-' + i" class="label">{{ 'STORE.PAYMENT_WEBHOOK_SECRET' | translate }}</label>
+                    <input [id]="'webhookSecret-' + i" formControlName="webhookSecret" fullWidth nbInput type="password">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <nb-checkbox formControlName="enabled" style="margin-top: 2rem;">{{ 'STORE.PAYMENT_ENABLED' | translate }}</nb-checkbox>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="col-sm-3">
-              <div class="form-group">
-                <label class="label">{{ 'STORE.PAYMENT_SECRET_KEY' | translate }}</label>
-                <input formControlName="secretKey" fullWidth nbInput type="password">
-              </div>
-            </div>
-            <div class="col-sm-3">
-              <div class="form-group">
-                <label class="label">{{ 'STORE.PAYMENT_WEBHOOK_SECRET' | translate }}</label>
-                <input formControlName="webhookSecret" fullWidth nbInput type="password">
-              </div>
-            </div>
-            <div class="col-sm-3">
-              <div class="form-group">
-                <nb-checkbox formControlName="enabled" style="margin-top: 2rem;">{{ 'STORE.PAYMENT_ENABLED' | translate }}</nb-checkbox>
-              </div>
-            </div>
-          </div>
+          }
         </div>
-      </div>
-    </form>
+      </form>
+    }
   </nb-card-body>
 </nb-card>

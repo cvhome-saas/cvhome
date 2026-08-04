@@ -1,40 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {mergeMap, of, zip} from "rxjs";
-import {StoreService} from "../../../store-management/services/store.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {Store} from "../../../store-management/models/store";
-import {ErrorService} from "../../../shared/services/error.service";
+import {Component, OnInit, inject} from '@angular/core';
+import {CategoryCreationFacade} from '../facades/category-creation.facade';
+import {CategoryFormComponent} from '../category-form/category-form.component';
 
 @Component({
   selector: 'ngx-category-creation',
-  standalone: false,
+  standalone: true,
+  imports: [CategoryFormComponent],
   templateUrl: './category-creation.component.html',
-  styleUrls: ['./category-creation.component.scss']
+  styleUrls: ['./category-creation.component.scss'],
+  providers: [CategoryCreationFacade]
 })
 export class CategoryCreationComponent implements OnInit {
-  category = {};
-  store: Store;
+  protected readonly facade = inject(CategoryCreationFacade);
 
-  constructor(private storeService: StoreService, private selectedStoreService: SelectedStoreService, private errorService: ErrorService) {
+  ngOnInit(): void {
+    this.facade.init();
   }
-
-  ngOnInit() {
-    zip([this.selectedStoreService.current()])
-      .pipe(mergeMap(([selectedStore]) => {
-        return zip(of(selectedStore), this.storeService.getStore(selectedStore));
-      }))
-      .subscribe({
-        next: ([selectedStore, store]) => {
-          this.store = store;
-        },
-        error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        },
-        complete: () => {
-        },
-      });
-
-
-  }
-
 }

@@ -1,38 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {FormGroup} from '@angular/forms';
-import {UserService} from '../../shared/services/user.service';
-import {User} from '../../shared/models/user';
-import {ErrorService} from "../../shared/services/error.service";
+import {Component, OnInit, inject} from '@angular/core';
+import {UserProfileFacade} from './facades/user-profile.facade';
+import {UserFormComponent} from '../user-form/user-form.component';
 
 @Component({
   selector: 'ngx-user-profile',
-  standalone: false,
+  standalone: true,
+  imports: [UserFormComponent],
   templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.scss']
+  styleUrls: ['./user-profile.component.scss'],
+  providers: [UserProfileFacade]
 })
 export class UserProfileComponent implements OnInit {
-  form: FormGroup;
-  user: User;
-  loading = false;
-
-  constructor(
-    private userService: UserService,
-    private errorService: ErrorService
-  ) {
-  }
+  protected readonly facade = inject(UserProfileFacade);
 
   ngOnInit() {
-    this.loading = true;
-    this.userService.getCurrentAccount().subscribe({
-      next: (user) => {
-        this.user = user;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      }
-    });
+    this.facade.init();
   }
-
 }

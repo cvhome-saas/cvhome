@@ -1,64 +1,75 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from '../../../shared/services/crud.service';
 import {Observable} from 'rxjs';
+import {PageT, StorePageRequest} from '../../../shared/table/table.types';
+import {EntityExists} from '../../../shared/models/entity.model';
+import {
+  CreatedProductEntity,
+  LightPersistableProduct,
+  PersistableProductDefinition,
+  ReadableProduct,
+  ReadableProductDefinition
+} from '../models/product.model';
+import {ReadableProductType} from '../../types/models/product-type.model';
+
+export interface TinyProductPageRequest extends StorePageRequest {
+  name?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
+  private crudService = inject(CrudService);
 
-  constructor(
-    private crudService: CrudService,
-  ) {
-  }
 
-  getListOfProducts(params): Observable<any> {
+  getListOfProducts(params: StorePageRequest): Observable<PageT<ReadableProduct>> {
     //release 3.2.1 use V2
     return this.crudService.get(`/spg/catalog/api/v2/private/base-products`, params);
   }
 
-  getListOfTinyProducts(params): Observable<any> {
+  getListOfTinyProducts(params: TinyProductPageRequest): Observable<PageT<ReadableProduct>> {
     //release 3.2.1 use V2
     return this.crudService.get(`/spg/catalog/api/v2/private/tiny-products`, params);
   }
 
-  updateProductFromTable(id, product): Observable<any> {
+  updateProductFromTable(id: string | number, product: LightPersistableProduct): Observable<void> {
     return this.crudService.patch(`/spg/catalog/api/v1/private/product/${id}`, product);
   }
 
-  updateProduct(id, product): Observable<any> {
+  updateProduct(id: string | number, product: PersistableProductDefinition): Observable<void> {
     return this.crudService.put(`/spg/catalog/api/v2/private/product/${id}`, product);
   }
 
-  getProductDefinitionById(id): Observable<any> {
+  getProductDefinitionById(id: string | number): Observable<ReadableProductDefinition> {
     return this.crudService.get(`/spg/catalog/api/v2/private/product/${id}`);
   }
 
-  createProduct(product): Observable<any> {
+  createProduct(product: PersistableProductDefinition): Observable<CreatedProductEntity> {
     return this.crudService.post(`/spg/catalog/api/v2/private/product`, product);
   }
 
-  deleteProduct(id): Observable<any> {
+  deleteProduct(id: string | number): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/${id}`);
   }
 
-  getProductTypes(): Observable<any> {
+  getProductTypes(): Observable<PageT<ReadableProductType>> {
     return this.crudService.get(`/spg/catalog/api/v1/private/product/types`);
   }
 
-  checkProductSku(code): Observable<any> {
+  checkProductSku(code: string): Observable<EntityExists> {
     const params = {
       'code': code,
     };
     return this.crudService.get(`/spg/catalog/api/v1/private/product/unique`, params);
   }
 
-  addProductToCategory(productId, categoryId): Observable<any> {
+  addProductToCategory(productId: string | number, categoryId: string | number): Observable<void> {
     return this.crudService.post(`/spg/catalog/api/v1/private/product/${productId}/category/${categoryId}}`, {});
   }
 
-  removeProductFromCategory(productId, categoryId): Observable<any> {
+  removeProductFromCategory(productId: string | number, categoryId: string | number): Observable<void> {
     return this.crudService.delete(`/spg/catalog/api/v1/private/product/${productId}/category/${categoryId}`);
   }
 

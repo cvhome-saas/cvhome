@@ -8,26 +8,25 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="addBoxes()" [disabled]="params.store==undefined||params.store==''" nbButton
-                status="success">
-          <label>{{ 'CONTENT.CREATE_BOX' | translate }}</label>
+        <button (click)="facade.addBox()" [disabled]="!facade.selectedStore()" nbButton status="success">
+          <span>{{ 'CONTENT.CREATE_BOX' | translate }}</span>
         </button>
 
       </div>
     </div>
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <ngx-datatable
-      (page)="onPageEvent($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="page.content"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
       class="material"
       rowHeight="auto">
 
@@ -49,18 +48,21 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onCreate(row)" *ngIf="!row.id" nbButton shape="round" size="small" status="success">
-            <nb-icon icon="external-link"></nb-icon>
-          </button>
-          <button (click)="onEdit(row)" *ngIf="row.id" nbButton shape="round" size="small" status="primary">
-            <nb-icon icon="edit"></nb-icon>
-          </button>
-          <button (click)="onDelete(row)" *ngIf="row.id" nbButton shape="round" size="small" status="danger">
-            <nb-icon icon="trash"></nb-icon>
-          </button>
+          @if (!row.id) {
+            <button (click)="facade.onCreate(row)" nbButton shape="round" size="small" status="success">
+              <nb-icon icon="external-link"></nb-icon>
+            </button>
+          }
+          @if (row.id) {
+            <button (click)="facade.onEdit(row)" nbButton shape="round" size="small" status="primary">
+              <nb-icon icon="edit"></nb-icon>
+            </button>
+            <button (click)="facade.onDelete(row)" nbButton shape="round" size="small" status="danger">
+              <nb-icon icon="trash"></nb-icon>
+            </button>
+          }
         </ng-template>
       </ngx-datatable-column>
     </ngx-datatable>
   </nb-card-body>
 </nb-card>
-

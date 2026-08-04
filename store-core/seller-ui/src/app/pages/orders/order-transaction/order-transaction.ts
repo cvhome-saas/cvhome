@@ -1,24 +1,25 @@
-import {Component,} from '@angular/core';
+import {Component, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
+import {OrderTransaction} from '../models/order.model';
 
 @Component({
   selector: 'ngx-order-transaction',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule],
   templateUrl: 'order-transaction.html',
   styleUrls: ['order-transaction.scss'],
 })
 export class OrderTransactionComponent {
-  transactionData: any;
+  protected readonly ref = inject(NbDialogRef<OrderTransactionComponent>);
 
-  constructor(protected ref: NbDialogRef<OrderTransactionComponent>) {
-    // console.log(this.historyData)
-  }
+  transactionData: OrderTransaction[];
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name) {
+  submit(name?: string) {
     this.ref.close(name);
   }
 }

@@ -1,57 +1,31 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnDestroy} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
-import {combineLatest, mergeMap, Observable, Subscription} from "rxjs";
-import {map} from "rxjs/operators";
-import {StatisticList, StatisticService, StatisticsParams} from "../../service/statistic.service";
-import {ErrorService} from '../../../shared/services/error.service';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {NgxEchartsDirective} from 'ngx-echarts';
+import {EMPTY_STATISTIC_LIST, StatisticList} from '../../services/statistic.api.service';
+import {EChartsLikeOption, NbEchartsTheme} from '../../models/echarts.model';
 
 @Component({
   selector: 'ngx-subscription-statistic',
-  standalone: false,
+  standalone: true,
+  imports: [NgxEchartsDirective],
   template: `
-    <div echarts [options]="options" class="echart"></div>
+    <div echarts [options]="options()" class="echart"></div>
   `,
 })
-export class SubscriptionStatisticComponent implements AfterViewInit, OnDestroy {
-  options: any = {};
-  @Input()
-  paramsEmitter: EventEmitter<StatisticsParams>;
-  subscription: Subscription;
+export class SubscriptionStatisticComponent {
+  private readonly theme = inject(NbThemeService);
+  private readonly themeConfig = toSignal(this.theme.getJsTheme());
 
-  constructor(private theme: NbThemeService,
-              private statisticService: StatisticService,
-              private errorService: ErrorService
-  ) {
-  }
+  readonly data = input<StatisticList>(EMPTY_STATISTIC_LIST);
 
-  getData(p: StatisticsParams): Observable<StatisticList> {
-    return this.statisticService.getSubscriptionStatistic(p)
-  }
+  readonly options = computed(() => {
+    const config = this.themeConfig();
+    return config ? this.buildOptions(config.variables, this.data()) : {};
+  });
 
-  ngAfterViewInit() {
-    this.subscription = combineLatest([this.paramsEmitter, this.theme.getJsTheme()])
-      .pipe(mergeMap(([params, config]) => {
-        return this.getData(params).pipe(map((data: StatisticList) => {
-          return {
-            config: config.variables,
-            data: data
-          }
-        }))
-      }))
-      .subscribe((result) => {
-        this.options = this.buildOptions(result.config, result.data);
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
-
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
-
-  buildOptions(colors: NbJSThemeVariable, data: StatisticList): any {
-    let echarts: any = colors.echarts;
+  private buildOptions(colors: NbJSThemeVariable, data: StatisticList): EChartsLikeOption {
+    const echarts = colors.echarts as unknown as NbEchartsTheme;
 
     return {
       backgroundColor: echarts.bg,

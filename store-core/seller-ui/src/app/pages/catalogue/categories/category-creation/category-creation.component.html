@@ -1,3 +1,5 @@
 <div>
-  <ngx-category-form *ngIf="store" [category]="category" [store]="store"></ngx-category-form>
+  @if (facade.store()) {
+    <ngx-category-form [category]="facade.category()" [store]="facade.store()"></ngx-category-form>
+  }
 </div>

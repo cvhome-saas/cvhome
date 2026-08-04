@@ -8,25 +8,25 @@
       <div class="col">
       </div>
       <div class="col col-lg-2">
-        <button (click)="createUser()" [disabled]="params.store==undefined||params.store==''" nbButton
+        <button (click)="facade.createUser()" [disabled]="!facade.store()" nbButton
                 status="success">
-          <label>{{ 'COMPONENTS.CREATE_USER' | translate }}</label>
+          <span>{{ 'COMPONENTS.CREATE_USER' | translate }}</span>
         </button>
 
       </div>
     </div>
   </nb-card-header>
-  <nb-card-body [nbSpinner]="isLoading" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.tableState.isLoading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <ngx-datatable
-      (page)="onPageEvent($event)"
+      (page)="facade.onPageChange($event)"
       [columnMode]="ColumnMode.force"
-      [count]="page.totalElements"
+      [count]="facade.tableState.page().totalElements"
       [externalPaging]="true"
       [footerHeight]="50"
       [headerHeight]="50"
-      [limit]="perPageSize"
-      [offset]="page.pageNumber"
-      [rows]="page.content"
+      [limit]="facade.tableState.params().count"
+      [offset]="facade.tableState.params().page"
+      [rows]="facade.tableState.page().content"
       class="material"
       rowHeight="auto">
 
@@ -51,7 +51,7 @@
         <ng-template let-column="column" ngx-datatable-header-template> {{ 'COMMON.ACTIVE' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <ngx-user-status [rowData]="row" [store]="params.store"/>
+          <ngx-user-status [rowData]="row" [store]="facade.store()"/>
         </ng-template>
       </ngx-datatable-column>
 
@@ -60,10 +60,10 @@
           {{ 'ORDER.ACTIONS' |translate }}
         </ng-template>
         <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-          <button (click)="onEdit(row)" nbButton shape="round" size="small" status="primary">
+          <button (click)="facade.onEdit(row)" nbButton shape="round" size="small" status="primary">
             <nb-icon icon="edit"/>
           </button>
-          <button (click)="onDelete(row)" nbButton shape="round" size="small" status="danger">
+          <button (click)="facade.onDelete(row)" nbButton shape="round" size="small" status="danger">
             <nb-icon icon="trash"/>
           </button>
         </ng-template>

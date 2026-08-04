@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 
 import {UserService} from './user.service';
 import {ErrorService} from "./error.service";
@@ -7,12 +7,8 @@ import {ErrorService} from "./error.service";
   providedIn: 'root'
 })
 export class StorageService {
-
-  constructor(
-    private userService: UserService,
-    private errorService: ErrorService
-  ) {
-  }
+  private readonly userService = inject(UserService);
+  private readonly errorService = inject(ErrorService);
 
   getUserId() {
     let userId = localStorage.getItem('userId');
@@ -33,7 +29,8 @@ export class StorageService {
     if (!merchant) {
       this.userService.getUser(this.getUserId())
         .subscribe(user => {
-          merchant = user.merchant;
+          // `merchant` does not exist on the User DTO — this call site is dead code.
+          merchant = (user as unknown as Record<string, string>)['merchant'];
           localStorage.setItem('merchant', merchant);
         }, err => {
           this.errorService.error('ERROR.SYSTEM_ERROR', err);

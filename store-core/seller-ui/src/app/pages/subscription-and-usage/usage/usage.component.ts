@@ -1,18 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {NbCardModule} from '@nebular/theme';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
   selector: 'ngx-usage',
-  standalone: false,
+  standalone: true,
+  imports: [NbCardModule, TranslateModule],
   templateUrl: './usage.component.html',
   styleUrls: ['./usage.component.scss']
 })
-export class UsageComponent implements OnInit {
-  loadingList = false;
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
+export class UsageComponent {
 }

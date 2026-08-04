@@ -1,51 +1,32 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {NbDialogRef} from '@nebular/theme';
-import {CrudService} from "../../services/crud.service";
-import {ErrorService} from "../../services/error.service";
+import {Component, DestroyRef, Input, OnInit, inject} from '@angular/core';
+import {NbDialogRef, NbSpinnerModule} from '@nebular/theme';
+import {ImageBrowserFacade} from './facades/image-browser.facade';
+import {ContentFileItem} from '../../../content/models/content.model';
 
 @Component({
   selector: 'ngx-image-browser',
-  standalone: false,
+  standalone: true,
+  imports: [NbSpinnerModule],
   templateUrl: './image-browser.component.html',
-  styleUrls: ['./image-browser.component.scss']
+  styleUrls: ['./image-browser.component.scss'],
+  providers: [ImageBrowserFacade]
 })
 export class ImageBrowserComponent implements OnInit {
-  @Input()
-  store: string;
-  uploadedFiles: any[] = [];
-  loadingList = false;
+  @Input() store: string;
 
-  constructor(
-    private crudService: CrudService,
-    protected ref: NbDialogRef<ImageBrowserComponent>,
-    private errorService: ErrorService
-  ) {
+  protected readonly facade = inject(ImageBrowserFacade);
+  protected readonly ref = inject(NbDialogRef<ImageBrowserComponent>);
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    this.facade.init(this.destroyRef);
   }
 
-  ngOnInit() {
-    this.getImages();
-  }
-
-  getImages() {
-    this.loadingList = true;
-    this.crudService.get('/spg/merchant/api/v1/content/images')
-      .subscribe({
-        next: (data) => {
-          this.uploadedFiles = data.content;
-          this.loadingList = false;
-        },
-        error: (err) => {
-          this.loadingList = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      });
-  }
-
-  cancel() {
+  cancel(): void {
     this.ref.close();
   }
 
-  openImage(value) {
+  openImage(value: ContentFileItem): void {
     this.ref.close(value.path + value.name);
   }
 }

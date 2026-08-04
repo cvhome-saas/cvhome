@@ -1,158 +1,55 @@
-import {Component, Input, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, Validators} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
-import {StoreService} from "../services/store.service";
-import {NbToastrService} from "@nebular/theme";
-import {Banner} from "../models/banner";
-import {ErrorService} from "../../shared/services/error.service";
+import {Component, Input, OnInit, ViewChild, ElementRef, inject} from "@angular/core";
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
+import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade";
+import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
 
 @Component({
   selector: 'ngx-store-branding-banner',
-  standalone: false,
+  standalone: true,
+  imports: [ReactiveFormsModule, TranslateModule, NbButtonModule, NbInputModule, NbSpinnerModule],
   template: `
-    <form [formGroup]="imageUpload">
-      <div (click)='imageInput.click()' (dragover)="allowDrop($event)" (drop)="drop($event)" class="wrapper">
+    <form [formGroup]="facade.imageUpload">
+      <div (click)='imageInput.click()' (dragover)="facade.allowDrop($event)" (drop)="facade.drop($event, imageDrop)"
+           (keydown.enter)='imageInput.click()' class="wrapper" role="button" tabindex="0">
         <div #imageDrop id="imageDrop">
-
-          <img *ngIf="banner" [src]="banner?.path" style="height:250px"/>
-
+          @if (facade.banner()) {
+            <img [src]="facade.banner()?.path" alt="{{ 'STORE_BRANDING.BANNER' | translate }}" style="height:250px"/>
+          }
         </div>
         <div class="uploadingPhrase">{{ 'STORE_BRANDING.DROP_FILE' | translate }}</div>
       </div>
 
-      <input nbInput fullWidth #imageInput (change)='imageChange($event)' formControlName="imageInput" id="imageInput" required
+      <input nbInput fullWidth #imageInput (change)='facade.imageChange($event, imageDrop)' formControlName="imageInput" id="imageInput" required
              type="file">
 
       <div class="form-group actions-button">
-        <button nbButton status="danger" (click)="removeBanner()" *ngIf="showRemoveButton"  type="submit">{{
-            'COMMON.REMOVE' | translate
-          }}
-        </button>
-        <button nbButton status="success" (click)="saveBanner()" *ngIf="bannerFile" [nbSpinner]="loadingButton"
-                nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
-          {{ (!loadingButton ? 'COMMON.SAVE' : '') | translate }}
-        </button>
+        @if (facade.showRemoveButton()) {
+          <button nbButton status="danger" (click)="facade.removeBanner(store.id, imageDrop)" type="submit">{{
+              'COMMON.REMOVE' | translate
+            }}
+          </button>
+        }
+        @if (facade.bannerFile) {
+          <button nbButton status="success" (click)="facade.saveBanner(store.id)" [nbSpinner]="facade.loadingButton()"
+                  nbSpinnerMessage="" nbSpinnerSize="large" type="submit">
+            {{ (!facade.loadingButton() ? 'COMMON.SAVE' : '') | translate }}
+          </button>
+        }
       </div>
-
     </form>
   `,
-  styleUrls: ['./store-branding.component.scss']
+  styleUrls: ['./store-branding.component.scss'],
+  providers: [StoreBrandingBannerFacade]
 })
 export class StoreBrandingBannerComponent implements OnInit {
-  @Input()
-  store: any
-  @ViewChild('imageDrop', {static: false}) imageDrop;
-  acceptedImageTypes = {'image/png': true, 'image/jpeg': true, 'image/gif': true};
-  imageUpload
-  loadingButton = false;
-  banner: Banner;
+  @Input() store: ReadableMerchantStoreWithPod;
+  @ViewChild('imageDrop', {static: false}) imageDrop!: ElementRef;
 
-  bannerFile: any;
-  showRemoveButton = false;
-
-  constructor(private formBuilder: FormBuilder,
-              private storeService: StoreService,
-              private toastr: NbToastrService,
-              private translate: TranslateService,
-              private errorService: ErrorService
-  ) {
-    this.imageUpload = this.formBuilder.group({
-      imageInput: ['', Validators.required]
-    });
-  }
+  protected readonly facade = inject(StoreBrandingBannerFacade);
 
   ngOnInit(): void {
-
-    this.banner = this.store.banner;
-    if (this.banner) {
-      this.showRemoveButton = true;
-    }
-  }
-
-
-  // readfiles
-  readfiles(files) {
-    this.bannerFile = files[0];
-    this.showRemoveButton = true;
-    const reader = new FileReader();
-    const image = new Image();
-    reader.onload = (event) => {
-      this.imageDrop.nativeElement.innerHTML = '';
-      const fileReader = event.target as FileReader;
-      image.src = fileReader.result as string;
-      image.height = 200;
-      image.style.display = 'block';
-      image.style.margin = '0 auto';
-      image.className = 'appendedImage';
-      this.imageDrop.nativeElement.appendChild(image);
-      if (this.imageUpload.controls.imageInput.value == null) {
-        const input = this.imageUpload.controls.imageInput as any;
-        input.files = files;
-      }
-    };
-    reader.readAsDataURL(files[0]);
-
-  }
-
-  allowDrop(e) {
-    e.preventDefault();
-  }
-
-  drop(e) {
-    e.preventDefault();
-    this.imageUpload.controls.imageInput.reset();
-    this.imageDrop.innerHTML = '';
-    this.checkfiles(e.dataTransfer.files);
-  }
-
-  // imageChange
-  imageChange(event) {
-    this.imageDrop.innerHTML = '';
-    this.checkfiles(event.target.files);
-  }
-
-  saveBanner() {
-    this.loadingButton = true;
-    this.storeService.addStoreBanner(this.store.id, this.bannerFile)
-      .subscribe({
-        next: (data) => {
-          this.toastr.success(this.translate.instant('STORE_BRANDING.BANNER_SAVED'));
-          this.loadingButton = false;
-        },
-        error: (err) => {
-          this.loadingButton = false;
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
-        }
-      })
-  }
-
-  checkfiles(files) {
-    if (this.acceptedImageTypes[files[0].type] !== true) {
-      this.imageDrop.nativeElement.innerHTML = this.translate.instant('STORE_BRANDING.NOT_AN_IMAGE');
-      return;
-    } else if (files.length > 1) {
-      this.imageDrop.nativeElement.innerHTML = this.translate.instant('STORE_BRANDING.ONLY_ONE_IMAGE');
-      return;
-    } else {
-      this.readfiles(files);
-    }
-  }
-
-  removeBanner() {
-    this.showRemoveButton = false;
-    this.bannerFile = null;
-    const image = document.getElementsByClassName('appendedImage')[0];
-    const node = document.getElementById('imageDrop');
-    if (!image) {
-      node.removeChild(node.getElementsByTagName('img')[0]);
-    } else {
-      node.removeChild(node.getElementsByClassName('appendedImage')[0]);
-    }
-    this.storeService.removeStoreBanner(this.store.id)
-      .subscribe(res => {
-        this.toastr.success(this.translate.instant('STORE_BRANDING.BANNER_REMOVED'));
-      }, err => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
-      });
+    this.facade.init(this.store);
   }
 }

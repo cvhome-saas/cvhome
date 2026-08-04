@@ -1,8 +1,11 @@
 import {Component} from '@angular/core';
+import {NbLayoutModule} from '@nebular/theme';
+import {FooterComponent} from '../../components/footer/footer.component';
 
 @Component({
   selector: 'ngx-empty-layout',
-  standalone: false,
+  standalone: true,
+  imports: [NbLayoutModule, FooterComponent],
   styleUrls: ['./empty.layout.scss'],
   template: `
     <nb-layout>

@@ -1,85 +1,61 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {Observable, of} from "rxjs";
-import {ProductService} from "../../../catalogue/products/services/product.service";
-import {map} from "rxjs/operators";
-import {ErrorService} from "../../services/error.service";
-
+import {AfterViewInit, Component, DestroyRef, ElementRef, EventEmitter, Input, Output, ViewChild, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule} from '@nebular/theme';
+import {ProductAutocompleteFacade} from './facades/product-autocomplete.facade';
+import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autocomplete.constants';
+import {ReadableProduct} from '../../../catalogue/products/models/product.model';
 
 @Component({
   selector: 'ngx-product-auto-complete',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule],
   template: `<input #autoInput
                     nbInput fullWidth
                     type="text"
                     [disabled]="disabled"
-                    (input)="onChange($event)"
+                    (input)="onChange()"
                     [placeholder]="'COMMON.SEARCH_BY_NAME'|translate"
                     [nbAutocomplete]="auto"/>
 
   <nb-autocomplete #auto (selectedChange)="onSelectionChange($event)">
-    <nb-option *ngFor="let option of filteredOptions$ | async" [value]="option">
-      {{ option.sku }}
-      <nb-icon icon="heart-outline" status="success"></nb-icon>
-    </nb-option>
+    @for (option of facade.options(); track option) {
+      <nb-option [value]="option">
+        {{ option.sku }}
+        <nb-icon icon="heart-outline" status="success"></nb-icon>
+      </nb-option>
+    }
   </nb-autocomplete>
   `,
+  providers: [ProductAutocompleteFacade]
 })
 export class ProductAutoCompleteComponent implements AfterViewInit {
   @Input() store: string;
-  @Input() disabled: boolean = false;
-  filteredOptions$: Observable<any[]>;
-  @Output()
-  onProduct: EventEmitter<any> = new EventEmitter<any>()
-  @ViewChild('autoInput', {static: false})
-  autoInput: ElementRef;
-  firstProducts: any[] = [];
-  params;
+  @Input() disabled = false;
+  @Output() productSelected: EventEmitter<ReadableProduct> = new EventEmitter<ReadableProduct>();
+  @ViewChild('autoInput', {static: false}) autoInput: ElementRef;
 
-  constructor(
-    private productService: ProductService,
-    private errorService: ErrorService,
-  ) {
-    this.params = {
-      "store": "",
-      "name": "",
-    }
-  }
-
-  onChange($event) {
-    if (this.autoInput.nativeElement.value && this.autoInput.nativeElement.value.trim().length > 3 && this.autoInput.nativeElement.value.trim() != this.params.name)
-      this.getProductList();
-    if (this.autoInput.nativeElement.value.trim().length == 0) {
-      this.resetResultToFirst();
-    }
-  }
-
-  onSelectionChange($event) {
-    this.onProduct.emit($event);
-    this.autoInput.nativeElement.value = '';
-    this.resetResultToFirst()
-  }
-
-  getProductList() {
-    this.params.name = this.autoInput.nativeElement.value;
-    this.filteredOptions$ = this.productService.getListOfTinyProducts(this.params).pipe(map(it => {
-      return it.content
-    }));
-  }
+  protected readonly facade = inject(ProductAutocompleteFacade);
+  private readonly destroyRef = inject(DestroyRef);
+  private lastSearchedName = '';
 
   ngAfterViewInit(): void {
-    this.params.store = this.store;
-    this.productService.getListOfTinyProducts(this.params).pipe(map(it => {
-      return it.content
-    })).subscribe((it: any[]) => {
-      this.firstProducts = it
-      this.resetResultToFirst();
-    }, err => {
-      this.errorService.error('ERROR.SYSTEM_ERROR', err);
-    });
-
+    this.facade.init(this.store, this.destroyRef);
   }
 
-  resetResultToFirst() {
-    this.filteredOptions$ = of(this.firstProducts);
+  onChange(): void {
+    const value = this.autoInput.nativeElement.value.trim();
+    if (value && value.length > PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH && value !== this.lastSearchedName) {
+      this.lastSearchedName = value;
+      this.facade.search(value);
+    }
+    if (value.length === 0) {
+      this.facade.resetToFirst();
+    }
+  }
+
+  onSelectionChange(value: ReadableProduct): void {
+    this.productSelected.emit(value);
+    this.autoInput.nativeElement.value = '';
+    this.facade.resetToFirst();
   }
 }

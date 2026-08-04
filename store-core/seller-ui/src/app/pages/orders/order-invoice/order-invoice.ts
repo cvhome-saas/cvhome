@@ -1,40 +1,31 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
+import {ReadableOrder} from '../models/order.model';
+import {ReadableMerchantStore} from '../../store-management/models/store';
 
 @Component({
   selector: 'ngx-order-invoice',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule],
   templateUrl: 'order-invoice.html',
   styleUrls: ['order-invoice.scss'],
 })
 export class OrderInvoiceComponent {
-  orderData: any;
-  store: any;
+  protected readonly ref = inject(NbDialogRef<OrderInvoiceComponent>);
 
-  constructor(protected ref: NbDialogRef<OrderInvoiceComponent>) {
-  }
+  orderData: ReadableOrder;
+  store: ReadableMerchantStore;
 
   cancel() {
     this.ref.close();
   }
 
-  submit(name) {
+  submit(name?: string) {
     this.ref.close(name);
   }
 
   print() {
-    // var printContents = document.getElementById('print-section').innerHTML;
-    // var popupWin = window.open('', '_blank', 'width=300,height=300');
-    // popupWin.document.open();
-    // popupWin.document.write(printContents);
-    // popupWin.document.close();
-    // let printContents = document.getElementById('print-section').innerHTML;
-    // let originalContents = document.body.innerHTML;
-
-    // document.body.innerHTML = printContents;
-
     window.print();
-
-    // document.body.innerHTML = originalContents;
   }
 }

@@ -1,20 +1,12 @@
-import {Component, DoCheck, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'ngx-store-management',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './store-management.component.html',
   styleUrls: ['./store-management.component.scss']
 })
-export class StoreManagementComponent implements OnInit, DoCheck {
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-
-  ngDoCheck() {
-  }
-
+export class StoreManagementComponent {
 }

@@ -9,97 +9,113 @@
         </div>
       </div>
     </div>
-    <div *ngIf="this.table?.tables.YEAR || this.table?.tables.MONTH" class="row justify-content-center">
-      <div class="toggle-btn">
-        <span style="margin: 0.8em;">Month</span>
-        <label class="switch">
-          <input (click)="toggle()" id="checkbox" type="checkbox"/>
-          <span class="slider round"></span>
-        </label>
-        <span style="margin: 0.8em;">Annual</span>
-      </div>
+    @if (facade.hasPlans()) {
+      <div class="row justify-content-center">
+        <div class="toggle-btn">
+          <span style="margin: 0.8em;">Month</span>
+          <label class="switch">
+            <input (click)="toggle()" id="checkbox" type="checkbox"/>
+            <span class="slider round"></span>
+          </label>
+          <span style="margin: 0.8em;">Annual</span>
+        </div>
 
-      <div class="col-12 col-sm-12 col-lg-12">
-        <div *ngIf="prices" class="row price-plan-wrapper">
-          <div *ngFor="let p of prices" class="col-md-4">
-            <!-- Single Price Plan -->
-            <div class="single-price-plan text-center p-5 wow " data-aos-duration="2s"
-                 data-wow-delay="0.4s">
-              <!-- Plan Thumb -->
-              <div class="plan-thumb">
-                <img [src]="p.icon" alt="" class="avatar-lg">
-              </div>
-              <!-- Plan Title -->
-              <div class="plan-title my-2 my-sm-3">
-                <h4 class="text-uppercase">{{ p.name }}</h4>
-              </div>
-              <!-- Plan Price -->
-              <div class="plan-price pb-2 pb-sm-3">
-                <h2 class="fw-7">
-                  <div *ngIf="p.previousCost!=p.cost">
-                    <small class="fw-6">$</small>
-                    {{ p.cost }}
-                    &nbsp;
-                    <span style="text-decoration-line: line-through;color: gray">
-                    {{ p.previousCost }}
-                    </span>
-                  </div>
-                  <div *ngIf="p.previousCost==p.cost">
-                    <small class="fw-6">$</small>
-                    {{ p.cost }}
-                  </div>
-                </h2>
+        <div class="col-12 col-sm-12 col-lg-12">
+          @if (facade.prices(); as prices) {
+            <div class="row price-plan-wrapper">
+              @for (p of prices; track p.name) {
+                <div class="col-md-4">
+                  <!-- Single Price Plan -->
+                  <div class="single-price-plan text-center p-5 wow " data-aos-duration="2s"
+                       data-wow-delay="0.4s">
+                    <!-- Plan Thumb -->
+                    <div class="plan-thumb">
+                      <img [src]="p.icon" alt="" class="avatar-lg">
+                    </div>
+                    <!-- Plan Title -->
+                    <div class="plan-title my-2 my-sm-3">
+                      <h4 class="text-uppercase">{{ p.name }}</h4>
+                    </div>
+                    <!-- Plan Price -->
+                    <div class="plan-price pb-2 pb-sm-3">
+                      <h2 class="fw-7">
+                        @if (p.previousCost !== p.cost) {
+                          <div>
+                            <small class="fw-6">$</small>
+                            {{ p.cost }}
+                            &nbsp;
+                            <span style="text-decoration-line: line-through;color: gray">
+                            {{ p.previousCost }}
+                            </span>
+                          </div>
+                        }
+                        @if (p.previousCost === p.cost) {
+                          <div>
+                            <small class="fw-6">$</small>
+                            {{ p.cost }}
+                          </div>
+                        }
+                      </h2>
 
-              </div>
-              <!-- Plan Description -->
-              <div class="plan-description">
-                <ul class="plan-features">
-                  <li *ngFor="let pf of p.pricingFeatures" class="border-top py-3">{{ pf.desc }}</li>
-                </ul>
-              </div>
-              <!-- Plan Button -->
-              <div class="plan-button">
-                <a [routerLink]="['/signup']" class="btn mt-4">Sign Up</a>
-              </div>
+                    </div>
+                    <!-- Plan Description -->
+                    <div class="plan-description">
+                      <ul class="plan-features">
+                        @for (pf of p.pricingFeatures; track pf.desc) {
+                          <li class="border-top py-3">{{ pf.desc }}</li>
+                        }
+                      </ul>
+                    </div>
+                    <!-- Plan Button -->
+                    <div class="plan-button">
+                      <a [routerLink]="['/signup']" class="btn mt-4">Sign Up</a>
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
-          </div>
+          }
         </div>
       </div>
-    </div>
+    }
     <div class="row justify-content-center pt-5">
 
       <p class="text-body pt-4 fw-5">Do you want to try it for FREE</p>
 
       <div class="col-12 col-sm-12 col-lg-12">
         <div class="row price-plan-wrapper">
-          <div *ngIf="freePricing" class="col-4 col-md-4">
-            <!-- Single Price Plan -->
-            <div class="single-price-plan text-center p-5 wow " data-aos-duration="2s"
-                 data-wow-delay="0.4s">
-              <!-- Plan Thumb -->
-              <div class="plan-thumb">
-                <img [src]="freePricing.icon" alt="" class="avatar-lg">
-              </div>
-              <!-- Plan Title -->
-              <div class="plan-title my-2 my-sm-3">
-                <h4 class="text-uppercase">{{ freePricing.name }}</h4>
-              </div>
-              <!-- Plan Price -->
-              <div class="plan-price pb-2 pb-sm-3">
-                <h2 class="fw-7"><small class="fw-6">$</small>{{ freePricing.cost }}</h2>
-              </div>
-              <!-- Plan Description -->
-              <div class="plan-description">
-                <ul class="plan-features">
-                  <li *ngFor="let pf of freePricing.pricingFeatures" class="border-top py-3">{{ pf.desc }}</li>
-                </ul>
-              </div>
-              <!-- Plan Button -->
-              <div class="plan-button">
-                <a [routerLink]="['/signup']" class="btn mt-4">Sign Up</a>
+          @if (facade.freePricing(); as freePricing) {
+            <div class="col-4 col-md-4">
+              <!-- Single Price Plan -->
+              <div class="single-price-plan text-center p-5 wow " data-aos-duration="2s"
+                   data-wow-delay="0.4s">
+                <!-- Plan Thumb -->
+                <div class="plan-thumb">
+                  <img [src]="freePricing.icon" alt="" class="avatar-lg">
+                </div>
+                <!-- Plan Title -->
+                <div class="plan-title my-2 my-sm-3">
+                  <h4 class="text-uppercase">{{ freePricing.name }}</h4>
+                </div>
+                <!-- Plan Price -->
+                <div class="plan-price pb-2 pb-sm-3">
+                  <h2 class="fw-7"><small class="fw-6">$</small>{{ freePricing.cost }}</h2>
+                </div>
+                <!-- Plan Description -->
+                <div class="plan-description">
+                  <ul class="plan-features">
+                    @for (pf of freePricing.pricingFeatures; track pf.desc) {
+                      <li class="border-top py-3">{{ pf.desc }}</li>
+                    }
+                  </ul>
+                </div>
+                <!-- Plan Button -->
+                <div class="plan-button">
+                  <a [routerLink]="['/signup']" class="btn mt-4">Sign Up</a>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>

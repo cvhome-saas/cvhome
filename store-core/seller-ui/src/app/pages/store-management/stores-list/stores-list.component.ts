@@ -1,72 +1,24 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-
-import {StoreService} from '../services/store.service';
-import {TranslateService} from '@ngx-translate/core';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
-import {ShowcaseDialogComponent} from "../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ColumnMode} from "@swimlane/ngx-datatable";
-import {ErrorService} from "../../shared/services/error.service";
-import {BaseTable, PageT, StorePageRequest} from "../../common/BaseTable";
-import {Observable, of} from "rxjs";
+import {Component, OnInit, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
+import {StoresListFacade} from "./facades/stores-list.facade";
+import {TableStateService} from "../../shared/table/table-state.service";
 
 @Component({
   selector: 'ngx-stores-list',
-  standalone: false,
+  standalone: true,
+  imports: [RouterLink, TranslateModule, NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule, NgxDatatableModule],
   templateUrl: './stores-list.component.html',
-  styleUrls: ['./stores-list.component.scss']
+  styleUrls: ['./stores-list.component.scss'],
+  providers: [StoresListFacade, TableStateService]
 })
-export class StoresListComponent extends BaseTable<any> implements OnInit {
+export class StoresListComponent implements OnInit {
   protected readonly ColumnMode = ColumnMode;
-  private isInitialized: boolean = false;
-
-  constructor(
-    private storeService: StoreService,
-    private router: Router,
-    private toastr: NbToastrService,
-    private dialogService: NbDialogService,
-    private translate: TranslateService,
-    errorService: ErrorService
-  ) {
-    super(null, errorService);
-  }
+  protected readonly facade = inject(StoresListFacade);
 
   ngOnInit() {
-    this.isInitialized = true;
-    this.trigger();
+    this.facade.init();
   }
-
-  override list(request: StorePageRequest): Observable<PageT<any>> {
-    if (!this.isInitialized) {
-      return of();
-    }
-    return this.storeService.getListOfStores(this.params)
-  }
-
-
-  onEdit(row) {
-    this.router.navigate(['pages/store-management/store/', row.id.id]);
-  }
-
-  onDelete(row) {
-    this.dialogService.open(ShowcaseDialogComponent, {
-      context: {
-        title: 'Are you sure!',
-        text: 'Do you really want to remove this entity?'
-      }
-    })
-      .onClose.subscribe(res => {
-      if (res) {
-        this.storeService.deleteStore(row.id.id)
-          .subscribe(data => {
-            this.toastr.success(this.translate.instant('USER_FORM.USER_REMOVED'));
-            this.trigger();
-          }, err => {
-            this.errorService.error('ERROR.SYSTEM_ERROR', err);
-          });
-      }
-    });
-
-  }
-
 }

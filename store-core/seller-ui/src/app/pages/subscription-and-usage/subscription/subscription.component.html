@@ -6,86 +6,101 @@
 
   </nb-card-header>
 
-  <nb-card-body [nbSpinner]="loader" nbSpinnerSize="large" nbSpinnerStatus="primary">
+  <nb-card-body [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
     <div class="d-flex justify-content-center">
       <div class="toggle-btn pb-3">
         <span>{{ 'SUBSCRIPTION.RECURRING_MONTH' | translate }}</span>
-        <nb-toggle (checkedChange)="toggle()" [checked]="flag" status="basic"></nb-toggle>
+        <nb-toggle (checkedChange)="facade.toggle()" [checked]="facade.isYearly()" status="basic"></nb-toggle>
         <span>{{ 'SUBSCRIPTION.RECURRING_YEAR' | translate }}</span>
       </div>
 
     </div>
-    <div class="d-flex justify-content-center">
-      <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='ACTIVE'"
-        size="tiny"
-        status="warning">
-        <p class="text-center">
-          {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
-          {{ currentSubscriptionDetails.endDate }}
-        </p>
-      </nb-alert>
-      <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan=='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
-        status="warning">
-        <p class="text-center">
-          {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
-        </p>
-      </nb-alert>
-      <nb-alert
-        *ngIf="currentSubscriptionDetails&&currentSubscriptionDetails.subscriptionPlan!='FREE'&&currentSubscriptionDetails.status=='IN_ACTIVE'"
-        status="warning">
-        <p class="text-center">
-          {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
-        </p>
-      </nb-alert>
+    @if (facade.currentSubscriptionDetails(); as details) {
+      <div class="d-flex justify-content-center">
+        @if (details.subscriptionPlan==='FREE'&&details.status==='ACTIVE') {
+          <nb-alert
+            size="tiny"
+            status="warning">
+            <p class="text-center">
+              {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
+              {{ details.endDate }}
+            </p>
+          </nb-alert>
+        }
+        @if (details.subscriptionPlan==='FREE'&&details.status==='IN_ACTIVE') {
+          <nb-alert
+            status="warning">
+            <p class="text-center">
+              {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
+            </p>
+          </nb-alert>
+        }
+        @if (details.subscriptionPlan!=='FREE'&&details.status==='IN_ACTIVE') {
+          <nb-alert
+            status="warning">
+            <p class="text-center">
+              {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
+            </p>
+          </nb-alert>
+        }
 
-    </div>
+      </div>
+    }
 
-    <div *ngIf="prices" class="row ">
-      <div *ngFor="let p of prices; index as i" class="col-md-4">
-        <nb-card [accent]="accent[i]">
-          <nb-card-header>
-            {{ 'SUBSCRIPTION.SUBSCRIPTION_PLAN.' + p.name | translate }}
-            <h6 class="fw-7">
+    @if (facade.prices(); as prices) {
+      <div class="row ">
+        @for (p of prices; track p.name; let i = $index) {
+          <div class="col-md-4">
+            <nb-card [accent]="facade.accents[i]">
+              <nb-card-header>
+                {{ 'SUBSCRIPTION.SUBSCRIPTION_PLAN.' + p.name | translate }}
+                <h6 class="fw-7">
 
-              <div *ngIf="p.previousCost!=p.cost">
-                <small class="fw-6">$</small>
-                {{ p.cost }}
-                <span style="text-decoration-line: line-through;color: gray">
+                  @if (p.previousCost!==p.cost) {
+                    <div>
+                      <small class="fw-6">$</small>
+                      {{ p.cost }}
+                      <span style="text-decoration-line: line-through;color: gray">
                     {{ p.previousCost }}
                     </span>
-              </div>
-              <div *ngIf="p.previousCost==p.cost">
-                <small class="fw-6">$</small>
-                {{ p.cost }}
-              </div>
-            </h6>
-          </nb-card-header>
-          <nb-card-body>
-            <div>
-              <ul>
-                <li *ngFor="let pf of p.pricingFeatures" class="border-top pt-2 pb-2">
+                    </div>
+                  }
+                  @if (p.previousCost===p.cost) {
+                    <div>
+                      <small class="fw-6">$</small>
+                      {{ p.cost }}
+                    </div>
+                  }
+                </h6>
+              </nb-card-header>
+              <nb-card-body>
+                <div>
+                  <ul>
+                    @for (pf of p.pricingFeatures; track pf.desc) {
+                      <li class="border-top pt-2 pb-2">
                   <span>
                     {{ 'SUBSCRIPTION.FEATURE.' + pf.desc | translate }}
                   </span>
-                </li>
-              </ul>
-            </div>
-          </nb-card-body>
-          <nb-card-footer>
-            <div class="row justify-content-center">
-              <a [disabled]="p.name==currentSubscriptionDetails.subscriptionPlan"
-                 [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
-                 size="medium"
-                 status="primary">
-                {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}
-              </a>
-            </div>
-          </nb-card-footer>
-        </nb-card>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="row justify-content-center">
+                  <a [disabled]="p.name===facade.currentSubscriptionDetails()?.subscriptionPlan"
+                     [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
+                     size="medium"
+                     status="primary">
+                    {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}
+                  </a>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        }
       </div>
-    </div>
+    }
   </nb-card-body>
 </nb-card>
 

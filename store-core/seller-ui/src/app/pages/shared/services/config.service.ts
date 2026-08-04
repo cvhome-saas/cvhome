@@ -1,25 +1,61 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Language} from '../models/Language';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../../../environments/environment';
-import {HttpClient} from "@angular/common/http";
 import {CrudService} from "./crud.service";
+import {Observable} from 'rxjs';
+
+/** Mirrors the wire shape of List<LanguageCode> as returned by
+ *  MerchantStoreApi#supportedLanguages — a record with only `code`
+ *  (no custom LanguageCode serializer is applied on this endpoint). */
+export interface SupportedLanguageCode {
+  code: string;
+}
+
+/** Static reference data served from public/assets/data/countries.json —
+ *  same shape as reference-commons' ReadableCountry/ReadableZone. */
+export interface ReferenceCountry {
+  id?: number;
+  code?: string;
+  supported?: boolean;
+  name?: string;
+  zones?: ReferenceZone[];
+}
+
+export interface ReferenceZone {
+  id?: number;
+  countryCode?: string;
+  code?: string;
+  name?: string;
+}
+
+/** Static reference data served from public/assets/data/currencies.json. */
+export interface ReferenceCurrency {
+  id?: number;
+  currency?: string;
+  supported?: boolean;
+  code?: string;
+  name?: string;
+  new?: boolean;
+}
+
+/** Static reference data served from public/assets/data/weightSizes.json. */
+export interface WeightAndSizes {
+  weights: string[];
+  measures: string[];
+}
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigService {
+  private readonly crudService = inject(CrudService);
+  private readonly translate = inject(TranslateService);
+
   languages = [];
 
-  constructor(
-    private httpClient: HttpClient,
-    private crudService: CrudService,
-    private translate: TranslateService,
-  ) {
-  }
-
-  getListOfSupportedLanguages(store: string) {
+  getListOfSupportedLanguages(store: string): Observable<SupportedLanguageCode[]> {
     const params = {
       'store': store
     };
@@ -28,8 +64,8 @@ export class ConfigService {
   }
 
   getListOfGlobalLanguages(): Language[] {
-    let langs: string[] = environment.client.language.array
-    let languages: Language[] = [];
+    const langs: string[] = environment.client.language.array
+    const languages: Language[] = [];
     langs.forEach(lang => {
       const l = new Language(0, lang, this.translate.instant('LANG.' + lang));
       languages.push(l);
@@ -38,15 +74,15 @@ export class ConfigService {
     return languages;
   }
 
-  getListOfCountries() {
-    return this.httpClient.get<any[]>("assets/data/countries.json");
+  getListOfCountries(): Observable<ReferenceCountry[]> {
+    return this.crudService.get("assets/data/countries.json");
   }
 
-  getListOfSupportedCurrency() {
-    return this.httpClient.get<any[]>("assets/data/currencies.json");
+  getListOfSupportedCurrency(): Observable<ReferenceCurrency[]> {
+    return this.crudService.get("assets/data/currencies.json");
   }
 
-  getWeightAndSizes() {
-    return this.httpClient.get<any>("assets/data/weightSizes.json");
+  getWeightAndSizes(): Observable<WeightAndSizes> {
+    return this.crudService.get("assets/data/weightSizes.json");
   }
 }

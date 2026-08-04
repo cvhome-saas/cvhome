@@ -1,18 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {ProductFormComponent} from '../product-form/product-form.component';
 
 @Component({
   selector: 'ngx-product-creation',
-  standalone: false,
+  standalone: true,
+  imports: [ProductFormComponent],
   templateUrl: './product-creation.component.html',
   styleUrls: ['./product-creation.component.scss']
 })
-export class ProductCreationComponent implements OnInit {
+export class ProductCreationComponent {
   product = {};
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
 }

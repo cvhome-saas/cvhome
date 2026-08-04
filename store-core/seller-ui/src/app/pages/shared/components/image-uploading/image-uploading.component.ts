@@ -1,49 +1,50 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {HttpEventType} from "@angular/common/http";
-import {catchError, map} from "rxjs/operators";
-import {of} from "rxjs";
-import {CrudService} from "../../services/crud.service";
+import {Component, DestroyRef, EventEmitter, Input, Output, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {TranslateModule} from '@ngx-translate/core';
+import {NbButtonModule} from '@nebular/theme';
+import {ImageUploadingFacade} from './facades/image-uploading.facade';
 
-interface UploadItem {
-  file: File;
-  progress: number;
-  error: boolean;
+const REMOVE_FROM_QUEUE_DELAY_MS = 2000;
+
+/** Minimal structural shape shared by the various image DTOs this generic
+ *  uploader is bound to (catalogue ReadableImage, store SliderImage, …). */
+export interface UploadedImageItem {
+  id?: number | string;
+  path?: string;
+  imageUrl?: string;
 }
 
 @Component({
-  selector: "ngx-image-uploading",
-  standalone: false,
-  templateUrl: "./image-uploading.component.html",
-  styleUrls: ["./image-uploading.component.scss"],
+  selector: 'ngx-image-uploading',
+  standalone: true,
+  imports: [TranslateModule, NbButtonModule],
+  templateUrl: './image-uploading.component.html',
+  styleUrls: ['./image-uploading.component.scss'],
+  providers: [ImageUploadingFacade]
 })
-export class ImageUploadingComponent implements OnInit {
-
-  @Input() images: any[] = [];
+export class ImageUploadingComponent {
+  @Input() images: UploadedImageItem[] = [];
   @Input() addImageUrl: string;
   @Input() deleteImageUrl: string;
 
   @Output() remove = new EventEmitter<string>();
-  @Output() update = new EventEmitter<any>();
-  @Output() error = new EventEmitter<string>();
+  @Output() update = new EventEmitter<{id: string | number; position: number}>();
+  @Output() uploadError = new EventEmitter<string>();
   @Output() success = new EventEmitter<string>();
-  @Output() fileAdded = new EventEmitter<any>();
+  @Output() fileAdded = new EventEmitter<boolean>();
 
-  uploadQueue: UploadItem[] = [];
+  protected readonly facade = inject(ImageUploadingFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(private crudService: CrudService) {
-  }
-
-  ngOnInit() {
-  }
-
-  public itemTrackBy(index, item) {
+  itemTrackBy(index: number, item: UploadedImageItem) {
     return item.id;
   }
 
-  onFileSelected(event: any) {
-    const files: FileList = event.target.files;
+  onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
     this.handleFiles(files);
-    event.target.value = ''; // Reset input
+    target.value = '';
   }
 
   onDragOver(event: DragEvent) {
@@ -60,55 +61,29 @@ export class ImageUploadingComponent implements OnInit {
     }
   }
 
-  handleFiles(files: FileList) {
+  removeImage(image: UploadedImageItem) {
+    this.remove.emit(`${image.id}`);
+  }
+
+  private handleFiles(files: FileList) {
     if (files && files.length > 0) {
-      for (let i = 0; i < files.length; i++) {
-        this.uploadFile(files[i]);
+      for (const file of Array.from(files)) {
+        this.uploadFile(file);
       }
     }
   }
 
-  uploadFile(file: File) {
-    const item: UploadItem = {
-      file: file,
-      progress: 0,
-      error: false
-    };
-    this.uploadQueue.push(item);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    this.crudService.request('POST', this.addImageUrl, formData, {
-      reportProgress: true,
-    })
-
-      .pipe(
-        map(event => {
-          if (event.type === HttpEventType.UploadProgress) {
-            if (event.total) {
-              item.progress = Math.round(100 * event.loaded / event.total);
-            }
-          } else if (event.type === HttpEventType.Response) {
-            item.progress = 100;
-            this.success.emit(file.name);
-            this.fileAdded.emit(true);
-            // Remove from queue after delay
-            setTimeout(() => {
-              this.uploadQueue = this.uploadQueue.filter(i => i !== item);
-            }, 2000);
-          }
-        }),
-        catchError(err => {
-          console.error(err);
-          item.error = true;
-          this.error.emit(err.message || 'Upload failed');
-          return of(null);
-        })
-      ).subscribe();
-  }
-
-  removeImage(image) {
-    this.remove.emit(image.id);
+  private uploadFile(file: File) {
+    this.facade.uploadFile(file, this.addImageUrl)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result.type === 'success') {
+          this.success.emit(file.name);
+          this.fileAdded.emit(true);
+          setTimeout(() => this.facade.removeFromQueue(result.item), REMOVE_FROM_QUEUE_DELAY_MS);
+        } else if (result.type === 'error') {
+          this.uploadError.emit(result.message);
+        }
+      });
   }
 }

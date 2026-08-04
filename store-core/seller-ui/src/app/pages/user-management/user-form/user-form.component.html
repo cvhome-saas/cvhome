@@ -6,27 +6,31 @@
     <div class="row">
       <div class="col">
       </div>
-      <div *ngIf="user!=undefined" class="col col-lg-2">
-        <nb-select [(selected)]="selectedItem" fullWidth outline shape="rectangle">
-          <nb-option (click)="route(item.link)" *ngFor="let item of sidemenuLinks" [value]="item.id">
-            {{ item.title |translate }}
-          </nb-option>
-        </nb-select>
-      </div>
+      @if (user!==undefined) {
+        <div class="col col-lg-2">
+          <nb-select [selected]="facade.selectedItem()" fullWidth outline shape="rectangle">
+            @for (item of facade.sidemenuLinks(); track item.id) {
+              <nb-option (click)="facade.route(item.link)" [value]="item.id">
+                {{ item.title |translate }}
+              </nb-option>
+            }
+          </nb-select>
+        </div>
+      }
       <div class="col col-lg-2">
-        <button (click)="goToBack()" class="m-1" nbButton status="warning" type="button">
+        <button (click)="facade.goToBack()" class="m-1" nbButton status="warning" type="button">
           {{ 'ORDER_FORM.CANCEL'| translate }}
         </button>
-        <button (click)="save()" [nbSpinner]="loader" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
+        <button (click)="facade.save(action, store, user)" [nbSpinner]="facade.loader()" nbButton nbSpinnerSize="large" nbSpinnerStatus="control"
                 status="success"
                 type="submit">
-          {{ (!loader ? 'COMMON.SAVE' : '') | translate }}
+          {{ (!facade.loader() ? 'COMMON.SAVE' : '') | translate }}
         </button>
       </div>
     </div>
   </nb-card-header>
   <nb-card-body>
-    <form [formGroup]='form'>
+    <form [formGroup]='facade.form'>
       <div class="form-group">
         <label class="col-sm-3 col-form-label " for="username">
           {{ 'USER_FORM.USER_NAME' | translate }}
@@ -36,10 +40,11 @@
           <input class="form-control " formControlName='userName' fullWidth id="username" nbInput
                  placeholder="{{ 'USER_FORM.USER_NAME' | translate }}"
                  required type="text">
-          <span *ngIf="(userName.dirty || userName.touched) && userName.invalid && userName.errors.required"
-                class="err-message">
+          @if ((facade.userName.dirty || facade.userName.touched) && facade.userName.invalid && facade.userName.errors?.required) {
+            <span class="err-message">
               {{ 'USER_FORM.USER_NAME_ERROR_REQUIRED' | translate }}
             </span>
+          }
         </div>
       </div>
 
@@ -51,10 +56,11 @@
           <input class="form-control " formControlName='firstName' fullWidth id="firstname" nbInput
                  placeholder="{{ 'USER_FORM.FIRST_NAME' | translate }}"
                  required type="text">
-          <span *ngIf="(firstName.dirty || firstName.touched) && firstName.invalid && firstName.errors.required"
-                class="err-message">
+          @if ((facade.firstName.dirty || facade.firstName.touched) && facade.firstName.invalid && facade.firstName.errors?.required) {
+            <span class="err-message">
               {{ 'USER_FORM.FIRST_NAME_ERROR_REQUIRED' | translate }}
             </span>
+          }
         </div>
       </div>
       <div class="form-group">
@@ -64,10 +70,11 @@
           <input class="form-control " formControlName='lastName' fullWidth id="lastname" nbInput
                  placeholder="{{ 'USER_FORM.LAST_NAME' | translate }}"
                  required type="text">
-          <span *ngIf="(lastName.dirty || lastName.touched) && lastName.invalid && lastName.errors.required"
-                class="err-message">
+          @if ((facade.lastName.dirty || facade.lastName.touched) && facade.lastName.invalid && facade.lastName.errors?.required) {
+            <span class="err-message">
               {{ 'USER_FORM.LAST_NAME_ERROR_REQUIRED' | translate }}
             </span>
+          }
         </div>
       </div>
       <div class="form-group">
@@ -77,59 +84,79 @@
         <div class="col-sm-12">
           <input class="form-control " formControlName='emailAddress' fullWidth id="email" nbInput
                  placeholder="{{ 'USER_FORM.EMAIL_ADDRESS' | translate }}" required type="email">
-          <span *ngIf="(emailAddress.dirty || emailAddress.touched) && emailAddress.invalid && emailAddress"
-                class="err-message">
-              <span *ngIf="emailAddress.errors.email || emailAddress.errors.pattern">
-                {{ 'USER_FORM.EMAIL_ADDRESS_ERROR_NOT_VALID' | translate }}
-              </span>
-              <span *ngIf="emailAddress.errors.required">
-                {{ 'USER_FORM.EMAIL_ADDRESS_ERROR_REQUIRED' | translate }}
-              </span>
+          @if ((facade.emailAddress.dirty || facade.emailAddress.touched) && facade.emailAddress.invalid && facade.emailAddress) {
+            <span class="err-message">
+              @if (facade.emailAddress.errors?.email || facade.emailAddress.errors?.pattern) {
+                <span>
+                  {{ 'USER_FORM.EMAIL_ADDRESS_ERROR_NOT_VALID' | translate }}
+                </span>
+              }
+              @if (facade.emailAddress.errors?.required) {
+                <span>
+                  {{ 'USER_FORM.EMAIL_ADDRESS_ERROR_REQUIRED' | translate }}
+                </span>
+              }
             </span>
+          }
         </div>
       </div>
 
-      <div *ngIf="action=='CREATE'" class="form-group">
-        <label class="col-sm-3 col-form-label " for="password">
-          {{ 'COMMON.PASSWORD' | translate }}*
-        </label>
-        <div class="col-sm-12">
-          <input class="form-control " formControlName='password' fullWidth id="password" nbInput
-                 placeholder="{{ 'COMMON.PASSWORD' | translate }}"
-                 required type="password">
-          <span *ngIf="(password.dirty || password.touched) && password.invalid && password" class="err-message">
-              <span *ngIf="password.errors.required">
-                {{ 'USER_FORM.PASSWORD_ERROR_REQUIRED' | translate }}
+      @if (action==='CREATE') {
+        <div class="form-group">
+          <label class="col-sm-3 col-form-label " for="password">
+            {{ 'COMMON.PASSWORD' | translate }}*
+          </label>
+          <div class="col-sm-12">
+            <input class="form-control " formControlName='password' fullWidth id="password" nbInput
+                   placeholder="{{ 'COMMON.PASSWORD' | translate }}"
+                   required type="password">
+            @if ((facade.password.dirty || facade.password.touched) && facade.password.invalid && facade.password) {
+              <span class="err-message">
+                @if (facade.password.errors?.required) {
+                  <span>
+                    {{ 'USER_FORM.PASSWORD_ERROR_REQUIRED' | translate }}
+                  </span>
+                }
+                @if (facade.password.errors?.pattern) {
+                  <span>
+                    {{ 'USER_FORM.PASSWORD_ERROR_NOT_VALID' | translate }} <br/>
+                    {{ 'USER_FORM.PASSWORD_ERROR_RULES' | translate }}
+                  </span>
+                }
               </span>
-              <span *ngIf="password.errors.pattern">
-                {{ 'USER_FORM.PASSWORD_ERROR_NOT_VALID' | translate }} <br/>
-                {{ 'USER_FORM.PASSWORD_ERROR_RULES' | translate }}
-              </span>
-            </span>
+            }
+          </div>
         </div>
-      </div>
-      <div *ngIf="action=='CREATE'" class="form-group">
-        <label class="col-sm-3 col-form-label " for="password">
-          Repeat Password *
-        </label>
-        <div class="col-sm-12">
-          <input class="form-control" formControlName='repeatPassword' fullWidth id="repeatPassword" nbInput
-                 placeholder="Repeat Password"
-                 required type="password">
-          <span *ngIf="(repeatPassword.dirty || repeatPassword.touched) && repeatPassword.invalid && repeatPassword"
-                class="err-message">
-              <span *ngIf="repeatPassword.errors.required">
-                {{ 'USER_FORM.PASSWORD_ERROR_REQUIRED' | translate }}<br/>
-              </span>
+      }
+      @if (action==='CREATE') {
+        <div class="form-group">
+          <label class="col-sm-3 col-form-label " for="password">
+            Repeat Password *
+          </label>
+          <div class="col-sm-12">
+            <input class="form-control" formControlName='repeatPassword' fullWidth id="repeatPassword" nbInput
+                   placeholder="Repeat Password"
+                   required type="password">
+            @if ((facade.repeatPassword.dirty || facade.repeatPassword.touched) && facade.repeatPassword.invalid && facade.repeatPassword) {
+              <span class="err-message">
+                @if (facade.repeatPassword.errors?.required) {
+                  <span>
+                    {{ 'USER_FORM.PASSWORD_ERROR_REQUIRED' | translate }}<br/>
+                  </span>
+                }
 
-            </span>
-          <span *ngIf="form.hasError('notSame')" class="err-message">
-              <span>
-                {{ 'USER_CHANGE_PASSWORD.PASSWORDS_NOT_MATCH' | translate }}
               </span>
-            </span>
+            }
+            @if (facade.form.hasError('notSame')) {
+              <span class="err-message">
+                <span>
+                  {{ 'USER_CHANGE_PASSWORD.PASSWORDS_NOT_MATCH' | translate }}
+                </span>
+              </span>
+            }
+          </div>
         </div>
-      </div>
+      }
       <div class="form-group">
         <nb-checkbox class="col-sm-4" formControlName='active'>
           {{ 'USER_FORM.ACTIVE' | translate }}
@@ -137,14 +164,16 @@
       </div>
 
       <div class="form-group">
-        <label class="col-sm-3 col-form-label ">
+        <span class="col-sm-3 col-form-label ">
           {{ 'USER_FORM.ROLES' | translate }} *
-        </label>
+        </span>
         <div class="col-sm-12 group-block">
-          <nb-checkbox (change)="checkRole(role.name)" *ngFor="let role of roles" [checked]="role.checked"
-                       [disabled]="action=='VIEW'">
-            {{ role.name }}
-          </nb-checkbox>
+          @for (role of facade.roles(); track role.name) {
+            <nb-checkbox (change)="facade.checkRole(role.name)" [checked]="role.checked"
+                         [disabled]="action==='VIEW'">
+              {{ role.name }}
+            </nb-checkbox>
+          }
         </div>
       </div>
     </form>
