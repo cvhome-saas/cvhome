@@ -3,7 +3,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {map} from 'rxjs/operators';
 import {UserService} from '../../../shared/services/user.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {ChangePasswordFormService} from '../services/change-password-form.service';
 import {USER_DETAILS_SIDE_MENU_LINKS} from '../../constants/user-management.constants';
 
@@ -13,7 +14,8 @@ export class ChangePasswordFacade {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
   private readonly formService = inject(ChangePasswordFormService);
 
   readonly loader = signal<boolean>(false);
@@ -64,12 +66,12 @@ export class ChangePasswordFacade {
     this.userService.updatePassword(this.userService.getUserId(), passwords).subscribe({
       next: () => {
         this.loader.set(false);
-        this.errorService.success('USER.PASSWORD_CHANGED');
+        this.notify.success('USER.PASSWORD_CHANGED');
       },
       error: (err) => {
         this.loader.set(false);
         this.errorMessage.set(this.translate.instant('USER.PASSWORD_NOT_MATCH'));
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

@@ -1,7 +1,7 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {sideMenuLinks} from '../../services/constents';
 import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 
@@ -10,7 +10,7 @@ export class StoreBrandingFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly loading = signal<boolean>(false);
@@ -29,7 +29,7 @@ export class StoreBrandingFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

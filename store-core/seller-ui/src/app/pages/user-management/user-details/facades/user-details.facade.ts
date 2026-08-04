@@ -2,14 +2,14 @@ import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {UserService} from '../../../shared/services/user.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
 import {User} from '../../../shared/models/user';
 
 @Injectable()
 export class UserDetailsFacade {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly user = signal<User>(null);
   readonly loadingInfo = signal<boolean>(false);
@@ -28,7 +28,7 @@ export class UserDetailsFacade {
         },
         error: (err) => {
           this.loadingInfo.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }

@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreSocialLinksFormService} from '../services/store-social-links.form.service';
 import {zip} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
@@ -14,7 +15,8 @@ export class StoreSocialLinksFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly isSubmited = signal<boolean>(false);
   readonly store = signal<ReadableMerchantStoreWithPod>(null);
@@ -42,7 +44,7 @@ export class StoreSocialLinksFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -70,10 +72,10 @@ export class StoreSocialLinksFacade {
 
     this.storeService.updateStoreSocialLinks(st.id, { socialLinks }).subscribe({
       next: () => {
-        this.errorService.success('STORE.SOCIAL_LINKS_UPDATED');
+        this.notify.success('STORE.SOCIAL_LINKS_UPDATED');
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }

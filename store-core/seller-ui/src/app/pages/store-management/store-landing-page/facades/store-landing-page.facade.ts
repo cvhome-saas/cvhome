@@ -2,7 +2,8 @@ import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreLandingPageFormService} from '../services/store-landing-page.form.service';
 import {forkJoin} from 'rxjs';
 import {sideMenuLinks} from '../../services/constents';
@@ -14,7 +15,8 @@ export class StoreLandingPageFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly loader = signal<boolean>(false);
   readonly store = signal<ReadableMerchantStoreWithPod>(null);
@@ -56,7 +58,7 @@ export class StoreLandingPageFacade {
       },
       error: (err) => {
         this.loader.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -79,17 +81,17 @@ export class StoreLandingPageFacade {
     if (pg && pg.id) {
       this.storeService.updatePageContent(st.id, pg.id, this.form.value).subscribe({
         next: () => {
-          this.errorService.success('STORE_LANDING.PAGE_UPDATED');
+          this.notify.success('STORE_LANDING.PAGE_UPDATED');
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
     } else {
       this.storeService.createPageContent(this.form.value, st.id).subscribe({
         next: () => {
-          this.errorService.success('STORE_LANDING.PAGE_ADDED');
+          this.notify.success('STORE_LANDING.PAGE_ADDED');
           this.router.navigate(['pages/store-management/store/', st.id]);
         },
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
     }
   }

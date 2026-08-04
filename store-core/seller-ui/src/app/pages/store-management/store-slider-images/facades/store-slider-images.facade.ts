@@ -1,7 +1,8 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {StoreService} from '../../services/store.service';
-import {ErrorService} from '../../../shared/services/error.service';
+import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {NotificationService} from '../../../../core/notifications/notification.service';
 import {sideMenuLinks} from '../../services/constents';
 import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
 import {SliderImage} from '../../models/store';
@@ -11,7 +12,8 @@ export class StoreSliderImagesFacade {
   private readonly storeService = inject(StoreService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
+  private readonly notify = inject(NotificationService);
 
   readonly store = signal<ReadableMerchantStoreWithPod>(null);
   readonly newImageData = signal<string | ArrayBuffer | null>(null);
@@ -37,7 +39,7 @@ export class StoreSliderImagesFacade {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       }
     });
   }
@@ -61,10 +63,10 @@ export class StoreSliderImagesFacade {
       }));
       this.storeService.saveStoreImageSliders(st.id, sliderImagesPayload).subscribe({
         next: () => {
-          this.errorService.success('STORE.SLIDER_IMAGE_UPDATED');
+          this.notify.success('STORE.SLIDER_IMAGE_UPDATED');
         },
         error: (err) => {
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
     }
@@ -130,10 +132,10 @@ export class StoreSliderImagesFacade {
       next: (data) => {
         const imgs = [...this.sliderImages(), data];
         this.sliderImages.set(imgs);
-        this.errorService.success('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY');
+        this.notify.success('STORE.SLIDER_IMAGE_UPLOADED_SUCCESSFULLY');
       },
       error: (err) => {
-        this.errorService.error('ERROR.SYSTEM_ERROR', err);
+        this.apiErrors.notify(err);
       },
       complete: () => {
         this.resetNewImage(newImageInput);

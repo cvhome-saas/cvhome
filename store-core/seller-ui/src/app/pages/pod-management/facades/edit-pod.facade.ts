@@ -3,13 +3,13 @@ import {ActivatedRoute} from '@angular/router';
 import {switchMap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ErrorService} from '../../shared/services/error.service';
+import {ApiErrorService} from '../../../core/errors/api-error.service';
 
 @Injectable()
 export class EditPodFacade {
   private readonly route = inject(ActivatedRoute);
   private readonly podService = inject(PodService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly pod = signal<Pod | null>(null);
 
@@ -19,7 +19,7 @@ export class EditPodFacade {
       takeUntilDestroyed(destroyRef)
     ).subscribe({
       next: (pod) => this.pod.set(pod),
-      error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+      error: (err) => this.apiErrors.notify(err)
     });
   }
 }
