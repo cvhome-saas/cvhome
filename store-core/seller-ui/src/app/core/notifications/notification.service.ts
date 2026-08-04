@@ -11,11 +11,12 @@ export interface NotificationOptions {
 /**
  * The one wrapper around `NbToastrService`.
  *
- * Nebular is the only toast stack that actually works here: `app.config.ts` provides
- * `NbToastrModule.forRoot()`, nothing provides ngx-toastr's `ToastrModule.forRoot()`, and
- * `ngx-toastr/toastr.css` is imported in no stylesheet — so the ngx-toastr path throws
- * `NullInjectorError` the moment it is used. Nebular also inherits the app theme and its RTL handling,
- * which matters because Arabic ships.
+ * Nebular is the only toast stack that actually worked here: `app.config.ts` provides
+ * `NbToastrModule.forRoot()`, while nothing ever provided ngx-toastr's `ToastrModule.forRoot()` — so
+ * injecting `ToastrService` threw `NullInjectorError`, which is why /signup rendered without its form
+ * until this replaced it. (Its stylesheet *was* being loaded from `angular.json`, which made the gap
+ * easy to miss.) ngx-toastr is gone from the dependencies now, and a lint rule keeps it out.
+ * Nebular also inherits the app theme and its RTL handling, which matters because Arabic ships.
  *
  * The asymmetry in these signatures is deliberate:
  *

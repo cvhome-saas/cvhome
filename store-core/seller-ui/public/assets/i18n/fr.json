@@ -633,12 +633,6 @@
     "PAGE_NOT_FOUND_TEXT": "La page que vous recherchiez n'existe pas",
     "BACK": "Ramenez-moi à l'accueuil"
   },
-  "ERROR": {
-    "SYSTEM_ERROR": "Erreur système",
-    "SYSTEM_ERROR_TEXT": "Une erreur est survenue lors de cette demande",
-    "SERVER_UNAVAILABLE": "Serveur non disponible",
-    "SERVER_RETRY": "Ce serveur est déserté depuis un certain temps. Soyez patient ou réessayez plus tard."
-  },
   "COMMON": {
     "LANGUAGE": "Langue",
     "LANGUAGES": "Langues",
