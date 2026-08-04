@@ -5,7 +5,7 @@ into an `lb://` URL, and a Spring Cloud `DiscoveryClient` resolves that name to 
 discovery client changes between local and AWS** — the URL, the code and the config keys above it are identical.
 
 ```
-RestClientBuilder.buildClient("catalog", Iface.class)
+RestClientBuilder.buildClient("catalog", Iface.class, errorCatalog)
         ↓  ServiceUrlBuilder            (service-to-service.md)
    "lb://catalog"
         ↓  @LoadBalanced RestClient.Builder → Spring Cloud LoadBalancer

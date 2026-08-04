@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.controlplane.errors.PodNotFoundException;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
@@ -26,7 +27,7 @@ public class PodDatabaseInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void onApplicationReady() {
+    public void onApplicationReady() throws PodNotFoundException {
         List<Pod> pods = properties.pods();
         if (pods == null || pods.isEmpty()) {
             log.info("No pods found in properties to sync");

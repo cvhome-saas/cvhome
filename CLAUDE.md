@@ -17,7 +17,8 @@ Don't re-derive that from source; don't duplicate it here.
 **Layering of the rules:** the `project-structure` skill is the *rulebook* (why the architecture is shaped
 this way); this file is the *enforcement layer* (what every change must satisfy). When they overlap they
 agree — and if either drifts, the source wins: `settings.gradle` for modules, `common-config.yml` for
-ports/hosts, `CustomPermissionEvaluator` for permission tokens, `schema.sql` for DDL.
+ports/hosts, `CustomPermissionEvaluator` for permission tokens, `schema.sql` for DDL, `BaseException`'s javadoc
+for the error rules.
 
 ## House style & working modes
 
@@ -110,6 +111,25 @@ host. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts and namespaces are
 - A new service needs entries in **all three** of `common-config.yml`, `lcl-config.yml`,
   `fargate-config.yml` to be resolvable via `lb://`.
 
+## Error handling
+
+Rules, hierarchy and the corrections behind them: `references/error-handling.md` in the skill — read it before
+touching errors. What binds every change:
+
+- **Throw and declare condition-named classes only** (`DuplicateSkuException`), never `BaseException` or a
+  category base. Throwing one is a compile error (bases are abstract); *declaring* one still compiles, so it is
+  a review/grep gate. Exceptions are checked by design — let the new failure mode break callers.
+- **Category names the parent, condition names the class**, one class per condition with a static `of(...)`
+  factory over that context's `ErrorCode` enum. Catch narrowly, never `switch` on `category()`.
+- **Get *who failed* right:** us → our code and status; a peer cvhome service → `RemoteServiceException`, the
+  remote's code re-emitted; a third party → `ExternalProviderException`, our code with theirs as `providerCode`.
+  Inside a provider call also split *decided* (refused, 422) from *undecided* (no answer, 502) — collapsing them
+  cancels orders that were charged.
+- **Bodies come only from `ProblemDetailFactory`**, via the single `@ControllerAdvice` with no `basePackages`.
+  No root-cause text in `detail`; internal detail stays in the log, joined by `traceId`.
+- **A nicer `ErrorCode` on a legacy exception is not a migration** — the signature still says nothing. `LEGACY.*`
+  marks un-migrated throw sites; `payment` is the reference implementation.
+
 ## Feature checklist (review policy)
 
 Apply to every PR that adds or extends a feature. The `project-structure` skill explains *why*; this is the
@@ -142,9 +162,20 @@ enforcement layer. Tick only the rows the change actually touches — but a touc
 - [ ] Tenant-supplied credentials encrypted in the mapper (`toEntity` encrypt / `toDTO` decrypt, guarded by
       `EncryptedValue.isEncrypted`) via `secret-crypto` — never a plaintext column, never logged
 
+**Errors** (details: `references/error-handling.md`)
+- [ ] New failure mode = `ErrorCode` constant + one condition-named exception in that `-commons`, declared by
+      name on the throwing method and on `I<Domain>Service` if exposed over HTTP
+- [ ] No new `LEGACY.*`; a touched legacy throw site is migrated, not just re-coded
+- [ ] Ran the skill's grep gates: generic `throws` over the touched module, and old type names (comments
+      included) after a rename
+
 **Integration**
 - [ ] Synchronous cross-service call declared as a `@HttpExchange` interface in the provider's
       `-external-api`, implemented by its `External*Api` controller, consumed via `RestClientBuilder`
+- [ ] `buildClient(...)` gets an explicit error contract — `*ApiErrors.CATALOG`, or `RemoteErrorCatalog.none()`
+      when the API names no failures
+- [ ] Caller-side exception types on the **`@HttpExchange` interface's** `throws` clause (not the server one) —
+      that is what delivers them narrowed; a `.map(...)` entry alone does not. Reactive callers use `onErrorMap`
 - [ ] Asynchronous work published as a domain event from an aggregate root, event type in an `-events`
       module, `@OutboxHandler` **idempotent** (delivery is at-least-once)
 - [ ] uaa user management goes through `UserAccountService` (`uaa-client`), stamping `org` + `store`
@@ -187,6 +218,12 @@ Reject or fix on sight — each of these has a repo mechanism that is being bypa
 - A non-idempotent `@OutboxHandler`
 - A new endpoint that ignores `StoreMerchantId`, or a repository query not scoped by store
 - An i18n key added to `en` only
+- `throws BaseException` (or a category base), a new `LEGACY.*` throw site, or `catch (BaseException)` +
+  `switch (category())`
+- A hand-built `ProblemDetail`, a second `@ControllerAdvice`, or root-cause text in `detail`
+- A provider's code/status re-emitted as ours, or a rejection and a transport failure sharing one `catch`
+- `buildClient(...)` with no catalog argument, or caller-side types on the server interface
+- A `catch` that swallows a typed failure and returns a success shape (200 on a rejection kills the typed path)
 
 ## Plans
 

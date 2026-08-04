@@ -9,8 +9,8 @@ Authenticating a user, validating a token, or reading the current principal is a
 
 | Module | Contains | Depends on |
 |---|---|---|
-| `store-commons:uaa-client` | **Contract only**: `UserAccountService` + the `domain/user` DTOs (`PersistableUser`, `ReadableUser`, `ReadableUserList`, `UserPassword`, `UserEntity`) | `store-commons:commons` (compileOnly) |
-| `store-commons:uaa-client-impl` | **Implementation**: `UserAccountServiceImpl`, the raw SDK (`AdminUserClient`, `AdminClientClient`, `AbstractAdminClient`, `OAuth2TokenManager`), `sdk/dto/*`, `ApiException` | `uaa-client` |
+| `store-commons:uaa-client` | **Contract**: `UserAccountService`, the `domain/user` DTOs (`PersistableUser`, `ReadableUser`, `ReadableUserList`, `UserPassword`, `UserEntity`), the shared `UaaErrors` vocabulary + uaa's condition types (`errors/`), and the caller-side exception family + `UaaApiErrors.CATALOG` (`api/errors/`) | `store-commons:errors` (api), `store-commons:commons` (compileOnly) |
+| `store-commons:uaa-client-impl` | **Implementation**: `UserAccountServiceImpl`, the raw SDK (`AdminUserClient`, `AdminClientClient`, `AbstractAdminClient`, `OAuth2TokenManager`), `sdk/dto/*` | `uaa-client` |
 
 Same interface/impl split as `-external-api` vs `-service` elsewhere: business code compiles against
 `UserAccountService`, and only one `@Configuration` ever touches the concrete client. Today
@@ -72,7 +72,9 @@ The base URL is **interpolated from `common-config.yml`**, so it follows a port 
 `OAuth2TokenManager` fetches `grant_type=client_credentials&scope=super_admin` from `{baseUrl}/oauth2/token`,
 caches the token and refreshes it 60s before expiry, `synchronized` around the refresh. It posts credentials in
 the form body and **falls back to HTTP Basic** if that is rejected. `AbstractAdminClient` then attaches
-`Authorization: Bearer …` to every call and throws `ApiException` on any status ≥ 400.
+`Authorization: Bearer …` to every call. A failed token exchange is a `UaaApiUnavailableException` carrying
+`phase=token`: the request the caller wanted was never attempted, and the response body is deliberately not copied
+into the exception because it can echo back client credentials.
 
 That `super_admin` scope matters: every endpoint on uaa's `AdminUserController` is guarded by
 
@@ -83,19 +85,46 @@ That `super_admin` scope matters: every endpoint on uaa's `AdminUserController` 
 so **this SDK carries platform-wide privileges**. Tenant scoping is *not* enforced by uaa — the caller must do
 it (see "Tenant scoping" below).
 
+## Errors — a client SDK with one interface
+
+`AbstractAdminClient` decodes uaa's problem body and resolves it against `UaaApiErrors.CATALOG`, the same
+`RemoteErrorCatalog` contract the Spring clients use; the shared decision-making is `RemoteFailures` in
+`store-commons:errors`, which works on a plain `Map` so it needs no Spring and no JSON library. The family:
+
+```
+abstract UaaApiException extends RemoteServiceException     remoteService = "uaa"
+ ├── UaaUserNotFoundException        UAA.USER.NOT_FOUND
+ ├── UaaClientNotFoundException      UAA.CLIENT.NOT_FOUND
+ ├── UaaOperationForbiddenException  UAA.USER.SUPER_ADMIN_IMMUTABLE
+ ├── UaaConflictException            COMMON.DATA_INTEGRITY_VIOLATION  (username/email taken)
+ └── UaaApiUnavailableException      transport failure, token failure, any unmapped code
+```
+
+**One interface, not payment's two.** The split in `payment-external-api` exists because a single `@HttpExchange`
+interface was implemented by both the server's controller and the client proxy. Nothing implements
+`UserAccountService`, so it simply carries the caller-side types. Don't copy the payment split here.
+
+**Where precision lives.** `AdminUserClient`/`AdminClientClient` declare `UaaApiException` throughout — every method
+routes through one `send(...)` that can produce any type in the family, so the transport genuinely cannot narrow.
+`UserAccountServiceImpl` is what narrows, per operation, folding anything it cannot name into
+`UaaApiUnavailableException` ("nothing was decided"). Catch the specific types; treat `UaaApiUnavailableException`
+as *undecided*, never as a refusal.
+
 ## The domain-facing API — `UserAccountService`
 
+Every method declares `UaaApiUnavailableException`, plus what its operation can actually mean:
+
 ```java
-ReadableUser     createUser(PersistableUser user);
-ReadableUser     updateUser(PersistableUser user);
-ReadableUser     findOne(String userId);
-ReadableUser     current(String id);
-ReadableUserList list(Map<String,String> filters, Integer pageNumber, Integer pageSize);
-void             deleteUser(String userId);
-void             enableUser(String userId);
-void             disableUser(String userId);
-void             changePassword(String userId, UserPassword request);
-Set<String>      getAssignableRoles();
+ReadableUser     createUser(PersistableUser user)        throws UaaConflictException, …;
+ReadableUser     updateUser(PersistableUser user)        throws UaaUserNotFoundException, UaaConflictException, …;
+ReadableUser     findOne(String userId)                  throws UaaUserNotFoundException, …;
+ReadableUser     current(String id)                      throws UaaUserNotFoundException, …;
+ReadableUserList list(Map<String,String> filters, Integer pageNumber, Integer pageSize) throws …;
+void             deleteUser(String userId)               throws UaaUserNotFoundException, UaaOperationForbiddenException, …;
+void             enableUser(String userId)               throws UaaUserNotFoundException, UaaOperationForbiddenException, …;
+void             disableUser(String userId)              throws UaaUserNotFoundException, UaaOperationForbiddenException, …;
+void             changePassword(String userId, UserPassword request) throws UaaUserNotFoundException, …;
+Set<String>      getAssignableRoles()                    throws …;
 ```
 
 `PersistableUser` in, `ReadableUser` out — the same `Readable*`/`Persistable*` convention as the pods. Both
@@ -104,7 +133,12 @@ carry `org`, `store`, `userName`, `active`, `roles`.
 ### Get a user
 
 ```java
-ReadableUser user = userAccountService.findOne(userId);   // → GET /api/v1/admin/users/{id}
+try {
+    ReadableUser user = userAccountService.findOne(userId);   // → GET /api/v1/admin/users/{id}
+} catch (UaaUserNotFoundException e) {
+    throw MyContextUserNotFoundException.of(userId, e);       // your 404, not uaa's
+}
+// UaaApiUnavailableException propagates: a 502, and nothing was decided
 ```
 
 ### Create a user
@@ -168,7 +202,9 @@ Base path `{baseUrl}/api/v1/admin/users`. Use it directly only for what `UserAcc
 2. Copy the `UaaClientConfig` bean and the `com.asrevo.cvhome.uaa.client` properties block, keeping `base-url`
    interpolated from `common-config.yml`.
 3. Inject `UserAccountService` — never `AdminUserClient` — into a service that applies the tenant check.
-4. Handle `ApiException` (any status ≥ 400) at the boundary; it is unchecked and carries status + body.
+4. Handle the checked failures the interface declares. Restate uaa's answers in your own vocabulary — control-plane
+   turns `UaaUserNotFoundException` into `ManagedUserNotFoundException` — and let `UaaApiUnavailableException`
+   propagate: it is a 502 the shared advice already renders, and catching it as "not found" records a guess as a fact.
 
 Ask first whether you need it at all: a pod service dealing with *shoppers* wants `cua`, not `uaa`
 (`authentication.md`), and reading the current caller's identity needs no SDK — that comes from the JWT via

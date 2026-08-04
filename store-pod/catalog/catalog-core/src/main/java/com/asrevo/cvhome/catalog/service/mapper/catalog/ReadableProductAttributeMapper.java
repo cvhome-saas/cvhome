@@ -4,13 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductAttributeEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValue;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
@@ -33,14 +33,15 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
 
     @Override
     public ReadableProductAttributeEntity convert(ProductAttribute source, StoreMerchantId store,
-                                                  LanguageCode language) {
+                                                  LanguageCode language) throws ProductAttributeNotConvertibleException {
         ReadableProductAttributeEntity productAttribute = new ReadableProductAttributeEntity();
         return merge(source, productAttribute, store, language);
     }
 
     @Override
     public ReadableProductAttributeEntity merge(ProductAttribute source, ReadableProductAttributeEntity destination,
-                                                StoreMerchantId store, LanguageCode language) {
+                                                StoreMerchantId store, LanguageCode language)
+            throws ProductAttributeNotConvertibleException {
 
         ReadableProductAttributeEntity attr = new ReadableProductAttributeEntity();
         if (destination != null) {
@@ -76,7 +77,7 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
             }
 
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Exception while product attribute conversion", e);
+            throw ProductAttributeNotConvertibleException.of(e);
         }
 
         return attr;

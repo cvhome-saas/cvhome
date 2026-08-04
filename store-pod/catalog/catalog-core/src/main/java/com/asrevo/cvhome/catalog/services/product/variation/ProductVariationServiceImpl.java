@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.repositories.product.variation.PageableProductV
 import com.asrevo.cvhome.catalog.repositories.product.variation.ProductVariationRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productVariationeService")
@@ -54,7 +53,7 @@ public class ProductVariationServiceImpl extends SalesManagerEntityServiceImpl<L
     }
 
     @Override
-    public void saveOrUpdate(ProductVariation entity) throws ServiceException {
+    public void saveOrUpdate(ProductVariation entity) {
 
         // save or update (persist and attach entities
         if (entity.getId() != null && entity.getId() > 0) {

@@ -15,6 +15,9 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
+import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductFull;
@@ -24,8 +27,6 @@ import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
@@ -42,7 +43,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
     @Override
     public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
-                                    LanguageCode language) throws ConversionException {
+                                    LanguageCode language) throws ProductNotConvertibleException {
         try {
 
             List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions = new ArrayList<>();
@@ -105,7 +106,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw ProductNotConvertibleException.of(e);
         }
     }
 
@@ -199,7 +200,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
     }
 
     private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         FinalPriceCalc price = pricingService.calculateProductPrice(source);
         if (price == null) {
             return;

@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.errors.InvalidWebhookSignatureException;
+import com.asrevo.cvhome.payment.errors.PaymentInitiateRejectedException;
+import com.asrevo.cvhome.payment.errors.PaymentProviderUnavailableException;
+import com.asrevo.cvhome.payment.errors.UnexpectedWebhookObjectException;
+import com.asrevo.cvhome.payment.errors.UnreadableWebhookPayloadException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.model.payment.PaymentResponse;
@@ -16,7 +21,6 @@ import com.asrevo.cvhome.payment.model.payment.WebhookResult;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.payment.service.processor.PaymentProcessor;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.stripe.exception.SignatureVerificationException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +36,23 @@ public class PaymentGatewayService {
     private final WebhookUseCaseHandler webhookUseCaseHandler;
 
 
+    /**
+     * Starts a payment.
+     *
+     * <p>
+     * A refusal by the provider is <em>propagated</em>, not folded into a failed result. Swallowing it returned HTTP
+     * 200 with {@code failed()} and no reason at all, so the caller could not tell a declined card from a
+     * misconfigured store — the exception is the only thing that carries the provider's own code across the wire.
+     * Conditions this service decides for itself (no configuration, no processor) stay as failed results, because they
+     * are answers rather than failures.
+     * </p>
+     *
+     * @throws PaymentInitiateRejectedException    the provider refused the payment
+     * @throws PaymentProviderUnavailableException the provider could not be reached, so nothing was decided
+     */
     @Transactional
-    public PaymentInitiateResult initiatePayment(StoreMerchantId store, PaymentRequest request) {
+    public PaymentInitiateResult initiatePayment(StoreMerchantId store, PaymentRequest request)
+            throws PaymentInitiateRejectedException, PaymentProviderUnavailableException {
         log.info("Initiating payment for store {} and order {}", store, request.ref());
 
         PaymentInitiateResult existingRequest =
@@ -53,7 +72,6 @@ public class PaymentGatewayService {
         // Initialize transaction
         String transactionInternalRef = transactionService.createInitialTransaction(store, request);
 
-        try {
 
             PaymentProcessor processor = getProcessor(request.paymentType()).orElse(null);
             if (processor == null) {
@@ -73,9 +91,6 @@ public class PaymentGatewayService {
                     .gatewayRef(transactionInternalRef)
                     .redirectUrl(initiateResult.redirectUrl())
                     .build();
-        } catch (Exception _) {
-            return PaymentInitiateResult.failed(transactionInternalRef);
-        }
     }
 
 
@@ -99,8 +114,14 @@ public class PaymentGatewayService {
         try {
             WebhookResult result = processor.parseWebhook(store, payload, headers, config);
             webhookUseCaseHandler.handleUseCase(store, result);
-        } catch (SignatureVerificationException _) {
-            log.warn("Signature verification failed for webhook from store {}", store);
+        } catch (InvalidWebhookSignatureException | UnreadableWebhookPayloadException
+                 | UnexpectedWebhookObjectException e) {
+            // Every failure parseWebhook declares is permanent for this payload: a redelivery of the same body fails
+            // identically. So acknowledge and stop — propagating would make the outbox redeliver the bad event forever.
+            // The multi-catch is deliberate: if a processor gains a retryable failure mode, this stops compiling and
+            // the retry decision gets made explicitly instead of defaulting to "discard".
+            log.warn("Discarding unprocessable {} webhook for store {} [{}]: {} {}", paymentType, store,
+                    e.errorCode().code(), e.getMessage(), e.params());
         }
     }
 

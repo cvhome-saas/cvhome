@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
+import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +24,8 @@ public class SignUpController {
 
     @PostMapping("public/create")
 
-    public ReadableUser create(@RequestBody CreateOrgRequest request) {
+    public ReadableUser create(@RequestBody CreateOrgRequest request)
+            throws UaaConflictException, UaaApiUnavailableException {
         return signupService.createOrgUser(request);
     }
 

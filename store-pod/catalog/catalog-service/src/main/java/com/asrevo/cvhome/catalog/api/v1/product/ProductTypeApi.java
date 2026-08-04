@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.DuplicateProductTypeException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeNotFoundException;
 import com.asrevo.cvhome.catalog.model.product.type.PersistableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductTypeList;
@@ -78,7 +80,8 @@ public class ProductTypeApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public ReadableProductType get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
+    public ReadableProductType get(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductTypeNotFoundException {
 
         return productTypeFacade.get(merchantStore, id, LanguageCode.allLanguage());
     }
@@ -109,7 +112,8 @@ public class ProductTypeApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@RequestBody PersistableProductType type, StoreMerchantId merchantStore,
-                         LanguageCode language) {
+                         LanguageCode language)
+            throws DuplicateProductTypeException {
 
         Long id = productTypeFacade.save(type, merchantStore, LanguageCode.allLanguage());
         Entity entity = new Entity();
@@ -127,7 +131,8 @@ public class ProductTypeApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@RequestBody PersistableProductType type, @PathVariable Long id, StoreMerchantId merchantStore,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws ProductTypeNotFoundException {
 
         productTypeFacade.update(type, id, merchantStore, language);
     }
@@ -141,7 +146,8 @@ public class ProductTypeApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
+    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductTypeNotFoundException {
 
         productTypeFacade.delete(id, merchantStore, language);
     }

@@ -1,9 +1,7 @@
 package com.asrevo.cvhome.checkout.api.order.v1.order;
 
 import java.util.List;
-import java.util.function.Supplier;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
 import com.asrevo.cvhome.checkout.model.order.history.ReadableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.v0.ReadableOrder;
@@ -22,7 +22,8 @@ import com.asrevo.cvhome.checkout.service.facade.customer.CustomerFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
+import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
+import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
 import com.asrevo.cvhome.store.core.constants.Constants;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,11 +48,6 @@ public class CustomerOrderApi {
 
     private final CustomerFacade customerFacade;
 
-    private static @NonNull Supplier<ResourceNotFoundException> buildCustomerNotFoundException(
-            StoreMerchantId merchantStore, String cuaExternalId) {
-        return () -> new ResourceNotFoundException(
-                String.format("Customer not found for sub : %s in store %s", cuaExternalId, merchantStore));
-    }
 
     @GetMapping(value = {"/private/customer/orders"})
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
@@ -77,11 +73,10 @@ public class CustomerOrderApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
     public ReadableOrder get(@PathVariable final Long id, StoreMerchantId merchantStore, LanguageCode language,
-                             JwtAuthenticationToken auth) {
-        String cuaExternalId = (String) auth.getTokenAttributes().get(SUB_KEY);
-        return customerFacade.getCustomerByCuaExternalId(cuaExternalId)
-                .map(it -> orderFacade.getReadableOrder(id, it.getId(), merchantStore, language))
-                .orElseThrow(buildCustomerNotFoundException(merchantStore, cuaExternalId));
+                             JwtAuthenticationToken auth)
+            throws CustomerNotFoundException, OrderNotFoundException, PriceNotFormattableException {
+        ReadableCustomer customer = requireCustomer(merchantStore, auth);
+        return orderFacade.getReadableOrder(id, customer.getId(), merchantStore, language);
     }
 
     @GetMapping(value = {"/private/customer/{id}/order/history"})
@@ -92,12 +87,27 @@ public class CustomerOrderApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUSTOMER.*')")
     public List<ReadableOrderStatusHistory> history(@PathVariable final Long id, StoreMerchantId merchantStore,
-                                                    LanguageCode language, JwtAuthenticationToken auth) {
+                                                    LanguageCode language, JwtAuthenticationToken auth)
+            throws CustomerNotFoundException, OrderNotFoundException {
 
+        ReadableCustomer customer = requireCustomer(merchantStore, auth);
+        return orderFacade.getReadableOrderHistory(id, customer.getId(), merchantStore, language);
+    }
+
+    /**
+     * Resolves the shopper behind the token.
+     *
+     * <p>
+     * Written as a statement rather than the {@code Optional.map(...)} chain it replaces: the facade calls inside that
+     * chain now declare checked failures, and a lambda cannot carry them — the chain would have had to swallow the
+     * very types this migration exists to deliver.
+     * </p>
+     */
+    private ReadableCustomer requireCustomer(StoreMerchantId merchantStore, JwtAuthenticationToken auth)
+            throws CustomerNotFoundException {
         String cuaExternalId = (String) auth.getTokenAttributes().get(SUB_KEY);
         return customerFacade.getCustomerByCuaExternalId(cuaExternalId)
-                .map(it -> orderFacade.getReadableOrderHistory(id, it.getId(), merchantStore, language))
-                .orElseThrow(buildCustomerNotFoundException(merchantStore, cuaExternalId));
+                .orElseThrow(() -> CustomerNotFoundException.byExternalId(cuaExternalId, merchantStore));
     }
 
 }

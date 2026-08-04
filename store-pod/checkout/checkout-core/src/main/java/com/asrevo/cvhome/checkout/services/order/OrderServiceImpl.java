@@ -28,10 +28,8 @@ import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -47,7 +45,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Override
     @Transactional
-    public void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException {
+    public void addOrderStatusHistory(Order order, OrderStatusHistory history) {
         order.setStatus(history.getStatus());
         order.getOrderHistory().add(history);
         history.setOrder(order);
@@ -55,17 +53,13 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) throws ServiceException {
-        try {
-            return calculateOrder(orderSummary, store);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) {
+        return calculateOrder(orderSummary, store);
     }
 
     @Override
     @Transactional
-    public void delete(Order order) throws ServiceException {
+    public void delete(Order order) {
 
         super.delete(order);
     }
@@ -82,8 +76,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Transactional
     @Override
-    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store)
-            throws ServiceException {
+    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) {
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
@@ -108,7 +101,6 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return order;
     }
 
-    @SneakyThrows
     private OrderTotalSummary calculateOrder(OrderSummary summary, StoreMerchantId store) {
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();

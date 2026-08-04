@@ -16,12 +16,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductIdParameterMissingException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.inventory.PersistableInventory;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductInventoryFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.RestApiException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
@@ -54,7 +61,10 @@ public class ProductInventoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableInventory create(@PathVariable Long productId, @Valid @RequestBody PersistableInventory inventory,
-                                    StoreMerchantId merchantStore, LanguageCode language) {
+                                    StoreMerchantId merchantStore, LanguageCode language)
+
+            throws InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         inventory.setProductId(productId);
         return productInventoryFacade.add(inventory, merchantStore, language);
     }
@@ -68,7 +78,11 @@ public class ProductInventoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable Long productId, @PathVariable Long id,
-                       @Valid @RequestBody PersistableInventory inventory, StoreMerchantId merchantStore, LanguageCode language) {
+                       @Valid @RequestBody PersistableInventory inventory, StoreMerchantId merchantStore, LanguageCode language)
+
+            throws InventoryNotFoundException, InventoryNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductNotFoundException, ProductReferenceUnresolvableException, ProductVariantNotFoundException,
+            ProductVariantReferenceUnresolvableException {
         inventory.setId(id);
         inventory.setProductId(inventory.getProductId());
         inventory.setVariant(inventory.getVariant());
@@ -85,7 +99,8 @@ public class ProductInventoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable Long productId, @PathVariable Long id, StoreMerchantId merchantStore,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws InventoryNotFoundException {
 
         productInventoryFacade.delete(productId, id, merchantStore);
     }
@@ -99,7 +114,8 @@ public class ProductInventoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableInventory> getBySku(@PathVariable String sku, StoreMerchantId merchantStore,
-                                                          LanguageCode language, Pageable pageable) {
+                                                          LanguageCode language, Pageable pageable)
+            throws ProductNotFoundException, InventoryNotConvertibleException {
 
         return productInventoryFacade.get(sku, merchantStore, language, pageable);
     }
@@ -113,10 +129,11 @@ public class ProductInventoryApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableInventory> getByProductId(@RequestParam Long productId,
-                                                                StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+                                                                StoreMerchantId merchantStore, LanguageCode language, Pageable pageable)
+            throws InventoryNotConvertibleException, ProductIdParameterMissingException {
 
         if (productId == null) {
-            throw new RestApiException("Requires request parameter product id [/product/inventoty?productId");
+            throw ProductIdParameterMissingException.of();
         }
 
         return productInventoryFacade.get(productId, merchantStore, language, pageable);

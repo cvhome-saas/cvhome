@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +21,15 @@ import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableImage;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
@@ -30,10 +38,8 @@ import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerServi
 import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
+import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 /**
@@ -66,13 +72,23 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     }
 
     @Override
-    public Product convert(PersistableProduct source, StoreMerchantId store, LanguageCode language) {
+    public Product convert(PersistableProduct source, StoreMerchantId store, LanguageCode language)
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException {
         Product product = new Product();
         return this.merge(source, product, store, language);
     }
 
     @Override
-    public Product merge(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language) {
+    public Product merge(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException {
         try {
 
             // core properties
@@ -115,13 +131,16 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
             return destination;
 
+        } catch (ConversionException e) {
+            // Already names its condition and its offending field; re-wrapping would bury both.
+            throw e;
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Error converting product mapper", e);
+            throw ProductNotConvertibleException.of(e);
         }
     }
 
     private void applySpecifications(PersistableProduct source, Product destination, StoreMerchantId store)
-            throws ConversionException {
+            throws ManufacturerReferenceUnresolvableException {
         if (source.getProductSpecifications() == null) {
             return;
         }
@@ -137,20 +156,20 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
         Manufacturer manufacturer = manufacturerService.getByCode(store,
                 source.getProductSpecifications().getManufacturer());
         if (manufacturer == null) {
-            throw new ConversionException(
-                    "Manufacturer [%s] does not exist".formatted(source.getProductSpecifications().getManufacturer()));
+            throw ManufacturerReferenceUnresolvableException.of(
+                    source.getProductSpecifications().getManufacturer(), store);
         }
         destination.setManufacturer(manufacturer);
     }
 
     private void applyType(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws ProductTypeReferenceUnresolvableException {
         if (StringUtils.isBlank(source.getType())) {
             return;
         }
         ProductType type = productTypeService.getByCode(source.getType(), store, language);
         if (type == null) {
-            throw new ConversionException("Product type [%s] does not exist".formatted(source.getType()));
+            throw ProductTypeReferenceUnresolvableException.of(source.getType(), store);
         }
         destination.setType(type);
     }
@@ -196,46 +215,49 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     }
 
     private void applyCategories(PersistableProduct source, Product destination, StoreMerchantId store)
-            throws ConversionException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (CollectionUtils.isEmpty(source.getCategories())) {
             return;
         }
         for (com.asrevo.cvhome.catalog.model.category.Category categ : source.getCategories()) {
             Category c = resolveCategory(categ, store);
             if (!Objects.equals(c.getStoreMerchantId(), store)) {
-                throw new ConversionException("Invalid category id");
+                throw CategoryReferenceUnresolvableException.of(categ.getId(), store);
             }
             destination.getCategories().add(c);
         }
     }
 
     private Category resolveCategory(com.asrevo.cvhome.catalog.model.category.Category categ, StoreMerchantId store)
-            throws ConversionException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         boolean hasCode = !StringUtils.isBlank(categ.getCode());
         Category c = hasCode ? categoryService.getByCode(store, categ.getCode()) : categoryService.getById(categ.getId(), store);
 
         if (c != null) {
             return c;
         }
-        if (hasCode) {
-            throw new ConversionException("Category code %s does not exist".formatted(categ.getCode()));
-        }
-        throw new ConversionException("Category id %s does not exist".formatted(categ.getId()));
+        throw CategoryReferenceUnresolvableException.of(hasCode ? categ.getCode() : categ.getId(), store);
     }
 
-    private void applyVariants(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language) {
+    private void applyVariants(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
+            throws ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException {
         if (CollectionUtils.isEmpty(source.getVariants())) {
             return;
         }
-        Set<ProductVariant> variants = source.getVariants()
-                .stream()
-                .map(v -> this.variant(destination, v, store, language))
-                .collect(Collectors.toSet());
+        // A plain loop rather than stream().map(...): the variant mapper declares checked failures, and a lambda
+        // cannot carry them.
+        Set<ProductVariant> variants = new HashSet<>();
+        for (PersistableProductVariant persistableVariant : source.getVariants()) {
+            variants.add(this.variant(destination, persistableVariant, store, language));
+        }
 
         destination.setVariants(variants);
     }
 
-    private void applyInventory(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language) {
+    private void applyInventory(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException {
         if (source.getInventory() != null) {
             ProductAvailability productAvailability = persistableProductAvailabilityMapper
                     .convert(source.getInventory(), store, language);
@@ -282,7 +304,10 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     }
 
     private ProductVariant variant(Product product, PersistableProductVariant variant, StoreMerchantId store,
-                                   LanguageCode language) {
+                                   LanguageCode language)
+            throws ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException {
         ProductVariant productVariant = persistableProductVariantMapper.convert(variant, store, language);
         productVariant.setProduct(product);
         return productVariant;

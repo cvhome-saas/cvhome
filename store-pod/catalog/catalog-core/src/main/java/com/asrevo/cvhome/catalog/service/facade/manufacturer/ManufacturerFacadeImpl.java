@@ -11,42 +11,37 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotFoundException;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturerList;
+import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableManufacturerMapper;
 import com.asrevo.cvhome.catalog.service.populator.manufacturer.PersistableManufacturerPopulator;
 import com.asrevo.cvhome.catalog.service.populator.manufacturer.ReadableManufacturerPopulator;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
-import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.core.model.entity.ListCriteria;
 
 @Service("manufacturerFacade")
 public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
-    private static final String CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE = "Category with id [%s] not found";
-
-    private static final String MANUFACTURER_WITH_ID_NOT_FOUND_TEMPLATE = "Manufacturer with id [%s] not found";
-
-    private static final String MANUFACTURER_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE =
-            "Manufacturer with id [%s] not found for store [%s]";
-
-    private static final String MANUFACTURER_NOT_FOUND_TEMPLATE = "Manufacturer [%s] not found";
-
-    private static final String MANUFACTURER_NOT_FOUND_FOR_STORE_TEMPLATE = "Manufacturer [%s] not found for store [%s]";
-
-    private final Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter;
+    /**
+     * Typed as the concrete mapper, not as {@code Mapper<Manufacturer, ReadableManufacturer>}: the SPI declares the
+     * shared {@code ConversionException} base, so a field of the interface type would hand this facade a failure it
+     * cannot name. The implementation narrows it, and that narrowing is only visible through the concrete type.
+     */
+    private final ReadableManufacturerMapper readableManufacturerConverter;
 
     private final ManufacturerService manufacturerService;
 
     private final CategoryService categoryService;
 
-    public ManufacturerFacadeImpl(Mapper<Manufacturer, ReadableManufacturer> readableManufacturerConverter,
+    public ManufacturerFacadeImpl(ReadableManufacturerMapper readableManufacturerConverter,
                                   ManufacturerService manufacturerService, CategoryService categoryService) {
         this.readableManufacturerConverter = readableManufacturerConverter;
         this.manufacturerService = manufacturerService;
@@ -55,28 +50,35 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
     @Override
     public List<ReadableManufacturer> getByProductInCategory(StoreMerchantId store, LanguageCode language,
-                                                             Long categoryId) {
+                                                             Long categoryId)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException, ManufacturerNotConvertibleException {
         Category category = categoryService.getById(categoryId, store);
 
         if (category == null) {
-            throw new ResourceNotFoundException(CATEGORY_WITH_ID_NOT_FOUND_TEMPLATE.formatted(categoryId));
+            throw CategoryNotFoundException.of(categoryId, store);
         }
 
         if (!Objects.equals(category.getStoreMerchantId(), store)) {
-            throw new UnauthorizedException("Merchant [%s] not authorized".formatted(store));
+            // Was a 401 from UnauthorizedException. The caller is authenticated and passed the permission check; the
+            // category simply is not theirs, which is a 403.
+            throw ForeignStoreProductAccessException.of(categoryId, store);
         }
 
         List<Manufacturer> manufacturers = manufacturerService.listByProductsInCategory(store, category, language);
+        manufacturers.sort(Comparator.comparing(Manufacturer::getCode));
 
-        return manufacturers.stream()
-                .sorted(Comparator.comparing(Manufacturer::getCode))
-                .map(manuf -> readableManufacturerConverter.convert(manuf, store, language))
-                .toList();
+        // A plain loop rather than stream().map(...): the mapper declares a checked failure now.
+        List<ReadableManufacturer> readable = new ArrayList<>();
+        for (Manufacturer manuf : manufacturers) {
+            readable.add(readableManufacturerConverter.convert(manuf, store, language));
+        }
+        return readable;
     }
 
     @Override
     public void saveOrUpdateManufacturer(PersistableManufacturer manufacturer, StoreMerchantId store,
-                                         LanguageCode language) throws Exception {
+                                         LanguageCode language)
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException {
 
         PersistableManufacturerPopulator populator = new PersistableManufacturerPopulator();
 
@@ -84,13 +86,8 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
         if (manufacturer.getId() != null && manufacturer.getId() > 0) {
             manuf = manufacturerService.getById(manufacturer.getId());
-            if (manuf == null) {
-                throw new ResourceNotFoundException(MANUFACTURER_WITH_ID_NOT_FOUND_TEMPLATE.formatted(manufacturer.getId()));
-            }
-
-            if (!Objects.equals(manuf.getStoreMerchantId(), store)) {
-                throw new ResourceNotFoundException(
-                        MANUFACTURER_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(manufacturer.getId(), store));
+            if (manuf == null || !Objects.equals(manuf.getStoreMerchantId(), store)) {
+                throw ManufacturerNotFoundException.of(manufacturer.getId(), store);
             }
         }
 
@@ -102,20 +99,17 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
     }
 
     @Override
-    public void deleteManufacturer(Manufacturer manufacturer) throws Exception {
+    public void deleteManufacturer(Manufacturer manufacturer) {
         manufacturerService.delete(manufacturer);
     }
 
     @Override
-    public ReadableManufacturer getManufacturer(Long id, StoreMerchantId store, LanguageCode language) {
+    public ReadableManufacturer getManufacturer(Long id, StoreMerchantId store, LanguageCode language)
+            throws ManufacturerNotFoundException, ManufacturerNotConvertibleException {
         Manufacturer manufacturer = manufacturerService.getById(id);
 
-        if (manufacturer == null) {
-            throw new ResourceNotFoundException(MANUFACTURER_NOT_FOUND_TEMPLATE.formatted(id));
-        }
-
-        if (!manufacturer.getStoreMerchantId().equals(store)) {
-            throw new ResourceNotFoundException(MANUFACTURER_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
+        if (manufacturer == null || !manufacturer.getStoreMerchantId().equals(store)) {
+            throw ManufacturerNotFoundException.of(id, store);
         }
 
         ReadableManufacturer readableManufacturer = new ReadableManufacturer();
@@ -138,37 +132,31 @@ public class ManufacturerFacadeImpl implements ManufacturerFacade {
 
     @Override
     public ReadableManufacturerList listByStore(StoreMerchantId store, LanguageCode language, ListCriteria criteria,
-                                                Pageable pageable) {
+                                                Pageable pageable) throws ManufacturerNotConvertibleException {
 
         ReadableManufacturerList readableList = new ReadableManufacturerList();
 
-        try {
+        List<Manufacturer> manufacturers;
 
-            List<Manufacturer> manufacturers;
+        Page<Manufacturer> m = manufacturerService.listByStore(store, language, criteria.getName(), pageable);
 
-            Page<Manufacturer> m = manufacturerService.listByStore(store, language, criteria.getName(), pageable);
+        manufacturers = m.getContent();
+        readableList.setTotalPages(m.getTotalPages());
+        readableList.setTotalElements(m.getTotalElements());
+        readableList.setSize(m.getNumberOfElements());
+        readableList.setPageNumber(m.getNumber());
 
-            manufacturers = m.getContent();
-            readableList.setTotalPages(m.getTotalPages());
-            readableList.setTotalElements(m.getTotalElements());
-            readableList.setSize(m.getNumberOfElements());
-            readableList.setPageNumber(m.getNumber());
+        ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
+        List<ReadableManufacturer> returnList = new ArrayList<>();
 
-            ReadableManufacturerPopulator populator = new ReadableManufacturerPopulator();
-            List<ReadableManufacturer> returnList = new ArrayList<>();
-
-            for (Manufacturer mf : manufacturers) {
-                ReadableManufacturer readableManufacturer = new ReadableManufacturer();
-                populator.populate(mf, readableManufacturer, store, language);
-                returnList.add(readableManufacturer);
-            }
-
-            readableList.setContent(returnList);
-            return readableList;
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while get manufacturers", e);
+        for (Manufacturer mf : manufacturers) {
+            ReadableManufacturer readableManufacturer = new ReadableManufacturer();
+            populator.populate(mf, readableManufacturer, store, language);
+            returnList.add(readableManufacturer);
         }
+
+        readableList.setContent(returnList);
+        return readableList;
     }
 
 }

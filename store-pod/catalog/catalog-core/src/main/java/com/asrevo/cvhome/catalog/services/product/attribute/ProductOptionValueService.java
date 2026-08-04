@@ -6,12 +6,11 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductOptionValueService extends SalesManagerEntityService<Long, ProductOptionValue> {
 
-    void saveOrUpdate(ProductOptionValue entity) throws ServiceException;
+    void saveOrUpdate(ProductOptionValue entity);
 
     ProductOptionValue getByCode(StoreMerchantId store, String optionValueCode);
 

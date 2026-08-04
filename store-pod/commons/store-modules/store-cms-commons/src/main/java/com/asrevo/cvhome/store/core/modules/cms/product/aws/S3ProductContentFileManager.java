@@ -15,7 +15,9 @@ import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
 import com.asrevo.cvhome.store.core.modules.cms.product.ProductAssetsManager;
 
@@ -81,14 +83,16 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
 
     @Override
     public List<OutputContentFile> getImages(String merchantStoreCode, FileContentType imageContentType)
-            throws ServiceException {
+            throws AssetListFailedException {
+
+        String prefix = nodePath(merchantStoreCode);
         try {
             // get buckets
             String bucketName = bucketName();
 
             ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
                     .bucket(bucketName)
-                    .prefix(nodePath(merchantStoreCode))
+                    .prefix(prefix)
                     .build();
 
             List<OutputContentFile> files = null;
@@ -117,37 +121,38 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
             return files;
         } catch (final Exception e) {
             log.error("Error while getting files", e);
-            throw new ServiceException(e);
+            throw AssetListFailedException.of(prefix, e);
         }
     }
 
     @Override
-    public void removeImages(String merchantStoreCode) throws ServiceException {
+    public void removeImages(String merchantStoreCode) throws AssetDeleteFailedException {
+        String key = nodePath(merchantStoreCode);
         try {
             // get buckets
             String bucketName = bucketName();
-            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(nodePath(merchantStoreCode)).build());
+            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
 
             log.info("Remove folder");
         } catch (final Exception e) {
             log.error("Error while removing folder", e);
-            throw new ServiceException(e);
+            throw AssetDeleteFailedException.of(key, e);
         }
     }
 
     @Override
-    public void removeProductImage(CmsProductImage productImage) throws ServiceException {
+    public void removeProductImage(CmsProductImage productImage) throws AssetDeleteFailedException {
+        String key = nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku())
+                + productImage.getProductImage();
         try {
             // get buckets
             String bucketName = bucketName();
-            String key = nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku())
-                    + productImage.getProductImage();
             s3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
 
             log.info("Remove file");
         } catch (final Exception e) {
             log.error("Error while removing file", e);
-            throw new ServiceException(e);
+            throw AssetDeleteFailedException.of(key, e);
         }
     }
 
@@ -171,18 +176,18 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
     }
 
     @Override
-    public void addProductImage(CmsProductImage productImage, ImageContentFile contentImage) throws ServiceException {
+    public void addProductImage(CmsProductImage productImage, ImageContentFile contentImage)
+            throws AssetUploadFailedException {
 
+        String key = this.nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku(), contentImage)
+                + contentImage.getFileName();
         try {
             // get buckets
             String bucketName = bucketName();
 
-            String nodePath = this.nodePath(productImage.getStoreMerchantId().getId(), productImage.getSku(),
-                    contentImage);
-
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(nodePath + contentImage.getFileName())
+                    .key(key)
                     .metadata(Map.of("content-type", contentImage.getMimeType()))
                     .build();
 
@@ -192,7 +197,7 @@ public class S3ProductContentFileManager implements ProductAssetsManager {
 
         } catch (final Exception e) {
             log.error("Error while adding file", e);
-            throw new ServiceException(e);
+            throw AssetUploadFailedException.of(key, e);
         }
     }
 

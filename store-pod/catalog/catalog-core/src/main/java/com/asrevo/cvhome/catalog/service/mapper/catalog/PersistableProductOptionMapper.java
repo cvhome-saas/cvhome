@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionDescription;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.PersistableProductOptionEntity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -29,7 +29,8 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
     }
 
     @Override
-    public ProductOption convert(PersistableProductOptionEntity source, StoreMerchantId store, LanguageCode language) {
+    public ProductOption convert(PersistableProductOptionEntity source, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionNotConvertibleException {
         ProductOption destination = new ProductOption();
         return merge(source, destination, store, language);
     }
@@ -54,7 +55,8 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
 
     @Override
     public ProductOption merge(PersistableProductOptionEntity source, ProductOption destination, StoreMerchantId store,
-                               LanguageCode language) {
+                               LanguageCode language)
+            throws ProductOptionNotConvertibleException {
         if (destination == null) {
             destination = new ProductOption();
         }
@@ -81,7 +83,7 @@ public class PersistableProductOptionMapper implements Mapper<PersistableProduct
 
             return destination;
         } catch (Exception e) {
-            throw new ServiceRuntimeException("Error while converting product option", e);
+            throw ProductOptionNotConvertibleException.of(e);
         }
     }
 

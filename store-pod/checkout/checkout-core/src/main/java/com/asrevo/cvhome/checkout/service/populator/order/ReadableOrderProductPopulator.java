@@ -12,12 +12,12 @@ import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductAttribute;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProductAttribute;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
@@ -44,7 +44,7 @@ public class ReadableOrderProductPopulator
 
     @Override
     public ReadableOrderProduct populate(OrderProduct source, ReadableOrderProduct target, StoreMerchantId store,
-                                         LanguageCode language) throws ConversionException {
+                                         LanguageCode language) throws PriceNotFormattableException {
 
         target.setId(source.getId());
         target.setOrderedQuantity(source.getProductQuantity());
@@ -62,7 +62,7 @@ public class ReadableOrderProductPopulator
                     .getStoreFormatedAmountWithCurrency(externalMerchantStoreService.getStore(store), subTotal);
             target.setSubTotal(subTotalPrice);
         } catch (Exception e) {
-            throw new ConversionException("Cannot format price", e);
+            throw PriceNotFormattableException.of(subTotal, e);
         }
 
         if (source.getOrderAttributes() != null) {

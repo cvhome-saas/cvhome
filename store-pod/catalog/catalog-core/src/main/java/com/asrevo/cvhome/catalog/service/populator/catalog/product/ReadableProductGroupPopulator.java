@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.catalog.service.populator.catalog.product;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -7,13 +9,13 @@ import org.apache.commons.collections.CollectionUtils;
 
 import com.asrevo.cvhome.catalog.entity.product.group.ProductGroup;
 import com.asrevo.cvhome.catalog.entity.product.group.ProductGroupDescription;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroup;
 import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupDescription;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableMinimalProductPopulator;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 public class ReadableProductGroupPopulator
@@ -27,7 +29,7 @@ public class ReadableProductGroupPopulator
 
     @Override
     public ReadableProductGroup populate(ProductGroup source, ReadableProductGroup target, StoreMerchantId store,
-                                         LanguageCode language) throws ConversionException {
+                                         LanguageCode language) throws ProductNotConvertibleException {
         target.setId(source.getId());
         target.setCode(source.getCode());
         target.setActive(source.isActive());
@@ -54,15 +56,16 @@ public class ReadableProductGroupPopulator
         }
 
         if (CollectionUtils.isNotEmpty(source.getProducts())) {
-            target.setProducts(source.getProducts().stream().map(p -> {
+            // A plain loop rather than stream().map(...). The lambda could not throw, so it wrapped the failure in a
+            // bare RuntimeException — which the advice renders as an unexplained 500. The condition now travels on
+            // this method's signature instead.
+            List<ReadableProduct> readableProducts = new ArrayList<>();
+            for (var p : source.getProducts()) {
                 ReadableProduct readableProduct = new ReadableProduct();
-                try {
-                    readableMinimalProductPopulator.populate(p, readableProduct, store, language);
-                } catch (ConversionException e) {
-                    throw new RuntimeException(e);
-                }
-                return readableProduct;
-            }).toList());
+                readableMinimalProductPopulator.populate(p, readableProduct, store, language);
+                readableProducts.add(readableProduct);
+            }
+            target.setProducts(readableProducts);
         }
 
         return target;

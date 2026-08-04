@@ -86,6 +86,6 @@ graph TD
 
 ### Key Logic Observations
 1. **Atomic Reservation:** Order placement always attempts to reserve inventory before initiating payment.
-2. **Orchestration:** `OrderPlacementFacade` coordinates between `OrderFacade` (local state), `OrderInventoryOrchestrator` (catalog interaction), and `ExternalPaymentGatewayService` (payment).
+2. **Orchestration:** `OrderPlacementFacade` coordinates between `OrderFacade` (local state), `OrderInventoryOrchestrator` (catalog interaction), and `IPaymentGatewayService` (payment).
 3. **Propagation:** When an external payment gateway updates a transaction (via Webhook), the `PaymentGatewayService` propagates the status back to the Checkout service, which then triggers either a `commit` or `release` of the inventory reservation.
 4. **Resiliency:** If a reservation commit fails after a successful payment, the system retains the order in `PENDING_PAYMENT` with `PAID` payment status to allow for manual reconciliation or retry, preventing data loss.

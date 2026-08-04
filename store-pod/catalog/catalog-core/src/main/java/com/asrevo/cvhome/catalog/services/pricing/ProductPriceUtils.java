@@ -16,10 +16,10 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.product.price.SimpleProductPrice;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class ProductPriceUtils {
     private static final String NO_INVENTORY_MESSAGE =
             "No inventory available to calculate the price. Availability should contain at least a region set to *";
 
-    public FinalPriceCalc getFinalPrice(Product product) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(Product product) throws NoApplicableInventoryException {
 
         FinalPriceCalc finalPrice = calculateFinalPrice(product);
 
@@ -47,7 +47,7 @@ public class ProductPriceUtils {
         return finalPrice;
     }
 
-    public FinalPriceCalc getFinalPrice(ProductAvailability availability) throws ServiceException {
+    public FinalPriceCalc getFinalPrice(ProductAvailability availability) throws NoApplicableInventoryException {
 
         FinalPriceCalc finalPrice = calculateFinalPrice(availability);
 
@@ -59,16 +59,15 @@ public class ProductPriceUtils {
     }
 
     private Set<ProductAvailability> applicableAvailabilities(Set<ProductAvailability> availabilities)
-            throws ServiceException {
+            throws NoApplicableInventoryException {
         if (CollectionUtils.isEmpty(availabilities)) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR,
-                    "No applicable inventory to calculate the price.");
+            throw NoApplicableInventoryException.of(null);
         }
 
         return availabilities.stream().filter(a -> !CollectionUtils.isEmpty(a.getPrices())).collect(Collectors.toSet());
     }
 
-    private FinalPriceCalc calculateFinalPrice(Product product) throws ServiceException {
+    private FinalPriceCalc calculateFinalPrice(Product product) throws NoApplicableInventoryException {
 
         Set<ProductAvailability> availabilities = resolveApplicableAvailabilities(product);
 
@@ -85,7 +84,7 @@ public class ProductPriceUtils {
         return finalPrice;
     }
 
-    private Set<ProductAvailability> resolveApplicableAvailabilities(Product product) throws ServiceException {
+    private Set<ProductAvailability> resolveApplicableAvailabilities(Product product) throws NoApplicableInventoryException {
         Set<ProductAvailability> availabilities = null;
         if (!CollectionUtils.isEmpty(product.getVariants())) {
             Optional<ProductVariant> variants = product.getVariants()
@@ -108,11 +107,11 @@ public class ProductPriceUtils {
                 && availability.getRegion().equals(Constants.ALL_REGIONS);
     }
 
-    private FinalPriceCalc calculateFinalPrice(ProductAvailability availability) throws ServiceException {
+    private FinalPriceCalc calculateFinalPrice(ProductAvailability availability) throws NoApplicableInventoryException {
         return buildFinalPriceFromPrices(availability.getPrices());
     }
 
-    private FinalPriceCalc buildFinalPriceFromPrices(Collection<ProductPrice> prices) throws ServiceException {
+    private FinalPriceCalc buildFinalPriceFromPrices(Collection<ProductPrice> prices) throws NoApplicableInventoryException {
 
         FinalPriceCalc finalPrice = null;
         List<FinalPriceCalc> otherPrices = null;
@@ -137,7 +136,7 @@ public class ProductPriceUtils {
         }
 
         if (finalPrice == null) {
-            throw new ServiceException(ServiceException.EXCEPTION_ERROR, NO_INVENTORY_MESSAGE);
+            throw NoApplicableInventoryException.of(null);
         }
 
         return finalPrice;

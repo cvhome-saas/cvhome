@@ -24,6 +24,9 @@ import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
@@ -45,8 +48,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.model.references.DimensionUnitOfMeasure;
 import com.asrevo.cvhome.store.model.references.WeightUnitOfMeasure;
@@ -90,14 +91,18 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     @Override
-    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language) {
+    public ReadableProduct convert(Product source, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException, ProductVariantParentMissingException,
+            InventoryNotConvertibleException {
         ReadableProduct product = new ReadableProduct();
         return this.merge(source, product, store, language);
     }
 
     @Override
     public ReadableProduct merge(Product source, ReadableProduct destination, StoreMerchantId store,
-                                 LanguageCode language) {
+                                 LanguageCode language)
+            throws ProductPriceNotConvertibleException, ProductVariantParentMissingException,
+            InventoryNotConvertibleException {
         TreeMap<Long, ReadableProductOption> selectableOptions = new TreeMap<>();
 
         destination.setSku(source.getSku());
@@ -213,7 +218,8 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populateAttributes(Product source, ReadableProduct destination,
-                                    TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
+                                    TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         if (CollectionUtils.isEmpty(source.getAttributes())) {
             return;
         }
@@ -276,7 +282,8 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void applySelectableAttribute(ProductAttribute attribute, TreeMap<Long, ReadableProductOption> selectableOptions,
-                                          StoreMerchantId store, LanguageCode language) {
+                                          StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         ReadableProductOption opt = selectableOptions.get(attribute.getProductOption().getId());
         if (opt == null) {
             opt = createOption(attribute.getProductOption(), language);
@@ -292,7 +299,8 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         }
     }
 
-    private ReadableProductOptionValue buildOptionValue(ProductAttribute attribute, StoreMerchantId store, LanguageCode language) {
+    private ReadableProductOptionValue buildOptionValue(ProductAttribute attribute, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         ProductOptionValue optionValue = attribute.getProductOptionValue();
         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
 
@@ -323,17 +331,14 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
         return optValue;
     }
 
-    private void applyAttributePrice(ProductAttribute attribute, StoreMerchantId store, ReadableProductOptionValue optValue) {
+    private void applyAttributePrice(ProductAttribute attribute, StoreMerchantId store, ReadableProductOptionValue optValue)
+            throws ProductPriceNotConvertibleException {
         if (attribute.getProductAttributePrice() == null || attribute.getProductAttributePrice().doubleValue() <= 0) {
             return;
         }
-        try {
-            String formatedPrice = pricingService.getDisplayAmount(attribute.getProductAttributePrice(), store);
-            optValue.setPrice(formatedPrice);
-        } catch (ServiceException e) {
-            throw new ConversionRuntimeException(
-                    "Error converting product option, an exception occured with pricingService", e);
-        }
+        // No try/catch: getDisplayAmount now declares the conversion failure directly, so wrapping it would only
+        // re-wrap the same type.
+        optValue.setPrice(pricingService.getDisplayAmount(attribute.getProductAttributePrice(), store));
     }
 
     private ProductOptionValueDescription resolveOptionValueDescription(ProductOptionValue optionValue, LanguageCode language) {
@@ -354,14 +359,19 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populateVariants(Product source, ReadableProduct destination,
-                                  TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store, LanguageCode language) {
+                                  TreeMap<Long, ReadableProductOption> selectableOptions, StoreMerchantId store,
+                                  LanguageCode language)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException,
+            ProductPriceNotConvertibleException {
         if (CollectionUtils.isEmpty(source.getVariants())) {
             return;
         }
-        List<ReadableProductVariant> instances = source.getVariants()
-                .stream()
-                .map(i -> readableProductVariantMapper.convert(i, store, language))
-                .toList();
+        // A plain loop rather than stream().map(...): the variant mapper declares checked failures now, and a lambda
+        // cannot carry them out to this method's signature.
+        List<ReadableProductVariant> instances = new ArrayList<>();
+        for (ProductVariant variant : source.getVariants()) {
+            instances.add(readableProductVariantMapper.convert(variant, store, language));
+        }
         destination.setVariants(instances);
 
         for (ProductVariant instance : source.getVariants()) {
@@ -391,7 +401,8 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
     }
 
     private void populatePrice(Product source, ReadableProduct destination, StoreMerchantId store,
-                               ProductAvailability availability, LanguageCode language) {
+                               ProductAvailability availability, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
         try {
             FinalPriceCalc price = pricingService.calculateProductPrice(source);
             if (price == null) {
@@ -409,7 +420,7 @@ public class ReadableProductMapper implements Mapper<Product, ReadableProduct> {
             // price appender
             appendProductPrice(destination, availability, language);
         } catch (Exception e) {
-            throw new ConversionRuntimeException("An error while converting product price", e);
+            throw ProductPriceNotConvertibleException.of(e);
         }
     }
 

@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
 
 public interface ImageGet {
 
     List<OutputContentFile> getImages(String merchantStoreCode, FileContentType imageContentType)
-            throws ServiceException;
+            throws AssetListFailedException;
 
 }

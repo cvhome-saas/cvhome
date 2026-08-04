@@ -4,6 +4,9 @@ import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.content.errors.ContentFileUnreadableException;
+import com.asrevo.cvhome.merchant.content.errors.ContentNotFoundException;
+import com.asrevo.cvhome.merchant.content.errors.DuplicateContentCodeException;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
 import com.asrevo.cvhome.merchant.content.model.content.box.PersistableContentBox;
@@ -12,6 +15,9 @@ import com.asrevo.cvhome.merchant.content.model.content.box.ReadableContentBoxLi
 import com.asrevo.cvhome.merchant.content.model.content.page.PersistableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPageList;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
 /**
  * Images and files management
@@ -20,7 +26,7 @@ import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage
  */
 public interface ContentFacade {
 
-    ContentFolder getContentFolder(String folder, StoreMerchantId store);
+    ContentFolder getContentFolder(String folder, StoreMerchantId store) throws AssetListFailedException;
 
     /**
      * File pth
@@ -30,12 +36,12 @@ public interface ContentFacade {
     /**
      * Deletes a file from CMS
      */
-    void delete(StoreMerchantId store, String fileName, String fileType);
+    void delete(StoreMerchantId store, String fileName, String fileType) throws AssetDeleteFailedException;
 
     /**
      * Delete content page
      */
-    void delete(StoreMerchantId store, Long id);
+    void delete(StoreMerchantId store, Long id) throws ContentNotFoundException;
 
     /**
      * Returns page names and urls configured for a given StoreMerchantId
@@ -45,17 +51,20 @@ public interface ContentFacade {
     /**
      * Returns page name by code
      */
-    ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language);
+    ReadableContentPage getContentPage(String code, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException;
 
     /**
      * Returns page by name
      */
-    ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language);
+    ReadableContentPage getContentPageByName(String name, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException;
 
     /**
      * Returns a content box for a given code and merchant store
      */
-    ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language);
+    ReadableContentBox getContentBox(String code, StoreMerchantId store, LanguageCode language)
+            throws ContentNotFoundException;
 
     /**
      *
@@ -64,20 +73,25 @@ public interface ContentFacade {
 
     ReadableContentBoxList getContentBoxes(StoreMerchantId store, LanguageCode language, Pageable pageable);
 
-    void addContentFile(ContentFile file, String merchantStoreCode);
+    void addContentFile(ContentFile file, String merchantStoreCode)
+            throws ContentFileUnreadableException, AssetUploadFailedException;
 
     /**
      * Creates content page
      */
-    Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language);
+    Long saveContentPage(PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language)
+            throws DuplicateContentCodeException;
 
-    void updateContentPage(Long id, PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language);
+    void updateContentPage(Long id, PersistableContentPage page, StoreMerchantId merchantStore, LanguageCode language)
+            throws ContentNotFoundException;
 
     /**
      * Creates content box
      */
-    Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language);
+    Long saveContentBox(PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language)
+            throws DuplicateContentCodeException;
 
-    void updateContentBox(Long id, PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language);
+    void updateContentBox(Long id, PersistableContentBox box, StoreMerchantId merchantStore, LanguageCode language)
+            throws ContentNotFoundException;
 
 }

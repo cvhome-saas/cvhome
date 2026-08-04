@@ -5,11 +5,14 @@ import java.util.Optional;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.entity.catalog.product.file.ProductImageSize;
 import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductImageService extends SalesManagerEntityService<Long, ProductImage> {
@@ -18,19 +21,20 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Add a ProductImage to the persistence and an entry to the CMS
      */
     void addProductImage(Product product, ProductImage productImage, ImageContentFile inputImage)
-            throws ServiceException;
+            throws ProductImageNotPersistedException;
 
     /**
      * Get the image ByteArrayOutputStream and content description from CMS
      */
-    OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size) throws ServiceException;
+    OutputContentFile getProductImage(ProductImage productImage, ProductImageSize size)
+            throws AssetNotFoundException, AssetReadFailedException;
 
     /**
      * Get a product image by name for a given product id
      */
     Optional<ProductImage> getProductImage(Long imageId, Long productId, StoreMerchantId store);
 
-    void removeProductImage(ProductImage productImage) throws ServiceException;
+    void removeProductImage(ProductImage productImage) throws AssetDeleteFailedException;
 
     ProductImage saveOrUpdate(ProductImage productImage);
 
@@ -38,10 +42,11 @@ public interface ProductImageService extends SalesManagerEntityService<Long, Pro
      * Returns an image file from required identifier. This method is used by the image
      * servlet
      */
-    OutputContentFile getProductImage(String storeCode, String productCode, String fileName,
-                                      ProductImageSize size) throws ServiceException;
+    OutputContentFile getProductImage(String storeCode, String productCode, String fileName, ProductImageSize size)
+            throws AssetNotFoundException, AssetReadFailedException;
 
-    void addProductImages(Product product, List<ProductImage> productImages) throws ServiceException;
+    void addProductImages(Product product, List<ProductImage> productImages)
+            throws ProductImageNotPersistedException;
 
     void updateProductImage(Product product, ProductImage productImage);
 

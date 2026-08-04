@@ -14,12 +14,15 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.availability.ProductAvailabilityService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
+import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
@@ -39,13 +42,17 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
     }
 
     @Override
-    public ProductPrice convert(PersistableProductPrice source, StoreMerchantId store, LanguageCode language) {
+    public ProductPrice convert(PersistableProductPrice source, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException {
         return merge(source, new ProductPrice(), store, language);
     }
 
     @Override
     public ProductPrice merge(PersistableProductPrice source, ProductPrice destination, StoreMerchantId store,
-                              LanguageCode language) {
+                              LanguageCode language)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException,
+            ProductReferenceUnresolvableException {
 
         try {
             if (destination == null) {
@@ -60,8 +67,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
                 Optional<ProductAvailability> avail = productAvailabilityService
                         .getById(source.getProductAvailabilityId(), store);
                 if (avail.isEmpty()) {
-                    throw new ConversionRuntimeException(
-                            "Product availability with id [%s] was not found".formatted(source.getProductAvailabilityId()));
+                    throw InventoryReferenceUnresolvableException.of(source.getProductAvailabilityId(), store);
                 }
                 availability = avail.get();
 
@@ -75,8 +81,7 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 
                 Product product = productService.getBySku(source.getSku(), store, language);
                 if (product == null) {
-                    throw new ConversionRuntimeException(
-                            "Product with sku [%s] not found for Store [%s]".formatted(source.getSku(), store));
+                    throw ProductReferenceUnresolvableException.of(source.getSku(), store);
                 }
 
                 availability = new ProductAvailability();
@@ -105,9 +110,11 @@ public class PersistableProductPriceMapper implements Mapper<PersistableProductP
 
             destination.setDefaultPrice(source.isDefaultPrice());
 
+        } catch (ConversionException e) {
+            // Already names the unresolvable reference; re-wrapping would bury it.
+            throw e;
         } catch (Exception e) {
-
-            throw new ConversionRuntimeException(e);
+            throw ProductPriceNotConvertibleException.of(e);
         }
         return destination;
     }

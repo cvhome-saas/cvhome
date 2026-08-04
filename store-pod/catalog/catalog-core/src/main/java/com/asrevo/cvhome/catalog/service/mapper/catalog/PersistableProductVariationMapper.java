@@ -5,12 +5,13 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOption;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.variation.PersistableProductVariation;
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionService;
 import com.asrevo.cvhome.catalog.services.product.attribute.ProductOptionValueService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -27,7 +28,8 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
     }
 
     @Override
-    public ProductVariation convert(PersistableProductVariation source, StoreMerchantId store, LanguageCode language) {
+    public ProductVariation convert(PersistableProductVariation source, StoreMerchantId store, LanguageCode language)
+            throws ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException {
 
         ProductVariation variation = new ProductVariation();
         return this.merge(source, variation, store, language);
@@ -35,21 +37,21 @@ public class PersistableProductVariationMapper implements Mapper<PersistableProd
 
     @Override
     public ProductVariation merge(PersistableProductVariation source, ProductVariation destination,
-                                  StoreMerchantId store, LanguageCode language) {
+                                  StoreMerchantId store, LanguageCode language)
+            throws ProductOptionReferenceUnresolvableException, ProductOptionValueReferenceUnresolvableException {
         destination.setId(source.getId());
         destination.setCode(source.getCode());
         destination.setStoreMerchantId(store);
 
         ProductOption option = productOptionService.getById(store, source.getOption());
         if (option == null) {
-            throw new ConversionRuntimeException("ProductOption [%s] does not exists".formatted(source.getOption()));
+            throw ProductOptionReferenceUnresolvableException.of(source.getOption(), store);
         }
         destination.setProductOption(option);
 
         ProductOptionValue optionValue = productOptionValueService.getById(store, source.getOptionValue());
         if (optionValue == null) {
-            throw new ConversionRuntimeException(
-                    "ProductOptionValue [%s] does not exists".formatted(source.getOptionValue()));
+            throw ProductOptionValueReferenceUnresolvableException.of(source.getOptionValue(), store);
         }
         destination.setProductOptionValue(optionValue);
 

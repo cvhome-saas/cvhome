@@ -9,12 +9,11 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.catalog.entity.product.variation.ProductVariation;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductVariationService extends SalesManagerEntityService<Long, ProductVariation> {
 
-    void saveOrUpdate(ProductVariation entity) throws ServiceException;
+    void saveOrUpdate(ProductVariation entity);
 
     Optional<ProductVariation> getById(StoreMerchantId store, Long id, LanguageCode lang);
 

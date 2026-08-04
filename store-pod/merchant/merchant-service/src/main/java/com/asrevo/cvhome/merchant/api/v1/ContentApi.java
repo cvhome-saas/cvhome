@@ -25,6 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.content.errors.ContentFileUnreadableException;
+import com.asrevo.cvhome.merchant.content.errors.ContentNotFoundException;
+import com.asrevo.cvhome.merchant.content.errors.DuplicateContentCodeException;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFile;
 import com.asrevo.cvhome.merchant.content.model.content.ContentFolder;
 import com.asrevo.cvhome.merchant.content.model.content.ContentName;
@@ -35,9 +38,11 @@ import com.asrevo.cvhome.merchant.content.model.content.page.PersistableContentP
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPage;
 import com.asrevo.cvhome.merchant.content.model.content.page.ReadableContentPageList;
 import com.asrevo.cvhome.merchant.content.service.facade.content.ContentFacade;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -146,7 +151,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentPage page(@PathVariable("code") String code, StoreMerchantId merchantStore,
-                                    LanguageCode language) {
+                                    LanguageCode language) throws ContentNotFoundException {
 
         return contentFacade.getContentPage(code, merchantStore, LanguageCode.allLanguage());
     }
@@ -164,7 +169,7 @@ public class ContentApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentPage getPage(@PathVariable("code") String code, StoreMerchantId merchantStore,
-                                       LanguageCode language) {
+                                       LanguageCode language) throws ContentNotFoundException {
 
         return contentFacade.getContentPage(code, merchantStore, language);
     }
@@ -180,7 +185,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public ReadableContentBox box(@PathVariable("code") String code, StoreMerchantId merchantStore,
-                                  LanguageCode language) {
+                                  LanguageCode language) throws ContentNotFoundException {
         return contentFacade.getContentBox(code, merchantStore, LanguageCode.allLanguage());
     }
 
@@ -194,7 +199,7 @@ public class ContentApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentBox getBox(@PathVariable("code") String code, StoreMerchantId merchantStore,
-                                     LanguageCode language) {
+                                     LanguageCode language) throws ContentNotFoundException {
         return contentFacade.getContentBox(code, merchantStore, language);
     }
 
@@ -211,7 +216,7 @@ public class ContentApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableContentPage pageByName(@PathVariable("name") String name, StoreMerchantId merchantStore,
-                                          LanguageCode language) {
+                                          LanguageCode language) throws ContentNotFoundException {
 
         return contentFacade.getContentPageByName(name, merchantStore, language);
     }
@@ -231,7 +236,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public Entity createBox(@RequestBody @Valid PersistableContentBox box, StoreMerchantId merchantStore,
-                            LanguageCode language) {
+                            LanguageCode language) throws DuplicateContentCodeException {
 
         Long id = contentFacade.saveContentBox(box, merchantStore, language);
         Entity entity = new Entity();
@@ -288,7 +293,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public Entity createPage(@RequestBody @Valid PersistableContentPage page, StoreMerchantId merchantStore,
-                             LanguageCode language) {
+                             LanguageCode language) throws DuplicateContentCodeException {
 
         Long id = contentFacade.saveContentPage(page, merchantStore, language);
         Entity entity = new Entity();
@@ -308,7 +313,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void updatePage(@RequestBody @Valid PersistableContentPage page, @PathVariable Long id,
-                           StoreMerchantId merchantStore, LanguageCode language) {
+                           StoreMerchantId merchantStore, LanguageCode language) throws ContentNotFoundException {
 
         contentFacade.updateContentPage(id, page, merchantStore, language);
     }
@@ -325,7 +330,7 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void updateBox(@RequestBody @Valid PersistableContentBox box, @PathVariable Long id,
-                          StoreMerchantId merchantStore, LanguageCode language) {
+                          StoreMerchantId merchantStore, LanguageCode language) throws ContentNotFoundException {
 
         contentFacade.updateContentBox(id, box, merchantStore, language);
     }
@@ -344,7 +349,8 @@ public class ContentApi {
 
     // @TODO create another one for private so seller-ui call it in private
     public ContentFolder images(StoreMerchantId merchantStore, LanguageCode language,
-                                @RequestParam(value = "path", required = false) String path) {
+                                @RequestParam(value = "path", required = false) String path)
+            throws AssetListFailedException {
 
         return contentFacade.getContentFolder(path, merchantStore);
     }
@@ -359,7 +365,8 @@ public class ContentApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
     public void uploadMultipleFiles(@RequestParam(value = "files") MultipartFile[] files, StoreMerchantId merchantStore,
-                                    LanguageCode language) {
+                                    LanguageCode language)
+            throws ContentFileUnreadableException, AssetUploadFailedException {
 
         for (MultipartFile f : files) {
             ContentFile cf = new ContentFile();
@@ -367,10 +374,12 @@ public class ContentApi {
             cf.setName(f.getOriginalFilename());
             try {
                 cf.setFile(f.getBytes());
-                contentFacade.addContentFile(cf, merchantStore.getId());
-            } catch (IOException _) {
-                throw new ServiceRuntimeException("Error while getting file bytes");
+            } catch (IOException e) {
+                // Was a bare "Error while getting file bytes" with the file name dropped, so a seller uploading a
+                // batch could not tell which file had failed.
+                throw ContentFileUnreadableException.of(f.getOriginalFilename(), e);
             }
+            contentFacade.addContentFile(cf, merchantStore.getId());
         }
     }
 
@@ -384,7 +393,7 @@ public class ContentApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
-    public void deleteContent(@PathVariable Long id, StoreMerchantId merchantStore) {
+    public void deleteContent(@PathVariable Long id, StoreMerchantId merchantStore) throws ContentNotFoundException {
         contentFacade.delete(merchantStore, id);
     }
 
@@ -395,7 +404,8 @@ public class ContentApi {
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CONTENT.*')")
-    public void deleteFile(@Valid ContentName name, StoreMerchantId merchantStore) {
+    public void deleteFile(@Valid ContentName name, StoreMerchantId merchantStore)
+            throws AssetDeleteFailedException {
         contentFacade.delete(merchantStore, name.getName(), name.getContentType());
     }
 

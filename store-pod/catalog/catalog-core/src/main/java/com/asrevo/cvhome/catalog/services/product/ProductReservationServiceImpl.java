@@ -13,13 +13,14 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservation;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationLine;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductReservationStatus;
+import com.asrevo.cvhome.catalog.errors.EmptyReservationException;
+import com.asrevo.cvhome.catalog.errors.InsufficientInventoryException;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationCommitResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReleaseResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductAvailabilityRepository;
 import com.asrevo.cvhome.catalog.repositories.product.availability.ProductReservationRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
 import com.asrevo.cvhome.store.core.model.catalog.ReserveProductEntry;
 
@@ -39,27 +40,20 @@ public class ProductReservationServiceImpl implements ProductReservationService 
 
     @Transactional
     @Override
-    public ProductReservationReserveResult reserve(StoreMerchantId store, String ref, ProductReservationList productReservation) {
-        return getProductReservationResult(store, ref, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
-    }
-
-    private ProductReservationReserveResult getProductReservationResult(StoreMerchantId store, String ref,
-                                                                        ProductReservationList productReservation,
-                                                                        ProductReservationStatus status) {
-        try {
-            ProductReservation reservation = doReserveWithStatus(store, ref, productReservation, status);
-            return ProductReservationReserveResult.builder().status(true).reservationId(reservation.getId())
-                    .expireAt(reservation.getExpireAt())
-                    .build();
-        } catch (ServiceException _) {
-            return ProductReservationReserveResult.builder().status(false).build();
-        }
+    public ProductReservationReserveResult reserve(StoreMerchantId store, String ref, ProductReservationList productReservation)
+            throws InsufficientInventoryException, EmptyReservationException {
+        ProductReservation reservation =
+                doReserveWithStatus(store, ref, productReservation, ProductReservationStatus.TEMPORARY_RESERVED);
+        return ProductReservationReserveResult.builder().status(true).reservationId(reservation.getId())
+                .expireAt(reservation.getExpireAt())
+                .build();
     }
 
     private ProductReservation doReserveWithStatus(StoreMerchantId store, String ref, ProductReservationList productReservation,
-                                                   ProductReservationStatus status) throws ServiceException {
+                                                   ProductReservationStatus status)
+            throws InsufficientInventoryException, EmptyReservationException {
         if (Objects.isNull(productReservation.entries()) || productReservation.entries().isEmpty()) {
-            throw new ServiceException("No entries to reserve");
+            throw EmptyReservationException.of(ref);
         }
 
         ProductReservation reservation = productReservationRepository.findByRef(ref, store)
@@ -88,14 +82,14 @@ public class ProductReservationServiceImpl implements ProductReservationService 
 
             List<ProductAvailability> availabilities = productAvailabilityRepository.getBySku(entry.sku(), store);
             if (availabilities.isEmpty()) {
-                throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+                throw InsufficientInventoryException.notStocked(entry.sku(), entry.reserveQty());
             }
 
             // Pick the first availability for the store
             ProductAvailability availability = availabilities.getFirst();
 
             if (availability.getProductQuantity() < entry.reserveQty()) {
-                throw new ServiceException(ServiceException.EXCEPTION_INVENTORY_MISMATCH);
+                throw InsufficientInventoryException.of(entry.sku(), entry.reserveQty(), availability.getProductQuantity());
             }
 
             // Deduct quantity

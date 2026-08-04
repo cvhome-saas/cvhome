@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderChannel;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -17,7 +18,6 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
@@ -32,7 +32,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
 
     @Override
     public Order populate(PersistableOrder source, Order target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws OrderNotConvertibleException {
 
         try {
 
@@ -68,7 +68,7 @@ public class PersistableOrderApiPopulator extends AbstractDataPopulator<Persista
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw OrderNotConvertibleException.of(store, e);
         }
     }
 

@@ -4,12 +4,16 @@ plugins {
 
 dependencies {
     compileOnly project(":store-commons:commons")
+    api project(":store-commons:errors")
     compileOnly project(":store-commons:ecs-commons:fargate-task-info")
     compileOnly libs.spring.webflux
     compileOnly libs.spring.webmvc
     compileOnly libs.jakarta.servlet.api
     compileOnly libs.spring.boot.starter.jackson
     compileOnly libs.spring.data.commons
+    // org.springframework.dao lives here; DataIntegrityErrorHandler is @ConditionalOnClass so services without it
+    // simply do not get that advice.
+    compileOnly libs.spring.tx
     compileOnly libs.spring.boot.starter.oauth2.client
     compileOnly libs.spring.boot.starter.security.oauth2.resource.server
     compileOnly libs.spring.cloud.gateway.server.webflux

@@ -4,11 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
+import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableOrderTotal;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.PriceUtils;
@@ -23,14 +23,16 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
     }
 
     @Override
-    public ReadableOrderTotal convert(OrderTotal source, StoreMerchantId store, LanguageCode language) {
+    public ReadableOrderTotal convert(OrderTotal source, StoreMerchantId store, LanguageCode language)
+            throws PriceNotFormattableException {
         ReadableOrderTotal destination = new ReadableOrderTotal();
         return this.merge(source, destination, store, language);
     }
 
     @Override
     public ReadableOrderTotal merge(OrderTotal source, ReadableOrderTotal target, StoreMerchantId store,
-                                    LanguageCode language) {
+                                    LanguageCode language)
+            throws PriceNotFormattableException {
 
         try {
 
@@ -52,7 +54,7 @@ public class ReadableOrderTotalMapper implements Mapper<OrderTotal, ReadableOrde
 
 
         } catch (Exception e) {
-            throw new ConversionRuntimeException(e);
+            throw PriceNotFormattableException.of(source.getValue(), e);
         }
 
         return target;

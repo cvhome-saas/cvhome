@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ProductTypeService extends SalesManagerEntityService<Long, ProductType> {
@@ -19,7 +18,7 @@ public interface ProductTypeService extends SalesManagerEntityService<Long, Prod
 
     ProductType getById(Long id, StoreMerchantId store);
 
-    ProductType saveOrUpdate(ProductType productType) throws ServiceException;
+    ProductType saveOrUpdate(ProductType productType);
 
     List<ProductType> listProductTypes(List<Long> ids, StoreMerchantId store, LanguageCode language);
 

@@ -12,7 +12,6 @@ import com.asrevo.cvhome.catalog.entity.product.group.ProductGroup;
 import com.asrevo.cvhome.catalog.repositories.product.group.ProductGroupRepository;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productGroupService")
@@ -28,12 +27,12 @@ public class ProductGroupServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     @Transactional
-    public void saveOrUpdate(ProductGroup productGroup) throws ServiceException {
+    public void saveOrUpdate(ProductGroup productGroup) {
         productGroupRepository.save(productGroup);
     }
 
     @Override
-    public Optional<ProductGroup> getByCode(StoreMerchantId store, String code) throws ServiceException {
+    public Optional<ProductGroup> getByCode(StoreMerchantId store, String code) {
         return productGroupRepository.findByStoreAndCode(store, code);
     }
 
@@ -44,18 +43,17 @@ public class ProductGroupServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     @Override
     @Transactional
-    public void delete(ProductGroup productGroup) throws ServiceException {
+    public void delete(ProductGroup productGroup) {
         productGroupRepository.delete(productGroup);
     }
 
     @Override
-    public List<ProductGroup> listByParentProduct(StoreMerchantId store, Long productId) throws ServiceException {
+    public List<ProductGroup> listByParentProduct(StoreMerchantId store, Long productId) {
         return productGroupRepository.findByStoreAndParentProduct(store, productId);
     }
 
     @Override
-    public Optional<ProductGroup> getByParentProductAndCode(StoreMerchantId store, Long productId, String code)
-            throws ServiceException {
+    public Optional<ProductGroup> getByParentProductAndCode(StoreMerchantId store, Long productId, String code) {
         return productGroupRepository.findByStoreAndParentProductAndCode(store, productId, code);
     }
 

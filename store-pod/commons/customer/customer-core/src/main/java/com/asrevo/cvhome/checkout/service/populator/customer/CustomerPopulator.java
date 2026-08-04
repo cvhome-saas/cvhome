@@ -14,11 +14,12 @@ import com.asrevo.cvhome.commons.domain.CountryIsoCode;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
+import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
+import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
 import com.asrevo.cvhome.customer.model.customer.PersistableCustomer;
 import com.asrevo.cvhome.customer.model.customer.address.CustomerAddress;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,22 +42,19 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
      */
     @Override
     public Customer populate(PersistableCustomer source, Customer target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
 
-        try {
-            applyBasics(source, target);
+        applyBasics(source, target);
 
-            Map<CountryIsoCode, Country> countries = countryService.getCountriesMap(language);
-            Map<ZoneCode, Zone> zones = zoneService.getZones(language);
+        Map<CountryIsoCode, Country> countries = countryService.getCountriesMap(language);
+        Map<ZoneCode, Zone> zones = zoneService.getZones(language);
 
-            target.setStoreMerchantId(store);
+        target.setStoreMerchantId(store);
 
-            applyBilling(source, target, countries, zones);
-            applyDelivery(source, target, countries);
-
-        } catch (Exception e) {
-            throw new ConversionException(e);
-        }
+        // No blanket catch any more: it used to turn an unsupported country code and a NullPointerException in this
+        // mapping code into the same 400, which told a shopper their input was wrong when the bug was ours.
+        applyBilling(source, target, countries, zones);
+        applyDelivery(source, target, countries);
 
         return target;
     }
@@ -85,13 +83,13 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     }
 
     private void applyBilling(PersistableCustomer source, Customer target, Map<CountryIsoCode, Country> countries,
-            Map<ZoneCode, Zone> zones) throws ConversionException {
+                              Map<ZoneCode, Zone> zones) throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
         applyBillingFromSource(source, target, countries, zones);
         applyDefaultBillingIfMissing(source, target, countries);
     }
 
     private void applyBillingFromSource(PersistableCustomer source, Customer target, Map<CountryIsoCode, Country> countries,
-            Map<ZoneCode, Zone> zones) throws ConversionException {
+                                        Map<ZoneCode, Zone> zones) throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
         CustomerAddress sourceBilling = source.getBilling();
         if (sourceBilling == null) {
             return;
@@ -123,7 +121,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     }
 
     private void applyDefaultBillingIfMissing(PersistableCustomer source, Customer target,
-            Map<CountryIsoCode, Country> countries) throws ConversionException {
+                                              Map<CountryIsoCode, Country> countries) throws UnsupportedCountryCodeException {
         if (target.getBilling() != null || source.getBilling() == null) {
             return;
         }
@@ -137,13 +135,13 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     }
 
     private void applyDelivery(PersistableCustomer source, Customer target, Map<CountryIsoCode, Country> countries)
-            throws ConversionException {
+            throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
         applyDeliveryFromSource(source, target, countries);
         applyDefaultDeliveryIfMissing(source, target, countries);
     }
 
     private void applyDeliveryFromSource(PersistableCustomer source, Customer target, Map<CountryIsoCode, Country> countries)
-            throws ConversionException {
+            throws UnsupportedCountryCodeException, UnsupportedZoneCodeException {
         CustomerAddress sourceShipping = source.getDelivery();
         if (sourceShipping == null) {
             return;
@@ -172,7 +170,7 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
     }
 
     private void applyDefaultDeliveryIfMissing(PersistableCustomer source, Customer target,
-            Map<CountryIsoCode, Country> countries) throws ConversionException {
+                                               Map<CountryIsoCode, Country> countries) throws UnsupportedCountryCodeException {
         if (target.getDelivery() != null || source.getDelivery() == null) {
             return;
         }
@@ -185,18 +183,19 @@ public class CustomerPopulator extends AbstractDataPopulator<PersistableCustomer
         }
     }
 
-    private Country resolveCountry(CountryIsoCode code, Map<CountryIsoCode, Country> countries) throws ConversionException {
+    private Country resolveCountry(CountryIsoCode code, Map<CountryIsoCode, Country> countries)
+            throws UnsupportedCountryCodeException {
         Country country = countries.get(code);
         if (country == null) {
-            throw new ConversionException(String.format("Unsupported country code %s", code));
+            throw UnsupportedCountryCodeException.of(code);
         }
         return country;
     }
 
-    private Zone resolveZone(ZoneCode code) throws ConversionException {
+    private Zone resolveZone(ZoneCode code) throws UnsupportedZoneCodeException {
         Zone zone = zoneService.getByCode(code);
         if (zone == null) {
-            throw new ConversionException(String.format("Unsupported zone code %s", code));
+            throw UnsupportedZoneCodeException.of(code);
         }
         return zone;
     }

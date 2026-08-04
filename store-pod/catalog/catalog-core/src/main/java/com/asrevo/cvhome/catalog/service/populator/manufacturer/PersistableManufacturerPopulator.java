@@ -6,11 +6,11 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
+import com.asrevo.cvhome.catalog.errors.ManufacturerNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.manufacturer.ManufacturerDescription;
 import com.asrevo.cvhome.catalog.model.manufacturer.PersistableManufacturer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class PersistableManufacturerPopulator
 
     @Override
     public Manufacturer populate(PersistableManufacturer source, Manufacturer target, StoreMerchantId store,
-                                 LanguageCode language) throws ConversionException {
+                                 LanguageCode language) throws ManufacturerNotConvertibleException {
 
         try {
 
@@ -49,7 +49,7 @@ public class PersistableManufacturerPopulator
             }
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw ManufacturerNotConvertibleException.of(e);
         }
 
         return target;

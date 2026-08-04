@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantGroupNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariantGroup;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductVariantGroupFacade;
@@ -66,7 +70,8 @@ public class ProductVariantGroupApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void update(@PathVariable Long id, @Valid @RequestBody PersistableProductVariantGroup instance,
-                       StoreMerchantId merchantStore, LanguageCode language) {
+                       StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductVariantGroupNotFoundException {
 
         productVariantGroupFacade.update(id, instance, merchantStore, language);
     }
@@ -77,7 +82,8 @@ public class ProductVariantGroupApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductVariantGroup get(@PathVariable Long id, StoreMerchantId merchantStore,
-                                           LanguageCode language) {
+                                           LanguageCode language)
+            throws ProductVariantGroupNotFoundException, ProductVariantParentMissingException, InventoryNotConvertibleException {
         return productVariantGroupFacade.get(id, merchantStore, language);
     }
 
@@ -88,7 +94,8 @@ public class ProductVariantGroupApi {
     @Operation(method = "DELETE", description = "Delete product instance group",
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
+    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductVariantGroupNotFoundException, ProductVariantNotFoundException {
         productVariantGroupFacade.delete(id, id, merchantStore);
     }
 
@@ -99,7 +106,8 @@ public class ProductVariantGroupApi {
             responses = @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema())))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableEntityList<ReadableProductVariantGroup> list(@PathVariable final Long id,
-                                                                StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+                                                                StoreMerchantId merchantStore, LanguageCode language, Pageable pageable)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException {
         return productVariantGroupFacade.list(id, merchantStore, language, pageable);
     }
 

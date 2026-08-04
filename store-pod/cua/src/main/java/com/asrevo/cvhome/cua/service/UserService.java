@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.cua.domain.User;
 import com.asrevo.cvhome.cua.dto.ReadableUser;
+import com.asrevo.cvhome.cua.errors.DuplicateEmailException;
+import com.asrevo.cvhome.cua.errors.DuplicateUsernameException;
 import com.asrevo.cvhome.cua.repo.UserRepository;
 import com.asrevo.cvhome.cua.web.dto.RegistrationRequest;
 
@@ -23,13 +25,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void registerUser(RegistrationRequest request) {
+    public void registerUser(RegistrationRequest request)
+            throws DuplicateUsernameException, DuplicateEmailException {
         if (userRepository.findByClientIdAndUsername(request.getClientId(), request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists for this client");
+            throw DuplicateUsernameException.of(request.getClientId(), request.getUsername());
         }
 
         if (userRepository.findByClientIdAndEmail(request.getClientId(), request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists for this client");
+            throw DuplicateEmailException.of(request.getClientId(), request.getEmail());
         }
 
         User user = new User();

@@ -11,6 +11,18 @@ import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
@@ -20,13 +32,10 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.UncheckedBaseException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.OperationNotAllowedException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.errors.NonPositivePriceException;
+import com.asrevo.cvhome.store.errors.PriceNotParseableException;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
@@ -37,27 +46,6 @@ import com.asrevo.cvhome.store.utils.PriceUtils;
  */
 @Service("productCommonFacade")
 public class ProductCommonFacadeImpl implements ProductCommonFacade {
-
-    private static final String PRODUCT_NOT_FOUND_TEMPLATE = "Product [%s] not found";
-
-    private static final String PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE = "Product [%s] not found for store [%s]";
-
-    private static final String ERROR_CONVERTING_PRODUCT_TEMPLATE = "Error converting product [%s]";
-
-    private static final String CATEGORY_ALREADY_ATTACHED_TEMPLATE =
-            "Category with id [%s] already attached to product [%s]";
-
-    private static final String ADDING_PRODUCT_TO_CATEGORY_ERROR_TEMPLATE =
-            "Exception when adding product [%s] to category [%s]";
-
-    private static final String INVALID_PRICE_FORMAT_MESSAGE = "Invalid product price format";
-
-    private static final String PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE = "Product with id [%s not found";
-
-    private static final String PRODUCT_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE =
-            "Product with id [%s not found for store [%s]";
-
-    private static final String DELETING_PTODUCT_ERROR_TEMPLATE = "Error while deleting ptoduct with id [%s]";
 
     private final ProductService productService;
 
@@ -80,7 +68,12 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public Long saveProduct(StoreMerchantId store, PersistableProduct product, LanguageCode language) {
+    public Long saveProduct(StoreMerchantId store, PersistableProduct product, LanguageCode language)
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ProductNotPersistedException {
 
         Product target;
         if (product.getId() != null && product.getId() > 0) {
@@ -89,68 +82,47 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             target = new Product();
         }
 
-        try {
+        target = persistableProductMapper.merge(product, target, store, language);
+        target = productService.saveProduct(target);
 
-            target = persistableProductMapper.merge(product, target, store, language);
-            target = productService.saveProduct(target);
-
-            return target.getId();
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(e);
-        }
+        return target.getId();
     }
 
     @Override
-    public ReadableProduct getProduct(StoreMerchantId store, Long id, LanguageCode language) {
+    public ReadableProduct getProduct(StoreMerchantId store, Long id, LanguageCode language)
+            throws ProductNotFoundException, ProductNotConvertibleException {
 
         Product product = productService.findOne(id, store);
-        if (product == null) {
-            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_TEMPLATE.formatted(id));
-        }
-
-        if (!product.getStore().equals(store)) {
-            throw new ResourceNotFoundException(PRODUCT_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
+        if (product == null || !product.getStore().equals(store)) {
+            throw ProductNotFoundException.of(id, store);
         }
 
         ReadableProduct readableProduct = new ReadableProduct();
         ReadableProductPopulator populator = new ReadableProductPopulator(pricingService, imageUtils,
                 externalStoreMerchantIdService);
-        try {
-            readableProduct = populator.populate(product, readableProduct, store, language);
-        } catch (ConversionException e) {
-            throw new ConversionRuntimeException(ERROR_CONVERTING_PRODUCT_TEMPLATE.formatted(id), e);
-        }
-
-        return readableProduct;
+        return populator.populate(product, readableProduct, store, language);
     }
 
     @Override
-    public ReadableProduct addProductToCategory(Category category, Product product, LanguageCode language) {
+    public ReadableProduct addProductToCategory(Category category, Product product, LanguageCode language)
+            throws CategoryAlreadyAttachedException, ProductNotConvertibleException, ProductNotPersistedException {
         List<Category> assigned = product.getCategories()
                 .stream()
                 .filter(cat -> cat.getId().longValue() == category.getId().longValue())
                 .toList();
 
         if (!assigned.isEmpty()) {
-            throw new OperationNotAllowedException(
-                    CATEGORY_ALREADY_ATTACHED_TEMPLATE.formatted(category.getId(), product.getId()));
+            throw CategoryAlreadyAttachedException.of(category.getId(), product.getId());
         }
 
         product.getCategories().add(category);
         ReadableProduct readableProduct = new ReadableProduct();
 
-        try {
+        productService.saveProduct(product);
 
-            productService.saveProduct(product);
-
-            ReadableProductPopulator populator = new ReadableProductPopulator(pricingService, imageUtils,
-                    externalStoreMerchantIdService);
-            populator.populate(product, readableProduct, product.getStore(), language);
-
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    ADDING_PRODUCT_TO_CATEGORY_ERROR_TEMPLATE.formatted(product.getId(), category.getId()), e);
-        }
+        ReadableProductPopulator populator = new ReadableProductPopulator(pricingService, imageUtils,
+                externalStoreMerchantIdService);
+        populator.populate(product, readableProduct, product.getStore(), language);
 
         return readableProduct;
     }
@@ -187,8 +159,10 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                     if (price.isDefaultPrice()) {
                         try {
                             price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                        } catch (ServiceException _) {
-                            throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
+                        } catch (PriceNotParseableException | NonPositivePriceException e) {
+                            // Carried unchecked because this method cannot declare it yet; the advice unwraps the
+                            // carrier, so the precise price code survives instead of collapsing into a generic one.
+                            throw new UncheckedBaseException(e);
                         }
                     }
                 }
@@ -205,33 +179,21 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
     }
 
     @Override
-    public void deleteProduct(Long id, StoreMerchantId store) {
+    public void deleteProduct(Long id, StoreMerchantId store) throws ProductNotFoundException {
         Product p = productService.getById(id);
 
-        if (p == null) {
-            throw new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_TEMPLATE.formatted(id));
+        if (p == null || !Objects.equals(p.getStore(), store)) {
+            throw ProductNotFoundException.of(id, store);
         }
 
-        if (!Objects.equals(p.getStore(), store)) {
-            throw new ResourceNotFoundException(PRODUCT_WITH_ID_NOT_FOUND_FOR_STORE_TEMPLATE.formatted(id, store));
-        }
-
-        try {
-            productService.delete(p);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(DELETING_PTODUCT_ERROR_TEMPLATE.formatted(id), e);
-        }
+        productService.delete(p);
     }
 
     @Override
-    public void update(String sku, LightPersistableProduct product, StoreMerchantId store, LanguageCode language) {
+    public void update(String sku, LightPersistableProduct product, StoreMerchantId store, LanguageCode language)
+            throws ProductNotFoundException, ProductNotPersistedException {
         // Get product
-        Product modified;
-        try {
-            modified = productService.getBySku(sku, store, language);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException(e);
-        }
+        Product modified = productService.getBySku(sku, store, language);
 
         ProductVariant instance = modified.getVariants()
                 .stream()
@@ -254,11 +216,7 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             }
         }
 
-        try {
-            productService.saveProduct(modified);
-        } catch (ServiceException e) {
-            throw new ServiceRuntimeException("Cannot update product ", e);
-        }
+        productService.saveProduct(modified);
     }
 
     /**
@@ -272,8 +230,8 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
                 if (price.isDefaultPrice()) {
                     try {
                         price.setProductPriceAmount(PriceUtils.getAmount(product.getPrice()));
-                    } catch (ServiceException _) {
-                        throw new ServiceRuntimeException(INVALID_PRICE_FORMAT_MESSAGE);
+                    } catch (PriceNotParseableException | NonPositivePriceException e) {
+                        throw new UncheckedBaseException(e);
                     }
                 }
             }

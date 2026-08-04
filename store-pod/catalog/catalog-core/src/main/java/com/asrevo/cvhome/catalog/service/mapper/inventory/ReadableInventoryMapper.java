@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
@@ -17,8 +19,6 @@ import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -35,14 +35,15 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
     }
 
     @Override
-    public ReadableInventory convert(ProductAvailability source, StoreMerchantId store, LanguageCode language) {
+    public ReadableInventory convert(ProductAvailability source, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException {
         ReadableInventory availability = new ReadableInventory();
         return merge(source, availability, store, language);
     }
 
     @Override
     public ReadableInventory merge(ProductAvailability source, ReadableInventory destination, StoreMerchantId store,
-                                   LanguageCode language) {
+                                   LanguageCode language) throws InventoryNotConvertibleException {
         try {
             destination.setQuantity(source.getProductQuantity() != null ? source.getProductQuantity() : 0);
             destination.setProductQuantityOrderMax(
@@ -75,7 +76,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
             destination.setPrice(price.getStringPrice());
 
         } catch (Exception e) {
-            throw new ConversionRuntimeException("Error while converting Inventory", e);
+            throw InventoryNotConvertibleException.of(e);
         }
 
         return destination;
@@ -97,7 +98,7 @@ public class ReadableInventoryMapper implements Mapper<ProductAvailability, Read
     }
 
     private List<ReadableProductPrice> prices(ProductAvailability source, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws ProductPriceNotConvertibleException {
 
         ReadableProductPricePopulator populator;
         List<ReadableProductPrice> prices = new ArrayList<>();

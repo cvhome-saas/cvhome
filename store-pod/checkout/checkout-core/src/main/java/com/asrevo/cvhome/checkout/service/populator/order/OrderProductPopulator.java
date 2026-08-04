@@ -13,9 +13,10 @@ import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductPrice;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +33,8 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
 
     @Override
     public OrderProduct populate(ShoppingCartItem source, OrderProduct target, StoreMerchantId store,
-                                 LanguageCode language) throws ConversionException {
+                                 LanguageCode language)
+            throws OrderProductPriceMissingException, OrderProductNotConvertibleException {
 
         try {
 
@@ -45,7 +47,7 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
                     language);
             FinalPriceCalc finalPrice = detailedProduct.price();
             if (finalPrice == null) {
-                throw new ConversionException("Object final price not populated in shoppingCartItem (source)");
+                throw OrderProductPriceMissingException.of(source.getSku());
             }
             // Default price
             OrderProductPrice orderProductPrice = orderProductPrice(finalPrice);
@@ -66,8 +68,11 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
 
             target.setPrices(prices);
 
+        } catch (OrderProductPriceMissingException e) {
+            // Already names its condition; re-wrapping it would bury the sku the caller needs.
+            throw e;
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw OrderProductNotConvertibleException.of(source.getSku(), e);
         }
 
         return target;

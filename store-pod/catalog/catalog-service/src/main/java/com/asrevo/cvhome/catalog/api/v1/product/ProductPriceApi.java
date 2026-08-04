@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.service.facade.product.ProductPriceFacade;
@@ -58,7 +62,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity save(@PathVariable String sku, @PathVariable Long inventoryId,
-                       @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
+                       @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException, ProductReferenceUnresolvableException {
 
         price.setSku(sku);
         price.setProductAvailabilityId(inventoryId);
@@ -76,7 +81,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity save(@PathVariable String sku, @Valid @RequestBody PersistableProductPrice price,
-                       StoreMerchantId merchantStore, LanguageCode language) {
+                       StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException, ProductReferenceUnresolvableException {
 
         price.setSku(sku);
 
@@ -92,7 +98,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void edit(@PathVariable String sku, @PathVariable Long inventoryId, @PathVariable Long priceId,
-                     @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language) {
+                     @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductPriceNotConvertibleException, InventoryReferenceUnresolvableException, ProductReferenceUnresolvableException {
 
         price.setSku(sku);
         price.setProductAvailabilityId(inventoryId);
@@ -110,7 +117,8 @@ public class ProductPriceApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductPrice get(@PathVariable String sku, @PathVariable Long priceId,
                                     @Valid @RequestBody PersistableProductPrice price, StoreMerchantId merchantStore,
-                                    LanguageCode language) {
+                                    LanguageCode language)
+            throws ProductPriceNotFoundException, ProductPriceNotConvertibleException {
 
         price.setSku(sku);
         price.setId(priceId);
@@ -126,7 +134,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public List<ReadableProductPrice> list(@PathVariable String sku, @PathVariable Long inventoryId,
-                                           StoreMerchantId merchantStore, LanguageCode language) {
+                                           StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
 
         return productPriceFacade.list(sku, inventoryId, merchantStore, language);
     }
@@ -139,7 +148,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public List<ReadableProductPrice> list(@PathVariable String sku, StoreMerchantId merchantStore,
-                                           LanguageCode language) {
+                                           LanguageCode language)
+            throws ProductPriceNotConvertibleException {
 
         return productPriceFacade.list(sku, merchantStore, language);
     }
@@ -153,7 +163,8 @@ public class ProductPriceApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void delete(@PathVariable String sku, @PathVariable Long priceId, StoreMerchantId merchantStore,
-                       LanguageCode language) {
+                       LanguageCode language)
+            throws ProductPriceNotFoundException {
 
         productPriceFacade.delete(priceId, sku, merchantStore);
     }

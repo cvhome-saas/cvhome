@@ -23,15 +23,14 @@ import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.service.mapper.cart.ReadableShoppingCartMapper;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,16 +53,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     private final ExternalProductService externalProductService;
 
     private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
-                                            StoreMerchantId store, LanguageCode language) throws Exception {
+                                            StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
         ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, shoppingCartItem.getProduct(),
                 language);
         ReadableProductAvailability availability = detailedProduct.availability();
 
         if (!availability.isCanBePurchased()) {
-            throw new ServiceException(String.format(
-                    "Product with sku %s is not available or is not properly configured. It contains no inventory",
-                    availability.getSku()));
+            throw ProductNotPurchasableException.of(availability.getSku());
         }
 
         FinalPriceCalc price = detailedProduct.price();
@@ -95,10 +93,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (StringUtils.isNotBlank(cartId)) {
             try {
                 return shoppingCartService.loadCartByCode(cartId, store, language);
-            } catch (ServiceException e) {
-                log.error("unable to find any cart asscoiated with this Id: {}", cartId);
-                log.error("error while fetching cart model...", e);
-                return null;
             } catch (NoResultException _) {
                 // nothing
             }
@@ -107,14 +101,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception {
+    public void saveOrUpdateShoppingCart(ShoppingCart cart) {
         shoppingCartService.saveOrUpdate(cart);
     }
 
     @Override
     // KEEP ** ENTRY POINT **
     public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store,
-                                          LanguageCode language) {
+                                          LanguageCode language) throws ProductNotPurchasableException {
 
         ShoppingCart cartModel = new ShoppingCart();
         cartModel.setStoreMerchantId(store);
@@ -125,24 +119,17 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             cartModel.setPromoAdded(Instant.now());
         }
 
-        try {
-            return readableShoppingCart(cartModel, item, store, language);
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e.getMessage(), e);
-            }
-        }
+        return readableShoppingCart(cartModel, item, store, language);
     }
 
     @Override
     public ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
-                                                       LanguageCode language, boolean returnCart) throws Exception {
+                                                       LanguageCode language, boolean returnCart)
+            throws ShoppingCartNotFoundException {
         ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException(String.format("Cart code [ %s ] not found", cartCode));
+            throw ShoppingCartNotFoundException.byCode(cartCode);
         }
 
         Set<ShoppingCartItem> items = new HashSet<>();
@@ -175,7 +162,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     // KEEP
     private ReadableShoppingCart readableShoppingCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                                      StoreMerchantId store, LanguageCode language) throws Exception {
+                                                      StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
@@ -187,7 +175,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     private ReadableShoppingCart modifyCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                            StoreMerchantId store, LanguageCode language) throws Exception {
+                                            StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
@@ -260,11 +249,12 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     @Override
     // KEEP
     public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
-                                           LanguageCode language) throws Exception {
+                                           LanguageCode language)
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {
-            throw new ResourceNotFoundException(String.format("Cart code [%s] not found", cartCode));
+            throw ShoppingCartNotFoundException.byCode(cartCode);
         }
 
         return modifyCart(cartModel, item, store, language);
@@ -280,7 +270,7 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws Exception {
+    public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) {
 
         ShoppingCart cart = shoppingCartService.loadCartByCode(code, store, language);
         ReadableShoppingCart readableCart = null;

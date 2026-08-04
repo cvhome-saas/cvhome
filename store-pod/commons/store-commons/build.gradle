@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(':store-commons:commons')
+    api project(':store-commons:errors')
     compileOnly libs.jakarta.persistence.api
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.databind

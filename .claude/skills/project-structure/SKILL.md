@@ -190,8 +190,8 @@ Two sanctioned mechanisms — pick by whether the caller needs an answer now:
 
 - **Synchronous:** a `@HttpExchange` interface in the provider's `-external-api` module. The provider's
   `External*Api` controller *implements* that same interface; the consumer builds a proxy with
-  `RestClientBuilder.buildClient("catalog", Iface.class)`. Never depend on another pod's `-core` or `-service`.
-  → `references/service-to-service.md`
+  `RestClientBuilder.buildClient("catalog", Iface.class, errorCatalog)`. Never depend on another pod's `-core` or
+  `-service`. → `references/service-to-service.md`, and `references/error-handling.md` for the error contract.
 - **Asynchronous:** a domain event registered on an aggregate root (`registerEvent(...)` via
   `AbstractAggregateRoot`) and delivered by the **namastack transactional outbox** to an `@OutboxHandler`.
   Used in `control-plane-service` and `payment-service`. Put event types in their own **`-events` module**
@@ -298,6 +298,7 @@ See `references/frontends.md`.
 - `references/configuration.md` — the shared config slices, the composition rule, the service registry.
 - `references/gateways-and-local-domains.md` — port vs gateway-path addressing, both edges' routing tables, the local Docker/`/etc/hosts` setup.
 - `references/service-to-service.md` — `@HttpExchange` contracts, `RestClientBuilder`, URL/namespace resolution.
+- `references/error-handling.md` — the `BaseException` hierarchy and its rules, the ProblemDetail wire format, the shared advice, and typed service-to-service errors.
 - `references/service-discovery.md` — `lb://` resolution, simple discovery locally vs `ecs-service-discoveryclient` / Cloud Map on Fargate.
 - `references/uaa-client.md` — the UAA admin SDK: creating/reading users in `uaa`, tenant metadata, wiring.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.

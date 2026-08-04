@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
+import com.asrevo.cvhome.catalog.api.errors.ProductReservationRejectedException;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationCommitResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReleaseResult;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
@@ -11,7 +13,6 @@ import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationServ
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -33,13 +34,20 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
         this.externalProductReservationService = externalProductReservationService;
     }
 
+    /**
+     * Passes both catalog failures straight through.
+     *
+     * <p>
+     * This method used to be {@code catch (Exception _) -> status(false)}, which made "the shopper cannot have this"
+     * and "catalog is restarting" indistinguishable one line after they arrived — so a deploy told shoppers their
+     * basket was out of stock, and a reservation catalog had actually taken was abandoned. There is nothing useful to
+     * do with either failure here; the placement flow is the only layer that knows what to do about it.
+     * </p>
+     */
     @Override
-    public ProductReservationReserveResult reserveProduct(StoreMerchantId store, Order order) {
-        try {
-            return externalProductReservationService.reserve(store, order.getId().toString(), toProductReservationList(order));
-        } catch (Exception _) {
-            return ProductReservationReserveResult.builder().status(false).build();
-        }
+    public ProductReservationReserveResult reserveProduct(StoreMerchantId store, Order order)
+            throws ProductReservationRejectedException, CatalogApiUnavailableException {
+        return externalProductReservationService.reserve(store, order.getId().toString(), toProductReservationList(order));
     }
 
     private ProductReservationList toProductReservationList(Order modelOrder) {
@@ -51,36 +59,42 @@ public class OrderInventoryOrchestratorImpl implements OrderInventoryOrchestrato
 
     @Override
     public void updateOrderStatusWithReservationCommit(Long orderId, StoreMerchantId store, OrderStatus successOrder,
-                                                       PaymentStatus successPay) {
-        try {
-            ProductReservationCommitResult result = externalProductReservationService.commit(store, orderId.toString());
-            if (result.status()) {
-                orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.COMMITTED, successPay);
-            } else {
-                log.error("Failed to commit reservation for order {} at catalog service", orderId);
-                // We keep the status as is (likely RESERVED) to allow retry
-            }
-        } catch (Exception e) {
-            log.error("Error calling external reservation commit for order {}", orderId, e);
-            throw new ServiceRuntimeException("Error during reservation commit", e);
+                                                       PaymentStatus successPay) throws CatalogApiUnavailableException {
+        ProductReservationCommitResult result = externalProductReservationService.commit(store, orderId.toString());
+        if (result.status()) {
+            orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.COMMITTED, successPay);
+        } else {
+            log.error("Failed to commit reservation for order {} at catalog service", orderId);
+            // We keep the status as is (likely RESERVED) to allow retry
         }
     }
 
+    /**
+     * Marks the reservation failed on either outcome, but only after catalog has been asked.
+     *
+     * <p>
+     * An unreachable catalog still ends in {@code RESERVATION_FAILED} — unlike commit, there is no state worth
+     * preserving, and catalog's expiry job frees anything still held — but it is rethrown so the caller learns the
+     * release was never confirmed.
+     * </p>
+     */
     @Override
     public void updateOrderStatusWithReservationRelease(Long orderId, StoreMerchantId store, OrderStatus successOrder,
-                                                        PaymentStatus successPay) {
+                                                        PaymentStatus successPay) throws CatalogApiUnavailableException {
+        ProductReservationReleaseResult result;
         try {
-            ProductReservationReleaseResult result = externalProductReservationService.release(store, orderId.toString());
-            if (result.status()) {
-                orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RELEASED, successPay);
-            } else {
-                log.error("Failed to release reservation for order {} at catalog service", orderId);
-                orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RESERVATION_FAILED, successPay);
-            }
-        } catch (Exception e) {
-            log.error("Error calling external reservation release for order {}", orderId, e);
+            result = externalProductReservationService.release(store, orderId.toString());
+        } catch (CatalogApiUnavailableException e) {
+            log.error("Catalog unreachable while releasing the reservation for order {}", orderId, e);
             orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RESERVATION_FAILED, successPay);
-            throw new ServiceRuntimeException("Error during reservation release", e);
+            throw e;
+        }
+
+        if (result.status()) {
+            orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RELEASED, successPay);
+        } else {
+            log.error("Failed to release reservation for order {} at catalog service", orderId);
+            orderService.updateOrderStatus(orderId, successOrder, InventoryStatus.RESERVATION_FAILED, successPay);
         }
     }
 }

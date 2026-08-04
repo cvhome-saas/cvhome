@@ -9,13 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
+import com.asrevo.cvhome.catalog.errors.CategoryDescriptionLanguageMissingException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.category.CategoryDescription;
 import com.asrevo.cvhome.catalog.model.category.PersistableCategory;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -37,7 +38,8 @@ public class PersistableCategoryPopulator
 
     @Override
     public Category populate(PersistableCategory source, Category target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
+            CategoryDescriptionLanguageMissingException {
 
         try {
 
@@ -58,12 +60,12 @@ public class PersistableCategoryPopulator
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw CategoryNotConvertibleException.of(e);
         }
     }
 
     private void applyParent(PersistableCategory source, Category target, StoreMerchantId store)
-            throws ConversionException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (source.getParent() == null || StringUtils.isBlank(source.getParent().getCode())
                 || source.getParent().getId() == null) {
             target.setParent(null);
@@ -75,7 +77,9 @@ public class PersistableCategoryPopulator
 
         Category parent = resolveParent(source, store);
         if (parent != null && !Objects.equals(parent.getStoreMerchantId(), store)) {
-            throw new ConversionException("Store id does not belong to specified parent id");
+            // Reported as unresolvable rather than as a cross-store rule: saying "that parent belongs to another
+            // store" would confirm the row exists, which a caller probing category ids should not learn.
+            throw CategoryReferenceUnresolvableException.of(parent.getId(), store);
         }
 
         if (parent != null) {
@@ -91,18 +95,19 @@ public class PersistableCategoryPopulator
     }
 
     private Category resolveParent(PersistableCategory source, StoreMerchantId store)
-            throws ConversionException, ServiceException {
+            throws CategoryReferenceUnresolvableException {
         if (!StringUtils.isBlank(source.getParent().getCode())) {
             return categoryService.getByCode(store, source.getParent().getCode());
         }
         if (source.getParent().getId() != null) {
             return categoryService.getById(source.getParent().getId(), store);
         }
-        throw new ConversionException("Category parent needs at least an id or a code for reference");
+        throw CategoryReferenceUnresolvableException.incomplete();
     }
 
     private void applyChildren(PersistableCategory source, Category target, StoreMerchantId store, LanguageCode language)
-            throws ConversionException {
+            throws CategoryNotConvertibleException, CategoryReferenceUnresolvableException,
+            CategoryDescriptionLanguageMissingException {
         if (CollectionUtils.isEmpty(source.getChildren())) {
             return;
         }
@@ -112,7 +117,8 @@ public class PersistableCategoryPopulator
         }
     }
 
-    private void applyDescriptions(PersistableCategory source, Category target) throws ConversionException {
+    private void applyDescriptions(PersistableCategory source, Category target)
+            throws CategoryDescriptionLanguageMissingException {
         if (CollectionUtils.isEmpty(source.getDescriptions())) {
             return;
         }
@@ -134,11 +140,11 @@ public class PersistableCategoryPopulator
 
     private void mergeExistingDescriptions(PersistableCategory source, Category target,
                                            Set<com.asrevo.cvhome.catalog.entity.category.CategoryDescription> descriptions)
-            throws ConversionException {
+            throws CategoryDescriptionLanguageMissingException {
         for (com.asrevo.cvhome.catalog.entity.category.CategoryDescription description : target.getDescriptions()) {
             for (CategoryDescription d : source.getDescriptions()) {
                 if (StringUtils.isBlank(d.getLanguage().code())) {
-                    throw new ConversionException("Source category description has no language");
+                    throw CategoryDescriptionLanguageMissingException.of();
                 }
                 if (d.getLanguage().equals(description.getLanguageCode())) {
                     description.setCategory(target);

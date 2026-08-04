@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.category.CategoryDescription;
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.repositories.category.CategoryDescriptionRepository;
 import com.asrevo.cvhome.catalog.repositories.category.CategoryRepository;
 import com.asrevo.cvhome.catalog.repositories.category.PageableCategoryRepository;
@@ -21,7 +22,6 @@ import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("categoryService")
@@ -46,7 +46,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
         this.categoryDescriptionRepository = categoryDescriptionRepository;
     }
 
-    public void create(Category category) throws ServiceException {
+    public void create(Category category) {
 
         super.create(category);
         StringBuilder lineage = new StringBuilder();
@@ -66,7 +66,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public void saveOrUpdate(Category category) throws ServiceException {
+    public void saveOrUpdate(Category category) {
 
         // save or update (persist and attach entities
         if (category.getId() != null && category.getId() > 0) {
@@ -77,12 +77,11 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public List<Category> getListByLineage(StoreMerchantId store, String lineage) throws ServiceException {
-        try {
-            return categoryRepository.findByLineage(store, lineage);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public List<Category> getListByLineage(StoreMerchantId store, String lineage) {
+        // No try/catch: a Spring Data repository signals infrastructure failure with an unchecked DataAccessException,
+        // which the shared advice already renders as a 500 with a traceId. The ServiceException wrapper that used to
+        // sit here added a checked type to every caller's signature and told them nothing they could act on.
+        return categoryRepository.findByLineage(store, lineage);
     }
 
     @Override
@@ -91,13 +90,8 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public Category getByCode(StoreMerchantId storeCode, String code) throws ServiceException {
-
-        try {
-            return categoryRepository.findByCode(storeCode, code);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
+    public Category getByCode(StoreMerchantId storeCode, String code) {
+        return categoryRepository.findByCode(storeCode, code);
     }
 
     @Override
@@ -117,7 +111,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public void delete(Category category) throws ServiceException {
+    public void delete(Category category) {
 
         StringBuilder lineage = new StringBuilder();
         lineage.append(category.getLineage()).append(category.getId()).append(Constants.SLASH);
@@ -155,7 +149,7 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
         }
     }
 
-    private void removeCategoriesFromProduct(Product product, List<Category> categories) throws ServiceException {
+    private void removeCategoriesFromProduct(Product product, List<Category> categories) {
         Product dbProduct = productService.getById(product.getId());
         Set<Category> productCategories = dbProduct.getCategories();
         if (productCategories.size() <= 1) {
@@ -174,51 +168,50 @@ public class CategoryServiceImpl extends SalesManagerEntityServiceImpl<Long, Cat
     }
 
     @Override
-    public void addChild(Category parent, Category child) throws ServiceException {
+    public void addChild(Category parent, Category child)
+            throws CategoryReferenceUnresolvableException {
 
         if (child == null || child.getStoreMerchantId() == null) {
-            throw new ServiceException("Child category and merchant store should not be null");
+            throw CategoryReferenceUnresolvableException.incomplete();
         }
 
-        try {
+        // The catch-all that used to wrap this block re-emitted every failure as one opaque ServiceException. Nothing
+        // here fails in a way the caller can act on beyond the incomplete-child check above; a store failure stays an
+        // unchecked DataAccessException and renders as a 500 with a traceId.
+        if (parent == null) {
 
-            if (parent == null) {
+            child.setParent(null);
+            child.setDepth(0);
+            child.setLineage(new StringBuilder().append(Constants.SLASH).append(child.getId()).append(Constants.SLASH).toString());
 
-                child.setParent(null);
-                child.setDepth(0);
-                child.setLineage(new StringBuilder().append(Constants.SLASH).append(child.getId()).append(Constants.SLASH).toString());
+        } else {
 
-            } else {
+            Category p = getById(parent.getId(), parent.getStoreMerchantId()); // parent
 
-                Category p = getById(parent.getId(), parent.getStoreMerchantId()); // parent
+            String lineage = p.getLineage();
+            int depth = p.getDepth();
 
-                String lineage = p.getLineage();
-                int depth = p.getDepth();
+            child.setParent(p);
+            child.setDepth(depth + 1);
+            child.setLineage(new StringBuilder().append(lineage)
+                    .append(Constants.SLASH)
+                    .append(child.getId())
+                    .append(Constants.SLASH)
+                    .toString());
+        }
 
-                child.setParent(p);
-                child.setDepth(depth + 1);
-                child.setLineage(new StringBuilder().append(lineage)
-                        .append(Constants.SLASH)
-                        .append(child.getId())
-                        .append(Constants.SLASH)
-                        .toString());
-            }
+        update(child);
+        StringBuilder childLineage = new StringBuilder();
+        childLineage.append(child.getLineage()).append(child.getId()).append(Constants.SLASH);
+        List<Category> subCategories = getListByLineage(child.getStoreMerchantId(), childLineage.toString());
 
-            update(child);
-            StringBuilder childLineage = new StringBuilder();
-            childLineage.append(child.getLineage()).append(child.getId()).append(Constants.SLASH);
-            List<Category> subCategories = getListByLineage(child.getStoreMerchantId(), childLineage.toString());
-
-            // ajust all sub categories lineages
-            if (subCategories != null && !subCategories.isEmpty()) {
-                for (Category subCategory : subCategories) {
-                    if (!child.getId().equals(subCategory.getId())) {
-                        addChild(child, subCategory);
-                    }
+        // ajust all sub categories lineages
+        if (subCategories != null && !subCategories.isEmpty()) {
+            for (Category subCategory : subCategories) {
+                if (!child.getId().equals(subCategory.getId())) {
+                    addChild(child, subCategory);
                 }
             }
-        } catch (Exception e) {
-            throw new ServiceException(e);
         }
     }
 

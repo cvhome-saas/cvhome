@@ -6,14 +6,14 @@ import java.util.Set;
 
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
+import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductPriceFull;
 import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.Getter;
@@ -26,9 +26,22 @@ public class ReadableProductPricePopulator
 
     private PricingService pricingService;
 
+    /**
+     * Narrows the inherited two-argument form back to this populator's own failure type. {@code AbstractDataPopulator}
+     * declares the shared category base so that a migrated populator can name its own conditions; without this
+     * override, callers of the short form would have to handle a base none of them can act on.
+     */
+    @Override
+    public ReadableProductPrice populate(ProductPrice source, StoreMerchantId store, LanguageCode language)
+            throws ProductPriceNotConvertibleException {
+        // Not super.populate(...): that is the frame declaring the wide base. Re-dispatching to the four-argument
+        // override here is what keeps the narrow type on this signature.
+        return populate(source, createTarget(), store, language);
+    }
+
     @Override
     public ReadableProductPrice populate(ProductPrice source, ReadableProductPrice target, StoreMerchantId store,
-                                         LanguageCode language) throws ConversionException {
+                                         LanguageCode language) throws ProductPriceNotConvertibleException {
         try {
 
             if (language == null) {
@@ -45,14 +58,14 @@ public class ReadableProductPricePopulator
             applyDescriptions(source, target, language);
 
         } catch (Exception e) {
-            throw new ConversionException("Exception while converting to ReadableProductPrice", e);
+            throw ProductPriceNotConvertibleException.of(e);
         }
 
         return target;
     }
 
     private void applyFinalPrice(ProductPrice source, ReadableProductPrice target, StoreMerchantId store)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         FinalPriceCalc finalPrice = pricingService.calculateProductPrice(source.getProductAvailability().getProduct());
 
         target.setOriginalPrice(pricingService.getDisplayAmount(source.getProductPriceAmount(), store));

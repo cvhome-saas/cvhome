@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.cua.errors.DuplicateEmailException;
+import com.asrevo.cvhome.cua.errors.DuplicateUsernameException;
 import com.asrevo.cvhome.cua.service.UserService;
 import com.asrevo.cvhome.cua.web.dto.RegistrationRequest;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -37,6 +39,8 @@ public class RegistrationController {
     private static final String REQUEST_PARAM_CLIENT_ID_KEY = "client_id";
 
     private static final String REGISTER_PAGE = "register";
+
+    private static final String REGISTRATION_ERROR_CODE = "error.registrationRequest";
 
     private final RequestCache requestCache;
 
@@ -96,8 +100,15 @@ public class RegistrationController {
 
         try {
             userService.registerUser(registrationRequest);
-        } catch (IllegalArgumentException e) {
-            bindingResult.rejectValue("username", "error.registrationRequest", e.getMessage());
+            // Two catches rather than one: each collision belongs under the control the shopper has to change, and
+            // the compiler is what says the set is complete.
+        } catch (DuplicateUsernameException e) {
+            // payload().detail(), not getMessage(): the latter is prefixed with the error code for logs, and the
+            // shopper should see the sentence rather than CUA.REGISTRATION.USERNAME_TAKEN.
+            bindingResult.rejectValue("username", REGISTRATION_ERROR_CODE, e.payload().detail());
+            return REGISTER_PAGE;
+        } catch (DuplicateEmailException e) {
+            bindingResult.rejectValue("email", REGISTRATION_ERROR_CODE, e.payload().detail());
             return REGISTER_PAGE;
         } catch (Exception e) {
             log.error("Registration failed", e);

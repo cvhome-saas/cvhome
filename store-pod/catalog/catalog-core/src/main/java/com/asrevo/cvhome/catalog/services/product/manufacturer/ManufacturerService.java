@@ -9,7 +9,6 @@ import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
 
 public interface ManufacturerService extends SalesManagerEntityService<Long, Manufacturer> {
@@ -20,9 +19,9 @@ public interface ManufacturerService extends SalesManagerEntityService<Long, Man
 
     Page<Manufacturer> listByStore(StoreMerchantId store, LanguageCode language, String name, Pageable pageable);
 
-    void saveOrUpdate(Manufacturer manufacturer) throws ServiceException;
+    void saveOrUpdate(Manufacturer manufacturer);
 
-    void delete(Manufacturer manufacturer) throws ServiceException;
+    void delete(Manufacturer manufacturer);
 
     Manufacturer getByCode(StoreMerchantId store, String code);
 

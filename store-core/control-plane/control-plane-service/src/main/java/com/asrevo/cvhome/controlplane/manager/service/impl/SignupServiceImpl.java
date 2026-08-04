@@ -7,6 +7,8 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.controlplane.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.controlplane.manager.service.InternalOrgService;
 import com.asrevo.cvhome.controlplane.manager.service.SignupService;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
+import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.service.UserAccountService;
 
@@ -23,7 +25,8 @@ public class SignupServiceImpl implements SignupService {
     private final InternalOrgService internalOrgService;
 
     @Override
-    public ReadableUser createOrgUser(CreateOrgRequest request) {
+    public ReadableUser createOrgUser(CreateOrgRequest request)
+            throws UaaConflictException, UaaApiUnavailableException {
         ManagerOrgId org = internalOrgService.createOrgForUser(new Email(request.user().getEmailAddress()));
         request.user().setActive(true);
         request.user().setUserName(request.user().getEmailAddress());

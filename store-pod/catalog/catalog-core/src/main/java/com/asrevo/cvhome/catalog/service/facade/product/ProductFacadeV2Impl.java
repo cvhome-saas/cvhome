@@ -12,6 +12,11 @@ import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
@@ -24,11 +29,10 @@ import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
+import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.LocaleUtils;
 
-import lombok.SneakyThrows;
 
 @Service("productFacadeV2")
 public class ProductFacadeV2Impl implements ProductFacade {
@@ -62,20 +66,15 @@ public class ProductFacadeV2Impl implements ProductFacade {
         return productService.findOne(id, store);
     }
 
-    private ReadableProductVariant productVariant(ProductVariant instance, StoreMerchantId store,
-                                                  LanguageCode language) {
-
-        return readableProductVariantMapper.convert(instance, store, language);
-    }
-
     @Override
-    public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language) {
+    public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
+            throws ProductNotFoundException, ProductPriceNotConvertibleException, ProductVariantParentMissingException,
+            InventoryNotConvertibleException {
 
         Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
         if (product == null) {
-            throw new ResourceNotFoundException(
-                    "Product [%s] not found for merchant [%s]".formatted(friendlyUrl, store));
+            throw ProductNotFoundException.of(friendlyUrl, store);
         }
 
         ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
@@ -84,10 +83,11 @@ public class ProductFacadeV2Impl implements ProductFacade {
         // limit to 15 searches
         List<ProductVariant> instances = productVariantService.getByProductId(store, product, language);
 
-        // the above get all possible images
-        List<ReadableProductVariant> readableInstances = instances.stream()
-                .map(p -> this.productVariant(p, store, language))
-                .toList();
+        // A plain loop rather than stream().map(...): the variant mapper declares checked failures now.
+        List<ReadableProductVariant> readableInstances = new ArrayList<>();
+        for (ProductVariant instance : instances) {
+            readableInstances.add(readableProductVariantMapper.convert(instance, store, language));
+        }
         readableProduct.setVariants(readableInstances);
 
         return readableProduct;
@@ -96,22 +96,33 @@ public class ProductFacadeV2Impl implements ProductFacade {
     /**
      * Filters on otion, optionValues and other criterias
      */
-    @SneakyThrows
     @Override
     public ReadableProductList getProductListsByCriteria(StoreMerchantId merchantStore,
-                                                         ProductCriteria searchCriteria) {
+                                                         ProductCriteria searchCriteria)
+            throws ProductNotConvertibleException {
         return listProducts(readableProductMapper, merchantStore, searchCriteria);
     }
 
     @Override
     public ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore,
-                                                             ProductCriteria searchCriteria) {
+                                                             ProductCriteria searchCriteria)
+            throws ProductNotConvertibleException {
         return listProducts(new ReadableBaseProductMapper(pricingService), merchantStore, searchCriteria);
     }
 
-    @SneakyThrows
+    /**
+     * The one place the mapper is a parameter rather than a field, because the two public methods above pass different
+     * implementations. Through the {@code Mapper} interface javac sees only the shared {@code ConversionException}
+     * base, which rule 2 forbids putting on a signature — so it is narrowed here, once, to the condition that is
+     * actually true of every path into this method: a product could not be converted.
+     *
+     * <p>
+     * Both {@code @SneakyThrows} annotations that used to sit here and on the caller are gone with it; they were
+     * hiding exactly this base from the signature rather than resolving it.
+     * </p>
+     */
     ReadableProductList listProducts(Mapper<Product, ReadableProduct> mapper, StoreMerchantId store,
-                                     ProductCriteria criteria) {
+                                     ProductCriteria criteria) throws ProductNotConvertibleException {
         if (CollectionUtils.isNotEmpty(criteria.getCategoryIds()) && criteria.getCategoryIds().size() == 1) {
 
             Category category = categoryService.getById(criteria.getCategoryIds().getFirst());
@@ -125,11 +136,17 @@ public class ProductFacadeV2Impl implements ProductFacade {
         Page<Product> all = productService.findAll(criteria, store);
 
         ReadableProductList readableProductList = new ReadableProductList();
-        List<ReadableProduct> readableProducts = all.getContent()
-                .stream()
-                .map(p -> mapper.convert(p, store, criteria.getLanguage()))
-                .sorted(Comparator.comparing(ReadableProduct::getSortOrder))
-                .toList();
+        List<ReadableProduct> readableProducts = new ArrayList<>();
+        try {
+            for (Product p : all.getContent()) {
+                readableProducts.add(mapper.convert(p, store, criteria.getLanguage()));
+            }
+        } catch (ProductNotConvertibleException e) {
+            throw e;
+        } catch (ConversionException e) {
+            throw ProductNotConvertibleException.of(e);
+        }
+        readableProducts.sort(Comparator.comparing(ReadableProduct::getSortOrder));
 
         readableProductList.setTotalElements(all.getTotalElements());
         readableProductList.setSize(all.getNumberOfElements());
@@ -140,7 +157,6 @@ public class ProductFacadeV2Impl implements ProductFacade {
         return readableProductList;
     }
 
-    @SneakyThrows
     private List<Long> resolveCategoryIds(StoreMerchantId store, Category category) {
         String lineage = category.getLineage();
 

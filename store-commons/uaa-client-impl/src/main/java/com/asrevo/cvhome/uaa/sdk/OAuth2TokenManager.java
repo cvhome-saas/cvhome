@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 
-import com.asrevo.cvhome.uaa.exception.ApiException;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import tools.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ public class OAuth2TokenManager {
 
     private static final String ACCEPT_HEADER = "Accept";
 
-    private static final String ERR_TOKEN_REQUEST = "Error during token request";
+    private static final String ERR_TOKEN_REQUEST = "Could not obtain an access token from uaa.";
 
     private final String tokenEndpoint;
 
@@ -43,14 +43,27 @@ public class OAuth2TokenManager {
     private Instant expiryTime;
 
     public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret) {
+        this(baseUrl, clientId, clientSecret, HttpClient.newBuilder().build());
+    }
+
+    /**
+     * Overload taking the {@link HttpClient}, so the SDK and its token exchange share one client — and so a test can
+     * drive both without a uaa to talk to.
+     */
+    public OAuth2TokenManager(String baseUrl, String clientId, String clientSecret, HttpClient httpClient) {
         this.tokenEndpoint = String.format("%s/oauth2/token", baseUrl);
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.httpClient = HttpClient.newBuilder().build();
+        this.httpClient = httpClient;
         this.objectMapper = new ObjectMapper();
     }
 
-    public synchronized String getAccessToken() {
+    /**
+     * @throws UaaApiUnavailableException the token could not be obtained, so the request the caller wanted was never
+     *                                    attempted — whether that is uaa being down or our own credentials being
+     *                                    wrong is an operational question, not one the caller can act on
+     */
+    public synchronized String getAccessToken() throws UaaApiUnavailableException {
         if (currentToken == null || isExpired()) {
             refreshToken();
         }
@@ -62,7 +75,7 @@ public class OAuth2TokenManager {
         return expiryTime == null || Instant.now().isAfter(expiryTime.minusSeconds(60));
     }
 
-    private void refreshToken() {
+    private void refreshToken() throws UaaApiUnavailableException {
         // admin-sdk uses client_credentials
         // V2 says client_secret_post for admin-sdk
 
@@ -96,15 +109,17 @@ public class OAuth2TokenManager {
             }
 
             if (response.statusCode() != 200) {
-                throw new ApiException(String.format("Failed to get token: %s", response.body()));
+                // The body is deliberately not carried into the exception: a failed token exchange can echo back
+                // client credentials, and this detail reaches a client response.
+                throw UaaApiUnavailableException.tokenRequestFailed(ERR_TOKEN_REQUEST, null);
             }
             currentToken = objectMapper.readValue(response.body(), TokenResponse.class);
             expiryTime = Instant.now().plusSeconds(currentToken.expiresIn());
         } catch (IOException e) {
-            throw new ApiException(ERR_TOKEN_REQUEST, e);
+            throw UaaApiUnavailableException.tokenRequestFailed(ERR_TOKEN_REQUEST, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ApiException(ERR_TOKEN_REQUEST, e);
+            throw UaaApiUnavailableException.tokenRequestFailed(ERR_TOKEN_REQUEST, e);
         }
     }
 

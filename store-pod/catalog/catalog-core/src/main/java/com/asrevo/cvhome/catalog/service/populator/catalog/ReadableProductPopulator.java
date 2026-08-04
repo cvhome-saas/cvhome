@@ -25,6 +25,9 @@ import com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescrip
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
+import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
@@ -44,8 +47,6 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
 
@@ -64,7 +65,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
     @Override
     public ReadableProduct populate(Product source, ReadableProduct target, StoreMerchantId store,
-                                    LanguageCode language) throws ConversionException {
+                                    LanguageCode language) throws ProductNotConvertibleException {
         try {
             ReadableMerchantStore baseStore = externalMerchantStoreService.getStore(store);
             List<com.asrevo.cvhome.catalog.model.product.ProductDescription> fulldescriptions = new ArrayList<>();
@@ -100,7 +101,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
             return target;
 
         } catch (Exception e) {
-            throw new ConversionException(e);
+            throw ProductNotConvertibleException.of(e);
         }
     }
 
@@ -261,7 +262,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void populateAttributes(Product source, ReadableProduct target, StoreMerchantId store, LanguageCode language)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         if (CollectionUtils.isEmpty(source.getAttributes())) {
             return;
         }
@@ -330,7 +331,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     private Map<Long, ReadableProductOption> applySelectableAttribute(ProductAttribute attribute,
                                                                       Map<Long, ReadableProductOption> selectableOptions,
                                                                       StoreMerchantId store, LanguageCode language)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         Map<Long, ReadableProductOption> options = selectableOptions;
         if (options == null) {
             options = new TreeMap<>();
@@ -352,7 +353,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private ReadableProductOptionValue buildOptionValue(ProductAttribute attribute, StoreMerchantId store, LanguageCode language)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
         ProductOptionValue optionValue = attribute.getProductOptionValue();
 
@@ -382,7 +383,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void applyAttributePrice(ProductAttribute attribute, StoreMerchantId store, ReadableProductOptionValue optValue)
-            throws ServiceException {
+            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         if (attribute.getProductAttributePrice() == null || attribute.getProductAttributePrice().doubleValue() <= 0) {
             return;
         }
@@ -432,7 +433,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
     }
 
     private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability,
-                               LanguageCode lang) throws ServiceException {
+                               LanguageCode lang) throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
         FinalPriceCalc price = pricingService.calculateProductPrice(source);
         if (price == null) {
             return;

@@ -13,7 +13,6 @@ import com.asrevo.cvhome.catalog.model.product.group.PersistableProductGroupDesc
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ConversionException;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 @Component
@@ -28,7 +27,7 @@ public class PersistableProductGroupPopulator
 
     @Override
     public ProductGroup populate(PersistableProductGroup source, ProductGroup target, StoreMerchantId store,
-                                 LanguageCode language) throws ConversionException {
+                                 LanguageCode language) {
         target.setStoreMerchantId(store);
         target.setCode(source.getCode());
         target.setActive(source.isActive());

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.repositories.product.price.ProductPriceRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 @Service("productPrice")
@@ -29,7 +28,7 @@ public class ProductPriceServiceImpl extends SalesManagerEntityServiceImpl<Long,
     }
 
     @Override
-    public void delete(ProductPrice price) throws ServiceException {
+    public void delete(ProductPrice price) {
         // override method, this allows the error that we try to remove a detached variant
         price = this.getById(price.getId());
         super.delete(price);

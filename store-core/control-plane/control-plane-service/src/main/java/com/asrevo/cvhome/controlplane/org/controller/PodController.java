@@ -18,6 +18,7 @@ import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.controlplane.errors.PodNotFoundException;
 import com.asrevo.cvhome.controlplane.org.service.PodService;
 
 import lombok.AllArgsConstructor;
@@ -59,7 +60,7 @@ public class PodController {
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
-    public Pod update(@PathVariable PodId id, @RequestBody Pod pod) {
+    public Pod update(@PathVariable PodId id, @RequestBody Pod pod) throws PodNotFoundException {
         return podService.update(id, pod);
     }
 

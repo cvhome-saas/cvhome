@@ -1,11 +1,15 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantGroup;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariantGroup;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -23,13 +27,15 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
 
     @Override
     public ReadableProductVariantGroup convert(ProductVariantGroup source, StoreMerchantId store,
-                                               LanguageCode language) {
+                                               LanguageCode language)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException {
         return this.merge(source, new ReadableProductVariantGroup(), store, language);
     }
 
     @Override
     public ReadableProductVariantGroup merge(ProductVariantGroup source, ReadableProductVariantGroup destination,
-                                             StoreMerchantId store, LanguageCode language) {
+                                             StoreMerchantId store, LanguageCode language)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException {
         if (destination == null) {
             destination = new ReadableProductVariantGroup();
         }
@@ -37,16 +43,15 @@ public class ReadableProductVariantGroupMapper implements Mapper<ProductVariantG
         destination.setId(source.getId());
 
         Set<ProductVariant> instances = source.getProductVariants();
-        destination.setProductVariants(
-                instances.stream().map(i -> this.instance(i, store, language)).toList());
-
+        // A plain loop rather than stream().map(...): the variant mapper declares checked failures, and a lambda
+        // cannot carry them. The one-line `instance` helper it used to call went with it.
+        List<ReadableProductVariant> readableVariants = new ArrayList<>();
+        for (ProductVariant instance : instances) {
+            readableVariants.add(readableProductVariantMapper.convert(instance, store, language));
+        }
+        destination.setProductVariants(readableVariants);
 
         return destination;
-    }
-
-    private ReadableProductVariant instance(ProductVariant instance, StoreMerchantId store, LanguageCode language) {
-
-        return readableProductVariantMapper.convert(instance, store, language);
     }
 
 }

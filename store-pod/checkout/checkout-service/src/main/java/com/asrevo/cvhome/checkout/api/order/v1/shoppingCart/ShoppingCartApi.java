@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.checkout.api.order.v1.shoppingCart;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -16,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +57,8 @@ public class ShoppingCartApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
-                                          StoreMerchantId merchantStore, LanguageCode language) {
+                                          StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductNotPurchasableException {
         return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
     }
 
@@ -73,24 +73,16 @@ public class ShoppingCartApi {
     public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
                                                            @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                                            StoreMerchantId merchantStore,
-                                                           LanguageCode language) {
+                                                           LanguageCode language)
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
 
-        try {
-            ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
+        ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 
-            if (cart == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(cart, HttpStatus.CREATED);
-
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e);
-            }
+        if (cart == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -102,26 +94,18 @@ public class ShoppingCartApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
-                                          LanguageCode language, HttpServletResponse response) {
+                                          LanguageCode language)
+            throws ShoppingCartNotFoundException {
 
-        try {
+        ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
 
-            ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
-
-            if (cart == null) {
-                response.sendError(404, String.format("No ShoppingCart found for customer code : %s", code));
-                return null;
-            }
-
-            return cart;
-
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e);
-            }
+        if (cart == null) {
+            // Previously a raw response.sendError(404), which bypassed the advice and returned an HTML error page
+            // instead of a problem document.
+            throw ShoppingCartNotFoundException.byCode(code);
         }
+
+        return cart;
     }
 
     @DeleteMapping(value = "/cart/{code}/product/{sku}", produces = {APPLICATION_JSON_VALUE})
@@ -136,7 +120,8 @@ public class ShoppingCartApi {
     public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
                                                                @PathVariable("sku") String sku, StoreMerchantId merchantStore,
                                                                LanguageCode language,
-                                                               @RequestParam(defaultValue = "false") boolean body) throws Exception {
+                                                               @RequestParam(defaultValue = "false") boolean body)
+            throws ShoppingCartNotFoundException {
 
         ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
                 language, body);

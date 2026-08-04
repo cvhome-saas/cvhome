@@ -22,6 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
+import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
@@ -32,9 +46,6 @@ import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.Entity;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.UnauthorizedException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.model.entity.EntityExists;
 
@@ -61,12 +72,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Product definition resource (Create udtate and delete product definition. Serves")
 @Slf4j
 public class ProductApi {
-
-    private static final String ERR_PRODUCT_ID_NOT_FOUND = "Product id [%s] is not found";
-    private static final String ERR_PRODUCT_ID_WRONG_STORE = "Product id [%s] does not belong to store [%s]";
-    private static final String ERR_CATEGORY_ID_NOT_FOUND = "Category id [%s] is not found";
-    private static final String ERR_CATEGORY_ID_WRONG_STORE = "Category id [%s] does not belong to store [%s]";
-    private static final String ERR_PRODUCT_NOT_FOUND_MERCHANT = "Product [%s] not found for merchant [%s]";
 
     private final CategoryService categoryService;
 
@@ -99,7 +104,12 @@ public class ProductApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity create(@Valid @RequestBody PersistableProduct product, StoreMerchantId merchantStore,
-                         LanguageCode language) {
+                         LanguageCode language)
+            throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
+            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
+            InventoryNotConvertibleException, ProductNotPersistedException {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
         Entity returnEntity = new Entity();
@@ -134,7 +144,8 @@ public class ProductApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language) {
+    public void delete(@PathVariable Long id, StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductNotFoundException {
 
         productCommonFacade.deleteProduct(id, merchantStore);
     }
@@ -199,35 +210,14 @@ public class ProductApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void addProductToCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-                                     StoreMerchantId merchantStore, LanguageCode language) {
+                                     StoreMerchantId merchantStore, LanguageCode language)
+            throws CategoryAlreadyAttachedException, CategoryNotFoundException, ProductNotFoundException,
+            ForeignStoreProductAccessException, ProductNotConvertibleException, ProductNotPersistedException {
 
-        try {
-            // get the product
-            Product product = productService.getById(productId);
+        Product product = requireProduct(productId, merchantStore);
+        Category category = requireCategory(categoryId, merchantStore);
 
-            if (product == null) {
-                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_ID_NOT_FOUND, productId));
-            }
-
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(String.format(ERR_PRODUCT_ID_WRONG_STORE, productId, merchantStore));
-            }
-
-            Category category = categoryService.getById(categoryId);
-
-            if (category == null) {
-                throw new ResourceNotFoundException(String.format(ERR_CATEGORY_ID_NOT_FOUND, categoryId));
-            }
-
-            if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(String.format(ERR_CATEGORY_ID_WRONG_STORE, categoryId, merchantStore));
-            }
-
-            productCommonFacade.addProductToCategory(category, product, language);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(e);
-        }
+        productCommonFacade.addProductToCategory(category, product, language);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -240,34 +230,13 @@ public class ProductApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void removeProductFromCategory(@PathVariable Long productId, @PathVariable Long categoryId,
-                                          StoreMerchantId merchantStore, LanguageCode language) {
+                                          StoreMerchantId merchantStore, LanguageCode language)
+            throws CategoryNotFoundException, Exception, ProductNotFoundException {
 
-        try {
-            Product product = productService.getById(productId);
+        Product product = requireProduct(productId, merchantStore);
+        Category category = requireCategory(categoryId, merchantStore);
 
-            if (product == null) {
-                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_ID_NOT_FOUND, productId));
-            }
-
-            if (!Objects.equals(product.getStore(), merchantStore)) {
-                throw new UnauthorizedException(String.format(ERR_PRODUCT_ID_WRONG_STORE, productId, merchantStore));
-            }
-
-            Category category = categoryService.getById(categoryId);
-
-            if (category == null) {
-                throw new ResourceNotFoundException(String.format(ERR_CATEGORY_ID_NOT_FOUND, categoryId));
-            }
-
-            if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
-                throw new UnauthorizedException(String.format(ERR_CATEGORY_ID_WRONG_STORE, categoryId, merchantStore));
-            }
-
-            productCommonFacade.removeProductFromCategory(category, product, language);
-
-        } catch (Exception e) {
-            throw new ServiceRuntimeException(e);
-        }
+        productCommonFacade.removeProductFromCategory(category, product, language);
     }
 
     /**
@@ -285,26 +254,44 @@ public class ProductApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void changeProductOrder(@PathVariable Long id,
                                    @RequestParam(value = "order", required = false, defaultValue = "0") Integer position,
-                                   StoreMerchantId merchantStore, LanguageCode language) {
+                                   StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductNotFoundException, ForeignStoreProductAccessException {
 
-        try {
+        Product p = requireProduct(id, merchantStore);
+        p.setSortOrder(position);
+    }
 
-            Product p = productService.getById(id);
-
-            if (p == null) {
-                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_NOT_FOUND_MERCHANT, id, merchantStore));
-            }
-
-            if (!p.getStore().equals(merchantStore)) {
-                throw new ResourceNotFoundException(String.format(ERR_PRODUCT_NOT_FOUND_MERCHANT, id, merchantStore));
-            }
-
-            p.setSortOrder(position);
-
-        } catch (Exception e) {
-            log.error("Error while updating Product position", e);
-            throw new ServiceRuntimeException(String.format("Product [%s] cannot be edited", id));
+    /**
+     * Resolves a product the caller is entitled to touch.
+     *
+     * <p>
+     * The cross-store check answers 403, replacing an {@code UnauthorizedException} that answered 401. The caller is
+     * authenticated and passed {@code @PreAuthorize}; the product simply belongs to another store, and telling a
+     * storefront to re-authenticate would send it round a loop that cannot terminate.
+     * </p>
+     */
+    private Product requireProduct(Long productId, StoreMerchantId merchantStore)
+            throws ProductNotFoundException, ForeignStoreProductAccessException {
+        Product product = productService.getById(productId);
+        if (product == null) {
+            throw ProductNotFoundException.of(productId, merchantStore);
         }
+        if (!Objects.equals(product.getStore(), merchantStore)) {
+            throw ForeignStoreProductAccessException.of(productId, merchantStore);
+        }
+        return product;
+    }
+
+    private Category requireCategory(Long categoryId, StoreMerchantId merchantStore)
+            throws CategoryNotFoundException, ForeignStoreProductAccessException {
+        Category category = categoryService.getById(categoryId);
+        if (category == null) {
+            throw CategoryNotFoundException.of(categoryId, merchantStore);
+        }
+        if (!Objects.equals(category.getStoreMerchantId(), merchantStore)) {
+            throw ForeignStoreProductAccessException.of(categoryId, merchantStore);
+        }
+        return category;
     }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.errors.PaymentConfigurationNotFoundException;
 import com.asrevo.cvhome.payment.models.PersistablePaymentConfiguration;
 import com.asrevo.cvhome.payment.models.ReadablePaymentConfiguration;
 import com.asrevo.cvhome.payment.service.PaymentConfigurationService;
@@ -43,13 +44,15 @@ public class PaymentConfigurationController {
     @PutMapping("/{paymentType}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')")
     public void updateConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType,
-                             @RequestBody PersistablePaymentConfiguration config) {
+                             @RequestBody PersistablePaymentConfiguration config)
+            throws PaymentConfigurationNotFoundException {
         service.updateConfig(merchantStore, paymentType, config);
     }
 
     @DeleteMapping("/{paymentType}")
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.PAYMENT.*')")
-    public void deleteConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType) {
+    public void deleteConfig(StoreMerchantId merchantStore, @PathVariable PaymentType paymentType)
+            throws PaymentConfigurationNotFoundException {
         service.deleteConfig(merchantStore, paymentType);
     }
 

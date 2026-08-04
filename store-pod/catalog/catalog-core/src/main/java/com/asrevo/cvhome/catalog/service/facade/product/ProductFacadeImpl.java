@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
+import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
@@ -48,7 +49,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
     @Override
     public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
-            throws Exception {
+            throws ProductNotConvertibleException {
 
         Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 

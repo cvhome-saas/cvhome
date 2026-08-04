@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,8 +9,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
+import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariantImage;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
@@ -17,7 +21,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductVariation
 import com.asrevo.cvhome.catalog.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
@@ -39,14 +42,16 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
     }
 
     @Override
-    public ReadableProductVariant convert(ProductVariant source, StoreMerchantId store, LanguageCode language) {
+    public ReadableProductVariant convert(ProductVariant source, StoreMerchantId store, LanguageCode language)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException {
         ReadableProductVariant readableproductVariant = new ReadableProductVariant();
         return this.merge(source, readableproductVariant, store, language);
     }
 
     @Override
     public ReadableProductVariant merge(ProductVariant source, ReadableProductVariant destination,
-                                        StoreMerchantId store, LanguageCode language) {
+                                        StoreMerchantId store, LanguageCode language)
+            throws ProductVariantParentMissingException, InventoryNotConvertibleException {
 
         if (destination == null) {
             destination = new ReadableProductVariant();
@@ -65,8 +70,7 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
         // get product
         Product baseProduct = source.getProduct();
         if (baseProduct == null) {
-            throw new ResourceNotFoundException(
-                    "Product instances do not include the parent product [%s]".formatted(destination.getSku()));
+            throw ProductVariantParentMissingException.of(destination.getSku());
         }
 
         destination.setProductShipeable(baseProduct.isProductShipeable());
@@ -89,10 +93,13 @@ public class ReadableProductVariantMapper implements Mapper<ProductVariant, Read
         }
 
         if (!CollectionUtils.isEmpty(source.getAvailabilities())) {
-            List<ReadableInventory> inventories = source.getAvailabilities()
-                    .stream()
-                    .map(i -> readableInventoryMapper.convert(i, store, language))
-                    .toList();
+            // A plain loop rather than stream().map(...): the mapper now declares a checked failure, and a lambda
+            // cannot carry it. Restructuring keeps the type on this method's signature instead of reaching for the
+            // Unchecked carrier to hide it.
+            List<ReadableInventory> inventories = new ArrayList<>();
+            for (ProductAvailability availability : source.getAvailabilities()) {
+                inventories.add(readableInventoryMapper.convert(availability, store, language));
+            }
             destination.setInventory(inventories);
         }
 

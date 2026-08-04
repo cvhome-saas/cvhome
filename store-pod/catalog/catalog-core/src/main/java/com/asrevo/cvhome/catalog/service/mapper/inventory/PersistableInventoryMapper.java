@@ -18,14 +18,17 @@ import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
 import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
+import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.InventoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductVariantReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.inventory.PersistableInventory;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ConversionRuntimeException;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
+import com.asrevo.cvhome.errors.ConversionException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
@@ -44,7 +47,9 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
     }
 
     @Override
-    public ProductAvailability convert(PersistableInventory source, StoreMerchantId store, LanguageCode language) {
+    public ProductAvailability convert(PersistableInventory source, StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException, ProductReferenceUnresolvableException,
+            InventoryReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         ProductAvailability availability = new ProductAvailability();
         availability.setStoreMerchantId(store);
         return merge(source, availability, store, language);
@@ -52,7 +57,9 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 
     @Override
     public ProductAvailability merge(PersistableInventory source, ProductAvailability destination,
-                                     StoreMerchantId store, LanguageCode language) {
+                                     StoreMerchantId store, LanguageCode language)
+            throws InventoryNotConvertibleException, ProductReferenceUnresolvableException,
+            InventoryReferenceUnresolvableException, ProductVariantReferenceUnresolvableException {
         try {
             Product product = resolveProduct(source, destination, store);
             destination = applyExistingAvailability(source, destination, product, store);
@@ -76,35 +83,37 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
 
             return destination;
 
-        } catch (ResourceNotFoundException rne) {
-            throw new ConversionRuntimeException(rne.getErrorCode(), rne.getErrorMessage(), rne);
+        } catch (ConversionException e) {
+            // Already names which reference in the payload failed to resolve; re-wrapping would bury it. The legacy
+            // code did re-wrap, which is why every unresolvable id here arrived as one undifferentiated 400.
+            throw e;
         } catch (Exception e) {
-            throw new ConversionRuntimeException(e);
+            throw InventoryNotConvertibleException.of(e);
         }
     }
 
-    private Product resolveProduct(PersistableInventory source, ProductAvailability destination, StoreMerchantId store) {
+    private Product resolveProduct(PersistableInventory source, ProductAvailability destination, StoreMerchantId store)
+            throws ProductReferenceUnresolvableException {
         if (source.getProductId() == null || source.getProductId() <= 0) {
             return null;
         }
         Product product = productService.findOne(source.getProductId(), store);
         if (product == null) {
-            throw new ResourceNotFoundException(
-                    "Product with id [%s] not found for store [%s]".formatted(source.getProductId(), store));
+            throw ProductReferenceUnresolvableException.of(source.getProductId(), store);
         }
         destination.setProduct(product);
         return product;
     }
 
     private ProductAvailability applyExistingAvailability(PersistableInventory source, ProductAvailability destination,
-            Product product, StoreMerchantId store) {
+                                                          Product product, StoreMerchantId store)
+            throws InventoryReferenceUnresolvableException {
         ProductAvailability existing = findExistingAvailability(source, destination, product, store);
         if (existing == null) {
             return destination;
         }
         if (!existing.getStoreMerchantId().equals(store)) {
-            throw new ResourceNotFoundException(
-                    "Product Inventory with id [%s] not found for store [%s]".formatted(source.getId(), store));
+            throw InventoryReferenceUnresolvableException.of(source.getId(), store);
         }
         return existing;
     }
@@ -159,14 +168,14 @@ public class PersistableInventoryMapper implements Mapper<PersistableInventory, 
                 && a.getRegionVariant().equals(source.getRegionVariant());
     }
 
-    private void applyVariant(PersistableInventory source, ProductAvailability destination, StoreMerchantId store) {
+    private void applyVariant(PersistableInventory source, ProductAvailability destination, StoreMerchantId store)
+            throws ProductVariantReferenceUnresolvableException {
         if (source.getVariant() == null || source.getVariant() <= 0) {
             return;
         }
         Optional<ProductVariant> instance = productVariantService.getById(source.getVariant(), store);
         if (instance.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "productVariant with id [%s] not found for store [%s]".formatted(source.getVariant(), store));
+            throw ProductVariantReferenceUnresolvableException.of(source.getVariant(), store);
         }
         destination.setSku(instance.get().getSku());
         destination.setProductVariant(instance.get());

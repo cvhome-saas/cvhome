@@ -4,22 +4,29 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
+import com.asrevo.cvhome.catalog.api.errors.ProductReservationRejectedException;
 import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
+import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
+import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.v1.PersistableOrder;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrator;
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
+import com.asrevo.cvhome.payment.api.errors.PaymentGatewayRejectedException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
 import com.asrevo.cvhome.payment.model.payment.PaymentRequest;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,11 +50,24 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
 
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
-                                            Locale locale, String successUrl, String cancelUrl) throws ServiceException {
+                                            Locale locale, String successUrl, String cancelUrl)
+            throws PaymentApiUnavailableException, CatalogApiUnavailableException,
+            ShoppingCartNotFoundException, OrderNotConvertibleException, OrderProductNotConvertibleException,
+            OrderProductPriceMissingException {
 
         Order modelOrder = orderFacade.saveOrder(order, customer, store, language);
 
-        ProductReservationReserveResult result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        ProductReservationReserveResult result;
+        try {
+            result = orderInventoryOrchestrator.reserveProduct(store, modelOrder);
+        } catch (ProductReservationRejectedException e) {
+            // Catalog looked and said no. A decision, so the order can be resolved on it — and, since nothing was
+            // reserved, there is nothing to release.
+            log.info("Reservation refused for order {} [{} / remote {}]: {}", modelOrder.getId(), e.errorCode().code(),
+                    e.remoteCode(), e.getMessage());
+            updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
+            return new OrderProcessingResult(modelOrder);
+        }
 
         if (!result.status()) {
             updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
@@ -67,7 +87,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CONFIRMED);
                     modelOrder.setInventoryStatus(InventoryStatus.COMMITTED);
                     modelOrder.setPaymentStatus(PaymentStatus.PAID);
-                } catch (Exception e) {
+                } catch (CatalogApiUnavailableException e) {
                     log.error("Failed to commit reservation for PAID order {}. Manual intervention required.", modelOrder.getId(), e);
                     // Ensure local status reflects payment even if catalog commit failed
                     updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PAID);
@@ -88,7 +108,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CANCELLED);
                     modelOrder.setInventoryStatus(InventoryStatus.RELEASED);
                     modelOrder.setPaymentStatus(PaymentStatus.FAILED);
-                } catch (Exception e) {
+                } catch (CatalogApiUnavailableException e) {
                     log.error("Failed to release reservation for FAILED order {}.", modelOrder.getId(), e);
                     updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }
@@ -106,8 +126,23 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
         return new OrderProcessingResult(modelOrder);
     }
 
+    /**
+     * Starts the payment, translating a refusal into a FAILED result.
+     *
+     * <p>
+     * A refusal is a definitive answer, so it takes the FAILED path, which releases the reservation this method's
+     * caller has already taken. Before the payment API declared it, this call had no error handling at all: any failure
+     * escaped {@code placeOrder} with the reservation still held, and it stayed held until the cleanup job expired it.
+     * </p>
+     *
+     * <p>
+     * {@link PaymentApiUnavailableException} is deliberately <em>not</em> caught. Nothing was decided, so cancelling
+     * the order would be a guess that could contradict a payment that did start; it propagates and leaves the order
+     * reserved and pending.
+     * </p>
+     */
     private PaymentInitiateResult doOrderPaymentInitiate(Order modelOrder, ProductReservationReserveResult result, String successUrl,
-                                                         String cancelUrl) {
+                                                         String cancelUrl) throws PaymentApiUnavailableException {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .ref(modelOrder.getId().toString())
                 .amount(modelOrder.getTotal())
@@ -119,8 +154,13 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                 .build();
 
         log.debug("Initiating gateway payment for order {} type {}", modelOrder.getId(), modelOrder.getPaymentType());
-        return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
-
+        try {
+            return externalPaymentGatewayService.initiatePayment(modelOrder.getStoreMerchantId(), paymentRequest);
+        } catch (PaymentGatewayRejectedException e) {
+            log.warn("Payment refused for order {} [{} / remote {}]: {}", modelOrder.getId(), e.errorCode().code(),
+                    e.remoteCode(), e.getMessage());
+            return PaymentInitiateResult.failed();
+        }
     }
 
     private String appendOrderId(String url, Long orderId) {

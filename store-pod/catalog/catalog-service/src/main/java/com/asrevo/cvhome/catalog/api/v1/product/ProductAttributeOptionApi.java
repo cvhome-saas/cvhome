@@ -20,6 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductAttributeNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotConvertibleException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductOptionValueReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.PersistableProductOptionEntity;
@@ -66,7 +75,8 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductOptionEntity createOption(@Valid @RequestBody PersistableProductOptionEntity option,
-                                                    StoreMerchantId merchantStore, LanguageCode language) {
+                                                    StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException {
 
         return productOptionFacade.saveOption(option, merchantStore, language);
     }
@@ -114,7 +124,8 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductOptionValue createOptionValue(@Valid @RequestBody PersistableProductOptionValue optionValue,
                                                         // @RequestParam(name = "file", required = false) MultipartFile file,
-                                                        StoreMerchantId merchantStore, LanguageCode language) {
+                                                        StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException {
 
         return productOptionFacade.saveOptionValue(optionValue, merchantStore, language);
     }
@@ -129,7 +140,8 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 
     public ReadableProductOptionEntity getOption(@PathVariable Long id, StoreMerchantId merchantStore,
-                                                 LanguageCode language) {
+                                                 LanguageCode language)
+            throws ProductOptionNotFoundException {
 
         return productOptionFacade.getOption(id, merchantStore, language);
     }
@@ -144,7 +156,8 @@ public class ProductAttributeOptionApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 
     public ReadableProductOptionValue getOptionValue(@PathVariable Long id, StoreMerchantId merchantStore,
-                                                     LanguageCode language) {
+                                                     LanguageCode language)
+            throws ProductOptionValueNotFoundException {
 
         return productOptionFacade.getOptionValue(id, merchantStore, language);
     }
@@ -158,7 +171,8 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateOption(@Valid @RequestBody PersistableProductOptionEntity option, @PathVariable Long optionId,
-                             StoreMerchantId merchantStore, LanguageCode language) {
+                             StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductOptionNotFoundException, ProductOptionNotConvertibleException {
         option.setId(optionId);
         productOptionFacade.saveOption(option, merchantStore, language);
     }
@@ -168,7 +182,8 @@ public class ProductAttributeOptionApi {
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void deleteOption(@PathVariable Long optionId, StoreMerchantId merchantStore) {
+    public void deleteOption(@PathVariable Long optionId, StoreMerchantId merchantStore)
+            throws ProductOptionNotFoundException {
 
         productOptionFacade.deleteOption(optionId, merchantStore);
     }
@@ -182,7 +197,8 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateOptionValue(@PathVariable Long id, @Valid @RequestBody PersistableProductOptionValue optionValue,
-                                  StoreMerchantId merchantStore, LanguageCode language) {
+                                  StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductOptionValueNotFoundException, ProductOptionNotConvertibleException {
 
         optionValue.setId(id);
         productOptionFacade.saveOptionValue(optionValue, merchantStore, language);
@@ -193,7 +209,8 @@ public class ProductAttributeOptionApi {
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void deleteOptionValue(@PathVariable Long id, StoreMerchantId merchantStore) {
+    public void deleteOptionValue(@PathVariable Long id, StoreMerchantId merchantStore)
+            throws ProductOptionValueNotFoundException {
 
         productOptionFacade.deleteOptionValue(id, merchantStore);
     }
@@ -241,7 +258,8 @@ public class ProductAttributeOptionApi {
                     content = @Content(schema = @Schema(implementation = ReadableProductAttributeList.class))))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductAttributeList attributes(@PathVariable Long id, StoreMerchantId merchantStore,
-                                                   LanguageCode language, Pageable pageable) {
+                                                   LanguageCode language, Pageable pageable)
+            throws ProductNotFoundException, ProductAttributeNotConvertibleException {
 
         return productOptionFacade.getAttributesList(id, merchantStore, language, pageable);
     }
@@ -257,7 +275,8 @@ public class ProductAttributeOptionApi {
             responses = @ApiResponse(content = @Content(schema = @Schema(implementation = EntityExists.class))))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductAttributeEntity getAttribute(@PathVariable Long id, @PathVariable Long attributeId,
-                                                       StoreMerchantId merchantStore, LanguageCode language) {
+                                                       StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductAttributeNotFoundException, ProductAttributeNotConvertibleException {
 
         return productOptionFacade.getAttribute(id, attributeId, merchantStore, language);
     }
@@ -271,7 +290,11 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public Entity createAttribute(@PathVariable Long id, @Valid @RequestBody PersistableProductAttribute attribute,
-                                  StoreMerchantId merchantStore, LanguageCode language) {
+                                  StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductAttributeNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException {
 
         ReadableProductAttributeEntity attributeEntity = productOptionFacade.saveAttribute(id, attribute, merchantStore,
                 language);
@@ -297,7 +320,11 @@ public class ProductAttributeOptionApi {
     public List<CodeEntity> createAttributes(@PathVariable Long id,
                                              @Valid @RequestBody List<PersistableProductAttribute> attributes,
                                              StoreMerchantId merchantStore,
-                                             LanguageCode language) {
+                                             LanguageCode language)
+
+            throws ProductNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException {
 
         return productOptionFacade.createAttributes(attributes, id, merchantStore);
     }
@@ -311,7 +338,11 @@ public class ProductAttributeOptionApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public void updateAttribute(@PathVariable Long id, @Valid @RequestBody PersistableProductAttribute attribute,
-                                @PathVariable Long attributeId, StoreMerchantId merchantStore, LanguageCode language) {
+                                @PathVariable Long attributeId, StoreMerchantId merchantStore, LanguageCode language)
+
+            throws ProductAttributeNotFoundException, ProductOptionReferenceUnresolvableException,
+            ProductOptionValueReferenceUnresolvableException, ProductReferenceUnresolvableException,
+            ProductAttributeNotConvertibleException, ProductOptionNotConvertibleException {
 
         attribute.setId(attributeId);
         productOptionFacade.saveAttribute(id, attribute, merchantStore, language);
@@ -322,7 +353,8 @@ public class ProductAttributeOptionApi {
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
-    public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, StoreMerchantId merchantStore) {
+    public void deleteAttribute(@PathVariable Long id, @PathVariable Long attributeId, StoreMerchantId merchantStore)
+            throws ProductAttributeNotFoundException {
 
         productOptionFacade.deleteAttribute(id, attributeId, merchantStore);
     }
