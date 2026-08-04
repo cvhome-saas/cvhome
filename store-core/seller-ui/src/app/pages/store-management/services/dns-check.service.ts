@@ -2,7 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http'; // Removed HttpHeaders import
 import {Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 
 interface GoogleDnsResponse {
   Status: number; // 0 for NOERROR, 1 for FORMERR, 2 for SERVFAIL, 3 for NXDOMAIN, etc.
@@ -80,10 +80,10 @@ export class DnsCheckService {
         console.warn(`[DnsCheckService] Could not validate ${customDomain}. Status: ${response?.Status}`);
         return false;
       }),
-      catchError(error => {
-        console.error(`[DnsCheckService] Error querying Google DNS for ${customDomain}:`, error);
-        return of(false);
-      })
+      // No catchError here on purpose. Collapsing a failed lookup into `false` made "this domain does not
+      // point at your pod" and "we could not check" the same answer, and the seller was told to fix DNS
+      // that may well be correct. The validator already distinguishes them — its `dnsCheckServiceError`
+      // branch was unreachable while this swallowed.
     );
   }
 }

@@ -1,13 +1,13 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {StoreService} from '../../../services/store.service';
-import {ErrorService} from '../../../services/error.service';
+import {ApiErrorService} from '../../../../../core/errors/api-error.service';
 import {ManagerStoreId, ManagerStore} from '../../../models/commons';
 
 @Injectable()
 export class StoreAutocompleteFacade {
   private readonly storeService = inject(StoreService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly stores = signal<ManagerStore[]>([]);
 
@@ -16,7 +16,7 @@ export class StoreAutocompleteFacade {
       .pipe(takeUntilDestroyed(destroyRef))
       .subscribe({
         next: (page) => this.stores.set(page.content),
-        error: (err) => this.errorService.error('ERROR.SYSTEM_ERROR', err)
+        error: (err) => this.apiErrors.notify(err)
       });
   }
 

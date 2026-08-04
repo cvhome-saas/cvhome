@@ -1,13 +1,13 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ContentService} from '../../../../content/services/content.service';
-import {ErrorService} from '../../../services/error.service';
+import {ApiErrorService} from '../../../../../core/errors/api-error.service';
 import {ContentFileItem} from '../../../../content/models/content.model';
 
 @Injectable()
 export class ImageBrowserFacade {
   private readonly contentService = inject(ContentService);
-  private readonly errorService = inject(ErrorService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly loading = signal<boolean>(false);
   readonly images = signal<ContentFileItem[]>([]);
@@ -23,7 +23,7 @@ export class ImageBrowserFacade {
         },
         error: (err) => {
           this.loading.set(false);
-          this.errorService.error('ERROR.SYSTEM_ERROR', err);
+          this.apiErrors.notify(err);
         }
       });
   }

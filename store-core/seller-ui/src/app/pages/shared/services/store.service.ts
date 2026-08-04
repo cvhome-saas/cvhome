@@ -1,9 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 import {CreateStoreRequest, Page, ManagerStore} from "../models/commons";
-import {catchError} from "rxjs/operators";
-import {environment} from "../../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -16,24 +14,13 @@ export class StoreService {
     return this.httpClient.post<ManagerStore>(`${this.STORE_MANAGER_BASE_URL}/create`, request)
   }
 
+  /**
+   * Was `catchError(() => of(defaultPageOnError))`, which fabricated a page containing one invented
+   * "default" store. On a control-plane outage the seller silently got a store that does not exist, and
+   * every query afterwards was scoped to it — a wrong answer presented as a right one. The failure now
+   * reaches the caller, which shows it.
+   */
   list(): Observable<Page<ManagerStore>> {
-    const defaultPageOnError: Page<ManagerStore> = {
-      content: [{
-        id: {
-          id: environment.defaultStore
-        },
-        name: "default",
-        provisioningState: "SUCCESSFULLY_PROVISIONING",
-        orgId: {
-          id: "org-id"
-        },
-        podId: {
-          id: "pod-id"
-        }
-      }],
-    };
-    return this.httpClient.post<Page<ManagerStore>>(`${this.STORE_MANAGER_BASE_URL}/list`, {})
-      .pipe(catchError(() => of(defaultPageOnError)));
+    return this.httpClient.post<Page<ManagerStore>>(`${this.STORE_MANAGER_BASE_URL}/list`, {});
   }
-
 }
