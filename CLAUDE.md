@@ -79,27 +79,87 @@ cd store-core/seller-ui  && npm start          # Angular 20 SSR, ng serve
 cd store-pod/landing-ui  && npm run dev        # Next.js 16, npm workspaces (app, libs/*, templates/*)
 ```
 
+**seller-ui SSR vs. hot reload is already solved in `angular.json` — don't hand-edit it.** SSR (`server`,
+`outputMode: server`, `ssr.entry`) lives in the `production` build configuration only; the `development`
+configuration — what `ng serve` / `npm start` / `run-lcl.sh` use by default — is plain CSR, so HMR works.
+`ng build` still defaults to production and emits `dist/seller-ui/server/`. So: never strip the SSR block to
+get hot reload (that breaks the real build), and never commit a local `angular.json` diff — if you see one
+uncommitted, it predates this setup and should be reverted (`git checkout -- store-core/seller-ui/angular.json`).
+
 `landing-ui`'s build order matters — `npm run build` chains libs → templates → app; building `app` alone
 against stale libs will use old types. `uaa`'s Angular SPA (`store-core/uaa/src/main/resources/uaa-fe`) is
 **not** a Gradle module; it is built by the node plugin and copied into `static/` during `processResources`.
 
-Angular work: use the `angular-developer` skill. Next.js/React work: `vercel-react-best-practices`.
+Angular work: use the `angular-developer` skill. Next.js/React work: `vercel-react-best-practices`. To
+*exercise* a frontend (QA, reproducing a UI bug, anything needing real data) bring the backend up with
+`./extra/scripts/run-lcl.sh` — see **Running locally**.
 
 ## Running locally
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh   # once — /etc/hosts entries for gateway.com, pods, demo stores
-docker compose -f docker-compose-lcl.yml up -d   # postgres, spg (Caddy), otel/monitoring only
-./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl'
+./extra/scripts/run-lcl.sh                 # the whole stack: infra + every Java service + both frontends
 ```
+
+`run-lcl.sh` is the way to bring the stack up. It starts the compose infra (postgres, spg, monitoring), then
+each Java service under `--spring.profiles.active=lcl,test-stores` in dependency order (uaa first — it issues
+the tokens), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building landing-ui's workspace libs.
+It **blocks in the foreground** tailing `build/lcl-logs/*.log`; Ctrl-C (or SIGTERM) tears everything down,
+containers included, and it also brings the rest down if any one service dies. Ports come from
+`common-config.yml` — change one there and change it in the script's `JAVA_SERVICES`/`NODE_SERVICES` tables too.
+
+```bash
+./extra/scripts/run-lcl.sh --list             # what would start, then exit — safe dry run
+./extra/scripts/run-lcl.sh uaa catalog        # only those services, plus infra
+./extra/scripts/run-lcl.sh --no-infra         # compose already up; also leaves it up on exit
+./extra/scripts/run-lcl.sh --keep-infra       # stop the services, leave the containers running
+./extra/scripts/run-lcl.sh --build            # ./gradlew build -x test -x check first
+```
+
+**Testing UI / reproducing a frontend bug — including QA and browser-driven work — starts here.** A UI bug
+usually needs the backend behind it (gateway, uaa, the pod service serving the data), so start the stack
+rather than `npm start` alone. Entry points, with the demo logins the `test-stores` profile seeds:
+
+| what | url | login |
+|---|---|---|
+| seller console | `http://gateway.com:8000/` | `org1-admin` / `admin` |
+| demo storefront | `http://org1-store1.spg-507f1f77.gateway.com` | `user` / `revo` |
+| grafana | `http://localhost:3000` | — |
+
+Those credentials are local seed data only (`store-core/uaa/.../init-sql/data-test-stores.sql` and the pods'
+`init-sql/stores/*`) and exist solely because the `test-stores` profile is active — they are not secrets and
+never appear outside `lcl`. If a login fails, the stack almost certainly came up without `test-stores`. The
+storefront account is scoped per store (`cua.users.client_id`), so it only authenticates through the store
+host — posting to `localhost:8124/login` directly always fails, and that is not a bug.
+
+**Known local gap:** `docker-compose-lcl.yml` has no MinIO, but the seeded media urls point at
+`http://localhost:9000/...`, so every logo, slider and product image on the storefront is broken locally.
+Expected — don't file it as a UI bug.
+
+Because it blocks, run it in the background (`run_in_background`) and watch `build/lcl-logs/` — and
+**check whether it is already running before starting it again**: the script skips any service whose port is
+already bound, so a second run against a live stack starts nothing useful and its exit tears the containers
+down. `./extra/scripts/run-lcl.sh --list` plus a port probe (`lsof -i :8000`, `:8010`, `:8110`) is the cheap
+check. To iterate on one frontend against an already-running backend, don't restart everything — leave the
+stack up and run `npm start` in that `-ui` module, or start a narrowed set (`run-lcl.sh --no-infra seller-ui`).
+
+To stop a backgrounded run, send it **`SIGTERM`** (`pkill -TERM -f "bash ./extra/scripts/run-lcl.sh"`), not
+`SIGINT` — a shell that starts the script in the background inherits SIGINT as ignored and no trap can
+override that, so Ctrl-C/`kill -INT` is silently a no-op there. Then verify: ports free and
+`docker compose -f docker-compose-lcl.yml ps` empty. Ctrl-C only works when it is in the foreground.
 
 Java services run **on the host**, not in Docker; `spg`'s `extra_hosts` map service hostnames back to the
 host. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts and namespaces are declared once in
-`store-commons/autoconfigure/src/main/resources/common-config.yml` — change them there, never inline.
+`store-commons/autoconfigure/src/main/resources/common-config.yml` — change them there, never inline. To run a
+single service by hand:
+`./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl,test-stores'`.
 
 ## Working conventions
 
-- Branch off and PR into **`develop`** (`main` is the release branch); CI runs on both.
+- **Never commit to `develop` (or `main`) directly.** Any change starts with a fresh branch cut from an
+  up-to-date `develop` (`git fetch && git switch -c <type>/<short-name> origin/develop`) and lands via PR
+  into `develop`; `main` is the release branch. CI runs on both. If you find yourself already on `develop`
+  with edits, branch first, then commit.
 - Every new endpoint takes `StoreMerchantId merchantStore` + `LanguageCode language` (supplied by argument
   resolvers from the `store`/`lang` query params) and carries
   `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','LAYER.DOMAIN.ACTION')")`.
