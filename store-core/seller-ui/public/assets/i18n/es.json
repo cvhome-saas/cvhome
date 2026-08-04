@@ -100,5 +100,8 @@
     },
     "GENERIC": "Algo salió mal. Inténtalo de nuevo.",
     "TRACE": "Referencia: {{traceId}}"
+  },
+  "SIGN_UP": {
+    "SUCCESS": "Registro completado. Te redirigimos al inicio de sesión."
   }
 }

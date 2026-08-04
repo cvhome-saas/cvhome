@@ -3,6 +3,7 @@ import {AbstractControl} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {NotificationService} from '../notifications/notification.service';
 import {ApiError} from './api-error';
+import {toApiError} from './problem-detail.parser';
 import {applyFieldErrors, FieldErrorOptions} from './form-error.utils';
 import {ProblemFieldError} from './problem-detail.model';
 
@@ -35,7 +36,8 @@ export class ApiErrorService {
   private readonly notifications = inject(NotificationService);
 
   /** The message a seller should see. Never `detail`, which is developer text. */
-  messageFor(error: ApiError): string {
+  messageFor(raw: unknown): string {
+    const error = this.normalize(raw);
     return this.resolve(codeToKey(error.code), error.params)
       ?? this.resolve(categoryToKey(error.category))
       ?? this.translate.instant('ERRORS.GENERIC');
@@ -48,7 +50,8 @@ export class ApiErrorService {
    * reference for "that SKU is already taken", and printing one on every validation error trains them to
    * ignore it.
    */
-  notify(error: ApiError): void {
+  notify(raw: unknown): void {
+    const error = this.normalize(raw);
     let message = this.messageFor(error);
     if (error.isServerSide && error.traceId) {
       message += `\n${this.translate.instant('ERRORS.TRACE', {traceId: error.traceId})}`;
@@ -63,7 +66,8 @@ export class ApiErrorService {
    * A validation failure with no `fieldErrors` at all still gets a toast — otherwise the submit button
    * appears to do nothing.
    */
-  applyToForm(error: ApiError, form: AbstractControl, options?: FieldErrorOptions): void {
+  applyToForm(raw: unknown, form: AbstractControl, options?: FieldErrorOptions): void {
+    const error = this.normalize(raw);
     if (error.fieldErrors.length === 0) {
       this.notify(error);
       return;
@@ -87,6 +91,19 @@ export class ApiErrorService {
     return this.resolve(codeToKey(fieldError.code), fieldError.params)
       ?? fieldError.message
       ?? this.translate.instant('ERRORS.GENERIC');
+  }
+
+  /**
+   * These methods take `unknown` on purpose.
+   *
+   * The interceptor guarantees that everything *it* sees becomes an `ApiError` — but an error thrown
+   * downstream of it, inside a `map` or a `tap`, never passes through it at all. A `catchError((e: ApiError)
+   * => ...)` annotation is a cast, not a guarantee, and one such error reaching `messageFor` used to crash
+   * on `codeToKey(undefined)`. `toApiError` is idempotent, so normalising here costs nothing and makes the
+   * funnel honest.
+   */
+  private normalize(raw: unknown): ApiError {
+    return toApiError(raw);
   }
 
   /**

@@ -142,6 +142,37 @@ describe('ApiErrorService.notify', () => {
 
 });
 
+describe('ApiErrorService with something that is not an ApiError', () => {
+
+  // Regression: the interceptor only sees what passes through it. An error thrown downstream — inside a
+  // `map`, as AuthService does — never does, so `catchError((e: ApiError) => ...)` is a cast and not a
+  // guarantee. This used to crash on `codeToKey(undefined)` and swallow the real failure.
+  it('does not crash on a raw TypeError, and still says something', () => {
+    const {service, notifications} = setup();
+
+    expect(() => service.notify(new TypeError("Cannot read properties of undefined (reading 'principal')")))
+      .not.toThrow();
+    expect(notifications.dangers[0]).toBe('Something went wrong. Please try again.');
+  });
+
+  it('does not crash on undefined or a string', () => {
+    const {service} = setup();
+
+    expect(() => service.notify(undefined)).not.toThrow();
+    expect(() => service.notify('boom')).not.toThrow();
+    expect(service.messageFor(undefined)).not.toContain('ERRORS.');
+  });
+
+  it('applyToForm survives one too', () => {
+    const {service, notifications} = setup();
+    const form = new FormGroup({sku: new FormControl('')});
+
+    expect(() => service.applyToForm(new TypeError('nope'), form)).not.toThrow();
+    expect(notifications.dangers.length).toBe(1);
+  });
+
+});
+
 describe('ApiErrorService.applyToForm', () => {
 
   it('binds field errors to their controls', () => {

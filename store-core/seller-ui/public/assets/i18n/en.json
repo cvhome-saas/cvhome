@@ -1018,5 +1018,8 @@
     },
     "GENERIC": "Something went wrong. Please try again.",
     "TRACE": "Reference: {{traceId}}"
+  },
+  "SIGN_UP": {
+    "SUCCESS": "Registered successfully. Redirecting you to sign in."
   }
 }

@@ -1018,5 +1018,8 @@
     },
     "GENERIC": "Une erreur est survenue. Veuillez réessayer.",
     "TRACE": "Référence : {{traceId}}"
+  },
+  "SIGN_UP": {
+    "SUCCESS": "Inscription réussie. Redirection vers la connexion."
   }
 }

@@ -77,4 +77,9 @@ export const SERVER_CATEGORIES: ReadonlySet<string> = new Set<ServerErrorCategor
 export const CLIENT_ERROR_CODES = {
   NETWORK_UNAVAILABLE: 'CLIENT.NETWORK_UNAVAILABLE',
   UNEXPECTED: 'CLIENT.UNEXPECTED',
+  /**
+   * No session. uaa answers `/auth/me` with **200 and an empty body** rather than a 401 when nobody is
+   * signed in, so this is the client naming a condition the transport does not.
+   */
+  SESSION_MISSING: 'CLIENT.SESSION_MISSING',
 } as const;
