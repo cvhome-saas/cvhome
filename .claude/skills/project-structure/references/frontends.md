@@ -1,6 +1,7 @@
 # Frontend patterns
 
-Three different ways UI is delivered in this repo. Know which one you're in before making changes.
+Three different ways UI is delivered in this repo. Know which one you're in before making changes. Creating a
+*new* UI service (a `-ui` module, or a Java service with an embedded SPA) is `new-service.md`.
 
 ## 1. `-ui` modules — Gradle-wrapped npm apps
 
