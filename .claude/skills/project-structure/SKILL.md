@@ -141,7 +141,7 @@ tenant-scoped by construction.
 ```java
 @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
 public Entity create(@Valid @RequestBody PersistableProduct product,
-                     StoreMerchantId merchantStore, LanguageCode language) { ... }
+                     StoreMerchantId merchantStore, LanguageCode language) {  }
 ```
 
 **Authorization is declarative**, never an inline role check: `hasPermission(target, type, 'LAYER.DOMAIN.ACTION')`
