@@ -44,3 +44,7 @@ bin/
 /store-core/uaa/src/main/resources/uaa-fe/.angular/
 **/.DS_Store
 /.junie/*
+### IntelliJ HTTP Client ###
+# Session ids are per-developer and expire; copy http-client.private.env.json.example to
+# http-client.private.env.json and paste your own. Never commit it.
+http-client.private.env.json

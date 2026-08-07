@@ -154,7 +154,12 @@ default.
 and permission evaluator dispatch on type, and persist via `AttributeConverter`s. Don't introduce a raw `String`
 id or code — check `commons/domain/` first.
 
-Details: `references/api-conventions.md`.
+**Every endpoint ships a runnable request.** Adding or changing one means adding or changing its block in
+`<service>/http/<api-class>.http` — IntelliJ HTTP Client format, one file per `*Api` class, addressed through
+the gateway (`{{SELLER_UI_URL}}/spg/catalog/…`) rather than the service's own port. Env vars come from the
+repo-root `http-client.env.json`; session ids from the gitignored `http-client.private.env.json`.
+
+Details: `references/api-conventions.md`, and `references/http-request-files.md` for the request files.
 
 ## Persistence — schema per service, two stacks
 
@@ -274,7 +279,8 @@ See `references/frontends.md`.
 |---|---|
 | Find a business capability | `store-pod/<domain>/` — or `store-core/` if it's platform-level (auth, billing, tenants) |
 | Find a REST endpoint | the `<domain>-service` module, in `**/api/**` or `**/controller/**` |
-| Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")` |
+| Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
+| Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
 | Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
 | Store an API key / secret | encrypt in the mapper via `SecretCryptoProvider` — never a plaintext column |
 | Add a table or column | the service's `schema.sql` / `init-sql/schema.sql`, not just the entity |
@@ -314,6 +320,8 @@ See `references/frontends.md`.
 
 **Cross-cutting mechanics**
 - `references/api-conventions.md` — `StoreMerchantId`/`LanguageCode` on every API, value objects, `hasPermission`.
+- `references/http-request-files.md` — the `.http` request file every endpoint ships: where it lives, the shared
+  env files, gateway-form addressing, response handlers, and which existing `.http` files are stale.
 - `references/database-schemas.md` — schema per service, Spring Data JDBC vs JPA, DDL locations, outbox tables.
 - `references/secrets-encryption.md` — encrypting tenant credentials at rest via `secret-crypto`.
 - `references/authentication.md` — the two authorization servers, multi-issuer JWT, s2s clients, login flows.
