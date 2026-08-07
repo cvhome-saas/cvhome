@@ -160,6 +160,10 @@ single service by hand:
   up-to-date `develop` (`git fetch && git switch -c <type>/<short-name> origin/develop`) and lands via PR
   into `develop`; `main` is the release branch. CI runs on both. If you find yourself already on `develop`
   with edits, branch first, then commit.
+- **PR body follows `.github/PULL_REQUEST_TEMPLATE.md`**: title `<type|area>: <what changed>`, then
+  *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with
+  the untouched sections deleted. Label it before merge — `.github/release.yml` builds the changelog from
+  `type/*` and `warn/*` labels, and an unlabelled PR lands in "Other Changes".
 - Every new endpoint takes `StoreMerchantId merchantStore` + `LanguageCode language` (supplied by argument
   resolvers from the `store`/`lang` query params) and carries
   `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','LAYER.DOMAIN.ACTION')")`.
