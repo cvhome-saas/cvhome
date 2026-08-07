@@ -167,6 +167,13 @@ single service by hand:
 - Every new endpoint takes `StoreMerchantId merchantStore` + `LanguageCode language` (supplied by argument
   resolvers from the `store`/`lang` query params) and carries
   `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','LAYER.DOMAIN.ACTION')")`.
+- **Every endpoint ships a runnable request.** Adding or changing one means adding or changing its block in
+  `<service>/http/<api-class>.http` (IntelliJ HTTP Client format, one file per `*Api` class, named after the
+  class kebab-cased). Address it through the gateway — `{{SELLER_UI_URL}}/spg/catalog/…`, never the service's
+  own port — with `?store={{STORE_ID}}&lang={{LANG}}`. Shared vars live in the repo-root
+  `http-client.env.json`; session ids in the gitignored `http-client.private.env.json` (copy the `.example`).
+  Reference: `store-pod/catalog/catalog-service/http/product-api.http`; rules:
+  `references/http-request-files.md` in the skill.
 - Use the value objects in `store-commons/commons/.../domain/` instead of raw `String`/`Long` ids.
 - `schema.sql` (`src/main/resources/schema.sql` for control-plane's Spring Data JDBC, `init-sql/schema.sql`
   for the JPA pod services) is the source of truth for DDL — `ddl-auto: update` is only a safety net.
@@ -215,6 +222,9 @@ enforcement layer. Tick only the rows the change actually touches — but a touc
       denies by default, so a token with no case silently 403s
 - [ ] Ids/codes use value objects from `store-commons/commons/.../domain/`, not raw `String`/`Long`
 - [ ] Request DTOs validated (`@Valid` + bean-validation annotations)
+- [ ] Endpoint has a runnable block in `<service>/http/<api-class>.http` — gateway path form, not the service
+      port; `?store={{STORE_ID}}&lang={{LANG}}`; a new url/id added to `http-client.env.json` rather than
+      inlined; at least one non-2xx block where the endpoint declares a failure mode
 
 **Persistence**
 - [ ] Table/column added to the service's DDL (`schema.sql` for control-plane's Spring Data JDBC,
@@ -276,6 +286,8 @@ Reject or fix on sight — each of these has a repo mechanism that is being bypa
 - A hardcoded dependency version in a `build.gradle` instead of `libs.versions.toml`
 - A raw `String`/`Long` where a `commons/domain/` value object exists
 - A controller method missing `@PreAuthorize`, or authorization done with an inline role/authority check
+- An endpoint added or changed with no matching `.http` block, a `.http` request aimed at a service's own port
+  instead of the gateway, or a session id / secret committed to `http-client.env.json`
 - A plaintext secret column, or a credential written to a log
 - An entity/column change with no matching `schema.sql` edit
 - A consumer depending on another pod's `-core`/`-service`, or reaching into another service's schema

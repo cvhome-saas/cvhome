@@ -1,0 +1,82 @@
+# ProductApi — com.asrevo.cvhome.catalog.api.v1.product.ProductApi (@RequestMapping "/api/v1")
+#
+# Addressed through the gateway, not catalog's own port: a seller request really crosses
+# store-core-gateway (:8000) then the pod's spg, so `{{SELLER_UI_URL}}/spg/catalog/...` is what
+# production traffic looks like. Env vars come from the repo-root http-client.env.json; the session
+# id comes from http-client.private.env.json (gitignored — copy the .example and log in once).
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### create a product
+# @name createProduct
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "sku": "HTTP-DEMO-001",
+  "available": true,
+  "visible": true,
+  "productSpecifications": {
+    "weight": 1,
+    "height": 1,
+    "width": 1,
+    "length": 1
+  },
+  "descriptions": [
+    {
+      "language": "en",
+      "name": "Demo product",
+      "description": "Created from product-api.http",
+      "friendlyUrl": "demo-product"
+    }
+  ]
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201 || response.status === 200, "status " + response.status);
+    });
+    client.global.set("PRODUCT_ID", response.body.id);
+%}
+
+### is the sku unique — 200 with {"exists": true|false}
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/unique?store={{STORE_ID}}&lang={{LANG}}&code=HTTP-DEMO-001
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### patch the product created above
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "available": false
+}
+
+### add it to a category
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### remove it from that category
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### reorder it
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}&position=2
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### public — fetch by friendly url, no auth (storefront path, not the seller gateway)
+GET {{LANDING_UI_URL}}/catalog/api/v1/product/demo-product?store={{STORE_ID}}&lang={{LANG}}
+Accept: application/json
+
+### another store's product — 404, not 403 (see ProductApi's javadoc on why)
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### delete it
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
