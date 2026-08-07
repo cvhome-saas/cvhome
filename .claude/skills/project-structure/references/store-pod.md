@@ -3,7 +3,8 @@
 A "pod" is an isolated **deployment** of everything below, serving a group of tenant stores — the whole tree is
 deployed once per pod, each with its own database. Namespace in config: `store-pod-<id>.cvhome.lcl`, fronted by
 `spg` (Caddy). Which stores live in which pod, and how pods are provisioned and routed to, is in
-`multi-tenancy.md`.
+`multi-tenancy.md`. Standing up a *new* pod service (modules, config registration, Caddy route) is
+`new-service.md`.
 
 ```
 store-pod/

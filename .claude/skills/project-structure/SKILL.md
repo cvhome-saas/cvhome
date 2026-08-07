@@ -1,8 +1,8 @@
 ---
 name: project-structure
-description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, control-plane, seller-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme. Trigger when navigating the repo, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
+description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, control-plane, seller-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or control-plane, UI like seller-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, run-lcl.sh, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
 metadata:
-  version: '3.0'
+  version: '3.1'
 ---
 
 # cvhome monorepo
@@ -238,6 +238,24 @@ Business pods (`merchant`, `catalog`, `checkout`, `payment`) are split into up t
 A pod may host more than one sub-domain in one service (e.g. `merchant-service` serves both `merchant-*` and
 `content-*` modules). Details and per-pod module lists: `references/store-pod.md`.
 
+## Adding a whole new service
+
+Decide the **shape** first — backend only (`catalog`, `control-plane`), frontend only (`seller-ui`,
+`landing-ui`), or one deployable serving both (`uaa`, `cua`) — then the **tree** (`store-core/` = one shared
+platform instance, `store-pod/` = deployed once per pod). Those two choices fix the module layout, the config
+slices, the s2s client and the fronting gateway.
+
+Whatever the shape, the service does not exist until it is registered in **four** places —
+`settings.gradle`, `common-config.yml` (block key **must** equal `spring.application.name`), `lcl-config.yml`,
+`fargate-config.yml` — plus a row in `run-lcl.sh` and a route on its edge. For a pod service that is a
+`store-pod/spg/Caddyfile` block; **for any `store-core/` service — backend, UI or both — it is
+`GatewayRouteLocatorImpl`, and the name must go in its `backendServices` array as well as getting a
+`.route(...)`**, because that array is negated to build seller-ui's catch-all, which otherwise swallows the
+path. Miss one of these and you get "no instances available", a gateway 503, or seller-ui's HTML instead of
+your API.
+
+**Full procedure, per-shape skeletons and a checklist: `references/new-service.md`.**
+
 ## Frontend patterns — three distinct ones
 
 1. **`-ui` suffix = Gradle-wrapped npm app.** `seller-ui` (Angular) and `landing-ui` (Next.js) both apply the
@@ -278,6 +296,7 @@ See `references/frontends.md`.
 | Change how a request is routed to a service | `store-pod/spg/Caddyfile` (pod) or `GatewayRouteLocatorImpl`/`PodClient` (platform) |
 | Bump a dependency version | `gradle/libs.versions.toml` — never hardcode versions in a `build.gradle` |
 | Add a storefront theme | `store-pod/landing-ui/templates/` — follow `references/new-landing-ui-template.md` |
+| Create a whole new service (backend, UI, or both) | `references/new-service.md` — pick the shape first, then register it in all four config files |
 | Know if a folder is a build unit | `settings.gradle` |
 
 ## Reference files
@@ -286,6 +305,9 @@ See `references/frontends.md`.
 - `references/multi-tenancy.md` — orgs / stores / pods, provisioning, pod routing, regional placement, isolation.
 
 **Structure**
+- `references/new-service.md` — **step-by-step procedure + checklist for creating a new service**: the three
+  shapes (backend like `catalog`/`control-plane`, UI like `seller-ui`, both-in-one like `uaa`), module layout
+  per shape, the four registration files, routing, and what `store-commons:autoconfigure` already gives you.
 - `references/store-core.md` — platform services in depth: uaa, gateway, control-plane and its library modules.
 - `references/store-pod.md` — the 4-module pod pattern with evidence, per-pod breakdown, spg routing, pod-shared libs.
 - `references/shared-libraries.md` — `store-commons` submodules, the `store-commons` naming collision.
