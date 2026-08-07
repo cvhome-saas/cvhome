@@ -1,93 +1,194 @@
 name: Release Workflow
 
+# Cuts a release from develop:
+#   develop (x.y.z-SNAPSHOT) -> release/x.y.z -> merged into develop + main
+#   -> tag x.y.z on main -> GitHub release -> develop bumped to x.y.(z+1)-SNAPSHOT
+#
+# The GitHub release is what triggers on-tag-publishing-to-private-ecr.yml. Events raised with
+# the default GITHUB_TOKEN never start another workflow, so publishing only runs when
+# secrets.RELEASE_TOKEN (a PAT with repo scope) is configured. Without it the release is still
+# created, but images have to be published by dispatching that workflow by hand.
+
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version to release (default: gradle.properties without -SNAPSHOT)'
+        required: false
+        type: string
+      next_version:
+        description: 'Next development version, without -SNAPSHOT (default: patch + 1)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Resolve and print the versions, then stop without changing anything'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code Main branch
-        uses: actions/checkout@v2
-        with:
-          ref: main
-
-      - name: Checkout code develop branch
-        uses: actions/checkout@v2
+      - name: Checkout develop
+        uses: actions/checkout@v4
         with:
           ref: develop
+          # Full history: the job merges, tags and pushes across branches.
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
 
-      - name: Configure github user
+      - name: Configure git user
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-      - name: Next Version
-        id: next_version
+      - name: Resolve versions
+        id: versions
+        # Inputs arrive as env vars, never interpolated into the script — an ${{ }} inside a
+        # shell body is a script-injection hole.
+        env:
+          INPUT_RELEASE: ${{ inputs.release_version }}
+          INPUT_NEXT: ${{ inputs.next_version }}
         run: |
-          CURRENT_VERSION_STR=$(cat gradle.properties | grep 'version='|   cut -d"=" -f2-)
-          NEXT_VERSION=$(echo $CURRENT_VERSION_STR | awk -F. -v OFS=. '{$NF += 1 ; print}')
-          CURRENT_VERSION=$(echo $CURRENT_VERSION_STR | awk -F. -v OFS=. '{$NF += 0 ; print}')
-          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          set -euo pipefail
+          CURRENT_RAW=$(sed -n 's/^version=//p' gradle.properties | head -n1 | tr -d '[:space:]')
+          if [[ -z "$CURRENT_RAW" ]]; then
+            echo "::error file=gradle.properties::no 'version=' property found"
+            exit 1
+          fi
 
-      - name: Delete Old Release branche
-        run: |
-          git push origin --delete release/${{ env.CURRENT_VERSION}} &>/dev/null || true 
-          git push origin --delete ${{ env.CURRENT_VERSION}} &>/dev/null || true 
+          RELEASE="${INPUT_RELEASE:-}"
+          [[ -n "$RELEASE" ]] || RELEASE="${CURRENT_RAW%-SNAPSHOT}"
 
-      - name: Create new Release branch
-        run: |
-          git checkout -b release/${{ env.CURRENT_VERSION}}
-          git pull origin develop
+          NEXT="${INPUT_NEXT:-}"
+          [[ -n "$NEXT" ]] || NEXT=$(echo "$RELEASE" | awk -F. -v OFS=. '{$NF += 1; print}')
 
-      - name: Commit version to new release branch
+          for v in "$RELEASE" "$NEXT"; do
+            if [[ ! "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::'$v' is not a x.y.z version (from gradle.properties '$CURRENT_RAW')"
+              exit 1
+            fi
+          done
+
+          {
+            echo "release=$RELEASE"
+            echo "next=$NEXT"
+            echo "branch=release/$RELEASE"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Releasing $RELEASE, develop continues on $NEXT-SNAPSHOT" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify the release does not already exist
         run: |
-          sed -i "s/version=.*/version=${{ env.CURRENT_VERSION}}/" gradle.properties
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.versions.outputs.release }}" >/dev/null 2>&1; then
+            echo "::error::tag ${{ steps.versions.outputs.release }} already exists — bump the version on develop or pass release_version"
+            exit 1
+          fi
+
+      - name: Stop here on a dry run
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "Dry run: would cut ${{ steps.versions.outputs.branch }} and tag ${{ steps.versions.outputs.release }}."
+          exit 0
+
+      - name: Create the release branch
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          # A leftover branch from a failed run is transient state, safe to drop. Tags are not,
+          # and are guarded above.
+          git push origin --delete "${{ steps.versions.outputs.branch }}" 2>/dev/null || true
+          git switch -c "${{ steps.versions.outputs.branch }}"
+
+      - name: Set the release version
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          sed -i "s/^version=.*/version=${{ steps.versions.outputs.release }}/" gradle.properties
           git add gradle.properties
-          git commit -m "Releasing ${{ env.CURRENT_VERSION}}"
-          git push origin release/${{ env.CURRENT_VERSION}}
+          git commit -m "Releasing ${{ steps.versions.outputs.release }}"
+          git push origin "${{ steps.versions.outputs.branch }}"
 
-      - name: Create pr for release branch and merge it to develop and main
-        run: |
-          PR_DEVELOP=$(gh pr create --base develop --head release/${{ env.CURRENT_VERSION}} --title "Pull Request for release/${{ env.CURRENT_VERSION}} for develop" --body "Description of the pull request")
-          PR_MAIN=$(gh pr create --base main --head release/${{ env.CURRENT_VERSION}} --title "Pull Request for release/${{ env.CURRENT_VERSION}} for main" --body "Description of the pull request")
-
-          PR_DEVELOP_NUMBER=$(echo "$PR_DEVELOP" | sed 's#.*/pull/\([0-9]*\)$#\1#')
-          PR_MAIN_NUMBER=$(echo "$PR_MAIN" | sed 's#.*/pull/\([0-9]*\)$#\1#')
-          
-          gh pr merge $PR_DEVELOP_NUMBER --merge --admin
-          gh pr merge $PR_MAIN_NUMBER --merge --admin
+      - name: Merge the release branch into develop and main
+        if: ${{ !inputs.dry_run }}
         env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Tag main for new release
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         run: |
-          git checkout main
-          git pull
-          git tag -a ${{ env.CURRENT_VERSION}} -m "Release ${{ env.CURRENT_VERSION}}" main
-          git push origin ${{ env.CURRENT_VERSION}}
+          set -euo pipefail
+          for base in develop main; do
+            url=$(gh pr create \
+              --base "$base" \
+              --head "${{ steps.versions.outputs.branch }}" \
+              --title "release: ${{ steps.versions.outputs.release }} into $base" \
+              --body "Automated release of ${{ steps.versions.outputs.release }}, cut from develop by [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).")
+            # Keeps the release PRs out of the generated changelog (see .github/release.yml).
+            gh pr edit "$url" --add-label ignore-changelog || echo "::warning::could not label $url"
+            gh pr merge "$url" --merge --admin
+          done
+
+      - name: Tag main
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git switch --detach origin/main
+          git tag -a "${{ steps.versions.outputs.release }}" -m "Release ${{ steps.versions.outputs.release }}"
+          git push origin "${{ steps.versions.outputs.release }}"
+
+      - name: Publish the GitHub release
+        if: ${{ !inputs.dry_run }}
         env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: GH Release
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         run: |
-          gh release create ${{ env.CURRENT_VERSION}} --generate-notes
-        env:
-          GH_TOKEN: ${{ github.token }}
+          set -euo pipefail
+          gh release create "${{ steps.versions.outputs.release }}" \
+            --target main \
+            --verify-tag \
+            --latest \
+            --title "${{ steps.versions.outputs.release }}" \
+            --generate-notes
+          if [[ -z "${{ secrets.RELEASE_TOKEN }}" ]]; then
+            echo "::warning::released with GITHUB_TOKEN — the ECR publishing workflow will not start on its own"
+          fi
 
-      - name: Delete Develop Branch
+      - name: Open develop on the next snapshot
+        if: ${{ !inputs.dry_run }}
         run: |
-          git push origin --delete develop
-          git branch -d develop
-
-      - name: Create a new Develop Branch
-        run: |
-          git checkout -b develop
-          git pull origin main
-
-      - name: Set Source Code version to -SNAPSHOT
-        run: |
-          sed -i "s/version=.*/version=${{ env.NEXT_VERSION }}-SNAPSHOT/" gradle.properties
-          git commit -am "Update develop to next snapshot ${{ env.NEXT_VERSION }}-SNAPSHOT"
+          set -euo pipefail
+          git fetch origin develop
+          git switch -C develop origin/develop
+          sed -i "s/^version=.*/version=${{ steps.versions.outputs.next }}-SNAPSHOT/" gradle.properties
+          if git diff --quiet -- gradle.properties; then
+            echo "develop is already on ${{ steps.versions.outputs.next }}-SNAPSHOT"
+            exit 0
+          fi
+          git commit -am "Update develop to next snapshot ${{ steps.versions.outputs.next }}-SNAPSHOT"
           git push origin develop
+
+      - name: Delete the release branch
+        if: ${{ !inputs.dry_run }}
+        run: git push origin --delete "${{ steps.versions.outputs.branch }}" || true
+
+      - name: Summary
+        if: ${{ !inputs.dry_run && success() }}
+        run: |
+          {
+            echo "### Released ${{ steps.versions.outputs.release }}"
+            echo ""
+            echo "- Tag: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.versions.outputs.release }}"
+            echo "- develop is now on \`${{ steps.versions.outputs.next }}-SNAPSHOT\`"
+          } >> "$GITHUB_STEP_SUMMARY"
