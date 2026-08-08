@@ -91,68 +91,30 @@ against stale libs will use old types. `uaa`'s Angular SPA (`store-core/uaa/src/
 **not** a Gradle module; it is built by the node plugin and copied into `static/` during `processResources`.
 
 Angular work: use the `angular-developer` skill. Next.js/React work: `vercel-react-best-practices`. To
-*exercise* a frontend (QA, reproducing a UI bug, anything needing real data) bring the backend up with
-`./extra/scripts/run-lcl.sh` — see **Running locally**.
+*exercise* a frontend (QA, reproducing a UI bug, anything needing real data) start the backend too — see
+**Running locally & QA**; `npm start` alone is not enough.
 
-## Running locally
+## Running locally & QA
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh   # once — /etc/hosts entries for gateway.com, pods, demo stores
 ./extra/scripts/run-lcl.sh                 # the whole stack: infra + every Java service + both frontends
 ```
 
-`run-lcl.sh` is the way to bring the stack up. It starts the compose infra (postgres, spg, monitoring), then
-each Java service under `--spring.profiles.active=lcl,test-stores` in dependency order (uaa first — it issues
-the tokens), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building landing-ui's workspace libs.
-It **blocks in the foreground** tailing `build/lcl-logs/*.log`; Ctrl-C (or SIGTERM) tears everything down,
-containers included, and it also brings the rest down if any one service dies. Ports come from
-`common-config.yml` — change one there and change it in the script's `JAVA_SERVICES`/`NODE_SERVICES` tables too.
+**Read `references/qa-testing.md` in the `project-structure` skill before running the stack or QA-ing a
+change.** It has the flags, the demo logins, browser-driven QA, `.http` API QA, where the logs and traces
+are, the known local gaps, and the QA checklist. Don't re-derive it here.
 
-```bash
-./extra/scripts/run-lcl.sh --list             # what would start, then exit — safe dry run
-./extra/scripts/run-lcl.sh uaa catalog        # only those services, plus infra
-./extra/scripts/run-lcl.sh --no-infra         # compose already up; also leaves it up on exit
-./extra/scripts/run-lcl.sh --keep-infra       # stop the services, leave the containers running
-./extra/scripts/run-lcl.sh --build            # ./gradlew build -x test -x check first
-```
+What binds every change:
 
-**Testing UI / reproducing a frontend bug — including QA and browser-driven work — starts here.** A UI bug
-usually needs the backend behind it (gateway, uaa, the pod service serving the data), so start the stack
-rather than `npm start` alone. Entry points, with the demo logins the `test-stores` profile seeds:
-
-| what | url | login |
-|---|---|---|
-| seller console | `http://gateway.com:8000/` | `org1-admin` / `admin` |
-| demo storefront | `http://org1-store1.spg-507f1f77.gateway.com` | `user` / `revo` |
-| grafana | `http://localhost:3000` | — |
-
-Those credentials are local seed data only (`store-core/uaa/.../init-sql/data-test-stores.sql` and the pods'
-`init-sql/stores/*`) and exist solely because the `test-stores` profile is active — they are not secrets and
-never appear outside `lcl`. If a login fails, the stack almost certainly came up without `test-stores`. The
-storefront account is scoped per store (`cua.users.client_id`), so it only authenticates through the store
-host — posting to `localhost:8124/login` directly always fails, and that is not a bug.
-
-**Known local gap:** `docker-compose-lcl.yml` has no MinIO, but the seeded media urls point at
-`http://localhost:9000/...`, so every logo, slider and product image on the storefront is broken locally.
-Expected — don't file it as a UI bug.
-
-Because it blocks, run it in the background (`run_in_background`) and watch `build/lcl-logs/` — and
-**check whether it is already running before starting it again**: the script skips any service whose port is
-already bound, so a second run against a live stack starts nothing useful and its exit tears the containers
-down. `./extra/scripts/run-lcl.sh --list` plus a port probe (`lsof -i :8000`, `:8010`, `:8110`) is the cheap
-check. To iterate on one frontend against an already-running backend, don't restart everything — leave the
-stack up and run `npm start` in that `-ui` module, or start a narrowed set (`run-lcl.sh --no-infra seller-ui`).
-
-To stop a backgrounded run, send it **`SIGTERM`** (`pkill -TERM -f "bash ./extra/scripts/run-lcl.sh"`), not
-`SIGINT` — a shell that starts the script in the background inherits SIGINT as ignored and no trap can
-override that, so Ctrl-C/`kill -INT` is silently a no-op there. Then verify: ports free and
-`docker compose -f docker-compose-lcl.yml ps` empty. Ctrl-C only works when it is in the foreground.
-
-Java services run **on the host**, not in Docker; `spg`'s `extra_hosts` map service hostnames back to the
-host. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts and namespaces are declared once in
-`store-commons/autoconfigure/src/main/resources/common-config.yml` — change them there, never inline. To run a
-single service by hand:
-`./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl,test-stores'`.
+- **A user-visible change is not done until it has been exercised end to end** — through the gateway, in the
+  browser or via its `.http` blocks. Passing unit tests is not QA.
+- `run-lcl.sh` **blocks and tears the whole stack down on exit** — run it in the background, check it isn't
+  already running first (`--list` + `lsof -i :8000`), and stop it with **`SIGTERM`**, never `SIGINT`.
+- QA proves **tenant isolation and the permission gate**, not just the happy path: repeat the action as a
+  second store, and confirm a principal without the token gets 403.
+- Java services run **on the host**, not in Docker. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts
+  and namespaces come from `common-config.yml` — never inline one.
 
 ## Working conventions
 
@@ -276,6 +238,7 @@ enforcement layer. Tick only the rows the change actually touches — but a touc
 - [ ] `./gradlew build -x test -x check` clean
 - [ ] `./gradlew test` (or the touched module's `:test`) clean, Docker running for Testcontainers
 - [ ] Touched frontend builds: `npm run build` in that `-ui` module
+- [ ] User-visible change QA'd against the local stack — the checklist in the skill's `references/qa-testing.md`
 
 ## Flag in review
 
