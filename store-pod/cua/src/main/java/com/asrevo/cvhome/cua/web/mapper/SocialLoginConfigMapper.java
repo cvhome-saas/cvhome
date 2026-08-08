@@ -28,6 +28,7 @@ public class SocialLoginConfigMapper {
 
         SocialLoginConfig entity = new SocialLoginConfig();
         entity.setId(new SocialLoginConfigId(dto.getStoreMerchantId(), dto.getProviderId()));
+        entity.setEnabled(dto.getEnabled());
 
         // Encrypt appId
         if (dto.getAppId() != null && !EncryptedValue.isEncrypted(dto.getAppId())) {
@@ -53,6 +54,7 @@ public class SocialLoginConfigMapper {
         ReadableSocialLoginConfig dto = new ReadableSocialLoginConfig();
         dto.setStoreMerchantId(entity.getId().storeMerchantId());
         dto.setProviderId(entity.getId().providerId());
+        dto.setEnabled(entity.getEnabled());
 
         // Decrypt appId
         if (EncryptedValue.isEncrypted(entity.getAppId())) {
