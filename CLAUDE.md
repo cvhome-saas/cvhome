@@ -179,7 +179,6 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 - A provider's code/status re-emitted as ours, or a rejection and a transport failure sharing one `catch`
 - `buildClient(...)` with no catalog argument, or caller-side types on the server interface
 - A `catch` that swallows a typed failure and returns a success shape (200 on a rejection kills the typed path)
-- A hand-edited `store-core/seller-ui/angular.json`
 
 **Verification gates — all mandatory before saying done:**
 
