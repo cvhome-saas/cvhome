@@ -55,44 +55,31 @@ Gradle wrapper (9.2.0) drives Java *and* the npm apps. All commands from the rep
 ./gradlew :store-core:seller-ui:bootBuildImage    # docker image (Spring apps and -ui apps alike)
 ```
 
-Module paths come from `settings.gradle` — it is the source of truth for what is a Gradle module versus a
-grouping folder. Only that file lists modules; there is no root `build.gradle`.
+Toolchain, the checkstyle rule set and the test-tag split: `references/build-system.md` in the skill. What
+binds every change:
 
-- **Checkstyle failures block CI** (`config/checkstyle/checkstyle.xml`, warnings = errors). Notable rules:
-  140-char lines, no star imports, no unused imports, `DeclarationOrder`, `MissingSwitchDefault`,
-  `MultipleStringLiterals`, and **`TodoComment` — a `TODO` comment fails the build**. Reports land in
-  `build/reports/checkstyle/`.
-- **Toolchain is Java 25** (`java-common-conventions`), and CI sets up Corretto 25 — the README's "JDK 21" is
-  stale. Gradle needs a JDK it can run on; toolchains are auto-provisioned via foojay.
-- Integration tests use Testcontainers (Postgres, MinIO), so **Docker must be running** for `./gradlew test`.
-- Dependency versions live in `gradle/libs.versions.toml`; convention plugins in `build-logic/`. Never
-  hardcode a version in a `build.gradle`.
+- **Checkstyle failures block CI** — warnings = errors, and a `TODO` comment fails the build.
+- **Docker must be running** for `./gradlew test` (Testcontainers).
+- Module paths come from `settings.gradle`; dependency versions from `gradle/libs.versions.toml`. Never
+  hardcode a version in a `build.gradle`, and never add a module without `settings.gradle`.
 
 ## Frontends
 
-`-ui` modules are npm apps wrapped by the `ui-conventions` plugin: Gradle `build` → `npm run build`, Gradle
-`bootRun` → `npm run dev`. Node/npm are downloaded by the node plugin, so Gradle tasks work without a local
-Node install; running npm directly in the module also works.
+The three delivery patterns (`-ui` npm modules, uaa's embedded SPA, Thymeleaf) and their build wiring:
+`references/frontends.md`; landing-ui's workspace and themes: `references/landing-ui.md`.
 
 ```bash
-cd store-core/seller-ui  && npm start          # Angular 20 SSR, ng serve
+cd store-core/seller-ui  && npm start          # Angular 20, ng serve
 cd store-pod/landing-ui  && npm run dev        # Next.js 16, npm workspaces (app, libs/*, templates/*)
 ```
 
-**seller-ui SSR vs. hot reload is already solved in `angular.json` — don't hand-edit it.** SSR (`server`,
-`outputMode: server`, `ssr.entry`) lives in the `production` build configuration only; the `development`
-configuration — what `ng serve` / `npm start` / `run-lcl.sh` use by default — is plain CSR, so HMR works.
-`ng build` still defaults to production and emits `dist/seller-ui/server/`. So: never strip the SSR block to
-get hot reload (that breaks the real build), and never commit a local `angular.json` diff — if you see one
-uncommitted, it predates this setup and should be reverted (`git checkout -- store-core/seller-ui/angular.json`).
-
-`landing-ui`'s build order matters — `npm run build` chains libs → templates → app; building `app` alone
-against stale libs will use old types. `uaa`'s Angular SPA (`store-core/uaa/src/main/resources/uaa-fe`) is
-**not** a Gradle module; it is built by the node plugin and copied into `static/` during `processResources`.
-
-Angular work: use the `angular-developer` skill. Next.js/React work: `vercel-react-best-practices`. To
-*exercise* a frontend (QA, reproducing a UI bug, anything needing real data) start the backend too — see
-**Running locally & QA**; `npm start` alone is not enough.
+- **Never hand-edit `store-core/seller-ui/angular.json` to get hot reload** — SSR lives in the `production`
+  configuration by design and `ng serve` already runs CSR. An uncommitted diff there gets reverted.
+- **Build landing-ui from the root** (`npm run build` chains libs → templates → app); `app` alone compiles
+  against stale types.
+- Angular work: the `angular-developer` skill. Next.js/React: `vercel-react-best-practices`.
+- To *exercise* a frontend (QA, reproducing a UI bug, anything needing real data) start the backend too —
+  see **Running locally**; `npm start` alone is not enough.
 
 ## Running locally & QA
 
@@ -122,6 +109,9 @@ What binds every change:
   up-to-date `develop` (`git fetch && git switch -c <type>/<short-name> origin/develop`) and lands via PR
   into `develop`; `main` is the release branch. CI runs on both. If you find yourself already on `develop`
   with edits, branch first, then commit.
+- **`/go` ships the working tree** (branch if needed → commit → push → PR into `develop`, template filled,
+  changelog label) and **`/reset` returns to a clean `develop`** without losing work. Both live in
+  `.claude/commands/`; prefer them over doing the sequence by hand.
 - **PR body follows `.github/PULL_REQUEST_TEMPLATE.md`**: title `<type|area>: <what changed>`, then
   *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with
   the untouched sections deleted. Label it before merge — `.github/release.yml` builds the changelog from
@@ -158,96 +148,27 @@ catch most of it:
 - Bodies only from `ProblemDetailFactory`, one `@ControllerAdvice`, no root-cause text in `detail`.
 - A nicer `ErrorCode` on a legacy exception is not a migration. `payment` is the reference implementation.
 
-## Feature checklist (review policy)
+## Review policy
 
-Apply to every PR that adds or extends a feature. The `project-structure` skill explains *why*; this is the
-enforcement layer. Tick only the rows the change actually touches — but a touched row is mandatory.
+**The rows live in `.github/PULL_REQUEST_TEMPLATE.md`** — Placement / API / Persistence / Secrets / Errors /
+Integration / Configuration / Frontend, one gate per row, each with a repo mechanism behind it that fails
+silently when skipped. Every PR that adds or extends a feature is checked against them: delete the sections
+the change does not touch, and treat a section you keep as mandatory. The `project-structure` skill explains
+*why* each row exists; this file and that template are the enforcement.
 
-**Placement**
-- [ ] Entities + `Readable*`/`Persistable*` DTOs in `<domain>-commons`; business logic (services, facades,
-      populators, repositories) in `<domain>-core`; controllers/`SecurityConfig` in `<domain>-service`
-- [ ] New Gradle module added to `settings.gradle` and applying a `build-logic` convention plugin
-- [ ] No dependency on another pod's `-core` or `-service` — cross-service calls go through that pod's
-      `-external-api`
-
-**API**
-- [ ] Endpoint signature takes `StoreMerchantId merchantStore` and `LanguageCode language` (unannotated)
-- [ ] `@PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.<DOMAIN>.*')")` present —
-      `STORE-CORE.<DOMAIN>.<ACTION>` for platform endpoints. No inline role/authority checks
-- [ ] A genuinely new permission token has a `case` in `CustomPermissionEvaluator` **and** a method on
-      `PermissionAccessChecker` (`store-commons/autoconfigure`, `com.asrevo.cvhome.s2s`) — the evaluator
-      denies by default, so a token with no case silently 403s
-- [ ] Ids/codes use value objects from `store-commons/commons/.../domain/`, not raw `String`/`Long`
-- [ ] Request DTOs validated (`@Valid` + bean-validation annotations)
-- [ ] Endpoint has a runnable block in `<service>/http/<api-class>.http` — gateway path form, not the service
-      port; `?store={{STORE_ID}}&lang={{LANG}}`; a new url/id added to `http-client.env.json` rather than
-      inlined; at least one non-2xx block where the endpoint declares a failure mode
-
-**Persistence**
-- [ ] Table/column added to the service's DDL (`schema.sql` for control-plane's Spring Data JDBC,
-      `init-sql/schema.sql` for the JPA pod services) — an entity change alone is not a schema change
-- [ ] New enum value also added to the `varchar` `CHECK` constraint
-- [ ] Query is tenant-scoped by store; no cross-service foreign key, no cross-schema join
-
-**Secrets**
-- [ ] Tenant-supplied credentials encrypted in the mapper (`toEntity` encrypt / `toDTO` decrypt, guarded by
-      `EncryptedValue.isEncrypted`) via `secret-crypto` — never a plaintext column, never logged
-
-**Errors** (details: `references/error-handling.md`)
-- [ ] New failure mode = `ErrorCode` constant + one condition-named exception in that `-commons`, declared by
-      name on the throwing method and on `I<Domain>Service` if exposed over HTTP
-- [ ] No new `LEGACY.*`; a touched legacy throw site is migrated, not just re-coded
-- [ ] Ran the skill's grep gates: generic `throws` over the touched module, and old type names (comments
-      included) after a rename
-
-**Integration**
-- [ ] Synchronous cross-service call declared as a `@HttpExchange` interface in the provider's
-      `-external-api`, implemented by its `External*Api` controller, consumed via `RestClientBuilder`
-- [ ] `buildClient(...)` gets an explicit error contract — `*ApiErrors.CATALOG`, or `RemoteErrorCatalog.none()`
-      when the API names no failures
-- [ ] Caller-side exception types on the **`@HttpExchange` interface's** `throws` clause (not the server one) —
-      that is what delivers them narrowed; a `.map(...)` entry alone does not. Reactive callers use `onErrorMap`
-- [ ] Asynchronous work published as a domain event from an aggregate root, event type in an `-events`
-      module, `@OutboxHandler` **idempotent** (delivery is at-least-once)
-- [ ] uaa user management goes through `UserAccountService` (`uaa-client`), stamping `org` + `store`
-
-**Configuration**
-- [ ] Ports/hosts/namespaces changed in `common-config.yml` only; a new service registered in
-      `common-config.yml` + `lcl-config.yml` + `fargate-config.yml`
-- [ ] New route reflected in `store-pod/spg/Caddyfile` (pod edge) or `GatewayRouteLocatorImpl`/`PodClient`
-      (platform edge), and in `configure-domain.sh` if a new local hostname is involved
-- [ ] Dependency versions added to `gradle/libs.versions.toml`, referenced as `libs.*`
-
-**Frontend**
-- [ ] i18n keys added to **all five locales** — no orphans: seller-ui `public/assets/i18n/{en,ar,es,fr,ru}.json`,
-      landing-ui `locales/{en,ar,es,fr,ru}.json`, cua `messages_{en,ar,es,fr,ru}.properties` (+ the default
-      `messages.properties`)
-- [ ] Angular: standalone components, `OnPush` change detection, `inject()`, signals, HTTP through a service
-      never inside a component (see the `angular-developer` skill)
-- [ ] landing-ui: a change to `libs/*` or `templates/*` is built through the root `npm run build` chain, and
-      a new theme follows `references/new-landing-ui-template.md`
-- [ ] AR is an RTL locale — check layout, not just the strings
-
-**Verification gates (all mandatory before saying done)**
-- [ ] `./gradlew checkstyleMain checkstyleTest` clean (warnings = errors)
-- [ ] `./gradlew build -x test -x check` clean
-- [ ] `./gradlew test` (or the touched module's `:test`) clean, Docker running for Testcontainers
-- [ ] Touched frontend builds: `npm run build` in that `-ui` module
-- [ ] User-visible change QA'd against the local stack — the checklist in the skill's `references/qa-testing.md`
-
-## Flag in review
-
-Reject or fix on sight — each of these has a repo mechanism that is being bypassed:
+**Reject or fix on sight** — the violations that recur, each bypassing a mechanism:
 
 - A `TODO` comment (checkstyle `TodoComment` fails the build), a star import, a 140+ char line
 - A hardcoded host, port, or service URL instead of `common-config.yml` + `lb://<service>`
 - A hardcoded dependency version in a `build.gradle` instead of `libs.versions.toml`
 - A raw `String`/`Long` where a `commons/domain/` value object exists
 - A controller method missing `@PreAuthorize`, or authorization done with an inline role/authority check
+- A new permission token with no `case` in `CustomPermissionEvaluator` — it denies by default, so it 403s silently
 - An endpoint added or changed with no matching `.http` block, a `.http` request aimed at a service's own port
   instead of the gateway, or a session id / secret committed to `http-client.env.json`
 - A plaintext secret column, or a credential written to a log
-- An entity/column change with no matching `schema.sql` edit
+- An entity/column change with no matching `schema.sql` edit, or a new enum value not added to the `CHECK`
+  constraint
 - A consumer depending on another pod's `-core`/`-service`, or reaching into another service's schema
 - A non-idempotent `@OutboxHandler`
 - A new endpoint that ignores `StoreMerchantId`, or a repository query not scoped by store
@@ -258,6 +179,15 @@ Reject or fix on sight — each of these has a repo mechanism that is being bypa
 - A provider's code/status re-emitted as ours, or a rejection and a transport failure sharing one `catch`
 - `buildClient(...)` with no catalog argument, or caller-side types on the server interface
 - A `catch` that swallows a typed failure and returns a success shape (200 on a rejection kills the typed path)
+- A hand-edited `store-core/seller-ui/angular.json`
+
+**Verification gates — all mandatory before saying done:**
+
+- [ ] `./gradlew checkstyleMain checkstyleTest` clean (warnings = errors)
+- [ ] `./gradlew build -x test -x check` clean
+- [ ] `./gradlew test` (or the touched module's `:test`) clean, Docker running for Testcontainers
+- [ ] Touched frontend builds: `npm run build` in that `-ui` module
+- [ ] User-visible change exercised against a running stack, not just unit-tested
 
 ## Plans
 
