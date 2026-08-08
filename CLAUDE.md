@@ -73,8 +73,6 @@ cd store-core/seller-ui  && npm start          # Angular 20, ng serve
 cd store-pod/landing-ui  && npm run dev        # Next.js 16, npm workspaces (app, libs/*, templates/*)
 ```
 
-- **Never hand-edit `store-core/seller-ui/angular.json` to get hot reload** — SSR lives in the `production`
-  configuration by design and `ng serve` already runs CSR. An uncommitted diff there gets reverted.
 - **Build landing-ui from the root** (`npm run build` chains libs → templates → app); `app` alone compiles
   against stale types.
 - Angular work: the `angular-developer` skill. Next.js/React: `vercel-react-best-practices`.
