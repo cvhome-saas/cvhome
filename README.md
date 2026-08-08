@@ -42,7 +42,7 @@ isolation, cloud-native optimization, and a modernized technology stack.
 
 **Backend:**
 
-* Java (JDK 21)
+* Java (JDK 25)
 * Spring Boot 4.0.1
 * Spring Boot & Spring Cloud
 * Spring Data JPA / Hibernate 7.2.0

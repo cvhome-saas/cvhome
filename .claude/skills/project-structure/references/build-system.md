@@ -80,6 +80,36 @@ bootBuildImage {
 }
 ```
 
+## Toolchain, checkstyle and the test tasks
+
+**Java 25.** `java-common-conventions` sets the toolchain and CI installs Corretto 25. Toolchains are
+auto-provisioned via foojay, so a missing JDK downloads itself — but Gradle still needs a JDK it can *run* on.
+
+**Checkstyle failures block CI** — `config/checkstyle/checkstyle.xml`, `maxWarnings = 0`, so a warning is an
+error. Reports land in `build/reports/checkstyle/`. The rules that bite in practice:
+
+| Rule | Effect |
+|---|---|
+| `TodoComment` | **a `TODO` comment fails the build** — finish it or leave it out |
+| `LineLength` | 140 characters |
+| `AvoidStarImport`, `UnusedImports` | no `import x.*`, no unused imports |
+| `DeclarationOrder` | fields → constructors → methods, statics first |
+| `MissingSwitchDefault` | every `switch` needs a `default` |
+| `MultipleStringLiterals` | the same literal twice in one file → extract a constant |
+
+Two test tasks come from `java-application-conventions`, split by JUnit tag:
+
+```bash
+./gradlew test                 # everything
+./gradlew unitTest             # only @Tag("unit-test")
+./gradlew integrationTest      # only @Tag("integration-test")
+./gradlew checkstyleMain checkstyleTest        # what CI's quality job runs
+./gradlew :store-pod:catalog:catalog-service:test --tests '*ProductApiTest*'
+```
+
+Integration tests use **Testcontainers (Postgres, MinIO), so Docker must be running** for `./gradlew test` —
+a failure at container startup is an environment problem, not a test failure.
+
 ## Configuration
 
 Shared configuration ships **inside** the `store-commons:autoconfigure` jar, and each service imports slices
