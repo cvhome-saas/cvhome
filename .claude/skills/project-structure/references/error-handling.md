@@ -114,6 +114,10 @@ These also live in `BaseException`'s javadoc, so they are read where they are ne
    Catching `BaseException` to switch on `category()` re-creates at runtime the distinction the type system was
    making for free.
 7. **Name the condition, not the category** — `DuplicateSkuException`, not `CatalogDuplicateException`.
+8. **Response bodies come only from `ProblemDetailFactory`**, rendered by the single `@ControllerAdvice` with
+   **no** `basePackages`. Never hand-build a `ProblemDetail`, never add a second advice, and never put
+   root-cause text in `detail` — that stays in the log, joined to the response by `traceId`. A scoped advice
+   fails silently (see *Mis-scoped advice is silent* below), which is why the scope is part of the rule.
 
 The shape, once per condition:
 

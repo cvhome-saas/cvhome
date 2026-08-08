@@ -184,22 +184,17 @@ single service by hand:
 
 ## Error handling
 
-Rules, hierarchy and the corrections behind them: `references/error-handling.md` in the skill — read it before
-touching errors. What binds every change:
+**Read `references/error-handling.md` in the skill before touching errors** — the rules, the hierarchy, the
+wire format, the three-way *who failed* split, the checklists and the grep gates all live there. Tips that
+catch most of it:
 
-- **Throw and declare condition-named classes only** (`DuplicateSkuException`), never `BaseException` or a
-  category base. Throwing one is a compile error (bases are abstract); *declaring* one still compiles, so it is
-  a review/grep gate. Exceptions are checked by design — let the new failure mode break callers.
-- **Category names the parent, condition names the class**, one class per condition with a static `of(...)`
-  factory over that context's `ErrorCode` enum. Catch narrowly, never `switch` on `category()`.
-- **Get *who failed* right:** us → our code and status; a peer cvhome service → `RemoteServiceException`, the
-  remote's code re-emitted; a third party → `ExternalProviderException`, our code with theirs as `providerCode`.
-  Inside a provider call also split *decided* (refused, 422) from *undecided* (no answer, 502) — collapsing them
-  cancels orders that were charged.
-- **Bodies come only from `ProblemDetailFactory`**, via the single `@ControllerAdvice` with no `basePackages`.
-  No root-cause text in `detail`; internal detail stays in the log, joined by `traceId`.
-- **A nicer `ErrorCode` on a legacy exception is not a migration** — the signature still says nothing. `LEGACY.*`
-  marks un-migrated throw sites; `payment` is the reference implementation.
+- Throw and declare **condition-named** classes only (`DuplicateSkuException`) — never `BaseException` or a
+  category base. Catch narrowly; exceptions are checked on purpose, so let a new failure mode break callers.
+- Get **who failed** right: us → our code; a peer cvhome service → `RemoteServiceException`; a third party →
+  `ExternalProviderException`. Inside a provider call, *refused* (422) and *no answer* (502) never share a
+  `catch` — collapsing them cancels orders that were charged.
+- Bodies only from `ProblemDetailFactory`, one `@ControllerAdvice`, no root-cause text in `detail`.
+- A nicer `ErrorCode` on a legacy exception is not a migration. `payment` is the reference implementation.
 
 ## Feature checklist (review policy)
 
