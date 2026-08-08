@@ -40,17 +40,12 @@ relative API calls rather than holding tokens.
 Feature areas live under `src/app/pages/`. Note this module also carries its own `ARCHITECTURE.md` and
 `ANGULAR_MODERNIZATION_PLAN.md`.
 
-**SSR vs. hot reload is already solved in `angular.json` — never hand-edit that file to "fix" HMR.** The two
-needs are separated by build configuration, not by editing one setting back and forth:
+**SSR vs. hot reload is already solved in `angular.json`.** The two needs are separated by build configuration:
 
 | configuration | used by | shape |
 |---|---|---|
 | `production` | `ng build` (its default), the container image | SSR — `server`, `outputMode: server`, `ssr.entry`; emits `dist/seller-ui/server/` |
 | `development` | `ng serve` / `npm start` / `run-lcl.sh` | plain CSR, so HMR works |
-
-Stripping the SSR block to get hot reload breaks the real build while appearing to fix the dev loop, which is
-why this keeps happening. An uncommitted `angular.json` diff predates this setup and should be reverted:
-`git checkout -- store-core/seller-ui/angular.json`. Never commit one.
 
 ### `landing-ui` specifics
 
