@@ -40,9 +40,18 @@ relative API calls rather than holding tokens.
 Feature areas live under `src/app/pages/`. Note this module also carries its own `ARCHITECTURE.md` and
 `ANGULAR_MODERNIZATION_PLAN.md`.
 
+**SSR vs. hot reload is already solved in `angular.json`.** The two needs are separated by build configuration:
+
+| configuration | used by | shape |
+|---|---|---|
+| `production` | `ng build` (its default), the container image | SSR — `server`, `outputMode: server`, `ssr.entry`; emits `dist/seller-ui/server/` |
+| `development` | `ng serve` / `npm start` / `run-lcl.sh` | plain CSR, so HMR works |
+
 ### `landing-ui` specifics
 
-See `landing-ui.md` — it has its own npm-workspaces structure and template system.
+See `landing-ui.md` — it has its own npm-workspaces structure and template system. The one thing to carry
+across: its `npm run build` is a **strictly ordered chain** (libs → templates → app), because templates and
+app consume the libs as built output. Building `app` alone compiles against yesterday's types.
 
 ## 2. Embedded Angular inside Spring Boot — `uaa-fe`
 

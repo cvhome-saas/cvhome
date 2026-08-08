@@ -61,6 +61,7 @@ section you keep is mandatory.** Every row here has a repo mechanism behind it t
 - [ ] A genuinely new permission token has a `case` in `CustomPermissionEvaluator` **and** a method on `PermissionAccessChecker` — the evaluator denies by default, so a missing case is a silent 403
 - [ ] Ids/codes use `store-commons/commons/.../domain/` value objects, not raw `String`/`Long`
 - [ ] Request DTOs validated (`@Valid` + bean-validation annotations)
+- [ ] Endpoint has a runnable block in `<service>/http/<api-class>.http` — gateway path form, not the service port; `?store={{STORE_ID}}&lang={{LANG}}`; a new url/id in `http-client.env.json` rather than inlined; at least one non-2xx block where the endpoint declares a failure mode
 
 **Persistence**
 - [ ] Table/column in the service's DDL (`schema.sql`, or `init-sql/schema.sql` for JPA pods) — an entity change alone is not a schema change
