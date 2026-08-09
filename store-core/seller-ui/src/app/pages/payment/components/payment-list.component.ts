@@ -13,8 +13,8 @@ import {
 } from '@nebular/theme';
 import {ColumnMode, NgxDatatableModule, PageEvent} from '@swimlane/ngx-datatable';
 import {PaymentListFacade, PaymentFilter} from '../facades/payment-list.facade';
-import {TableStateService} from '../../shared/table/table-state.service';
-import {PaymentTransaction} from '../models/payment-transaction.model';
+import {TableStateService} from 'seller-core';
+import {PaymentTransaction} from 'seller-core/payments';
 
 @Component({
   selector: 'ngx-payment-list',

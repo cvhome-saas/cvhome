@@ -1,8 +1,8 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Injectable()
 export class StoreDetailInfoFacade {

@@ -3,7 +3,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {NbAutocompleteModule, NbIconModule, NbInputModule, NbOptionModule} from '@nebular/theme';
 import {ProductAutocompleteFacade} from './facades/product-autocomplete.facade';
 import {PRODUCT_AUTOCOMPLETE_MIN_SEARCH_LENGTH} from './constants/product-autocomplete.constants';
-import {ReadableProduct} from '../../../catalogue/products/models/product.model';
+import {ReadableProduct} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-product-auto-complete',

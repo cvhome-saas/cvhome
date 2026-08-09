@@ -2,14 +2,14 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {BrandFormService} from '../services/brand-form.service';
-import {BrandService} from '../services/brand.service';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {BrandService} from 'seller-core/catalog';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {slugify} from '../../../shared/utils/slugifying';
-import {ReadableMerchantStore} from '../../../store-management/models/store';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ManufacturerDescription, ReadableManufacturer} from '../models/brand.model';
+import {slugify} from 'seller-core';
+import {ReadableMerchantStore} from 'seller-core/stores';
+import {SupportedLanguageCode} from 'seller-core';
+import {ManufacturerDescription, ReadableManufacturer} from 'seller-core/catalog';
 
 @Injectable()
 export class BrandFormFacade {

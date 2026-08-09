@@ -2,11 +2,11 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {OrgService} from '../../services/org.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {OrgService} from 'seller-core/orgs';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {OrgChangePasswordFormService} from '../services/org-change-password-form.service';
-import {Org} from '../../model/org';
+import {Org} from 'seller-core/orgs';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
 
 @Injectable()

@@ -2,9 +2,9 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DateRangeStateService} from '../state/date-range.state';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
-import {SelectedStoreService} from '../../shared/services/selected-store.service';
-import {EMPTY_STATISTIC_LIST, StatisticApiService, StatisticList, StatisticsParams} from '../services/statistic.api.service';
+import {ApiErrorService} from 'seller-core';
+import {SelectedStoreService} from 'seller-core';
+import {EMPTY_STATISTIC_LIST, StatisticApiService, StatisticList, StatisticsParams} from 'seller-core/analytics';
 
 @Injectable()
 export class ClientDashboardFacade {

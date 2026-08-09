@@ -3,12 +3,12 @@ import {NavigationEnd, Router} from '@angular/router';
 import {NbMenuItem, NbMenuService} from '@nebular/theme';
 import {filter, map} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AuthService, AuthUser} from '../../../../shared/services/auth.service';
-import {StoreService} from '../../../../shared/services/store.service';
-import {ApiErrorService} from '../../../../../core/errors/api-error.service';
-import {SelectedStoreService} from '../../../../shared/services/selected-store.service';
-import {SelectedLanguageService} from '../../../../shared/services/selected-language.service';
-import {ManagerStoreId, ManagerStore} from '../../../../shared/models/commons';
+import {AuthService, AuthUser} from 'seller-core';
+import {ManagerStoreService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
+import {SelectedStoreService} from 'seller-core';
+import {SelectedLanguageService} from 'seller-core';
+import {ManagerStoreId, ManagerStore} from 'seller-core';
 import {HeaderMenuAction, STORE_SELECT_DISABLED_ROUTE_PREFIXES} from '../constants/header.constants';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class HeaderFacade {
   private readonly router = inject(Router);
   private readonly menuService = inject(NbMenuService);
   private readonly authService = inject(AuthService);
-  private readonly storeService = inject(StoreService);
+  private readonly storeService = inject(ManagerStoreService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly selectedStoreService = inject(SelectedStoreService);
   private readonly selectedLanguageService = inject(SelectedLanguageService);

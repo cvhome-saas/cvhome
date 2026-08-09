@@ -1,11 +1,11 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {Logo} from '../../models/store';
-import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+import {Logo} from 'seller-core/stores';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Injectable()
 export class StoreBrandingLogoFacade {

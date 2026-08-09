@@ -1,16 +1,16 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreDomainFormService} from '../services/store-domain.form.service';
 import {StoreDomainComponentValidatorContext} from '../store-domain.validator';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
-import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
+import {DatatablePageEvent} from 'seller-core';
+import {EMPTY_PAGE, PageT} from 'seller-core';
 import {zip} from 'rxjs';
-import {sideMenuLinks} from '../../services/constents';
-import {ManagerStoreDomain} from '../../models/store';
+import {sideMenuLinks} from 'seller-core/stores';
+import {ManagerStoreDomain} from 'seller-core/stores';
 
 @Injectable()
 export class StoreDomainFacade implements StoreDomainComponentValidatorContext {

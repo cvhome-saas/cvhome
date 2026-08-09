@@ -1,7 +1,7 @@
 import {AbstractControl, AsyncValidatorFn, ValidationErrors} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, first, map, switchMap} from 'rxjs/operators';
-import {DnsCheckService} from "../services/dns-check.service"; // Import necessary operators
+import {DnsCheckService} from "seller-core/stores"; // Import necessary operators
 
 
 // Define the interface for the component instance properties the validator needs

@@ -1,7 +1,7 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {HttpEventType} from '@angular/common/http';
 import {Observable, catchError, filter, map, of} from 'rxjs';
-import {CrudService} from '../../../services/crud.service';
+import {CrudService} from 'seller-core';
 
 export interface UploadItem {
   file: File;

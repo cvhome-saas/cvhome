@@ -3,15 +3,15 @@ import {NbDialogService} from '@nebular/theme';
 import {Observable, tap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {PageEvent} from '@swimlane/ngx-datatable';
-import {PaymentService} from '../services/payment.service';
-import {SelectedStoreService} from '../../shared/services/selected-store.service';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
+import {PaymentService} from 'seller-core/payments';
+import {SelectedStoreService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../core/notifications/notification.service';
-import {TableStateService} from '../../shared/table/table-state.service';
-import {StorePageRequest, PageT} from '../../shared/table/table.types';
+import {TableStateService} from 'seller-core';
+import {StorePageRequest, PageT} from 'seller-core';
 import {PaymentApproveComponent} from '../payment-approve/payment-approve';
 import {ACTIONABLE_PAYMENT_STATUSES, EMPTY_PAYMENT_FILTER} from '../constants/payment.constants';
-import {PaymentTransaction} from '../models/payment-transaction.model';
+import {PaymentTransaction} from 'seller-core/payments';
 
 export interface PaymentFilter {
   status?: string;

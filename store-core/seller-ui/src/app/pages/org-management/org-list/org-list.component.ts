@@ -4,7 +4,7 @@ import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
 import {TranslateModule} from '@ngx-translate/core';
 import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {OrgListFacade} from "./facades/org-list.facade";
-import {TableStateService} from "../../shared/table/table-state.service";
+import {TableStateService} from "seller-core";
 
 @Component({
   selector: 'ngx-org-list',

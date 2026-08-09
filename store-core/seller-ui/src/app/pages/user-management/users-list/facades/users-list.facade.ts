@@ -2,15 +2,15 @@ import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {UserService} from '../../../shared/services/user.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {UserService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {TableStateService} from '../../../shared/table/table-state.service';
+import {SelectedStoreService} from 'seller-core';
+import {TableStateService} from 'seller-core';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
-import {StorePageRequest} from '../../../shared/table/table.types';
-import {User} from '../../../shared/models/user';
+import {DatatablePageEvent} from 'seller-core';
+import {StorePageRequest} from 'seller-core';
+import {User} from 'seller-core';
 
 @Injectable()
 export class UsersListFacade {

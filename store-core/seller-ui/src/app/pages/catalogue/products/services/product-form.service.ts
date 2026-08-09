@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {validators} from '../../../shared/validation/validators';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ProductDescription, ReadableProductDefinition} from '../models/product.model';
+import {validators} from 'seller-core';
+import {SupportedLanguageCode} from 'seller-core';
+import {ProductDescription, ReadableProductDefinition} from 'seller-core/catalog';
 
 @Injectable()
 export class ProductFormService {

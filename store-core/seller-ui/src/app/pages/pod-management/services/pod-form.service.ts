@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {validators} from '../../shared/validation/validators';
-import {EndpointType, Pod} from '../../store-management/services/pod.service';
+import {validators} from 'seller-core';
+import {EndpointType, Pod} from 'seller-core/stores';
 
 @Injectable()
 export class PodFormService {

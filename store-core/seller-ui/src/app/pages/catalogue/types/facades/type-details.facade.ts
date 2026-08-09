@@ -2,16 +2,16 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {TypeFormService} from '../services/type-form.service';
-import {TypesService} from '../services/types.service';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {TypesService} from 'seller-core/catalog';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {StoreService} from '../../../store-management/services/store.service';
+import {SelectedStoreService} from 'seller-core';
+import {StoreService} from 'seller-core/stores';
 import {Observable, zip} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ReadableProductType} from '../models/product-type.model';
+import {SupportedLanguageCode} from 'seller-core';
+import {ReadableProductType} from 'seller-core/catalog';
 
 @Injectable()
 export class TypeDetailsFacade {

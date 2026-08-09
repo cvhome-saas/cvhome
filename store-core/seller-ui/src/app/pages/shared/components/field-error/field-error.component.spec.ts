@@ -2,9 +2,8 @@ import {Component, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {NotificationService} from '../../../../core/notifications/notification.service';
-import {applyFieldErrors} from '../../../../core/errors/form-error.utils';
+import {ApiErrorService, NOTIFICATION_PORT} from 'seller-core';
+import {applyFieldErrors} from 'seller-core';
 import {FieldErrorComponent} from './field-error.component';
 
 class FakeTranslateService {
@@ -45,9 +44,10 @@ describe('FieldErrorComponent', () => {
       providers: [
         ApiErrorService,
         {provide: TranslateService, useValue: new FakeTranslateService()},
-        // ApiErrorService pulls in NotificationService, which pulls in Nebular's toastr; this component
-        // only ever calls fieldMessage, so a stub keeps the test to what it is actually about.
-        {provide: NotificationService, useValue: {danger: () => undefined}},
+        // ApiErrorService pulls in NOTIFICATION_PORT, which the app wires to NotificationService (Nebular's
+        // toastr); this component only ever calls fieldMessage, so a stub keeps the test to what it is
+        // actually about.
+        {provide: NOTIFICATION_PORT, useValue: {danger: () => undefined}},
       ],
     });
     fixture = TestBed.createComponent(HostComponent);

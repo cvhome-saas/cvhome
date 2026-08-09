@@ -10,7 +10,7 @@ import {
   NbSidebarService,
   NbUserModule
 } from '@nebular/theme';
-import {ManagerStoreId} from '../../../shared/models/commons';
+import {ManagerStoreId} from 'seller-core';
 import {HEADER_USER_MENU} from './constants/header.constants';
 import {HeaderFacade} from './facades/header.facade';
 

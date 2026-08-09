@@ -1,8 +1,8 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {PodFormService} from '../services/pod-form.service';
-import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
+import {Pod, PodService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 
 @Injectable()
 export class PodFormFacade {

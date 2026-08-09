@@ -1,11 +1,11 @@
 import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {TableStateService} from '../../../shared/table/table-state.service';
-import {OrgService} from '../../services/org.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {StorePageRequest, PageT} from '../../../shared/table/table.types';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
-import {Org} from '../../model/org';
+import {TableStateService} from 'seller-core';
+import {OrgService} from 'seller-core/orgs';
+import {ApiErrorService} from 'seller-core';
+import {StorePageRequest, PageT} from 'seller-core';
+import {DatatablePageEvent} from 'seller-core';
+import {Org} from 'seller-core/orgs';
 
 @Injectable()
 export class OrgListFacade {

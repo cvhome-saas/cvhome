@@ -3,7 +3,7 @@ import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {NgControl} from '@angular/forms';
 import {NbInputDirective} from '@nebular/theme';
 import {switchMap} from 'rxjs';
-import {serverErrorOf} from '../../../../core/errors/form-error.utils';
+import {serverErrorOf} from 'seller-core';
 
 /**
  * Turns a Nebular input red while its control is in error, replacing the expression every template repeats

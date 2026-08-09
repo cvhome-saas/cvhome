@@ -2,17 +2,17 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {ContentService} from "../../services/content.service";
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {TableStateService} from "../../../shared/table/table-state.service";
-import {StorePageRequest, PageT} from "../../../shared/table/table.types";
+import {ContentService} from "seller-core/content";
+import {SelectedStoreService} from "seller-core";
+import {TableStateService} from "seller-core";
+import {StorePageRequest, PageT} from "seller-core";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {Observable, tap} from "rxjs";
 import {map} from "rxjs/operators";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ReadableContentBox} from "../../models/content.model";
+import {ReadableContentBox} from "seller-core/content";
 
 @Injectable()
 export class BoxesFacade {

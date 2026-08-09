@@ -1,11 +1,11 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
-import {CategoryService} from '../services/category.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {CategoryService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {SelectedStoreService} from 'seller-core';
 import {NgcxTreeNode} from '@cluetec/ngcx-tree';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {CategoryTreeMoveEvent, ReadableCategory} from '../models/category.model';
+import {CategoryTreeMoveEvent, ReadableCategory} from 'seller-core/catalog';
 
 @Injectable()
 export class CategoriesHierarchyFacade {

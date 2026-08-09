@@ -14,7 +14,7 @@ import {
 } from '@nebular/theme';
 import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {ProductsListFacade} from '../facades/products-list.facade';
-import {TableStateService} from '../../../shared/table/table-state.service';
+import {TableStateService} from 'seller-core';
 
 @Component({
   selector: 'ngx-products-list',

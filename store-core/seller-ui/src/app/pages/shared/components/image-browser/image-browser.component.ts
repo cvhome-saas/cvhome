@@ -1,7 +1,7 @@
 import {Component, DestroyRef, Input, OnInit, inject} from '@angular/core';
 import {NbDialogRef, NbSpinnerModule} from '@nebular/theme';
 import {ImageBrowserFacade} from './facades/image-browser.facade';
-import {ContentFileItem} from '../../../content/models/content.model';
+import {ContentFileItem} from 'seller-core/content';
 
 @Component({
   selector: 'ngx-image-browser',

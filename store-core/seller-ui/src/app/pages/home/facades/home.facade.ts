@@ -1,6 +1,6 @@
 import {DestroyRef, Injectable, computed, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AuthService, UserType} from '../../shared/services/auth.service';
+import {AuthService, UserType} from 'seller-core';
 
 @Injectable()
 export class HomeFacade {

@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {validators} from '../../../shared/validation/validators';
-import {DnsCheckService} from '../../services/dns-check.service';
+import {validators} from 'seller-core';
+import {DnsCheckService} from 'seller-core/stores';
 import {dnsPointsToPodValidatorFactory, StoreDomainComponentValidatorContext} from '../store-domain.validator';
 
 @Injectable()

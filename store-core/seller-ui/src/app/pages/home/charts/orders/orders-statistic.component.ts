@@ -2,7 +2,7 @@ import {Component, computed, inject, input} from '@angular/core';
 import {NbJSThemeVariable, NbThemeService} from '@nebular/theme';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NgxEchartsDirective} from 'ngx-echarts';
-import {EMPTY_STATISTIC_LIST, StatisticList} from '../../services/statistic.api.service';
+import {EMPTY_STATISTIC_LIST, StatisticList} from 'seller-core/analytics';
 import {EChartsLikeOption, NbEchartsTheme} from '../../models/echarts.model';
 
 @Component({

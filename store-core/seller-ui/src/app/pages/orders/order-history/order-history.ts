@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
-import {ReadableOrderStatusHistory} from '../models/order.model';
+import {ReadableOrderStatusHistory} from 'seller-core/orders';
 
 @Component({
   selector: 'ngx-order-history',

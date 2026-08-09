@@ -1,12 +1,12 @@
 import {DestroyRef, inject, Injectable, signal} from '@angular/core';
-import {CustomersService} from '../services/customer.service';
-import {SelectedStoreService} from '../../shared/services/selected-store.service';
-import {TableStateService} from '../../shared/table/table-state.service';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
-import {StorePageRequest} from '../../shared/table/table.types';
+import {CustomersService} from 'seller-core/customers';
+import {SelectedStoreService} from 'seller-core';
+import {TableStateService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
+import {StorePageRequest} from 'seller-core';
 import {PageEvent} from '@swimlane/ngx-datatable';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ReadableCustomer} from '../../orders/models/order.model';
+import {ReadableCustomer} from 'seller-core/orders';
 
 @Injectable()
 export class CustomerListFacade {

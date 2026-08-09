@@ -4,11 +4,11 @@ import {Lightbox} from 'ngx-lightbox';
 import {IAlbum} from 'ngx-lightbox/lightbox-event.service';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
 import {FileSystemFileEntry, NgxFileDropEntry} from 'ngx-file-drop';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {ContentService} from '../../services/content.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
+import {ApiErrorService} from 'seller-core';
+import {ContentService} from 'seller-core/content';
+import {SelectedStoreService} from 'seller-core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ContentFileItem} from '../../models/content.model';
+import {ContentFileItem} from 'seller-core/content';
 
 export interface FileImage extends IAlbum {
   file?: File;

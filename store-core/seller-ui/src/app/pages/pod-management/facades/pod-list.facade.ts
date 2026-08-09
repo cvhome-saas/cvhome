@@ -1,10 +1,10 @@
 import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
-import {TableStateService} from '../../shared/table/table-state.service';
-import {PageRequest} from '../../shared/table/table.types';
-import {DatatablePageEvent} from '../../shared/table/table-events';
+import {Pod, PodService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
+import {TableStateService} from 'seller-core';
+import {PageRequest} from 'seller-core';
+import {DatatablePageEvent} from 'seller-core';
 
 @Injectable()
 export class PodListFacade {

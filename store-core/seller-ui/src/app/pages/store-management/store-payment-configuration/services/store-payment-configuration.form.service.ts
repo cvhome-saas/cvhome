@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {ReadablePaymentConfiguration} from '../../models/store-service.model';
+import {ReadablePaymentConfiguration} from 'seller-core/stores';
 
 @Injectable()
 export class StorePaymentConfigurationFormService {

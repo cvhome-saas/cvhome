@@ -2,14 +2,14 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {TableStateService} from '../../../shared/table/table-state.service';
-import {OrgService} from '../../services/org.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {Org} from '../../model/org';
+import {TableStateService} from 'seller-core';
+import {OrgService} from 'seller-core/orgs';
+import {ApiErrorService} from 'seller-core';
+import {Org} from 'seller-core/orgs';
 import {ORG_SIDEMENU_LINKS} from '../../constants/org-management.constants';
-import {PageT, StorePageRequest} from '../../../shared/table/table.types';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
-import {ManagerStore} from '../../../shared/models/commons';
+import {PageT, StorePageRequest} from 'seller-core';
+import {DatatablePageEvent} from 'seller-core';
+import {ManagerStore} from 'seller-core';
 
 @Injectable()
 export class OrgStoresListFacade {

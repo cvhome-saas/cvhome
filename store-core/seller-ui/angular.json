@@ -3,6 +3,31 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "seller-core": {
+      "projectType": "library",
+      "root": "projects/seller-core",
+      "sourceRoot": "projects/seller-core/src",
+      "prefix": "sc",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {"project": "projects/seller-core/ng-package.json"},
+          "configurations": {
+            "production": {"tsConfig": "projects/seller-core/tsconfig.lib.prod.json"},
+            "development": {"tsConfig": "projects/seller-core/tsconfig.lib.json"}
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {"tsConfig": "projects/seller-core/tsconfig.spec.json", "polyfills": ["zone.js", "zone.js/testing"]}
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {"lintFilePatterns": ["projects/seller-core/**/*.ts"]}
+        }
+      }
+    },
     "seller-ui": {
       "projectType": "application",
       "schematics": {

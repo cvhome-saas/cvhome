@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {Org} from '../../model/org';
+import {Org} from 'seller-core/orgs';
 
 @Injectable()
 export class UpdateOrgDetailsFormService {

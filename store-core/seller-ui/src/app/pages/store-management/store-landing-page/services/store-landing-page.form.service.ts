@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {LandingPageContent} from '../../models/store-service.model';
+import {LandingPageContent} from 'seller-core/stores';
 
 @Injectable()
 export class StoreLandingPageFormService {

@@ -1,11 +1,11 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {sideMenuLinks} from '../../services/constents';
-import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
-import {SliderImage} from '../../models/store';
+import {sideMenuLinks} from 'seller-core/stores';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
+import {SliderImage} from 'seller-core/stores';
 
 @Injectable()
 export class StoreSliderImagesFacade {

@@ -5,20 +5,20 @@ import {NbRouteTab} from '@nebular/theme';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable, forkJoin} from 'rxjs';
 import {ProductFormService} from '../services/product-form.service';
-import {ProductService} from '../services/product.service';
-import {ManufactureService} from '../../brands/services/manufacture.service';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ProductService} from 'seller-core/catalog';
+import {ManufactureService} from 'seller-core/catalog';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {ApiError} from '../../../../core/errors/api-error';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {StoreService} from '../../../store-management/services/store.service';
-import {slugify} from '../../../shared/utils/slugifying';
+import {ApiError} from 'seller-core';
+import {SelectedStoreService} from 'seller-core';
+import {StoreService} from 'seller-core/stores';
+import {slugify} from 'seller-core';
 import {PRODUCT_FORM_TABS} from '../constants/product-form.constants';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ProductDescription, ReadableProductDefinition} from '../models/product.model';
-import {ReadableManufacturer} from '../../brands/models/brand.model';
-import {ReadableProductType} from '../../types/models/product-type.model';
+import {SupportedLanguageCode} from 'seller-core';
+import {ProductDescription, ReadableProductDefinition} from 'seller-core/catalog';
+import {ReadableManufacturer} from 'seller-core/catalog';
+import {ReadableProductType} from 'seller-core/catalog';
 
 @Injectable()
 export class ProductFormFacade {

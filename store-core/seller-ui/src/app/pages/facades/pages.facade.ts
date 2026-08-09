@@ -1,10 +1,10 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AuthService} from '../shared/services/auth.service';
-import {SelectedStoreService} from '../shared/services/selected-store.service';
-import {SelectedLanguageService} from '../shared/services/selected-language.service';
-import {Roles} from '../shared/models/roles';
+import {AuthService} from 'seller-core';
+import {SelectedStoreService} from 'seller-core';
+import {SelectedLanguageService} from 'seller-core';
+import {Roles} from 'seller-core';
 import {MenuItem} from '../menu-item';
 import {MENU_ITEMS} from '../pages-menu';
 

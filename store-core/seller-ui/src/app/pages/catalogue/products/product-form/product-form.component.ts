@@ -16,7 +16,7 @@ import {
 import {QuillModule} from 'ngx-quill';
 import {ProductFormFacade} from '../facades/product-form.facade';
 import {ProductFormService} from '../services/product-form.service';
-import {ReadableProductDefinition} from '../models/product.model';
+import {ReadableProductDefinition} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-product-form',

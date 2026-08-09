@@ -1,7 +1,7 @@
 import {Injectable, inject, signal} from '@angular/core';
-import {UserService} from '../../../shared/services/user.service';
-import {User} from '../../../shared/models/user';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {UserService} from 'seller-core';
+import {User} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 
 @Injectable()
 export class UserProfileFacade {

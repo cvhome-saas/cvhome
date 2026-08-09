@@ -1,13 +1,13 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreLandingPageFormService} from '../services/store-landing-page.form.service';
 import {forkJoin} from 'rxjs';
-import {sideMenuLinks} from '../../services/constents';
-import {ReadableMerchantStoreWithPod, LandingPageContent} from '../../models/store-service.model';
+import {sideMenuLinks} from 'seller-core/stores';
+import {ReadableMerchantStoreWithPod, LandingPageContent} from 'seller-core/stores';
 
 @Injectable()
 export class StoreLandingPageFacade {

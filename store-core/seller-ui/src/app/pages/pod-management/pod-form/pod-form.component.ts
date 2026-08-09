@@ -9,7 +9,7 @@ import {
   NbSelectModule,
   NbSpinnerModule
 } from '@nebular/theme';
-import {Pod} from '../../store-management/services/pod.service';
+import {Pod} from 'seller-core/stores';
 import {PodFormFacade} from '../facades/pod-form.facade';
 import {PodFormService} from '../services/pod-form.service';
 import {ControlStatusDirective} from '../../shared/components/field-error/control-status.directive';

@@ -1,8 +1,8 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ProductService} from '../../../../catalogue/products/services/product.service';
-import {ApiErrorService} from '../../../../../core/errors/api-error.service';
-import {ReadableProduct} from '../../../../catalogue/products/models/product.model';
+import {ProductService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
+import {ReadableProduct} from 'seller-core/catalog';
 
 @Injectable()
 export class ProductAutocompleteFacade {
