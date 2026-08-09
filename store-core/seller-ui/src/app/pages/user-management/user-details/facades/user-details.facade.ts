@@ -1,9 +1,9 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {map, mergeMap} from 'rxjs/operators';
-import {UserService} from '../../../shared/services/user.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {User} from '../../../shared/models/user';
+import {UserService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
+import {User} from 'seller-core';
 
 @Injectable()
 export class UserDetailsFacade {

@@ -3,7 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbButtonModule, NbInputModule, NbSpinnerModule} from '@nebular/theme';
 import {StoreBrandingBannerFacade} from "./facades/store-branding-banner.facade";
-import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Component({
   selector: 'ngx-store-branding-banner',

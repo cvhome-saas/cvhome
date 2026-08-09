@@ -3,15 +3,15 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {switchMap, zip} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ProductGroupFormService} from '../services/product-group-form.service';
-import {ProductGroupsService} from '../services/product-groups.service';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ProductGroupsService} from 'seller-core/catalog';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ProductGroupItem} from '../models/product-group.model';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {SelectedStoreService} from 'seller-core';
+import {EMPTY_PAGE, PageT} from 'seller-core';
+import {SupportedLanguageCode} from 'seller-core';
+import {ProductGroupItem} from 'seller-core/catalog';
+import {DatatablePageEvent} from 'seller-core';
 
 @Injectable()
 export class ProductGroupFormFacade {

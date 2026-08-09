@@ -1,5 +1,5 @@
 import {NbMenuItem} from '@nebular/theme';
-import {Roles} from './shared/models/roles';
+import {Roles} from 'seller-core';
 
 export declare abstract class MenuItem extends NbMenuItem {
   key?: string;

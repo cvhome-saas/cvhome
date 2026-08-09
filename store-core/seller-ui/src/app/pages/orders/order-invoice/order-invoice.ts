@@ -1,8 +1,8 @@
 import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
-import {ReadableOrder} from '../models/order.model';
-import {ReadableMerchantStore} from '../../store-management/models/store';
+import {ReadableOrder} from 'seller-core/orders';
+import {ReadableMerchantStore} from 'seller-core/stores';
 
 @Component({
   selector: 'ngx-order-invoice',

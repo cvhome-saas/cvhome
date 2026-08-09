@@ -2,8 +2,8 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {switchMap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Pod, PodService} from '../../store-management/services/pod.service';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
+import {Pod, PodService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 
 @Injectable()
 export class EditPodFacade {

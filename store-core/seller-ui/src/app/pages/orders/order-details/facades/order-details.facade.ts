@@ -3,19 +3,19 @@ import {NbDialogService} from '@nebular/theme';
 import {ActivatedRoute, Router} from '@angular/router';
 import {zip} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {OrderDetailsMapper} from '../services/order-details.mapper';
+import {OrderDetailsMapper} from 'seller-core/orders';
 import {AsYouType} from 'libphonenumber-js';
 import {LANGUAGES, ORDER_STATUS_LIST, OrderDialogType} from '../constants/order-details.constants';
-import {OrdersService} from "../../services/orders.service";
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {OrdersService} from "seller-core/orders";
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from "../../../shared/services/selected-store.service";
-import {StoreService} from "../../../store-management/services/store.service";
+import {SelectedStoreService} from "seller-core";
+import {StoreService} from "seller-core/stores";
 import {OrderTransactionComponent} from "../../order-transaction/order-transaction";
 import {OrderInvoiceComponent} from "../../order-invoice/order-invoice";
 import {OrderHistoryComponent} from "../../order-history/order-history";
-import {CustomerAddress, OrderTransaction, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "../../models/order.model";
-import {ReadableMerchantStore} from "../../../store-management/models/store";
+import {CustomerAddress, OrderTransaction, ReadableCountry, ReadableOrder, ReadableOrderStatusHistory, ReadableZone} from "seller-core/orders";
+import {ReadableMerchantStore} from "seller-core/stores";
 
 @Injectable()
 export class OrderDetailsFacade {

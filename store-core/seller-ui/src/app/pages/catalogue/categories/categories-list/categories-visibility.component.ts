@@ -1,7 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {CategoriesVisibilityFacade} from '../facades/categories-visibility.facade';
-import {PersistableCategory} from '../models/category.model';
+import {PersistableCategory} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-categories-visibility',

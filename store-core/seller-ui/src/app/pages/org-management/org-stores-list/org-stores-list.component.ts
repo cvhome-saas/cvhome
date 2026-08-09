@@ -3,7 +3,7 @@ import {ColumnMode, NgxDatatableModule} from "@swimlane/ngx-datatable";
 import {TranslateModule} from '@ngx-translate/core';
 import {NbCardModule, NbOptionModule, NbSelectModule, NbSpinnerModule} from '@nebular/theme';
 import {OrgStoresListFacade} from "./facades/org-stores-list.facade";
-import {TableStateService} from "../../shared/table/table-state.service";
+import {TableStateService} from "seller-core";
 
 @Component({
   selector: 'ngx-org-stores-list',

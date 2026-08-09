@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {validators} from '../../../shared/validation/validators';
-import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+import {validators} from 'seller-core';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Injectable()
 export class StoreFormService {

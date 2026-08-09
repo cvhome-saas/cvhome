@@ -2,14 +2,14 @@ import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {PageEvent} from '@swimlane/ngx-datatable';
-import {ProductService} from '../services/product.service';
+import {ProductService} from 'seller-core/catalog';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {TableStateService} from '../../../shared/table/table-state.service';
-import {StorePageRequest} from '../../../shared/table/table.types';
-import {ReadableProduct} from '../models/product.model';
+import {SelectedStoreService} from 'seller-core';
+import {TableStateService} from 'seller-core';
+import {StorePageRequest} from 'seller-core';
+import {ReadableProduct} from 'seller-core/catalog';
 
 export interface ProductFilterPageRequest extends StorePageRequest {
   sku?: string;

@@ -1,7 +1,7 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {OrgService} from '../../services/org.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {OrgService} from 'seller-core/orgs';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {CreateNewOrgFormService} from '../services/create-new-org-form.service';
 

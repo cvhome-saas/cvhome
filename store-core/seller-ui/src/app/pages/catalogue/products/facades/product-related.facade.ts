@@ -2,13 +2,13 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {zip} from 'rxjs';
-import {EMPTY_PAGE, PageT} from '../../../shared/table/table.types';
-import {ProductRelationshipService} from '../product-related/services/product-relationship.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {EMPTY_PAGE, PageT} from 'seller-core';
+import {ProductRelationshipService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
-import {ProductGroupItem} from '../../products-groups/models/product-group.model';
+import {SelectedStoreService} from 'seller-core';
+import {DatatablePageEvent} from 'seller-core';
+import {ProductGroupItem} from 'seller-core/catalog';
 
 @Injectable()
 export class ProductRelatedFacade {

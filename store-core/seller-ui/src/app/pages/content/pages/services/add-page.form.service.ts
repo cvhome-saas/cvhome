@@ -1,10 +1,10 @@
 import {Injectable, inject} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {validators} from '../../../shared/validation/validators';
-import {slugify} from '../../../shared/utils/slugifying';
+import {validators} from 'seller-core';
+import {slugify} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {ContentDescription, ReadableContentPage} from '../../models/content.model';
+import {SupportedLanguageCode} from 'seller-core';
+import {ContentDescription, ReadableContentPage} from 'seller-core/content';
 
 @Injectable()
 export class AddPageFormService {

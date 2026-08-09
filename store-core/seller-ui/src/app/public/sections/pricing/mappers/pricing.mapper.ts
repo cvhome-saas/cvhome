@@ -1,4 +1,4 @@
-import {FreeOption, Option} from '../../../../pages/shared/models/subscription.model';
+import {FreeOption, Option} from 'seller-core';
 import {PRICING_BASE_IMG_PATH} from '../constants/pricing.constants';
 
 export interface PricingFeature {

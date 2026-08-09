@@ -1,13 +1,13 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {StoreService} from '../../services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {StoreSocialLinksFormService} from '../services/store-social-links.form.service';
 import {zip} from 'rxjs';
-import {sideMenuLinks} from '../../services/constents';
-import {ReadableMerchantStoreWithPod, SocialLink} from '../../models/store-service.model';
+import {sideMenuLinks} from 'seller-core/stores';
+import {ReadableMerchantStoreWithPod, SocialLink} from 'seller-core/stores';
 
 @Injectable()
 export class StoreSocialLinksFacade {

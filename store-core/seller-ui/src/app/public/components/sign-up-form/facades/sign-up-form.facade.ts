@@ -1,10 +1,9 @@
 import {Injectable, PLATFORM_ID, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {isPlatformBrowser} from '@angular/common';
-import {SignUpService} from '../../../service/sign-up.service';
-import {SignUpForm} from '../../../domain/types';
-import {ApiError} from '../../../../core/errors/api-error';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {SignUpForm, SignUpService} from 'seller-core/signup';
+import {ApiError} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {SignUpFormService} from '../services/sign-up-form.service';
 import {SIGN_UP_REDIRECT_DELAY_MS, SIGN_UP_REDIRECT_PATH} from '../constants/sign-up-form.constants';

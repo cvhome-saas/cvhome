@@ -2,15 +2,15 @@ import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormArray, FormGroup} from '@angular/forms';
 import {CategoryFormService} from '../services/category-form.service';
-import {CategoryService} from '../services/category.service';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {CategoryService} from 'seller-core/catalog';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {slugify} from '../../../shared/utils/slugifying';
-import {ReadableMerchantStore} from '../../../store-management/models/store';
+import {slugify} from 'seller-core';
+import {ReadableMerchantStore} from 'seller-core/stores';
 import {zip} from 'rxjs';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {CategoryDescription, ReadableCategory} from '../models/category.model';
+import {SupportedLanguageCode} from 'seller-core';
+import {CategoryDescription, ReadableCategory} from 'seller-core/catalog';
 
 @Injectable()
 export class CategoryFormFacade {

@@ -1,7 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {ActiveButtonFacade} from '../facades/active-button.facade';
-import {ReadableProductGroup} from '../models/product-group.model';
+import {ReadableProductGroup} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-product-groups-active',

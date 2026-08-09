@@ -1,10 +1,10 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {zip} from 'rxjs';
-import {SubscriptionDetails, SubscriptionService} from '../services/subscription.service';
-import {Table} from '../../shared/models/subscription.model';
-import {ApiErrorService} from '../../../core/errors/api-error.service';
-import {PRICING_CARD_ACCENTS} from '../constants/subscription.constants';
-import {Pricing, toFreePricing, toPricing} from '../mappers/subscription.mapper';
+import {SubscriptionDetails, SubscriptionService} from 'seller-core/subscriptions';
+import {Table} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
+import {PRICING_CARD_ACCENTS} from 'seller-core/subscriptions';
+import {Pricing, toFreePricing, toPricing} from 'seller-core/subscriptions';
 
 @Injectable()
 export class SubscriptionFacade {

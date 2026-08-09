@@ -3,7 +3,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {NbButtonModule, NbCardModule, NbIconModule, NbSpinnerModule} from '@nebular/theme';
 import {ColumnMode, NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {GroupsListFacade} from '../facades/groups-list.facade';
-import {TableStateService} from '../../../shared/table/table-state.service';
+import {TableStateService} from 'seller-core';
 import {ActiveButtonComponent} from './active-button.component';
 
 @Component({

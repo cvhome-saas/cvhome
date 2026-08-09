@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
-import {ProductGroupsService} from '../services/product-groups.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ProductGroupsService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {ReadableProductGroup} from '../models/product-group.model';
+import {ReadableProductGroup} from 'seller-core/catalog';
 
 @Injectable()
 export class ActiveButtonFacade {

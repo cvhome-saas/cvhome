@@ -2,12 +2,12 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {forkJoin, zip} from 'rxjs';
-import {CategoryService} from '../../categories/services/category.service';
-import {ProductService} from '../services/product.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {CategoryService} from 'seller-core/catalog';
+import {ProductService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {ReadableCategory} from '../../categories/models/category.model';
+import {SelectedStoreService} from 'seller-core';
+import {ReadableCategory} from 'seller-core/catalog';
 
 const PER_PAGE = 50; // ideally display all categories
 

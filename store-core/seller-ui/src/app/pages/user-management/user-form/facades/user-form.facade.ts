@@ -1,10 +1,10 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {UserService} from '../../../shared/services/user.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {UserService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
 import {UserFormFormService} from '../services/user-form-form.service';
-import {User} from '../../../shared/models/user';
+import {User} from 'seller-core';
 import {NEW_USER_SIDE_MENU_LINKS, USER_DETAILS_SIDE_MENU_LINKS} from '../../constants/user-management.constants';
 
 @Injectable()

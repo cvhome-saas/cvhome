@@ -3,8 +3,8 @@ import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {AbstractControl, ValidationErrors} from '@angular/forms';
 import {switchMap} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {SERVER_ERROR_KEY, serverErrorOf} from '../../../../core/errors/form-error.utils';
+import {ApiErrorService} from 'seller-core';
+import {SERVER_ERROR_KEY, serverErrorOf} from 'seller-core';
 
 /** Client-validator key → i18n key, so `[messages]` is optional for the ordinary cases. */
 const GENERIC_FIELD_MESSAGES: Readonly<Record<string, string>> = {
@@ -36,7 +36,7 @@ const GENERIC_FIELD_MESSAGES: Readonly<Record<string, string>> = {
   template: `
     @if (visible()) {
       <div class="caption status-danger mt-1">
-        @for (message of messages(); track message) {
+        @for (message of visibleMessages(); track message) {
           <div>{{ message }}</div>
         }
       </div>
@@ -48,7 +48,7 @@ export class FieldErrorComponent {
   readonly control = input.required<AbstractControl>();
 
   /** Per-validator overrides, e.g. `{required: 'POD_FORM.NAME_REQUIRED'}`. */
-  readonly messageKeys = input<Record<string, string>>({}, {alias: 'messages'});
+  readonly messages = input<Record<string, string>>({});
 
   private readonly apiErrors = inject(ApiErrorService);
 
@@ -74,7 +74,7 @@ export class FieldErrorComponent {
     return serverErrorOf(control) !== null || (control.invalid && (control.dirty || control.touched));
   });
 
-  protected readonly messages = computed(() => {
+  protected readonly visibleMessages = computed(() => {
     this.controlEvent();
     const control = this.control();
 
@@ -97,7 +97,7 @@ export class FieldErrorComponent {
   });
 
   private clientMessage(key: string, value: unknown): string | null {
-    const translationKey = this.messageKeys()[key] ?? GENERIC_FIELD_MESSAGES[key];
+    const translationKey = this.messages()[key] ?? GENERIC_FIELD_MESSAGES[key];
     if (!translationKey) {
       return null;
     }

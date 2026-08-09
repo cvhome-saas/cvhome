@@ -1,8 +1,8 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ContentService} from '../../../../content/services/content.service';
-import {ApiErrorService} from '../../../../../core/errors/api-error.service';
-import {ContentFileItem} from '../../../../content/models/content.model';
+import {ContentService} from 'seller-core/content';
+import {ApiErrorService} from 'seller-core';
+import {ContentFileItem} from 'seller-core/content';
 
 @Injectable()
 export class ImageBrowserFacade {

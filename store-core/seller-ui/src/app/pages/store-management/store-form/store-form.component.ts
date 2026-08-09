@@ -13,7 +13,7 @@ import {
 } from '@nebular/theme';
 import {StoreFormFacade} from './facades/store-form.facade';
 import {StoreFormService} from './services/store-form.service';
-import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Component({
   selector: 'ngx-store-form',

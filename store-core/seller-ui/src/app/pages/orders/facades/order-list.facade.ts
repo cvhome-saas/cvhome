@@ -1,13 +1,13 @@
 import {DestroyRef, Injectable, inject, signal} from '@angular/core';
-import {OrdersService} from '../services/orders.service';
-import {SelectedStoreService} from "../../shared/services/selected-store.service";
-import {TableStateService} from "../../shared/table/table-state.service";
+import {OrdersService} from 'seller-core/orders';
+import {SelectedStoreService} from "seller-core";
+import {TableStateService} from "seller-core";
 import {Observable, tap} from "rxjs";
-import {StorePageRequest, PageT} from "../../shared/table/table.types";
+import {StorePageRequest, PageT} from "seller-core";
 import {PageEvent} from "@swimlane/ngx-datatable";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ReadableOrder} from "../models/order.model";
-import {ApiErrorService} from "../../../core/errors/api-error.service";
+import {ReadableOrder} from "seller-core/orders";
+import {ApiErrorService} from "seller-core";
 
 export interface OrderFilterPageRequest extends StorePageRequest {
   phone?: string;
@@ -74,7 +74,7 @@ export class OrderListFacade {
     return this.ordersService.getOrders(request).pipe(
       tap({
         next: () => this.tableState.setLoading(false),
-        error: (err) => {
+        error: () => {
           this.tableState.setLoading(false);
         }
       })

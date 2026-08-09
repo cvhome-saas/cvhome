@@ -3,12 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "start": "rm -rf dist/seller-core && concurrently -k -n lib,app \"npm:watch:lib\" \"npm run wait:lib && ng serve\"",
+    "wait:lib": "wait-on dist/seller-core/package.json dist/seller-core/analytics/package.json dist/seller-core/catalog/package.json dist/seller-core/content/package.json dist/seller-core/customers/package.json dist/seller-core/orders/package.json dist/seller-core/orgs/package.json dist/seller-core/payments/package.json dist/seller-core/signup/package.json dist/seller-core/stores/package.json dist/seller-core/subscriptions/package.json",
+    "build": "ng build seller-core && ng build seller-ui",
+    "build:lib": "ng build seller-core",
+    "watch:lib": "ng build seller-core --watch --configuration development",
+    "watch": "ng build seller-ui --watch --configuration development",
+    "test": "ng build seller-core && ng test seller-core --watch=false && ng test seller-ui --watch=false",
+    "dev": "npm run build:lib && ng serve",
     "serve:ssr:seller-ui": "node dist/seller-ui/server/server.mjs",
-    "lint": "ng lint"
+    "lint": "ng lint seller-core && ng lint seller-ui"
   },
   "private": true,
   "dependencies": {
@@ -56,6 +60,7 @@
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",
     "angular-eslint": "21.0.1",
+    "concurrently": "^9.2.4",
     "eslint": "^9.39.1",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
@@ -63,9 +68,11 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ng-packagr": "^20.3.2",
     "ngx-build-plus": "^20.0.0",
     "patch-package": "^8.0.0",
     "typescript": "~5.8.0",
-    "typescript-eslint": "8.46.4"
+    "typescript-eslint": "8.46.4",
+    "wait-on": "^8.0.5"
   }
 }

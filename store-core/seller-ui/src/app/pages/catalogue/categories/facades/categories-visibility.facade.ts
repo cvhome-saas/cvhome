@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
-import {CategoryService} from '../services/category.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {CategoryService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {PersistableCategory} from '../models/category.model';
+import {PersistableCategory} from 'seller-core/catalog';
 
 @Injectable()
 export class CategoriesVisibilityFacade {

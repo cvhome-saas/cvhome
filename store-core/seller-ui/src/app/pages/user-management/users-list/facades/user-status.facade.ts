@@ -1,8 +1,8 @@
 import {Injectable, inject} from '@angular/core';
-import {UserService} from '../../../shared/services/user.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {UserService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {User} from '../../../shared/models/user';
+import {User} from 'seller-core';
 
 @Injectable()
 export class UserStatusFacade {

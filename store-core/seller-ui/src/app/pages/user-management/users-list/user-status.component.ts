@@ -1,7 +1,7 @@
 import {Component, Input, inject} from '@angular/core';
 import {NbCheckboxModule} from '@nebular/theme';
 import {UserStatusFacade} from './facades/user-status.facade';
-import {User} from '../../shared/models/user';
+import {User} from 'seller-core';
 
 @Component({
   selector: 'ngx-user-status',

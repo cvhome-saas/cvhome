@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {EMAIL_PATTERN, PWD_PATTERN} from '../../constants/user-management.constants';
-import {User} from '../../../shared/models/user';
+import {User} from 'seller-core';
 
 @Injectable()
 export class UserFormFormService {

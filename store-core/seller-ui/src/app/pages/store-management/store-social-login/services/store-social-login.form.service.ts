@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {ReadableSocialLoginConfig} from '../../models/store-service.model';
+import {ReadableSocialLoginConfig} from 'seller-core/stores';
 
 @Injectable()
 export class StoreSocialLoginFormService {

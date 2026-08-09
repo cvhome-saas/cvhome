@@ -12,10 +12,10 @@ import {
   NbSpinnerModule
 } from '@nebular/theme';
 import {QuillModule} from 'ngx-quill';
-import {ReadableMerchantStore} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from 'seller-core/stores';
 import {CategoryFormFacade} from '../facades/category-form.facade';
 import {CategoryFormService} from '../services/category-form.service';
-import {ReadableCategory} from '../models/category.model';
+import {ReadableCategory} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-category-form',

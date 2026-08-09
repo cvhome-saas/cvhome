@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {NbDialogRef} from '@nebular/theme';
-import {OrderTransaction} from '../models/order.model';
+import {OrderTransaction} from 'seller-core/orders';
 
 @Component({
   selector: 'ngx-order-transaction',

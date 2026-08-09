@@ -12,7 +12,7 @@ import ru from '../../../../public/assets/i18n/ru.json';
 
 type Json = Record<string, unknown>;
 
-const LOCALES: ReadonlyArray<readonly [string, Json]> = [
+const LOCALES: readonly (readonly [string, Json])[] = [
   ['en', en as Json], ['ar', ar as Json], ['es', es as Json], ['fr', fr as Json], ['ru', ru as Json],
 ];
 

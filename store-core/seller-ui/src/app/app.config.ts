@@ -22,11 +22,22 @@ import {provideServerRendering, withRoutes} from "@angular/ssr";
 import {serverRoutes} from "./app.routes.server";
 import {provideRouter} from "@angular/router";
 import {provideClientHydration} from "@angular/platform-browser";
-import {apiErrorInterceptor} from "./core/errors/api-error.interceptor";
-import {GlobalErrorHandler} from "./core/errors/global-error-handler";
+import {apiErrorInterceptor} from "seller-core";
+import {GlobalErrorHandler} from "seller-core";
+import {provideSellerCore, StoreMode, withNotifications} from 'seller-core';
+import {NotificationService} from './core/notifications/notification.service';
+import {environment} from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideSellerCore({
+      apiUrl: environment.apiUrl,
+      loginUrl: environment.LOGIN_URL,
+      logoutUrl: environment.LOGOUT_URL,
+      mode: environment.mode as StoreMode,
+      defaultStore: environment.defaultStore,
+      languages: {default: environment.client.language.default, available: environment.client.language.array},
+    }, withNotifications(NotificationService)),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideClientHydration(),

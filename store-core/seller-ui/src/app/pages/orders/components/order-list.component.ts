@@ -2,7 +2,7 @@ import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {OrderListFacade} from '../facades/order-list.facade';
-import {TableStateService} from '../../shared/table/table-state.service';
+import {TableStateService} from 'seller-core';
 import {ColumnMode, NgxDatatableModule, PageEvent} from "@swimlane/ngx-datatable";
 import {TranslateModule} from '@ngx-translate/core';
 import {

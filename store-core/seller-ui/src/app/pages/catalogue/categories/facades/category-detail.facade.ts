@@ -1,12 +1,12 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {CategoryService} from '../services/category.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {StoreService} from '../../../store-management/services/store.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {ReadableMerchantStore} from '../../../store-management/models/store';
+import {CategoryService} from 'seller-core/catalog';
+import {SelectedStoreService} from 'seller-core';
+import {StoreService} from 'seller-core/stores';
+import {ApiErrorService} from 'seller-core';
+import {ReadableMerchantStore} from 'seller-core/stores';
 import {zip} from 'rxjs';
-import {ReadableCategory} from '../models/category.model';
+import {ReadableCategory} from 'seller-core/catalog';
 
 @Injectable()
 export class CategoryDetailFacade {

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {StoreFormComponent} from '../store-form/store-form.component';
-import {ReadableMerchantStoreWithPod} from '../models/store-service.model';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Component({
   selector: 'ngx-store-creation',

@@ -1,15 +1,15 @@
 import {Injectable, inject, signal, DestroyRef} from '@angular/core';
 import {Router} from '@angular/router';
-import {ProductGroupsService} from '../services/product-groups.service';
+import {ProductGroupsService} from 'seller-core/catalog';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from '../../../shared/components/showcase-dialog/showcase-dialog.component';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {TableStateService} from '../../../shared/table/table-state.service';
-import {StorePageRequest} from '../../../shared/table/table.types';
-import {DatatablePageEvent} from '../../../shared/table/table-events';
+import {ApiErrorService} from 'seller-core';
+import {SelectedStoreService} from 'seller-core';
+import {TableStateService} from 'seller-core';
+import {StorePageRequest} from 'seller-core';
+import {DatatablePageEvent} from 'seller-core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ReadableProductGroup} from '../models/product-group.model';
+import {ReadableProductGroup} from 'seller-core/catalog';
 
 @Injectable()
 export class GroupsListFacade {

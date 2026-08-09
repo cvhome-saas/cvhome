@@ -2,13 +2,13 @@ import {Injectable, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {NbDialogService} from '@nebular/theme';
 import {ShowcaseDialogComponent} from "../../../shared/components/showcase-dialog/showcase-dialog.component";
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {StoreService} from "../../services/store.service";
-import {TableStateService} from "../../../shared/table/table-state.service";
-import {PageT, StorePageRequest} from "../../../shared/table/table.types";
+import {StoreService} from "seller-core/stores";
+import {TableStateService} from "seller-core";
+import {PageT, StorePageRequest} from "seller-core";
 import {PageEvent} from "@swimlane/ngx-datatable";
-import {ManagerStore} from "../../../shared/models/commons";
+import {ManagerStore} from "seller-core";
 
 @Injectable()
 export class StoresListFacade {

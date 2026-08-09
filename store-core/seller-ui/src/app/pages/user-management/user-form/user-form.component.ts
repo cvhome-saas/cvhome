@@ -10,7 +10,7 @@ import {
   NbSelectModule,
   NbSpinnerModule
 } from '@nebular/theme';
-import {User} from '../../shared/models/user';
+import {User} from 'seller-core';
 import {UserFormFacade} from './facades/user-form.facade';
 import {UserFormFormService} from './services/user-form-form.service';
 

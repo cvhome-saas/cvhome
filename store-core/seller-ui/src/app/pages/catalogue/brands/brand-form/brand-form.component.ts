@@ -10,10 +10,10 @@ import {
   NbSpinnerModule
 } from '@nebular/theme';
 import {QuillModule} from 'ngx-quill';
-import {ReadableMerchantStore} from '../../../store-management/models/store';
+import {ReadableMerchantStore} from 'seller-core/stores';
 import {BrandFormFacade} from '../facades/brand-form.facade';
 import {BrandFormService} from '../services/brand-form.service';
-import {ReadableManufacturer} from '../models/brand.model';
+import {ReadableManufacturer} from 'seller-core/catalog';
 
 @Component({
   selector: 'ngx-brand-form',

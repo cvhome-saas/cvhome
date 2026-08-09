@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {ReadableMerchantStoreWithPod} from '../../models/store-service.model';
+import {ReadableMerchantStoreWithPod} from 'seller-core/stores';
 
 @Injectable()
 export class StoreSocialLinksFormService {

@@ -2,11 +2,11 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {zip} from 'rxjs';
-import {ProductImageService} from '../services/product-image.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ProductImageService} from 'seller-core/catalog';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {ReadableImage} from '../models/product.model';
+import {SelectedStoreService} from 'seller-core';
+import {ReadableImage} from 'seller-core/catalog';
 
 @Injectable()
 export class ProductsImagesFacade {

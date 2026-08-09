@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, DestroyRef, EventEmitter, Input, Output, ViewChild, effect, inject} from '@angular/core';
-import {ManagerStoreId} from '../../models/commons';
+import {ManagerStoreId} from 'seller-core';
 import {NbOptionModule, NbSelectComponent, NbSelectModule} from '@nebular/theme';
 import {StoreAutocompleteFacade} from './facades/store-autocomplete.facade';
 

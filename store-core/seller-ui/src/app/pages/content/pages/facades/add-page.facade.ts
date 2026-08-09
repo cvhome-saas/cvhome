@@ -1,17 +1,17 @@
 import {Injectable, inject, signal} from '@angular/core';
 import {FormArray, FormGroup} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ConfigService} from '../../../shared/services/config.service';
-import {ApiErrorService} from '../../../../core/errors/api-error.service';
+import {ConfigService} from 'seller-core';
+import {ApiErrorService} from 'seller-core';
 import {NotificationService} from '../../../../core/notifications/notification.service';
-import {ContentService} from '../../services/content.service';
-import {SelectedStoreService} from '../../../shared/services/selected-store.service';
-import {StoreService} from '../../../store-management/services/store.service';
+import {ContentService} from 'seller-core/content';
+import {SelectedStoreService} from 'seller-core';
+import {StoreService} from 'seller-core/stores';
 import {AddPageFormService} from '../services/add-page.form.service';
 import {mergeMap, of, zip} from 'rxjs';
-import {SupportedLanguageCode} from '../../../shared/services/config.service';
-import {HttpParamsLike} from '../../../shared/services/crud.service';
-import {ReadableContentPage} from '../../models/content.model';
+import {SupportedLanguageCode} from 'seller-core';
+import {HttpParamsLike} from 'seller-core';
+import {ReadableContentPage} from 'seller-core/content';
 
 @Injectable()
 export class AddPageFacade {
