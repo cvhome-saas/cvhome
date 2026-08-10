@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.billing.commons.dto.CheckoutSessionView;
 import com.asrevo.cvhome.billing.commons.dto.SubscriptionView;
 import com.asrevo.cvhome.billing.commons.errors.BillingProviderUnavailableException;
+import com.asrevo.cvhome.billing.commons.errors.IllegalSubscriptionTransitionException;
+import com.asrevo.cvhome.billing.commons.errors.ImmediateCancelForbiddenException;
 import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionChangeRejectedException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
@@ -99,6 +101,52 @@ public class SubscriptionApi {
         RedirectionUrlBuilder urlBuilder = sellerConsoleUrls(httpRequest);
         return subscriptionService.checkout(store, tenantScopeOf(identity), request.planPriceId(),
                 urlBuilder.getRedirectionUrl(SUCCESS_PATH), urlBuilder.getRedirectionUrl(CANCEL_PATH));
+    }
+
+    /**
+     * Moves the store to another plan.
+     *
+     * <p>
+     * One endpoint for both directions, because the direction is not the caller's to choose — see
+     * {@link com.asrevo.cvhome.billing.service.SubscriptionService#changePlan}. The response says what actually
+     * happened: an upgrade comes back already on the new plan, a downgrade comes back with
+     * {@code pendingPlanChange} set and the old plan still in force.
+     * </p>
+     */
+    @PostMapping("plan")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    public SubscriptionView changePlan(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                       @RequestParam("store") ManagerStoreId store,
+                                       @RequestBody PlanChangeRequest request)
+            throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
+            BillingProviderUnavailableException, IllegalSubscriptionTransitionException {
+        return subscriptionService.changePlan(store, tenantScopeOf(identity), request.planPriceId());
+    }
+
+    /**
+     * Switches renewal off, or — for an administrator — ends the subscription now.
+     */
+    @PostMapping("cancel")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    public SubscriptionView cancel(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                   @RequestParam("store") ManagerStoreId store,
+                                   @RequestBody CancelRequest request)
+            throws SubscriptionNotFoundException, BillingProviderUnavailableException,
+            IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException {
+        return subscriptionService.cancel(store, tenantScopeOf(identity), request.immediate(),
+                identity.isSuperAdmin());
+    }
+
+    /**
+     * Switches renewal back on, and calls off a scheduled downgrade if one is pending.
+     */
+    @PostMapping("resume")
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    public SubscriptionView resume(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
+                                   @RequestParam("store") ManagerStoreId store)
+            throws SubscriptionNotFoundException, BillingProviderUnavailableException,
+            IllegalSubscriptionTransitionException {
+        return subscriptionService.resume(store, tenantScopeOf(identity));
     }
 
     /**

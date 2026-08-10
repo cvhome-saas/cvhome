@@ -269,9 +269,38 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
     /**
      * Renewal switched off. The status does not change: the customer keeps everything until the period they paid for
      * runs out, which is what separates this from cancelling.
+     *
+     * <p>
+     * Any pending plan change is dropped, because it can no longer happen — a deferred downgrade takes effect at the
+     * period boundary, which is exactly when this subscription now ends. Keeping it would leave a change scheduled
+     * for a subscription that will not be there.
+     * </p>
      */
     public StoreSubscriptionEntity scheduleCancel() {
         this.cancelAtPeriodEnd = true;
+        this.clearPendingChange();
+        this.updatedDate = Instant.now();
+        return this;
+    }
+
+    /**
+     * Mirrors the provider's renewal flag, in whichever direction it moved.
+     *
+     * <p>
+     * For the webhook path only, and deliberately without the guard {@link #revokeScheduledCancel} carries. The
+     * provider is the authority on whether this subscription will renew, so reconciliation has to be able to clear
+     * the flag as well as set it. An earlier version only ever set it, which left a resumed subscription reading as
+     * "will not renew" forever once a late webhook from the cancel arrived after the resume.
+     * </p>
+     */
+    public StoreSubscriptionEntity reconcileRenewal(boolean providerCancelAtPeriodEnd) {
+        if (this.cancelAtPeriodEnd == providerCancelAtPeriodEnd) {
+            return this;
+        }
+        this.cancelAtPeriodEnd = providerCancelAtPeriodEnd;
+        if (providerCancelAtPeriodEnd) {
+            this.clearPendingChange();
+        }
         this.updatedDate = Instant.now();
         return this;
     }

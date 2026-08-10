@@ -209,9 +209,9 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     private void applyStatusOf(StoreSubscriptionEntity entity, ProviderSubscriptionState state)
             throws IllegalSubscriptionTransitionException {
-        if (state.cancelAtPeriodEnd() && !entity.isCancelAtPeriodEnd()) {
-            entity.scheduleCancel();
-        }
+        // Mirrored both ways: the provider decides whether this renews, so a flag that only ever went on would
+        // leave a resumed subscription reading as cancelled the moment a late webhook arrived.
+        entity.reconcileRenewal(state.cancelAtPeriodEnd());
         if (state.ended()) {
             entity.cancelNow(Instant.now());
             return;

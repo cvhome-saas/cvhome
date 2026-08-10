@@ -114,3 +114,104 @@ Content-Type: application/json
         client.assert(response.body.code === "BILLING.PLAN_PRICE.NOT_FOUND", JSON.stringify(response.body));
     });
 %}
+
+
+### upgrade — applies at once and charges the difference
+# Direction is not a parameter: billing works it out from the catalog (tier first, price as tie-break), so a client
+# cannot ask for an immediate move to a cheaper plan and take away a month the customer already paid for.
+# PRO_MONTH_PRICE_ID comes from plan-catalog-api.http.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/plan?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PRO_MONTH_PRICE_ID}}
+}
+
+> {%
+    client.test("the new plan is in force immediately, with nothing pending", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.planCode === "PRO", "plan is " + response.body.planCode);
+        client.assert(response.body.pendingPlanChange === null, "an upgrade should not be deferred");
+    });
+%}
+
+### downgrade — deferred, so the customer keeps what they paid for
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/plan?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PLAN_PRICE_ID}}
+}
+
+> {%
+    client.test("the old plan stays in force and the change is pending", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.planCode === "PRO", "a downgrade must not apply immediately");
+        client.assert(response.body.pendingPlanChange !== null, "no pending change recorded");
+        client.assert(response.body.pendingPlanChange.effectiveAt === response.body.currentPeriodEnd,
+            "a downgrade should land exactly at the period end");
+    });
+%}
+
+### stop renewing — access is kept until the paid period runs out
+# Not a cancellation: status stays ACTIVE. A pending downgrade is dropped with it, because it would have landed at
+# the very moment the subscription ends.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/cancel?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "immediate": false
+}
+
+> {%
+    client.test("renewal off, access retained", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "status changed to " + response.body.status);
+        client.assert(response.body.cancelAtPeriodEnd === true, "renewal was not switched off");
+        client.assert(response.body.pendingPlanChange === null, "a pending downgrade should have been dropped");
+    });
+%}
+
+### ending it now is administrators only
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/cancel?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "immediate": true
+}
+
+> {%
+    client.test("an org admin cannot throw away paid time", function () {
+        client.assert(response.status === 403, "expected 403, got " + response.status);
+        client.assert(response.body.code === "BILLING.SUBSCRIPTION.IMMEDIATE_CANCEL_FORBIDDEN",
+            JSON.stringify(response.body));
+    });
+%}
+
+### resume — renewal back on
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/resume?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("renewal restored", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.cancelAtPeriodEnd === false, "renewal is still off");
+    });
+%}
+
+### resuming something that was never stopped — 422, and Stripe is never called
+# The check runs before any provider call on purpose: an earlier version released the schedule at Stripe and only
+# then found there was nothing to resume, leaving the provider changed by a request that failed.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/resume?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("nothing to resume is a typed refusal", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "BILLING.SUBSCRIPTION.TRANSITION_ILLEGAL", JSON.stringify(response.body));
+    });
+%}
