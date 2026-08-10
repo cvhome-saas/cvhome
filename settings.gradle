@@ -73,5 +73,9 @@ include(
         'store-core:control-plane:subscription-events',
         'store-core:control-plane:subscription-external-api',
         'store-core:control-plane:pod-external-api',
+        'store-core:billing:billing-commons',
+        'store-core:billing:billing-events',
+        'store-core:billing:billing-external-api',
+        'store-core:billing:billing-service',
         'store-core:seller-ui',
 )

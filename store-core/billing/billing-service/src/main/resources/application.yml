@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: billing
+  config:
+    import:
+      - "classpath:common-config.yml"
+      - "classpath:plan-catalog.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-core@service.store-core.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_core
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jdbc:
+      schema-initialization:
+        enabled: false
+      schema-name: billing_outbox
+com:
+  asrevo:
+    cvhome:
+      billing:
+        # How long the org's one trial runs. Per store in shape, but granted once per org: the first store an org
+        # creates gets it, later ones start unpaid.
+        trial-period: P14D
+        # How long a failed renewal keeps working before the store is suspended.
+        past-due-grace: P7D
+        quota:
+          # Not a cap on stores an org may own — each store pays for itself. This stops an org stockpiling stores
+          # that no one ever pays for.
+          max-pending-stores: 3
+        catalog:
+          # Seeds plan-catalog.yml into the database on start. The Stripe half is a separate switch because it needs
+          # real credentials.
+          seed-enabled: true
+          stripe-sync-enabled: false

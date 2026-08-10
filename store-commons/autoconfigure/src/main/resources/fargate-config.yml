@@ -8,6 +8,7 @@ spring:
           - "store-core-gateway"
           - "uaa"
           - "control-plane"
+          - "billing"
           - "seller-ui"
           - "spg"
           - "merchant"
@@ -27,6 +28,7 @@ spring:
           "store-core-gateway": 8000
           "seller-ui": 8010
           "control-plane": 8020
+          "billing": 8021
           "landing-ui": 8110
           "merchant": 8120
           "catalog": 8122

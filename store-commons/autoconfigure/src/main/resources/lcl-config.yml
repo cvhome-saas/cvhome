@@ -20,6 +20,12 @@ spring:
                 metadata:
                   service-name: control-plane
                   instance: control-plane-1
+            billing:
+              - uri: "http://localhost:8021"
+                instance-id: billing-1
+                metadata:
+                  service-name: billing
+                  instance: billing-1
             seller-ui:
               - uri: "http://localhost:8010"
                 instance-id: seller-ui-1

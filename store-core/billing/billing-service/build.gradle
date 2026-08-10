@@ -1,0 +1,76 @@
+plugins {
+    alias(libs.plugins.java.application.conventions)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+}
+
+group = 'com.asrevo.cvhome'
+
+
+springBoot {
+    buildInfo()
+}
+
+bootBuildImage {
+    environment["BP_JVM_JLINK_ENABLED"] = "true"
+    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
+    imageName = createImageName("store-core/billing", project.version)
+    tags = createImageTags("store-core/billing", project.version)
+    docker {
+        publishRegistry {
+            url = System.getenv("REGISTRY")
+            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
+            password = System.getenv("ECR_TOKEN")
+        }
+    }
+}
+
+dependencies {
+
+    implementation libs.spring.cloud.starter.loadbalancer
+    implementation libs.spring.boot.starter.web
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.actuator
+    implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.oauth2.client
+    implementation libs.spring.boot.starter.security.oauth2.resource.server
+    implementation libs.spring.boot.starter.data.jdbc
+    implementation libs.namastack.outbox.starter.jdbc
+    runtimeOnly libs.postgresql
+
+    implementation libs.spring.boot.starter.opentelemetry
+    implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
+
+    implementation libs.stripe.java
+    implementation libs.gson
+
+    implementation project(':store-commons:ecs-commons:fargate-task-info')
+    implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
+
+    implementation libs.caffeine
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+    implementation libs.springdoc.openapi.starter.webmvc.ui
+
+    implementation project(':store-core:billing:billing-events')
+    implementation project(':store-core:billing:billing-external-api')
+    implementation project(':store-commons:autoconfigure')
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    annotationProcessor libs.lombok.mapstruct.binding
+    testImplementation libs.spring.boot.starter.test
+    testImplementation libs.spring.security.test
+    testImplementation libs.spring.boot.testcontainers
+    testImplementation libs.testcontainers.junit.jupiter
+    testImplementation libs.testcontainers.postgresql
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
+        mavenBom "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.27.0"
+    }
+}
