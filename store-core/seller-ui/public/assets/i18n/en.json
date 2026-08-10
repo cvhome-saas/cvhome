@@ -885,13 +885,48 @@
       "PERFORMANCE_ORDERS": "performance orders",
       "PERFORMANCE_PRODUCTS": "performance products",
       "PERFORMANCE_VISITORS": "performance visitors",
-      "PERFORMANCE_ACCOUNTS": "performance accounts"
+      "PERFORMANCE_ACCOUNTS": "performance accounts",
+      "MAX_PRODUCTS": "Products",
+      "MAX_ORDERS_MONTH": "Orders per month",
+      "MAX_ACCOUNTS": "Staff accounts",
+      "MAX_STORAGE_MB": "Storage (MB)",
+      "CUSTOM_DOMAIN": "Custom domain",
+      "ANALYTICS": "Analytics",
+      "PRIORITY_SUPPORT": "Priority support"
     },
     "SUBSCRIPTION_PLAN": {
       "FREE": "Free",
       "LIMITED": "Limited",
       "BASIC": "Basic",
       "PERFORMANCE": "Performance"
+    },
+    "NO_PLAN": "No plan",
+    "TRIAL_ENDS": "Trial ends",
+    "PAST_DUE": "A payment failed. The store will be suspended on",
+    "NOT_ACTIVE": "This store has no active subscription. Choose a plan to continue working in it.",
+    "WILL_NOT_RENEW": "Will not renew. Access continues until",
+    "RENEWS_ON": "Renews on",
+    "PENDING_CHANGE": "Scheduled change to",
+    "STOP_RENEWAL": "Stop renewal",
+    "RESUME": "Resume",
+    "CURRENT_PLAN": "Current plan",
+    "CHANGE_PLAN": "Change plan",
+    "INVOICES": "Invoices",
+    "DOWNLOAD": "PDF",
+    "STATUS": {
+      "PENDING": "Not subscribed",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment failed",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Cancelled"
+    },
+    "INVOICE_STATUS": {
+      "DRAFT": "Draft",
+      "OPEN": "Unpaid",
+      "PAID": "Paid",
+      "UNCOLLECTIBLE": "Written off",
+      "VOID": "Void"
     }
   },
   "POD": {

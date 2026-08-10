@@ -1,0 +1,57 @@
+// Spacing and rhythm only; colour comes from the Nebular theme so this page follows the console's palette and its
+// dark/light switch without restating either.
+
+.current-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__name {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  // Secondary to the plan name and the alerts: this is the "nothing to do" line.
+  &__note {
+    margin: 0;
+    opacity: 0.75;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.plan {
+  &__description {
+    opacity: 0.75;
+  }
+
+  // The granted amount sits opposite its label, so a column of cards can be compared down the right edge.
+  &__value {
+    float: inline-end;
+    font-weight: 600;
+  }
+}
+
+.invoices {
+  margin-top: 2rem;
+
+  &__table {
+    width: 100%;
+
+    td {
+      padding: 0.5rem 0.75rem 0.5rem 0;
+      border-top: 1px solid rgba(128, 128, 128, 0.25);
+    }
+  }
+}

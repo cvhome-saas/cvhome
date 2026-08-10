@@ -3,104 +3,148 @@
     <div class="row">
       <h1 class="page_title">{{ 'COMPONENTS.SUBSCRIPTION' | translate }}</h1>
     </div>
-
   </nb-card-header>
 
   <nb-card-body [nbSpinner]="facade.loading()" nbSpinnerSize="large" nbSpinnerStatus="primary">
-    <div class="d-flex justify-content-center">
-      <div class="toggle-btn pb-3">
-        <span>{{ 'SUBSCRIPTION.RECURRING_MONTH' | translate }}</span>
-        <nb-toggle (checkedChange)="facade.toggle()" [checked]="facade.isYearly()" status="basic"></nb-toggle>
-        <span>{{ 'SUBSCRIPTION.RECURRING_YEAR' | translate }}</span>
-      </div>
 
-    </div>
-    @if (facade.currentSubscriptionDetails(); as details) {
-      <div class="d-flex justify-content-center">
-        @if (details.subscriptionPlan==='FREE'&&details.status==='ACTIVE') {
-          <nb-alert
-            size="tiny"
-            status="warning">
-            <p class="text-center">
-              {{ 'SUBSCRIPTION.ALERT_USING_ACTIVE_FREE_PLAN' | translate }}
-              {{ details.endDate }}
-            </p>
+    @if (facade.subscription(); as sub) {
+      <!-- What the store is on now. The states a seller has to act on are called out; the rest is just status. -->
+      <div class="current-plan">
+        <div class="current-plan__summary">
+          <span class="current-plan__name">
+            {{ sub.planDisplayName ?? ('SUBSCRIPTION.NO_PLAN' | translate) }}
+          </span>
+          <nb-tag [status]="statusStatus(sub.status)" appearance="filled"
+                  text="{{ 'SUBSCRIPTION.STATUS.' + sub.status | translate }}"></nb-tag>
+        </div>
+
+        @if (sub.status === 'TRIALING' && sub.trialEnd) {
+          <p class="current-plan__note">
+            {{ 'SUBSCRIPTION.TRIAL_ENDS' | translate }} {{ sub.trialEnd | date: 'mediumDate' }}
+          </p>
+        }
+        @if (sub.status === 'PAST_DUE' && sub.graceUntil) {
+          <nb-alert status="danger" size="tiny">
+            {{ 'SUBSCRIPTION.PAST_DUE' | translate }} {{ sub.graceUntil | date: 'mediumDate' }}
           </nb-alert>
         }
-        @if (details.subscriptionPlan==='FREE'&&details.status==='IN_ACTIVE') {
-          <nb-alert
-            status="warning">
-            <p class="text-center">
-              {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_FREE_PLAN' | translate }}
-            </p>
+        @if (sub.status === 'SUSPENDED' || sub.status === 'PENDING') {
+          <nb-alert status="warning" size="tiny">
+            {{ 'SUBSCRIPTION.NOT_ACTIVE' | translate }}
           </nb-alert>
         }
-        @if (details.subscriptionPlan!=='FREE'&&details.status==='IN_ACTIVE') {
-          <nb-alert
-            status="warning">
-            <p class="text-center">
-              {{ 'SUBSCRIPTION.ALERT_USING_IN_ACTIVE_NON_FREE_PLAN' | translate }}
-            </p>
+        @if (sub.cancelAtPeriodEnd && sub.currentPeriodEnd) {
+          <!-- Not cancelled: the store keeps working to the end of the period it paid for. -->
+          <nb-alert status="warning" size="tiny">
+            {{ 'SUBSCRIPTION.WILL_NOT_RENEW' | translate }} {{ sub.currentPeriodEnd | date: 'mediumDate' }}
+          </nb-alert>
+        } @else if (sub.currentPeriodEnd && sub.status !== 'TRIALING') {
+          <p class="current-plan__note">
+            {{ 'SUBSCRIPTION.RENEWS_ON' | translate }} {{ sub.currentPeriodEnd | date: 'mediumDate' }}
+          </p>
+        }
+        @if (sub.pendingPlanChange; as pending) {
+          <!-- A downgrade takes effect at the period boundary, so the plan above is still the one in force. -->
+          <nb-alert status="info" size="tiny">
+            {{ 'SUBSCRIPTION.PENDING_CHANGE' | translate }} {{ pending.planCode }}
+            — {{ pending.effectiveAt | date: 'mediumDate' }}
           </nb-alert>
         }
 
+        <div class="current-plan__actions">
+          @if (facade.subscribed() && !sub.cancelAtPeriodEnd) {
+            <button (click)="facade.cancel()" [disabled]="facade.acting()" nbButton size="small" status="basic">
+              {{ 'SUBSCRIPTION.STOP_RENEWAL' | translate }}
+            </button>
+          }
+          @if (sub.cancelAtPeriodEnd || sub.pendingPlanChange) {
+            <button (click)="facade.resume()" [disabled]="facade.acting()" nbButton size="small" status="primary">
+              {{ 'SUBSCRIPTION.RESUME' | translate }}
+            </button>
+          }
+        </div>
       </div>
     }
 
-    @if (facade.prices(); as prices) {
-      <div class="row ">
-        @for (p of prices; track p.name; let i = $index) {
-          <div class="col-md-4">
-            <nb-card [accent]="facade.accents[i]">
-              <nb-card-header>
-                {{ 'SUBSCRIPTION.SUBSCRIPTION_PLAN.' + p.name | translate }}
-                <h6 class="fw-7">
+    <div class="d-flex justify-content-center">
+      <div class="toggle-btn pb-3">
+        <span>{{ 'SUBSCRIPTION.RECURRING_MONTH' | translate }}</span>
+        <nb-toggle (checkedChange)="facade.toggleInterval()" [checked]="facade.interval() === 'YEAR'"
+                   status="basic"></nb-toggle>
+        <span>{{ 'SUBSCRIPTION.RECURRING_YEAR' | translate }}</span>
+      </div>
+    </div>
 
-                  @if (p.previousCost!==p.cost) {
-                    <div>
-                      <small class="fw-6">$</small>
-                      {{ p.cost }}
-                      <span style="text-decoration-line: line-through;color: gray">
-                    {{ p.previousCost }}
-                    </span>
-                    </div>
-                  }
-                  @if (p.previousCost===p.cost) {
-                    <div>
-                      <small class="fw-6">$</small>
-                      {{ p.cost }}
-                    </div>
-                  }
-                </h6>
-              </nb-card-header>
-              <nb-card-body>
-                <div>
-                  <ul>
-                    @for (pf of p.pricingFeatures; track pf.desc) {
-                      <li class="border-top pt-2 pb-2">
-                  <span>
-                    {{ 'SUBSCRIPTION.FEATURE.' + pf.desc | translate }}
-                  </span>
-                      </li>
-                    }
-                  </ul>
-                </div>
-              </nb-card-body>
-              <nb-card-footer>
-                <div class="row justify-content-center">
-                  <a [disabled]="p.name===facade.currentSubscriptionDetails()?.subscriptionPlan"
-                     [href]="'/control-plane/api/v1/subscription/subscribe?priceId='+p.id.id" nbButton
-                     size="medium"
-                     status="primary">
+    <div class="row">
+      @for (offer of facade.offers(); track offer.price.id.id; let i = $index) {
+        <div class="col-md-4">
+          <nb-card [accent]="accentFor(i)">
+            <nb-card-header>
+              {{ offer.plan.displayName }}
+              <h6 class="fw-7">
+                <small class="fw-6">{{ offer.price.amount.currency.code }}</small>
+                {{ amount(offer.price.amount) }}
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              @if (offer.plan.description) {
+                <p class="plan__description">{{ offer.plan.description }}</p>
+              }
+              <ul>
+                <!-- Straight from the plan's entitlements, so the card cannot drift from what is enforced. -->
+                @for (entry of entitlementsOf(offer.plan); track entry.key) {
+                  <li class="border-top pt-2 pb-2">
+                    <span>{{ 'SUBSCRIPTION.FEATURE.' + entry.key | translate }}</span>
+                    <span class="plan__value">{{ entry.display }}</span>
+                  </li>
+                }
+              </ul>
+            </nb-card-body>
+            <nb-card-footer>
+              <div class="row justify-content-center">
+                <button (click)="facade.choose(offer.price)"
+                        [disabled]="facade.acting() || facade.isCurrent(offer.price)"
+                        nbButton size="medium" status="primary">
+                  @if (facade.isCurrent(offer.price)) {
+                    {{ 'SUBSCRIPTION.CURRENT_PLAN' | translate }}
+                  } @else if (facade.subscribed()) {
+                    {{ 'SUBSCRIPTION.CHANGE_PLAN' | translate }}
+                  } @else {
                     {{ 'SUBSCRIPTION.SUBSCRIBE' | translate }}
-                  </a>
-                </div>
-              </nb-card-footer>
-            </nb-card>
-          </div>
-        }
+                  }
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
+        </div>
+      }
+    </div>
+
+    @if (facade.invoices().length > 0) {
+      <div class="invoices">
+        <h6>{{ 'SUBSCRIPTION.INVOICES' | translate }}</h6>
+        <table class="invoices__table">
+          <tbody>
+            @for (invoice of facade.invoices(); track invoice.id.id) {
+              <tr>
+                <td>{{ invoice.issuedAt | date: 'mediumDate' }}</td>
+                <td>{{ invoice.number }}</td>
+                <td>{{ 'SUBSCRIPTION.INVOICE_STATUS.' + invoice.status | translate }}</td>
+                <td>{{ invoice.amountPaid.currency.code }} {{ amount(invoice.amountPaid) }}</td>
+                <td>
+                  <!-- The provider's own document, not one we render: what the customer files must match what was
+                       issued. -->
+                  @if (invoice.invoicePdfUrl) {
+                    <a [href]="invoice.invoicePdfUrl" rel="noopener" target="_blank">
+                      {{ 'SUBSCRIPTION.DOWNLOAD' | translate }}
+                    </a>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     }
   </nb-card-body>
 </nb-card>
-
