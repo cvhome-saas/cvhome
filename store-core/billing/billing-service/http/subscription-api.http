@@ -1,0 +1,77 @@
+# SubscriptionApi — com.asrevo.cvhome.billing.api.v1.SubscriptionApi (@RequestMapping "/api/v1/subscription")
+#
+# Addressed through the gateway, not billing's own port (:8021): store-core-gateway on :8000 is what
+# strips the /billing prefix and relays the session as a bearer token. Env vars come from the repo-root
+# http-client.env.json; the session id from http-client.private.env.json (gitignored — copy the .example
+# and log in once).
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+#
+# STORE_ID must be a store billing has seen. A store created before billing existed has no subscription
+# and correctly answers 404 — create one through control-plane first if you get that.
+
+### what the store is on, and when it renews
+# @name current
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("200 with a status", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status !== undefined, "no subscription status");
+    });
+    client.test("a trialling store carries its trial end and next renewal", function () {
+        if (response.body.status === "TRIALING") {
+            client.assert(response.body.trialEnd !== null, "TRIALING with no trialEnd");
+            client.assert(response.body.currentPeriodEnd !== null, "TRIALING with no renewal date");
+        }
+    });
+    client.test("an unpaid store names no plan", function () {
+        if (response.body.status === "PENDING") {
+            client.assert(response.body.planCode === null, "PENDING should not be on a plan");
+        }
+    });
+%}
+
+### tenant isolation — another ORG's store must never come back with data
+# Note STORE_ID and STORE_ID_2 in http-client.env.json are two stores of the SAME org, so neither
+# proves isolation. 65f020632bc46470c104b76f is ORG2-STORE1, seeded under a different org, and that is
+# what makes this block meaningful.
+#
+# The answer is 404 rather than 403, deliberately: "exists but is not yours" would confirm another
+# org's store to someone who cannot see it. The service scopes the query by the caller's org, so the
+# row is simply not found — see SubscriptionApi.tenantScopeOf for why the @PreAuthorize alone is not
+# enough today.
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store=65f020632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("another org's subscription is not disclosed", function () {
+        client.assert(response.status === 404, "expected 404, got " + response.status);
+        client.assert(response.body.planCode === undefined, "leaked another org's plan");
+    });
+%}
+
+### no session at all — the permission evaluator denies by default, so this must never reach the service
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{STORE_ID}}
+
+> {%
+    client.test("unauthenticated is refused", function () {
+        client.assert(response.status === 401 || response.status === 302,
+            "expected 401 or a login redirect, got " + response.status);
+    });
+%}
+
+### a store billing has never seen — 404 with a typed code, not an empty 200
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store=000000000000000000000000
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("404 or 403, never a blank success", function () {
+        client.assert(response.status === 404 || response.status === 403, "status " + response.status);
+        if (response.status === 404) {
+            client.assert(response.body.code === "BILLING.SUBSCRIPTION.NOT_FOUND",
+                "untyped 404: " + JSON.stringify(response.body));
+        }
+    });
+%}

@@ -2,6 +2,7 @@ package com.asrevo.cvhome.billing.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.asrevo.cvhome.billing.commons.EntitlementKey;
 import com.asrevo.cvhome.billing.commons.EntitlementValue;
@@ -59,5 +60,26 @@ public interface PlanCatalogService {
      * What a plan grants. An absent key means unlimited, so callers must not treat a missing entry as zero.
      */
     Map<EntitlementKey, EntitlementValue> entitlementsOf(PlanId planId);
+
+    /**
+     * Looks up a plan without insisting it exists — for rendering a subscription, where a null plan simply means the
+     * store has never been on one.
+     */
+    Optional<PlanEntity> findPlan(PlanId planId);
+
+    /**
+     * Looks up a price without insisting it exists, including ones withdrawn from sale.
+     */
+    Optional<PlanPriceEntity> findPrice(PlanPriceId planPriceId);
+
+    /**
+     * The price a trial runs on: the cheapest active price of the lowest tier on sale.
+     *
+     * <p>
+     * Derived rather than configured, so the trial cannot drift out of step with the catalog — there is no second
+     * place to update when the free tier changes.
+     * </p>
+     */
+    Optional<PlanPriceEntity> cheapestActivePrice();
 
 }

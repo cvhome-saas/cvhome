@@ -64,6 +64,7 @@ dependencies {
     implementation project(':store-core:control-plane:subscription-events')
     implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-core:control-plane:subscription-external-api')
+    implementation project(':store-core:billing:billing-external-api')
     implementation project(':store-commons:autoconfigure')
 
 //    developmentOnly libs.spring.boot.docker.compose

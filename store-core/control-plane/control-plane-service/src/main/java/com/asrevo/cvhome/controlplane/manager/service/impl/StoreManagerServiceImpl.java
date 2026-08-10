@@ -11,6 +11,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.billing.api.errors.BillingApiUnavailableException;
+import com.asrevo.cvhome.billing.api.errors.StoreQuotaRefusedException;
+import com.asrevo.cvhome.billing.commons.dto.StoreQuotaDecision;
+import com.asrevo.cvhome.billing.commons.dto.StoreQuotaRequest;
+import com.asrevo.cvhome.billing.services.quota.ExternalStoreQuotaService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
@@ -39,16 +44,42 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     private final PodSelection podSelection;
 
+    private final ExternalStoreQuotaService billingQuotaService;
+
     public StoreManagerServiceImpl(InternalStoreService internalStoreService, ManagerStoreMappers managerStoreMappers,
-                                   StorePodClientFactory podClientFactory, PodSelection podSelection) {
+                                   StorePodClientFactory podClientFactory, PodSelection podSelection,
+                                   ExternalStoreQuotaService billingQuotaService) {
         this.internalStoreService = internalStoreService;
         this.managerStoreMappers = managerStoreMappers;
         this.podClientFactory = podClientFactory;
         this.podSelection = podSelection;
+        this.billingQuotaService = billingQuotaService;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The billing check runs before a pod is chosen, so a refusal costs nothing. It <em>fails closed</em>: if billing
+     * cannot be reached the store is not created. That is the opposite of how the enforcement layers behave — they
+     * fail open, because an outage must not take working stores offline — and the asymmetry is deliberate. Refusing
+     * to create one store is recoverable by retrying; a store that exists with nobody billed for it is not noticed
+     * until someone reconciles revenue.
+     * </p>
+     *
+     * <p>
+     * The subscription itself is not created here. {@code StoreCreatedEvent} carries that to
+     * {@code BillingProvisioningEventImpl} through the outbox, so provisioning inherits the outbox's retries instead
+     * of leaving a window where the store exists and its subscription does not.
+     * </p>
+     */
     @Override
-    public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request) {
+    public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request)
+            throws StoreQuotaRefusedException, BillingApiUnavailableException {
+        StoreQuotaDecision decision = billingQuotaService.checkStoreCreate(new StoreQuotaRequest(orgId));
+        if (!decision.allowed()) {
+            throw StoreQuotaRefusedException.refused(orgId, decision.reason());
+        }
         PodId prefaredPodId = Optional.ofNullable(request.get(POD_KEY))
                 .map(it -> (Map<String, String>) it)
                 .filter(it -> it.containsKey(ID_KEY))

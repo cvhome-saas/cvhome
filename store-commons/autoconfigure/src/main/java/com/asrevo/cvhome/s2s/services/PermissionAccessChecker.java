@@ -142,6 +142,47 @@ public class PermissionAccessChecker {
         }
     }
 
+    /**
+     * Reading a store's own billing — what it is on, when it renews, its invoices. Same audience as any other read of
+     * the store, so a moderator can see the plan they are working under without being able to change what it costs.
+     */
+    public boolean hasAccessOnBillingRead(Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasReadAccessOnStore(authentication, requestedStoreId);
+    }
+
+    /**
+     * Buying, upgrading, downgrading or cancelling. Restricted to the org admin: spending money is an org-level act,
+     * and a store admin is not the person who owns the card.
+     */
+    public boolean hasAccessOnBillingManage(Authentication authentication, ManagerStoreId requestedStoreId) {
+        return hasMaintainAccessOnStore(authentication, requestedStoreId);
+    }
+
+    /**
+     * Reading a store's entitlement snapshot. Wider than {@link #hasAccessOnBillingRead}: the pods enforce those
+     * ceilings, so a store-pod principal has to be able to ask, not only a human.
+     */
+    public boolean hasAccessOnBillingEntitlementRead(Authentication authentication, ManagerStoreId requestedStoreId) {
+        if (storeRoleAccessChecker.isScopeStoreCore(authentication)
+                || storeRoleAccessChecker.isScopeStorePod(authentication, null)) {
+            return true;
+        }
+        return hasReadAccessOnStore(authentication, requestedStoreId);
+    }
+
+    /**
+     * Asking billing whether an org may create another store, and provisioning the subscription that follows. A
+     * service-to-service call only — no human ever asks this directly, which is why there is no store to check.
+     */
+    public boolean hasAccessOnBillingQuotaCheck(Authentication authentication) {
+        if (storeRoleAccessChecker.isScopeStoreCore(authentication)) {
+            return true;
+        }
+        log.debug("User {} does not have store-core scope for a billing quota check with roles {}",
+                authentication.getName(), SecurityUtils.getRoles(authentication));
+        return false;
+    }
+
     public boolean isCustomerInSameStore(Authentication authentication, ManagerStoreId requestedStoreId) {
         if (!storeRoleAccessChecker.isStoreCustomer(authentication, requestedStoreId)) {
             log.debug("Customer {} does not have maintain access on customer on store {} on roles {}",

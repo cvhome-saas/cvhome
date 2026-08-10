@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,29 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
         planEntitlementRepository.findAllByPlanId(planId)
                 .forEach(it -> byKey.put(it.getEntitlementKey(), it.value()));
         return byKey;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PlanEntity> findPlan(PlanId planId) {
+        return planRepository.findById(planId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PlanPriceEntity> findPrice(PlanPriceId planPriceId) {
+        return planPriceRepository.findById(planPriceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PlanPriceEntity> cheapestActivePrice() {
+        return planRepository.findAllByActiveTrueOrderByTierAsc()
+                .stream()
+                .map(plan -> planPriceRepository.findAllByPlanIdAndActiveTrue(plan.getId()))
+                .flatMap(List::stream)
+                .min(Comparator.comparing(PlanPriceEntity::getUnitAmount)
+                        .thenComparing(PlanPriceEntity::getBillingInterval));
     }
 
     /**
