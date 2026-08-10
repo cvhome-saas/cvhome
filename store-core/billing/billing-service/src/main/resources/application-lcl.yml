@@ -3,3 +3,18 @@ spring:
     import:
       - "classpath:lcl-config.yml"
       - "classpath:store-core-lcl-config.yml"
+com:
+  asrevo:
+    cvhome:
+      billing:
+        catalog:
+          # Local runs publish the catalog to Stripe, so a plan can actually be bought against the test account.
+          stripe-sync-enabled: true
+      stripe:
+        # A Stripe *test* account key (sk_test_), encrypted with the local secret-crypto provider. Opening it needs
+        # the AES key from ~/.cvhome/secret-crypto/keys, which is not in this repository — the envelope alone is not
+        # a credential. Never put a live key here in any form.
+        key: "ENC:1:default-key:AES-256-GCM:Su2GFSFPt+ml3yyd:/tLGn7hG4FCbdL1WgC988FvD7/Xvcfz1eKtAsvDoY7yQCrHrH5nQHh2I6z2caYti5Fw6Av2MvnIVhZyUfb307y5rju0U0hyW0YlD+9nuvzNGWG1mMjPd3yH5HiKyKWNuPeavceDMFglNX3BaxcE8Dr1UHolG95eG5XRA"
+        # Printed by `stripe listen` and different for every listener, so it cannot be committed usefully. Set it for
+        # the run:  COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_...
+        webhook-signing-key: "${STRIPE_WEBHOOK_SECRET:}"

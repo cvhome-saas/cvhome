@@ -56,6 +56,7 @@ dependencies {
     implementation project(':store-core:billing:billing-events')
     implementation project(':store-core:billing:billing-external-api')
     implementation project(':store-commons:autoconfigure')
+    implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok

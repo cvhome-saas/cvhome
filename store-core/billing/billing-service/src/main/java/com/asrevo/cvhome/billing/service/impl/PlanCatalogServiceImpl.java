@@ -13,6 +13,7 @@ import com.asrevo.cvhome.billing.commons.EntitlementKey;
 import com.asrevo.cvhome.billing.commons.EntitlementValue;
 import com.asrevo.cvhome.billing.commons.PlanId;
 import com.asrevo.cvhome.billing.commons.PlanPriceId;
+import com.asrevo.cvhome.billing.commons.StripePriceId;
 import com.asrevo.cvhome.billing.commons.dto.PlanView;
 import com.asrevo.cvhome.billing.commons.errors.PlanNotFoundException;
 import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
@@ -95,6 +96,14 @@ public class PlanCatalogServiceImpl implements PlanCatalogService {
     @Transactional(readOnly = true)
     public Optional<PlanPriceEntity> findPrice(PlanPriceId planPriceId) {
         return planPriceRepository.findById(planPriceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PlanPriceEntity> findByStripePriceId(String stripePriceId) {
+        return stripePriceId == null
+                ? Optional.empty()
+                : planPriceRepository.findByStripePriceId(new StripePriceId(stripePriceId));
     }
 
     @Override

@@ -7,16 +7,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.billing.commons.AuditEventType;
 import com.asrevo.cvhome.billing.commons.ChangeSource;
+import com.asrevo.cvhome.billing.commons.PlanPriceId;
+import com.asrevo.cvhome.billing.commons.StripeCustomerId;
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
+import com.asrevo.cvhome.billing.commons.dto.CheckoutSessionView;
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.commons.dto.SubscriptionView;
+import com.asrevo.cvhome.billing.commons.errors.BillingProviderUnavailableException;
 import com.asrevo.cvhome.billing.commons.errors.IllegalSubscriptionTransitionException;
+import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
+import com.asrevo.cvhome.billing.commons.errors.SubscriptionChangeRejectedException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
+import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.domain.StoreSubscriptionEntity;
 import com.asrevo.cvhome.billing.mappers.SubscriptionMappers;
 import com.asrevo.cvhome.billing.repository.StoreSubscriptionRepository;
+import com.asrevo.cvhome.billing.service.PlanCatalogService;
 import com.asrevo.cvhome.billing.service.SubscriptionAuditService;
 import com.asrevo.cvhome.billing.service.SubscriptionService;
+import com.asrevo.cvhome.billing.service.stripe.StripeCheckoutGateway;
+import com.asrevo.cvhome.billing.service.stripe.StripeCustomerGateway;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 
@@ -36,6 +46,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final StoreSubscriptionRepository subscriptionRepository;
 
+    private final PlanCatalogService planCatalogService;
+
+    private final StripeCustomerGateway customerGateway;
+
+    private final StripeCheckoutGateway checkoutGateway;
+
     private final SubscriptionAuditService auditService;
 
     private final SubscriptionMappers mappers;
@@ -45,6 +61,28 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public SubscriptionView current(ManagerStoreId store, ManagerOrgId scopeOrg)
             throws SubscriptionNotFoundException {
         return mappers.toView(requireInOrg(store, scopeOrg));
+    }
+
+    @Override
+    @Transactional
+    public CheckoutSessionView checkout(ManagerStoreId store, ManagerOrgId scopeOrg, PlanPriceId planPriceId,
+                                        String successUrl, String cancelUrl)
+            throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
+            BillingProviderUnavailableException {
+        StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
+        PlanPriceEntity price = planCatalogService.requirePurchasablePrice(planPriceId);
+        if (price.getStripePriceId() == null) {
+            // The plan exists locally but was never published. Reported as "not purchasable" rather than as a
+            // provider fault, because nothing is wrong with Stripe — the catalog sync has not run.
+            throw PlanPriceNotFoundException.of(planPriceId);
+        }
+        StripeCustomerId customer = customerGateway.findOrCreate(entity.getOrgId(), null);
+        if (!customer.equals(entity.getStripeCustomerId())) {
+            subscriptionRepository.save(entity.bindCustomer(customer));
+        }
+        String url = checkoutGateway.createSubscriptionSession(store, entity.getOrgId(), customer, price,
+                successUrl, cancelUrl);
+        return new CheckoutSessionView(url);
     }
 
     @Override

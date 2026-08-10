@@ -34,6 +34,12 @@ public interface StoreSubscriptionRepository extends CrudRepository<StoreSubscri
 
     Optional<StoreSubscriptionEntity> findByStripeSubscriptionId(StripeSubscriptionId stripeSubscriptionId);
 
+    /**
+     * Whether this provider customer is one of ours — used to tell an invoice we cannot attribute <em>yet</em> from
+     * one that was never ours to begin with.
+     */
+    boolean existsByStripeCustomerId(StripeCustomerId stripeCustomerId);
+
     Optional<StoreSubscriptionEntity> findFirstByOrgIdAndStripeCustomerIdNotNull(ManagerOrgId orgId);
 
     List<StoreSubscriptionEntity> findAllByStatusAndTrialEndBefore(SubscriptionStatus status, Instant before);

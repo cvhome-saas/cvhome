@@ -219,10 +219,14 @@ CREATE INDEX IF NOT EXISTS idx_processed_stripe_event_received ON billing.proces
 -- leaves completed_at null, and that is exactly what makes replaying under the same key safe.
 CREATE TABLE IF NOT EXISTS billing.stripe_request
 (
-    idempotency_key  varchar(80) not null,
+    -- 255 because that is Stripe's own limit on an idempotency key, and ours are built from an operation name plus
+    -- two 24-character ids plus a time bucket, which already passes 80.
+    idempotency_key  varchar(255) not null,
     store_id         varchar(24),
     operation        varchar(40) not null,
-    stripe_object_id varchar(60),
+    -- Wider than the other Stripe id columns on purpose: this one holds whatever object the operation produced, and
+    -- checkout session ids run far longer than the cus_/sub_/price_ ids stored elsewhere.
+    stripe_object_id varchar(255),
     created_at       timestamp   not null,
     completed_at     timestamp,
     version          int,

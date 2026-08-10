@@ -75,3 +75,42 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
         }
     });
 %}
+
+
+### open a Stripe checkout — 200 with a URL, not a 302
+# A single-page console has to open the URL itself, and a browser will not usefully follow a redirect out
+# of an XHR. Needs BILLING.MANAGE (org admin), because this is the call that leads to a charge.
+# PLAN_PRICE_ID is set by plan-catalog-api.http; run that first.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/checkout?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PLAN_PRICE_ID}}
+}
+
+> {%
+    client.test("a checkout url comes back", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.url.startsWith("https://checkout.stripe.com/"),
+            "not a Stripe checkout url: " + response.body.url);
+    });
+%}
+
+### a price that was never published to Stripe is not purchasable — 404, not a provider error
+# Nothing is wrong with Stripe here; the catalog sync has not run. Reporting it as a provider fault would
+# send someone looking at the wrong system.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/checkout?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": "000000000000000000000000"
+}
+
+> {%
+    client.test("unknown price is a typed 404", function () {
+        client.assert(response.status === 404, "status " + response.status);
+        client.assert(response.body.code === "BILLING.PLAN_PRICE.NOT_FOUND", JSON.stringify(response.body));
+    });
+%}

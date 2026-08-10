@@ -73,6 +73,17 @@ public interface PlanCatalogService {
     Optional<PlanPriceEntity> findPrice(PlanPriceId planPriceId);
 
     /**
+     * Finds the catalog price behind a Stripe price id.
+     *
+     * <p>
+     * The reverse of the catalog sync, and how a webhook naming only a Stripe price is mapped back to a plan. Absent
+     * means Stripe charged for something this catalog does not publish — a price created by hand in the Stripe
+     * dashboard, most likely — which a caller has to treat as an error rather than guess about.
+     * </p>
+     */
+    Optional<PlanPriceEntity> findByStripePriceId(String stripePriceId);
+
+    /**
      * The price a trial runs on: the cheapest active price of the lowest tier on sale.
      *
      * <p>
