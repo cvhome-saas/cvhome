@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import {CrudService} from 'seller-core';
-import {Observable} from 'rxjs';
+import {Observable, map} from 'rxjs';
 import {Org} from "../model/org";
 import {SpringPage, StorePageRequest} from 'seller-core';
 import {ManagerStore} from 'seller-core';
@@ -22,8 +22,18 @@ export class OrgService {
     return this.crudService.get('control-plane/api/v1/org-manager/find-one?id=' + id);
   }
 
+  /**
+   * Plan codes, from billing's public catalog.
+   *
+   * Repointed when control-plane's org-level subscriptions were retired; the endpoint this used to call no longer
+   * exists. Note the concept it serves does not either: a plan now belongs to a store, not to an org, so the
+   * org-management screens that offer this list are choosing something that is no longer applied anywhere. Kept
+   * working rather than silently 404-ing, but those screens need a product decision, not a client fix.
+   */
   getSubscriptionPlans(): Observable<string[]> {
-    return this.crudService.get('control-plane/api/v1/subscription-plan/public/list');
+    return this.crudService
+      .get<{code: string}[]>('billing/api/v1/plan/public/plans')
+      .pipe(map((plans) => plans.map((plan) => plan.code)));
   }
 
   /** No matching controller was found for a PUT org-manager/update endpoint
