@@ -18,6 +18,7 @@ import com.asrevo.cvhome.controlplane.manager.entity.ManagerStoreEntity;
 @Mapper(componentModel = "spring")
 public interface ManagerStoreMappers {
 
+    @Mapping(target = "billingStatus", ignore = true)
     ManagerStoreDto toDto(ManagerStoreEntity entity);
 
     @Mapping(target = "new", ignore = true)

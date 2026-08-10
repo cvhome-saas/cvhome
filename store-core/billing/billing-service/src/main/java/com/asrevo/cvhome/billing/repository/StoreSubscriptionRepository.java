@@ -1,10 +1,13 @@
 package com.asrevo.cvhome.billing.repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.asrevo.cvhome.billing.commons.StripeCustomerId;
 import com.asrevo.cvhome.billing.commons.StripeSubscriptionId;
@@ -53,6 +56,19 @@ public interface StoreSubscriptionRepository extends CrudRepository<StoreSubscri
      * gateway polls this once a minute for every blocked store on the platform.
      */
     List<StoreSubscriptionEntity> findAllByStatusIn(List<SubscriptionStatus> statuses);
+
+    /**
+     * Loads several subscriptions by store id.
+     *
+     * <p>
+     * Written out rather than using {@code findAllById}, which renders each element of the {@code IN} list as its own
+     * parenthesised group — {@code IN ((?), (?))} — because the id is a value object Spring Data treats as
+     * potentially composite. Postgres rejects that as a syntax error, so the derived method fails for every
+     * multi-store read.
+     * </p>
+     */
+    @Query("select * from billing.store_subscription where id in (:ids)")
+    List<StoreSubscriptionEntity> findAllByStoreIds(@Param("ids") Collection<String> ids);
 
     /**
      * @return the customer this org already has at the provider, if any of its stores has one

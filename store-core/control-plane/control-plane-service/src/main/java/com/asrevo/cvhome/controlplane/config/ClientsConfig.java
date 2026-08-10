@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.billing.api.errors.BillingApiErrors;
+import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
 import com.asrevo.cvhome.billing.services.quota.ExternalStoreQuotaService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 
@@ -26,6 +27,20 @@ public class ClientsConfig {
     @Bean
     public ExternalStoreQuotaService externalStoreQuotaService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient(BILLING_SERVICE_NAME, ExternalStoreQuotaService.class,
+                BillingApiErrors.CATALOG);
+    }
+
+    /**
+     * Reads store billing standing for the seller console.
+     *
+     * <p>
+     * Unlike the quota client, every caller of this one degrades rather than fails: a store list that cannot reach
+     * billing shows the standing as unknown instead of erroring.
+     * </p>
+     */
+    @Bean
+    public ExternalEntitlementService externalEntitlementService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient(BILLING_SERVICE_NAME, ExternalEntitlementService.class,
                 BillingApiErrors.CATALOG);
     }
 
