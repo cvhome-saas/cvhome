@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
@@ -109,7 +110,7 @@ public class ProductApi {
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
             ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ProductNotPersistedException {
+            InventoryNotConvertibleException, ProductNotPersistedException, EntitlementExceededException {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
         Entity returnEntity = new Entity();

@@ -38,6 +38,16 @@ spring:
                 metadata:
                   service-name: store-core-gateway
                   instance: store-core-gateway-1
+            # The same gateway under its namespace-qualified name. ServiceUrlBuilder addresses a service in another
+            # namespace as lb://<gateway>.<gateway-namespace>/<service>, which Cloud Map resolves on Fargate but the
+            # local SimpleDiscoveryClient only knows if it is listed. Needed since the pods began calling billing —
+            # the first store-pod to store-core call in the platform, and until then nothing exercised this path.
+            store-core-gateway.store-core.cvhome.lcl:
+              - uri: "http://localhost:8000"
+                instance-id: store-core-gateway-ns-1
+                metadata:
+                  service-name: store-core-gateway
+                  instance: store-core-gateway-ns-1
             merchant:
               - uri: "http://localhost:8120"
                 instance-id: merchant-1

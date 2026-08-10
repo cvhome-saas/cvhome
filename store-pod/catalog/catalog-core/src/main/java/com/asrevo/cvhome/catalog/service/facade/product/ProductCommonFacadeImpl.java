@@ -6,6 +6,9 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.asrevo.cvhome.billing.commons.EntitlementKey;
+import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
+import com.asrevo.cvhome.billing.guard.StoreEntitlements;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
@@ -26,6 +29,7 @@ import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableExc
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
+import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.PersistableProductMapper;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
 import com.asrevo.cvhome.catalog.services.pricing.PricingService;
@@ -57,14 +61,22 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
 
     private final ExternalMerchantStoreService externalStoreMerchantIdService;
 
+    private final StoreEntitlements storeEntitlements;
+
+    private final ProductRepository productRepository;
+
+    @SuppressWarnings("java:S107")
     public ProductCommonFacadeImpl(ProductService productService, PricingService pricingService,
                                    PersistableProductMapper persistableProductMapper, ImageFilePath imageUtils,
-                                   ExternalMerchantStoreService externalStoreMerchantIdService) {
+                                   ExternalMerchantStoreService externalStoreMerchantIdService,
+                                   StoreEntitlements storeEntitlements, ProductRepository productRepository) {
         this.productService = productService;
         this.pricingService = pricingService;
         this.persistableProductMapper = persistableProductMapper;
         this.imageUtils = imageUtils;
         this.externalStoreMerchantIdService = externalStoreMerchantIdService;
+        this.storeEntitlements = storeEntitlements;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -73,12 +85,15 @@ public class ProductCommonFacadeImpl implements ProductCommonFacade {
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
             ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ProductNotPersistedException {
+            InventoryNotConvertibleException, ProductNotPersistedException, EntitlementExceededException {
 
         Product target;
         if (product.getId() != null && product.getId() > 0) {
             target = productService.getById(product.getId());
         } else {
+            // Only a new product can take the store past its ceiling; editing one cannot. The count is behind a
+            // supplier so a plan with no product limit never runs it.
+            storeEntitlements.require(store, EntitlementKey.MAX_PRODUCTS, () -> productRepository.countByStore(store));
             target = new Product();
         }
 

@@ -38,6 +38,17 @@ public interface ProductRepository
     @Query(value = "select p.id from Product p left join p.variants pv where (p.sku=?1 or pv.sku=?1) and p.store=?2")
     List<Long> findBySku(String sku, StoreMerchantId merchantStoreId);
 
+    /**
+     * How many products the store holds, for the plan ceiling.
+     *
+     * <p>
+     * Scoped by store, like every query here. It is only run when the store's plan actually caps products, so a plan
+     * with no ceiling never pays for the count.
+     * </p>
+     */
+    @Query(value = "select count(p) from Product p where p.store = ?1")
+    int countByStore(StoreMerchantId merchantStoreId);
+
     default Page<Product> findAll(ProductCriteria productCriteria, StoreMerchantId storeMerchantId, Pageable pageable) {
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

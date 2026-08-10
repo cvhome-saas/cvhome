@@ -1,11 +1,13 @@
 package com.asrevo.cvhome.gateway.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -20,13 +22,18 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
- * Turns away seller traffic for a store whose subscription has lapsed.
+ * Turns away seller <em>writes</em> for a store whose subscription has lapsed.
  *
  * <p>
- * Applies only to pod traffic addressed by the {@code store} query parameter — the seller console's path through the
- * gateway. A shopper reaches a storefront by host, through the pod's own edge, and never crosses this filter: a
- * suspended store keeps selling, deliberately, because a merchant who cannot trade cannot earn the money to settle
- * the invoice.
+ * Applies only to changes, and only to pod traffic addressed by the {@code store} query parameter — the seller
+ * console's path through the gateway. A seller who has stopped paying can still read their catalog and orders, which
+ * is both humane and practical: they need to see what they are paying for in order to decide to pay for it.
+ * </p>
+ *
+ * <p>
+ * A shopper reaches a storefront by host, through the pod's own edge, and never crosses this filter — so a suspended
+ * store keeps selling, deliberately, because a merchant who cannot trade cannot earn the money to settle the
+ * invoice.
  * </p>
  *
  * <p>
@@ -51,12 +58,18 @@ public class StoreBillingGuardFilter implements GlobalFilter, Ordered {
             "title":"BILLING.STORE.SUSPENDED",\
             "detail":"This store's subscription is not active. Renew it to continue."}""";
 
+    /**
+     * Methods that change nothing. Reads pass even for a lapsed store, matching the pods' own gate — without this
+     * the gateway refused everything, and the pods' deliberate read allowance could never be reached.
+     */
+    private static final Set<HttpMethod> READ_METHODS = Set.of(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS);
+
     private final StoreBillingStatusClient billingStatusClient;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        if (!path.startsWith(POD_PREFIX)) {
+        if (!path.startsWith(POD_PREFIX) || isRead(exchange)) {
             return chain.filter(exchange);
         }
         String store = exchange.getRequest().getQueryParams().getFirst(STORE_PARAM);
@@ -74,6 +87,10 @@ public class StoreBillingGuardFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE + 100;
+    }
+
+    private boolean isRead(ServerWebExchange exchange) {
+        return READ_METHODS.contains(exchange.getRequest().getMethod());
     }
 
     private Mono<Void> refuse(ServerWebExchange exchange) {

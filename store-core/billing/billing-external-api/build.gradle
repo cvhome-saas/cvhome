@@ -9,6 +9,7 @@ dependencies {
     compileOnly libs.spring.web
     compileOnly libs.spring.webflux
     compileOnly libs.caffeine
+    compileOnly libs.slf4j.api
     compileOnly libs.lombok
     annotationProcessor libs.lombok
 }

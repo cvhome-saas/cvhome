@@ -163,8 +163,11 @@ public class PermissionAccessChecker {
      * ceilings, so a store-pod principal has to be able to ask, not only a human.
      */
     public boolean hasAccessOnBillingEntitlementRead(Authentication authentication, ManagerStoreId requestedStoreId) {
-        if (storeRoleAccessChecker.isScopeStoreCore(authentication)
-                || storeRoleAccessChecker.isScopeStorePod(authentication, null)) {
+        // The scope is checked directly rather than through isScopeStorePod, which additionally requires the caller's
+        // resource to match a pod — and returns false outright when handed a null one. Billing is a store-core
+        // service and has no pod, so routing through it denied every pod that asked, which is every service that
+        // enforces these ceilings.
+        if (storeRoleAccessChecker.isScopeStoreCore(authentication) || SecurityUtils.hasScopeStorePod(authentication)) {
             return true;
         }
         return hasReadAccessOnStore(authentication, requestedStoreId);
