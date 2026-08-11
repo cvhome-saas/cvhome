@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.controlplane.manager.service.impl;
 
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.commons.domain.Email;
@@ -31,6 +33,7 @@ public class SignupServiceImpl implements SignupService {
         request.user().setActive(true);
         request.user().setUserName(request.user().getEmailAddress());
         request.user().setOrg(org.id().toString());
+        request.user().setRoles(Set.of("ORG_ADMIN"));
         return userAccountService.createUser(request.user());
     }
 

@@ -42,7 +42,8 @@ public class SubscriptionMappers {
                 entity.getPlanPriceId(),
                 price == null ? null : price.amount(),
                 entity.getCurrentPeriodEnd(), entity.getTrialEnd(), entity.isCancelAtPeriodEnd(),
-                entity.getGraceUntil(), pendingChange(entity), entitlements(entity));
+                entity.getGraceUntil(), pendingChange(entity), entity.getStripeSubscriptionId() != null,
+                entitlements(entity));
     }
 
     public EntitlementSnapshot toSnapshot(StoreSubscriptionEntity entity) {

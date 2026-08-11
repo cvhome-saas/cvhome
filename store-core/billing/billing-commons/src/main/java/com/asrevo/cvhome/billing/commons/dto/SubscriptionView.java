@@ -25,11 +25,15 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
  * @param cancelAtPeriodEnd  whether renewal has been switched off
  * @param graceUntil         how long a failed renewal has left before suspension
  * @param pendingPlanChange  a downgrade waiting for the period to end, if any
+ * @param providerLinked     whether a provider subscription stands behind this row, and so whether changing plan,
+ *                           cancelling or resuming is possible at all — a trial granted by us has none, and must be
+ *                           bought through checkout rather than switched. Status does not answer this: a store is
+ *                           {@code TRIALING} both before it has ever paid and, in principle, on a provider-run trial
  * @param entitlements       what the current plan grants
  */
 public record SubscriptionView(ManagerStoreId store, SubscriptionStatus status, String planCode,
                                String planDisplayName, PlanPriceId planPriceId, Money amount,
                                Instant currentPeriodEnd, Instant trialEnd, boolean cancelAtPeriodEnd,
-                               Instant graceUntil, PendingPlanChangeView pendingPlanChange,
+                               Instant graceUntil, PendingPlanChangeView pendingPlanChange, boolean providerLinked,
                                Map<EntitlementKey, EntitlementValue> entitlements) implements Serializable {
 }

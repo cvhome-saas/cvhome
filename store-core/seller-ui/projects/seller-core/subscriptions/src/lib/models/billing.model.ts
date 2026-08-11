@@ -71,6 +71,7 @@ export interface SubscriptionView {
   /** How long a failed renewal has left before the store is suspended. */
   graceUntil: string | null;
   pendingPlanChange: PendingPlanChangeView | null;
+  providerLinked: boolean;
   entitlements: Entitlements;
 }
 

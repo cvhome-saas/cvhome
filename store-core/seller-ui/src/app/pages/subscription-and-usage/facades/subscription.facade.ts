@@ -32,11 +32,12 @@ export class SubscriptionFacade {
    * Whether the store has something to change. A store that has never paid has no provider subscription behind it, so
    * it must go through checkout rather than a plan change — the two are different calls and only this tells them
    * apart.
+   *
+   * Read from the server rather than inferred from the status, which cannot answer it: a trial we grant locally is
+   * `TRIALING` with nothing at the provider, so treating that as subscribed sent "upgrade to Basic" down the
+   * plan-change path and the store got a 422 for a transition that was never possible.
    */
-  readonly subscribed = computed(() => {
-    const status = this.subscription()?.status;
-    return status !== undefined && status !== 'PENDING' && status !== 'CANCELED';
-  });
+  readonly subscribed = computed(() => this.subscription()?.providerLinked === true);
 
   readonly operable = computed(() => {
     const status = this.subscription()?.status;
