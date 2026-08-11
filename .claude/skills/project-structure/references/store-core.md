@@ -11,10 +11,6 @@ store-core/
 │   ├── control-plane-service/        BE     :8020  the deployable app
 │   ├── manager-commons/              lib           org/store DTOs
 │   ├── manager-events/               lib           org/store domain events
-│   ├── manager-external-api/         lib           remote client contract
-│   ├── subscription-commons/         lib           plan/pricing DTOs
-│   ├── subscription-events/          lib           subscription + Stripe events
-│   ├── subscription-external-api/    lib           remote client contract
 │   └── pod-external-api/             lib           client for talking to a tenant pod
 └── seller-ui/                        FE     :8010  Angular 20 SSR admin console
 ```
@@ -71,10 +67,7 @@ consume.
 | Module | Contents |
 |---|---|
 | `manager-commons` | `ManagerOrgDto`, `ManagerStoreDto`, `ListManagerStoreQuery`, `ProvisioningState`. Depends on `store-commons:commons` (+ `dnsjava` for custom-domain checks). |
-| `manager-events` | `OrgCreatedEvent`, `StoreCreatedEvent`, `StoreProvisionedEvent`, `OrgSubscriptionPlanChangedEvent`. Uses `namastack-outbox-api` — events go out via a **transactional outbox**. |
-| `subscription-commons` | `SubscriptionStatus`, `SubscriptionPlanDetails`, `SubscriptionPlanTable(s)`, `RecurringPlan`, `PricePlanCost`, `PriceId`. |
-| `subscription-events` | `SubscriptionEvent`, `SubscriptionDeActivateEvent`, `SubscriptionCommand`, plus Stripe-shaped events (`InvoicePaymentSucceededEvent`, `InvoicePaymentFailedEvent`, `CustomerSubscriptionDeletedEvent`). Also outbox-based. |
-| `manager-external-api` / `subscription-external-api` | Remote client contracts, e.g. `SubscriptionPlanDetailsService`. |
+| `manager-events` | `OrgCreatedEvent`, `StoreCreatedEvent`, `StoreProvisionedEvent`. Uses `namastack-outbox-api` — events go out via a **transactional outbox**. |
 | `pod-external-api` | `ExternalPodClient` — how store-core talks to a tenant pod. |
 
 The `-events` suffix is unique to control-plane: it marks **messaging/event contract** modules, published

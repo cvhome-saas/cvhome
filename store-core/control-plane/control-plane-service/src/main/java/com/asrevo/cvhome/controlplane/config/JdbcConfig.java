@@ -30,18 +30,6 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
                 return new ManagerOrgId(source);
             }
         });
-        converters.add(new Converter<Identifier, String>() {
-            @Override
-            public String convert(Identifier source) {
-                return source.getId().toString();
-            }
-        });
-        converters.add(new Converter<String, ManagerOrgId>() {
-            @Override
-            public ManagerOrgId convert(String source) {
-                return new ManagerOrgId(source);
-            }
-        });
         converters.add(new Converter<String, ManagerStoreId>() {
             @Override
             public ManagerStoreId convert(String source) {

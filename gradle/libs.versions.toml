@@ -32,6 +32,8 @@ commonsBeanutils = "1.10.1"
 nodeGradle = "7.0.2"
 namastack-outbox = "1.7.1"
 slf4j = "2.0.17"
+springCloudBom = "2025.1.0"
+opentelemetryInstrumentationBom = "2.27.0"
 
 [libraries]
 spring-boot-starter-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "springBoot" }
