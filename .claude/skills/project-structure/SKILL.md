@@ -1,6 +1,6 @@
 ---
 name: project-structure
-description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, control-plane, seller-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with run-lcl.sh and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or control-plane, UI like seller-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, run-lcl.sh, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
+description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, tenancy, seller-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with run-lcl.sh and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like seller-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, run-lcl.sh, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
 metadata:
   version: '3.2'
 ---
@@ -37,11 +37,11 @@ catalog). See `references/build-system.md`.
 | Service | Category | Port | Purpose |
 |---|---|---|---|
 | `store-core/uaa` | **BE+FE** | 8001 | OAuth2 **Authorization Server** + OIDC provider for staff/admin identity. Issues tokens for all other services. Serves an **embedded Angular admin SPA** (`uaa-fe`) from its own `static/` folder, plus Thymeleaf login pages. Controllers: `AuthController`, `AdminUserController`, `AdminClientController`, `AdminRoleController`, `UserInfoController`. |
-| `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies to `control-plane` / `seller-ui`. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
-| `store-core/control-plane/control-plane-service` | **BE** | 8020 | The **SaaS control plane**: organizations, store provisioning, subscription plans, Stripe billing, usage statistics. Controllers: `PodController`, `StoreManagerController`, `OrgManagerController`, `SubscriptionController`, `StripeWebhookController`, `SignUpController`, `StoreStatisticApi`. |
+| `store-core/gateway/gateway-service` | **BE** | 8000 | Spring Cloud **Gateway** (WebFlux, reactive) for the platform layer. Terminates the browser OAuth2 login session, exchanges it for tokens, and proxies to `tenancy` / `seller-ui`. Key classes: `GatewayRouteLocatorImpl`, `SecurityConfig`, `RedirectingServerAuthenticationSuccessHandler`, `PodClient`. |
+| `store-core/tenancy/tenancy-service` | **BE** | 8020 | The **SaaS control plane**: organizations, store provisioning, subscription plans, Stripe billing, usage statistics. Controllers: `PodController`, `StoreManagerController`, `OrgManagerController`, `SubscriptionController`, `StripeWebhookController`, `SignUpController`, `StoreStatisticApi`. |
 | `store-core/seller-ui` | **FE** | 8010 | Angular 20 (SSR) **seller/admin console** — the UI merchants and platform admins use. Feature areas under `src/app/pages/`: catalogue, orders, customer, payment, store-management, org-management, pod-management, subscription-and-usage, user-management, content. Logs in via `/oauth2/authorization/uaa`. |
 
-`control-plane` is backed by sibling library modules (`manager-*`, `subscription-*`, `pod-external-api`) — see
+`tenancy` is backed by sibling library modules (`tenancy-commons`, `tenancy-events`, `pod-external-api`) — see
 `references/store-core.md`.
 
 ### store-pod — per-tenant business layer
@@ -68,7 +68,7 @@ merchant, same endpoint, two addresses:
   http://spg-507f1f77.gateway.com/merchant/api/v1/store/...  via spg — from anywhere else (prefix stripped)
 ```
 
-Two edges: **`store-core-gateway`** (:8000, `gateway.com`) fronts `control-plane` (`/control-plane/**`),
+Two edges: **`store-core-gateway`** (:8000, `gateway.com`) fronts `tenancy` (`/tenancy/**`),
 `seller-ui`, and every pod under `/spg/**?store=&pod=`; **`spg`** (:80, the pod's Caddy) fronts the pod
 services under `/merchant*`, `/catalog*`, `/checkout*`, `/payment*`, `/cua*`, with everything else falling
 through to `landing-ui`. A seller request therefore crosses *both*:
@@ -94,7 +94,7 @@ store to a pod is what decides which region its data physically lives in.** A po
 shared by many.
 
 Two runtime paths reach a store: sellers go through `store-core-gateway`, whose `PodClient` rebuilds its route
-table from control-plane every minute and token-relays into the right pod; shoppers hit a custom domain on that
+table from tenancy every minute and token-relays into the right pod; shoppers hit a custom domain on that
 pod's own Caddy (`spg`), which asks the pod's `merchant-service` to map domain → store and injects
 `Store-Id` / `Theme` headers.
 
@@ -166,9 +166,9 @@ Details: `references/api-conventions.md`, and `references/http-request-files.md`
 Every service owns a **Postgres schema** and ships its own hand-written DDL; there is no shared database and no
 cross-service foreign key. Two persistence stacks coexist:
 
-- **Spring Data JDBC** — `control-plane-service`. Entities use
-  `org.springframework.data.relational.core.mapping.@Table(schema = "manager", …)`, extend `BaseEntity`, and it
-  owns four schemas (`manager`, `subscription`, `org`, `control`) mirroring its bounded contexts. DDL at
+- **Spring Data JDBC** — `tenancy-service`. Entities use
+  `org.springframework.data.relational.core.mapping.@Table(schema = "tenancy", …)`, extend `BaseEntity`, and it
+  owns three schemas (`tenancy`, `org`, `tenancy_outbox`) mirroring its bounded contexts. DDL at
   `src/main/resources/schema.sql`.
 - **Spring Data JPA / Hibernate** — the pod services. Entities use `jakarta.persistence`, extend
   `SalesManagerEntity`, and get their schema from `hibernate.default_schema: ${spring.application.name}`. DDL at
@@ -199,7 +199,7 @@ Two sanctioned mechanisms — pick by whether the caller needs an answer now:
   `-service`. → `references/service-to-service.md`, and `references/error-handling.md` for the error contract.
 - **Asynchronous:** a domain event registered on an aggregate root (`registerEvent(...)` via
   `AbstractAggregateRoot`) and delivered by the **namastack transactional outbox** to an `@OutboxHandler`.
-  Used in `control-plane-service` and `payment-service`. Put event types in their own **`-events` module**
+  Used in `tenancy-service` and `payment-service`. Put event types in their own **`-events` module**
   (like `subscription-events`) — consumers must know an event's structure, so the contract has to be
   dependable without pulling in the producer. Delivery is **at-least-once, so handlers must be idempotent**,
   and `@OutboxEvent(key = …)` picks the ordering key. → `references/events-outbox.md`
@@ -245,7 +245,7 @@ A pod may host more than one sub-domain in one service (e.g. `merchant-service` 
 
 ## Adding a whole new service
 
-Decide the **shape** first — backend only (`catalog`, `control-plane`), frontend only (`seller-ui`,
+Decide the **shape** first — backend only (`catalog`, `tenancy`), frontend only (`seller-ui`,
 `landing-ui`), or one deployable serving both (`uaa`, `cua`) — then the **tree** (`store-core/` = one shared
 platform instance, `store-pod/` = deployed once per pod). Those two choices fix the module layout, the config
 slices, the s2s client and the fronting gateway.
@@ -331,9 +331,9 @@ See `references/frontends.md`.
 
 **Structure**
 - `references/new-service.md` — **step-by-step procedure + checklist for creating a new service**: the three
-  shapes (backend like `catalog`/`control-plane`, UI like `seller-ui`, both-in-one like `uaa`), module layout
+  shapes (backend like `catalog`/`tenancy`, UI like `seller-ui`, both-in-one like `uaa`), module layout
   per shape, the four registration files, routing, and what `store-commons:autoconfigure` already gives you.
-- `references/store-core.md` — platform services in depth: uaa, gateway, control-plane and its library modules.
+- `references/store-core.md` — platform services in depth: uaa, gateway, tenancy and its library modules.
 - `references/store-pod.md` — the 4-module pod pattern with evidence, per-pod breakdown, spg routing, pod-shared libs.
 - `references/shared-libraries.md` — `store-commons` submodules, the `store-commons` naming collision.
 

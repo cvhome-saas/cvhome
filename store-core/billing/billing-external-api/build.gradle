@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api project(':store-core:billing:billing-commons')
-    // Servlet callers (control-plane, the pods) and the reactive gateway both consume this module. The Mono-returning
+    // Servlet callers (tenancy, the pods) and the reactive gateway both consume this module. The Mono-returning
     // methods live on their own interface so a servlet caller never sees reactor types on its proxy.
     compileOnly libs.spring.web
     compileOnly libs.spring.webflux

@@ -53,7 +53,7 @@ public class PodClient implements RouteDefinitionRepository {
 
     public Flux<Pod> getPods() {
         return externalPodClient.listPods().onErrorResume(e -> {
-            log.error("Could not fetch pods from control-plane", e);
+            log.error("Could not fetch pods from tenancy", e);
             return Mono.empty();
         }).flatMapMany(Flux::fromIterable);
     }

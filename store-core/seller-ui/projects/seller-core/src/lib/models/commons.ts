@@ -12,7 +12,7 @@ export interface CreateStoreRequest {
   email?: Email;
 }
 
-/** Mirrors control-plane manager/commons/dto/ManagerStoreDto (record) */
+/** Mirrors tenancy manager/commons/dto/ManagerStoreDto (record) */
 export interface ManagerStore {
   id: ManagerStoreId
   name: string

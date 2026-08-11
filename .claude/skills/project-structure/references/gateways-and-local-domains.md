@@ -18,7 +18,7 @@ The `/merchant` prefix is stripped by Caddy, so the service itself sees the iden
 
 | Edge | Service | Port | Local domain | Fronts |
 |---|---|---|---|---|
-| Platform | `store-core/gateway` (Spring Cloud Gateway) | 8000 | `gateway.com` | `control-plane`, `seller-ui`, and **all pods** via `/spg/**` |
+| Platform | `store-core/gateway` (Spring Cloud Gateway) | 8000 | `gateway.com` | `tenancy`, `seller-ui`, and **all pods** via `/spg/**` |
 | Pod | `store-pod/spg` (Caddy) | 80 / 443 | `spg-507f1f77.gateway.com` | `merchant`, `catalog`, `checkout`, `payment`, `cua`, `landing-ui` |
 
 ### `spg` — path → pod service (`store-pod/spg/Caddyfile`)
@@ -41,7 +41,7 @@ externally visible URL; that same `…/cua` string is what appears in the pod's 
 
 | Path | Target |
 |---|---|
-| `/control-plane/**` | `lb://control-plane` (`StripPrefix=1`, token relay) |
+| `/tenancy/**` | `lb://tenancy` (`StripPrefix=1`, token relay) |
 | `/spg/**?store=<id>&pod=<podId>` | the matching pod's `spg`, route built at runtime by `PodClient` |
 | anything else on `gateway.com` / `www.` / `seller-ui.` | `lb://seller-ui` |
 

@@ -17,7 +17,7 @@ export interface PageT<T> {
   recordsFiltered?: number;
 }
 
-/** Mirrors Spring Data's Page<T> — used by control-plane endpoints that
+/** Mirrors Spring Data's Page<T> — used by tenancy endpoints that
  *  return the framework's own paging envelope instead of this app's PageT. */
 export interface SpringPage<T> {
   content: T[];

@@ -3,7 +3,7 @@ import {SpringPage} from 'seller-core';
 
 export type {SpringPage};
 
-/** control-plane StoreManagerServiceImpl#getStore forwards to the merchant
+/** tenancy StoreManagerServiceImpl#getStore forwards to the merchant
  *  pod's ReadableMerchantStore and merges in a `pod` key — not a separate
  *  Java DTO, confirmed by reading the actual implementation rather than the
  *  controller's declared `Object` return type. */
@@ -33,7 +33,7 @@ export interface LandingPageContent {
   }[];
 }
 
-/** Mirrors control-plane manager/controller/SaasController#saasProperties */
+/** Mirrors tenancy manager/controller/SaasController#saasProperties */
 export interface SaasProperties {
   alis: string;
   domain: string;

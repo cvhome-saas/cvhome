@@ -1,6 +1,6 @@
 /** Mirrors merchant-commons model/merchant/ReadableMerchantStore -> MerchantStoreEntity
  *  -> MerchantStorePricingBase. Renamed from the app's original `Store` name
- *  (shared/models/commons.ts has an unrelated `Store` for the control-plane
+ *  (shared/models/commons.ts has an unrelated `Store` for the tenancy
  *  ManagerStoreDto — that one is untouched). */
 export interface ReadableMerchantStore {
   id: string

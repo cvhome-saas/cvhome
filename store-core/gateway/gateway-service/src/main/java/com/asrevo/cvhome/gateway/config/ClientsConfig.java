@@ -13,7 +13,7 @@ public class ClientsConfig {
 
     @Bean
     public ExternalPodClient externalPodClient(WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("control-plane", ExternalPodClient.class, RemoteErrorCatalog.none());
+        return webClientBuilder.buildClient("tenancy", ExternalPodClient.class, RemoteErrorCatalog.none());
     }
 
     /**

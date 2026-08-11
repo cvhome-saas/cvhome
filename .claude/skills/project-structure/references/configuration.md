@@ -55,7 +55,7 @@ spring.config.import:
 A store-core service is identical but swaps the layer slice:
 
 ```yaml
-# store-core/control-plane/control-plane-service/application-lcl.yml
+# store-core/tenancy/tenancy-service/application-lcl.yml
 spring.config.import:
   - "classpath:lcl-config.yml"
   - "classpath:store-core-lcl-config.yml"
@@ -86,7 +86,7 @@ com.asrevo.cvhome:
     uaa:        { name: uaa,        domain: uaa.${...app.domain}, port: 8001,
                   namespace: store-core.cvhome.lcl,          gateway-service-name: store-core-gateway }
     store-core-gateway: { ..., port: 8000, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
-    control-plane:      { ..., port: 8020, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
+    tenancy:      { ..., port: 8020, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
     seller-ui:          { ..., port: 8010, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
     spg:        { ..., port: 80,   namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
     merchant:   { ..., port: 8120, namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
@@ -182,7 +182,7 @@ store-core calls into a pod. In production these come from the control plane, no
 `common-config.yml` sets `spring.sql.init.mode: always`, `spring.datasource.hikari.schema:
 ${spring.application.name}` and `spring.jpa.hibernate.ddl-auto: update` for everyone. Each service then owns a
 Postgres schema and ships its own DDL — `init-sql/schema.sql` + `init-sql/data-common.sql` for pod services,
-plain `schema.sql` for control-plane (which owns four schemas: `manager`, `subscription`, `org`, `control`).
+plain `schema.sql` for tenancy (which owns three schemas: `tenancy`, `org`, `tenancy_outbox`).
 
 Full detail — the JDBC vs JPA split, conventions in the DDL, and the outbox tables: `database-schemas.md`.
 

@@ -22,7 +22,7 @@ export interface Pricing {
 /**
  * A catalog plan as the public pricing page renders it.
  *
- * The shape is unchanged from when this page read control-plane's org-level plan tables, so the template did not have
+ * The shape is unchanged from when this page read the org-level plan tables, so the template did not have
  * to move with the data source. What changed underneath is where plans come from: billing's public catalog, which is
  * the same list the seller console and Stripe are driven from, so a marketing page can no longer quietly disagree
  * with what a customer is actually charged.

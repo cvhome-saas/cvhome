@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
  * a mutation having been attempted.
  *
  * <p>
- * The credential is passed per call. Assigning {@code Stripe.apiKey} once, as control-plane's implementation does,
+ * The credential is passed per call. Assigning {@code Stripe.apiKey} once, as tenancy's implementation does,
  * makes it process-wide state that no call site can see or override, and silently binds every call in the JVM to
  * whichever key was set last.
  * </p>

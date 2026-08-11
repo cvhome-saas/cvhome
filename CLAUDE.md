@@ -133,7 +133,7 @@ What binds every change:
   Reference: `store-pod/catalog/catalog-service/http/product-api.http`; rules:
   `references/http-request-files.md` in the skill.
 - Use the value objects in `store-commons/commons/.../domain/` instead of raw `String`/`Long` ids.
-- `schema.sql` (`src/main/resources/schema.sql` for control-plane's Spring Data JDBC, `init-sql/schema.sql`
+- `schema.sql` (`src/main/resources/schema.sql` for tenancy's Spring Data JDBC, `init-sql/schema.sql`
   for the JPA pod services) is the source of truth for DDL — `ddl-auto: update` is only a safety net.
 - Tenant secrets are encrypted in the mapper layer via `secret-crypto`; never add a plaintext credential
   column.

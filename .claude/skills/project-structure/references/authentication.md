@@ -11,7 +11,7 @@ never share an identity realm.
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
 | Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | Thymeleaf login/registration/social-login pages |
 | Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `RegistrationController`, social login |
-| Serves tokens to | seller-ui, control-plane, gateway, all `-service` s2s clients | landing-ui storefront sessions |
+| Serves tokens to | seller-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |
 
 Both use `spring-boot-starter-oauth2-authorization-server` with JDBC sessions, so they look nearly identical in

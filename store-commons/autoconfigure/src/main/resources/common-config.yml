@@ -27,8 +27,8 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        control-plane:
-          name: control-plane
+        tenancy:
+          name: tenancy
           domain: ${com.asrevo.cvhome.app.domain}
           port: 8020
           schema: http

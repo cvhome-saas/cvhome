@@ -20,6 +20,10 @@ import {
   SpringPage
 } from '../models/store-service.model';
 
+/** Base path for the tenancy service. Store, router and saas endpoints all hang off
+ *  it, so a rename of the service is one line here rather than nine. */
+export const TENANCY_API_BASE = '/tenancy/api/v1';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,7 +33,7 @@ export class StoreService {
 
 
   getStore(store: string): Observable<ReadableMerchantStoreWithPod> {
-    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store/${store}`);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/private/store/${store}`);
   }
 
   getAllocations(store: string): Observable<ManagerStoreDomain[]> {
@@ -37,11 +41,11 @@ export class StoreService {
   }
 
   storePodByStoreId(store: string): Observable<Pod> {
-    return this.crudService.get(`/control-plane/api/v1/router/store-pod-by-store-id`, {store});
+    return this.crudService.get(`${TENANCY_API_BASE}/router/store-pod-by-store-id`, {store});
   }
 
   saasProperties(): Observable<SaasProperties> {
-    return this.crudService.get(`/control-plane/api/v1/saas/public/saas-properties`);
+    return this.crudService.get(`${TENANCY_API_BASE}/saas/public/saas-properties`);
   }
 
   allocateDomain(store: string, domain: string): Observable<void> {
@@ -53,18 +57,18 @@ export class StoreService {
   }
 
   getListOfStores(params: StorePageRequest): Observable<SpringPage<ManagerStore>> {
-    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store`, params);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/private/store`, params);
   }
 
   checkIfStoreExist(name: string): Observable<EntityExists> {
     const params = {
       name
     };
-    return this.crudService.get(`/control-plane/api/v1/store-manager/private/store/unique`, params);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/private/store/unique`, params);
   }
 
   createStore(store: Record<string, unknown>): Observable<ManagerStore> {
-    return this.crudService.post(`/control-plane/api/v1/store-manager/private/store`, store);
+    return this.crudService.post(`${TENANCY_API_BASE}/store-manager/private/store`, store);
   }
 
   deleteStore(store: string): Observable<void> {
@@ -127,15 +131,15 @@ export class StoreService {
   }
 
   getSupportedThemes(): Observable<string[]> {
-    return this.crudService.get(`/control-plane/api/v1/store-manager/public/themes`);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/public/themes`);
   }
 
   getSupportedColorThemes(): Observable<string[]> {
-    return this.crudService.get(`/control-plane/api/v1/store-manager/public/color-themes`);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/public/color-themes`);
   }
 
   getSupportedSocialLinkProviders(): Observable<string[]> {
-    return this.crudService.get(`/control-plane/api/v1/store-manager/public/social-links-providers`);
+    return this.crudService.get(`${TENANCY_API_BASE}/store-manager/public/social-links-providers`);
   }
 
   updateStoreSocialLinks(storeId: string, request: {socialLinks: SocialLink[]} & Record<string, unknown>): Observable<void> {

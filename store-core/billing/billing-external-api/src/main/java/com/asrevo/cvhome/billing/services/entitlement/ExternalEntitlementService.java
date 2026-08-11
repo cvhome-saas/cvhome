@@ -13,7 +13,7 @@ import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 
 /**
- * What a servlet caller of billing's entitlement API depends on — the pods, and control-plane.
+ * What a servlet caller of billing's entitlement API depends on — the pods, and tenancy.
  *
  * <p>
  * Nothing implements this; the proxy is generated from it. Naming the caller-side exception here is what makes it

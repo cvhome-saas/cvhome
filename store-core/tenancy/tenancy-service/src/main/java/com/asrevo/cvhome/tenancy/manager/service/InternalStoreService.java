@@ -1,0 +1,36 @@
+package com.asrevo.cvhome.tenancy.manager.service;
+
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
+import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+
+public interface InternalStoreService {
+
+    ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
+
+    void completeProvisioning(ManagerStoreId store);
+
+    void failProvisioning(ManagerStoreId store);
+
+    void startProvisioning(ManagerStoreId store);
+
+    Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
+                                  Pageable pageable);
+
+    Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
+
+    ManagerStoreDto findStore(ManagerStoreId store);
+
+    Boolean checkNameExists(String name);
+
+    PodId getStorePod(ManagerStoreId managerStoreId);
+
+}

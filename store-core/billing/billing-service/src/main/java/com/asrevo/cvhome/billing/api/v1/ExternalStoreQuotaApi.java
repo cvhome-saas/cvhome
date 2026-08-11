@@ -17,7 +17,7 @@ import com.asrevo.cvhome.billing.services.quota.IStoreQuotaService;
 import lombok.RequiredArgsConstructor;
 
 /**
- * The store-provisioning API, called by control-plane and by nobody else.
+ * The store-provisioning API, called by tenancy and by nobody else.
  *
  * <p>
  * Implements {@link IStoreQuotaService} — the server-vocabulary half of the contract — so the paths and shapes here

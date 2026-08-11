@@ -13,6 +13,9 @@ export interface AuthPrincipal {
   id?: string;
 }
 
+/** Base path for tenancy's user-account endpoints. */
+export const USER_ACCOUNT_API_BASE = '/tenancy/api/v1/user-account';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,38 +42,38 @@ export class UserService {
 
 
   getCurrentAccount(): Observable<User> {
-    return this.crudService.get(`/control-plane/api/v1/user-account/current`);
+    return this.crudService.get(`${USER_ACCOUNT_API_BASE}/current`);
   }
 
   createUser(user: PersistableUser, store: string): Observable<User> {
-    return this.crudService.post(`/control-plane/api/v1/user-account/create`, user, {store});
+    return this.crudService.post(`${USER_ACCOUNT_API_BASE}/create`, user, {store});
   }
 
   updateUser(user: PersistableUser, store: string): Observable<User> {
-    return this.crudService.put(`/control-plane/api/v1/user-account/update`, user, {store});
+    return this.crudService.put(`${USER_ACCOUNT_API_BASE}/update`, user, {store});
   }
 
   getUser(userId: string): Observable<User> {
-    return this.crudService.get(`/control-plane/api/v1/user-account/find-one?userId=${userId}`);
+    return this.crudService.get(`${USER_ACCOUNT_API_BASE}/find-one?userId=${userId}`);
   }
 
   roles(): Observable<string[]> {
-    return this.crudService.get(`/control-plane/api/v1/user-account/assignable-roles`);
+    return this.crudService.get(`${USER_ACCOUNT_API_BASE}/assignable-roles`);
   }
 
   getUsersList(params: StorePageRequest): Observable<PageT<User>> {
-    return this.crudService.get(`/control-plane/api/v1/user-account/list`, params);
+    return this.crudService.get(`${USER_ACCOUNT_API_BASE}/list`, params);
   }
 
   deleteUser(userId: string, store: string): Observable<void> {
-    return this.crudService.delete(`/control-plane/api/v1/user-account/delete?userId=${userId}`, {store});
+    return this.crudService.delete(`${USER_ACCOUNT_API_BASE}/delete?userId=${userId}`, {store});
   }
 
   disable(userId: string, store: string): Observable<void> {
-    return this.crudService.post(`/control-plane/api/v1/user-account/disable?userId=${userId}`, {store});
+    return this.crudService.post(`${USER_ACCOUNT_API_BASE}/disable?userId=${userId}`, {store});
   }
 
   enable(userId: string, store: string): Observable<void> {
-    return this.crudService.post(`/control-plane/api/v1/user-account/enable?userId=${userId}`, {store});
+    return this.crudService.post(`${USER_ACCOUNT_API_BASE}/enable?userId=${userId}`, {store});
   }
 }

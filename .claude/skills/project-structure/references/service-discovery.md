@@ -36,7 +36,7 @@ spring.cloud.discovery.client.simple.instances:
 ```
 
 Every service is listed with its hardcoded localhost URI (`uaa` 8001, `store-core-gateway` 8000, `seller-ui`
-8010, `control-plane` 8020, `landing-ui` 8110, `merchant` 8120, `catalog` 8122, `checkout` 8123, `cua` 8124,
+8010, `tenancy` 8020, `landing-ui` 8110, `merchant` 8120, `catalog` 8122, `checkout` 8123, `cua` 8124,
 `payment` 8125). Spring Cloud Commons auto-configures the matching client from those properties:
 
 | App type | Bean | Where |
@@ -84,7 +84,7 @@ spring.cloud.ecs.discovery:
   namespace-id: "ns-je7qri6wn7fbsrpn"
   enabled: true
   default-port: 8080
-  service-ports: { uaa: 8001, store-core-gateway: 8000, seller-ui: 8010, control-plane: 8020,
+  service-ports: { uaa: 8001, store-core-gateway: 8000, seller-ui: 8010, tenancy: 8020,
                    landing-ui: 8110, merchant: 8120, catalog: 8122, checkout: 8123, cua: 8124, payment: 8125 }
 ```
 
@@ -157,7 +157,7 @@ so a store-core task can resolve a pod's edge in the pod's own namespace. Two ca
 - `EcsReactiveDiscoveryClient` does **not** do this splitting — it always queries `properties.getNamespace()`.
 - Locally the simple instance list has no `spg` entry and no namespace-qualified keys, so this form does not
   resolve. It doesn't need to: every name-based `buildClient(...)` in the repo today is same-namespace
-  (pod → pod, gateway → control-plane), and store-core reaches a pod through the `buildClient(Pod, …)` overload,
+  (pod → pod, gateway → tenancy), and store-core reaches a pod through the `buildClient(Pod, …)` overload,
   which uses the pod's `EXTERNAL` endpoint URL (`http://spg-507f1f77.gateway.com`) on the non-load-balanced
   builder. See `multi-tenancy.md`.
 
