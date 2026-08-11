@@ -58,8 +58,7 @@ public class UserAccountController {
     }
 
     @GetMapping("find-one")
-    // @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
-
+    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
     public ReadableUser findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                 @RequestParam ManagerStoreId store, @RequestParam String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,

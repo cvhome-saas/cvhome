@@ -3,6 +3,7 @@ package com.asrevo.cvhome.tenancy.manager.controller.statistic;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,12 @@ public class StoreStatisticApi {
 
     private final ManagerStoreRepository managerStoreRepository;
 
+    /**
+     * Counts stores created per day across every organization. Operator metric, not tenant data; super-admin only.
+     * It previously had no annotation.
+     */
     @PostMapping(value = {"/private/store-statistic"})
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public StatisticList storeStatistic(@RequestBody StatisticRange range) {
         List<StatisticEntry> entries = managerStoreRepository.storeStatistic(range.fromDate().toInstant(),

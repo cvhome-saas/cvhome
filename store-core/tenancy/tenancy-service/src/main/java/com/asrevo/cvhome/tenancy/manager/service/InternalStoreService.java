@@ -11,6 +11,7 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 
 public interface InternalStoreService {
 
@@ -27,10 +28,21 @@ public interface InternalStoreService {
 
     Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
 
-    ManagerStoreDto findStore(ManagerStoreId store);
+    /**
+     * Unscoped lookup, for callers that have no user — outbox handlers and provisioning. Never reachable from a
+     * controller: use the {@link UserOrgStoreIdentity} overload there so a foreign store is refused.
+     */
+    ManagerStoreDto findStore(ManagerStoreId store) throws StoreNotFoundException;
+
+    /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
+    ManagerStoreDto findStore(UserOrgStoreIdentity identity, ManagerStoreId store) throws StoreNotFoundException;
 
     Boolean checkNameExists(String name);
 
-    PodId getStorePod(ManagerStoreId managerStoreId);
+    /** Unscoped; see {@link #findStore(ManagerStoreId)}. */
+    PodId getStorePod(ManagerStoreId managerStoreId) throws StoreNotFoundException;
+
+    /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
+    PodId getStorePod(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId) throws StoreNotFoundException;
 
 }

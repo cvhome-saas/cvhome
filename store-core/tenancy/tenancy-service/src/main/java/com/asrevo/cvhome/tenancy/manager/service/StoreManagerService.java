@@ -12,6 +12,7 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 
 public interface StoreManagerService {
 
@@ -28,6 +29,13 @@ public interface StoreManagerService {
     PageImpl<Object> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
                              Pageable pageable);
 
-    Object getStore(ManagerStoreId managerStoreId);
+    /**
+     * Unscoped: only for rows {@link #findAll} has already confined to the caller's org. A controller must use the
+     * {@link UserOrgStoreIdentity} overload, or it will serve another org's store.
+     */
+    Object getStore(ManagerStoreId managerStoreId) throws StoreNotFoundException;
+
+    /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
+    Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId) throws StoreNotFoundException;
 
 }

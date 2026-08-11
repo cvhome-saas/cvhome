@@ -23,6 +23,7 @@ import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.PodSelection;
@@ -109,8 +110,17 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     }
 
     @Override
-    public Object getStore(ManagerStoreId managerStoreId) {
-        PodId podId = internalStoreService.getStorePod(managerStoreId);
+    public Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
+            throws StoreNotFoundException {
+        return getStore(internalStoreService.getStorePod(identity, managerStoreId), managerStoreId);
+    }
+
+    @Override
+    public Object getStore(ManagerStoreId managerStoreId) throws StoreNotFoundException {
+        return getStore(internalStoreService.getStorePod(managerStoreId), managerStoreId);
+    }
+
+    private Object getStore(PodId podId, ManagerStoreId managerStoreId) {
         MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(podId);
         Map<String, Object> response = client.getStore(managerStoreId.getId().toString());
         HashMap<String, Object> newIt = new HashMap<>(response);

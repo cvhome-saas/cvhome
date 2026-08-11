@@ -47,7 +47,9 @@ public class PodController {
                 : podService.listAllPods(identity.org(), pageable).toList();
     }
 
+    /** Matches {@link #listPods}; it was the one read here with no annotation, exposing any pod's endpoint by id. */
     @GetMapping("{id}")
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN') or hasAuthority('SCOPE_STORE_CORE')")
     public Pod find(@PathVariable PodId id) {
         return podService.pod(id);
     }
