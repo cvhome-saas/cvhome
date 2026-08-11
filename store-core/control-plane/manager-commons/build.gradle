@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(':store-commons:commons')
+    api project(':store-core:billing:billing-commons')
     compileOnly libs.jackson.databind
     compileOnly libs.spring.data.relational
     compileOnly libs.lombok

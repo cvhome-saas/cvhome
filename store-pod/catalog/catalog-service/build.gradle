@@ -63,6 +63,8 @@ dependencies {
     implementation libs.springdoc.openapi.starter.webmvc.ui
 
     implementation project(':store-commons:autoconfigure')
+    implementation project(':store-core:billing:billing-external-api')
+    implementation libs.caffeine
 
 //    developmentOnly libs.spring.boot.docker.compose
     compileOnly libs.lombok

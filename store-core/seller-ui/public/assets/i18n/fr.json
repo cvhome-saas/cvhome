@@ -885,13 +885,48 @@
       "PERFORMANCE_ORDERS": "commandes de performance",
       "PERFORMANCE_PRODUCTS": "produits de performance",
       "PERFORMANCE_VISITORS": "visiteurs de performance",
-      "PERFORMANCE_ACCOUNTS": "comptes de performance"
+      "PERFORMANCE_ACCOUNTS": "comptes de performance",
+      "MAX_PRODUCTS": "Produits",
+      "MAX_ORDERS_MONTH": "Commandes par mois",
+      "MAX_ACCOUNTS": "Comptes utilisateurs",
+      "MAX_STORAGE_MB": "Stockage (Mo)",
+      "CUSTOM_DOMAIN": "Domaine personnalisé",
+      "ANALYTICS": "Analyses",
+      "PRIORITY_SUPPORT": "Support prioritaire"
     },
     "SUBSCRIPTION_PLAN": {
       "FREE": "Gratuit",
       "LIMITED": "Limité",
       "BASIC": "Basique",
       "PERFORMANCE": "Performance"
+    },
+    "NO_PLAN": "Aucun forfait",
+    "TRIAL_ENDS": "L'essai se termine le",
+    "PAST_DUE": "Un paiement a échoué. La boutique sera suspendue le",
+    "NOT_ACTIVE": "Cette boutique n'a pas d'abonnement actif. Choisissez un forfait pour continuer à l'utiliser.",
+    "WILL_NOT_RENEW": "Ne sera pas renouvelé. L'accès continue jusqu'au",
+    "RENEWS_ON": "Se renouvelle le",
+    "PENDING_CHANGE": "Changement prévu vers",
+    "STOP_RENEWAL": "Arrêter le renouvellement",
+    "RESUME": "Reprendre",
+    "CURRENT_PLAN": "Forfait actuel",
+    "CHANGE_PLAN": "Changer de forfait",
+    "INVOICES": "Factures",
+    "DOWNLOAD": "PDF",
+    "STATUS": {
+      "PENDING": "Non abonné",
+      "TRIALING": "Essai",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Paiement échoué",
+      "SUSPENDED": "Suspendue",
+      "CANCELED": "Annulée"
+    },
+    "INVOICE_STATUS": {
+      "DRAFT": "Brouillon",
+      "OPEN": "Impayée",
+      "PAID": "Payée",
+      "UNCOLLECTIBLE": "Irrécouvrable",
+      "VOID": "Annulée"
     }
   },
   "POD": {

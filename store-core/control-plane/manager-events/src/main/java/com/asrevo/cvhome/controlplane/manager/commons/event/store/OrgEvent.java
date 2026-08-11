@@ -5,7 +5,7 @@ import java.util.List;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.event.Event;
 
-public sealed interface OrgEvent extends Event permits OrgCreatedEvent, OrgSubscriptionPlanChangedEvent {
+public sealed interface OrgEvent extends Event permits OrgCreatedEvent {
 
     ManagerOrgId org();
 

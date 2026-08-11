@@ -103,5 +103,47 @@
   },
   "SIGN_UP": {
     "SUCCESS": "تم التسجيل بنجاح. سيتم تحويلك إلى تسجيل الدخول."
+  },
+  "SUBSCRIPTION": {
+    "NO_PLAN": "لا توجد خطة",
+    "TRIAL_ENDS": "تنتهي الفترة التجريبية في",
+    "PAST_DUE": "فشل الدفع. سيتم إيقاف المتجر في",
+    "NOT_ACTIVE": "لا يوجد اشتراك نشط لهذا المتجر. اختر خطة لمتابعة العمل فيه.",
+    "WILL_NOT_RENEW": "لن يتم التجديد. يستمر الوصول حتى",
+    "RENEWS_ON": "يتجدد في",
+    "PENDING_CHANGE": "تغيير مجدول إلى",
+    "STOP_RENEWAL": "إيقاف التجديد",
+    "RESUME": "استئناف",
+    "CURRENT_PLAN": "الخطة الحالية",
+    "CHANGE_PLAN": "تغيير الخطة",
+    "INVOICES": "الفواتير",
+    "DOWNLOAD": "PDF",
+    "FEATURE": {
+      "MAX_PRODUCTS": "المنتجات",
+      "MAX_ORDERS_MONTH": "الطلبات شهريًا",
+      "MAX_ACCOUNTS": "حسابات الموظفين",
+      "MAX_STORAGE_MB": "مساحة التخزين (ميجابايت)",
+      "CUSTOM_DOMAIN": "نطاق مخصص",
+      "ANALYTICS": "التحليلات",
+      "PRIORITY_SUPPORT": "دعم ذو أولوية"
+    },
+    "STATUS": {
+      "PENDING": "غير مشترك",
+      "TRIALING": "فترة تجريبية",
+      "ACTIVE": "نشط",
+      "PAST_DUE": "فشل الدفع",
+      "SUSPENDED": "موقوف",
+      "CANCELED": "ملغى"
+    },
+    "INVOICE_STATUS": {
+      "DRAFT": "مسودة",
+      "OPEN": "غير مدفوعة",
+      "PAID": "مدفوعة",
+      "UNCOLLECTIBLE": "غير قابلة للتحصيل",
+      "VOID": "ملغاة"
+    },
+    "RECURRING_MONTH": "شهريًا",
+    "RECURRING_YEAR": "سنويًا",
+    "SUBSCRIBE": "اشترك"
   }
 }

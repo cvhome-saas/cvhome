@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.billing.api.errors.BillingApiUnavailableException;
+import com.asrevo.cvhome.billing.api.errors.StoreQuotaRefusedException;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ColorTheme;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
@@ -45,11 +47,16 @@ public class StoreManagerController {
         return internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
     }
 
+    /**
+     * @throws StoreQuotaRefusedException     billing will not let this org have another store — 422 with the reason
+     * @throws BillingApiUnavailableException billing could not be reached, so the store is not created; the caller
+     *                                        should retry rather than assume it exists
+     */
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
-
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestBody Map<Object, Object> request) {
+                                  @RequestBody Map<Object, Object> request)
+            throws StoreQuotaRefusedException, BillingApiUnavailableException {
         return this.managerService.createStore(identity.org(), request);
     }
 

@@ -103,5 +103,47 @@
   },
   "SIGN_UP": {
     "SUCCESS": "Registro completado. Te redirigimos al inicio de sesión."
+  },
+  "SUBSCRIPTION": {
+    "NO_PLAN": "Sin plan",
+    "TRIAL_ENDS": "La prueba termina el",
+    "PAST_DUE": "Un pago falló. La tienda se suspenderá el",
+    "NOT_ACTIVE": "Esta tienda no tiene una suscripción activa. Elige un plan para seguir trabajando en ella.",
+    "WILL_NOT_RENEW": "No se renovará. El acceso continúa hasta el",
+    "RENEWS_ON": "Se renueva el",
+    "PENDING_CHANGE": "Cambio programado a",
+    "STOP_RENEWAL": "Detener renovación",
+    "RESUME": "Reanudar",
+    "CURRENT_PLAN": "Plan actual",
+    "CHANGE_PLAN": "Cambiar de plan",
+    "INVOICES": "Facturas",
+    "DOWNLOAD": "PDF",
+    "FEATURE": {
+      "MAX_PRODUCTS": "Productos",
+      "MAX_ORDERS_MONTH": "Pedidos por mes",
+      "MAX_ACCOUNTS": "Cuentas de personal",
+      "MAX_STORAGE_MB": "Almacenamiento (MB)",
+      "CUSTOM_DOMAIN": "Dominio propio",
+      "ANALYTICS": "Analíticas",
+      "PRIORITY_SUPPORT": "Soporte prioritario"
+    },
+    "STATUS": {
+      "PENDING": "Sin suscripción",
+      "TRIALING": "Prueba",
+      "ACTIVE": "Activa",
+      "PAST_DUE": "Pago fallido",
+      "SUSPENDED": "Suspendida",
+      "CANCELED": "Cancelada"
+    },
+    "INVOICE_STATUS": {
+      "DRAFT": "Borrador",
+      "OPEN": "Pendiente",
+      "PAID": "Pagada",
+      "UNCOLLECTIBLE": "Incobrable",
+      "VOID": "Anulada"
+    },
+    "RECURRING_MONTH": "Mensual",
+    "RECURRING_YEAR": "Anual",
+    "SUBSCRIBE": "Suscribirse"
   }
 }

@@ -34,6 +34,13 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
+        billing:
+          name: billing
+          domain: ${com.asrevo.cvhome.app.domain}
+          port: 8021
+          schema: http
+          namespace: store-core.cvhome.lcl
+          gateway-service-name: store-core-gateway
         seller-ui:
           name: seller-ui
           domain: seller-ui.${com.asrevo.cvhome.app.domain}

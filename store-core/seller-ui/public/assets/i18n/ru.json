@@ -103,5 +103,47 @@
   },
   "SIGN_UP": {
     "SUCCESS": "Регистрация выполнена. Перенаправляем вас на вход."
+  },
+  "SUBSCRIPTION": {
+    "NO_PLAN": "Нет тарифа",
+    "TRIAL_ENDS": "Пробный период заканчивается",
+    "PAST_DUE": "Платёж не прошёл. Магазин будет приостановлен",
+    "NOT_ACTIVE": "У этого магазина нет активной подписки. Выберите тариф, чтобы продолжить работу.",
+    "WILL_NOT_RENEW": "Не продлевается. Доступ сохраняется до",
+    "RENEWS_ON": "Продление",
+    "PENDING_CHANGE": "Запланирован переход на",
+    "STOP_RENEWAL": "Отключить продление",
+    "RESUME": "Возобновить",
+    "CURRENT_PLAN": "Текущий тариф",
+    "CHANGE_PLAN": "Сменить тариф",
+    "INVOICES": "Счета",
+    "DOWNLOAD": "PDF",
+    "FEATURE": {
+      "MAX_PRODUCTS": "Товары",
+      "MAX_ORDERS_MONTH": "Заказов в месяц",
+      "MAX_ACCOUNTS": "Учётные записи",
+      "MAX_STORAGE_MB": "Хранилище (МБ)",
+      "CUSTOM_DOMAIN": "Свой домен",
+      "ANALYTICS": "Аналитика",
+      "PRIORITY_SUPPORT": "Приоритетная поддержка"
+    },
+    "STATUS": {
+      "PENDING": "Нет подписки",
+      "TRIALING": "Пробный период",
+      "ACTIVE": "Активна",
+      "PAST_DUE": "Платёж не прошёл",
+      "SUSPENDED": "Приостановлена",
+      "CANCELED": "Отменена"
+    },
+    "INVOICE_STATUS": {
+      "DRAFT": "Черновик",
+      "OPEN": "Не оплачен",
+      "PAID": "Оплачен",
+      "UNCOLLECTIBLE": "Списан",
+      "VOID": "Аннулирован"
+    },
+    "RECURRING_MONTH": "Ежемесячно",
+    "RECURRING_YEAR": "Ежегодно",
+    "SUBSCRIBE": "Подписаться"
   }
 }

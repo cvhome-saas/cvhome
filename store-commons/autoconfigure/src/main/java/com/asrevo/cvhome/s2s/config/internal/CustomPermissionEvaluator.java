@@ -80,6 +80,25 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, (ManagerStoreId) targetId);
             case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, (ManagerStoreId) targetId);
             case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, (ManagerStoreId) targetId);
+            default -> hasBillingPermission(authentication, targetId, action);
+        };
+    }
+
+    /**
+     * Split out of {@link #hasStoreCorePermission} to keep either switch readable, not because billing is special.
+     *
+     * <p>
+     * Note {@code QUOTA-CHECK} ignores the target: it is asked about an org before any store exists, and only a
+     * store-core service principal ever asks it.
+     * </p>
+     */
+    private boolean hasBillingPermission(Authentication authentication, Serializable targetId, String action) {
+        return switch (action) {
+            case "STORE-CORE.BILLING.READ" -> checker.hasAccessOnBillingRead(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.BILLING.MANAGE" -> checker.hasAccessOnBillingManage(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.BILLING.ENTITLEMENT-READ" ->
+                    checker.hasAccessOnBillingEntitlementRead(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.BILLING.QUOTA-CHECK" -> checker.hasAccessOnBillingQuotaCheck(authentication);
             default -> false;
         };
     }

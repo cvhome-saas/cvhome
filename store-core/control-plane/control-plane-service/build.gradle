@@ -45,10 +45,6 @@ dependencies {
     implementation libs.spring.boot.starter.opentelemetry
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
-
-    implementation libs.stripe.java
-    implementation libs.gson
-
     implementation project(':store-commons:ecs-commons:fargate-task-info')
     implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
 
@@ -61,9 +57,8 @@ dependencies {
     implementation project(":store-commons:uaa-client")
     implementation project(":store-commons:uaa-client-impl")
     implementation project(':store-core:control-plane:manager-events')
-    implementation project(':store-core:control-plane:subscription-events')
     implementation project(':store-pod:merchant:merchant-external-api')
-    implementation project(':store-core:control-plane:subscription-external-api')
+    implementation project(':store-core:billing:billing-external-api')
     implementation project(':store-commons:autoconfigure')
 
 //    developmentOnly libs.spring.boot.docker.compose

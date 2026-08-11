@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
+import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
@@ -25,12 +26,17 @@ public interface ProductCommonFacade {
     /**
      * Create / Update product
      */
+    /**
+     * @throws EntitlementExceededException creating this product would take the store past the product ceiling its
+     *                                      plan grants. Editing an existing one never can, so this only applies to a
+     *                                      new product.
+     */
     Long saveProduct(StoreMerchantId store, PersistableProduct product, LanguageCode language)
             throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
             ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
             ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ProductNotPersistedException;
+            InventoryNotConvertibleException, ProductNotPersistedException, EntitlementExceededException;
 
     /**
      * Update minimal product details
