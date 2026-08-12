@@ -392,22 +392,25 @@ excluded from placement, still routed.
 
 ## 6. Phases
 
-Each phase is independently shippable, QA-able, and gets a `qa/<name>.md` per CLAUDE.md.
+Each phase is independently shippable and QA-able. **All of them share one QA document** —
+`qa/tenancy-and-pod-registry-split.md`, named after this plan, appended to as each phase landed. That is the
+convention (CLAUDE.md, and `references/qa-testing.md` §7 in the `project-structure` skill); the per-phase files
+this plan originally produced were folded into it.
 
 ### Status — phases 0–6 are done and collected on one branch
 
 **Branch: `feat/tenancy-pod-registry-split`.** Phase 0 is already in `develop`; phases 1–6 were each developed
 on their own branch and are merged into this one, which is what goes to review as a single PR.
 
-| Phase | Commit | qa/ |
+| Phase | Commit | QA section |
 |---|---|---|
-| 0 — cleanup | `2215afcd2` (already in `develop`) | — |
-| 1 — rename to `tenancy` | `4a7ed20f6` | `rename-control-plane-to-tenancy.md`, `control-plane-pre-rename-cleanup.md` |
-| 2 — gateway resilience | `f63847fbd` | `gateway-pod-route-resilience.md` |
-| 3 — tenancy authorization gaps | `bc13e48e5` | `tenancy-authorization-gaps.md` |
-| 4 — pod-registry exists | `e85ecb60f` | `pod-registry-service.md` |
-| 5 — gateway cutover | `f415062b5` | `gateway-pod-registry-cutover.md` |
-| 6 — placement cutover | `112ccbb03` | `pod-placement-cutover.md` |
+| 0 — cleanup | `2215afcd2` (already in `develop`) | RNM-01 |
+| 1 — rename to `tenancy` | `4a7ed20f6` | RNM |
+| 2 — gateway resilience | `f63847fbd` | GWR-01 … GWR-06 |
+| 3 — tenancy authorization gaps | `bc13e48e5` | SEC |
+| 4 — pod-registry exists | `e85ecb60f` | PDR-01 … PDR-07 |
+| 5 — gateway cutover | `f415062b5` | GWR-07 … GWR-10 |
+| 6 — placement cutover | `112ccbb03` | PLC |
 
 Verified on the merged branch: full `build -x test -x check` clean, every touched module's `build` +
 checkstyle clean, **29 tests green** (`PodPlacementServiceTest` 10, `StoreTenantScopingTest` 7,
@@ -415,11 +418,11 @@ checkstyle clean, **29 tests green** (`PodPlacementServiceTest` 10, `StoreTenant
 
 **Phases 7–11 are also done**, each on its own branch cut from the one before:
 `feat/tenancy-drops-pods` (7), `feat/pod-health-capacity-drain` (8), `fix/tenancy-robustness` (9),
-`feat/tenancy-store-org-lifecycle` (10), `refactor/tenancy-conventions` (11). Their qa/ files are
-`tenancy-drops-pods.md`, `pod-health-capacity-drain.md`, `tenancy-robustness.md`,
-`tenancy-store-org-lifecycle.md` and `tenancy-conventions.md`.
+`feat/tenancy-store-org-lifecycle` (10), `refactor/tenancy-conventions` (11). Their QA sections are
+PDR-08 … PDR-15 (7), OPS (8), RBS (9), LIF (10) and CNV (11).
 
-**The plan is complete.** What remains is listed under "Still open" in `qa/tenancy-conventions.md`; the largest
+**The plan is complete.** What remains is listed under "99 — Known gaps" in
+`qa/tenancy-and-pod-registry-split.md`; the largest
 by far is `StoreRoleAccessChecker.isOrgAdmin`, which is still unfixed and still lets an org admin manage any
 store on the platform through the pods.
 
