@@ -7,14 +7,14 @@ export class ContentService {
     /** Degrades: the footer page list. Missing links beat a missing storefront. */
     public static getContents = async (storeContext: StoreContext): Promise<ContentPage | undefined> => {
         return orUndefined(apiFetch<ContentPage>(
-            `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.locale}`,
+            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.locale}`,
             get()));
     }
 
     /** Must fail: the CMS page is what the route is for. */
     public static getPage = async (storeContext: StoreContext, code: string): Promise<Page> => {
         return apiFetch<Page>(
-            `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/content/pages/name/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
+            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/pages/name/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
             get());
     }
 
@@ -24,7 +24,7 @@ export class ContentService {
      */
     public static getBox = async (storeContext: StoreContext, code: string): Promise<Box | undefined> => {
         return orUndefined(apiFetch<Box>(
-            `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/content/boxes/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
+            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/boxes/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
             get()));
     }
 }

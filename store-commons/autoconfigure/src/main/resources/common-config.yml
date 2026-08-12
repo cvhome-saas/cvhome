@@ -69,6 +69,13 @@ com:
           schema: http
           namespace: store-pod-507f1f77.cvhome.lcl
           gateway-service-name: spg
+        content:
+          name: content
+          domain: ${com.asrevo.cvhome.pod.domain}
+          port: 8121
+          schema: http
+          namespace: store-pod-507f1f77.cvhome.lcl
+          gateway-service-name: spg
         catalog:
           name: catalog
           domain: ${com.asrevo.cvhome.pod.domain}

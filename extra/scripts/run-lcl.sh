@@ -31,6 +31,7 @@ JAVA_SERVICES=(
     "pod-registry|:store-core:pod-registry:pod-registry-service|8022"
     "gateway|:store-core:gateway:gateway-service|8000"
     "merchant|:store-pod:merchant:merchant-service|8120"
+    "content|:store-pod:content:content-service|8121"
     "catalog|:store-pod:catalog:catalog-service|8122"
     "checkout|:store-pod:checkout:checkout-service|8123"
     "payment|:store-pod:payment:payment-service|8125"

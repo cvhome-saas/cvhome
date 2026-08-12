@@ -36,7 +36,7 @@ spring.cloud.discovery.client.simple.instances:
 ```
 
 Every service is listed with its hardcoded localhost URI (`uaa` 8001, `store-core-gateway` 8000, `seller-ui`
-8010, `tenancy` 8020, `landing-ui` 8110, `merchant` 8120, `catalog` 8122, `checkout` 8123, `cua` 8124,
+8010, `tenancy` 8020, `landing-ui` 8110, `merchant` 8120, `content` 8121, `catalog` 8122, `checkout` 8123, `cua` 8124,
 `payment` 8125). Spring Cloud Commons auto-configures the matching client from those properties:
 
 | App type | Bean | Where |
@@ -85,7 +85,7 @@ spring.cloud.ecs.discovery:
   enabled: true
   default-port: 8080
   service-ports: { uaa: 8001, store-core-gateway: 8000, seller-ui: 8010, tenancy: 8020,
-                   landing-ui: 8110, merchant: 8120, catalog: 8122, checkout: 8123, cua: 8124, payment: 8125 }
+                   landing-ui: 8110, merchant: 8120, content: 8121, catalog: 8122, checkout: 8123, cua: 8124, payment: 8125 }
 ```
 
 `fargate-config.yml` also sets `spring.cloud.loadbalancer.eager-load.clients` for every service, so LB state is

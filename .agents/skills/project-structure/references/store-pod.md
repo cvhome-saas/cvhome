@@ -11,7 +11,8 @@ store-pod/
 ├── spg/                          INFRA :80    Caddy edge proxy (Caddyfile, compose.yml)
 ├── landing-ui/                   FE    :8110  Next.js storefront + template system
 ├── cua/                          BE+FE :8124  shopper OAuth2 auth server (standalone)
-├── merchant/                     BE    :8120  store + CMS content
+├── merchant/                     BE    :8120  store, branding, domains, routing
+├── content/                      BE    :8121  CMS pages, boxes, files, images
 ├── catalog/                      BE    :8122  products & categories
 ├── checkout/                     BE    :8123  cart, orders, customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
@@ -71,23 +72,19 @@ Applies the `spring-boot` plugin, has the `*Application` main class, `*Api` cont
 directly (so `-commons` arrives transitively), plus cross-cutting infra: `fargate-task-info`,
 `ecs-service-discoveryclient`, `store-commons:autoconfigure`.
 
-Evidence: `MerchantApplication`, `MerchantStoreApi`, `ContentApi`, `ExternalMerchantStoreApi`, `AuthController`,
+Evidence: `MerchantApplication`, `MerchantStoreApi`, `ExternalMerchantStoreApi`, `AuthController`,
 `RouterController`.
 
 ## Per-pod breakdown
 
-### `merchant` — two sub-domains, one service
+### `merchant` and `content` — independent services
 
-The only pod with a second domain prefix. `merchant-*` covers the store entity itself; `content-*` covers
-CMS-style pages/boxes attached to a store. Each gets its own commons+core pair, both wired into the single
-`merchant-service`, which exposes `MerchantStoreApi` and `ContentApi`.
+`merchant` owns store, branding, domain, and routing data. Its modules are `merchant-commons`, `merchant-core`,
+`merchant-external-api`, and `merchant-service`.
 
-```
-'store-pod:merchant:merchant-commons'      'store-pod:merchant:content-commons'
-'store-pod:merchant:merchant-core'         'store-pod:merchant:content-core'
-'store-pod:merchant:merchant-external-api'
-'store-pod:merchant:merchant-service'
-```
+`content` owns CMS pages, boxes, files, and images. Its modules are `content-commons`, `content-core`, and
+`content-service`; it has no external-api module. SPG routes legacy content paths under `/merchant` to
+`content-service` indefinitely.
 
 ### `catalog` — products & categories
 

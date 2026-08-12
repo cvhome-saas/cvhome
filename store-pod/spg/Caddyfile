@@ -23,15 +23,39 @@
 
 (routes) {
 
-    handle_path /merchant* {
+    handle_path /content* {
         tracing {
-            span merchant
+            span content
         }
         header {
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://merchant.{$NAMESPACE}:8120
+        reverse_proxy http://content.{$NAMESPACE}:8121
+    }
+
+    handle_path /merchant* {
+        @legacy_content path /api/v1/content /api/v1/content/* /api/v1/private/content /api/v1/private/content/* /api/v1/private/files
+        handle @legacy_content {
+            tracing {
+                span content-legacy
+            }
+            header {
+                response X-Trace-Id {http.vars.trace_id}
+                response X-Span-Id {http.vars.span_id}
+            }
+            reverse_proxy http://content.{$NAMESPACE}:8121
+        }
+        handle {
+            tracing {
+                span merchant
+            }
+            header {
+                response X-Trace-Id {http.vars.trace_id}
+                response X-Span-Id {http.vars.span_id}
+            }
+            reverse_proxy http://merchant.{$NAMESPACE}:8120
+        }
     }
 
     handle_path /catalog* {
