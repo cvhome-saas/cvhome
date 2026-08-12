@@ -4,16 +4,31 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.asrevo.cvhome.billing.services.entitlement.ReactiveExternalEntitlementService;
-import com.asrevo.cvhome.controlplane.pod.api.ExternalPodClient;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
+import com.asrevo.cvhome.podregistry.api.ReactiveExternalPodService;
 import com.asrevo.cvhome.s2s.config.internal.WebClientBuilder;
 
 @Configuration
 public class ClientsConfig {
 
+    /**
+     * The pod list now comes from pod-registry rather than tenancy.
+     *
+     * <p>
+     * This is what the split was for. Tenancy is the busiest service in store-core and the one most often
+     * redeployed, and the gateway's whole tenant route table used to hang off it; pod-registry holds one table that
+     * changes when infrastructure changes, which is to say almost never.
+     * </p>
+     *
+     * <p>
+     * {@code RemoteErrorCatalog.none()} for the same reason as billing below: {@code PodClient} treats every failure
+     * identically — keep the last known routes — so there is nothing for a catalog to distinguish.
+     * </p>
+     */
     @Bean
-    public ExternalPodClient externalPodClient(WebClientBuilder webClientBuilder) {
-        return webClientBuilder.buildClient("tenancy", ExternalPodClient.class, RemoteErrorCatalog.none());
+    public ReactiveExternalPodService reactivePodService(WebClientBuilder webClientBuilder) {
+        return webClientBuilder.buildClient("pod-registry", ReactiveExternalPodService.class,
+                RemoteErrorCatalog.none());
     }
 
     /**

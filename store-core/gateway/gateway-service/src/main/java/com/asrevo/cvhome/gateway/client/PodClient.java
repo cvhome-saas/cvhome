@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.Pod;
-import com.asrevo.cvhome.controlplane.pod.api.ExternalPodClient;
+import com.asrevo.cvhome.podregistry.api.ReactiveExternalPodService;
 import com.asrevo.cvhome.s2s.config.internal.ServiceUrlBuilder;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
@@ -60,7 +60,7 @@ public class PodClient implements RouteDefinitionRepository {
 
     private final ServiceDomainProperties serviceDomainProperties;
 
-    private final ExternalPodClient externalPodClient;
+    private final ReactiveExternalPodService podService;
 
     private final Environment environment;
 
@@ -88,7 +88,7 @@ public class PodClient implements RouteDefinitionRepository {
 
     @Scheduled(fixedRateString = "${cvhome.gateway.route-refresh-rate:PT1M}")
     public void refreshRoutes() {
-        externalPodClient.listPods()
+        podService.listPods()
                 .map(this::toRouteDefinitions)
                 .subscribe(this::applyRefresh,
                         e -> log.error("Pod route refresh failed; keeping {} known route(s)",

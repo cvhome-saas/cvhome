@@ -68,7 +68,6 @@ include(
         'store-core:tenancy:tenancy-commons',
         'store-core:tenancy:tenancy-events',
         'store-core:tenancy:tenancy-service',
-        'store-core:tenancy:pod-external-api',
         'store-core:billing:billing-commons',
         'store-core:billing:billing-events',
         'store-core:billing:billing-external-api',

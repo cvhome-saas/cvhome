@@ -18,7 +18,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodEndpoint;
 import com.asrevo.cvhome.commons.domain.PodId;
-import com.asrevo.cvhome.controlplane.pod.api.ExternalPodClient;
+import com.asrevo.cvhome.podregistry.api.ReactiveExternalPodService;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 import reactor.core.publisher.Mono;
@@ -45,7 +45,7 @@ class PodRouteResilienceTest {
 
     private static final Pod POD_B = pod("607f1f77bcf86cd799439012", "pod-b", "http://pod-b.example");
 
-    private ExternalPodClient externalPodClient;
+    private ReactiveExternalPodService podService;
 
     private ApplicationEventPublisher publisher;
 
@@ -59,7 +59,7 @@ class PodRouteResilienceTest {
     private PodClient buildPodClient(List<Pod> configuredPods) {
         Environment environment = new MockEnvironment().withProperty("spring.application.name", "store-core-gateway");
         ServiceDomainProperties properties = new ServiceDomainProperties(Map.of(), configuredPods);
-        return new PodClient(properties, externalPodClient, environment, publisher);
+        return new PodClient(properties, podService, environment, publisher);
     }
 
     private List<String> routeIds(PodClient client) {
@@ -68,7 +68,7 @@ class PodRouteResilienceTest {
 
     @BeforeEach
     void setUp() {
-        externalPodClient = mock(ExternalPodClient.class);
+        podService = mock(ReactiveExternalPodService.class);
         publisher = mock(ApplicationEventPublisher.class);
         podClient = buildPodClient(List.of(POD_A));
         podClient.seedFromConfiguration();
@@ -77,7 +77,7 @@ class PodRouteResilienceTest {
     @Test
     @DisplayName("a failed refresh leaves the existing routes in place")
     void failedRefreshKeepsLastKnownGood() {
-        when(externalPodClient.listPods()).thenReturn(Mono.error(new IllegalStateException("registry is down")));
+        when(podService.listPods()).thenReturn(Mono.error(new IllegalStateException("registry is down")));
 
         podClient.refreshRoutes();
 
@@ -90,7 +90,7 @@ class PodRouteResilienceTest {
     @Test
     @DisplayName("an empty response is honoured — that is a real answer, not a failure")
     void emptyResponseIsAppliedButOnlyWhenItIsTheRealAnswer() {
-        when(externalPodClient.listPods()).thenReturn(Mono.just(List.of()));
+        when(podService.listPods()).thenReturn(Mono.just(List.of()));
 
         podClient.refreshRoutes();
 
@@ -100,7 +100,7 @@ class PodRouteResilienceTest {
     @Test
     @DisplayName("routes are replaced and a refresh is published only when they actually change")
     void publishesOnlyOnChange() {
-        when(externalPodClient.listPods()).thenReturn(Mono.just(List.of(POD_A, POD_B)));
+        when(podService.listPods()).thenReturn(Mono.just(List.of(POD_A, POD_B)));
 
         podClient.refreshRoutes();
         assertThat(routeIds(podClient)).containsExactly(POD_A_ROUTE_ID, "pod-607f1f77");
@@ -116,7 +116,7 @@ class PodRouteResilienceTest {
     void lookupDoesNotCallTheRegistry() {
         routeIds(podClient);
 
-        verify(externalPodClient, never()).listPods();
+        verify(podService, never()).listPods();
     }
 
     @Test
