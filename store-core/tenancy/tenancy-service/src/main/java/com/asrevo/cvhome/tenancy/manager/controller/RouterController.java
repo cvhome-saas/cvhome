@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.podregistry.commons.errors.PodNotFoundException;
+import com.asrevo.cvhome.podregistry.services.pod.CachingPodDirectory;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
-import com.asrevo.cvhome.tenancy.org.service.PodService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,22 +27,39 @@ public class RouterController {
 
     public final InternalStoreService internalStoreService;
 
-    private final PodService podService;
+    private final CachingPodDirectory podDirectory;
 
     /**
-     * Which pod hosts a store. Guarded twice on purpose: the permission gate, and an org check inside
-     * {@link InternalStoreService#getStorePod(UserOrgStoreIdentity, ManagerStoreId)} — the gate alone does not hold
-     * a foreign store out, because the shared {@code isOrgAdmin} ignores the store it is asked about.
+     * Which pod hosts a store.
      *
      * <p>
-     * It had no annotation at all, so any authenticated principal could map any store id to its pod endpoint.
+     * The two halves come from different owners now: tenancy holds the store→pod binding in
+     * {@code manager_store.pod_id}, and the pod registry holds what that pod actually is. The lookup goes through
+     * {@link CachingPodDirectory}, which degrades to its last known map and then to the configuration seed, so a
+     * registry outage does not take this endpoint down.
      * </p>
+     *
+     * <p>
+     * Guarded twice on purpose: the permission gate, and an org check inside
+     * {@link InternalStoreService#getStorePod(UserOrgStoreIdentity, ManagerStoreId)} — the gate alone does not hold
+     * a foreign store out, because the shared {@code isOrgAdmin} ignores the store it is asked about.
+     * </p>
+     *
+     * @throws StoreNotFoundException the store does not exist, or belongs to another organization
+     * @throws PodNotFoundException   the store names a pod the registry has never heard of. A real inconsistency —
+     *                                the binding outlived the pod — so it is an error rather than the {@code null}
+     *                                body this used to return through {@code PodRepository.orElse(null)}
      */
     @GetMapping("store-pod-by-store-id")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
     public Pod getStorePodByStoreId(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                    @RequestParam ManagerStoreId store) throws StoreNotFoundException {
-        return podService.pod(internalStoreService.getStorePod(identity, store));
+                                    @RequestParam ManagerStoreId store)
+            throws StoreNotFoundException, PodNotFoundException {
+        PodId podId = internalStoreService.getStorePod(identity, store);
+        return podDirectory.find(podId).orElseThrow(() -> {
+            log.error("Store {} is bound to pod {}, which the registry does not know", store, podId);
+            return PodNotFoundException.of(podId);
+        });
     }
 
 }

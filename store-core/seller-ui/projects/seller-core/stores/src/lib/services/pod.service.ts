@@ -3,9 +3,9 @@ import {CrudService} from "seller-core";
 import {Observable} from "rxjs";
 import {PageRequest, PageT} from "seller-core";
 
-/** Base path for pod endpoints. Pods move out to their own service (pod-registry) later in the tenancy
- *  split, and this constant is the one line that has to change when they do. */
-export const POD_API_BASE = '/tenancy/api/v1/pod';
+/** Base path for pod endpoints. Pods now live in their own service; tenancy no longer has a pod table.
+ *  Hoisting this constant in the rename is what made that move a one-line change here. */
+export const POD_API_BASE = '/pod-registry/api/v1/pod';
 
 @Injectable({
   providedIn: 'root'

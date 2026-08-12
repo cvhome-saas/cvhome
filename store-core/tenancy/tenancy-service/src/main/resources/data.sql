@@ -25,8 +25,3 @@ INSERT INTO tenancy.manager_store(id, name, created_date, org_id, pod_id, provis
 VALUES ('65f023632bc26470c104b75f', 'ORG2-STORE2', CURRENT_DATE, '352023632b046970c104b76f', '507f1f77bcf86cd799439011',
         'SUCCESSFULLY_PROVISIONING', 1)
 ON CONFLICT DO NOTHING;
-
-INSERT INTO org.pod(id, name, endpoint, endpoint_type, org_id, version)
-VALUES ('507f1f77bcf86cd799439011', 'pod-507f1f77', 'http://spg-507f1f77.gateway.com', 'EXTERNAL', null, 1)
-ON CONFLICT DO NOTHING;
-

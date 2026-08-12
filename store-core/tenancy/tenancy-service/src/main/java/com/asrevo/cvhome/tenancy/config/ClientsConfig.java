@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.tenancy.config;
 
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +10,10 @@ import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService
 import com.asrevo.cvhome.billing.services.quota.ExternalStoreQuotaService;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryApiErrors;
 import com.asrevo.cvhome.podregistry.services.placement.ExternalPodPlacementService;
+import com.asrevo.cvhome.podregistry.services.pod.CachingPodDirectory;
+import com.asrevo.cvhome.podregistry.services.pod.ExternalPodService;
 import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
+import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 
 @Configuration
 public class ClientsConfig {
@@ -16,6 +21,9 @@ public class ClientsConfig {
     private static final String BILLING_SERVICE_NAME = "billing";
 
     private static final String POD_REGISTRY_SERVICE_NAME = "pod-registry";
+
+    /** Pod endpoints change when infrastructure changes, so a minute of staleness costs nothing. */
+    private static final Duration POD_DIRECTORY_TTL = Duration.ofMinutes(1);
 
     /**
      * Built from {@code ExternalStoreQuotaService}, the caller-side half of billing's contract — never from
@@ -66,6 +74,33 @@ public class ClientsConfig {
     public ExternalPodPlacementService externalPodPlacementService(RestClientBuilder restClientBuilder) {
         return restClientBuilder.buildClient(POD_REGISTRY_SERVICE_NAME, ExternalPodPlacementService.class,
                 PodRegistryApiErrors.CATALOG);
+    }
+
+    @Bean
+    public ExternalPodService externalPodService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient(POD_REGISTRY_SERVICE_NAME, ExternalPodService.class,
+                PodRegistryApiErrors.CATALOG);
+    }
+
+    /**
+     * Resolves a store's pod for the router endpoint, now that tenancy no longer holds a pod table.
+     *
+     * <p>
+     * Seeded from {@code ServiceDomainProperties} so a tenancy that starts while the registry is down still answers
+     * for the pods it was deployed alongside — the same seed {@code StorePodClientFactory} already resolves against,
+     * which is why provisioning needs no registry call at all.
+     * </p>
+     *
+     * <p>
+     * Fails <em>open</em>, unlike the placement client above. Placement decides where a store will live and must
+     * refuse rather than guess; this only answers where one already lives, and a stale endpoint beats a 502 on the
+     * screen a seller uses to reach their store.
+     * </p>
+     */
+    @Bean
+    public CachingPodDirectory cachingPodDirectory(ExternalPodService externalPodService,
+                                                  ServiceDomainProperties serviceDomainProperties) {
+        return new CachingPodDirectory(externalPodService, serviceDomainProperties.pods(), POD_DIRECTORY_TTL);
     }
 
 }

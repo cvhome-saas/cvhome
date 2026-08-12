@@ -2,6 +2,7 @@ package com.asrevo.cvhome.podregistry.api.v1;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,9 +68,32 @@ public class PodApi {
     @PreAuthorize(READ)
     public List<Pod> listPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity) {
         Pageable pageable = Pageable.unpaged();
-        boolean platformWide = identity == null || identity.org() == null || identity.org().id() == null;
-        return platformWide ? podService.listAllPods(pageable).toList()
+        return isPlatformWide(identity) ? podService.listAllPods(pageable).toList()
                 : podService.listAllPods(identity.org(), pageable).toList();
+    }
+
+    /**
+     * Whether the caller sees every org's pods: a super admin or a {@code store_core} service principal, both of
+     * which arrive with no org claim. The gateway and tenancy are service principals, so both see all.
+     */
+    private static boolean isPlatformWide(UserOrgStoreIdentity identity) {
+        return identity == null || identity.org() == null || identity.org().id() == null;
+    }
+
+    /**
+     * The same pods as {@link #listPods}, paged — what the super-admin pod screen binds to.
+     *
+     * <p>
+     * Scoped identically: an org admin sees only its own private pods. It exists alongside the unpaged {@code list}
+     * because the gateway wants every route in one call and a table wants a page; folding them together would make
+     * one of the two callers wrong.
+     * </p>
+     */
+    @GetMapping
+    @PreAuthorize(READ)
+    public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
+        return isPlatformWide(identity) ? podService.listAllPods(pageable)
+                : podService.listAllPods(identity.org(), pageable);
     }
 
     /** The registry's own view, including lifecycle, capacity and health. Super admin only. */
