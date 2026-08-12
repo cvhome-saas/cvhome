@@ -1,0 +1,137 @@
+# PodApi — com.asrevo.cvhome.podregistry.api.v1.PodApi (@RequestMapping "api/v1/pod")
+#
+# Addressed through the gateway, not pod-registry's own port (:8022): a real request crosses
+# store-core-gateway on :8000, which is where the /pod-registry prefix is stripped. Env vars come from the
+# repo-root http-client.env.json; the session id lives in the gitignored http-client.private.env.json
+# (copy the .example).
+#
+# Nothing here is public. A pod's endpoint tells you exactly which host runs a tenant's storefront, so even
+# the list needs a token — there is no /public/ path in this service by design.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### the route source — what the gateway polls every minute to build its per-pod routes
+# @name listPods
+GET {{SELLER_UI_URL}}/pod-registry/api/v1/pod/list
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("the registry answers", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    client.test("the local pod is seeded from configuration", function () {
+        const pod = response.body.find(p => p.name === "pod-507f1f77");
+        client.assert(pod !== undefined, "pod-507f1f77 missing — PodSeedInitializer did not run");
+        client.assert(pod.endpoint.endpoint.length > 0, "pod has no endpoint, so no route can be built");
+    });
+    client.global.set("SEEDED_POD_ID", response.body[0].id.id);
+%}
+
+### the registry's own view — lifecycle, capacity and health, which `list` deliberately does not carry
+GET {{SELLER_UI_URL}}/pod-registry/api/v1/pod/{{POD_ID}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("super admin reads the full view", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.lifecycleState === "ACTIVE", "seeded pod should be ACTIVE");
+        client.assert(response.body.visibility === "PUBLIC", "the local pod has no owner, so it is public");
+        client.assert(response.body.capacityStores === 0, "nothing has been placed yet");
+    });
+%}
+
+### the failure this endpoint exists to produce — an unknown id is a 404 with a code, not 200 with null
+GET {{SELLER_UI_URL}}/pod-registry/api/v1/pod/000000000000000000000000
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("unknown pod is a typed 404", function () {
+        client.assert(response.status === 404, "status " + response.status);
+        client.assert(response.body.code === "POD_REGISTRY.POD.NOT_FOUND", "code " + response.body.code);
+    });
+%}
+
+### creating a pod — super admin only
+# @name createPod
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "pod-http-test",
+  "endpoint": {
+    "endpoint": "http://pod-http-test.gateway.com",
+    "type": "EXTERNAL"
+  }
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    client.global.set("CREATED_POD_ID", response.body.id.id);
+%}
+
+### the same name twice is a 409 naming the pod, not a 500 carrying a constraint violation
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "pod-http-test",
+  "endpoint": {
+    "endpoint": "http://pod-http-test.gateway.com",
+    "type": "EXTERNAL"
+  }
+}
+
+> {%
+    client.test("duplicate name is a typed 409", function () {
+        client.assert(response.status === 409, "status " + response.status);
+        client.assert(response.body.code === "POD_REGISTRY.POD.NAME_TAKEN", "code " + response.body.code);
+    });
+%}
+
+### tidy up — deleting is safe here only because nothing was ever placed on this pod
+DELETE {{SELLER_UI_URL}}/pod-registry/api/v1/pod/{{CREATED_POD_ID}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("deleted", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### an org admin may read, but only its own private pods — the local pod is public, so this is empty
+# Run this one with an org1-admin session in http-client.private.env.json.
+GET {{SELLER_UI_URL}}/pod-registry/api/v1/pod/list
+Cookie: SESSION={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("org admin gets a list, not a 403", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    client.test("and does not see pods it does not own", function () {
+        client.assert(response.body.every(p => p.orgId !== null),
+            "a public pod leaked into an org admin's list");
+    });
+%}
+
+### an org admin may not manage pods
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod
+Cookie: SESSION={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "pod-should-not-exist",
+  "endpoint": {
+    "endpoint": "http://nope.gateway.com",
+    "type": "EXTERNAL"
+  }
+}
+
+> {%
+    client.test("org admin is refused", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}

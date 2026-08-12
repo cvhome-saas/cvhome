@@ -20,7 +20,7 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
 
     // Every path prefix that belongs to a backend. The array is negated below to build seller-ui's catch-all, so a
     // service missing from here is not merely unrouted — its calls are answered with the console's shell HTML.
-    private static final String[] backendServices = {"tenancy", "billing", "uaa", "spg"};
+    private static final String[] backendServices = {"tenancy", "billing", "pod-registry", "uaa", "spg"};
 
     private static final String[] backendServicesPattern = Arrays.stream(backendServices)
             .map(it -> String.format("/%s/**", it))
@@ -44,6 +44,9 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path("/billing/**")
                         .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
                         .uri("lb://billing"))
+                .route(r -> r.path("/pod-registry/**")
+                        .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
+                        .uri("lb://pod-registry"))
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()

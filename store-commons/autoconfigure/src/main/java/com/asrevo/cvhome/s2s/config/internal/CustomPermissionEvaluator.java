@@ -99,6 +99,20 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             case "STORE-CORE.BILLING.ENTITLEMENT-READ" ->
                     checker.hasAccessOnBillingEntitlementRead(authentication, (ManagerStoreId) targetId);
             case "STORE-CORE.BILLING.QUOTA-CHECK" -> checker.hasAccessOnBillingQuotaCheck(authentication);
+            default -> hasPodRegistryPermission(authentication, action);
+        };
+    }
+
+    /**
+     * The pod registry's tokens. All three ignore the target: a pod is infrastructure, not tenant data, so there is
+     * no store to scope against — which is also why the registry answers an org admin only its own private pods
+     * rather than relying on the permission layer to filter rows.
+     */
+    private boolean hasPodRegistryPermission(Authentication authentication, String action) {
+        return switch (action) {
+            case "STORE-CORE.POD.READ" -> checker.hasAccessOnPodRead(authentication);
+            case "STORE-CORE.POD.MANAGE" -> checker.hasAccessOnPodManage(authentication);
+            case "STORE-CORE.POD.PLACEMENT" -> checker.hasAccessOnPodPlacement(authentication);
             default -> false;
         };
     }

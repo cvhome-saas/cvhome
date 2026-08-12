@@ -9,6 +9,7 @@ spring:
           - "uaa"
           - "tenancy"
           - "billing"
+          - "pod-registry"
           - "seller-ui"
           - "spg"
           - "merchant"
@@ -29,6 +30,7 @@ spring:
           "seller-ui": 8010
           "tenancy": 8020
           "billing": 8021
+          "pod-registry": 8022
           "landing-ui": 8110
           "merchant": 8120
           "catalog": 8122

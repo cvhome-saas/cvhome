@@ -26,6 +26,12 @@ spring:
                 metadata:
                   service-name: billing
                   instance: billing-1
+            pod-registry:
+              - uri: "http://localhost:8022"
+                instance-id: pod-registry-1
+                metadata:
+                  service-name: pod-registry
+                  instance: pod-registry-1
             seller-ui:
               - uri: "http://localhost:8010"
                 instance-id: seller-ui-1
