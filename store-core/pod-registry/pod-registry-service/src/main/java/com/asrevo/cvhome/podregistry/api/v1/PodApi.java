@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.commons.dto.PodView;
 import com.asrevo.cvhome.podregistry.commons.errors.DuplicatePodNameException;
 import com.asrevo.cvhome.podregistry.commons.errors.PodNotFoundException;
+import com.asrevo.cvhome.podregistry.service.PodLifecycleService;
 import com.asrevo.cvhome.podregistry.service.PodService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,6 +57,8 @@ public class PodApi {
     private static final String MANAGE = "hasPermission(null,'PodId','STORE-CORE.POD.MANAGE')";
 
     private final PodService podService;
+
+    private final PodLifecycleService lifecycleService;
 
     /**
      * Every pod, unpaged — the gateway's route source.
@@ -117,12 +121,38 @@ public class PodApi {
     }
 
     /**
+     * Stops new stores being placed here, without touching the ones already on it.
+     *
+     * <p>
+     * This is the safe counterpart to {@link #delete}. A drained pod keeps its gateway route and keeps serving its
+     * tenants; it simply stops being a candidate for placement. Deleting, by contrast, strands every store on it.
+     * </p>
+     */
+    @PostMapping("{id}/drain")
+    @PreAuthorize(MANAGE)
+    public PodView drain(@PathVariable PodId id, Authentication authentication) throws PodNotFoundException {
+        return lifecycleService.drain(id, actorOf(authentication));
+    }
+
+    /** Returns a drained pod to rotation. */
+    @PostMapping("{id}/resume")
+    @PreAuthorize(MANAGE)
+    public PodView resume(@PathVariable PodId id, Authentication authentication) throws PodNotFoundException {
+        return lifecycleService.resume(id, actorOf(authentication));
+    }
+
+    private static String actorOf(Authentication authentication) {
+        return authentication == null ? "unknown" : authentication.getName();
+    }
+
+    /**
      * Removes a pod from the registry.
      *
      * <p>
      * It does <strong>not</strong> check whether stores are still placed here, and there is no foreign key to stop
      * it — tenancy owns {@code manager_store.pod_id} in a different schema. Deleting a populated pod orphans every
-     * store on it. Drain, in phase 8, is the safe operation; until then this is a sharp tool and super-admin only.
+     * store on it. {@link #drain} is the safe operation and is what an operator retiring a pod should use; this
+     * remains a sharp tool, and is super-admin only.
      * </p>
      */
     @DeleteMapping("{id}")

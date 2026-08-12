@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementDecision;
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementRequest;
+import com.asrevo.cvhome.podregistry.commons.dto.RecordPlacementRequest;
 import com.asrevo.cvhome.podregistry.commons.errors.NoEligiblePodException;
+import com.asrevo.cvhome.podregistry.service.PodCapacityService;
 import com.asrevo.cvhome.podregistry.service.PodPlacementService;
 import com.asrevo.cvhome.podregistry.services.placement.IPodPlacementService;
 
@@ -36,6 +38,8 @@ public class PodPlacementApi implements IPodPlacementService {
 
     private final PodPlacementService placementService;
 
+    private final PodCapacityService capacityService;
+
     /**
      * A refusal is an error status rather than a 200 carrying a verdict, unlike billing's quota check.
      *
@@ -54,6 +58,27 @@ public class PodPlacementApi implements IPodPlacementService {
         log.info("Placed a new store for org {} on pod {} ({})",
                 request.org() == null ? null : request.org().id(), decision.podId(), decision.reason());
         return decision;
+    }
+
+    /**
+     * Records that a store actually landed on a pod, so the registry can count it.
+     *
+     * <p>
+     * Called from tenancy's outbox after the store row is committed, not from {@code place} above — placement is a
+     * question, this is the answer, and only the second one should move a counter. Reserving capacity at decision
+     * time would leak it every time a creation was abandoned.
+     * </p>
+     *
+     * <p>
+     * The outbox retries, so this is called more than once for the same store as a matter of course. It is
+     * idempotent on the store id and answers 200 either way: a redelivery is a normal event, not a conflict, and
+     * returning an error for one would make the outbox retry it forever.
+     * </p>
+     */
+    @PostMapping("placement-recorded")
+    @PreAuthorize("hasPermission(null,'PodId','STORE-CORE.POD.PLACEMENT')")
+    public void recordPlacement(@RequestBody RecordPlacementRequest request) {
+        capacityService.recordPlacement(request);
     }
 
 }

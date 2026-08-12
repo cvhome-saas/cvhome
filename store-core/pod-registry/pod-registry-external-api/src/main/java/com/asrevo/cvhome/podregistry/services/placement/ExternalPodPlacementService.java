@@ -8,6 +8,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementDecision;
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementRequest;
+import com.asrevo.cvhome.podregistry.commons.dto.RecordPlacementRequest;
 
 /**
  * What a caller of the placement API depends on. Blocking, for servlet callers such as tenancy — the reactive
@@ -37,5 +38,20 @@ public interface ExternalPodPlacementService {
     @PostExchange("/placement")
     PlacementDecision place(@RequestBody PlacementRequest request)
             throws PodPlacementRefusedException, PodRegistryUnavailableException;
+
+    /**
+     * Tells the registry a store actually landed, so it can count it against the pod's capacity.
+     *
+     * <p>
+     * Called after the store row is committed, from an outbox handler, so it inherits durable retries — which is
+     * also why the registry makes it idempotent. It declares only the unavailable failure: there is no refusal to
+     * express, because by this point the store exists whether the registry likes it or not.
+     * </p>
+     *
+     * @throws PodRegistryUnavailableException the registry could not be reached, so the count is not yet updated;
+     *                                         the caller should let the outbox retry rather than swallow it
+     */
+    @PostExchange("/placement-recorded")
+    void recordPlacement(@RequestBody RecordPlacementRequest request) throws PodRegistryUnavailableException;
 
 }
