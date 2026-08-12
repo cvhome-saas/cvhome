@@ -12,7 +12,7 @@ import com.asrevo.cvhome.billing.commons.errors.SubscriptionChangeRejectedExcept
 import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Subscription;
@@ -70,7 +70,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      * @throws BillingProviderUnavailableException nothing was decided; the change may or may not have landed, so the
      *                                             caller must not write a local plan change
      */
-    public void upgradeNow(ManagerStoreId store, StripeSubscriptionId subscription, PlanPriceEntity target)
+    public void upgradeNow(StoreMerchantId store, StripeSubscriptionId subscription, PlanPriceEntity target)
             throws SubscriptionChangeRejectedException, BillingProviderUnavailableException {
         String key = idempotencyKey(SUBSCRIPTION_UPDATE,
                 String.format(SUBJECT, subscription.id(), target.getStripePriceId().id()));
@@ -115,7 +115,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      * @return the schedule Stripe created, so it can be released if the downgrade is called off
      * @throws BillingProviderUnavailableException nothing was decided
      */
-    public StripeScheduleId scheduleDowngrade(ManagerStoreId store, StripeSubscriptionId subscription,
+    public StripeScheduleId scheduleDowngrade(StoreMerchantId store, StripeSubscriptionId subscription,
                                               PlanPriceEntity target, Instant effectiveAt)
             throws BillingProviderUnavailableException {
         String key = idempotencyKey(SCHEDULE_CREATE,
@@ -182,7 +182,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      * not what calling off a downgrade means.
      * </p>
      */
-    public void releaseSchedule(ManagerStoreId store, StripeScheduleId schedule)
+    public void releaseSchedule(StoreMerchantId store, StripeScheduleId schedule)
             throws BillingProviderUnavailableException {
         String key = idempotencyKey(SUBSCRIPTION_RESUME, schedule.id());
         recordIntent(key, store, SUBSCRIPTION_RESUME);
@@ -213,7 +213,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      * {@code customer.subscription.deleted}.
      * </p>
      */
-    public void setRenewal(ManagerStoreId store, StripeSubscriptionId subscription, boolean renew)
+    public void setRenewal(StoreMerchantId store, StripeSubscriptionId subscription, boolean renew)
             throws BillingProviderUnavailableException {
         String key = idempotencyKey(SUBSCRIPTION_UPDATE, String.format("%s:renew:%s", subscription.id(), renew));
         recordIntent(key, store, SUBSCRIPTION_UPDATE);
@@ -236,7 +236,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      * away something already bought is not a thing a customer should be able to do to themselves by accident.
      * </p>
      */
-    public void cancelNow(ManagerStoreId store, StripeSubscriptionId subscription)
+    public void cancelNow(StoreMerchantId store, StripeSubscriptionId subscription)
             throws BillingProviderUnavailableException {
         String key = idempotencyKey(SUBSCRIPTION_CANCEL, subscription.id());
         recordIntent(key, store, SUBSCRIPTION_CANCEL);

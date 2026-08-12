@@ -1,7 +1,7 @@
 package com.asrevo.cvhome.podregistry.commons.dto;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * Tells the registry that a store now actually lives on a pod.
@@ -13,5 +13,5 @@ import com.asrevo.cvhome.commons.domain.PodId;
  * creation was abandoned.
  * </p>
  */
-public record RecordPlacementRequest(ManagerStoreId store, PodId pod) {
+public record RecordPlacementRequest(StoreMerchantId store, PodId pod) {
 }

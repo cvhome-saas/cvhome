@@ -10,7 +10,7 @@ import com.asrevo.cvhome.billing.domain.SubscriptionInvoiceEntity;
 import com.asrevo.cvhome.billing.repository.SubscriptionInvoiceRepository;
 import com.asrevo.cvhome.billing.service.InvoiceService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InvoiceView> list(ManagerStoreId store, ManagerOrgId scopeOrg, Pageable pageable) {
+    public Page<InvoiceView> list(StoreMerchantId store, ManagerOrgId scopeOrg, Pageable pageable) {
         Page<SubscriptionInvoiceEntity> page = scopeOrg == null
                 ? invoiceRepository.findAllByStoreIdOrderByIssuedAtDesc(store, pageable)
                 : invoiceRepository.findAllByStoreIdAndOrgIdOrderByIssuedAtDesc(store, scopeOrg, pageable);

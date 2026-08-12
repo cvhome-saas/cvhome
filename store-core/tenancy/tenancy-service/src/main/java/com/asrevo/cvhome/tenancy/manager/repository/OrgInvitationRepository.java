@@ -7,12 +7,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.tenancy.commons.dto.InvitationStatus;
 import com.asrevo.cvhome.tenancy.manager.entity.OrgInvitationEntity;
 
 @Repository
-public interface OrgInvitationRepository extends CrudRepository<OrgInvitationEntity, ManagerStoreId> {
+public interface OrgInvitationRepository extends CrudRepository<OrgInvitationEntity, StoreMerchantId> {
 
     /** Looked up by hash — the plaintext token is never stored, so this is the only way in. */
     Optional<OrgInvitationEntity> findByTokenHash(String tokenHash);

@@ -51,7 +51,7 @@ export class StoresListFacade {
   }
 
   onEdit(row: ManagerStore): void {
-    this.router.navigate(['pages/store-management/store/', row.id.id]);
+    this.router.navigate(['pages/store-management/store/', row.id]);
   }
 
   onDelete(row: ManagerStore): void {
@@ -62,7 +62,7 @@ export class StoresListFacade {
       }
     }).onClose.subscribe(res => {
       if (res) {
-        this.storeService.deleteStore(row.id.id).subscribe({
+        this.storeService.deleteStore(row.id).subscribe({
           next: () => {
             this.notify.success('USER_FORM.USER_REMOVED');
             this.loadStores();

@@ -1,7 +1,3 @@
-export interface ManagerStoreId {
-  id: string;
-}
-
 export interface IdentityId {
   id: string;
 }
@@ -12,9 +8,14 @@ export interface CreateStoreRequest {
   email?: Email;
 }
 
-/** Mirrors tenancy manager/commons/dto/ManagerStoreDto (record) */
+/**
+ * Mirrors tenancy manager/commons/dto/ManagerStoreDto (record).
+ *
+ * `id` is a bare string: a store id serializes as `"65f0…"`, unlike `orgId` and `podId`, which are still
+ * `{id: "…"}` objects.
+ */
 export interface ManagerStore {
-  id: ManagerStoreId
+  id: string
   name: string
   orgId: IdentityId
   podId: PodId

@@ -16,8 +16,8 @@ import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
@@ -71,19 +71,19 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Transactional
     @Override
-    public void completeProvisioning(ManagerStoreId store) {
+    public void completeProvisioning(StoreMerchantId store) {
         storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.completeProvisioning()));
     }
 
     @Transactional
     @Override
-    public void failProvisioning(ManagerStoreId store) {
+    public void failProvisioning(StoreMerchantId store) {
         storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning()));
     }
 
     @Transactional
     @Override
-    public void startProvisioning(ManagerStoreId store) {
+    public void startProvisioning(StoreMerchantId store) {
         storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.startProvisioning()));
     }
 
@@ -109,7 +109,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
         String orgId = isPlatformWide(identityInfo) ? null : identityInfo.org().id().toString();
         String storeId = null;
         if (!isPlatformWide(identityInfo) && identityInfo.isAnyStoreAdmin()) {
-            storeId = identityInfo.store();
+            storeId = identityInfo.store().storeMerchantId();
         }
         String name = listManagerStoreQuery == null ? null : listManagerStoreQuery.name();
         return visiblePage(orgId, storeId, name, pageable);
@@ -158,7 +158,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
         if (stores.isEmpty()) {
             return stores;
         }
-        Map<ManagerStoreId, SubscriptionStatus> byStore;
+        Map<StoreMerchantId, SubscriptionStatus> byStore;
         try {
             byStore = entitlementService.snapshots(stores.stream().map(ManagerStoreDto::id).toList())
                     .stream()
@@ -170,7 +170,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
         return stores.stream().map(it -> ManagerStoreDto.billed(it, byStore.get(it.id()))).toList();
     }
 
-    private ManagerStoreEntity getManagerStoreEntity(ManagerStoreId store) throws StoreNotFoundException {
+    private ManagerStoreEntity getManagerStoreEntity(StoreMerchantId store) throws StoreNotFoundException {
         return storeRepository.findById(store).orElseThrow(() -> StoreNotFoundException.of(store));
     }
 
@@ -189,7 +189,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
      * 403.
      * </p>
      */
-    private ManagerStoreEntity getManagerStoreEntity(UserOrgStoreIdentity identity, ManagerStoreId store)
+    private ManagerStoreEntity getManagerStoreEntity(UserOrgStoreIdentity identity, StoreMerchantId store)
             throws StoreNotFoundException {
         ManagerStoreEntity entity = getManagerStoreEntity(store);
         if (!isPlatformWide(identity) && !identity.org().equals(entity.getOrgId())) {
@@ -201,19 +201,19 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     }
 
     @Override
-    public ManagerStoreDto findStore(ManagerStoreId store) throws StoreNotFoundException {
+    public ManagerStoreDto findStore(StoreMerchantId store) throws StoreNotFoundException {
         return storeMappers.toDto(getManagerStoreEntity(store));
     }
 
     @Override
-    public ManagerStoreDto findStore(UserOrgStoreIdentity identity, ManagerStoreId store)
+    public ManagerStoreDto findStore(UserOrgStoreIdentity identity, StoreMerchantId store)
             throws StoreNotFoundException {
         return storeMappers.toDto(getManagerStoreEntity(identity, store));
     }
 
     @Transactional
     @Override
-    public ManagerStoreDto updateStatus(ManagerStoreId store, StoreStatus status) throws StoreNotFoundException {
+    public ManagerStoreDto updateStatus(StoreMerchantId store, StoreStatus status) throws StoreNotFoundException {
         ManagerStoreEntity entity = getManagerStoreEntity(store);
         entity.setStatus(status);
         return storeMappers.toDto(storeRepository.save(entity));
@@ -229,7 +229,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
      * </p>
      */
     @Override
-    public void requireOperable(ManagerStoreId store) throws StoreNotFoundException, StoreNotOperableException {
+    public void requireOperable(StoreMerchantId store) throws StoreNotFoundException, StoreNotOperableException {
         ManagerStoreEntity entity = getManagerStoreEntity(store);
         StoreStatus status = Objects.requireNonNullElse(entity.getStatus(), StoreStatus.ACTIVE);
         if (!status.operable()) {
@@ -249,12 +249,12 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     }
 
     @Override
-    public PodId getStorePod(ManagerStoreId managerStoreId) throws StoreNotFoundException {
+    public PodId getStorePod(StoreMerchantId managerStoreId) throws StoreNotFoundException {
         return getManagerStoreEntity(managerStoreId).getPodId();
     }
 
     @Override
-    public PodId getStorePod(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
+    public PodId getStorePod(UserOrgStoreIdentity identity, StoreMerchantId managerStoreId)
             throws StoreNotFoundException {
         return getManagerStoreEntity(identity, managerStoreId).getPodId();
     }

@@ -13,8 +13,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Roles;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
@@ -49,14 +49,14 @@ class StoreTenantScopingTest {
 
     private static final ManagerOrgId OTHER_ORG = new ManagerOrgId("31f023932bc66470c104b770");
 
-    private static final ManagerStoreId STORE = new ManagerStoreId("507f1f77bcf86cd799439011");
+    private static final StoreMerchantId STORE = new StoreMerchantId("507f1f77bcf86cd799439011");
 
     private ManagerStoreRepository repository;
 
     private InternalStoreServiceImpl service;
 
     private static UserOrgStoreIdentity identity(ManagerOrgId org, Roles... roles) {
-        return new UserOrgStoreIdentity(org, "*", Set.of(roles));
+        return new UserOrgStoreIdentity(org, new StoreMerchantId("*"), Set.of(roles));
     }
 
     private static ManagerStoreEntity storeOwnedBy(ManagerOrgId org) {

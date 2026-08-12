@@ -2,7 +2,7 @@ package com.asrevo.cvhome.tenancy.errors;
 
 import java.io.Serial;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.ErrorBuilder;
 import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.ResourceNotFoundException;
@@ -34,9 +34,9 @@ public class StoreNotFoundException extends ResourceNotFoundException {
     /**
      * Takes the id rather than an {@code Object} so the message carries the bare id. Handed the value object, the
      * builder renders its record {@code toString()} and the detail reads
-     * {@code ManagerStoreId[id=65f0…]}, which is noise to whoever is reading the error.
+     * {@code StoreMerchantId[id=65f0…]}, which is noise to whoever is reading the error.
      */
-    public static StoreNotFoundException of(ManagerStoreId storeId) {
+    public static StoreNotFoundException of(StoreMerchantId storeId) {
         String id = storeId == null || storeId.getId() == null ? "unknown" : storeId.getId().toString();
         return new ErrorBuilder<>(TenancyErrors.STORE_NOT_FOUND, StoreNotFoundException::new)
                 .detail("No store is visible with id %s.", id)

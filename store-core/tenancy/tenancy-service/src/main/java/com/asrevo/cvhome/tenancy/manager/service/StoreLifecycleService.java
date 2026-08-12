@@ -8,7 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.AuditEntityType;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
@@ -51,19 +51,19 @@ public class StoreLifecycleService {
     private final TenancyAuditService auditService;
 
     @Transactional
-    public ManagerStoreDto suspend(UserOrgStoreIdentity identity, ManagerStoreId store, String actor, String reason)
+    public ManagerStoreDto suspend(UserOrgStoreIdentity identity, StoreMerchantId store, String actor, String reason)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return move(identity, store, StoreStatus.SUSPENDED, actor, reason);
     }
 
     @Transactional
-    public ManagerStoreDto resume(UserOrgStoreIdentity identity, ManagerStoreId store, String actor)
+    public ManagerStoreDto resume(UserOrgStoreIdentity identity, StoreMerchantId store, String actor)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return move(identity, store, StoreStatus.ACTIVE, actor, "resumed by operator");
     }
 
     @Transactional
-    public ManagerStoreDto archive(UserOrgStoreIdentity identity, ManagerStoreId store, String actor)
+    public ManagerStoreDto archive(UserOrgStoreIdentity identity, StoreMerchantId store, String actor)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return move(identity, store, StoreStatus.ARCHIVED, actor, "archived by owner");
     }
@@ -72,12 +72,12 @@ public class StoreLifecycleService {
      * Soft delete. The row and its id survive; only the status changes.
      */
     @Transactional
-    public ManagerStoreDto delete(UserOrgStoreIdentity identity, ManagerStoreId store, String actor)
+    public ManagerStoreDto delete(UserOrgStoreIdentity identity, StoreMerchantId store, String actor)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return move(identity, store, StoreStatus.DELETED, actor, "deleted by owner");
     }
 
-    private ManagerStoreDto move(UserOrgStoreIdentity identity, ManagerStoreId store, StoreStatus to, String actor,
+    private ManagerStoreDto move(UserOrgStoreIdentity identity, StoreMerchantId store, StoreStatus to, String actor,
                                  String detail)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         ManagerStoreDto current = internalStoreService.findStore(identity, store);

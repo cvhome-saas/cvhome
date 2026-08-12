@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.errors.ForeignOrgUserAccessException;
 import com.asrevo.cvhome.tenancy.errors.ForeignStoreUserAccessException;
@@ -49,18 +49,18 @@ public class UserAccountApi {
     }
 
     @GetMapping("list")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.LIST')")
 
     public ReadableUserList list(@AuthenticationPrincipal Principal principal,
-                                 @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+                                 @OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam StoreMerchantId store,
                                  Pageable pageable) throws UaaApiUnavailableException {
         return managedUserAccountService.list(identity, store, pageable);
     }
 
     @GetMapping("find-one")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.LIST')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.LIST')")
     public ReadableUser findOne(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                @RequestParam ManagerStoreId store, @RequestParam String userId)
+                                @RequestParam StoreMerchantId store, @RequestParam String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException {
         return managedUserAccountService.findOne(identity, store, userId);
@@ -73,29 +73,29 @@ public class UserAccountApi {
     }
 
     @PostMapping("create")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.CREATE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.CREATE')")
 
     public ReadableUser create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user)
+                               @RequestParam StoreMerchantId store, @RequestBody PersistableUser user)
             throws UaaConflictException, UaaApiUnavailableException {
         return managedUserAccountService.createUser(identity, store, user);
     }
 
     @PutMapping("update")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.UPDATE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.UPDATE')")
 
     public ReadableUser update(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                               @RequestParam ManagerStoreId store, @RequestBody PersistableUser user)
+                               @RequestParam StoreMerchantId store, @RequestBody PersistableUser user)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaConflictException, UaaApiUnavailableException {
         return managedUserAccountService.updateUser(identity, store, user);
     }
 
     @PostMapping("reset")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.RESET_PASSWORD')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.RESET_PASSWORD')")
 
     public void resetPassword(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                              @RequestParam ManagerStoreId store, @RequestParam String userId,
+                              @RequestParam StoreMerchantId store, @RequestParam String userId,
                               @RequestBody UserPassword passwordRequestDto)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException {
@@ -103,9 +103,9 @@ public class UserAccountApi {
     }
 
     @DeleteMapping("delete")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DELETE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.DELETE')")
 
-    public void delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+    public void delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam StoreMerchantId store,
                        @RequestParam String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {
@@ -113,9 +113,9 @@ public class UserAccountApi {
     }
 
     @PostMapping("enable")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.ENABLE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.ENABLE')")
 
-    public void enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+    public void enable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam StoreMerchantId store,
                        @RequestParam String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {
@@ -123,9 +123,9 @@ public class UserAccountApi {
     }
 
     @PostMapping("disable")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.USERS.DISABLE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.DISABLE')")
 
-    public void disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam ManagerStoreId store,
+    public void disable(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, @RequestParam StoreMerchantId store,
                         @RequestParam String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {

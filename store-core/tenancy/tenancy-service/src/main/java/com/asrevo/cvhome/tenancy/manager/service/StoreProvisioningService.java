@@ -5,8 +5,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.RemoteServiceTimeoutException;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
@@ -42,7 +42,7 @@ public class StoreProvisioningService {
      *                                           outbox retries
      * @throws RemoteServiceTimeoutException     likewise — the create may or may not have landed
      */
-    public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, CreateStoreRequest payload)
+    public void provisioning(ManagerOrgId managerOrgId, StoreMerchantId store, PodId pod, CreateStoreRequest payload)
             throws StoreNotFoundException, RemoteServiceUnavailableException, RemoteServiceTimeoutException {
         if (alreadyProvisioned(store)) {
             // The pod create is not idempotent on the pod's side, so a retry after a create that actually
@@ -73,7 +73,7 @@ public class StoreProvisioningService {
         }
     }
 
-    private boolean alreadyProvisioned(ManagerStoreId store) throws StoreNotFoundException {
+    private boolean alreadyProvisioned(StoreMerchantId store) throws StoreNotFoundException {
         ManagerStoreDto current = internalStoreService.findStore(store);
         return current.provisioningState() == ProvisioningState.SUCCESSFULLY_PROVISIONING;
     }

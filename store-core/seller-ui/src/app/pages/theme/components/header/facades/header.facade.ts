@@ -8,7 +8,7 @@ import {ManagerStoreService} from 'seller-core';
 import {ApiErrorService} from 'seller-core';
 import {SelectedStoreService} from 'seller-core';
 import {SelectedLanguageService} from 'seller-core';
-import {ManagerStoreId, ManagerStore} from 'seller-core';
+import {ManagerStore} from 'seller-core';
 import {HeaderMenuAction, STORE_SELECT_DISABLED_ROUTE_PREFIXES} from '../constants/header.constants';
 
 @Injectable()
@@ -59,9 +59,9 @@ export class HeaderFacade {
       .subscribe((event) => this.onUserMenuItemClick(event.item));
   }
 
-  onStoreChange(managerStoreId: ManagerStoreId | undefined): void {
-    if (managerStoreId?.id != undefined) {
-      this.selectedStoreService.select(managerStoreId.id);
+  onStoreChange(storeId: string | undefined): void {
+    if (storeId != undefined) {
+      this.selectedStoreService.select(storeId);
       location.reload();
     }
   }

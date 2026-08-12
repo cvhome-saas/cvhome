@@ -59,7 +59,7 @@ public class TenancyAuditEntity {
      * The bare id, not the value object's {@code toString()}.
      *
      * <p>
-     * {@code String.valueOf(someStoreId)} yields {@code ManagerStoreId[id=65f0…]} — forty-odd characters into a
+     * {@code String.valueOf(someStoreId)} yields {@code StoreMerchantId[id=65f0…]} — forty-odd characters into a
      * {@code varchar(24)} column, so every audited change failed on the insert and took the change with it. The
      * unwrapping lives here so no caller has to remember it.
      * </p>

@@ -7,7 +7,7 @@ import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
 import com.asrevo.cvhome.billing.events.stripe.StripeWebhookReceivedEvent;
 import com.asrevo.cvhome.billing.service.WebhookApplyService;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.event.EventImpl;
 import com.asrevo.cvhome.errors.UncheckedBaseException;
 
@@ -45,7 +45,7 @@ public class StripeWebhookReceivedEventImpl implements EventImpl<StripeWebhookRe
     @Override
     @OutboxHandler
     public void process(StripeWebhookReceivedEvent event) {
-        ManagerStoreId store = new ManagerStoreId(event.store());
+        StoreMerchantId store = new StoreMerchantId(event.store());
         log.info("Applying Stripe event {} of type {} to store {}", event.eventId(), event.stripeEventType(),
                 store);
         try {
@@ -59,7 +59,7 @@ public class StripeWebhookReceivedEventImpl implements EventImpl<StripeWebhookRe
         }
     }
 
-    private void dispatch(StripeWebhookReceivedEvent event, ManagerStoreId store)
+    private void dispatch(StripeWebhookReceivedEvent event, StoreMerchantId store)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException, PlanPriceNotFoundException {
         switch (event.stripeEventType()) {
             case "checkout.session.completed" ->

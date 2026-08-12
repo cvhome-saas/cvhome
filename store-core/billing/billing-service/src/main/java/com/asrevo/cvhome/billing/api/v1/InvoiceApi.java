@@ -12,7 +12,7 @@ import com.asrevo.cvhome.billing.commons.dto.InvoiceView;
 import com.asrevo.cvhome.billing.service.InvoiceService;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 
 import lombok.RequiredArgsConstructor;
@@ -34,9 +34,9 @@ public class InvoiceApi {
     private final InvoiceService invoiceService;
 
     @GetMapping("list")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.READ')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.READ')")
     public Page<InvoiceView> list(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestParam("store") ManagerStoreId store, Pageable pageable) {
+                                  @RequestParam("store") StoreMerchantId store, Pageable pageable) {
         return invoiceService.list(store, tenantScopeOf(identity), pageable);
     }
 

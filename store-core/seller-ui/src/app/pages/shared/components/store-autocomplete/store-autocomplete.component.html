@@ -1,6 +1,6 @@
-<nb-select (selectedChange)="changed({id:$event})" [disabled]="!selectable" [selected]="selectedItem?.id"
+<nb-select (selectedChange)="changed($event)" [disabled]="!selectable" [selected]="selectedItem"
            placeholder="Select Store">
-  @for (s of facade.stores(); track s.id.id) {
-    <nb-option [value]="s.id.id">{{ s.name }}</nb-option>
+  @for (s of facade.stores(); track s.id) {
+    <nb-option [value]="s.id">{{ s.name }}</nb-option>
   }
 </nb-select>

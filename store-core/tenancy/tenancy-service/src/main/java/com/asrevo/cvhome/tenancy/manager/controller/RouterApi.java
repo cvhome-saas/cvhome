@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.commons.errors.PodNotFoundException;
 import com.asrevo.cvhome.podregistry.services.pod.CachingPodDirectory;
@@ -42,7 +42,7 @@ public class RouterApi {
      *
      * <p>
      * Guarded twice on purpose: the permission gate, and an org check inside
-     * {@link InternalStoreService#getStorePod(UserOrgStoreIdentity, ManagerStoreId)} — the gate alone does not hold
+     * {@link InternalStoreService#getStorePod(UserOrgStoreIdentity, StoreMerchantId)} — the gate alone does not hold
      * a foreign store out, because the shared {@code isOrgAdmin} ignores the store it is asked about.
      * </p>
      *
@@ -53,9 +53,9 @@ public class RouterApi {
      *                                body this used to return through {@code PodRepository.orElse(null)}
      */
     @GetMapping("store-pod-by-store-id")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-FIND-ONE')")
     public Pod getStorePodByStoreId(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                    @RequestParam ManagerStoreId store)
+                                    @RequestParam StoreMerchantId store)
             throws StoreNotFoundException, PodNotFoundException, StoreNotOperableException {
         // Refused for a suspended or archived store, and for one whose organization is closed: this is the
         // call the console makes to enter a store, so it is where "suspended" has to bite. Reading the

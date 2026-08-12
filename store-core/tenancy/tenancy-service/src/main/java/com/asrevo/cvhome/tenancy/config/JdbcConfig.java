@@ -9,8 +9,8 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 @Configuration
 public class JdbcConfig extends AbstractJdbcConfiguration {
@@ -30,10 +30,10 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
                 return new ManagerOrgId(source);
             }
         });
-        converters.add(new Converter<String, ManagerStoreId>() {
+        converters.add(new Converter<String, StoreMerchantId>() {
             @Override
-            public ManagerStoreId convert(String source) {
-                return new ManagerStoreId(source);
+            public StoreMerchantId convert(String source) {
+                return new StoreMerchantId(source);
             }
         });
 

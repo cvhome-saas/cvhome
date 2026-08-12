@@ -24,7 +24,7 @@ store-commons/
 Domain primitives shared by every layer. `java-library-conventions` plugin, `api mongodb.bson`.
 
 `com.asrevo.cvhome.commons.domain` holds ~40 **value objects** used pervasively in place of raw `String`/`Long`:
-`StoreMerchantId`, `ManagerStoreId`, `ManagerOrgId`, `PodId`, `LanguageCode`, `CurrencyCode`, `CountryIsoCode`,
+`StoreMerchantId`, `ManagerOrgId`, `PodId`, `LanguageCode`, `CurrencyCode`, `CountryIsoCode`,
 `ZoneCode`, `Email`, `Domain`, `Pod`, `PodEndpoint`, `Theme`, `ColorTheme`, `Roles`, `UserOrgStoreIdentity`,
 `SubscriptionPlan*`, plus `BaseEntity`/`Identifier`/`Entity`. This is a load-bearing convention, not a style
 choice — argument resolvers and the permission evaluator dispatch on these types. See `api-conventions.md`.

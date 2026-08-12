@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.s2s.model.PodInfoProperties;
@@ -56,15 +55,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
-            case CATALOG_RESERVE -> checker.isSameStorePod(authentication,
-                    new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
+            case CATALOG_RESERVE -> checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
                  CUA_ALL, PAYMENT_ALL -> checker.hasManageAccessOnStore(authentication,
-                    new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
+                    (StoreMerchantId) targetId, this.pod);
 
-            case CUSTOMER_ALL -> checker.isCustomerInSameStore(authentication,
-                    new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()));
+            case CUSTOMER_ALL -> checker.isCustomerInSameStore(authentication, (StoreMerchantId) targetId);
 
             default -> false;
         };
@@ -72,14 +69,14 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     private boolean hasStoreCorePermission(Authentication authentication, Serializable targetId, String action) {
         return switch (action) {
-            case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.STORE-FIND-ONE" -> checker.hasAccessOnStoreFindOne(authentication, (StoreMerchantId) targetId);
 
-            case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.USERS.CREATE" -> checker.hasAccessOnStoreUsersCreate(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.USERS.UPDATE" -> checker.hasAccessOnStoreUsersUpdate(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.USERS.LIST" -> checker.hasAccessOnStoreUsersList(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.CREATE" -> checker.hasAccessOnStoreUsersCreate(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.UPDATE" -> checker.hasAccessOnStoreUsersUpdate(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, (StoreMerchantId) targetId);
             default -> hasBillingPermission(authentication, targetId, action);
         };
     }
@@ -94,10 +91,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
      */
     private boolean hasBillingPermission(Authentication authentication, Serializable targetId, String action) {
         return switch (action) {
-            case "STORE-CORE.BILLING.READ" -> checker.hasAccessOnBillingRead(authentication, (ManagerStoreId) targetId);
-            case "STORE-CORE.BILLING.MANAGE" -> checker.hasAccessOnBillingManage(authentication, (ManagerStoreId) targetId);
+            case "STORE-CORE.BILLING.READ" -> checker.hasAccessOnBillingRead(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.BILLING.MANAGE" -> checker.hasAccessOnBillingManage(authentication, (StoreMerchantId) targetId);
             case "STORE-CORE.BILLING.ENTITLEMENT-READ" ->
-                    checker.hasAccessOnBillingEntitlementRead(authentication, (ManagerStoreId) targetId);
+                    checker.hasAccessOnBillingEntitlementRead(authentication, (StoreMerchantId) targetId);
             case "STORE-CORE.BILLING.QUOTA-CHECK" -> checker.hasAccessOnBillingQuotaCheck(authentication);
             default -> hasPodRegistryPermission(authentication, action);
         };

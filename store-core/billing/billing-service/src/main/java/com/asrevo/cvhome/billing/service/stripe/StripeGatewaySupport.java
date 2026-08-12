@@ -11,7 +11,7 @@ import com.asrevo.cvhome.billing.commons.StripeRequestOperation;
 import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.StripeRequestEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.stripe.exception.StripeException;
 import com.stripe.net.RequestOptions;
 
@@ -86,7 +86,7 @@ public abstract class StripeGatewaySupport {
      * </p>
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void recordIntent(String idempotencyKey, ManagerStoreId store, StripeRequestOperation operation) {
+    protected void recordIntent(String idempotencyKey, StoreMerchantId store, StripeRequestOperation operation) {
         if (!stripeRequestRepository.existsById(idempotencyKey)) {
             stripeRequestRepository.save(StripeRequestEntity.intent(idempotencyKey, store, operation));
         }

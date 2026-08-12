@@ -7,12 +7,12 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.tenancy.manager.entity.ManagerStoreEntity;
 
 public interface ManagerStoreRepository
-        extends CrudRepository<ManagerStoreEntity, ManagerStoreId>, QueryByExampleExecutor<ManagerStoreEntity> {
+        extends CrudRepository<ManagerStoreEntity, StoreMerchantId>, QueryByExampleExecutor<ManagerStoreEntity> {
 
     Boolean existsByName(String name);
 

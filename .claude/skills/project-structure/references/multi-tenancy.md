@@ -8,12 +8,19 @@ mapping between them, and everything else — routing, TLS, data isolation, regi
 | Level | Identifier | Lives in | Meaning |
 |---|---|---|---|
 | **Organization** | `ManagerOrgId` | tenancy (`tenancy` schema) | The customer account that signs up and pays. Owns stores. |
-| **Store** | `ManagerStoreId` (tenancy) / `StoreMerchantId` (inside a pod) | tenancy + the pod's own DB | One storefront. The unit a shopper actually visits. |
+| **Store** | `StoreMerchantId` | tenancy + the pod's own DB | One storefront. The unit a shopper actually visits. |
 | **Pod** | `PodId` | tenancy (`org.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
 
-Note the deliberate id split: tenancy calls a store `ManagerStoreId` (an `ObjectId`), while inside a pod
-the same store is a `StoreMerchantId` (a `String`). The control plane tracks *that a store exists and where*;
-the pod owns the store's actual data. Neither side needs the other's model.
+**One store id everywhere.** `StoreMerchantId` (a `String`) is the store's identifier in tenancy, billing,
+pod-registry, the gateway and every pod alike. It used to be two types — store-core carried an `ObjectId`
+wrapper called `ManagerStoreId` and the pods a `String` wrapper — with the permission evaluator translating
+between them on every request; they held the same value, so they were merged. The value is still ObjectId hex
+(`StoreMerchantId.newId()`, called only by tenancy), stored `varchar(24)` in store-core and `varchar(50)` in
+the pods. It serializes as a bare string, and its deserializer still accepts the two older object shapes so
+outbox rows written before the merge remain readable.
+
+Control plane and pod still divide the work the same way: tenancy tracks *that a store exists and where*, the
+pod owns the store's actual data. They now just agree on what to call it.
 
 `PodId.shorten()` takes the first 8 chars of the ObjectId — that short form is what you see everywhere in
 infrastructure naming: namespace `store-pod-507f1f77.cvhome.lcl`, domain `spg-507f1f77.gateway.com`, gateway
@@ -60,7 +67,7 @@ still reaches it uniformly.
 
 ```java
 @Table(schema = "tenancy", name = "manager_store")
-public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
+public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, StoreMerchantId> {
     private String name;
     private ManagerOrgId orgId;                    // which customer owns it
     private PodId podId;                           // ← WHICH PHYSICAL POD HOSTS IT

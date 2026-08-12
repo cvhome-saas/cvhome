@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -36,7 +36,7 @@ public class OrgTrialGrantEntity {
     private ManagerOrgId orgId;
 
     @Column("store_id")
-    private ManagerStoreId storeId;
+    private StoreMerchantId storeId;
 
     @Column("granted_at")
     private Instant grantedAt;

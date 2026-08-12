@@ -170,8 +170,9 @@ holds for three of six):
 `@JsonSerialize(using = LanguageCodeSerializer.class)`, whose `serialize` calls
 `gen.writeString(value.code())` — so on the wire it is `"en"`, not `{ code: "en" }`. Before
 typing any value-object field, grep for a custom serializer or `@JsonValue`; default to
-`string`. **Exception:** `ManagerStoreId` / `PodId` have no such serializer and *do* serialize
-as objects — `crud.service.ts:60` already relies on `store.id.id` and `store.podId.id`.
+`string`. **Exception:** `PodId` has no such serializer and *does* serialize as an object, so
+`store.podId.id`. (A store's own id was in that category when this was written; it is now a
+bare `string` — see `multi-tenancy.md`.)
 
 **The controller's declared return type is the contract**, and it is not always `Readable*`.
 Read the actual method signature in `*Api.java` / `*Controller.java`. `@JsonIgnore` fields are

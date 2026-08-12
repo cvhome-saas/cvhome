@@ -10,7 +10,7 @@ import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -55,7 +55,7 @@ public class StripeCheckoutGateway extends StripeGatewaySupport {
      *                                              retrying
      * @throws BillingProviderUnavailableException  Stripe could not be reached, so nothing was decided
      */
-    public String createSubscriptionSession(ManagerStoreId store, ManagerOrgId org, StripeCustomerId customer,
+    public String createSubscriptionSession(StoreMerchantId store, ManagerOrgId org, StripeCustomerId customer,
                                             PlanPriceEntity price, String successUrl, String cancelUrl)
             throws SubscriptionChangeRejectedException, BillingProviderUnavailableException {
         String key = idempotencyKey(StripeRequestOperation.CHECKOUT_SESSION_CREATE,

@@ -14,9 +14,9 @@ import com.asrevo.cvhome.billing.commons.StripeSubscriptionId;
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
 import com.asrevo.cvhome.billing.domain.StoreSubscriptionEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
-public interface StoreSubscriptionRepository extends CrudRepository<StoreSubscriptionEntity, ManagerStoreId> {
+public interface StoreSubscriptionRepository extends CrudRepository<StoreSubscriptionEntity, StoreMerchantId> {
 
     List<StoreSubscriptionEntity> findAllByOrgId(ManagerOrgId orgId);
 
@@ -31,7 +31,7 @@ public interface StoreSubscriptionRepository extends CrudRepository<StoreSubscri
      * org's plan, spend and invoices.
      * </p>
      */
-    Optional<StoreSubscriptionEntity> findByIdAndOrgId(ManagerStoreId id, ManagerOrgId orgId);
+    Optional<StoreSubscriptionEntity> findByIdAndOrgId(StoreMerchantId id, ManagerOrgId orgId);
 
     int countByOrgIdAndStatus(ManagerOrgId orgId, SubscriptionStatus status);
 

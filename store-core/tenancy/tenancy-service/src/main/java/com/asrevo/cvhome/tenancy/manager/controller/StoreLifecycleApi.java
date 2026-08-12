@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.IllegalLifecycleTransitionException;
@@ -36,14 +36,14 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Store lifecycle", description = "Suspend, resume, archive and delete a store")
 public class StoreLifecycleApi {
 
-    private static final String OWNER = "hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')";
+    private static final String OWNER = "hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-FIND-ONE')";
 
     private final StoreLifecycleService lifecycleService;
 
     @PostMapping("private/store/suspend")
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
     public ManagerStoreDto suspend(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @RequestParam ManagerStoreId store,
+                                   @RequestParam StoreMerchantId store,
                                    @RequestParam(required = false) String reason, Authentication authentication)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return lifecycleService.suspend(identity, store, actorOf(authentication),
@@ -53,7 +53,7 @@ public class StoreLifecycleApi {
     @PostMapping("private/store/resume")
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
     public ManagerStoreDto resume(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestParam ManagerStoreId store, Authentication authentication)
+                                  @RequestParam StoreMerchantId store, Authentication authentication)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return lifecycleService.resume(identity, store, actorOf(authentication));
     }
@@ -61,7 +61,7 @@ public class StoreLifecycleApi {
     @PostMapping("private/store/archive")
     @PreAuthorize(OWNER)
     public ManagerStoreDto archive(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @RequestParam ManagerStoreId store, Authentication authentication)
+                                   @RequestParam StoreMerchantId store, Authentication authentication)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return lifecycleService.archive(identity, store, actorOf(authentication));
     }
@@ -73,7 +73,7 @@ public class StoreLifecycleApi {
     @DeleteMapping("private/store")
     @PreAuthorize(OWNER)
     public ManagerStoreDto delete(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestParam ManagerStoreId store, Authentication authentication)
+                                  @RequestParam StoreMerchantId store, Authentication authentication)
             throws StoreNotFoundException, IllegalLifecycleTransitionException {
         return lifecycleService.delete(identity, store, actorOf(authentication));
     }

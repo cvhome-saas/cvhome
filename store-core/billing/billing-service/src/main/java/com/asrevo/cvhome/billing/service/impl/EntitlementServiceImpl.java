@@ -13,7 +13,7 @@ import com.asrevo.cvhome.billing.domain.StoreSubscriptionEntity;
 import com.asrevo.cvhome.billing.mappers.SubscriptionMappers;
 import com.asrevo.cvhome.billing.repository.StoreSubscriptionRepository;
 import com.asrevo.cvhome.billing.service.EntitlementService;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
@@ -43,7 +43,7 @@ public class EntitlementServiceImpl implements EntitlementService {
 
     private final SubscriptionMappers mappers;
 
-    private final Cache<ManagerStoreId, EntitlementSnapshot> cache;
+    private final Cache<StoreMerchantId, EntitlementSnapshot> cache;
 
     public EntitlementServiceImpl(StoreSubscriptionRepository subscriptionRepository, SubscriptionMappers mappers) {
         this.subscriptionRepository = subscriptionRepository;
@@ -56,7 +56,7 @@ public class EntitlementServiceImpl implements EntitlementService {
 
     @Override
     @Transactional(readOnly = true)
-    public EntitlementSnapshot snapshot(ManagerStoreId store) throws SubscriptionNotFoundException {
+    public EntitlementSnapshot snapshot(StoreMerchantId store) throws SubscriptionNotFoundException {
         EntitlementSnapshot cached = cache.getIfPresent(store);
         if (cached != null) {
             return cached;
@@ -69,7 +69,7 @@ public class EntitlementServiceImpl implements EntitlementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EntitlementSnapshot> snapshots(List<ManagerStoreId> stores) {
+    public List<EntitlementSnapshot> snapshots(List<StoreMerchantId> stores) {
         if (stores == null || stores.isEmpty()) {
             return List.of();
         }
@@ -81,7 +81,7 @@ public class EntitlementServiceImpl implements EntitlementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ManagerStoreId> blockedStores() {
+    public List<StoreMerchantId> blockedStores() {
         return subscriptionRepository.findAllByStatusIn(BLOCKED).stream()
                 .map(StoreSubscriptionEntity::getId)
                 .toList();

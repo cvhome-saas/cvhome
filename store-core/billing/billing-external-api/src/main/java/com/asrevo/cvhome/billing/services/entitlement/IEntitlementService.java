@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * What a store is allowed to do, in billing's own vocabulary.
@@ -23,7 +23,7 @@ public interface IEntitlementService {
      *
      * @throws SubscriptionNotFoundException billing has never seen this store
      */
-    EntitlementSnapshot snapshot(ManagerStoreId store) throws SubscriptionNotFoundException;
+    EntitlementSnapshot snapshot(StoreMerchantId store) throws SubscriptionNotFoundException;
 
     /**
      * Several stores at once, skipping any billing does not know.
@@ -33,7 +33,7 @@ public interface IEntitlementService {
      * rather than erroring: a list of stores is not wrong because one of them has not been provisioned yet.
      * </p>
      */
-    List<EntitlementSnapshot> snapshots(@RequestBody List<ManagerStoreId> stores);
+    List<EntitlementSnapshot> snapshots(@RequestBody List<StoreMerchantId> stores);
 
     /**
      * Every store that must not be worked in — suspended, cancelled, or never paid for.
@@ -43,6 +43,6 @@ public interface IEntitlementService {
      * Asking billing per request would put a billing outage in the path of all seller traffic.
      * </p>
      */
-    List<ManagerStoreId> blockedStores();
+    List<StoreMerchantId> blockedStores();
 
 }

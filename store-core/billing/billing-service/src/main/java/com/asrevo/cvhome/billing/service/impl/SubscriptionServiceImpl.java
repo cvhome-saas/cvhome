@@ -33,7 +33,7 @@ import com.asrevo.cvhome.billing.service.stripe.StripeCheckoutGateway;
 import com.asrevo.cvhome.billing.service.stripe.StripeCustomerGateway;
 import com.asrevo.cvhome.billing.service.stripe.StripeSubscriptionGateway;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,14 +65,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional(readOnly = true)
-    public SubscriptionView current(ManagerStoreId store, ManagerOrgId scopeOrg)
+    public SubscriptionView current(StoreMerchantId store, ManagerOrgId scopeOrg)
             throws SubscriptionNotFoundException {
         return mappers.toView(requireInOrg(store, scopeOrg));
     }
 
     @Override
     @Transactional
-    public CheckoutSessionView checkout(ManagerStoreId store, ManagerOrgId scopeOrg, PlanPriceId planPriceId,
+    public CheckoutSessionView checkout(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId planPriceId,
                                         String successUrl, String cancelUrl)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException {
@@ -104,7 +104,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      */
     @Override
     @Transactional
-    public SubscriptionView changePlan(ManagerStoreId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
+    public SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
@@ -124,7 +124,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public SubscriptionView cancel(ManagerStoreId store, ManagerOrgId scopeOrg, boolean immediate,
+    public SubscriptionView cancel(StoreMerchantId store, ManagerOrgId scopeOrg, boolean immediate,
                                    boolean superAdmin)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException {
@@ -153,7 +153,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public SubscriptionView resume(ManagerStoreId store, ManagerOrgId scopeOrg)
+    public SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
@@ -177,7 +177,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public void applyPendingChange(ManagerStoreId store)
+    public void applyPendingChange(StoreMerchantId store)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException {
         StoreSubscriptionEntity entity = require(store);
         if (entity.getPendingPlanPriceId() == null) {
@@ -194,13 +194,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional(readOnly = true)
-    public EntitlementSnapshot snapshot(ManagerStoreId store) throws SubscriptionNotFoundException {
+    public EntitlementSnapshot snapshot(StoreMerchantId store) throws SubscriptionNotFoundException {
         return mappers.toSnapshot(require(store));
     }
 
     @Override
     @Transactional
-    public void expireTrial(ManagerStoreId store)
+    public void expireTrial(StoreMerchantId store)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = require(store);
         if (entity.getStatus() != SubscriptionStatus.TRIALING) {
@@ -214,7 +214,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public void suspendUnpaid(ManagerStoreId store)
+    public void suspendUnpaid(StoreMerchantId store)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = require(store);
         if (entity.getStatus() != SubscriptionStatus.PAST_DUE) {
@@ -337,7 +337,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return require(stale.getId());
     }
 
-    private StoreSubscriptionEntity require(ManagerStoreId store) throws SubscriptionNotFoundException {
+    private StoreSubscriptionEntity require(StoreMerchantId store) throws SubscriptionNotFoundException {
         return subscriptionRepository.findById(store)
                 .orElseThrow(() -> SubscriptionNotFoundException.forStore(store));
     }
@@ -351,7 +351,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      * the boundary hold even though the shared permission checker cannot yet tell which org a store belongs to.
      * </p>
      */
-    private StoreSubscriptionEntity requireInOrg(ManagerStoreId store, ManagerOrgId scopeOrg)
+    private StoreSubscriptionEntity requireInOrg(StoreMerchantId store, ManagerOrgId scopeOrg)
             throws SubscriptionNotFoundException {
         if (scopeOrg == null) {
             return require(store);

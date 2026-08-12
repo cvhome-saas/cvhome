@@ -10,7 +10,6 @@ import {
   NbSidebarService,
   NbUserModule
 } from '@nebular/theme';
-import {ManagerStoreId} from 'seller-core';
 import {HEADER_USER_MENU} from './constants/header.constants';
 import {HeaderFacade} from './facades/header.facade';
 
@@ -35,7 +34,7 @@ export class HeaderComponent implements OnInit {
     this.facade.init(this.destroyRef);
   }
 
-  onStoreChange(id: ManagerStoreId): void {
+  onStoreChange(id: string): void {
     this.facade.onStoreChange(id);
   }
 

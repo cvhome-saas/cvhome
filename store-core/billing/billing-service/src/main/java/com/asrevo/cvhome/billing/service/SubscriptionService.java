@@ -11,7 +11,7 @@ import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionChangeRejectedException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * Reads and lifecycle transitions of one store's subscription.
@@ -32,7 +32,7 @@ public interface SubscriptionService {
      *                                       are deliberately indistinguishable — answering "it exists but is not
      *                                       yours" would confirm another org's store to someone who cannot see it
      */
-    SubscriptionView current(ManagerStoreId store, ManagerOrgId scopeOrg) throws SubscriptionNotFoundException;
+    SubscriptionView current(StoreMerchantId store, ManagerOrgId scopeOrg) throws SubscriptionNotFoundException;
 
     /**
      * Opens a Stripe checkout so the store can start paying, and says where to send the customer.
@@ -48,7 +48,7 @@ public interface SubscriptionService {
      * @throws SubscriptionChangeRejectedException  the provider refused outright
      * @throws BillingProviderUnavailableException  the provider could not be reached, so nothing was decided
      */
-    CheckoutSessionView checkout(ManagerStoreId store, ManagerOrgId scopeOrg, PlanPriceId planPriceId,
+    CheckoutSessionView checkout(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId planPriceId,
                                  String successUrl, String cancelUrl)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException;
@@ -71,7 +71,7 @@ public interface SubscriptionService {
      * @throws BillingProviderUnavailableException nothing was decided, so nothing local was written either
      * @throws IllegalSubscriptionTransitionException the subscription has no provider subscription to change
      */
-    SubscriptionView changePlan(ManagerStoreId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
+    SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException;
 
@@ -87,7 +87,7 @@ public interface SubscriptionService {
      * @param superAdmin whether the caller may do that
      * @throws ImmediateCancelForbiddenException  an ordinary caller asked to end it immediately
      */
-    SubscriptionView cancel(ManagerStoreId store, ManagerOrgId scopeOrg, boolean immediate, boolean superAdmin)
+    SubscriptionView cancel(StoreMerchantId store, ManagerOrgId scopeOrg, boolean immediate, boolean superAdmin)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException;
 
@@ -96,14 +96,14 @@ public interface SubscriptionService {
      *
      * @throws IllegalSubscriptionTransitionException renewal was never switched off
      */
-    SubscriptionView resume(ManagerStoreId store, ManagerOrgId scopeOrg)
+    SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException;
 
     /**
      * Applies a deferred plan change whose date has arrived — the safety net behind the provider's own schedule.
      */
-    void applyPendingChange(ManagerStoreId store)
+    void applyPendingChange(StoreMerchantId store)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException;
 
     /**
@@ -111,7 +111,7 @@ public interface SubscriptionService {
      *
      * @throws SubscriptionNotFoundException billing has never seen this store
      */
-    EntitlementSnapshot snapshot(ManagerStoreId store) throws SubscriptionNotFoundException;
+    EntitlementSnapshot snapshot(StoreMerchantId store) throws SubscriptionNotFoundException;
 
     /**
      * Ends a trial that ran out without a payment.
@@ -119,7 +119,7 @@ public interface SubscriptionService {
      * @throws SubscriptionNotFoundException          the store disappeared between the job and the command
      * @throws IllegalSubscriptionTransitionException the subscription moved on before the command was handled
      */
-    void expireTrial(ManagerStoreId store)
+    void expireTrial(StoreMerchantId store)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException;
 
     /**
@@ -128,7 +128,7 @@ public interface SubscriptionService {
      * @throws SubscriptionNotFoundException          the store disappeared between the job and the command
      * @throws IllegalSubscriptionTransitionException the subscription moved on before the command was handled
      */
-    void suspendUnpaid(ManagerStoreId store)
+    void suspendUnpaid(StoreMerchantId store)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException;
 
 }

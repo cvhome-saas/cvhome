@@ -5,11 +5,11 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.podregistry.domain.PodStorePlacementEntity;
 
 @Repository
-public interface PodStorePlacementRepository extends CrudRepository<PodStorePlacementEntity, ManagerStoreId> {
+public interface PodStorePlacementRepository extends CrudRepository<PodStorePlacementEntity, StoreMerchantId> {
 
     /**
      * Claims a store for a pod, and answers whether this call is the one that did it.

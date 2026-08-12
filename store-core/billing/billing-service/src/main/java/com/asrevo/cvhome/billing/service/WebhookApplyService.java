@@ -3,7 +3,7 @@ package com.asrevo.cvhome.billing.service;
 import com.asrevo.cvhome.billing.commons.errors.IllegalSubscriptionTransitionException;
 import com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * Applies what Stripe reported to the local subscription.
@@ -24,7 +24,7 @@ public interface WebhookApplyService {
      * finished the form, and it is the invoice event that says money actually moved.
      * </p>
      */
-    void applyCheckoutCompleted(ManagerStoreId store, String eventId, String payload)
+    void applyCheckoutCompleted(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException;
 
     /**
@@ -32,25 +32,25 @@ public interface WebhookApplyService {
      *
      * @throws PlanPriceNotFoundException Stripe named a price this catalog does not know
      */
-    void applySubscriptionChanged(ManagerStoreId store, String eventId, String payload)
+    void applySubscriptionChanged(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException, PlanPriceNotFoundException;
 
     /**
      * Ends the subscription because Stripe ended it.
      */
-    void applySubscriptionEnded(ManagerStoreId store, String eventId, String payload)
+    void applySubscriptionEnded(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException;
 
     /**
      * Records a paid invoice and opens the period it paid for.
      */
-    void applyInvoicePaid(ManagerStoreId store, String eventId, String payload)
+    void applyInvoicePaid(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException, PlanPriceNotFoundException;
 
     /**
      * Records a failed invoice and starts the grace window.
      */
-    void applyInvoiceFailed(ManagerStoreId store, String eventId, String payload)
+    void applyInvoiceFailed(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException;
 
 }

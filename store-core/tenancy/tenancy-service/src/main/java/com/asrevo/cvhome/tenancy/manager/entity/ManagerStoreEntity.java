@@ -7,8 +7,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(schema = "tenancy", name = "manager_store")
-public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
+public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, StoreMerchantId> {
 
     @Column("name")
     private String name;
@@ -54,8 +54,8 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     }
 
     @Override
-    protected ManagerStoreId generateId() {
-        return ManagerStoreId.newId();
+    protected StoreMerchantId generateId() {
+        return StoreMerchantId.newId();
     }
 
     public ManagerStoreEntity completeProvisioning() {

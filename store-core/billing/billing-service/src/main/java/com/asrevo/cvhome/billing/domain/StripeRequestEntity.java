@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.asrevo.cvhome.billing.commons.StripeRequestOperation;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -31,7 +31,7 @@ public class StripeRequestEntity {
     private String idempotencyKey;
 
     @Column("store_id")
-    private ManagerStoreId storeId;
+    private StoreMerchantId storeId;
 
     @Column("operation")
     private StripeRequestOperation operation;
@@ -48,7 +48,7 @@ public class StripeRequestEntity {
     @Version
     private Integer version;
 
-    public static StripeRequestEntity intent(String idempotencyKey, ManagerStoreId store,
+    public static StripeRequestEntity intent(String idempotencyKey, StoreMerchantId store,
                                              StripeRequestOperation operation) {
         StripeRequestEntity entity = new StripeRequestEntity();
         entity.idempotencyKey = idempotencyKey;

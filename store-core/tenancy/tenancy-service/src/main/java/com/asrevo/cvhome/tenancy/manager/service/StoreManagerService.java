@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import com.asrevo.cvhome.billing.api.errors.BillingApiUnavailableException;
 import com.asrevo.cvhome.billing.api.errors.StoreQuotaRefusedException;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
@@ -45,10 +45,10 @@ public interface StoreManagerService {
      * Unscoped: only for rows {@link #findAll} has already confined to the caller's org. A controller must use the
      * {@link UserOrgStoreIdentity} overload, or it will serve another org's store.
      */
-    Object getStore(ManagerStoreId managerStoreId) throws StoreNotFoundException;
+    Object getStore(StoreMerchantId managerStoreId) throws StoreNotFoundException;
 
     /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
-    Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
+    Object getStore(UserOrgStoreIdentity identity, StoreMerchantId managerStoreId)
             throws StoreNotFoundException, StoreNotOperableException;
 
 }

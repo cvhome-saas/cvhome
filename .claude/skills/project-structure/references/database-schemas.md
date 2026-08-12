@@ -21,7 +21,7 @@ either side (`events-outbox.md`).
 ```java
 // tenancy — Spring Data JDBC
 @Table(schema = "tenancy", name = "manager_store")
-public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> { ... }
+public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, StoreMerchantId> { ... }
 
 // payment — JPA
 @Entity
@@ -102,8 +102,8 @@ plus the outbox tables.
 ## Conventions visible in the DDL
 
 - **Ids are `varchar(24)`** in tenancy — that's a Mongo `ObjectId` hex string, matching `PodId` /
-  `ManagerStoreId` / `ManagerOrgId` (`api-conventions.md`). Pod-side ids are `varchar(50)`
-  (`store_merchant_id`).
+  `StoreMerchantId` / `ManagerOrgId` (`api-conventions.md`). Pod-side ids are `varchar(50)`
+  (`store_merchant_id`) — the same store id, in a wider column.
 - **`version int`** on tenancy tables — optimistic locking via Spring Data JDBC.
 - **`sm_sequencer`** in pod schemas is the Shopizer-inherited `@TableGenerator` sequence table
   (`SEQ_NAME`/`SEQ_COUNT`), used by JPA entities like `Transaction` instead of a Postgres sequence.

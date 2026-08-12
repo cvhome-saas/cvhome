@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, DestroyRef, EventEmitter, Input, Output, ViewChild, effect, inject} from '@angular/core';
-import {ManagerStoreId} from 'seller-core';
 import {NbOptionModule, NbSelectComponent, NbSelectModule} from '@nebular/theme';
 import {StoreAutocompleteFacade} from './facades/store-autocomplete.facade';
 
@@ -15,16 +14,16 @@ export class StoreAutocompleteComponent {
   @ViewChild(NbSelectComponent)
   routeSelect: NbSelectComponent;
   @Output()
-  storeSelected: EventEmitter<ManagerStoreId> = new EventEmitter<ManagerStoreId>();
+  storeSelected: EventEmitter<string> = new EventEmitter<string>();
   @Input()
-  selectedItem: ManagerStoreId | undefined;
+  selectedItem: string | undefined;
   @Input()
   selectable = true;
 
   protected readonly facade = inject(StoreAutocompleteFacade);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
-  private lastStore: ManagerStoreId | undefined;
+  private lastStore: string | undefined;
 
   constructor() {
     this.facade.init(this.destroyRef);
@@ -39,8 +38,8 @@ export class StoreAutocompleteComponent {
     });
   }
 
-  changed(event: ManagerStoreId | undefined): void {
-    if (event != undefined && event.id != undefined && (this.lastStore == undefined || this.lastStore.id != event.id)) {
+  changed(event: string | undefined): void {
+    if (event != undefined && this.lastStore != event) {
       this.storeSelected.emit(event);
     }
     this.lastStore = event;

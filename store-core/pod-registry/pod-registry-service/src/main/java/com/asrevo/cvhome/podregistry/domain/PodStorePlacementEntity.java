@@ -6,8 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -32,7 +32,7 @@ public class PodStorePlacementEntity {
 
     @Id
     @Column("store_id")
-    private ManagerStoreId storeId;
+    private StoreMerchantId storeId;
 
     @Column("pod_id")
     private PodId podId;
@@ -40,7 +40,7 @@ public class PodStorePlacementEntity {
     @Column("placed_at")
     private Instant placedAt;
 
-    public static PodStorePlacementEntity of(ManagerStoreId storeId, PodId podId) {
+    public static PodStorePlacementEntity of(StoreMerchantId storeId, PodId podId) {
         PodStorePlacementEntity entity = new PodStorePlacementEntity();
         entity.storeId = storeId;
         entity.podId = podId;

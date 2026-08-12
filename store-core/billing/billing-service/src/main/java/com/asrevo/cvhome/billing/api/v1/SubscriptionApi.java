@@ -23,7 +23,7 @@ import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
 import com.asrevo.cvhome.billing.service.SubscriptionService;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.s2s.model.ServiceDomainProperties;
 import com.asrevo.cvhome.s2s.utils.RedirectionUrlBuilder;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
  *
  * <p>
  * Store-core convention, not the pod one: the store arrives as an explicit {@code store} parameter typed
- * {@link ManagerStoreId}, and every method is gated on it. The permission evaluator denies by default, so a token
+ * {@link StoreMerchantId}, and every method is gated on it. The permission evaluator denies by default, so a token
  * with no {@code case} behind it 403s silently — which is why {@code STORE-CORE.BILLING.*} exists in both
  * {@code CustomPermissionEvaluator} and {@code PermissionAccessChecker}.
  * </p>
@@ -70,9 +70,9 @@ public class SubscriptionApi {
      * @throws SubscriptionNotFoundException billing has never seen this store, or it is not this caller's to see
      */
     @GetMapping("current")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.READ')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.READ')")
     public SubscriptionView current(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                    @RequestParam("store") ManagerStoreId store)
+                                    @RequestParam("store") StoreMerchantId store)
             throws SubscriptionNotFoundException {
         return subscriptionService.current(store, tenantScopeOf(identity));
     }
@@ -91,9 +91,9 @@ public class SubscriptionApi {
      * </p>
      */
     @PostMapping("checkout")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public CheckoutSessionView checkout(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                        @RequestParam("store") ManagerStoreId store,
+                                        @RequestParam("store") StoreMerchantId store,
                                         @RequestBody CheckoutRequest request,
                                         HttpServletRequest httpRequest)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
@@ -114,9 +114,9 @@ public class SubscriptionApi {
      * </p>
      */
     @PostMapping("plan")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView changePlan(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                       @RequestParam("store") ManagerStoreId store,
+                                       @RequestParam("store") StoreMerchantId store,
                                        @RequestBody PlanChangeRequest request)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException {
@@ -127,9 +127,9 @@ public class SubscriptionApi {
      * Switches renewal off, or — for an administrator — ends the subscription now.
      */
     @PostMapping("cancel")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView cancel(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @RequestParam("store") ManagerStoreId store,
+                                   @RequestParam("store") StoreMerchantId store,
                                    @RequestBody CancelRequest request)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException {
@@ -141,9 +141,9 @@ public class SubscriptionApi {
      * Switches renewal back on, and calls off a scheduled downgrade if one is pending.
      */
     @PostMapping("resume")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.MANAGE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView resume(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @RequestParam("store") ManagerStoreId store)
+                                   @RequestParam("store") StoreMerchantId store)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException {
         return subscriptionService.resume(store, tenantScopeOf(identity));

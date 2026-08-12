@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.tenancy.commons.dto.InvitationStatus;
 
 import lombok.Getter;
@@ -25,7 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(schema = "tenancy", name = "org_invitation")
-public class OrgInvitationEntity extends BaseEntity<OrgInvitationEntity, ManagerStoreId> {
+public class OrgInvitationEntity extends BaseEntity<OrgInvitationEntity, StoreMerchantId> {
 
     @Column("org_id")
     private ManagerOrgId orgId;
@@ -78,8 +78,8 @@ public class OrgInvitationEntity extends BaseEntity<OrgInvitationEntity, Manager
     }
 
     @Override
-    protected ManagerStoreId generateId() {
-        return ManagerStoreId.newId();
+    protected StoreMerchantId generateId() {
+        return StoreMerchantId.newId();
     }
 
 }

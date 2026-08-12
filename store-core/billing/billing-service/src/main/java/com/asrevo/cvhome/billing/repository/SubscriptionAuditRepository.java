@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import com.asrevo.cvhome.billing.domain.SubscriptionAuditEntity;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface SubscriptionAuditRepository extends CrudRepository<SubscriptionAuditEntity, Long> {
 
-    List<SubscriptionAuditEntity> findAllByStoreIdOrderByOccurredAtDesc(ManagerStoreId storeId);
+    List<SubscriptionAuditEntity> findAllByStoreIdOrderByOccurredAtDesc(StoreMerchantId storeId);
 
 }

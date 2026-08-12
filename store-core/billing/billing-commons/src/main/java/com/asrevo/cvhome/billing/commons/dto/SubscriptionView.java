@@ -9,7 +9,7 @@ import com.asrevo.cvhome.billing.commons.EntitlementValue;
 import com.asrevo.cvhome.billing.commons.Money;
 import com.asrevo.cvhome.billing.commons.PlanPriceId;
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * A store's subscription as its owner sees it — the response behind "what am I on, and what happens next".
@@ -31,7 +31,7 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
  *                           {@code TRIALING} both before it has ever paid and, in principle, on a provider-run trial
  * @param entitlements       what the current plan grants
  */
-public record SubscriptionView(ManagerStoreId store, SubscriptionStatus status, String planCode,
+public record SubscriptionView(StoreMerchantId store, SubscriptionStatus status, String planCode,
                                String planDisplayName, PlanPriceId planPriceId, Money amount,
                                Instant currentPeriodEnd, Instant trialEnd, boolean cancelAtPeriodEnd,
                                Instant graceUntil, PendingPlanChangeView pendingPlanChange, boolean providerLinked,

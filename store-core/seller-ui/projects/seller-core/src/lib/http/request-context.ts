@@ -23,6 +23,6 @@ export class SelectedStoreRequestContext implements RequestContextProvider {
       }
       return {};
     }
-    return {store: store.id.id, pod: store.podId.id};
+    return {store: store.id, pod: store.podId.id};
   }
 }

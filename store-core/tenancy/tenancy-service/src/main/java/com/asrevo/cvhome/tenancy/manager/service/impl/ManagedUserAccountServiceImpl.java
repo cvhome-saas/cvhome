@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.errors.ForeignOrgUserAccessException;
 import com.asrevo.cvhome.tenancy.errors.ForeignStoreUserAccessException;
@@ -63,15 +63,15 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public ReadableUserList list(UserOrgStoreIdentity identity, ManagerStoreId store, Pageable pageable)
+    public ReadableUserList list(UserOrgStoreIdentity identity, StoreMerchantId store, Pageable pageable)
             throws UaaApiUnavailableException {
         return userAccountService.list(
-                Map.of("org", identity.org().id().toString(), "store", store.id().toString()), pageable.getPageNumber(),
+                Map.of("org", identity.org().id().toString(), "store", store.storeMerchantId()), pageable.getPageNumber(),
                 pageable.getPageSize());
     }
 
     @Override
-    public ReadableUser findOne(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    public ReadableUser findOne(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException {
         ReadableUser user = findOne(userId);
@@ -80,28 +80,28 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user)
+    public ReadableUser createUser(UserOrgStoreIdentity identity, StoreMerchantId store, PersistableUser user)
             throws UaaConflictException, UaaApiUnavailableException {
         user.setActive(true);
         user.setOrg(identity.org().id().toString());
-        user.setStore(store.id().toString());
+        user.setStore(store.storeMerchantId());
         return userAccountService.createUser(user);
     }
 
     @Override
-    public ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user)
+    public ReadableUser updateUser(UserOrgStoreIdentity identity, StoreMerchantId store, PersistableUser user)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaConflictException, UaaApiUnavailableException {
         ReadableUser existingUser = findOne(user.getId());
         validateUserAccess(identity, store, existingUser);
         // Ensure the user is not moved to another org/store via update
         user.setOrg(identity.org().id().toString());
-        user.setStore(store.id().toString());
+        user.setStore(store.storeMerchantId());
         return restatingNotFound(user.getId(), () -> userAccountService.updateUser(user));
     }
 
     @Override
-    public void resetPassword(UserOrgStoreIdentity identity, ManagerStoreId store, String userId,
+    public void resetPassword(UserOrgStoreIdentity identity, StoreMerchantId store, String userId,
                               UserPassword passwordRequestDto)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException {
@@ -114,7 +114,7 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public void deleteUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    public void deleteUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {
         ReadableUser user = findOne(userId);
@@ -126,7 +126,7 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public void enableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    public void enableUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {
         ReadableUser user = findOne(userId);
@@ -138,7 +138,7 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
     }
 
     @Override
-    public void disableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    public void disableUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException {
         ReadableUser user = findOne(userId);
@@ -164,7 +164,7 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
      * user", moved to {@link #findOne(String)}, which is the frame that knows the id.
      * </p>
      */
-    private void validateUserAccess(UserOrgStoreIdentity identity, ManagerStoreId store, ReadableUser user)
+    private void validateUserAccess(UserOrgStoreIdentity identity, StoreMerchantId store, ReadableUser user)
             throws ForeignOrgUserAccessException, ForeignStoreUserAccessException {
 
         if (!identity.org().id().toString().equals(user.getOrg())) {
@@ -172,10 +172,10 @@ public class ManagedUserAccountServiceImpl implements ManagedUserAccountService 
                     user.getOrg(), identity.org());
             throw ForeignOrgUserAccessException.of(user.getId(), user.getOrg(), identity.org().id().toString());
         }
-        if (!store.id().toString().equals(user.getStore())) {
+        if (!store.storeMerchantId().equals(user.getStore())) {
             log.error("Access denied: User {} belongs to store {}, but request is for store {}", user.getId(),
                     user.getStore(), store);
-            throw ForeignStoreUserAccessException.of(user.getId(), user.getStore(), store.id().toString());
+            throw ForeignStoreUserAccessException.of(user.getId(), user.getStore(), store.storeMerchantId());
         }
     }
 

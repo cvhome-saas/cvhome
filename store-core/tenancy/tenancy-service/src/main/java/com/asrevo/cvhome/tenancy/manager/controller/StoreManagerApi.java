@@ -18,8 +18,8 @@ import com.asrevo.cvhome.billing.api.errors.BillingApiUnavailableException;
 import com.asrevo.cvhome.billing.api.errors.StoreQuotaRefusedException;
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
 import com.asrevo.cvhome.commons.domain.ColorTheme;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.SocialProvider;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
@@ -108,17 +108,17 @@ public class StoreManagerApi {
     }
 
     @GetMapping("private/store/{code}")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-FIND-ONE')")
     public Object getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @PathVariable("code") ManagerStoreId store)
+                                   @PathVariable("code") StoreMerchantId store)
             throws StoreNotFoundException, StoreNotOperableException {
         return managerService.getStore(identity, store);
     }
 
     @GetMapping("store-info")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.STORE-FIND-ONE')")
     public ManagerStoreDto storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                     @RequestParam ManagerStoreId store) throws StoreNotFoundException {
+                                     @RequestParam StoreMerchantId store) throws StoreNotFoundException {
         return internalStoreService.findStore(identity, store);
     }
 
