@@ -1,86 +1,139 @@
-# Split Merchant and Content Services QA
+# QA — split merchant and content services
 
-Existing databases must be recreated before starting this version. No data migration is provided.
+CMS ownership moved from merchant-service to content-service while `/merchant/api/v1/content/**` remains a
+compatibility alias. Existing databases must be recreated; this change provides no data migration.
 
-## Service startup and schema
+- **Scope** — merchant · content · SPG routing · seller-ui · landing-ui
+- **Change** — PR #273, branch `feat/split-merchant-content-services`, plan
+  `.agents/plans/split-merchant-content-services.md`
+- **Run** — 2026-08-13, fresh `run-lcl.sh` stack with `test-stores`
 
-### [unit only] Content owns only its schema
+Tags: **[verified]** was exercised end to end; **[unit only]** was covered by automated checks but not the
+live stack; **[not verified]** remains for a human tester.
 
-Setup: fresh local PostgreSQL and MinIO; start the stack with `test-stores` enabled.
+## 00 — Startup
 
-Steps: inspect PostgreSQL after both services start.
+### START-01 — Both services start from fresh schemas · critical · [verified]
 
-Expected: `content.sm_sequencer`, `content.content`, and `content.content_description` exist. Merchant has no
-content tables. Content has no foreign key to merchant. The content integration context/schema assertion and
-the merchant context test pass; the full stack has not been exercised.
+- **Setup** — no prior local stack; run `./extra/scripts/run-lcl.sh` and wait for all readiness checks.
+- **Steps** — confirm merchant on 8120, content on 8121, SPG on 8000, seller-ui on 8010 and landing-ui on 8110.
+- **Expect** — every service is ready. Content seed SQL initializes content-service; merchant seed SQL contains
+  no content fragments.
+- **Observed** — passed after removing four orphaned HTML/CSS fragments from merchant store seed files.
 
-## Canonical and compatibility routes
+### START-02 — Content owns the content tables · [unit only]
 
-### [not verified] Public content routes are equivalent
+- **Steps** — run the content schema/context assertion and merchant context test.
+- **Expect** — `content.sm_sequencer`, `content.content`, and `content.content_description` belong to content;
+  merchant has no content tables or content foreign keys.
+- **Observed** — automated assertions pass. Live `psql` inspection was unavailable because the local database
+  had exhausted its connection slots while the full stack was running.
 
-Setup: seeded demo stores and running stack.
+## ROUTE — Gateway and compatibility
 
-Steps: execute the canonical and legacy public requests in `content-api.http` for pages, boxes, and images.
+### ROUTE-01 — Public page routes are equivalent · critical · [verified]
 
-Expected: `/spg/content/**` and `/spg/merchant/**` return equivalent payloads. Trace headers are present.
+- **Steps** — through `gateway.com:8000`, request canonical `/spg/content/api/v1/content/pages` and legacy
+  `/spg/merchant/api/v1/content/pages` with `store`, `pod`, `lang`, and pagination.
+- **Expect** — both return 200 and byte-identical JSON through Caddy.
+- **Observed** — 200/200; payload comparison passed. The runnable `.http` file was corrected to include the
+  required `pod={{POD_ID}}` route selector.
 
-### [not verified] Private content routes are equivalent
+### ROUTE-02 — Public box routes are equivalent · critical · [verified]
 
-Setup: seller session with `STORE-POD.CONTENT.*` for the selected store.
+- **Steps** — repeat ROUTE-01 for `/content/boxes`.
+- **Expect** — both return 200 and equivalent payloads.
+- **Observed** — 200/200; payload comparison passed.
 
-Steps: execute the canonical and legacy private list and file requests.
+### ROUTE-03 — Merchant routes remain on merchant-service · critical · [verified]
 
-Expected: both routes reach content-service and return equivalent status and payloads.
+- **Steps** — request `/spg/merchant/api/v1/store/<store>` through the platform gateway.
+- **Expect** — 200 with the seeded Riyadh merchant store.
+- **Observed** — passed.
 
-### [not verified] Merchant routes remain on merchant
+### ROUTE-04 — Typed missing-content response survives routing · [verified]
 
-Setup: running stack.
+- **Steps** — request a nonexistent page through `/spg/content/**`.
+- **Expect** — 404 Problem Detail with `CONTENT.NOT_FOUND`, store and code parameters, and trace id.
+- **Observed** — passed.
 
-Steps: call merchant store and router endpoints through `/spg/merchant/**`.
+### ROUTE-05 — Private canonical and compatibility routes match · [not verified]
 
-Expected: store and router behavior is unchanged; requests do not reach content-service.
+- **Setup** — obtain a seller session and place it in `http-client.private.env.json`.
+- **Steps** — run canonical and legacy private list/file blocks in `content-api.http`.
+- **Expect** — equivalent statuses and payloads; mutations happen once.
 
-## Seller CMS
+## SEC — Permission and tenancy
 
-### [not verified] CRUD through seller UI
+### SEC-01 — Missing content permission is denied · critical · [verified]
 
-Setup: sign in as a merchant with content permission.
+- **Setup** — sign in as `org1-store1-moderator` / `admin`.
+- **Steps** — directly open `/pages/content/pages/list` even though CMS navigation is hidden.
+- **Expect** — private content requests return 403 and no content is exposed.
+- **Observed** — UI displayed “You don't have permission to do that”; Problem Detail was
+  `COMMON.ACCESS_DENIED` with status 403. No rows rendered.
 
-Steps: create, edit, view, and delete one page and one box. Upload and delete an image.
+### SEC-02 — Public reads are store-scoped · critical · [verified]
 
-Expected: operations succeed through `/spg/content/**` and the changes persist.
+- **Steps** — request `about-us` for demo store 1 and demo store 2 using otherwise identical gateway URLs.
+- **Expect** — both resolve only their own seeded rows; their payloads differ.
+- **Observed** — 200/200 and payloads differed.
 
-### [not verified] Permission denial
+### SEC-03 — Cross-store mutation is refused · critical · [not verified]
 
-Setup: sign in as a principal without `STORE-POD.CONTENT.*`.
+- **Setup** — create uniquely coded content in store 1 and authenticate for store 2.
+- **Steps** — fetch, update and delete the store-1 id while scoped to store 2.
+- **Expect** — no visibility or mutation; store-1 content remains unchanged.
 
-Steps: attempt page or box mutation.
+## UI — Seller and storefront
 
-Expected: response is 403 and no content changes.
+### UI-01 — Seller CMS reads from content-service · critical · [verified]
 
-### [not verified] Tenant isolation
+- **Setup** — sign in as `org1-store1-admin` / `admin`.
+- **Steps** — open **Content management → Content Pages**.
+- **Expect** — six seeded pages render through the new canonical content route without console errors.
+- **Observed** — six pages rendered (`about-us`, `contact-us`, `terms`, `privacy`, `location`, `faq`); no
+  console errors on the list page.
 
-Setup: create content in the first demo store and switch to the second store.
+### UI-02 — Seller page, box and file CRUD · critical · [not verified]
 
-Steps: request, update, and delete the first store's content while scoped to the second store.
+- **Steps** — create, edit, view and delete one page and box; upload and delete one image.
+- **Expect** — operations persist through `/spg/content/**`.
+- **Observed** — create-page form and content editor loaded. Submission stayed client-side with “Please, fill
+  required fields” despite all visibly required fields being populated, so no mutation was claimed as verified.
 
-Expected: the content is not visible and cannot be changed or deleted.
+### UI-03 — Storefront CMS page renders · critical · [verified]
 
-## Storefront
+- **Steps** — open the store-1 storefront and follow **About Riyadh Fashion Hub**.
+- **Expect** — `/en/content/about-us` renders seeded title/body from content-service.
+- **Observed** — passed. Home navigation also contained the seeded content links.
 
-### [not verified] Page and box rendering
+### UI-04 — Storefront box rendering · [verified]
 
-Setup: seeded demo storefront and running stack.
+- **Steps** — open the store-1 home page.
+- **Expect** — seeded announcement box renders.
+- **Observed** — “Eid Collection Has Arrived!” announcement rendered.
 
-Steps: open storefront pages that render CMS pages and boxes.
+### UI-05 — Local media upload/public URL · [not verified]
 
-Expected: content renders through content-service with the existing fallback/degrade behavior unchanged.
+- **Steps** — upload an image, list it, and open its public URL.
+- **Expect** — upload/list succeed. Record the known local MinIO/public-media gap separately from routing.
 
-### [not verified] Local media gap
+## REG — Regression watchlist
 
-Setup: local stack and MinIO.
+### REG-01 — Semicolons inside seeded HTML do not leave merchant SQL fragments · [verified]
 
-Steps: upload an image, list images, and open the resulting URL.
+The first full-stack run failed merchant startup on an orphaned `font-size:0.9em` fragment. The four merchant
+store seed files now end after merchant-specific data; a fresh full-stack startup passed.
 
-Expected: upload/list behavior is tested. Record any known local MinIO/public-media URL failure explicitly;
-do not treat that existing gap as a content routing failure.
+### REG-02 — Platform SPG requests include the pod selector · [verified]
+
+Requests with only `store` returned 404 because the platform gateway route also predicates on `pod`. All
+blocks in `content-api.http` now send `pod={{POD_ID}}`; canonical and compatibility requests then returned 200.
+
+## 99 — Known gaps
+
+- Full CRUD, upload/delete, private alias equivalence, and cross-store mutation remain **[not verified]**.
+- Landing-ui dev mode logs an existing Next.js `legacyBehavior` deprecation; CMS rendering still succeeded.
+- Live schema inspection hit PostgreSQL's local `too many clients` limit; automated schema assertions remain
+  the evidence for table ownership in this run.

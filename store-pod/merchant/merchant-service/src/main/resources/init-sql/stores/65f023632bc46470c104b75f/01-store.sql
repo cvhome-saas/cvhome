@@ -71,34 +71,3 @@ ON CONFLICT DO NOTHING;
 INSERT INTO merchant.store_domains(domain, domain_type, store_merchant_id)
 VALUES ('org1-store2', 'SUB_DOMAIN', '65f023632bc46470c104b75f')
 ON CONFLICT DO NOTHING;
-
-
-/*
-Generated content for store_id='65f023632bc46470c104b75f' (electronics Domain) store name USA Electronics Hub
-Pages: ['about-us', 'contact-us', 'terms', 'privacy', 'location', 'faq']
-Boxes: ['header-message', 'agreement','meta-title','meta-description']
-Languages: ['en', 'fr']
-Starting content_id: 31
-Starting description_id: 61
-Starting sort_order: 1
-*/
-
--- Page: about-us
--- Page: contact-us
--- Page: terms
--- Page: privacy
--- Page: location
--- Page: faq
--- Box: header-message
--- Box: agreement
-font-size:0.9em; padding:5px;">By using this site, you agree to our <a href="/terms">Terms & Conditions</a>.</p>',
-        'User Agreement', 'User Agreement',
-        '', '', '', '', 38, 'en')
-on conflict (description_id) do nothing;
-font-size:0.9em; padding:5px;">En utilisant ce site, vous acceptez nos <a href="/conditions-generales">Conditions Générales</a>.</p>',
-        'Accord Utilisateur', 'Accord Utilisateur',
-        '', '', '', '', 38, 'fr')
-on conflict (description_id) do nothing;
-
--- Box: meta-title
--- Box: meta-description
