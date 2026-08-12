@@ -1,4 +1,4 @@
-/** Mirrors control-plane manager/commons/dto/ManagerOrgDto (record).
+/** Mirrors tenancy manager/commons/dto/ManagerOrgDto (record).
  *  NOTE: the Java DTO has no `owner` or `subscriptionPlan` field — those
  *  were on the previous version of this interface but don't exist on the
  *  wire; dropped rather than invented (see update-org-details-form.service.ts

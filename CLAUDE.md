@@ -100,14 +100,18 @@ What binds every change:
   second store, and confirm a principal without the token gets 403.
 - Java services run **on the host**, not in Docker. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts
   and namespaces come from `common-config.yml` — never inline one.
-- **A QA script written for a human tester lives in `qa/<feature>.md`** — repo root, one markdown file per
-  feature or refactor, named after it (`qa/billing-per-store-subscriptions.md`). Markdown so it reviews in the
-  PR and travels with the branch; in-repo so it ages with the code that made it necessary. Never a rendered
-  page or an attachment — those cannot be diffed, and a test plan nobody can review is a test plan nobody
-  trusts. Each case states its setup, its steps and what to expect, and says plainly whether it has actually
-  been run: a case nobody has executed is where the bugs are, and marking it is more useful than implying
-  otherwise. Say what is *expected to fail* too, so a tester does not spend a morning re-finding a known gap.
-  This is for people; the machine-checkable path is `.http` blocks and tests, which it does not replace.
+- **A QA script written for a human tester lives in `qa/<plan>.md` — one file per plan, never one per phase.**
+  Repo root, named after the plan it belongs to (`qa/billing-per-store-subscriptions.md`). A plan that ships in
+  ten PRs still produces **one** document, appended to as each phase lands: ten files covering one feature means
+  a tester cannot tell which to run, the setup drifts between copies, and later phases silently invalidate
+  earlier files. Markdown so it reviews in the PR and travels with the branch; in-repo so it ages with the code
+  that made it necessary. Never a rendered page or an attachment — those cannot be diffed, and a test plan
+  nobody can review is a test plan nobody trusts. Each case states its setup, its steps and what to expect, and
+  is tagged **[verified] / [unit only] / [not verified]**: a case nobody has executed is where the bugs are, and
+  marking it is more useful than implying otherwise. Say what is *expected to fail* too, so a tester does not
+  spend a morning re-finding a known gap. **The structure to copy is `qa/billing-per-store-subscriptions.md`,
+  and the rules are `references/qa-testing.md` §7 in the `project-structure` skill.** This is for people; the
+  machine-checkable path is `.http` blocks and tests, which it does not replace.
 
 ## Working conventions
 
@@ -133,7 +137,7 @@ What binds every change:
   Reference: `store-pod/catalog/catalog-service/http/product-api.http`; rules:
   `references/http-request-files.md` in the skill.
 - Use the value objects in `store-commons/commons/.../domain/` instead of raw `String`/`Long` ids.
-- `schema.sql` (`src/main/resources/schema.sql` for control-plane's Spring Data JDBC, `init-sql/schema.sql`
+- `schema.sql` (`src/main/resources/schema.sql` for tenancy's Spring Data JDBC, `init-sql/schema.sql`
   for the JPA pod services) is the source of truth for DDL — `ddl-auto: update` is only a safety net.
 - Tenant secrets are encrypted in the mapper layer via `secret-crypto`; never add a plaintext credential
   column.

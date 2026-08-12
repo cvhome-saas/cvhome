@@ -7,8 +7,9 @@ spring:
         clients:
           - "store-core-gateway"
           - "uaa"
-          - "control-plane"
+          - "tenancy"
           - "billing"
+          - "pod-registry"
           - "seller-ui"
           - "spg"
           - "merchant"
@@ -27,8 +28,9 @@ spring:
           "uaa": 8001
           "store-core-gateway": 8000
           "seller-ui": 8010
-          "control-plane": 8020
+          "tenancy": 8020
           "billing": 8021
+          "pod-registry": 8022
           "landing-ui": 8110
           "merchant": 8120
           "catalog": 8122

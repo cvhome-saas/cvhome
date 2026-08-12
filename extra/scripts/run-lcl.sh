@@ -26,8 +26,9 @@ PROFILES="lcl,test-stores"
 # name | gradle module | port. Order matters: uaa issues the tokens everything else validates.
 JAVA_SERVICES=(
     "uaa|:store-core:uaa|8001"
-    "control-plane|:store-core:control-plane:control-plane-service|8020"
+    "tenancy|:store-core:tenancy:tenancy-service|8020"
     "billing|:store-core:billing:billing-service|8021"
+    "pod-registry|:store-core:pod-registry:pod-registry-service|8022"
     "gateway|:store-core:gateway:gateway-service|8000"
     "merchant|:store-pod:merchant:merchant-service|8120"
     "catalog|:store-pod:catalog:catalog-service|8122"

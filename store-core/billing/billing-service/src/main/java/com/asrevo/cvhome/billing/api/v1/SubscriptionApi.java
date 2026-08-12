@@ -52,7 +52,7 @@ public class SubscriptionApi {
 
     /**
      * Where Stripe returns a paying customer. Both are pages of the seller console, which already exist for
-     * control-plane's checkout, so the flow does not need a second pair.
+     * tenancy's checkout, so the flow does not need a second pair.
      */
     private static final String SUCCESS_PATH = "/public/subscription/success";
 
@@ -81,7 +81,7 @@ public class SubscriptionApi {
      * Opens a Stripe checkout and returns where to send the customer.
      *
      * <p>
-     * Answers 200 with the URL in a body, rather than the 302 control-plane's equivalent returns. A single-page
+     * Answers 200 with the URL in a body, rather than the 302 tenancy's equivalent returns. A single-page
      * console has to open the URL itself, and a browser will not usefully follow a redirect out of an XHR; a body
      * also makes the endpoint assertable from a {@code .http} file.
      * </p>

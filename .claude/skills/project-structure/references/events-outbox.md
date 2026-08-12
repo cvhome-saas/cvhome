@@ -2,10 +2,10 @@
 
 Where a service-to-service **call** would create temporal coupling (the caller fails if the callee is down),
 cvhome uses **domain events published through a transactional outbox** instead. Currently wired in
-`control-plane-service` and `payment-service`.
+`tenancy-service` and `payment-service`.
 
 Library: `io.namastack:namastack-outbox` (`namastack-outbox = 1.7.1` in the version catalog) —
-`-starter-jpa` in payment, `-starter-jdbc` in control-plane, `-api` in the `-commons`/`-events` modules that
+`-starter-jpa` in payment, `-starter-jdbc` in tenancy, `-api` in the `-commons`/`-events` modules that
 only need the annotations.
 
 ## The DDD layer: aggregate roots register events
@@ -88,7 +88,7 @@ Note what this buys: the **HTTP call to checkout happens in the handler, after t
 checkout is down, the payment is still recorded and the outbox retries — no lost payment, no distributed
 transaction.
 
-`control-plane-service` — same shape, with an extra `EventImpl<T>` interface (from `store-commons:commons`) as a
+`tenancy-service` — same shape, with an extra `EventImpl<T>` interface (from `store-commons:commons`) as a
 naming convention:
 
 ```java
@@ -106,20 +106,19 @@ public class ManagerStoreCreatedEventImpl implements EventImpl<StoreCreatedEvent
 Store provisioning is slow and failure-prone, so it is deliberately decoupled from the HTTP request that created
 the store.
 
-Handlers in `control-plane-service` live under `subscription/processors/{event,command}/` and
-`manager/processors/event/`: `OrgCreatedEventImpl`, `ManagerStoreCreatedEventImpl`,
-`InvoicePaymentSucceededEventImpl`, `InvoicePaymentFailedEventImpl`, `CustomerSubscriptionDeletedEventImpl`,
-`DeActivateNonRenewedSubscriptionCommandImpl`.
+Handlers in `tenancy-service` live under `manager/processors/event/`: `ManagerStoreCreatedEventImpl` and
+`BillingProvisioningEventImpl`. Subscription handling moved to `billing-service` when billing took over
+per-store subscriptions.
 
 ## Events vs. commands
 
-`subscription-events` holds both:
+`billing-events` holds both:
 
-- **Events** (`SubscriptionEvent`, `SubscriptionDeActivateEvent`, `InvoicePaymentSucceededEvent`) — "this
-  happened", emitted by aggregates or Stripe webhooks.
-- **Commands** (`SubscriptionCommand`, `DeActivateNonRenewedSubscriptionCommand`) — "do this", enqueued by
-  schedulers. `DeActivateNonRenewedSubscriptionsJob` writes a command to the outbox so the actual work is
-  retried durably instead of running inline in the job thread.
+- **Events** (`SubscriptionEvent`, `SubscriptionActivatedEvent`, `InvoiceRecordedEvent`) — "this happened",
+  emitted by aggregates or Stripe webhooks.
+- **Commands** (`SubscriptionCommand`, `ExpireTrialCommand`, `SuspendUnpaidSubscriptionCommand`) — "do this",
+  enqueued by schedulers. The job writes a command to the outbox so the actual work is retried durably
+  instead of running inline in the job thread.
 
 ## Where events live in the module layout — put them in a separate `-events` module
 
@@ -127,16 +126,16 @@ Handlers in `control-plane-service` live under `subscription/processors/{event,c
 know its structure and properties — the record's fields, the `eventType()`, the `@OutboxEvent` key. So the event
 types need to be depended on *independently* of the code that produces them.
 
-That is why control-plane has dedicated **`-events` modules** — `manager-events`, `subscription-events` — each
+That is why `store-core` has dedicated **`-events` modules** — `tenancy-events`, `billing-events` — each
 depending only on its `-commons` sibling plus `namastack-outbox-api`:
 
 ```groovy
-// store-core/control-plane/subscription-events/build.gradle
-api project(':store-core:control-plane:subscription-commons')
+// store-core/billing/billing-events/build.gradle
+api project(':store-core:billing:billing-commons')
 api libs.namastack.outbox.api
 ```
 
-A consumer takes a dependency on `subscription-events` alone and gets exactly the event contracts — no
+A consumer takes a dependency on `billing-events` alone and gets exactly the event contracts — no
 repositories, no services, no database driver, no transitive pull of the producer's internals. It is the same
 principle as `-external-api` for synchronous calls (`service-to-service.md`): **the contract ships in its own
 tiny module so consumers can depend on the contract without depending on the producer.**
@@ -167,9 +166,9 @@ namastack:
       schema-name: ${spring.application.name}      # → "payment"
 ```
 
-`control-plane-service/application.yml` is identical except `jdbc:` instead of `jpa:` and
+`tenancy-service/application.yml` is identical except `jdbc:` instead of `jpa:` and
 `schema-name: control`. **The `jdbc.` vs `jpa.` prefix must match the starter** —
-`namastack-outbox-starter-jdbc` for control-plane (Spring Data JDBC), `-starter-jpa` for payment (Hibernate).
+`namastack-outbox-starter-jdbc` for tenancy (Spring Data JDBC), `-starter-jpa` for payment (Hibernate).
 
 Both explicitly set `schema-initialization.enabled: false`, overriding the library default of `true`: the
 outbox DDL is checked into each service's own `schema.sql` alongside its business tables rather than being
@@ -242,7 +241,7 @@ fine a key loses the ordering you wanted.
 
 ## Stripe webhooks → outbox
 
-`control-plane`'s `StripeWebhookController` and payment's `PublicPaymentWebhookApi` convert provider callbacks
+`tenancy`'s `StripeWebhookController` and payment's `PublicPaymentWebhookApi` convert provider callbacks
 into outbox events (`InvoicePaymentSucceededEvent`, `InvoicePaymentFailedEvent`,
 `CustomerSubscriptionDeletedEvent`, `WebhookEvent` handled by `WebhookOutboxHandler`). The webhook endpoint
 persists and returns 200 fast; the real work happens in the handler. Payment providers retry aggressively on

@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * ({@code ENC:1:default-key:AES-256-GCM:…}). Encrypted is the intended form: the envelope is safe to keep in a config
  * file because the AES key it needs lives outside the repository — an environment variable, or
  * {@code ~/.cvhome/secret-crypto/keys} — so a checked-in envelope discloses nothing on its own. Plaintext still works,
- * because control-plane configures the same property that way and this must not break it, but it is logged as a
+ * because tenancy configures the same property that way and this must not break it, but it is logged as a
  * warning rather than accepted silently.
  * </p>
  *

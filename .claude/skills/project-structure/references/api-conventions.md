@@ -163,7 +163,7 @@ Note the conventions:
   action.
 - **`default -> false`** — a typo'd or unregistered permission denies rather than allows.
 - **The evaluator converts `StoreMerchantId` → `ManagerStoreId`** before checking, bridging the pod-side and
-  control-plane-side identifiers (`multi-tenancy.md`).
+  tenancy-side identifiers (`multi-tenancy.md`).
 - **It is pod-aware.** `CustomPermissionEvaluator` injects the current `Pod` from `PodInfoProperties`, and the
   checks compare the caller's store/org against *this* pod — so a token valid in one pod can't manage a store in
   another.

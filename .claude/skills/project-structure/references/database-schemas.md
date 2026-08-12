@@ -8,7 +8,7 @@ in before writing a repository or an entity.
 
 | | **Spring Data JDBC** | **Spring Data JPA / Hibernate** |
 |---|---|---|
-| Used by | `control-plane-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`) |
+| Used by | `tenancy-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`) |
 | Entity annotations | `org.springframework.data.relational.core.mapping.{Table, Column}` | `jakarta.persistence.{Entity, Table, Column, Id, …}` |
 | Base class | `BaseEntity<E, ID>` (`store-commons:commons`) | `SalesManagerEntity<K, E>` (`store-pod/commons/store-commons`) |
 | Outbox starter | `namastack-outbox-starter-jdbc` | `namastack-outbox-starter-jpa` |
@@ -19,8 +19,8 @@ Both base classes extend Spring Data's `AbstractAggregateRoot`, so `registerEven
 either side (`events-outbox.md`).
 
 ```java
-// control-plane — Spring Data JDBC
-@Table(schema = "manager", name = "manager_store")
+// tenancy — Spring Data JDBC
+@Table(schema = "tenancy", name = "manager_store")
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> { ... }
 
 // payment — JPA
@@ -65,7 +65,7 @@ spring:
         default_schema: ${spring.application.name}      # → "payment"
 ```
 
-`control-plane-service` puts its DDL at the Spring Boot default location (`classpath:schema.sql`), so it needs
+`tenancy-service` puts its DDL at the Spring Boot default location (`classpath:schema.sql`), so it needs
 no `schema-locations` entry at all.
 
 > `ddl-auto: update` **and** a hand-written `schema.sql` both run. The SQL file is the source of truth
@@ -76,7 +76,7 @@ no `schema-locations` entry at all.
 
 | Service | DDL file | Data seed |
 |---|---|---|
-| `control-plane-service` | `src/main/resources/schema.sql` | — |
+| `tenancy-service` | `src/main/resources/schema.sql` | — |
 | `payment-service` | `src/main/resources/init-sql/schema.sql` | `init-sql/data-common.sql`, `init-sql/data-test-stores.sql`, `init-sql/stores/` |
 
 Pod services follow the `init-sql/` convention: `schema.sql` + `data-common.sql` (reference data loaded always)
@@ -84,17 +84,16 @@ Pod services follow the `init-sql/` convention: `schema.sql` + `data-common.sql`
 
 ### Schemas actually created
 
-**`control-plane-service`** is the exception — it owns **four** schemas rather than one, split by bounded
+**`tenancy-service`** is the exception — it owns **three** schemas rather than one, split by bounded
 context:
 
 | Schema | Tables |
 |---|---|
-| `manager` | `manager_org`, `manager_store` |
-| `subscription` | `subscription`, `subscription_price_plan` |
+| `tenancy` | `manager_org`, `manager_store` |
 | `org` | `pod` |
-| `control` | the three outbox tables |
+| `tenancy_outbox` | the three outbox tables |
 
-That mirrors the module split (`manager-commons`, `subscription-commons`, `pod-external-api`) — the code
+That mirrors the module split (`tenancy-commons`, `tenancy-events`, `pod-external-api`) — the code
 boundaries are reflected in the database.
 
 **`payment-service`** uses a single `payment` schema: `payment_configuration`, `transaction`, `sm_sequencer`,
@@ -102,10 +101,10 @@ plus the outbox tables.
 
 ## Conventions visible in the DDL
 
-- **Ids are `varchar(24)`** in control-plane — that's a Mongo `ObjectId` hex string, matching `PodId` /
+- **Ids are `varchar(24)`** in tenancy — that's a Mongo `ObjectId` hex string, matching `PodId` /
   `ManagerStoreId` / `ManagerOrgId` (`api-conventions.md`). Pod-side ids are `varchar(50)`
   (`store_merchant_id`).
-- **`version int`** on control-plane tables — optimistic locking via Spring Data JDBC.
+- **`version int`** on tenancy tables — optimistic locking via Spring Data JDBC.
 - **`sm_sequencer`** in pod schemas is the Shopizer-inherited `@TableGenerator` sequence table
   (`SEQ_NAME`/`SEQ_COUNT`), used by JPA entities like `Transaction` instead of a Postgres sequence.
 - **Enums are `varchar` with a `CHECK` constraint**, not Postgres enum types:
@@ -131,7 +130,7 @@ Both services create the same three tables, in their own schema (`control.*` / `
 library's auto-creation is **switched off** in this repo:
 
 ```yaml
-namastack.outbox.jdbc.schema-initialization.enabled: false   # control-plane
+namastack.outbox.jdbc.schema-initialization.enabled: false   # tenancy
 namastack.outbox.jpa.schema-initialization.enabled:  false   # payment
 ```
 
@@ -175,7 +174,7 @@ CREATE TABLE IF NOT EXISTS <schema>.outbox_partition (
 Plus indexes on `(record_key, created_at)`, `(partition_no, status, next_retry_at)`, `(status, next_retry_at)`,
 `(status)`, `(record_key, completed_at, created_at)`, and on the instance table `(status, last_heartbeat)`.
 Payment additionally indexes `outbox_instance(last_heartbeat)`, `outbox_instance(status)` and
-`outbox_partition(instance_id)` — control-plane's file stops earlier, a small inconsistency rather than a
+`outbox_partition(instance_id)` — tenancy's file stops earlier, a small inconsistency rather than a
 deliberate difference.
 
 **What the three tables mean together:** `outbox_instance` is a heartbeat registry of running replicas,
@@ -188,7 +187,7 @@ detail in `events-outbox.md`.
 
 1. Edit the service's `schema.sql` (`init-sql/schema.sql` for pod services) with `CREATE TABLE IF NOT EXISTS` /
    an idempotent `ALTER`.
-2. Put it in the right schema — pod services use one schema named after the app; control-plane picks the
+2. Put it in the right schema — pod services use one schema named after the app; tenancy picks the
    bounded-context schema.
 3. JDBC entity → add `@Table(schema = "...", name = "...")`; JPA entity → omit the schema, it comes from
    `hibernate.default_schema`.

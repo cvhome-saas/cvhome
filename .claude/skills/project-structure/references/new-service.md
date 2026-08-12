@@ -4,7 +4,7 @@ Three shapes exist in this repo, and the first decision is which one you are bui
 
 | Shape | Example | What you create |
 |---|---|---|
-| **BE** — backend only | `catalog`, `payment`, `control-plane` | Gradle Java modules + a Spring Boot `-service` |
+| **BE** — backend only | `catalog`, `payment`, `tenancy` | Gradle Java modules + a Spring Boot `-service` |
 | **FE** — frontend only | `seller-ui`, `landing-ui` | One Gradle module wrapping an npm app (`ui-conventions`) |
 | **BE+FE** — one deployable serving both | `uaa`, `cua` | A Java module whose npm app lives *inside* its resources, **not** a Gradle module |
 
@@ -13,7 +13,7 @@ admin UI) or `store-pod/` (deployed once per pod, per-tenant business runtime). 
 config slice, the fronting gateway, and the s2s client id — get it right before writing anything.
 
 Everything below is derived from what the existing services actually do. Copy the nearest neighbour
-(`payment` for a pod BE, `control-plane` for a core BE, `seller-ui` for an FE, `uaa` for BE+FE) rather than
+(`payment` for a pod BE, `tenancy` for a core BE, `seller-ui` for an FE, `uaa` for BE+FE) rather than
 inventing a layout.
 
 ---
@@ -40,7 +40,7 @@ gateway 503s.**
      gateway-service-name: spg                         # store-core-gateway for core
    ```
 
-   Ports in use: 80 spg · 8000 gateway · 8001 uaa · 8010 seller-ui · 8020 control-plane · 8110 landing-ui ·
+   Ports in use: 80 spg · 8000 gateway · 8001 uaa · 8010 seller-ui · 8020 tenancy · 8110 landing-ui ·
    8120 merchant · 8122 catalog · 8123 checkout · 8124 cua · 8125 payment. Pick the next free one in the
    right band (`81xx` pod, `80xx` core) and **never hardcode it anywhere else.**
 
@@ -168,7 +168,7 @@ evaluator — `store-commons:autoconfigure` (`CvhomeSharedConfig`) imports all o
 
 Nothing changes in the platform gateway: it already forwards `/spg/**?store=&pod=` to the whole pod.
 
-### Core backend (the `control-plane` shape)
+### Core backend (the `tenancy` shape)
 
 Same skeleton, different slices: `store-core/<name>/<name>-service` (with sibling `-commons`/`-events`/
 `-external-api` libs as needed), `application-lcl.yml` imports `lcl-config.yml` + **`store-core-lcl-config.yml`**,
@@ -190,16 +190,16 @@ is the platform edge's whole route table, and it is hand-written — there is no
 (`spring.cloud.gateway.server.webflux.discovery.locator.enabled: false`). Today:
 
 ```java
-private static final String[] backendServices = {"control-plane", "uaa", "spg"};
+private static final String[] backendServices = {"tenancy", "uaa", "spg"};
 
 private static final String[] backendServicesPattern = Arrays.stream(backendServices)
         .map(it -> String.format("/%s/**", it))
         .toArray(String[]::new);
 ...
 return routeLocatorBuilder.routes()
-        .route(r -> r.path("/control-plane/**")
+        .route(r -> r.path("/tenancy/**")
                 .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
-                .uri("lb://control-plane"))
+                .uri("lb://tenancy"))
         .route(r -> r.path(backendServicesPattern)          // ← everything NOT a backend path
                 .negate()
                 .and()
@@ -210,7 +210,7 @@ return routeLocatorBuilder.routes()
 
 **Two edits, and the second is the one people forget:**
 
-1. Add the route itself, in the same shape as `control-plane` — the filter chain matters:
+1. Add the route itself, in the same shape as `tenancy` — the filter chain matters:
    `stripPrefix(1)` removes the `/reporting` prefix so the service sees its own paths, `tokenRelay()` swaps
    the browser's gateway session for a bearer token (a service that skips it gets 401s on every authenticated
    call), `preserveHostHeader()` keeps tenant/host resolution working downstream.
@@ -233,7 +233,7 @@ seller-ui route (it is served by whichever `lb://` that route names), or give it
 Either way the hostname also needs `configure-domain.sh` and `com.asrevo.cvhome.app.sub`.
 
 Pod services need none of this — the gateway already forwards `/spg/**?store=&pod=` to the whole pod via
-`PodClient`, which rebuilds its routes from control-plane every minute.
+`PodClient`, which rebuilds its routes from tenancy every minute.
 
 ### Permissions
 

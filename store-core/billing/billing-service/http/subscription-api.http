@@ -8,7 +8,7 @@
 # Requires a running stack: ./extra/scripts/run-lcl.sh
 #
 # STORE_ID must be a store billing has seen. A store created before billing existed has no subscription
-# and correctly answers 404 — create one through control-plane first if you get that.
+# and correctly answers 404 — create one through tenancy first if you get that.
 
 ### what the store is on, and when it renews
 # @name current

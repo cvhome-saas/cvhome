@@ -138,7 +138,58 @@ the HTTP body alone.
 
 ---
 
-## 7. QA checklist for a user-visible change
+## 7. Writing the QA document — `qa/<plan>.md`
+
+The QA that a human tester runs lives in **one markdown file per plan or feature**, at the repo root under
+`qa/`, named after the plan it belongs to (`qa/billing-per-store-subscriptions.md` for
+`.claude/plans/billing-subscription-service.md`). Markdown so it reviews in the PR and travels with the branch.
+
+**One file per plan, not one per phase.** A plan that ships in ten PRs still produces one QA document, appended
+to as each phase lands. Ten files covering one feature is the failure mode: a tester has no idea which to run,
+the same setup is repeated ten times and drifts, later phases silently invalidate earlier files, and cases end
+up recorded as blocked in one file and passing in another with nothing connecting them. Fold each phase into
+the existing document instead.
+
+**`qa/billing-per-store-subscriptions.md` is the reference implementation.** Match its structure:
+
+1. **Title and a short intro** — what changed, and why anyone should read this rather than the PR.
+2. **A scope block** — `Scope` (the services touched) · `Change` (PR number, branch, plan path) · `Cases` (the
+   count) · anything a tester must know before touching it (a test-mode key, a migration order).
+3. **The tag legend.** Every case is tagged, and the tags are the point of the document:
+   - **[verified]** — run against a running stack and passed.
+   - **[unit only]** — the branch is covered by a named test, but nobody drove it through the stack. Name the
+     test so the reader can judge.
+   - **[not verified]** — never run end to end by anyone.
+
+   A case nobody has executed is where the bugs are. **Marking it is more useful than implying otherwise** —
+   never quietly present an unrun case as passing, and never drop it to keep the document tidy.
+4. **`## 00 — Before you start`** — setup, logins, seeded ids, fixture SQL, and the queries that show the truth
+   underneath. Everything a tester needs before case 1, in one place, so no case repeats it.
+5. **Sections with a short prefix**, each opening with the design points a tester needs in order to judge what
+   they see — especially anything deliberate that *looks* like a bug (fail-open here, fail-closed there;
+   404 instead of 403). One section per theme, not one per phase.
+6. **Cases as `### PFX-NN — what it proves · severity · [tag]`**, numbered within their section, with
+   `- **Setup**` / `- **Steps**` / `- **Expect**` bullets. Mark the ones that matter `· critical` or `· high`.
+   Add `- **Seen**` with the concrete evidence when the observation is worth more than "it passed" (the actual
+   status codes, the log line, the timing). State plainly what is *expected to fail* so a tester does not spend
+   a morning re-finding a known gap.
+7. **`## MIG`** when there is a migration — the order, and what breaks silently if a step is skipped.
+8. **`## REG — Regression watchlist`** — a table of every defect that actually happened during the work: what
+   broke, how it looked, and which case catches it again. Highest-value section in the file, because each row
+   has already proven it can happen.
+9. **`## 99 — Known gaps`** — behaviour that is expected today, so nobody re-raises it. Lead with the largest.
+10. **A closing line** — where to raise findings, and which log to attach.
+
+Write it for a person who did not do the work. Explain *why* a case exists, not just its steps — a case whose
+purpose is unclear gets skipped or "fixed" back. This is for humans; the machine-checkable path is `.http`
+blocks and tests, and it does not replace them.
+
+**Never a rendered page or an attachment.** Those cannot be diffed, and a test plan nobody can review is a test
+plan nobody trusts.
+
+---
+
+## 8. QA checklist for a user-visible change
 
 - [ ] Exercised through the **gateway**, not the service port — both edges if the feature is seller *and*
       storefront (`gateway.com:8000/spg/...` and `org1-store1.spg-507f1f77.gateway.com`)
@@ -154,7 +205,7 @@ the HTTP body alone.
 
 ---
 
-## 8. Where automated tests fit
+## 9. Where automated tests fit
 
 ```bash
 ./gradlew test                 # everything

@@ -7,11 +7,11 @@ mapping between them, and everything else — routing, TLS, data isolation, regi
 
 | Level | Identifier | Lives in | Meaning |
 |---|---|---|---|
-| **Organization** | `ManagerOrgId` | control-plane (`manager` schema) | The customer account that signs up and pays. Owns stores. |
-| **Store** | `ManagerStoreId` (control-plane) / `StoreMerchantId` (inside a pod) | control-plane + the pod's own DB | One storefront. The unit a shopper actually visits. |
-| **Pod** | `PodId` | control-plane (`org.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
+| **Organization** | `ManagerOrgId` | tenancy (`tenancy` schema) | The customer account that signs up and pays. Owns stores. |
+| **Store** | `ManagerStoreId` (tenancy) / `StoreMerchantId` (inside a pod) | tenancy + the pod's own DB | One storefront. The unit a shopper actually visits. |
+| **Pod** | `PodId` | tenancy (`org.pod` table) | A **physical deployment** of the whole `store-pod` stack. Hosts many stores. |
 
-Note the deliberate id split: control-plane calls a store `ManagerStoreId` (an `ObjectId`), while inside a pod
+Note the deliberate id split: tenancy calls a store `ManagerStoreId` (an `ObjectId`), while inside a pod
 the same store is a `StoreMerchantId` (a `String`). The control plane tracks *that a store exists and where*;
 the pod owns the store's actual data. Neither side needs the other's model.
 
@@ -56,10 +56,10 @@ still reaches it uniformly.
 
 ## Where the store → pod binding lives
 
-`ManagerStoreEntity` (control-plane, `manager.manager_store`) is the authoritative record:
+`ManagerStoreEntity` (tenancy, `tenancy.manager_store`) is the authoritative record:
 
 ```java
-@Table(schema = "manager", name = "manager_store")
+@Table(schema = "tenancy", name = "manager_store")
 public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerStoreId> {
     private String name;
     private ManagerOrgId orgId;                    // which customer owns it
@@ -145,8 +145,8 @@ public Flux<RouteDefinition> getRouteDefinitions() {
 }
 ```
 
-- Pods come from control-plane via `ExternalPodClient.listPods()` (`GET /api/v1/pod/list`), with
-  `onErrorResume` so a control-plane outage degrades to the existing routes instead of dropping them.
+- Pods come from tenancy via `ExternalPodClient.listPods()` (`GET /api/v1/pod/list`), with
+  `onErrorResume` so a tenancy outage degrades to the existing routes instead of dropping them.
 - A request to `/spg/**?store=<id>&pod=<podId>` matches the route for that pod. `StripPrefix=1` removes `/spg`,
   and **`TokenRelay` forwards the seller's OAuth2 token** into the pod — which the pod accepts because `uaa` is
   in its `issuer-uri-set` (`authentication.md`).
@@ -212,7 +212,7 @@ public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identit
 | Store data (products, orders, customers) | Per **pod** database; never crosses pods |
 | Shopper identity | Per pod — each pod runs its own `cua` |
 | Seller/admin identity | **Shared** — one `uaa` in store-core for the whole platform |
-| Billing, subscriptions, org/store registry | **Shared** — control-plane |
+| Billing, subscriptions, org/store registry | **Shared** — tenancy |
 | TLS certificates | Per pod (S3-backed Caddy storage, pod-local `ask` check) |
 | Physical region | Per pod, via `PodEndpoint` |
 

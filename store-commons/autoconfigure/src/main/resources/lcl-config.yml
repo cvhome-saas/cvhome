@@ -14,18 +14,24 @@ spring:
                 metadata:
                   service-name: uaa
                   instance: uaa-1
-            control-plane:
+            tenancy:
               - uri: "http://localhost:8020"
-                instance-id: control-plane-1
+                instance-id: tenancy-1
                 metadata:
-                  service-name: control-plane
-                  instance: control-plane-1
+                  service-name: tenancy
+                  instance: tenancy-1
             billing:
               - uri: "http://localhost:8021"
                 instance-id: billing-1
                 metadata:
                   service-name: billing
                   instance: billing-1
+            pod-registry:
+              - uri: "http://localhost:8022"
+                instance-id: pod-registry-1
+                metadata:
+                  service-name: pod-registry
+                  instance: pod-registry-1
             seller-ui:
               - uri: "http://localhost:8010"
                 instance-id: seller-ui-1

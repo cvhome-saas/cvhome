@@ -186,6 +186,49 @@ public class PermissionAccessChecker {
         return false;
     }
 
+    /**
+     * Reading the pod registry. Open to super admins, org admins and store-core service principals — the gateway is
+     * a service principal and rebuilds its route table from the pod list every minute, so excluding it would take
+     * tenant routing down. An org admin is admitted here but the registry still returns only its own private pods.
+     */
+    public boolean hasAccessOnPodRead(Authentication authentication) {
+        if (storeRoleAccessChecker.isSuperAdmin(authentication)
+                || storeRoleAccessChecker.isScopeStoreCore(authentication)
+                || SecurityUtils.hasOrgAdminRole(authentication)) {
+            return true;
+        }
+        log.debug("User {} may not read the pod registry with roles {}", authentication.getName(),
+                SecurityUtils.getRoles(authentication));
+        return false;
+    }
+
+    /**
+     * Creating, updating, draining or deleting a pod. Super admin only: a pod is platform infrastructure, and
+     * deleting one orphans every store placed on it.
+     */
+    public boolean hasAccessOnPodManage(Authentication authentication) {
+        if (storeRoleAccessChecker.isSuperAdmin(authentication)) {
+            return true;
+        }
+        log.debug("User {} may not manage pods with roles {}", authentication.getName(),
+                SecurityUtils.getRoles(authentication));
+        return false;
+    }
+
+    /**
+     * Asking the registry where a new store should be placed. A service-to-service call only — tenancy asks on
+     * behalf of an org before the store exists, so there is nothing to scope against and no human ever asks it
+     * directly. Same shape as {@link #hasAccessOnBillingQuotaCheck}.
+     */
+    public boolean hasAccessOnPodPlacement(Authentication authentication) {
+        if (storeRoleAccessChecker.isScopeStoreCore(authentication)) {
+            return true;
+        }
+        log.debug("User {} does not have store-core scope for a pod placement with roles {}",
+                authentication.getName(), SecurityUtils.getRoles(authentication));
+        return false;
+    }
+
     public boolean isCustomerInSameStore(Authentication authentication, ManagerStoreId requestedStoreId) {
         if (!storeRoleAccessChecker.isStoreCustomer(authentication, requestedStoreId)) {
             log.debug("Customer {} does not have maintain access on customer on store {} on roles {}",

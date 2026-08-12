@@ -1,11 +1,11 @@
 # ExternalStoreQuotaApi — com.asrevo.cvhome.billing.api.v1.ExternalStoreQuotaApi
 # (@RequestMapping "/api/v1/quota")
 #
-# A service-to-service API: control-plane calls it, no human does. It is gated on
+# A service-to-service API: tenancy calls it, no human does. It is gated on
 # STORE-CORE.BILLING.QUOTA-CHECK, which only a store-core service principal holds — so a seller session
 # gets 403 here, and that is the assertion worth keeping below.
 #
-# The real exercise of this API is creating a store through control-plane, which drives both endpoints:
+# The real exercise of this API is creating a store through tenancy, which drives both endpoints:
 # see the "provisioning" block at the bottom.
 #
 # Requires a running stack: ./extra/scripts/run-lcl.sh
@@ -25,11 +25,11 @@ Content-Type: application/json
     });
 %}
 
-### provisioning, exercised the way it actually happens: create a store through control-plane
+### provisioning, exercised the way it actually happens: create a store through tenancy
 # The store row commits, StoreCreatedEvent goes to the outbox, and BillingProvisioningEventImpl calls
 # billing. Give the outbox a couple of seconds, then read the subscription back.
 # @name createStore
-POST {{SELLER_UI_URL}}/control-plane/api/v1/store-manager/private/store
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 Content-Type: application/json
 

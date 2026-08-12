@@ -12,7 +12,7 @@ import com.asrevo.cvhome.uaa.errors.UaaErrors;
  *
  * <p>
  * An answer, not a failure of the call: uaa was reached and reported a fact. A caller should treat it as a 404 of its
- * own — control-plane restates it as {@code ManagedUserNotFoundException} — never as "the call did not go through".
+ * own — tenancy restates it as {@code ManagedUserNotFoundException} — never as "the call did not go through".
  * </p>
  */
 public class UaaUserNotFoundException extends UaaApiException {

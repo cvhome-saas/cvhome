@@ -50,7 +50,7 @@ public class StripeCustomerGateway extends StripeGatewaySupport {
      * The org's customer, creating one the first time.
      *
      * <p>
-     * Looked up from our own rows rather than through Stripe's customer search, which control-plane uses. Search is
+     * Looked up from our own rows rather than through Stripe's customer search, which tenancy uses. Search is
      * eventually consistent: two stores created for one org moments apart would both miss and both create a customer,
      * and the org would end up with its payment methods split across two.
      * </p>

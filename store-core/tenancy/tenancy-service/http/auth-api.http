@@ -1,0 +1,23 @@
+# AuthApi / SaasApi — com.asrevo.cvhome.tenancy.controller.AuthApi,
+#   com.asrevo.cvhome.tenancy.manager.controller.SaasApi
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### the current principal as tenancy sees it
+GET {{SELLER_UI_URL}}/tenancy/api/v1/auth/current?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("identity resolved", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### the platform properties the console bootstraps from — public
+GET {{SELLER_UI_URL}}/tenancy/api/v1/saas/public/saas-properties?lang={{LANG}}
+
+> {%
+    client.test("served without a session", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}

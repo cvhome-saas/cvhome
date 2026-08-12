@@ -1,4 +1,4 @@
-# `store-core/` — the platform / control-plane layer
+# `store-core/` — the platform / tenancy layer
 
 One shared deployment for the whole SaaS (not per-tenant). Namespace in config: `store-core.cvhome.lcl`,
 fronted by `store-core-gateway`.
@@ -7,10 +7,10 @@ fronted by `store-core-gateway`.
 store-core/
 ├── uaa/                              BE+FE  :8001  auth server + embedded Angular admin SPA
 ├── gateway/gateway-service/          BE     :8000  Spring Cloud Gateway (reactive)
-├── control-plane/                            grouping folder
-│   ├── control-plane-service/        BE     :8020  the deployable app
-│   ├── manager-commons/              lib           org/store DTOs
-│   ├── manager-events/               lib           org/store domain events
+├── tenancy/                          grouping folder
+│   ├── tenancy-service/              BE     :8020  the deployable app
+│   ├── tenancy-commons/              lib           org/store DTOs
+│   ├── tenancy-events/               lib           org/store domain events
 │   └── pod-external-api/             lib           client for talking to a tenant pod
 └── seller-ui/                        FE     :8010  Angular 20 SSR admin console
 ```
@@ -34,14 +34,14 @@ platform staff and merchants; `cua` authenticates storefront shoppers.
 
 Reactive Spring Cloud Gateway (`spring-cloud-starter-gateway-server-webflux`). It is the browser-facing entry
 point for the admin/seller experience: it runs the OAuth2 **client** login flow against `uaa`, holds the
-session, and forwards authenticated requests to `control-plane` and `seller-ui`.
+session, and forwards authenticated requests to `tenancy` and `seller-ui`.
 
 - Main class: `com.asrevo.cvhome.gateway.StoreCoreGatewayApplication`
 - `config/GatewayRouteLocatorImpl` — programmatic route definitions
 - `config/SecurityConfig`, `config/CapturingServerOAuth2AuthorizationRequestResolver`,
   `config/RedirectingServerAuthenticationSuccessHandler` — login/redirect handling
 - `controller/AuthController`, `controller/LogoutController`
-- `client/PodClient` — implements `RouteDefinitionRepository`: polls control-plane for the pod list every minute
+- `client/PodClient` — implements `RouteDefinitionRepository`: polls tenancy for the pod list every minute
   and **generates gateway routes per pod at runtime** (`multi-tenancy.md`)
 - Also registers a `client_credentials` service-to-service client
   (`store-core@service.store-core.internal`, scope `store_core`) for machine calls to `uaa`.
@@ -49,28 +49,26 @@ session, and forwards authenticated requests to `control-plane` and `seller-ui`.
 Note the naming: this is the **platform** gateway. The **tenant** edge is `store-pod/spg` (Caddy) — different
 technology, different layer.
 
-## `control-plane` — the SaaS brain
+## `tenancy` — the SaaS brain
 
-`control-plane-service` is the deployable app; the surrounding modules are libraries it (and other services)
+`tenancy-service` is the deployable app; the surrounding modules are libraries it (and other services)
 consume.
 
-**Controllers** (`com.asrevo.cvhome.controlplane.*`):
+**Controllers** (`com.asrevo.cvhome.tenancy.*`):
 - `org/controller/PodController` — pod/tenant infrastructure
 - `manager/controller/` — `StoreManagerController`, `SignUpController`, `UserAccountController`,
   `SaasController`, `RouterController`, `admin/OrgManagerController`
 - `manager/controller/statistic/` — `StoreStatisticApi`, `OrgStatisticApi`
-- `subscription/controller/` — `SubscriptionController`, `SubscriptionPlanController`,
-  `SubscriptionPlanDetailsController`, `StripeWebhookController`
 
 **Library modules and what distinguishes them:**
 
 | Module | Contents |
 |---|---|
-| `manager-commons` | `ManagerOrgDto`, `ManagerStoreDto`, `ListManagerStoreQuery`, `ProvisioningState`. Depends on `store-commons:commons` (+ `dnsjava` for custom-domain checks). |
-| `manager-events` | `OrgCreatedEvent`, `StoreCreatedEvent`, `StoreProvisionedEvent`. Uses `namastack-outbox-api` — events go out via a **transactional outbox**. |
+| `tenancy-commons` | `ManagerOrgDto`, `ManagerStoreDto`, `ListManagerStoreQuery`, `ProvisioningState`. Depends on `store-commons:commons` (+ `dnsjava` for custom-domain checks). |
+| `tenancy-events` | `OrgCreatedEvent`, `StoreCreatedEvent`, `StoreProvisionedEvent`. Uses `namastack-outbox-api` — events go out via a **transactional outbox**. |
 | `pod-external-api` | `ExternalPodClient` — how store-core talks to a tenant pod. |
 
-The `-events` suffix is unique to control-plane: it marks **messaging/event contract** modules, published
+The `-events` suffix is unique to tenancy: it marks **messaging/event contract** modules, published
 through the `io.namastack:namastack-outbox` starter.
 
 ## `seller-ui` — Angular 20 admin console

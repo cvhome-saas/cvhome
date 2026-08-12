@@ -14,7 +14,7 @@ Authenticating a user, validating a token, or reading the current principal is a
 
 Same interface/impl split as `-external-api` vs `-service` elsewhere: business code compiles against
 `UserAccountService`, and only one `@Configuration` ever touches the concrete client. Today
-`control-plane-service` is the sole consumer:
+`tenancy-service` is the sole consumer:
 
 ```gradle
 implementation project(":store-commons:uaa-client")
@@ -39,7 +39,7 @@ use `service-to-service.md` for that.
 
 ## Wiring (the only place the impl is named)
 
-`control-plane-service`'s `UaaClientConfig`:
+`tenancy-service`'s `UaaClientConfig`:
 
 ```java
 @Configuration
@@ -167,7 +167,7 @@ between them leaves a user with no password; treat creation as non-atomic.
 back out on the way in, and `list(...)` filters on them (`?metadata[org]=…&metadata[store]=…`). uaa itself has
 no notion of orgs or pods.
 
-`ManagedUserAccountServiceImpl` in control-plane is the reference for doing this correctly: it stamps
+`ManagedUserAccountServiceImpl` in tenancy is the reference for doing this correctly: it stamps
 `org`/`store` from the caller's `UserOrgStoreIdentity` on every create **and** update ("ensure the user is not
 moved to another org/store via update"), and calls `validateUserAccess(...)` after fetching before any
 mutation. `getAssignableRoles()` likewise strips the reserved `USER` and `ORG_ADMIN` roles.
@@ -202,7 +202,7 @@ Base path `{baseUrl}/api/v1/admin/users`. Use it directly only for what `UserAcc
 2. Copy the `UaaClientConfig` bean and the `com.asrevo.cvhome.uaa.client` properties block, keeping `base-url`
    interpolated from `common-config.yml`.
 3. Inject `UserAccountService` — never `AdminUserClient` — into a service that applies the tenant check.
-4. Handle the checked failures the interface declares. Restate uaa's answers in your own vocabulary — control-plane
+4. Handle the checked failures the interface declares. Restate uaa's answers in your own vocabulary — tenancy
    turns `UaaUserNotFoundException` into `ManagedUserNotFoundException` — and let `UaaApiUnavailableException`
    propagate: it is a 502 the shared advice already renders, and catching it as "not found" records a guess as a fact.
 
