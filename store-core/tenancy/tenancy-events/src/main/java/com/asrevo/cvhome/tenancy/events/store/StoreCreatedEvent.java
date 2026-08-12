@@ -2,11 +2,10 @@ package com.asrevo.cvhome.tenancy.events.store;
 
 import java.util.Map;
 
-import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
-
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 
 import io.namastack.outbox.annotation.OutboxEvent;
 
