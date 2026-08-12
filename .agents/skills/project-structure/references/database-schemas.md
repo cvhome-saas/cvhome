@@ -8,7 +8,7 @@ in before writing a repository or an entity.
 
 | | **Spring Data JDBC** | **Spring Data JPA / Hibernate** |
 |---|---|---|
-| Used by | `tenancy-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`) |
+| Used by | `tenancy-service` | the `store-pod` services (`payment`, `catalog`, `checkout`, `merchant`, `content`) |
 | Entity annotations | `org.springframework.data.relational.core.mapping.{Table, Column}` | `jakarta.persistence.{Entity, Table, Column, Id, …}` |
 | Base class | `BaseEntity<E, ID>` (`store-commons:commons`) | `SalesManagerEntity<K, E>` (`store-pod/commons/store-commons`) |
 | Outbox starter | `namastack-outbox-starter-jdbc` | `namastack-outbox-starter-jpa` |

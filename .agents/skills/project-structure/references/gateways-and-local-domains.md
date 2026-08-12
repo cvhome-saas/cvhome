@@ -19,13 +19,14 @@ The `/merchant` prefix is stripped by Caddy, so the service itself sees the iden
 | Edge | Service | Port | Local domain | Fronts |
 |---|---|---|---|---|
 | Platform | `store-core/gateway` (Spring Cloud Gateway) | 8000 | `gateway.com` | `tenancy`, `seller-ui`, and **all pods** via `/spg/**` |
-| Pod | `store-pod/spg` (Caddy) | 80 / 443 | `spg-507f1f77.gateway.com` | `merchant`, `catalog`, `checkout`, `payment`, `cua`, `landing-ui` |
+| Pod | `store-pod/spg` (Caddy) | 80 / 443 | `spg-507f1f77.gateway.com` | `merchant`, `content`, `catalog`, `checkout`, `payment`, `cua`, `landing-ui` |
 
 ### `spg` — path → pod service (`store-pod/spg/Caddyfile`)
 
 | Path | Target | Prefix |
 |---|---|---|
 | `/merchant*` | `http://merchant.{$NAMESPACE}:8120` | stripped (`handle_path`) |
+| `/content*` | `http://content.{$NAMESPACE}:8121` | stripped (`handle_path`) |
 | `/catalog*` | `http://catalog.{$NAMESPACE}:8122` | stripped |
 | `/checkout*` | `http://checkout.{$NAMESPACE}:8123` | stripped |
 | `/payment*` | `http://payment.{$NAMESPACE}:8125` | stripped |

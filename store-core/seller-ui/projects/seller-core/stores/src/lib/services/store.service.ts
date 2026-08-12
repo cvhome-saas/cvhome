@@ -82,16 +82,16 @@ export class StoreService {
   // PAGE CONTENT
 
   getPageContent(store: string, pageCode: string): Observable<LandingPageContent> {
-    return this.crudService.get(`/spg/merchant/api/v1/private/content/any/${pageCode}`, {store});
+    return this.crudService.get(`/spg/content/api/v1/private/content/any/${pageCode}`, {store});
   }
 
   updatePageContent(store: string, code: string | number, content: Record<string, unknown>): Observable<void> {
-    return this.crudService.put(`/spg/merchant/api/v1/private/content/${code}`, content, {store});
+    return this.crudService.put(`/spg/content/api/v1/private/content/${code}`, content, {store});
   }
 
   createPageContent(content: Record<string, unknown>, store: string): Observable<void> {
 
-    return this.crudService.post(`/spg/merchant/api/v1/private/content`, content, {store});
+    return this.crudService.post(`/spg/content/api/v1/private/content`, content, {store});
   }
 
   updateSocialNetworks(store: string, body: Record<string, unknown>): Observable<void> {

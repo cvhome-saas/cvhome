@@ -1,0 +1,126 @@
+### Public pages
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+
+### Public page
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages/about-us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Public page by name
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages/name/About%20Us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Public boxes
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+
+### Public box
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes/agreement?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Public images
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/images?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Private pages
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+Cookie: SESSION={{SESSION_ID}}
+
+### Private page
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/pages/about-us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Private boxes
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/boxes?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+Cookie: SESSION={{SESSION_ID}}
+
+### Private box
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/boxes/agreement?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Box exists
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/box/agreement/exists?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Page exists
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/page/about-us/exists?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Create box
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/box?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "code": "http-box",
+  "visible": true,
+  "descriptions": [{"language": "{{LANG}}", "name": "HTTP box", "description": "HTTP box body"}]
+}
+
+### Update box
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/box/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "code": "http-box",
+  "visible": true,
+  "descriptions": [{"language": "{{LANG}}", "name": "Updated HTTP box", "description": "Updated body"}]
+}
+
+### Create page
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/page?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "code": "http-page",
+  "visible": true,
+  "linkToMenu": false,
+  "descriptions": [{"language": "{{LANG}}", "name": "HTTP page", "description": "HTTP page body"}]
+}
+
+### Update page
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/page/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "code": "http-page",
+  "visible": true,
+  "linkToMenu": false,
+  "descriptions": [{"language": "{{LANG}}", "name": "Updated HTTP page", "description": "Updated body"}]
+}
+
+### Upload files
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/files?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: SESSION={{SESSION_ID}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="content-image.png"
+Content-Type: image/png
+
+< ../../../../landing-ui/templates/basis/public/placeholder.png
+--WebAppBoundary--
+
+### Delete content
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Delete image
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&contentType=IMAGE&name=content-image.png
+Cookie: SESSION={{SESSION_ID}}
+
+### Legacy public alias
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+
+### Legacy private alias
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/private/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&size=20
+Cookie: SESSION={{SESSION_ID}}
+
+### Legacy file alias
+POST {{SELLER_UI_URL}}/spg/merchant/api/v1/private/files?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: SESSION={{SESSION_ID}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="content-image.png"
+Content-Type: image/png
+
+< ../../../../landing-ui/templates/basis/public/placeholder.png
+--WebAppBoundary--

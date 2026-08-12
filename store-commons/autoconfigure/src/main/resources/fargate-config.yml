@@ -13,6 +13,7 @@ spring:
           - "seller-ui"
           - "spg"
           - "merchant"
+          - "content"
           - "catalog"
           - "checkout"
           - "cua"
@@ -33,6 +34,7 @@ spring:
           "pod-registry": 8022
           "landing-ui": 8110
           "merchant": 8120
+          "content": 8121
           "catalog": 8122
           "checkout": 8123
           "cua": 8124

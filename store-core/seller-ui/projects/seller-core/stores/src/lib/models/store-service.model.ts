@@ -13,7 +13,7 @@ export interface ReadableMerchantStoreWithPod extends ReadableMerchantStore {
 
 /** Local shape of the store-scoped "page content" (e.g. LANDING_PAGE) fetched
  *  via getPageContent/updatePageContent/createPageContent — no matching
- *  controller was found for `/spg/merchant/api/v1/private/content/any/{code}`
+ *  controller was found for `/spg/content/api/v1/private/content/any/{code}`
  *  or the bare `/private/content` POST/PUT (ContentApi only exposes
  *  `/private/content/box` and `/private/content/page`); typed from what
  *  store-landing-page.facade.ts and its form service already read/write

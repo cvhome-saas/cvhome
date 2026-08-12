@@ -5,12 +5,6 @@ INSERT INTO merchant.sm_sequencer (seq_name, seq_count)
 VALUES ('CATEGORY_SEQ_NEXT_VAL', 8)
 on conflict do nothing;
 INSERT INTO merchant.sm_sequencer (seq_name, seq_count)
-VALUES ('content_description_seq', 16)
-on conflict do nothing;
-INSERT INTO merchant.sm_sequencer (seq_name, seq_count)
-VALUES ('CONTENT_SEQ_NEXT_VAL', 16)
-on conflict do nothing;
-INSERT INTO merchant.sm_sequencer (seq_name, seq_count)
 VALUES ('MANUFACT_SEQ_NEXT_VAL', 8)
 on conflict do nothing;
 INSERT INTO merchant.sm_sequencer (seq_name, seq_count)

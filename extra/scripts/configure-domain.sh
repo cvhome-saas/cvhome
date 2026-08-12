@@ -25,6 +25,7 @@ function run-append() {
     append "127.0.0.1 spg-507f1f77.gateway.com" "$file"
     append "127.0.0.1 catalog.gateway.com" "$file"
     append "127.0.0.1 merchant.gateway.com" "$file"
+    append "127.0.0.1 content.gateway.com" "$file"
     append "127.0.0.1 checkout.gateway.com" "$file"
     append "127.0.0.1 cua.gateway.com" "$file"
     append "127.0.0.1 payment.gateway.com" "$file"
