@@ -10,10 +10,10 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.errors.RemoteServiceTimeoutException;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
-import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StoreProvisioningService {
 
-    private final ManagerStoreMappers managerStoreMappers;
-
     private final StorePodClientFactory podClientFactory;
 
     private final InternalStoreService internalStoreService;
@@ -44,7 +42,7 @@ public class StoreProvisioningService {
      *                                           outbox retries
      * @throws RemoteServiceTimeoutException     likewise — the create may or may not have landed
      */
-    public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, Map<Object, Object> payload)
+    public void provisioning(ManagerOrgId managerOrgId, ManagerStoreId store, PodId pod, CreateStoreRequest payload)
             throws StoreNotFoundException, RemoteServiceUnavailableException, RemoteServiceTimeoutException {
         if (alreadyProvisioned(store)) {
             // The pod create is not idempotent on the pod's side, so a retry after a create that actually
@@ -52,7 +50,8 @@ public class StoreProvisioningService {
             log.info("Store {} is already provisioned in pod {}; skipping", store, pod);
             return;
         }
-        Map<Object, Object> newRequest = managerStoreMappers.toExternalCreateRequest(payload, managerOrgId, store);
+        Map<Object, Object> newRequest = payload.toPodPayload(store.getId().toString(),
+                managerOrgId.getId().toString());
         internalStoreService.startProvisioning(store);
         try {
             podClientFactory.getMerchantStorePodClient(pod).create(newRequest);

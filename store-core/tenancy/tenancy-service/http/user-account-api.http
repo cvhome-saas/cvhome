@@ -1,0 +1,47 @@
+# UserAccountApi — com.asrevo.cvhome.tenancy.manager.controller.UserAccountApi
+#   (@RequestMapping "api/v1/user-account")
+#
+# A thin, tenant-guarded facade over uaa. Every endpoint here needs a session and a store-scoped permission —
+# which is why public signup was moved off this base path to api/v1/signup.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### who am I
+GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/current?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("the signed-in user", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### the users of a store
+GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/list?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### another org's store — the permission gate plus the org check behind it
+GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/list?store=65f020632bc46470c104b76f&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status === 403 || response.status === 404, "status " + response.status);
+    });
+%}
+
+### find-one — its @PreAuthorize was commented out until phase 3
+GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/find-one?store={{STORE_ID}}&userId={{USER_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("guarded and answering", function () {
+        client.assert(response.status === 200 || response.status === 404, "status " + response.status);
+    });
+%}

@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/router")
 @AllArgsConstructor
 @Slf4j
-public class RouterController {
+public class RouterApi {
 
     public final InternalStoreService internalStoreService;
 

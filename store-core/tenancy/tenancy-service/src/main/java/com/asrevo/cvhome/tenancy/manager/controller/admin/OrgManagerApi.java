@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/org-manager")
 @AllArgsConstructor
 @Slf4j
-public class OrgManagerController {
+public class OrgManagerApi {
 
     private final InternalOrgService internalOrgService;
 

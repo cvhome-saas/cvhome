@@ -15,10 +15,20 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("api/v1/user-account")
+/**
+ * Public signup: creates an organization and its first administrator.
+ *
+ * <p>
+ * Moved off {@code api/v1/user-account}, which it shared with {@code UserAccountApi}. Two controllers on one base
+ * path is legal and confusing: the shared prefix implied a shared audience, when in fact everything on the other
+ * one requires a session and a store-scoped permission while this is the one endpoint on the service that anyone
+ * on the internet may call.
+ * </p>
+ */
+@RequestMapping("api/v1/signup")
 @AllArgsConstructor
 @Slf4j
-public class SignUpController {
+public class SignUpApi {
 
     private final SignupService signupService;
 

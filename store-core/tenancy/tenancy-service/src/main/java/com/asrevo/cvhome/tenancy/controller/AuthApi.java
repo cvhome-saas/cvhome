@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/auth")
 @Slf4j
 @AllArgsConstructor
-public class AuthController {
+public class AuthApi {
 
     @GetMapping("current")
 

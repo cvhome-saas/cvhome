@@ -4,7 +4,7 @@ import {SignUpForm, SignUpResponse} from "../domain/types";
 import {CrudService} from 'seller-core';
 
 /** Base path for tenancy's public signup endpoint. */
-export const SIGNUP_API_BASE = '/tenancy/api/v1/user-account/public';
+export const SIGNUP_API_BASE = '/tenancy/api/v1/signup/public';
 
 @Injectable({
   providedIn: 'root'

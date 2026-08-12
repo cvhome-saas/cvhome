@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/saas")
 @AllArgsConstructor
 @Slf4j
-public class SaasController {
+public class SaasApi {
 
     private final AppProperties appProperties;
 

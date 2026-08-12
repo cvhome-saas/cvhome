@@ -24,6 +24,7 @@ import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
@@ -39,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/store-manager")
 @AllArgsConstructor
 @Slf4j
-public class StoreManagerController {
+public class StoreManagerApi {
 
     /**
      * Who may ask for a store listing at all. These endpoints scope their rows by the caller's org in the query, so
@@ -81,7 +82,7 @@ public class StoreManagerController {
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestBody Map<Object, Object> request)
+                                  @RequestBody CreateStoreRequest request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
             PodRegistryUnavailableException, DuplicateStoreNameException {
         return this.managerService.createStore(identity.org(), request);

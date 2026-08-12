@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.tenancy.manager.service;
 
-import java.util.Map;
 
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +11,7 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
@@ -34,7 +34,7 @@ public interface StoreManagerService {
      *                                        as billing: a store placed on a pod nobody confirmed was eligible is
      *                                        not recoverable by retrying, because the store is already there
      */
-    ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request)
+    ManagerStoreDto createStore(ManagerOrgId orgId, CreateStoreRequest request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
             PodRegistryUnavailableException, DuplicateStoreNameException;
 

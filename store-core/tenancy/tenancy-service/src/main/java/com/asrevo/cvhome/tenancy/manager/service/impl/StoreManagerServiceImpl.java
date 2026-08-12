@@ -3,7 +3,6 @@ package com.asrevo.cvhome.tenancy.manager.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -26,6 +25,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementDecision;
 import com.asrevo.cvhome.podregistry.commons.dto.PlacementRequest;
 import com.asrevo.cvhome.podregistry.services.placement.ExternalPodPlacementService;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
@@ -42,11 +42,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StoreManagerServiceImpl implements StoreManagerService {
 
+    /** The pod reference this decorates each store detail with, for the console's store switcher. */
     private static final String POD_KEY = "pod";
 
     private static final String ID_KEY = "id";
-
-    private static final String NAME_KEY = "name";
 
     private final InternalStoreService internalStoreService;
 
@@ -87,29 +86,25 @@ public class StoreManagerServiceImpl implements StoreManagerService {
      * </p>
      */
     @Override
-    public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request)
+    public ManagerStoreDto createStore(ManagerOrgId orgId, CreateStoreRequest request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
             PodRegistryUnavailableException, DuplicateStoreNameException {
         StoreQuotaDecision decision = billingQuotaService.checkStoreCreate(new StoreQuotaRequest(orgId));
         if (!decision.allowed()) {
             throw StoreQuotaRefusedException.refused(orgId, decision.reason());
         }
-        PodId prefaredPodId = Optional.ofNullable(request.get(POD_KEY))
-                .map(it -> (Map<String, String>) it)
-                .filter(it -> it.containsKey(ID_KEY))
-                .map(it -> it.get(ID_KEY))
-                .filter(it -> !it.trim().isEmpty())
-                .map(PodId::new)
-                .orElse(null);
-        PlacementDecision placement = placementService.place(new PlacementRequest(orgId, prefaredPodId));
+        // Five lines of unchecked map-digging until the request became a type.
+        String preferred = request.preferredPodId();
+        PlacementDecision placement = placementService
+                .place(new PlacementRequest(orgId, preferred == null ? null : new PodId(preferred)));
         try {
             return internalStoreService.createStore(request, orgId, placement.podId());
         } catch (DataIntegrityViolationException e) {
             // Caught here, outside createStore's transaction, and not inside it: Postgres aborts a transaction the
             // moment a constraint fails, so catching within would only trade this for an UnexpectedRollbackException
             // at commit — still a 500, minus the cause.
-            log.warn("Store name {} collided on the unique constraint", request.get(NAME_KEY), e);
-            throw DuplicateStoreNameException.of(String.valueOf(request.get(NAME_KEY)));
+            log.warn("Store name {} collided on the unique constraint", request.getName(), e);
+            throw DuplicateStoreNameException.of(request.getName());
         }
     }
 

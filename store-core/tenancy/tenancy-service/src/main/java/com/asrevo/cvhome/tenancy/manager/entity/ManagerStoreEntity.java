@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.tenancy.manager.entity;
 
 import java.time.Instant;
-import java.util.Map;
 
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -10,6 +9,7 @@ import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.events.store.StoreCreatedEvent;
@@ -40,11 +40,10 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     @Column("status")
     private StoreStatus status;
 
-    public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
+    public static ManagerStoreEntity createStore(CreateStoreRequest request, ManagerOrgId orgId, PodId podId) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.id = entity.generateId();
-        String storeName = request.get("name").toString();
-        entity.setName(storeName);
+        entity.setName(request.getName());
         entity.setCreatedDate(Instant.now());
         entity.setOrgId(orgId);
         entity.setPodId(podId);

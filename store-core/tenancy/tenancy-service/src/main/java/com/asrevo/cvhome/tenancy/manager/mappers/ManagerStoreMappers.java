@@ -1,16 +1,12 @@
 package com.asrevo.cvhome.tenancy.manager.mappers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.manager.entity.ManagerStoreEntity;
@@ -30,14 +26,6 @@ public interface ManagerStoreMappers {
     // A list filter has no lifecycle status: the query excludes DELETED itself and matches the rest.
     @Mapping(target = "status", ignore = true)
     ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
-
-    default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId,
-                                                        ManagerStoreId managerStoreId) {
-        HashMap<Object, Object> newRequest = new HashMap<>(request);
-        newRequest.put("id", managerStoreId.id().toString());
-        newRequest.put("org", orgId.id().toString());
-        return newRequest;
-    }
 
     default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {
         return new PageImpl<>(it, internalStores.getPageable(), internalStores.getTotalElements());

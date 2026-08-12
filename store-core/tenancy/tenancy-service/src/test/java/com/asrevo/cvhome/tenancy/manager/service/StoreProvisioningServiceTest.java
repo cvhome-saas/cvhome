@@ -13,11 +13,11 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
-import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,25 +46,31 @@ class StoreProvisioningServiceTest {
 
     private static final String MERCHANT = "merchant";
 
+    private static final String STORE_NAME = "a-store";
+
     private InternalStoreService storeService;
 
     private MerchantStorePodClient podClient;
 
     private StoreProvisioningService service;
 
+    private static CreateStoreRequest request() {
+        CreateStoreRequest request = new CreateStoreRequest();
+        request.setName(STORE_NAME);
+        return request;
+    }
+
     private static ManagerStoreDto storeIn(ProvisioningState state) {
-        return new ManagerStoreDto(STORE, "a-store", ORG, POD, state, StoreStatus.ACTIVE, null);
+        return new ManagerStoreDto(STORE, STORE_NAME, ORG, POD, state, StoreStatus.ACTIVE, null);
     }
 
     @BeforeEach
     void setUp() throws Exception {
         storeService = mock(InternalStoreService.class);
         podClient = mock(MerchantStorePodClient.class);
-        ManagerStoreMappers mappers = mock(ManagerStoreMappers.class);
-        when(mappers.toExternalCreateRequest(any(), any(), any())).thenReturn(Map.of());
         StorePodClientFactory factory = mock(StorePodClientFactory.class);
         when(factory.getMerchantStorePodClient(POD)).thenReturn(podClient);
-        service = new StoreProvisioningService(mappers, factory, storeService);
+        service = new StoreProvisioningService(factory, storeService);
     }
 
     @Test
@@ -72,7 +78,7 @@ class StoreProvisioningServiceTest {
     void replayDoesNotDuplicate() throws Exception {
         when(storeService.findStore(STORE)).thenReturn(storeIn(ProvisioningState.SUCCESSFULLY_PROVISIONING));
 
-        service.provisioning(ORG, STORE, POD, Map.of());
+        service.provisioning(ORG, STORE, POD, request());
 
         // The pod's create is not idempotent, so the guard has to be here.
         verify(podClient, never()).create(any());
@@ -84,7 +90,7 @@ class StoreProvisioningServiceTest {
     void firstRunProvisions() throws Exception {
         when(storeService.findStore(STORE)).thenReturn(storeIn(ProvisioningState.NOT_STARTED_PROVISIONING));
 
-        service.provisioning(ORG, STORE, POD, Map.of());
+        service.provisioning(ORG, STORE, POD, request());
 
         verify(podClient).create(any());
         verify(storeService).completeProvisioning(STORE);
@@ -97,7 +103,7 @@ class StoreProvisioningServiceTest {
         when(podClient.create(any()))
                 .thenThrow(RemoteServiceUnavailableException.of(MERCHANT, Map.of(), new IllegalStateException()));
 
-        assertThatThrownBy(() -> service.provisioning(ORG, STORE, POD, Map.of()))
+        assertThatThrownBy(() -> service.provisioning(ORG, STORE, POD, request()))
                 .isInstanceOf(RemoteServiceUnavailableException.class);
 
         // Marking it FAILED would record a verdict nobody reached; the outbox retry is what resolves it.
@@ -112,7 +118,7 @@ class StoreProvisioningServiceTest {
                 UnmappedRemoteFailureException.of(com.asrevo.cvhome.errors.CommonErrors.REMOTE_UNAVAILABLE,
                         "refused", Map.of(), java.util.List.of(), MERCHANT, "MERCHANT.STORE.INVALID", 422));
 
-        assertThatCode(() -> service.provisioning(ORG, STORE, POD, Map.of())).doesNotThrowAnyException();
+        assertThatCode(() -> service.provisioning(ORG, STORE, POD, request())).doesNotThrowAnyException();
 
         verify(storeService).failProvisioning(STORE);
     }
@@ -122,7 +128,7 @@ class StoreProvisioningServiceTest {
     void missingStoreIsNotFound() throws Exception {
         when(storeService.findStore(STORE)).thenThrow(StoreNotFoundException.of(STORE));
 
-        assertThatThrownBy(() -> service.provisioning(ORG, STORE, POD, Map.of()))
+        assertThatThrownBy(() -> service.provisioning(ORG, STORE, POD, request()))
                 .isInstanceOf(StoreNotFoundException.class);
     }
 

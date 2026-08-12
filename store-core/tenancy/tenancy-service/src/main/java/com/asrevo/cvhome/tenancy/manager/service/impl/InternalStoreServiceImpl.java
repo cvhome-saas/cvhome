@@ -19,6 +19,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.OrgStatus;
@@ -64,7 +65,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
      */
     @Transactional
     @Override
-    public ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
+    public ManagerStoreDto createStore(CreateStoreRequest request, ManagerOrgId orgId, PodId podId) {
         return storeMappers.toDto(storeRepository.save(ManagerStoreEntity.createStore(request, orgId, podId)));
     }
 

@@ -413,6 +413,16 @@ Verified on the merged branch: full `build -x test -x check` clean, every touche
 checkstyle clean, **29 tests green** (`PodPlacementServiceTest` 10, `StoreTenantScopingTest` 7,
 `PodRouteResilienceTest` 5, `PodServiceTest` 5, plus 2 context loads).
 
+**Phases 7–11 are also done**, each on its own branch cut from the one before:
+`feat/tenancy-drops-pods` (7), `feat/pod-health-capacity-drain` (8), `fix/tenancy-robustness` (9),
+`feat/tenancy-store-org-lifecycle` (10), `refactor/tenancy-conventions` (11). Their qa/ files are
+`tenancy-drops-pods.md`, `pod-health-capacity-drain.md`, `tenancy-robustness.md`,
+`tenancy-store-org-lifecycle.md` and `tenancy-conventions.md`.
+
+**The plan is complete.** What remains is listed under "Still open" in `qa/tenancy-conventions.md`; the largest
+by far is `StoreRoleAccessChecker.isOrgAdmin`, which is still unfixed and still lets an org admin manage any
+store on the platform through the pods.
+
 > **Do not continue phases 7–11 on this branch.** It is closed at phase 6 and is under review as one PR.
 > Each later phase cuts a fresh branch — from `develop` once this merges, or from this branch meanwhile,
 > and rebased after. The per-phase branches (`refactor/rename-…`, `fix/gateway-…`, `fix/tenancy-…`,
@@ -435,7 +445,7 @@ Both are recorded here because they outlive the phases that found them:
    yet understood. It fires in `preHandle`, before any controller. **Unowned by any phase here; it needs its
    own fix** and it blocks browser QA of tenancy's write endpoints until then.
 
-✅ = shipped on `feat/tenancy-pod-registry-split` · ▫ = not started, needs its own branch
+✅ = shipped · phases 0–6 on `feat/tenancy-pod-registry-split`, 7–11 each on their own branch
 
 | # | Content | Gate |
 |---|---|---|
@@ -446,11 +456,11 @@ Both are recorded here because they outlive the phases that found them:
 | **4** ✅ | pod-registry exists and is registered: 4 modules + the full §4 checklist + `schema.sql` + config-seeded initializer with advisory lock + `PodApi` + `http/pod-api.http`. tenancy untouched | `run-lcl.sh --list` shows it; `GET gateway.com:8000/pod-registry/api/v1/pod/list` returns the seeded pod; non-admin gets 403 |
 | **5** ✅ | Gateway cutover: `ExternalPodClient` → `pod-registry-external-api`; delete `pod-external-api`; gateway `build.gradle:43` + `ClientsConfig.java:16` repointed | Stop tenancy entirely; storefronts still serve (phase 2's cache makes this a swap, not a risk) |
 | **6** ✅ | Placement cutover: `PodPlacementService` + `/api/v1/pod/private/placement`; tenancy's `PodSelectionImpl` → `ExternalPodPlacementService`, fail closed. **Cross-tenant bug fixed here** | Org with a private pod always lands there; that pod DRAINING → 422, **not** another org's pod; registry down → create fails retryably with no orphan `manager_store` row |
-| **7** ▫ | tenancy stops owning pods: delete the 6 `org/**` classes, drop the `org` schema + `data.sql` insert, `RouterController` → `CachingPodDirectory`, seller-ui `pod.service.ts` base constant → `/pod-registry/...` | `grep -rn "org\.pod\|tenancy\.org" store-core/tenancy` empty; `npm run build`; super-admin pod screens exercised in the browser |
-| **8** ▫ | Pod health / capacity / drain / audit (§5): new columns, poller, capacity from events + reconcile, drain endpoints | Drain a pod → next store lands elsewhere; kill a pod → RED, existing storefronts unaffected; replay `StoreCreatedEvent` → `capacity_stores` unchanged |
-| **9** ▫ | **tenancy robustness** (independent track, unblocked by 4–7): make `ManagerStoreCreatedEventImpl` idempotent; split pod-rejected from pod-unreachable in `StoreProvisioningService:33`; kill `catch (Exception) → null` at `StoreManagerServiceImpl:102`; route signup through the outbox so uaa failure cannot orphan an org; unique constraint on store name; CHECK constraints + indexes in `schema.sql`; consumers for `OrgCreatedEvent` / `StoreProvisionedEvent` (+ `@OutboxEvent` on the latter) | Concurrent same-name creates → one wins; replayed provisioning issues one pod create; a down pod degrades the store list instead of hiding rows |
-| **10** ▫ | **Store + org lifecycle**: suspend/resume/archive/delete, the `IN_PROGRESS_PROVISIONING` reaper, org name/status/owner, members + invitations, audit trail | Stuck store is reaped and re-provisioned; suspended store blocks the console; every mutation lands in the audit table |
-| **11** ▫ | **Conventions**: `*Controller` → `*Api`, typed `CreateStoreRequest` replacing `Map<Object,Object>` (including in `StoreCreatedEvent`), drop `Object` returns, split the `api/v1/user-account` collision, real `http/` directory through the gateway, delete the 5 stale root `.http` files, seller-ui base constants updated | `npm run build`; every endpoint has a `.http` block hitting `{{SELLER_UI_URL}}`, none hitting `localhost:8020` |
+| **7** ✅ | tenancy stops owning pods: delete the 6 `org/**` classes, drop the `org` schema + `data.sql` insert, `RouterController` → `CachingPodDirectory`, seller-ui `pod.service.ts` base constant → `/pod-registry/...` | `grep -rn "org\.pod\|tenancy\.org" store-core/tenancy` empty; `npm run build`; super-admin pod screens exercised in the browser |
+| **8** ✅ | Pod health / capacity / drain / audit (§5): new columns, poller, capacity from events + reconcile, drain endpoints | Drain a pod → next store lands elsewhere; kill a pod → RED, existing storefronts unaffected; replay `StoreCreatedEvent` → `capacity_stores` unchanged |
+| **9** ✅ | **tenancy robustness** (independent track, unblocked by 4–7): make `ManagerStoreCreatedEventImpl` idempotent; split pod-rejected from pod-unreachable in `StoreProvisioningService:33`; kill `catch (Exception) → null` at `StoreManagerServiceImpl:102`; route signup through the outbox so uaa failure cannot orphan an org; unique constraint on store name; CHECK constraints + indexes in `schema.sql`; consumers for `OrgCreatedEvent` / `StoreProvisionedEvent` (+ `@OutboxEvent` on the latter) | Concurrent same-name creates → one wins; replayed provisioning issues one pod create; a down pod degrades the store list instead of hiding rows |
+| **10** ✅ | **Store + org lifecycle**: suspend/resume/archive/delete, the `IN_PROGRESS_PROVISIONING` reaper, org name/status/owner, members + invitations, audit trail | Stuck store is reaped and re-provisioned; suspended store blocks the console; every mutation lands in the audit table |
+| **11** ✅ | **Conventions**: `*Controller` → `*Api`, typed `CreateStoreRequest` replacing `Map<Object,Object>` (including in `StoreCreatedEvent`), drop `Object` returns, split the `api/v1/user-account` collision, real `http/` directory through the gateway, delete the 5 stale root `.http` files, seller-ui base constants updated | `npm run build`; every endpoint has a `.http` block hitting `{{SELLER_UI_URL}}`, none hitting `localhost:8020` |
 
 Phase 1 is a single sweeping PR and should not overlap anything else — merge it before opening the parallel
 tracks. After it, phases 9–11 are tenancy-only and can run in parallel with 4–8 by a second person.

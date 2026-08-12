@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.tenancy.manager.service;
 
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +8,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
@@ -21,7 +21,7 @@ public interface InternalStoreService {
      * Persists the store. A duplicate name surfaces as Spring's {@code DuplicateKeyException} from the unique
      * constraint; it is translated by the caller, outside this method's transaction — see the implementation.
      */
-    ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
+    ManagerStoreDto createStore(CreateStoreRequest request, ManagerOrgId orgId, PodId pod);
 
     void completeProvisioning(ManagerStoreId store);
 
