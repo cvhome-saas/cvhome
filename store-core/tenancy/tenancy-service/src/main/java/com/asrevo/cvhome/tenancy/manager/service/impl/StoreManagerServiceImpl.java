@@ -21,11 +21,15 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
+import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
+import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
+import com.asrevo.cvhome.podregistry.commons.dto.PlacementDecision;
+import com.asrevo.cvhome.podregistry.commons.dto.PlacementRequest;
+import com.asrevo.cvhome.podregistry.services.placement.ExternalPodPlacementService;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
-import com.asrevo.cvhome.tenancy.manager.service.PodSelection;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
 import com.asrevo.cvhome.tenancy.manager.service.StorePodClientFactory;
 
@@ -42,17 +46,18 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     private final StorePodClientFactory podClientFactory;
 
-    private final PodSelection podSelection;
+    private final ExternalPodPlacementService placementService;
 
     private final ExternalStoreQuotaService billingQuotaService;
 
     public StoreManagerServiceImpl(InternalStoreService internalStoreService, ManagerStoreMappers managerStoreMappers,
-                                   StorePodClientFactory podClientFactory, PodSelection podSelection,
+                                   StorePodClientFactory podClientFactory,
+                                   ExternalPodPlacementService placementService,
                                    ExternalStoreQuotaService billingQuotaService) {
         this.internalStoreService = internalStoreService;
         this.managerStoreMappers = managerStoreMappers;
         this.podClientFactory = podClientFactory;
-        this.podSelection = podSelection;
+        this.placementService = placementService;
         this.billingQuotaService = billingQuotaService;
     }
 
@@ -75,7 +80,8 @@ public class StoreManagerServiceImpl implements StoreManagerService {
      */
     @Override
     public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request)
-            throws StoreQuotaRefusedException, BillingApiUnavailableException {
+            throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
+            PodRegistryUnavailableException {
         StoreQuotaDecision decision = billingQuotaService.checkStoreCreate(new StoreQuotaRequest(orgId));
         if (!decision.allowed()) {
             throw StoreQuotaRefusedException.refused(orgId, decision.reason());
@@ -87,8 +93,8 @@ public class StoreManagerServiceImpl implements StoreManagerService {
                 .filter(it -> !it.trim().isEmpty())
                 .map(PodId::new)
                 .orElse(null);
-        PodId podId = podSelection.next(orgId, prefaredPodId);
-        return internalStoreService.createStore(request, orgId, podId);
+        PlacementDecision placement = placementService.place(new PlacementRequest(orgId, prefaredPodId));
+        return internalStoreService.createStore(request, orgId, placement.podId());
     }
 
     @Override

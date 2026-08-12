@@ -22,6 +22,8 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.SocialProvider;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
+import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
@@ -48,15 +50,20 @@ public class StoreManagerController {
     }
 
     /**
-     * @throws StoreQuotaRefusedException     billing will not let this org have another store — 422 with the reason
-     * @throws BillingApiUnavailableException billing could not be reached, so the store is not created; the caller
-     *                                        should retry rather than assume it exists
+     * @throws StoreQuotaRefusedException      billing will not let this org have another store — 422 with the reason
+     * @throws BillingApiUnavailableException  billing could not be reached, so the store is not created; the caller
+     *                                         should retry rather than assume it exists
+     * @throws PodPlacementRefusedException    the registry has nowhere to put it — 422. An operational fault, not
+     *                                         something the merchant can resolve: someone has to drain, resize or
+     *                                         add a pod
+     * @throws PodRegistryUnavailableException the registry could not be reached, so the store is not created
      */
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                   @RequestBody Map<Object, Object> request)
-            throws StoreQuotaRefusedException, BillingApiUnavailableException {
+            throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
+            PodRegistryUnavailableException {
         return this.managerService.createStore(identity.org(), request);
     }
 

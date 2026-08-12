@@ -59,6 +59,7 @@ dependencies {
     implementation project(':store-core:tenancy:tenancy-events')
     implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-core:billing:billing-external-api')
+    implementation project(':store-core:pod-registry:pod-registry-external-api')
     implementation project(':store-commons:autoconfigure')
 
 //    developmentOnly libs.spring.boot.docker.compose

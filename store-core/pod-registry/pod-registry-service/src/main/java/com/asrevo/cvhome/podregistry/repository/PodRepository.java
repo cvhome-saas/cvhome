@@ -19,6 +19,9 @@ public interface PodRepository extends CrudRepository<PodEntity, PodId>, PagingA
 
     Page<PodEntity> findAllByOrgId(ManagerOrgId orgId, Pageable pageable);
 
+    /** Every pod an organization owns privately — the only candidates placement may consider for it. */
+    List<PodEntity> findAllByOrgId(ManagerOrgId orgId);
+
     Optional<PodEntity> findByName(String name);
 
     /**
