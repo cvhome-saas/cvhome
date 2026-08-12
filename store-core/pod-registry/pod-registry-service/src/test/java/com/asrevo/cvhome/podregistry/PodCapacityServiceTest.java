@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.podregistry.commons.dto.RecordPlacementRequest;
 import com.asrevo.cvhome.podregistry.repository.PodStorePlacementRepository;
 import com.asrevo.cvhome.podregistry.service.PodCapacityService;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @Tag("unit-test")
 class PodCapacityServiceTest {
 
-    private static final ManagerStoreId STORE = new ManagerStoreId("65f023632bc46470c104b76f");
+    private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final PodId POD = new PodId("507f1f77bcf86cd799439011");
 

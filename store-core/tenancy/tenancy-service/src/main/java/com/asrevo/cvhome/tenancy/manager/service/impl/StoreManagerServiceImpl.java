@@ -16,8 +16,8 @@ import com.asrevo.cvhome.billing.commons.dto.StoreQuotaDecision;
 import com.asrevo.cvhome.billing.commons.dto.StoreQuotaRequest;
 import com.asrevo.cvhome.billing.services.quota.ExternalStoreQuotaService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
 import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
@@ -141,18 +141,18 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     }
 
     @Override
-    public Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
+    public Object getStore(UserOrgStoreIdentity identity, StoreMerchantId managerStoreId)
             throws StoreNotFoundException, StoreNotOperableException {
         internalStoreService.requireOperable(managerStoreId);
         return getStore(internalStoreService.getStorePod(identity, managerStoreId), managerStoreId);
     }
 
     @Override
-    public Object getStore(ManagerStoreId managerStoreId) throws StoreNotFoundException {
+    public Object getStore(StoreMerchantId managerStoreId) throws StoreNotFoundException {
         return getStore(internalStoreService.getStorePod(managerStoreId), managerStoreId);
     }
 
-    private Object getStore(PodId podId, ManagerStoreId managerStoreId) {
+    private Object getStore(PodId podId, StoreMerchantId managerStoreId) {
         MerchantStorePodClient client = podClientFactory.getMerchantStorePodClient(podId);
         Map<String, Object> response = client.getStore(managerStoreId.getId().toString());
         HashMap<String, Object> newIt = new HashMap<>(response);

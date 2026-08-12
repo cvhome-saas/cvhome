@@ -2,8 +2,8 @@ package com.asrevo.cvhome.tenancy.commons.dto;
 
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * A store as the seller console sees it.
@@ -19,7 +19,7 @@ import com.asrevo.cvhome.commons.domain.PodId;
  * @param status            whether it may be used at all — an operator's lever, unlike provisioningState
  * @param billingStatus     the standing of its subscription, or {@code null} if unknown
  */
-public record ManagerStoreDto(ManagerStoreId id, String name, ManagerOrgId orgId, PodId podId,
+public record ManagerStoreDto(StoreMerchantId id, String name, ManagerOrgId orgId, PodId podId,
                               ProvisioningState provisioningState, StoreStatus status,
                               SubscriptionStatus billingStatus) {
 

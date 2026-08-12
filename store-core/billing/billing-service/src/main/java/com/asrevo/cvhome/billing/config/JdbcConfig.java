@@ -19,7 +19,7 @@ import com.asrevo.cvhome.billing.commons.StripeSubscriptionId;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.Identifier;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * Teaches Spring Data JDBC to read and write the identifier value objects this service stores as columns.
@@ -49,10 +49,10 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
                 return new ManagerOrgId(source);
             }
         });
-        converters.add(new Converter<String, ManagerStoreId>() {
+        converters.add(new Converter<String, StoreMerchantId>() {
             @Override
-            public ManagerStoreId convert(String source) {
-                return new ManagerStoreId(source);
+            public StoreMerchantId convert(String source) {
+                return new StoreMerchantId(source);
             }
         });
         converters.add(new Converter<String, PlanId>() {

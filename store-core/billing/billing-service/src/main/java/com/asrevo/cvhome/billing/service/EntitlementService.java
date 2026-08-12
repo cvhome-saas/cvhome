@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * The read model every enforcement layer asks: what may this store do?
@@ -20,16 +20,16 @@ public interface EntitlementService {
     /**
      * @throws SubscriptionNotFoundException billing has never seen this store
      */
-    EntitlementSnapshot snapshot(ManagerStoreId store) throws SubscriptionNotFoundException;
+    EntitlementSnapshot snapshot(StoreMerchantId store) throws SubscriptionNotFoundException;
 
     /**
      * Several stores in one call, omitting any billing does not know.
      */
-    List<EntitlementSnapshot> snapshots(List<ManagerStoreId> stores);
+    List<EntitlementSnapshot> snapshots(List<StoreMerchantId> stores);
 
     /**
      * Every store that may not be worked in right now.
      */
-    List<ManagerStoreId> blockedStores();
+    List<StoreMerchantId> blockedStores();
 
 }

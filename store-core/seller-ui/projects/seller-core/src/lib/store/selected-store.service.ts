@@ -14,7 +14,7 @@ export class SelectedStoreService {
   private _stores: ManagerStore[] | undefined = undefined;
 
   public select(storeId: string): void {
-    const selectedStore = this._stores?.find(it => it.id.id == storeId);
+    const selectedStore = this._stores?.find(it => it.id == storeId);
     if (selectedStore) {
       this.storage.setItem(SelectedStoreService.SELECTED_STORE_ID_KEY, JSON.stringify(selectedStore));
     }
@@ -24,7 +24,7 @@ export class SelectedStoreService {
     const currentStoreStr = this.storage.getItem(SelectedStoreService.SELECTED_STORE_ID_KEY);
     if (currentStoreStr) {
       const parsedStore = JSON.parse(currentStoreStr);
-      if (this._stores && this._stores.some(store => store.id.id === parsedStore.id.id)) {
+      if (this._stores && this._stores.some(store => store.id === parsedStore.id)) {
         return parsedStore;
       }
       return undefined;
@@ -34,7 +34,7 @@ export class SelectedStoreService {
 
   public selectFirstStore(): ManagerStore | undefined {
     if (this._stores && this._stores.length > 0) {
-      this.select(this._stores[0].id.id);
+      this.select(this._stores[0].id);
       return this._stores[0];
     }
     return undefined;
@@ -44,14 +44,14 @@ export class SelectedStoreService {
     return this.getAllStores().pipe(map(() => {
       const current: ManagerStore | undefined = this.currentSelectedStore();
       if (current) {
-        return current.id.id;
+        return current.id;
       }
-      return this.selectFirstStore()?.id.id;
+      return this.selectFirstStore()?.id;
     }));
   }
 
   getStore(store: string): ManagerStore | undefined {
-    return this._stores?.find(it => it.id.id == store);
+    return this._stores?.find(it => it.id == store);
   }
 
   newStore(store: ManagerStore) {

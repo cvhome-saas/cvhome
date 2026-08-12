@@ -1,10 +1,10 @@
 package com.asrevo.cvhome.s2s.services;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface StoreOrgOwnerRetriever {
 
-    ManagerOrgId owner(ManagerStoreId store);
+    ManagerOrgId owner(StoreMerchantId store);
 
 }

@@ -195,7 +195,7 @@ public class InvitationService {
 
     /**
      * The bare id, not the value object's {@code toString()} — otherwise the invitation id reaches callers as
-     * {@code ManagerStoreId[id=…]}, which is both ugly and impossible to pass back to {@code revoke}.
+     * {@code StoreMerchantId[id=…]}, which is both ugly and impossible to pass back to {@code revoke}.
      */
     private static String idOf(OrgInvitationEntity entity) {
         return entity.getId() == null ? null : entity.getId().getId().toString();

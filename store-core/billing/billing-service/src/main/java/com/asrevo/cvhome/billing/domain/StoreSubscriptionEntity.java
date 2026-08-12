@@ -21,7 +21,7 @@ import com.asrevo.cvhome.billing.events.SubscriptionSuspendedEvent;
 import com.asrevo.cvhome.billing.events.SubscriptionTrialStartedEvent;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -41,7 +41,7 @@ import lombok.Getter;
  */
 @Getter
 @Table(schema = "billing", name = "store_subscription")
-public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity, ManagerStoreId> {
+public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity, StoreMerchantId> {
 
     @Column("org_id")
     private ManagerOrgId orgId;
@@ -100,7 +100,7 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
     /**
      * A store that has to be paid for before it can be used — what an org gets once it has spent its one trial.
      */
-    public static StoreSubscriptionEntity pending(ManagerStoreId store, ManagerOrgId org) {
+    public static StoreSubscriptionEntity pending(StoreMerchantId store, ManagerOrgId org) {
         StoreSubscriptionEntity entity = newRow(store, org);
         entity.status = SubscriptionStatus.PENDING;
         return entity;
@@ -109,7 +109,7 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
     /**
      * The org's one trial, spent on this store.
      */
-    public static StoreSubscriptionEntity trialing(ManagerStoreId store, ManagerOrgId org, PlanId plan,
+    public static StoreSubscriptionEntity trialing(StoreMerchantId store, ManagerOrgId org, PlanId plan,
                                                    PlanPriceId price, Instant trialEnd) {
         StoreSubscriptionEntity entity = newRow(store, org);
         entity.status = SubscriptionStatus.TRIALING;
@@ -122,7 +122,7 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
         return entity;
     }
 
-    private static StoreSubscriptionEntity newRow(ManagerStoreId store, ManagerOrgId org) {
+    private static StoreSubscriptionEntity newRow(StoreMerchantId store, ManagerOrgId org) {
         StoreSubscriptionEntity entity = new StoreSubscriptionEntity();
         Instant now = Instant.now();
         entity.setId(store);
@@ -382,7 +382,7 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
     }
 
     @Override
-    protected ManagerStoreId generateId() {
+    protected StoreMerchantId generateId() {
         return id;
     }
 

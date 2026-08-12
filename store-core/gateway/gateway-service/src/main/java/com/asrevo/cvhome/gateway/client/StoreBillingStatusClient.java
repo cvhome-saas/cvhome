@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.billing.services.entitlement.ReactiveExternalEntitlementService;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,9 +72,9 @@ public class StoreBillingStatusClient {
         return store != null && blockedStores.contains(store);
     }
 
-    private void replace(java.util.List<ManagerStoreId> stores) {
+    private void replace(java.util.List<StoreMerchantId> stores) {
         Set<String> refreshed = new HashSet<>(stores.size());
-        stores.forEach(it -> refreshed.add(it.getId().toString()));
+        stores.forEach(it -> refreshed.add(it.storeMerchantId()));
         if (refreshed.size() != blockedStores.size()) {
             log.info("Blocked store set changed: {} -> {}", blockedStores.size(), refreshed.size());
         }

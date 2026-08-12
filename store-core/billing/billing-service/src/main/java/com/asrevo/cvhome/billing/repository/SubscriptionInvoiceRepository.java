@@ -10,7 +10,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import com.asrevo.cvhome.billing.commons.StripeInvoiceId;
 import com.asrevo.cvhome.billing.domain.SubscriptionInvoiceEntity;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 public interface SubscriptionInvoiceRepository extends CrudRepository<SubscriptionInvoiceEntity, StripeInvoiceId>,
         PagingAndSortingRepository<SubscriptionInvoiceEntity, StripeInvoiceId> {
@@ -23,12 +23,12 @@ public interface SubscriptionInvoiceRepository extends CrudRepository<Subscripti
      * shared permission checker cannot tell which org a store belongs to, so the boundary has to be in the SQL.
      * </p>
      */
-    Page<SubscriptionInvoiceEntity> findAllByStoreIdAndOrgIdOrderByIssuedAtDesc(ManagerStoreId storeId,
+    Page<SubscriptionInvoiceEntity> findAllByStoreIdAndOrgIdOrderByIssuedAtDesc(StoreMerchantId storeId,
                                                                                 ManagerOrgId orgId,
                                                                                 Pageable pageable);
 
-    Page<SubscriptionInvoiceEntity> findAllByStoreIdOrderByIssuedAtDesc(ManagerStoreId storeId, Pageable pageable);
+    Page<SubscriptionInvoiceEntity> findAllByStoreIdOrderByIssuedAtDesc(StoreMerchantId storeId, Pageable pageable);
 
-    List<SubscriptionInvoiceEntity> findAllByStoreId(ManagerStoreId storeId);
+    List<SubscriptionInvoiceEntity> findAllByStoreId(StoreMerchantId storeId);
 
 }

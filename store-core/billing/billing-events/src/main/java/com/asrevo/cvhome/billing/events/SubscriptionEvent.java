@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.billing.events;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.event.Event;
 
 /**
@@ -20,6 +20,6 @@ import com.asrevo.cvhome.commons.event.Event;
  */
 public interface SubscriptionEvent extends Event {
 
-    ManagerStoreId store();
+    StoreMerchantId store();
 
 }

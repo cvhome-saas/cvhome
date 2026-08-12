@@ -13,7 +13,7 @@ import com.asrevo.cvhome.billing.commons.StripeInvoiceId;
 import com.asrevo.cvhome.billing.commons.StripeSubscriptionId;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -39,7 +39,7 @@ public class SubscriptionInvoiceEntity {
     private StripeInvoiceId id;
 
     @Column("store_id")
-    private ManagerStoreId storeId;
+    private StoreMerchantId storeId;
 
     @Column("org_id")
     private ManagerOrgId orgId;
@@ -87,7 +87,7 @@ public class SubscriptionInvoiceEntity {
     private Integer version;
 
     @SuppressWarnings("java:S107")
-    public static SubscriptionInvoiceEntity record(StripeInvoiceId id, ManagerStoreId store, ManagerOrgId org,
+    public static SubscriptionInvoiceEntity record(StripeInvoiceId id, StoreMerchantId store, ManagerOrgId org,
                                                    StripeSubscriptionId subscription, String number,
                                                    InvoiceStatus status, Money amountDue, Long amountPaid,
                                                    Instant issuedAt) {

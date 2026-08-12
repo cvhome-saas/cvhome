@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
@@ -23,11 +23,11 @@ public interface InternalStoreService {
      */
     ManagerStoreDto createStore(CreateStoreRequest request, ManagerOrgId orgId, PodId pod);
 
-    void completeProvisioning(ManagerStoreId store);
+    void completeProvisioning(StoreMerchantId store);
 
-    void failProvisioning(ManagerStoreId store);
+    void failProvisioning(StoreMerchantId store);
 
-    void startProvisioning(ManagerStoreId store);
+    void startProvisioning(StoreMerchantId store);
 
     Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
                                   Pageable pageable);
@@ -38,27 +38,27 @@ public interface InternalStoreService {
      * Unscoped lookup, for callers that have no user — outbox handlers and provisioning. Never reachable from a
      * controller: use the {@link UserOrgStoreIdentity} overload there so a foreign store is refused.
      */
-    ManagerStoreDto findStore(ManagerStoreId store) throws StoreNotFoundException;
+    ManagerStoreDto findStore(StoreMerchantId store) throws StoreNotFoundException;
 
     /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
-    ManagerStoreDto findStore(UserOrgStoreIdentity identity, ManagerStoreId store) throws StoreNotFoundException;
+    ManagerStoreDto findStore(UserOrgStoreIdentity identity, StoreMerchantId store) throws StoreNotFoundException;
 
     /** Sets the store's lifecycle status. Transition legality is decided by {@code StoreLifecycleService}. */
-    ManagerStoreDto updateStatus(ManagerStoreId store, StoreStatus status) throws StoreNotFoundException;
+    ManagerStoreDto updateStatus(StoreMerchantId store, StoreStatus status) throws StoreNotFoundException;
 
     /**
      * Refuses a store that is suspended, archived or deleted, or whose organization is not active.
      *
      * @throws StoreNotOperableException the store cannot be worked in right now
      */
-    void requireOperable(ManagerStoreId store) throws StoreNotFoundException, StoreNotOperableException;
+    void requireOperable(StoreMerchantId store) throws StoreNotFoundException, StoreNotOperableException;
 
     Boolean checkNameExists(String name);
 
-    /** Unscoped; see {@link #findStore(ManagerStoreId)}. */
-    PodId getStorePod(ManagerStoreId managerStoreId) throws StoreNotFoundException;
+    /** Unscoped; see {@link #findStore(StoreMerchantId)}. */
+    PodId getStorePod(StoreMerchantId managerStoreId) throws StoreNotFoundException;
 
     /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
-    PodId getStorePod(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId) throws StoreNotFoundException;
+    PodId getStorePod(UserOrgStoreIdentity identity, StoreMerchantId managerStoreId) throws StoreNotFoundException;
 
 }

@@ -14,7 +14,7 @@ import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.commons.errors.SubscriptionNotFoundException;
 import com.asrevo.cvhome.billing.service.EntitlementService;
 import com.asrevo.cvhome.billing.services.entitlement.IEntitlementService;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,8 +41,8 @@ public class ExternalEntitlementApi implements IEntitlementService {
 
     @Override
     @GetMapping("private/snapshot")
-    @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.BILLING.ENTITLEMENT-READ')")
-    public EntitlementSnapshot snapshot(@RequestParam("store") ManagerStoreId store)
+    @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.ENTITLEMENT-READ')")
+    public EntitlementSnapshot snapshot(@RequestParam("store") StoreMerchantId store)
             throws SubscriptionNotFoundException {
         return entitlementService.snapshot(store);
     }
@@ -59,8 +59,8 @@ public class ExternalEntitlementApi implements IEntitlementService {
      */
     @Override
     @PostMapping("private/snapshot/batch")
-    @PreAuthorize("hasPermission(null,'ManagerStoreId','STORE-CORE.BILLING.QUOTA-CHECK')")
-    public List<EntitlementSnapshot> snapshots(@RequestBody List<ManagerStoreId> stores) {
+    @PreAuthorize("hasPermission(null,'StoreMerchantId','STORE-CORE.BILLING.QUOTA-CHECK')")
+    public List<EntitlementSnapshot> snapshots(@RequestBody List<StoreMerchantId> stores) {
         return entitlementService.snapshots(stores);
     }
 
@@ -73,8 +73,8 @@ public class ExternalEntitlementApi implements IEntitlementService {
      */
     @Override
     @GetMapping("private/blocked-stores")
-    @PreAuthorize("hasPermission(null,'ManagerStoreId','STORE-CORE.BILLING.QUOTA-CHECK')")
-    public List<ManagerStoreId> blockedStores() {
+    @PreAuthorize("hasPermission(null,'StoreMerchantId','STORE-CORE.BILLING.QUOTA-CHECK')")
+    public List<StoreMerchantId> blockedStores() {
         return entitlementService.blockedStores();
     }
 

@@ -67,7 +67,6 @@ public final class WebClientsUtils {
         HttpServiceProxyFactory.Builder proxyBuilder = HttpServiceProxyFactory.builderFor(clientAdapter);
         proxyBuilder.customArgumentResolver(new LanguageCodeSerializeParamArgumentResolver())
                 .customArgumentResolver(new StoreMerchantIdSerializeParamArgumentResolver())
-                .customArgumentResolver(new StoreSerializeParamArgumentResolver())
                 .customArgumentResolver(new OrgSerializeParamArgumentResolver())
                 .customArgumentResolver(new DomainSerializeParamArgumentResolver());
         try {

@@ -31,7 +31,7 @@ export class ProductsListFacade {
   init(): void {
     const store = this.selectedStoreService.currentSelectedStore();
     if (store) {
-      this.tableState.patchParams({store: store.id.id} as ProductFilterPageRequest);
+      this.tableState.patchParams({store: store.id} as ProductFilterPageRequest);
       this.loadPage();
     }
   }

@@ -7,7 +7,7 @@ import java.util.Map;
 import com.asrevo.cvhome.billing.commons.EntitlementKey;
 import com.asrevo.cvhome.billing.commons.EntitlementValue;
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * Everything another service needs to decide whether a store may do something, in one call.
@@ -24,7 +24,7 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
  * @param currentPeriodEnd  when the paid period ends, i.e. the next renewal date
  * @param entitlements      the ceilings and capabilities the plan grants
  */
-public record EntitlementSnapshot(ManagerStoreId store, SubscriptionStatus status, boolean operable, String planCode,
+public record EntitlementSnapshot(StoreMerchantId store, SubscriptionStatus status, boolean operable, String planCode,
                                   Instant currentPeriodEnd, Map<EntitlementKey, EntitlementValue> entitlements)
         implements Serializable {
 
@@ -36,7 +36,7 @@ public record EntitlementSnapshot(ManagerStoreId store, SubscriptionStatus statu
      * choice is made at store creation, where being unable to check means refusing — see the quota client.
      * </p>
      */
-    public static EntitlementSnapshot degradedOpen(ManagerStoreId store) {
+    public static EntitlementSnapshot degradedOpen(StoreMerchantId store) {
         return new EntitlementSnapshot(store, SubscriptionStatus.ACTIVE, true, null, null, Map.of());
     }
 

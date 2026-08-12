@@ -67,7 +67,7 @@ response contains translatable content.
 `store-commons/commons/.../domain/` is a deliberate collection of **typed value objects instead of raw
 `String`/`Long`**. There are ~40 of them:
 
-- **Identifiers:** `StoreMerchantId`, `ManagerStoreId`, `ManagerOrgId`, `PodId`, `IdentityId`, `Identifier`
+- **Identifiers:** `StoreMerchantId`, `ManagerOrgId`, `PodId`, `IdentityId`, `Identifier`
 - **Codes:** `LanguageCode`, `CurrencyCode`, `CountryIsoCode`, `ZoneCode`
 - **Web/domain concepts:** `Email`, `Domain`, `DomainType`, `ManagerStoreDomain`, `SocialLink`, `SocialProvider`
 - **Infrastructure:** `Pod`, `PodEndpoint`, `EndpointType`, `ServiceDomain`, `StorageProviderType`
@@ -106,8 +106,10 @@ What this buys, concretely:
   could exist.
 - **You cannot transpose arguments.** `saveProduct(merchantStore, product, language)` won't compile with the
   store and language swapped.
-- **Serialization is centralized** — e.g. `PodId`/`ManagerStoreId` use `@JsonSerialize(using =
-  ToStringSerializer.class)` over a Mongo `ObjectId` in one place, not at every call site.
+- **Serialization is centralized** — `PodId` uses `@JsonSerialize(using = ToStringSerializer.class)` over a
+  Mongo `ObjectId` in one place, not at every call site. `StoreMerchantId` goes further: `@JsonValue` makes it
+  a bare string on the wire, and its own `@JsonDeserialize` reader also accepts the two object shapes it had
+  before store-core's `ManagerStoreId` was merged into it, so stored outbox payloads stay readable.
 
 **Persistence:** JPA `AttributeConverter`s in `store-pod/commons/store-commons`
 (`com.asrevo.cvhome.store.core.converter`) map them to plain columns —
@@ -143,7 +145,7 @@ to `PermissionAccessChecker`:
 ```java
 case "STORE-POD.MERCHANT.*", "STORE-POD.CONTENT.*", "STORE-POD.CATALOG.*", "STORE-POD.CHECKOUT.*",
      "STORE-POD.CUA.*", "STORE-POD.PAYMENT.*"
-     -> checker.hasManageAccessOnStore(authentication, new ManagerStoreId(((StoreMerchantId) targetId).storeMerchantId()), this.pod);
+     -> checker.hasManageAccessOnStore(authentication, (StoreMerchantId) targetId, this.pod);
 
 case "STORE-POD.CUSTOMER.*"          -> checker.isCustomerInSameStore(...);
 case "STORE-POD.CATALOG.RESERVE"     -> checker.isSameStorePod(...);          // service-to-service only
@@ -162,8 +164,9 @@ Note the conventions:
   `STORE-CORE.USERS.CREATE`. The `.*` suffix means "manage access to this domain" rather than a fine-grained
   action.
 - **`default -> false`** — a typo'd or unregistered permission denies rather than allows.
-- **The evaluator converts `StoreMerchantId` → `ManagerStoreId`** before checking, bridging the pod-side and
-  tenancy-side identifiers (`multi-tenancy.md`).
+- **The target is a `StoreMerchantId` on both sides.** The evaluator used to convert the pod-side id into a
+  tenancy-side `ManagerStoreId` here; the two types have been merged, so it now just casts
+  (`multi-tenancy.md`).
 - **It is pod-aware.** `CustomPermissionEvaluator` injects the current `Pod` from `PodInfoProperties`, and the
   checks compare the caller's store/org against *this* pod — so a token valid in one pod can't manage a store in
   another.
@@ -185,5 +188,5 @@ requires `isScopeStorePod`, so it can only be invoked by another service in the 
 
 - Why the same argument resolvers run client-side — `service-to-service.md`
 - Roles, scopes, and the two token issuers — `authentication.md`
-- `StoreMerchantId` vs `ManagerStoreId` and pod-scoped checks — `multi-tenancy.md`
+- The single `StoreMerchantId` and pod-scoped checks — `multi-tenancy.md`
 - Encrypting secret fields on the way into the DB — `secrets-encryption.md`

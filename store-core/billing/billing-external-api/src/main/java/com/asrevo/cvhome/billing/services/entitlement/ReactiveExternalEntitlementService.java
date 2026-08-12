@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import reactor.core.publisher.Mono;
 
@@ -28,6 +28,6 @@ import reactor.core.publisher.Mono;
 public interface ReactiveExternalEntitlementService {
 
     @GetExchange("/blocked-stores")
-    Mono<List<ManagerStoreId>> blockedStores();
+    Mono<List<StoreMerchantId>> blockedStores();
 
 }

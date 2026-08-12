@@ -21,7 +21,7 @@ import com.asrevo.cvhome.billing.service.PlanCatalogService;
 import com.asrevo.cvhome.billing.service.StoreQuotaService;
 import com.asrevo.cvhome.billing.service.SubscriptionAuditService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +84,7 @@ public class StoreQuotaServiceImpl implements StoreQuotaService {
      */
     @Override
     @Transactional
-    public SubscriptionView provision(ManagerOrgId org, ManagerStoreId store) throws PlanNotFoundException {
+    public SubscriptionView provision(ManagerOrgId org, StoreMerchantId store) throws PlanNotFoundException {
         var existing = subscriptionRepository.findById(store);
         if (existing.isPresent()) {
             // Provisioning arrives from an outbox handler, so a repeat is routine rather than exceptional.
@@ -103,7 +103,7 @@ public class StoreQuotaServiceImpl implements StoreQuotaService {
         return mappers.toView(saved);
     }
 
-    private StoreSubscriptionEntity trialSubscription(ManagerOrgId org, ManagerStoreId store, Instant trialEnd)
+    private StoreSubscriptionEntity trialSubscription(ManagerOrgId org, StoreMerchantId store, Instant trialEnd)
             throws PlanNotFoundException {
         PlanPriceEntity trialPrice = planCatalogService.cheapestActivePrice()
                 .orElseThrow(() -> PlanNotFoundException.byCode("cheapest-active"));
@@ -113,7 +113,7 @@ public class StoreQuotaServiceImpl implements StoreQuotaService {
     /**
      * @return whether this call is the one that spent the org's trial
      */
-    private boolean claimTrial(ManagerOrgId org, ManagerStoreId store, Instant trialEnd) {
+    private boolean claimTrial(ManagerOrgId org, StoreMerchantId store, Instant trialEnd) {
         boolean claimed = trialGrantRepository.claim(org.getId().toString(), store.getId().toString(), Instant.now(),
                 trialEnd) == 1;
         if (!claimed) {

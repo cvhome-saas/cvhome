@@ -85,7 +85,7 @@ export interface SocialLink {
 
 /** Mirrors cua web/dto/ReadableSocialLoginConfig */
 export interface ReadableSocialLoginConfig {
-  storeMerchantId?: unknown;
+  storeMerchantId?: string;
   providerId?: string;
   appId?: string;
   appSecret?: string;
@@ -94,7 +94,7 @@ export interface ReadableSocialLoginConfig {
 
 /** Mirrors cua web/dto/PersistableSocialLoginConfig */
 export interface PersistableSocialLoginConfig {
-  storeMerchantId?: unknown;
+  storeMerchantId?: string;
   providerId?: string;
   appId?: string;
   appSecret?: string;
@@ -103,7 +103,7 @@ export interface PersistableSocialLoginConfig {
 
 /** Mirrors payment-core models/ReadablePaymentConfiguration */
 export interface ReadablePaymentConfiguration {
-  storeMerchantId?: unknown;
+  storeMerchantId?: string;
   paymentType?: string;
   apiKey?: string;
   secretKey?: string;
@@ -113,7 +113,7 @@ export interface ReadablePaymentConfiguration {
 
 /** Mirrors payment-core models/PersistablePaymentConfiguration */
 export interface PersistablePaymentConfiguration {
-  storeMerchantId?: unknown;
+  storeMerchantId?: string;
   paymentType?: string;
   apiKey?: string;
   secretKey?: string;

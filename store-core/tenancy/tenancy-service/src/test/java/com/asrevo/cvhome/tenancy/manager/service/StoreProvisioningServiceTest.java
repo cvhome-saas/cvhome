@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @Tag("unit-test")
 class StoreProvisioningServiceTest {
 
-    private static final ManagerStoreId STORE = new ManagerStoreId("65f023632bc46470c104b76f");
+    private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");
 

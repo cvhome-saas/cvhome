@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.Roles;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
@@ -37,14 +37,14 @@ import static org.mockito.Mockito.when;
 @Tag("unit-test")
 class StoreLifecycleServiceTest {
 
-    private static final ManagerStoreId STORE = new ManagerStoreId("65f023632bc46470c104b76f");
+    private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");
 
     private static final PodId POD = new PodId("507f1f77bcf86cd799439011");
 
     private static final UserOrgStoreIdentity ADMIN =
-            new UserOrgStoreIdentity(ORG, "*", Set.of(Roles.ROLE_ORG_ADMIN));
+            new UserOrgStoreIdentity(ORG, new StoreMerchantId("*"), Set.of(Roles.ROLE_ORG_ADMIN));
 
     private static final String OPERATOR = "super-admin";
 

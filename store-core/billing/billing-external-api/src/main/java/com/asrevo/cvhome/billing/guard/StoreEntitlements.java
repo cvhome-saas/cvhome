@@ -8,7 +8,6 @@ import com.asrevo.cvhome.billing.commons.EntitlementValue;
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
 import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
 import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -42,12 +41,12 @@ public class StoreEntitlements {
 
     private final ExternalEntitlementService entitlementService;
 
-    private final Cache<ManagerStoreId, EntitlementSnapshot> cache;
+    private final Cache<StoreMerchantId, EntitlementSnapshot> cache;
 
     /**
      * Last known answers, kept beyond the live cache so an outage has something to fall back to rather than nothing.
      */
-    private final Cache<ManagerStoreId, EntitlementSnapshot> lastKnown;
+    private final Cache<StoreMerchantId, EntitlementSnapshot> lastKnown;
 
     public StoreEntitlements(ExternalEntitlementService entitlementService, Duration ttl) {
         this.entitlementService = entitlementService;
@@ -64,7 +63,7 @@ public class StoreEntitlements {
      * </p>
      */
     public EntitlementSnapshot snapshot(StoreMerchantId store) {
-        ManagerStoreId key = new ManagerStoreId(store.storeMerchantId());
+        StoreMerchantId key = new StoreMerchantId(store.storeMerchantId());
         EntitlementSnapshot cached = cache.getIfPresent(key);
         if (cached != null) {
             return cached;
@@ -114,7 +113,7 @@ public class StoreEntitlements {
         }
     }
 
-    private EntitlementSnapshot fetch(ManagerStoreId key) {
+    private EntitlementSnapshot fetch(StoreMerchantId key) {
         try {
             EntitlementSnapshot fresh = entitlementService.snapshot(key);
             cache.put(key, fresh);

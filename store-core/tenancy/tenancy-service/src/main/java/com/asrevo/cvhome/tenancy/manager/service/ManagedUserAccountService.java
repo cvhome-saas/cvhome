@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.errors.ForeignOrgUserAccessException;
 import com.asrevo.cvhome.tenancy.errors.ForeignStoreUserAccessException;
@@ -30,34 +30,34 @@ public interface ManagedUserAccountService {
 
     ReadableUser findOne(String id) throws ManagedUserNotFoundException, UaaApiUnavailableException;
 
-    ReadableUserList list(UserOrgStoreIdentity identity, ManagerStoreId store, Pageable pageable)
+    ReadableUserList list(UserOrgStoreIdentity identity, StoreMerchantId store, Pageable pageable)
             throws UaaApiUnavailableException;
 
-    ReadableUser findOne(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    ReadableUser findOne(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException;
 
-    ReadableUser createUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user)
+    ReadableUser createUser(UserOrgStoreIdentity identity, StoreMerchantId store, PersistableUser user)
             throws UaaConflictException, UaaApiUnavailableException;
 
-    ReadableUser updateUser(UserOrgStoreIdentity identity, ManagerStoreId store, PersistableUser user)
+    ReadableUser updateUser(UserOrgStoreIdentity identity, StoreMerchantId store, PersistableUser user)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaConflictException, UaaApiUnavailableException;
 
-    void resetPassword(UserOrgStoreIdentity identity, ManagerStoreId store, String userId,
+    void resetPassword(UserOrgStoreIdentity identity, StoreMerchantId store, String userId,
                        UserPassword passwordRequestDto)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaApiUnavailableException;
 
-    void deleteUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    void deleteUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException;
 
-    void enableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    void enableUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException;
 
-    void disableUser(UserOrgStoreIdentity identity, ManagerStoreId store, String userId)
+    void disableUser(UserOrgStoreIdentity identity, StoreMerchantId store, String userId)
             throws ManagedUserNotFoundException, ForeignOrgUserAccessException, ForeignStoreUserAccessException,
             UaaOperationForbiddenException, UaaApiUnavailableException;
 

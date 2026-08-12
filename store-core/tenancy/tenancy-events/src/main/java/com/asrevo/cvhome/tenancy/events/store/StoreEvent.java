@@ -2,12 +2,12 @@ package com.asrevo.cvhome.tenancy.events.store;
 
 import java.util.List;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.event.Event;
 
 public sealed interface StoreEvent extends Event permits StoreCreatedEvent {
 
-    ManagerStoreId store();
+    StoreMerchantId store();
 
     @Override
     default List<String> getDestinations() {

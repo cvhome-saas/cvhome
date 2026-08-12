@@ -2,7 +2,7 @@ import {DestroyRef, Injectable, inject, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ManagerStoreService} from 'seller-core';
 import {ApiErrorService} from 'seller-core';
-import {ManagerStoreId, ManagerStore} from 'seller-core';
+import {ManagerStore} from 'seller-core';
 
 @Injectable()
 export class StoreAutocompleteFacade {
@@ -20,14 +20,14 @@ export class StoreAutocompleteFacade {
       });
   }
 
-  resolveSelection(current: ManagerStoreId | undefined): ManagerStoreId | undefined {
+  resolveSelection(current: string | undefined): string | undefined {
     const stores = this.stores();
     if (stores.length === 0) return current;
 
     if (current === undefined) {
       return stores[0].id;
     }
-    const match = stores.find((store) => store.id.id === current.id);
+    const match = stores.find((store) => store.id === current);
     return match ? match.id : undefined;
   }
 }

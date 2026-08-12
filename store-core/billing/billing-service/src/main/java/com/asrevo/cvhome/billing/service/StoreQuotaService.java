@@ -4,7 +4,7 @@ import com.asrevo.cvhome.billing.commons.dto.StoreQuotaDecision;
 import com.asrevo.cvhome.billing.commons.dto.SubscriptionView;
 import com.asrevo.cvhome.billing.commons.errors.PlanNotFoundException;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * The gate in front of store creation, and the provisioning that follows it.
@@ -26,6 +26,6 @@ public interface StoreQuotaService {
      *
      * @throws PlanNotFoundException the catalog has nothing to start a trial on
      */
-    SubscriptionView provision(ManagerOrgId org, ManagerStoreId store) throws PlanNotFoundException;
+    SubscriptionView provision(ManagerOrgId org, StoreMerchantId store) throws PlanNotFoundException;
 
 }

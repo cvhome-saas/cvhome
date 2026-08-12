@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * <p>
  * The tokens take a {@code null} target — a pod is infrastructure, not tenant data, so there is no
- * {@code ManagerStoreId} to scope against. That is the same shape billing's {@code QUOTA-CHECK} uses. Row filtering
+ * {@code StoreMerchantId} to scope against. That is the same shape billing's {@code QUOTA-CHECK} uses. Row filtering
  * for an org admin happens in {@link #listPods}, not in the permission layer.
  * </p>
  */

@@ -3,8 +3,8 @@ package com.asrevo.cvhome.podregistry.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.podregistry.commons.dto.RecordPlacementRequest;
 import com.asrevo.cvhome.podregistry.repository.PodStorePlacementRepository;
 
@@ -39,7 +39,7 @@ public class PodCapacityService {
      */
     @Transactional
     public boolean recordPlacement(RecordPlacementRequest request) {
-        ManagerStoreId store = request.store();
+        StoreMerchantId store = request.store();
         PodId pod = request.pod();
         int claimed = placementRepository.claim(store.getId().toString(), pod.getId().toString());
         if (claimed == 0) {

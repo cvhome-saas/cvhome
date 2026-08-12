@@ -12,7 +12,7 @@ import com.asrevo.cvhome.billing.commons.PlanId;
 import com.asrevo.cvhome.billing.commons.StripeEventId;
 import com.asrevo.cvhome.billing.commons.SubscriptionStatus;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 import lombok.Getter;
 
@@ -38,7 +38,7 @@ public class SubscriptionAuditEntity {
     private Long id;
 
     @Column("store_id")
-    private ManagerStoreId storeId;
+    private StoreMerchantId storeId;
 
     @Column("org_id")
     private ManagerOrgId orgId;
@@ -74,7 +74,7 @@ public class SubscriptionAuditEntity {
     private Instant occurredAt;
 
     @SuppressWarnings("java:S107")
-    public static SubscriptionAuditEntity of(ManagerStoreId store, ManagerOrgId org, AuditEventType eventType,
+    public static SubscriptionAuditEntity of(StoreMerchantId store, ManagerOrgId org, AuditEventType eventType,
                                              SubscriptionStatus fromStatus, SubscriptionStatus toStatus,
                                              PlanId fromPlan, PlanId toPlan, ChangeSource source, String actor) {
         SubscriptionAuditEntity entity = new SubscriptionAuditEntity();

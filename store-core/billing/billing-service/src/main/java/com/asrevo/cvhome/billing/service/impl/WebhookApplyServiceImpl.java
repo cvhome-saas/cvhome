@@ -31,7 +31,7 @@ import com.asrevo.cvhome.billing.service.stripe.ProviderSubscriptionState;
 import com.asrevo.cvhome.billing.service.stripe.StripeFields;
 import com.asrevo.cvhome.billing.service.stripe.StripeJson;
 import com.asrevo.cvhome.commons.domain.CurrencyCode;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.google.gson.JsonObject;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +54,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     @Override
     @Transactional
-    public void applyCheckoutCompleted(ManagerStoreId store, String eventId, String payload)
+    public void applyCheckoutCompleted(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException {
         JsonObject session = StripeJson.parse(payload);
         String customer = StripeJson.string(session, StripeFields.CUSTOMER);
@@ -71,7 +71,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     @Override
     @Transactional
-    public void applySubscriptionChanged(ManagerStoreId store, String eventId, String payload)
+    public void applySubscriptionChanged(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException, PlanPriceNotFoundException {
         ProviderSubscriptionState state = ProviderSubscriptionState.from(StripeJson.parse(payload));
         StoreSubscriptionEntity entity = require(store);
@@ -91,7 +91,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     @Override
     @Transactional
-    public void applySubscriptionEnded(ManagerStoreId store, String eventId, String payload)
+    public void applySubscriptionEnded(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = require(store);
         SubscriptionStatus before = entity.getStatus();
@@ -105,7 +105,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     @Override
     @Transactional
-    public void applyInvoicePaid(ManagerStoreId store, String eventId, String payload)
+    public void applyInvoicePaid(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException, PlanPriceNotFoundException {
         JsonObject invoice = StripeJson.parse(payload);
         StoreSubscriptionEntity entity = require(store);
@@ -126,7 +126,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
     @Override
     @Transactional
-    public void applyInvoiceFailed(ManagerStoreId store, String eventId, String payload)
+    public void applyInvoiceFailed(StoreMerchantId store, String eventId, String payload)
             throws SubscriptionNotFoundException, IllegalSubscriptionTransitionException {
         JsonObject invoice = StripeJson.parse(payload);
         StoreSubscriptionEntity entity = require(store);
@@ -299,7 +299,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
         return preferred != null ? preferred : fallback;
     }
 
-    private StoreSubscriptionEntity require(ManagerStoreId store) throws SubscriptionNotFoundException {
+    private StoreSubscriptionEntity require(StoreMerchantId store) throws SubscriptionNotFoundException {
         return subscriptionRepository.findById(store)
                 .orElseThrow(() -> SubscriptionNotFoundException.forStore(store));
     }

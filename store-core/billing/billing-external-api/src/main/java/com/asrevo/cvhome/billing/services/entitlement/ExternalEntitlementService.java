@@ -10,7 +10,7 @@ import org.springframework.web.service.annotation.PostExchange;
 
 import com.asrevo.cvhome.billing.api.errors.BillingApiUnavailableException;
 import com.asrevo.cvhome.billing.commons.dto.EntitlementSnapshot;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 
 /**
  * What a servlet caller of billing's entitlement API depends on — the pods, and tenancy.
@@ -33,13 +33,13 @@ public interface ExternalEntitlementService {
      *                                        deny
      */
     @GetExchange("/snapshot")
-    EntitlementSnapshot snapshot(@RequestParam("store") ManagerStoreId store) throws BillingApiUnavailableException;
+    EntitlementSnapshot snapshot(@RequestParam("store") StoreMerchantId store) throws BillingApiUnavailableException;
 
     /**
      * @throws BillingApiUnavailableException billing could not be reached
      */
     @PostExchange("/snapshot/batch")
-    List<EntitlementSnapshot> snapshots(@RequestBody List<ManagerStoreId> stores)
+    List<EntitlementSnapshot> snapshots(@RequestBody List<StoreMerchantId> stores)
             throws BillingApiUnavailableException;
 
 }
