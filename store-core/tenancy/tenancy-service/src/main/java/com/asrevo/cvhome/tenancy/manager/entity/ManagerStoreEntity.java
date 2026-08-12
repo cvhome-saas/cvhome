@@ -12,7 +12,6 @@ import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.events.store.StoreCreatedEvent;
-import com.asrevo.cvhome.tenancy.events.store.StoreProvisionedEvent;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -57,19 +56,16 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
 
     public ManagerStoreEntity completeProvisioning() {
         this.provisioningState = ProvisioningState.SUCCESSFULLY_PROVISIONING;
-        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
         return this;
     }
 
     public ManagerStoreEntity failProvisioning() {
         this.provisioningState = ProvisioningState.FAILED_PROVISIONING;
-        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
         return this;
     }
 
     public ManagerStoreEntity startProvisioning() {
         this.provisioningState = ProvisioningState.IN_PROGRESS_PROVISIONING;
-        this.registerEvent(StoreProvisionedEvent.from(this.getId(), podId, this.provisioningState));
         return this;
     }
 

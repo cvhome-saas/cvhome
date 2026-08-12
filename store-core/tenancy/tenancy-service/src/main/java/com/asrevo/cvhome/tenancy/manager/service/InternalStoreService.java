@@ -15,6 +15,10 @@ import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 
 public interface InternalStoreService {
 
+    /**
+     * Persists the store. A duplicate name surfaces as Spring's {@code DuplicateKeyException} from the unique
+     * constraint; it is translated by the caller, outside this method's transaction — see the implementation.
+     */
     ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId pod);
 
     void completeProvisioning(ManagerStoreId store);

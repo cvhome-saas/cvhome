@@ -9,7 +9,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.tenancy.events.store.OrgCreatedEvent;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +29,6 @@ public class ManagerOrgEntity extends BaseEntity<ManagerOrgEntity, ManagerOrgId>
         entity.id = entity.generateId();
         entity.setCreatedDate(Instant.now());
         entity.setEmail(email);
-        entity.registerEvent(OrgCreatedEvent.from(entity.getId()));
         return entity;
     }
 

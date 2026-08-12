@@ -41,11 +41,22 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     private final ExternalEntitlementService entitlementService;
 
+    /**
+     * The unique constraint is the authority, not {@link #checkNameExists} — that check is a read-then-write and
+     * two concurrent creates both pass it.
+     *
+     * <p>
+     * The violation is deliberately <strong>not</strong> caught here. Postgres aborts the transaction the moment a
+     * constraint fails, so catching inside this {@code @Transactional} method only postpones the failure: the
+     * commit then throws {@code UnexpectedRollbackException} and the caller gets a 500 anyway, having lost the
+     * original cause. Translation happens in the caller, outside the transaction boundary, where the rollback has
+     * already completed cleanly.
+     * </p>
+     */
     @Transactional
     @Override
     public ManagerStoreDto createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
-        ManagerStoreEntity entity = storeRepository.save(ManagerStoreEntity.createStore(request, orgId, podId));
-        return storeMappers.toDto(entity);
+        return storeMappers.toDto(storeRepository.save(ManagerStoreEntity.createStore(request, orgId, podId)));
     }
 
     @Transactional

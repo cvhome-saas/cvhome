@@ -26,6 +26,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
@@ -81,7 +82,7 @@ public class StoreManagerController {
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                   @RequestBody Map<Object, Object> request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
-            PodRegistryUnavailableException {
+            PodRegistryUnavailableException, DuplicateStoreNameException {
         return this.managerService.createStore(identity.org(), request);
     }
 

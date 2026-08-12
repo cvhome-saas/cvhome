@@ -27,7 +27,10 @@ public enum TenancyErrors implements ErrorCode {
      * No store with the requested id is visible to the caller — either it does not exist, or it belongs to another
      * organization. Deliberately one code for both: see {@link StoreNotFoundException}.
      */
-    STORE_NOT_FOUND("CONTROL_PLANE.STORE.NOT_FOUND", ErrorCategory.NOT_FOUND);
+    STORE_NOT_FOUND("CONTROL_PLANE.STORE.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** Store names are unique platform-wide; this one is taken. */
+    STORE_NAME_TAKEN("CONTROL_PLANE.STORE.NAME_TAKEN", ErrorCategory.CONFLICT);
 
     private final String code;
 

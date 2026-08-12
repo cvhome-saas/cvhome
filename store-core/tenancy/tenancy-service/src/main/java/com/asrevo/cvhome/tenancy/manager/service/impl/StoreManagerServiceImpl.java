@@ -3,9 +3,9 @@ package com.asrevo.cvhome.tenancy.manager.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,18 +28,24 @@ import com.asrevo.cvhome.podregistry.commons.dto.PlacementRequest;
 import com.asrevo.cvhome.podregistry.services.placement.ExternalPodPlacementService;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
 import com.asrevo.cvhome.tenancy.manager.service.StorePodClientFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class StoreManagerServiceImpl implements StoreManagerService {
 
     private static final String POD_KEY = "pod";
 
     private static final String ID_KEY = "id";
+
+    private static final String NAME_KEY = "name";
 
     private final InternalStoreService internalStoreService;
 
@@ -82,7 +88,7 @@ public class StoreManagerServiceImpl implements StoreManagerService {
     @Override
     public ManagerStoreDto createStore(ManagerOrgId orgId, Map<Object, Object> request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
-            PodRegistryUnavailableException {
+            PodRegistryUnavailableException, DuplicateStoreNameException {
         StoreQuotaDecision decision = billingQuotaService.checkStoreCreate(new StoreQuotaRequest(orgId));
         if (!decision.allowed()) {
             throw StoreQuotaRefusedException.refused(orgId, decision.reason());
@@ -95,24 +101,47 @@ public class StoreManagerServiceImpl implements StoreManagerService {
                 .map(PodId::new)
                 .orElse(null);
         PlacementDecision placement = placementService.place(new PlacementRequest(orgId, prefaredPodId));
-        return internalStoreService.createStore(request, orgId, placement.podId());
+        try {
+            return internalStoreService.createStore(request, orgId, placement.podId());
+        } catch (DataIntegrityViolationException e) {
+            // Caught here, outside createStore's transaction, and not inside it: Postgres aborts a transaction the
+            // moment a constraint fails, so catching within would only trade this for an UnexpectedRollbackException
+            // at commit — still a 500, minus the cause.
+            log.warn("Store name {} collided on the unique constraint", request.get(NAME_KEY), e);
+            throw DuplicateStoreNameException.of(String.valueOf(request.get(NAME_KEY)));
+        }
     }
 
     @Override
     public PageImpl<Object> findAll(UserOrgStoreIdentity identity, ListManagerStoreQuery listManagerStoreQuery,
                                     Pageable pageable) {
         Page<ManagerStoreDto> internalStores = internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
-        List<Object> list = internalStores.getContent().stream()
-                .map(it -> {
-                    try {
-                        return getStore(it.id());
-                    } catch (Exception e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
+        List<Object> list = internalStores.getContent().stream().map(this::withPodDetail).toList();
         return managerStoreMappers.toPage(list, internalStores);
+    }
+
+    /**
+     * Decorates one row with the detail its pod holds, degrading to the row itself when the pod cannot answer.
+     *
+     * <p>
+     * This used to be {@code catch (Exception e) { return null; }} followed by a filter, so a pod that was slow or
+     * down did not degrade the console's main screen — it made stores <em>disappear from it</em>, silently and with
+     * nothing logged. A merchant looking at a list with a store missing concludes it was deleted.
+     * </p>
+     *
+     * <p>
+     * The catch is deliberately the base type: every failure to reach a pod has the same answer here, which is to
+     * show what tenancy knows. The rows are already scoped to the caller's org before this runs, so falling back to
+     * the plain row discloses nothing extra.
+     * </p>
+     */
+    private Object withPodDetail(ManagerStoreDto store) {
+        try {
+            return getStore(store.id());
+        } catch (Exception e) {
+            log.warn("Could not read store {} from its pod; listing it without pod detail", store.id(), e);
+            return store;
+        }
     }
 
     @Override

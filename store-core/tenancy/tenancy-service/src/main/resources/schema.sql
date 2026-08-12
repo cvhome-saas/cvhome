@@ -17,8 +17,21 @@ CREATE TABLE IF NOT EXISTS tenancy.manager_store
     provisioning_state varchar(30) not null,
     version            int,
     constraint manager_store_pk primary key (id),
-    constraint manager_store_manager_fk foreign key (org_id) references tenancy.manager_org (id)
+    constraint manager_store_manager_fk foreign key (org_id) references tenancy.manager_org (id),
+    -- Store names are the tenant's public handle and were only ever checked with a read-then-write
+    -- `checkNameExists` call, which two concurrent creates both pass. The constraint is what actually decides.
+    constraint manager_store_name_uq unique (name),
+    -- schema.sql is the source of truth for DDL, so a new ProvisioningState constant means editing this line.
+    constraint manager_store_provisioning_ck check (provisioning_state in
+                                                    ('NOT_STARTED_PROVISIONING', 'IN_PROGRESS_PROVISIONING',
+                                                     'SUCCESSFULLY_PROVISIONING', 'FAILED_PROVISIONING'))
 );
+
+-- Every store list is filtered by org (see InternalStoreServiceImpl.findAll), and the console's main screen is
+-- that query.
+CREATE INDEX IF NOT EXISTS manager_store_org_idx ON tenancy.manager_store (org_id);
+-- The reaper for stores stuck mid-provisioning scans on this.
+CREATE INDEX IF NOT EXISTS manager_store_provisioning_idx ON tenancy.manager_store (provisioning_state);
 create schema if not exists tenancy_outbox;
 
 CREATE TABLE IF NOT EXISTS tenancy_outbox.outbox_record
