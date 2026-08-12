@@ -30,6 +30,7 @@ import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
@@ -146,7 +147,8 @@ public class StoreManagerServiceImpl implements StoreManagerService {
 
     @Override
     public Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
-            throws StoreNotFoundException {
+            throws StoreNotFoundException, StoreNotOperableException {
+        internalStoreService.requireOperable(managerStoreId);
         return getStore(internalStoreService.getStorePod(identity, managerStoreId), managerStoreId);
     }
 

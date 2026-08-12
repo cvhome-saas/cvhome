@@ -16,6 +16,7 @@ import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
 
 public interface StoreManagerService {
 
@@ -47,6 +48,7 @@ public interface StoreManagerService {
     Object getStore(ManagerStoreId managerStoreId) throws StoreNotFoundException;
 
     /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
-    Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId) throws StoreNotFoundException;
+    Object getStore(UserOrgStoreIdentity identity, ManagerStoreId managerStoreId)
+            throws StoreNotFoundException, StoreNotOperableException;
 
 }

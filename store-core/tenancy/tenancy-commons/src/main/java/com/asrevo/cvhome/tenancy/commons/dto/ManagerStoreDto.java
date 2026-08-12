@@ -16,10 +16,12 @@ import com.asrevo.cvhome.commons.domain.PodId;
  * </p>
  *
  * @param provisioningState how far the store got in being built, which is unrelated to whether it is paid for
+ * @param status            whether it may be used at all — an operator's lever, unlike provisioningState
  * @param billingStatus     the standing of its subscription, or {@code null} if unknown
  */
 public record ManagerStoreDto(ManagerStoreId id, String name, ManagerOrgId orgId, PodId podId,
-                              ProvisioningState provisioningState, SubscriptionStatus billingStatus) {
+                              ProvisioningState provisioningState, StoreStatus status,
+                              SubscriptionStatus billingStatus) {
 
     /**
      * The same store with its billing standing filled in.
@@ -32,7 +34,7 @@ public record ManagerStoreDto(ManagerStoreId id, String name, ManagerOrgId orgId
      */
     public static ManagerStoreDto billed(ManagerStoreDto store, SubscriptionStatus status) {
         return new ManagerStoreDto(store.id(), store.name(), store.orgId(), store.podId(),
-                store.provisioningState(), status);
+                store.provisioningState(), store.status(), status);
     }
 
 }

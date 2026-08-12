@@ -8,9 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
@@ -22,13 +20,15 @@ import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.entity.ManagerStoreEntity;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
+import com.asrevo.cvhome.tenancy.manager.repository.ManagerOrgRepository;
 import com.asrevo.cvhome.tenancy.manager.repository.ManagerStoreRepository;
 import com.asrevo.cvhome.tenancy.manager.service.impl.InternalStoreServiceImpl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,9 +37,10 @@ import static org.mockito.Mockito.when;
  * Tenant isolation for stores, enforced in the query rather than only by {@code @PreAuthorize}.
  *
  * <p>
- * The permission gate cannot carry this on its own: the shared {@code StoreRoleAccessChecker.isOrgAdmin} ignores the
- * store it is handed and returns true for any store on the platform once the caller is an org admin. Tenancy owns
- * {@code manager_store.org_id}, so these are the checks that actually hold, and they are what these tests pin.
+ * The permission gate cannot carry this on its own: the shared {@code StoreRoleAccessChecker.isOrgAdmin} ignores
+ * the store it is handed and returns true for any store on the platform once the caller is an org admin. Tenancy
+ * owns {@code manager_store.org_id}, so these are the checks that actually hold.
+ * </p>
  */
 @Tag("unit-test")
 class StoreTenantScopingTest {
@@ -65,24 +66,24 @@ class StoreTenantScopingTest {
         return entity;
     }
 
-    private ManagerOrgId capturedProbeOrg() {
-        @SuppressWarnings("unchecked")
-        var captor = forClass(Example.class);
-        verify(repository).findAll(captor.capture(), any(Pageable.class));
-        return ((ManagerStoreEntity) captor.getValue().getProbe()).getOrgId();
+    /** The org id the list query was actually given — null means "every org". */
+    private String capturedQueryOrg() {
+        ArgumentCaptor<String> org = ArgumentCaptor.forClass(String.class);
+        verify(repository).findVisible(org.capture(), any(), any(), anyInt(), anyLong());
+        return org.getValue();
     }
 
     @BeforeEach
     void setUp() {
         repository = mock(ManagerStoreRepository.class);
         ManagerStoreMappers mappers = mock(ManagerStoreMappers.class);
-        when(mappers.toEntity(any(ListManagerStoreQuery.class))).thenReturn(new ManagerStoreEntity());
-        service = new InternalStoreServiceImpl(repository, mappers, mock(ExternalEntitlementService.class));
+        service = new InternalStoreServiceImpl(repository, mock(ManagerOrgRepository.class), mappers,
+                mock(ExternalEntitlementService.class));
     }
 
     private void givenNoRows() {
-        Page<ManagerStoreEntity> empty = new PageImpl<>(List.of());
-        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(empty);
+        when(repository.findVisible(any(), any(), any(), anyInt(), anyLong())).thenReturn(List.of());
+        when(repository.countVisible(any(), any(), any())).thenReturn(0L);
     }
 
     @Test
@@ -90,12 +91,12 @@ class StoreTenantScopingTest {
     void unrecognisedRoleIsStillScoped() {
         givenNoRows();
 
-        // ROLE_CUSTOMER matches none of the org/store-admin branches the old code keyed off, so it fell through and
-        // was handed every store on the platform.
+        // ROLE_CUSTOMER matches none of the org/store-admin branches the old code keyed off, so it fell through
+        // and was handed every store on the platform.
         service.findAll(identity(ORG, Roles.ROLE_CUSTOMER), new ListManagerStoreQuery(null, null, null),
-                Pageable.unpaged());
+                Pageable.ofSize(10));
 
-        assertThat(capturedProbeOrg()).isEqualTo(ORG);
+        assertThat(capturedQueryOrg()).isEqualTo(ORG.id().toString());
     }
 
     @Test
@@ -104,9 +105,9 @@ class StoreTenantScopingTest {
         givenNoRows();
 
         service.findAll(identity(ORG, Roles.ROLE_ORG_ADMIN), new ListManagerStoreQuery(null, null, null),
-                Pageable.unpaged());
+                Pageable.ofSize(10));
 
-        assertThat(capturedProbeOrg()).isEqualTo(ORG);
+        assertThat(capturedQueryOrg()).isEqualTo(ORG.id().toString());
     }
 
     @Test
@@ -116,9 +117,9 @@ class StoreTenantScopingTest {
 
         // getOrgStoreIdentity reports both a super admin and a store_core service token with a null org.
         service.findAll(identity(null, Roles.ROLE_SUPER_ADMIN), new ListManagerStoreQuery(null, null, null),
-                Pageable.unpaged());
+                Pageable.ofSize(10));
 
-        assertThat(capturedProbeOrg()).isNull();
+        assertThat(capturedQueryOrg()).isNull();
     }
 
     @Test

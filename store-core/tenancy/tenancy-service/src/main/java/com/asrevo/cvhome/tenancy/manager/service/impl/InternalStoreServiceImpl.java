@@ -2,9 +2,9 @@ package com.asrevo.cvhome.tenancy.manager.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +21,14 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.commons.dto.OrgStatus;
+import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
+import com.asrevo.cvhome.tenancy.manager.entity.ManagerOrgEntity;
 import com.asrevo.cvhome.tenancy.manager.entity.ManagerStoreEntity;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
+import com.asrevo.cvhome.tenancy.manager.repository.ManagerOrgRepository;
 import com.asrevo.cvhome.tenancy.manager.repository.ManagerStoreRepository;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 
@@ -35,7 +40,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InternalStoreServiceImpl implements InternalStoreService {
 
+    private static final int DEFAULT_PAGE_SIZE = 100;
+
     private final ManagerStoreRepository storeRepository;
+
+    private final ManagerOrgRepository orgRepository;
 
     private final ManagerStoreMappers storeMappers;
 
@@ -96,16 +105,25 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     @Override
     public Page<ManagerStoreDto> findAll(UserOrgStoreIdentity identityInfo, ListManagerStoreQuery listManagerStoreQuery,
                                          Pageable pageable) {
-        ManagerStoreEntity entity = storeMappers.toEntity(listManagerStoreQuery);
-        if (!isPlatformWide(identityInfo)) {
-            entity.setOrgId(new ManagerOrgId(identityInfo.org().id()));
-            if (identityInfo.isAnyStoreAdmin()) {
-                entity.setId(new ManagerStoreId(identityInfo.store()));
-            }
+        String orgId = isPlatformWide(identityInfo) ? null : identityInfo.org().id().toString();
+        String storeId = null;
+        if (!isPlatformWide(identityInfo) && identityInfo.isAnyStoreAdmin()) {
+            storeId = identityInfo.store();
         }
-        Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
-        return new PageImpl<>(withBillingStatus(all.stream().map(storeMappers::toDto).toList()), all.getPageable(),
-                all.getTotalElements());
+        String name = listManagerStoreQuery == null ? null : listManagerStoreQuery.name();
+        return visiblePage(orgId, storeId, name, pageable);
+    }
+
+    /**
+     * One page of visible stores. The count is a separate query because Spring Data JDBC's {@code @Query} has no
+     * {@code countQuery} attribute — that is JPA's — so the page has to be assembled here.
+     */
+    private Page<ManagerStoreDto> visiblePage(String orgId, String storeId, String name, Pageable pageable) {
+        Pageable page = pageable == null || pageable.isUnpaged() ? Pageable.ofSize(DEFAULT_PAGE_SIZE) : pageable;
+        List<ManagerStoreEntity> rows =
+                storeRepository.findVisible(orgId, storeId, name, page.getPageSize(), page.getOffset());
+        long total = storeRepository.countVisible(orgId, storeId, name);
+        return new PageImpl<>(withBillingStatus(rows.stream().map(storeMappers::toDto).toList()), page, total);
     }
 
     /**
@@ -118,11 +136,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Override
     public Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable) {
-        ManagerStoreEntity entity = new ManagerStoreEntity();
-        entity.setOrgId(new ManagerOrgId(id.id()));
-        Page<ManagerStoreEntity> all = storeRepository.findAll(Example.of(entity), pageable);
-        return new PageImpl<>(withBillingStatus(all.stream().map(storeMappers::toDto).toList()), all.getPageable(),
-                all.getTotalElements());
+        return visiblePage(id.id().toString(), null, null, pageable);
     }
 
     /**
@@ -194,6 +208,38 @@ public class InternalStoreServiceImpl implements InternalStoreService {
     public ManagerStoreDto findStore(UserOrgStoreIdentity identity, ManagerStoreId store)
             throws StoreNotFoundException {
         return storeMappers.toDto(getManagerStoreEntity(identity, store));
+    }
+
+    @Transactional
+    @Override
+    public ManagerStoreDto updateStatus(ManagerStoreId store, StoreStatus status) throws StoreNotFoundException {
+        ManagerStoreEntity entity = getManagerStoreEntity(store);
+        entity.setStatus(status);
+        return storeMappers.toDto(storeRepository.save(entity));
+    }
+
+    /**
+     * The organization is checked as well as the store, and that is the point of doing this in one place.
+     *
+     * <p>
+     * Suspending an organization has to close its stores, or suspension means nothing — but writing the status
+     * onto every store would be a dual write that drifts the moment one update fails. The org is the single owner
+     * of its own status, and this reads both.
+     * </p>
+     */
+    @Override
+    public void requireOperable(ManagerStoreId store) throws StoreNotFoundException, StoreNotOperableException {
+        ManagerStoreEntity entity = getManagerStoreEntity(store);
+        StoreStatus status = Objects.requireNonNullElse(entity.getStatus(), StoreStatus.ACTIVE);
+        if (!status.operable()) {
+            throw StoreNotOperableException.of(store, status.name());
+        }
+        OrgStatus orgStatus = orgRepository.findById(entity.getOrgId())
+                .map(ManagerOrgEntity::getStatus)
+                .orElse(OrgStatus.ACTIVE);
+        if (Objects.nonNull(orgStatus) && !orgStatus.operable()) {
+            throw StoreNotOperableException.of(store, String.format("owned by a %s organization", orgStatus));
+        }
     }
 
     @Override

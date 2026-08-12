@@ -28,6 +28,7 @@ import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
 
@@ -108,7 +109,8 @@ public class StoreManagerController {
     @GetMapping("private/store/{code}")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
     public Object getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @PathVariable("code") ManagerStoreId store) throws StoreNotFoundException {
+                                   @PathVariable("code") ManagerStoreId store)
+            throws StoreNotFoundException, StoreNotOperableException {
         return managerService.getStore(identity, store);
     }
 

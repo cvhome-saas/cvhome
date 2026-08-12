@@ -18,7 +18,7 @@ public interface ManagerOrgRepository extends CrudRepository<ManagerOrgEntity, M
 
     @Query("""
              select date(m.created_date) as date,count(date(m.created_date)) as value
-             from manager.manager_org m
+             from tenancy.manager_org m
              where m.created_date between  :from and :to
             group by date(m.created_date)""")
     List<StatisticEntry> orgStatistic(Instant from, Instant to);

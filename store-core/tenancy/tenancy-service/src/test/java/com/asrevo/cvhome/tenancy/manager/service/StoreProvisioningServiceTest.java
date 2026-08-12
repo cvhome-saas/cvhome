@@ -15,6 +15,7 @@ import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
+import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.mappers.ManagerStoreMappers;
 
@@ -52,7 +53,7 @@ class StoreProvisioningServiceTest {
     private StoreProvisioningService service;
 
     private static ManagerStoreDto storeIn(ProvisioningState state) {
-        return new ManagerStoreDto(STORE, "a-store", ORG, POD, state, null);
+        return new ManagerStoreDto(STORE, "a-store", ORG, POD, state, StoreStatus.ACTIVE, null);
     }
 
     @BeforeEach

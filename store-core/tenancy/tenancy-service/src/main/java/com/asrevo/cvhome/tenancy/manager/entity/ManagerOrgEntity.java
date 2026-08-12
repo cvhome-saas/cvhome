@@ -9,6 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.asrevo.cvhome.commons.domain.BaseEntity;
 import com.asrevo.cvhome.commons.domain.Email;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.tenancy.commons.dto.OrgStatus;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +25,21 @@ public class ManagerOrgEntity extends BaseEntity<ManagerOrgEntity, ManagerOrgId>
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private Email email;
 
+    @Column("name")
+    private String name;
+
+    @Column("status")
+    private OrgStatus status;
+
+    @Column("owner_user_id")
+    private String ownerUserId;
+
     public static ManagerOrgEntity createOrgFromUser(Email email) {
         ManagerOrgEntity entity = new ManagerOrgEntity();
         entity.id = entity.generateId();
         entity.setCreatedDate(Instant.now());
         entity.setEmail(email);
+        entity.setStatus(OrgStatus.ACTIVE);
         return entity;
     }
 

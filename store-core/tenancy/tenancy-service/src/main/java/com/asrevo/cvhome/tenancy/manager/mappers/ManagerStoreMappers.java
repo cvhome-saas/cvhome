@@ -27,6 +27,8 @@ public interface ManagerStoreMappers {
     @Mapping(target = "podId", ignore = true)
     @Mapping(target = "orgId", ignore = true)
     @Mapping(target = "provisioningState", ignore = true)
+    // A list filter has no lifecycle status: the query excludes DELETED itself and matches the rest.
+    @Mapping(target = "status", ignore = true)
     ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
     default Map<Object, Object> toExternalCreateRequest(Map<Object, Object> request, ManagerOrgId orgId,

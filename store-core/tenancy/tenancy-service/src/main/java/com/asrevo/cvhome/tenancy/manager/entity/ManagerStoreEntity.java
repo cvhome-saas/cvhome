@@ -11,6 +11,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
+import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.events.store.StoreCreatedEvent;
 
 import lombok.Getter;
@@ -36,6 +37,9 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
     @Column("provisioning_state")
     private ProvisioningState provisioningState;
 
+    @Column("status")
+    private StoreStatus status;
+
     public static ManagerStoreEntity createStore(Map<Object, Object> request, ManagerOrgId orgId, PodId podId) {
         ManagerStoreEntity entity = new ManagerStoreEntity();
         entity.id = entity.generateId();
@@ -45,6 +49,7 @@ public class ManagerStoreEntity extends BaseEntity<ManagerStoreEntity, ManagerSt
         entity.setOrgId(orgId);
         entity.setPodId(podId);
         entity.provisioningState = ProvisioningState.NOT_STARTED_PROVISIONING;
+        entity.status = StoreStatus.ACTIVE;
         entity.registerEvent(StoreCreatedEvent.from(entity.getId(), orgId, podId, request));
         return entity;
     }

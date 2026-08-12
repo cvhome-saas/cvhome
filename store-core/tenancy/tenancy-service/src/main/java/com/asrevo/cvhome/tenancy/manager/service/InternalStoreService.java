@@ -11,7 +11,9 @@ import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
 
 public interface InternalStoreService {
 
@@ -40,6 +42,16 @@ public interface InternalStoreService {
 
     /** Refuses, as a 404, a store belonging to an organization other than the caller's. */
     ManagerStoreDto findStore(UserOrgStoreIdentity identity, ManagerStoreId store) throws StoreNotFoundException;
+
+    /** Sets the store's lifecycle status. Transition legality is decided by {@code StoreLifecycleService}. */
+    ManagerStoreDto updateStatus(ManagerStoreId store, StoreStatus status) throws StoreNotFoundException;
+
+    /**
+     * Refuses a store that is suspended, archived or deleted, or whose organization is not active.
+     *
+     * @throws StoreNotOperableException the store cannot be worked in right now
+     */
+    void requireOperable(ManagerStoreId store) throws StoreNotFoundException, StoreNotOperableException;
 
     Boolean checkNameExists(String name);
 

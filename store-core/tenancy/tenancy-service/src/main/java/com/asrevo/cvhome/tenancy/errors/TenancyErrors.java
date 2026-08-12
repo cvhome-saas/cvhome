@@ -30,7 +30,22 @@ public enum TenancyErrors implements ErrorCode {
     STORE_NOT_FOUND("CONTROL_PLANE.STORE.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
     /** Store names are unique platform-wide; this one is taken. */
-    STORE_NAME_TAKEN("CONTROL_PLANE.STORE.NAME_TAKEN", ErrorCategory.CONFLICT);
+    STORE_NAME_TAKEN("CONTROL_PLANE.STORE.NAME_TAKEN", ErrorCategory.CONFLICT),
+
+    /** The store, or the organization that owns it, is suspended, archived or closed. */
+    STORE_NOT_OPERABLE("CONTROL_PLANE.STORE.NOT_OPERABLE", ErrorCategory.UNPROCESSABLE),
+
+    /** The requested lifecycle move is not one this status allows. */
+    ILLEGAL_LIFECYCLE_TRANSITION("CONTROL_PLANE.LIFECYCLE.ILLEGAL_TRANSITION", ErrorCategory.UNPROCESSABLE),
+
+    /** No organization with the requested id is visible to the caller. */
+    ORG_NOT_FOUND("CONTROL_PLANE.ORG.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /** No invitation matches that token, or it is no longer usable. */
+    INVITATION_NOT_USABLE("CONTROL_PLANE.INVITATION.NOT_USABLE", ErrorCategory.UNPROCESSABLE),
+
+    /** That address already has a live invitation to this organization, or already belongs to it. */
+    INVITATION_ALREADY_EXISTS("CONTROL_PLANE.INVITATION.ALREADY_EXISTS", ErrorCategory.CONFLICT);
 
     private final String code;
 
