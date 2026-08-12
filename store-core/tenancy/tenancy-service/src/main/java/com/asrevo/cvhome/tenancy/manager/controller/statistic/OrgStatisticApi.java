@@ -3,6 +3,7 @@ package com.asrevo.cvhome.tenancy.manager.controller.statistic;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,13 @@ public class OrgStatisticApi {
 
     private final ManagerOrgRepository managerOrgRepository;
 
+    /**
+     * Counts organizations created per day across the whole platform — a business metric for the operator, not
+     * tenant data, and not scopeable to one org. Super-admin only; it previously had no annotation, so any
+     * authenticated merchant could read the platform's growth curve.
+     */
     @PostMapping(value = {"/private/org-statistic"})
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public StatisticList orgStatistic(@RequestBody StatisticRange range) {
         List<StatisticEntry> entries = managerOrgRepository.orgStatistic(range.fromDate().toInstant(),

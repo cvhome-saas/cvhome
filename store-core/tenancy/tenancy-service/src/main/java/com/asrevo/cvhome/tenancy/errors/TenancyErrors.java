@@ -24,7 +24,13 @@ public enum TenancyErrors implements ErrorCode {
     USER_FOREIGN_STORE("CONTROL_PLANE.USER.FOREIGN_STORE", ErrorCategory.FORBIDDEN),
 
     /** No pod is registered under the requested id. */
-    POD_NOT_FOUND("CONTROL_PLANE.POD.NOT_FOUND", ErrorCategory.NOT_FOUND);
+    POD_NOT_FOUND("CONTROL_PLANE.POD.NOT_FOUND", ErrorCategory.NOT_FOUND),
+
+    /**
+     * No store with the requested id is visible to the caller — either it does not exist, or it belongs to another
+     * organization. Deliberately one code for both: see {@link StoreNotFoundException}.
+     */
+    STORE_NOT_FOUND("CONTROL_PLANE.STORE.NOT_FOUND", ErrorCategory.NOT_FOUND);
 
     private final String code;
 

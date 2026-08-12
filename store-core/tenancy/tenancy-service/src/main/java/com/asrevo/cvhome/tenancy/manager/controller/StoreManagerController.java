@@ -26,6 +26,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodPlacementRefusedException;
 import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
 import com.asrevo.cvhome.tenancy.manager.service.StoreManagerService;
 
@@ -38,12 +39,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StoreManagerController {
 
+    /**
+     * Who may ask for a store listing at all. These endpoints scope their rows by the caller's org in the query, so
+     * this is a coarse gate rather than the isolation boundary — but without it any authenticated principal could
+     * ask, and a principal holding none of these roles used to receive every store on the platform.
+     *
+     * <p>
+     * An inline role list rather than a {@code hasPermission} token because there is no single store to evaluate one
+     * against; the store-scoped endpoints below use tokens.
+     * </p>
+     */
+    private static final String STORE_VIEWER_ROLES = """
+            hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN','ROLE_STORE_ADMIN','ROLE_STORE_MODERATOR','ROLE_STORE_RETAIL')""";
+
     private final StoreManagerService managerService;
 
     private final InternalStoreService internalStoreService;
 
+    /**
+     * Rows are confined to the caller's org inside {@link InternalStoreService#findAll}, so this guard is about who
+     * may ask at all, not which stores come back.
+     */
     @PostMapping("list")
-
+    @PreAuthorize(STORE_VIEWER_ROLES)
     public Page<ManagerStoreDto> findAllStores(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                                @RequestBody ListManagerStoreQuery listManagerStoreQuery, Pageable pageable) {
         return internalStoreService.findAll(identity, listManagerStoreQuery, pageable);
@@ -67,15 +85,20 @@ public class StoreManagerController {
         return this.managerService.createStore(identity.org(), request);
     }
 
+    /**
+     * Store names are unique platform-wide, so this necessarily reports on names outside the caller's org — it is the
+     * pre-flight check for the create form. Restricted to those who can actually create a store, so it cannot be used
+     * to enumerate other tenants' store names.
+     */
     @GetMapping(value = "private/store/unique", params = "name")
-
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
     public Map<String, Boolean> checkExist(@RequestParam("name") String name) {
         return Map.of("exists", internalStoreService.checkNameExists(name));
     }
 
+    /** Same listing as {@link #findAllStores}, without a filter body. The guard was commented out. */
     @GetMapping("private/store")
-    // @PreAuthorize("hasAnyRole('ROLE_ORG_ADMIN')")
-
+    @PreAuthorize(STORE_VIEWER_ROLES)
     public Page<ManagerStoreDto> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                                        Pageable pageable) {
         return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
@@ -84,15 +107,15 @@ public class StoreManagerController {
     @GetMapping("private/store/{code}")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
     public Object getStoreDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @PathVariable("code") ManagerStoreId store) {
-        return managerService.getStore(store);
+                                   @PathVariable("code") ManagerStoreId store) throws StoreNotFoundException {
+        return managerService.getStore(identity, store);
     }
 
     @GetMapping("store-info")
     @PreAuthorize("hasPermission(#store,'ManagerStoreId','STORE-CORE.STORE-FIND-ONE')")
     public ManagerStoreDto storeInfo(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                     @RequestParam ManagerStoreId store) {
-        return internalStoreService.findStore(store);
+                                     @RequestParam ManagerStoreId store) throws StoreNotFoundException {
+        return internalStoreService.findStore(identity, store);
     }
 
     @GetMapping("public/themes")

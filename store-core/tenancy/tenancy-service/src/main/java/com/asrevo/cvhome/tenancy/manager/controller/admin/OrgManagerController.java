@@ -72,8 +72,13 @@ public class OrgManagerController {
         userAccountService.changePassword(id.toString(), request);
     }
 
+    /**
+     * Lists any organization's stores by id, so it is super-admin only like the rest of this controller. It was the
+     * one method here with no annotation, which let any authenticated principal enumerate any org's stores by
+     * passing its id.
+     */
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @GetMapping("stores")
-
     public Page<ManagerStoreDto> findAllStores(@RequestParam ManagerOrgId id, Pageable pageable) {
         return internalStoreService.findAll(id, pageable);
     }
