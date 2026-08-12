@@ -37,7 +37,7 @@ swallowing hides.
 
 # Section 1 — The backend contract (what the frontends must consume)
 
-Read `.claude/skills/project-structure/references/error-handling.md` before implementing. The parts that
+Read `../../.claude/skills/project-structure/references/error-handling.md` before implementing. The parts that
 bind the frontend work:
 
 **Wire format** — one shape, all services, built only by

@@ -46,7 +46,7 @@ embeddables). `ManagerOrgId` is **not** part of this: it identifies an organizat
 - Column widths. `varchar(24)` in store-core and `varchar(50)` in the pods both keep working; no migration.
 - `PodId` / `IdentityId` keep their `{"id":…}` JSON. Only the store id changes shape.
 
-## Step 1 — the unified type (`store-commons/commons`)
+## Step 1 — the unified type (`../../store-commons/commons`)
 
 Rewrite `commons/domain/StoreMerchantId.java`; delete `commons/domain/ManagerStoreId.java`.
 
@@ -82,7 +82,7 @@ Notes:
 - Check for `Map<StoreMerchantId, …>` fields that get serialized — `@JsonValue` covers values, not map keys.
   (The known caches in `StoreEntitlements` are Caffeine, not JSON.)
 
-## Step 2 — security and s2s plumbing (`store-commons/autoconfigure`, 6 files)
+## Step 2 — security and s2s plumbing (`../../store-commons/autoconfigure`, 6 files)
 
 - `s2s/config/internal/CustomPermissionEvaluator.java` — the three `new ManagerStoreId(((StoreMerchantId)
   targetId)…)` conversions collapse to a plain `(StoreMerchantId) targetId` cast, and the `STORE-CORE.*` /

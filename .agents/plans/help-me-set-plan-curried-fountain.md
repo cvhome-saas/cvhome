@@ -36,7 +36,7 @@ Consequences visible today: a remote 400 from catalog surfaces to the browser as
 
 ### New module `store-commons:errors`
 
-Plain Java, no Spring dependency, so both trees can depend on it. Registered in `settings.gradle` alongside `store-commons:commons`, then exposed as `api project(':store-commons:errors')` from **both** `store-commons/commons/build.gradle` and `store-pod/commons/store-commons/build.gradle` — those two are the roots that every other module already pulls in.
+Plain Java, no Spring dependency, so both trees can depend on it. Registered in `../../settings.gradle` alongside `store-commons:commons`, then exposed as `api project(':store-commons:errors')` from **both** `../../store-commons/commons/build.gradle` and `../../store-pod/commons/store-commons/build.gradle` — those two are the roots that every other module already pulls in.
 
 **Error code SPI** — per-module enums implement it; no central god-enum.
 
@@ -139,7 +139,7 @@ and at the enclosing service method, `Unchecked.rethrow(() -> ...)` restores the
 
 ### Global advice — `store-commons:autoconfigure`
 
-**Why here:** `store-commons/autoconfigure` is already a dependency of uaa, gateway, control-plane-service, and all five pod services (verified), and already auto-configures via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` → `CvhomeSharedConfig`. Adding the handler there gives all 8 services one implementation with zero per-service wiring, replacing 4 duplicated `RestErrorHandler`s, 4 duplicated `FileUploadExceptionAdvice`s, 2 duplicated `GeneralExceptionHandler`s, and 1 empty stub.
+**Why here:** `../../store-commons/autoconfigure` is already a dependency of uaa, gateway, control-plane-service, and all five pod services (verified), and already auto-configures via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` → `CvhomeSharedConfig`. Adding the handler there gives all 8 services one implementation with zero per-service wiring, replacing 4 duplicated `RestErrorHandler`s, 4 duplicated `FileUploadExceptionAdvice`s, 2 duplicated `GeneralExceptionHandler`s, and 1 empty stub.
 
 `GlobalErrorHandler extends ResponseEntityExceptionHandler`, annotated `@ControllerAdvice` **with no basePackages** — this alone fixes the mis-scoping that currently disables error handling in all four pod services. Registered from a new `ErrorHandlingAutoConfiguration` added to the `.imports` file, guarded `@ConditionalOnWebApplication` + `@ConditionalOnMissingBean` so a service can still override.
 
@@ -173,10 +173,10 @@ Ordered by throw-site count ascending, so the pattern is proven on modules where
 
 | Step | Module | Throw sites |
 |---|---|---|
-| 1 | `store-pod/commons/store-commons` | 4 |
+| 1 | `../../store-pod/commons/store-commons` | 4 |
 | 2 | `payment` (core + service) | ~7 |
 | 3 | `store-core` (uaa, cua, control-plane) | ~10 |
-| 4 | `store-pod/commons` leaves (customer, reference, store-modules) | ~21 |
+| 4 | `../../store-pod/commons` leaves (customer, reference, store-modules) | ~21 |
 | 5 | `merchant` + `content` | 29 |
 | 6 | `checkout` | 38 |
 | 7 | `catalog` | 216 |
@@ -185,7 +185,7 @@ Each step compiles and ships green on its own, and deletes the legacy types it r
 
 **Step 0 — Foundation.** New `store-commons:errors` module (SPI, the abstract hierarchy rooted at `BaseException`, `CommonErrors`, `Unchecked`, `FieldError`); `GlobalErrorHandler` + `ProblemDetailFactory` + `ErrorHandlingAutoConfiguration` in `store-commons:autoconfigure`; `ProblemDetailErrorHandler` wired into `WebClientsUtils`. Temporary `@ExceptionHandler`s for `GenericRuntimeException` and `ServiceException` translate legacy exceptions into the new format so **every later step is behaviour-preserving from the client's perspective**. No throw site changes. Fixes bugs 2, 3 and 4 repo-wide on day one.
 
-**Step 1 — `store-pod/commons/store-commons` (4 sites).** The pilot: smallest possible surface, and it is the module every pod depends on, so it validates that the new module reaches everywhere via the `api` wiring. Two distinct pieces of work, and conflating them is the trap this step exists to expose:
+**Step 1 — `../../store-pod/commons/store-commons` (4 sites).** The pilot: smallest possible surface, and it is the module every pod depends on, so it validates that the new module reaches everywhere via the `api` wiring. Two distinct pieces of work, and conflating them is the trap this step exists to expose:
 
 - **The bridge, for the ~275 sites this step does *not* touch.** The deprecated hierarchy becomes `ErrorCodeAware` (`GenericRuntimeException`) and a `BaseException` subclass (`ServiceException`), each reporting a `LegacyErrors.*` code. That is what makes every un-migrated throw render with the right status before it is rewritten. The `LEGACY.` prefix is deliberate — grepping it measures how much of the codebase is still on the old path, and a client seeing one knows the endpoint is not migrated. Delete the 4 identical `RestErrorHandler` copies and the 4 identical `FileUploadExceptionAdvice` copies; keep `ErrorEntity` until Step 8.
 - **The migration, for this module's own 4 sites.** `PriceUtils` throws `PriceNotParseableException extends ConversionException` and `NonPositivePriceException extends ValidationException` (the latter carrying a `price` field error), and `getAmount` declares both. Not `ServiceException` with a better code.
@@ -198,11 +198,11 @@ Cost of the rule at this step: narrowing a shared utility's signature breaks its
 
 **Step 2 — `payment` (~7 sites).** Replace `FailedPaymentInitiate`, `InvalidWebhookPayload`, and `InvalidPaymentReferenceId` (declared, never thrown — delete) with `PaymentErrors` plus four named exceptions in `payment-commons`: `InvalidWebhookSignatureException`, `UnreadableWebhookPayloadException`, `UnexpectedWebhookObjectException` (all `extends ValidationException`) and `PaymentInitiateRejectedException` (`extends RemoteServiceException`, keeping Stripe's code and status). `PaymentProcessor` declares them per operation. These currently have **no `@ExceptionHandler` at all**, so this is a small module that is also a genuine behaviour fix for `StripeProcessor` — a good second step because it shows the value early at low cost, and it is where the naming convention gets set for the remaining steps.
 
-**Step 2b — typed service-to-service errors.** Planned and implemented separately in `.claude/plans/claude-plans-help-me-set-plan-curried-f-cached-grove.md`: an `-external-api` module becomes its service's client SDK, publishing a named exception family and a `RemoteErrorCatalog` that turns a wire `code` back into it, with `WebClientsUtils` delivering the type through the `@HttpExchange` proxy. Payment is the pilot; each later step adds its own catalog and client wrapper. The `@HttpExchange` interface is implemented by the server's own controller, so its `throws` clause states the *server's* exceptions; a hand-written wrapper beside it restates them in the caller's vocabulary. This is also where the remote `code` finally survives re-emission, making this plan's long-standing claim about `RemoteServiceException` true.
+**Step 2b — typed service-to-service errors.** Planned and implemented separately in `claude-plans-help-me-set-plan-curried-f-cached-grove.md`: an `-external-api` module becomes its service's client SDK, publishing a named exception family and a `RemoteErrorCatalog` that turns a wire `code` back into it, with `WebClientsUtils` delivering the type through the `@HttpExchange` proxy. Payment is the pilot; each later step adds its own catalog and client wrapper. The `@HttpExchange` interface is implemented by the server's own controller, so its `throws` clause states the *server's* exceptions; a hand-written wrapper beside it restates them in the caller's vocabulary. This is also where the remote `code` finally survives re-emission, making this plan's long-standing claim about `RemoteServiceException` true.
 
 **Step 3 — `store-core` (~10 sites): uaa, cua, control-plane.** Delete the byte-identical duplicate pairs (`ForbiddenOperationException` / `ResourceNotExistException` exist twice — `store-core/uaa/.../exception/` and `store-pod/cua/.../exception/`) in favour of the shared types. Retire both `GeneralExceptionHandler` copies; their `ResourceNotExistException` → **400** titled "User Not Found" mismatch is corrected to 404 here. Convert control-plane's 3 `ResponseStatusException` throws in `ManagedUserAccountServiceImpl` and delete its empty `ExceptionHandlerAdvice`. Doing this early collapses the three wire formats into one before the bulk migration begins.
 
-**Step 4 — `store-pod/commons` leaves (~21 sites).** `customer-core` (`CustomerPopulator` country/zone codes), `reference-*`, and `store-modules/store-cms-commons` — the S3 layer. `S3StaticContentAssetsManagerImpl` (4 sites) is the model conversion: `ServiceException(e)` → named types under the abstract `StoreIOException` (`AssetUploadFailedException`, `AssetNotFoundException`, …), each with the S3 key in `params`. **This is the `Unchecked` ergonomics checkpoint** (see the flag in Decisions): the populators are the first lambda-heavy code to convert, and it is the last cheap moment to revisit checked-everywhere.
+**Step 4 — `../../store-pod/commons` leaves (~21 sites).** `customer-core` (`CustomerPopulator` country/zone codes), `reference-*`, and `store-modules/store-cms-commons` — the S3 layer. `S3StaticContentAssetsManagerImpl` (4 sites) is the model conversion: `ServiceException(e)` → named types under the abstract `StoreIOException` (`AssetUploadFailedException`, `AssetNotFoundException`, …), each with the S3 key in `params`. **This is the `Unchecked` ergonomics checkpoint** (see the flag in Decisions): the populators are the first lambda-heavy code to convert, and it is the last cheap moment to revisit checked-everywhere.
 
 **Step 5 — `merchant` + `content` (29 sites).** `ContentFacadeImpl`'s 4 `ConstraintException` sites; `MerchantStoreApi`'s `RestApiException(ioe)` → a named type under `StoreIOException`.
 
@@ -219,9 +219,9 @@ Cost of the rule at this step: narrowing a shared utility's signature breaks its
 
 ## Files that matter
 
-**Created:** `store-commons/errors/**` (new module + `settings.gradle` entry); in `store-commons/autoconfigure/src/main/java/com/asrevo/cvhome/`: `error/GlobalErrorHandler.java`, `error/ProblemDetailFactory.java`, `error/ErrorHandlingAutoConfiguration.java`, `s2s/error/ProblemDetailErrorHandler.java`. Then, per step, an `errors/` package in the touched `-commons` module holding that context's `ErrorCode` enum and its condition-named exceptions — `store-pod/commons/store-commons/.../store/errors/` (Step 1: `StoreErrors`, `LegacyErrors`, `PriceNotParseableException`, `NonPositivePriceException`), `payment-commons/.../payment/errors/` (Step 2), and so on.
+**Created:** `store-commons/errors/**` (new module + `../../settings.gradle` entry); in `../../store-commons/autoconfigure/src/main/java/com/asrevo/cvhome`: `error/GlobalErrorHandler.java`, `error/ProblemDetailFactory.java`, `error/ErrorHandlingAutoConfiguration.java`, `s2s/error/ProblemDetailErrorHandler.java`. Then, per step, an `errors/` package in the touched `-commons` module holding that context's `ErrorCode` enum and its condition-named exceptions — `store-pod/commons/store-commons/.../store/errors/` (Step 1: `StoreErrors`, `LegacyErrors`, `PriceNotParseableException`, `NonPositivePriceException`), `payment-commons/.../payment/errors/` (Step 2), and so on.
 
-**Modified:** `store-commons/autoconfigure/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`; `store-commons/autoconfigure/.../s2s/utils/WebClientsUtils.java` (both `build` overloads); `store-commons/commons/build.gradle` + `store-pod/commons/store-commons/build.gradle` (expose the new module as `api`).
+**Modified:** `../../store-commons/autoconfigure/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`; `store-commons/autoconfigure/.../s2s/utils/WebClientsUtils.java` (both `build` overloads); `../../store-commons/commons/build.gradle` + `../../store-pod/commons/store-commons/build.gradle` (expose the new module as `api`).
 
 **Deleted:** 4× `RestErrorHandler`, 4× `FileUploadExceptionAdvice` (under `store-pod/*/​*-service/.../controller/exception/`), 2× `GeneralExceptionHandler` (uaa, cua), `control-plane-service/.../ExceptionHandlerAdvice.java`, and the legacy exception classes in Step 9.
 

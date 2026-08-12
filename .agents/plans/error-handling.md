@@ -8,7 +8,7 @@ three describe designs that have since been replaced. Nothing below is aspiratio
 **Remaining work**.
 
 The distilled version of the *design* also lives in the `project-structure` skill
-(`.claude/skills/project-structure/references/error-handling.md` and `service-to-service.md`), which is what gets read
+(`../../.claude/skills/project-structure/references/error-handling.md` and `service-to-service.md`), which is what gets read
 during ordinary work. This file is the *migration*: what is done, what is left, in what order, and how each step is
 verified.
 
@@ -40,13 +40,13 @@ The four defects that started this, all now fixed repo-wide by Step 0:
 | | |
 |---|---|
 | **Step 0 — foundation** | `store-commons:errors` (SPI, abstract hierarchy, `Unchecked`, `FieldError`), `GlobalErrorHandler` + `ProblemDetailFactory` + `ErrorHandlingAutoConfiguration` in `store-commons:autoconfigure`, s2s error handling in `WebClientsUtils`. One `@ControllerAdvice` with **no** basePackages — defects 2, 3, 4 fixed everywhere on day one |
-| **Step 1 — `store-pod/commons/store-commons`** | The legacy bridge (`ServiceException`/`GenericRuntimeException`/`ServiceRuntimeException` → `LegacyErrors`) so un-migrated throws still render correctly under a `LEGACY.*` code; the module's own 4 sites migrated (`PriceNotParseableException`, `NonPositivePriceException`) |
+| **Step 1 — `../../store-pod/commons/store-commons`** | The legacy bridge (`ServiceException`/`GenericRuntimeException`/`ServiceRuntimeException` → `LegacyErrors`) so un-migrated throws still render correctly under a `LEGACY.*` code; the module's own 4 sites migrated (`PriceNotParseableException`, `NonPositivePriceException`) |
 | **Step 2 — `payment`** | `PaymentErrors` + four named exceptions in `payment-commons`; `PaymentProcessor` declares them per operation. Payment is the reference implementation to copy |
 | **Step 2b — typed s2s errors** | `-external-api` as client SDK: caller-side exception family, `RemoteErrorCatalog`, transport-failure translation, typed unwrapping through the proxy, remote code surviving re-emission. `OrderPlacementFacadeImpl` branches on the types |
 | **Refactor A — explicit catalogs** | `ServiceLoader` discovery, `RemoteErrorRegistry`, `apis()` and both `META-INF/services` files deleted. The catalog is passed to `buildClient(...)`; `S2sErrorHandler` is the one named class owning both failure paths |
 | **Refactor B — two interfaces, no wrapper** | The hand-written `PaymentGatewayClient`/`RestPaymentGatewayClient` pair is gone. The caller-side types are declared on the `@HttpExchange` interface itself, and `declaredOrCarrier` delivers them narrowed |
 | **Step 3 — `store-core`** | uaa, cua and control-plane migrated; the last two per-service advices and the empty stub deleted; `DataIntegrityErrorHandler` added so the 409 they used to provide is now every service's. Details below |
-| **Step 4 — `store-pod/commons` leaves** | `store-cms-commons` (all 12 sites) and `customer-core` migrated; `CmsErrors` + 7 exceptions, `CustomerErrors` + 2; the populator SPI widened so a migrated populator can name its own conditions. `reference-*` had nothing to migrate. Details below |
+| **Step 4 — `../../store-pod/commons` leaves** | `store-cms-commons` (all 12 sites) and `customer-core` migrated; `CmsErrors` + 7 exceptions, `CustomerErrors` + 2; the populator SPI widened so a migrated populator can name its own conditions. `reference-*` had nothing to migrate. Details below |
 | **Step 5 — `merchant` + `content`** | `ContentErrors` + 5 exceptions, `MerchantErrors` + 4; every facade, service and controller signature in both modules migrated. The 7 sites left blocked on the generic root dissolved in Step 8. Details below |
 | **Step 6 — `checkout` + the catalog reservation contract** | `CheckoutErrors` + 10 exceptions; every facade, service, populator and controller in `checkout-core`/`checkout-service` migrated. `catalog-external-api` split into the `IProductReservationService`/`ExternalProductReservationService` pair with `CatalogApiErrors.CATALOG`, so out-of-stock and catalog-is-down stopped being the same outcome. Three `ConversionRuntimeException` sites in the order mappers were **missed** — the step's grep pattern omitted that type — and were finished in Step 7 once the `Mapper` SPI could carry a checked failure. Details below |
 | **Step 7 — `catalog`** | The largest step: **205 legacy throw sites across 45 files, down to zero** (the last 2 went with the root in Step 8). `CatalogErrors` grown to 45 codes, 58 exception classes in `catalog-commons`. The `Mapper` SPI widened exactly as `DataPopulator` was in Step 4, which is what let 22 unchecked `ConversionRuntimeException` sites become named types. Details below |
@@ -115,8 +115,8 @@ each condition-named class was built to fix, and it links to nothing.
 
 | | |
 |---|---|
-| `store-commons/errors` | The whole type system. **Plain Java, zero dependencies** — no Spring, no logging, no Jackson at runtime. `api` from both commons roots, so every module sees it |
-| `store-commons/autoconfigure` | `errors/web/` — the advice, `ProblemDetailFactory`, autoconfiguration. `s2s/error/` — `S2sErrorHandler`, `RemoteProblemTranslator` |
+| `../../store-commons/errors` | The whole type system. **Plain Java, zero dependencies** — no Spring, no logging, no Jackson at runtime. `api` from both commons roots, so every module sees it |
+| `../../store-commons/autoconfigure` | `errors/web/` — the advice, `ProblemDetailFactory`, autoconfiguration. `s2s/error/` — `S2sErrorHandler`, `RemoteProblemTranslator` |
 | `<domain>-commons/.../errors/` | Per-context `ErrorCode` enum + the condition-named exceptions that service throws |
 | `<domain>-external-api/.../api/errors/` | The client SDK's caller-side types + its `RemoteErrorCatalog` constant |
 | `<domain>-external-api/.../services/` | The HTTP interfaces — one, or the split pair (below) |
@@ -350,7 +350,7 @@ straight through. The real `Unchecked` checkpoint is still Step 4's populators.
 
 ---
 
-## Step 4 as built — `store-pod/commons` leaves
+## Step 4 as built — `../../store-pod/commons` leaves
 
 **New vocabularies.** `CmsErrors` (`store-cms-commons/.../modules/cms/errors/`) with seven codes, and `CustomerErrors`
 (`customer-commons/.../customer/errors/`) with two. `reference-*` turned out to have no legacy throw site at all, so
@@ -678,7 +678,7 @@ What has to come back, in priority order:
 4. `AdviceScopeTest` — exists because defect 2 was invisible and would otherwise return.
 5. New: one case for `DataIntegrityErrorHandler` (409, not 500), added in Step 3 with no test at all.
 
-Two test-only Gradle additions are needed again in `store-commons/autoconfigure`:
+Two test-only Gradle additions are needed again in `../../store-commons/autoconfigure`:
 `testImplementation project(':store-commons:commons')` (the argument resolvers reference its domain types, which are
 `compileOnly` there) and `testImplementation libs.spring.webflux`.
 

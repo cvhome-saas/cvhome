@@ -1,6 +1,6 @@
 # Typed errors for the uaa admin SDK — the non-Spring client
 
-Extends `.claude/plans/error-handling.md`. That plan's Step 2b made an `-external-api` module a client SDK that
+Extends `error-handling.md`. That plan's Step 2b made an `-external-api` module a client SDK that
 decodes wire errors back into named types. `uaa-client` is the same thing for a client that has no Spring at all, and
 this is what it takes to give it the same contract.
 
@@ -99,7 +99,7 @@ are deleted**, roughly 90 lines. Behaviour is unchanged; this is a move.
 ### 3. `uaa-client` becomes the client SDK
 
 **Move `UaaErrors`** from `store-core/uaa/.../uaa/errors/` to `store-commons/uaa-client/.../uaa/errors/`, and add
-`implementation project(':store-commons:uaa-client')` to `store-core/uaa/build.gradle`. The catalog keys on
+`implementation project(':store-commons:uaa-client')` to `../../store-core/uaa/build.gradle`. The catalog keys on
 `ErrorCode` constants rather than strings so a rename cannot orphan a mapping, which means server and SDK must share
 the enum — exactly as `PaymentErrors` is shared from `payment-commons`.
 
@@ -108,7 +108,7 @@ the enum — exactly as `PaymentErrors` is shared from `payment-commons`.
 `com.asrevo.cvhome.uaa.errors` package across two jars for no gain; moving them makes `uaa-client` the exact analogue
 of `payment-commons` — the shared module holding a context's vocabulary *and* its condition types — with the
 caller-side family beside it in `uaa.api.errors`, as `payment-external-api` has it. The package name is unchanged, so
-no import in `store-core/uaa` needed editing.
+no import in `../../store-core/uaa` needed editing.
 
 **New caller-side family**, `store-commons/uaa-client/.../uaa/api/errors/`:
 
@@ -233,7 +233,7 @@ the SDK references it, and leaving an untyped escape hatch in a module that has 
 **Modified** — `RemoteProblemTranslator`; `AbstractAdminClient`, `OAuth2TokenManager`, `AdminUserClient`,
 `AdminClientClient`, `UserAccountServiceImpl`; `UserAccountService`; `ManagedUserAccountService` + `Impl`,
 `UserAccountController`, `SignupServiceImpl`, `OrgManagerController`, `ManagedUserNotFoundException`;
-`uaa-client/build.gradle` (`api project(':store-commons:errors')`), `store-core/uaa/build.gradle`
+`uaa-client/build.gradle` (`api project(':store-commons:errors')`), `../../store-core/uaa/build.gradle`
 (`implementation project(':store-commons:uaa-client')`).
 
 ---

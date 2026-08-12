@@ -7,7 +7,7 @@
 
 ## Context
 
-`.claude/plans/billing-subscription-service.md` shipped in one merge (6e49ddd5c): billing now owns plans,
+`billing-subscription-service.md` shipped in one merge (6e49ddd5c): billing now owns plans,
 subscriptions, Stripe, invoices and entitlements, and control-plane's org-level subscription code is gone.
 What is left in `store-core/control-plane` is the original service — orgs, stores, provisioning, pods, managed
 users and signup — and it did not get the same treatment. It is now the least conventional service in
@@ -45,7 +45,7 @@ An audit found the gap is not cosmetic:
   returns; two controllers colliding on `api/v1/user-account`; **no `http/` directory** (5 stale root-level
   `.http` files hitting `localhost:8020` and `localhost:8083` directly, two calling endpoints that no longer
   exist); **zero real tests** (3 scaffolding files); an **empty `manager-external-api` module** still in
-  `settings.gradle`; hardcoded dependency versions at `control-plane-service/build.gradle:78-79`.
+  `../../settings.gradle`; hardcoded dependency versions at `control-plane-service/build.gradle:78-79`.
 - **The name is wrong, and the split makes it wronger.** See §0.
 
 Intended outcome: a `pod-registry` service on **8022** owning pod identity, health, capacity and placement;
@@ -87,10 +87,10 @@ Three reasons the moment is now:
   `manager-external-api`, `pod-external-api` under a `control-plane/` tree, while billing is `billing-*` under
   `billing/` and the planned `pod-registry-*` under `pod-registry/`. The rename fixes the module prefix in the
   same sweep.
-- `.claude/skills/project-structure/references/multi-tenancy.md` already calls this concept tenancy. The code
+- `../../.claude/skills/project-structure/references/multi-tenancy.md` already calls this concept tenancy. The code
   is the thing that drifted.
 
-**The shape:** tree `store-core/tenancy/`, package root `com.asrevo.cvhome.tenancy.*`, modules
+**The shape:** tree `../../store-core/tenancy`, package root `com.asrevo.cvhome.tenancy.*`, modules
 `tenancy-commons` / `tenancy-events` / `tenancy-external-api` / `tenancy-service`,
 `spring.application.name: tenancy`, gateway path `/tenancy/**` → `lb://tenancy`, **port unchanged at 8020**.
 
@@ -162,7 +162,7 @@ ALTER SCHEMA manager RENAME TO tenancy;
 ALTER SCHEMA control  RENAME TO tenancy_outbox;
 ```
 
-Follow `extra/migrations/2026-08-10-retire-org-subscriptions.sql`'s conventions: a header explaining what
+Follow `../../extra/migrations/2026-08-10-retire-org-subscriptions.sql`'s conventions: a header explaining what
 changes shape, destructive parts kept separate. Nothing here is destructive, but the **ordering is** — run it
 with the service **stopped**, between the old release and the new one. A running instance holds the old schema
 names in its pinned `@Table` annotations and its Hikari `search_path`.
@@ -203,7 +203,7 @@ consumer calls these paths. If an out-of-repo client turns up, add `/control-pla
 
 ### 0e. Documentation
 
-`.claude/skills/project-structure/` is the rulebook: if it still says `control-plane`, the next change gets
+`../../.claude/skills/project-structure` is the rulebook: if it still says `control-plane`, the next change gets
 built wrong. Update, with occurrence counts — `SKILL.md` (13), `references/database-schemas.md` (10),
 `events-outbox.md` (10), `store-core.md` (9), `new-service.md` (9), `multi-tenancy.md` (8), `uaa-client.md`
 (4), `configuration.md` (3), `service-discovery.md` (3), `gateways-and-local-domains.md` (2), and one each in
@@ -219,8 +219,8 @@ is the only plan rewritten.
 
 ## 1. Modules
 
-New tree `store-core/pod-registry/`, package root `com.asrevo.cvhome.podregistry.*`. Copy
-`store-core/billing/billing-service/build.gradle` and prune (drop `stripe.java`, `gson`, `secret-crypto`; keep
+New tree `../../store-core/pod-registry`, package root `com.asrevo.cvhome.podregistry.*`. Copy
+`../../store-core/billing/billing-service/build.gradle` and prune (drop `stripe.java`, `gson`, `secret-crypto`; keep
 `caffeine`, `mapstruct`, `namastack.outbox.starter.jdbc`, `spring.boot.starter.data.jdbc`). Store-core layer ⇒
 **Spring Data JDBC**, hand-written `schema.sql`, s2s client `store-core@service.store-core.internal`, scope
 `store_core`.
@@ -252,7 +252,7 @@ post-rename, i.e. `tenancy-service/.../tenancy/`:
 | `manager/service/PodSelection{,Impl}` | `podregistry/service/PodPlacementService` (rewritten, §5) |
 | module `store-core/control-plane/pod-external-api` | `pod-registry-external-api` |
 
-**Deleted:** `store-core/control-plane/manager-external-api` (no `src/` at all) + its `settings.gradle` line —
+**Deleted:** `store-core/control-plane/manager-external-api` (no `src/` at all) + its `../../settings.gradle` line —
 in phase 0, before the rename.
 
 ---
@@ -315,8 +315,8 @@ at an import line and a log message.
 
 ## 4. Registration for `pod-registry` (all mandatory — miss one and it is unreachable)
 
-1. `settings.gradle` — the four `'store-core:pod-registry:pod-registry-*'` entries.
-2. `store-commons/autoconfigure/src/main/resources/common-config.yml` — a `pod-registry` block under
+1. `../../settings.gradle` — the four `'store-core:pod-registry:pod-registry-*'` entries.
+2. `../../store-commons/autoconfigure/src/main/resources/common-config.yml` — a `pod-registry` block under
    `com.asrevo.cvhome.services`, key **== `spring.application.name`**, `port: 8022` (**verified free**: 8000,
    8001, 8010, 8020, 8021 taken), `namespace: store-core.cvhome.lcl`,
    `gateway-service-name: store-core-gateway`.
@@ -327,7 +327,7 @@ at an import line and a log message.
    `stripPrefix(1).tokenRelay().preserveHostHeader()`, `uri("lb://pod-registry")`) **and** `"pod-registry"` in
    `backendServices` (line 23, post-rename `{"tenancy","billing","uaa","spg"}`). That array is negated to
    build the seller-ui catch-all — without the second edit every call returns seller-ui's shell HTML.
-6. `extra/scripts/run-lcl.sh` — a row after `billing`, before `gateway`.
+6. `../../extra/scripts/run-lcl.sh` — a row after `billing`, before `gateway`.
 7. `application.yml` + `-lcl` + `-fargate`, outbox `jdbc.schema-name: pod_registry_outbox`,
    `schema-initialization.enabled: false`.
 8. Permission tokens `STORE-CORE.POD.READ` / `.MANAGE` / `.PLACEMENT` need a `case` in
@@ -393,7 +393,7 @@ excluded from placement, still routed.
 ## 6. Phases
 
 Each phase is independently shippable and QA-able. **All of them share one QA document** —
-`qa/tenancy-and-pod-registry-split.md`, named after this plan, appended to as each phase landed. That is the
+`../../qa/tenancy-and-pod-registry-split.md`, named after this plan, appended to as each phase landed. That is the
 convention (CLAUDE.md, and `references/qa-testing.md` §7 in the `project-structure` skill); the per-phase files
 this plan originally produced were folded into it.
 
@@ -422,7 +422,7 @@ checkstyle clean, **29 tests green** (`PodPlacementServiceTest` 10, `StoreTenant
 PDR-08 … PDR-15 (7), OPS (8), RBS (9), LIF (10) and CNV (11).
 
 **The plan is complete.** What remains is listed under "99 — Known gaps" in
-`qa/tenancy-and-pod-registry-split.md`; the largest
+`../../qa/tenancy-and-pod-registry-split.md`; the largest
 by far is `StoreRoleAccessChecker.isOrgAdmin`, which is still unfixed and still lets an org admin manage any
 store on the platform through the pods.
 
@@ -441,7 +441,7 @@ Both are recorded here because they outlive the phases that found them:
    clients carried earlier clients' interceptors — and the earliest-registered one wraps the call. A
    pod-registry outage reported *"The billing service could not be reached"* with `remoteService: billing`
    while billing was healthy. Fixed by cloning per client. **It has no regression test**:
-   `store-commons/autoconfigure` has no test source set at all, and adding one belongs in its own PR.
+   `../../store-commons/autoconfigure` has no test source set at all, and adding one belongs in its own PR.
 2. **`RequestCacheAwareLocaleInterceptor` can 500 every request to a service.** It calls `setLocale` on an
    `AcceptHeaderLocaleResolver`, which throws `UnsupportedOperationException`. Seen blocking *all* tenancy
    requests, `GET` included, during phase 6 QA — but not on every run of the session, so the trigger is not
@@ -452,7 +452,7 @@ Both are recorded here because they outlive the phases that found them:
 
 | # | Content | Gate |
 |---|---|---|
-| **0** ✅ | Delete the empty `manager-external-api` (folder + `settings.gradle`); move `build.gradle:78-79` versions into `libs.versions.toml`; delete dead `manager/utils/ErrorCodes.java`; de-dupe `JdbcConfig` converter block | `./gradlew build -x test -x check` clean |
+| **0** ✅ | Delete the empty `manager-external-api` (folder + `../../settings.gradle`); move `build.gradle:78-79` versions into `libs.versions.toml`; delete dead `manager/utils/ErrorCodes.java`; de-dupe `JdbcConfig` converter block | `./gradlew build -x test -x check` clean |
 | **1** ✅ | **The rename `control-plane` → `tenancy`** (§0): Java packages + modules, config + gateway wiring, `ALTER SCHEMA` migration, 22 seller-ui paths hoisted to constants, 15 doc files | The §7 completeness grep is empty; `/tenancy/api/v1/...` returns JSON not seller-ui HTML; a mid-flight outbox record survives the schema rename |
 | **2** ✅ | **Gateway resilience only**, still against tenancy (§3) | Stack up; **SIGTERM** tenancy; `/spg/**?store=&pod=` still routes for >5 min; restart → refresh |
 | **3** ✅ | **Security fixes in place**, before any move: `@PreAuthorize` on `OrgManagerController:75`, `RouterController:26`, `PodController:51`, both statistic APIs; restore the two commented-out guards; **fix `StoreRoleAccessChecker.isOrgAdmin`** to actually resolve store→org | Org 1 admin gets **403** on org 2's stores; a `ROLE_STORE_MODERATOR` gets 200 on READ, 403 on MANAGE |
@@ -486,8 +486,8 @@ cd store-core/seller-ui && npm run build                             # phases 1,
 Plus the error-handling grep gate over both trees: zero hits for `throws BaseException`, any category base, or
 `catch (BaseException)` + `switch (category())`.
 
-**Phase 1 completeness gate** — must return hits only in `.claude/plans/` history and
-`store-core/seller-ui/.angular/` cache:
+**Phase 1 completeness gate** — must return hits only in `` history and
+`../../store-core/seller-ui/.angular` cache:
 
 ```bash
 grep -rIn --exclude-dir=node_modules --exclude-dir=.angular --exclude-dir=.git --exclude-dir=build \
@@ -533,7 +533,7 @@ Re-prove this after phase 1, since every path moved.
    backfill must be `ON CONFLICT (id) DO NOTHING` inside a `to_regclass('org.pod') IS NOT NULL` guard (it must
    not resurrect a pod an operator deleted, and must not fail to parse once the table is gone), and must be
    **deleted in phase 7**. It reads another service's schema — declare it in the PR as a one-release-train
-   exception, or move it to an operator script under `extra/scripts/` carrying only `org_id`.
+   exception, or move it to an operator script under `../../extra/scripts` carrying only `org_id`.
 3. **The tenancy ⇄ pod-registry cycle.** Placement wants store counts, which tenancy owns. Making
    that synchronous inside placement creates a request cycle that deadlocks both thread pools under load.
    Counts stay event-derived with a scheduled reconcile — this is the single most tempting shortcut here.
@@ -542,7 +542,7 @@ Re-prove this after phase 1, since every path moved.
 5. **The local pod id `507f1f77bcf86cd799439011`** is hardcoded in `configure-domain.sh`,
    `store-pod-lcl-config.yml`, tenancy's `data.sql` and the demo store rows. A regenerated seed id breaks
    every local storefront and the failure presents as DNS.
-6. **`StoreRoleAccessChecker.isOrgAdmin` (phase 3) is in `store-commons/autoconfigure`** — shared by every
+6. **`StoreRoleAccessChecker.isOrgAdmin` (phase 3) is in `../../store-commons/autoconfigure`** — shared by every
    service. Tightening it will surface 403s wherever code currently relies on the permissive behaviour. Sweep
    all callers and QA each service's store screens, not just tenancy's.
 7. **The `backendServices` shadow.** Adding a route without the array entry returns seller-ui's shell HTML —

@@ -3,7 +3,7 @@
 
 # Typed service-to-service errors — the `-external-api` module as a client SDK
 
-Extends `.claude/plans/help-me-set-plan-curried-fountain.md`. That plan gave *locally raised* failures condition-named types and compiler-checked signatures. This one closes the same gap across an HTTP hop.
+Extends `help-me-set-plan-curried-fountain.md`. That plan gave *locally raised* failures condition-named types and compiler-checked signatures. This one closes the same gap across an HTTP hop.
 
 ## Context
 
@@ -253,7 +253,7 @@ Each later migration step then adds one catalog for the module's own `-external-
 
 **Unit.** Extend `RemoteProblemTranslatorTest` (5 existing cases, pure-unit, no HTTP): a registered code yields the named type with `remoteCode`/`remoteStatus`/params intact; an unregistered code still yields plain `RemoteServiceException`; an unparseable body still degrades. Add a registry test asserting the payment catalog is discovered via `ServiceLoader` from the classpath.
 
-**Round-trip — the gap that matters most.** *(Implemented: `TypedRemoteErrorRoundTripTest`, four cases, all passing.)* There is no test today that exercises `@HttpExchange` → error handler → carrier → caller. `MockRestServiceServer` is available transitively via `spring-boot-starter-test` in `store-commons/autoconfigure`; MockWebServer is not in the repo. Bind it to a `RestClient.Builder`, build a probe `@HttpExchange` interface through `WebClientsUtils.build(...)`, and assert:
+**Round-trip — the gap that matters most.** *(Implemented: `TypedRemoteErrorRoundTripTest`, four cases, all passing.)* There is no test today that exercises `@HttpExchange` → error handler → carrier → caller. `MockRestServiceServer` is available transitively via `spring-boot-starter-test` in `../../store-commons/autoconfigure`; MockWebServer is not in the repo. Bind it to a `RestClient.Builder`, build a probe `@HttpExchange` interface through `WebClientsUtils.build(...)`, and assert:
 - a 502 with `{"code":"PAYMENT.INITIATE.FAILED"}` → the call throws `PaymentGatewayRejectedException`, catchable by name;
 - an undeclared code → `UncheckedBaseException` still escapes (advice renders it);
 - connection refused → `PaymentApiUnavailableException`;
@@ -270,7 +270,7 @@ Each later migration step then adds one catalog for the module's own `-external-
 
 `./gradlew :store-commons:errors:build :store-commons:autoconfigure:build :store-pod:payment:payment-external-api:build :store-pod:checkout:checkout-service:build`, then `./gradlew build`.
 
-Two test-only Gradle additions were needed in `store-commons/autoconfigure`: `testImplementation project(':store-commons:commons')` (the custom argument resolvers reference its domain types, which are `compileOnly` there, so a client proxy cannot be invoked at test time without them) and `testImplementation libs.spring.webflux` (`WebClientsUtils` touches both client stacks). Neither changes what production consumers get.
+Two test-only Gradle additions were needed in `../../store-commons/autoconfigure`: `testImplementation project(':store-commons:commons')` (the custom argument resolvers reference its domain types, which are `compileOnly` there, so a client proxy cannot be invoked at test time without them) and `testImplementation libs.spring.webflux` (`WebClientsUtils` touches both client stacks). Neither changes what production consumers get.
 
 ---
 

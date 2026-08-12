@@ -1,13 +1,13 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AGENTS Code (AGENTS.ai/code) when working with code in this repository.
 
 ## Orientation
 
 `cvhome` is a multi-tenant e-commerce SaaS: Java 25 / Spring Boot microservices plus Angular and Next.js
 frontends, in one Gradle composite build. Java package root `com.asrevo.cvhome.*`.
 
-**Read the `project-structure` skill (`.claude/skills/project-structure/`) before navigating the repo or
+**Read the `project-structure` skill (`.AGENTS/skills/project-structure/`) before navigating the repo or
 deciding where new code belongs.** It is the authoritative map: the three trees (`store-commons/`,
 `store-core/`, `store-pod/`), every service with its port and purpose, the tenancy model (orgs / stores /
 pods), the `-commons`/`-core`/`-external-api`/`-service` module pattern, API and permission conventions,
@@ -121,7 +121,7 @@ What binds every change:
   with edits, branch first, then commit.
 - **`/go` ships the working tree** (branch if needed → commit → push → PR into `develop`, template filled,
   changelog label) and **`/reset` returns to a clean `develop`** without losing work. Both live in
-  `.claude/commands/`; prefer them over doing the sequence by hand.
+  `.AGENTS/commands/`; prefer them over doing the sequence by hand.
 - **PR body follows `.github/PULL_REQUEST_TEMPLATE.md`**: title `<type|area>: <what changed>`, then
   *Why* → *What* → *The parts that are not obvious* → *Deviations* → *Verification*, then the checklist with
   the untouched sections deleted. Label it before merge — `.github/release.yml` builds the changelog from
@@ -200,6 +200,6 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 
 ## Plans
 
-Implementation plans live in `.claude/plans/<kebab-case-name>.md`, in-repo so they travel with the branch and
+Implementation plans live in `.AGENTS/plans/<kebab-case-name>.md`, in-repo so they travel with the branch and
 any tool can read them. Use a descriptive name (`stripe-refund-flow.md`, not an auto-generated one). When
 asked to "create a plan" or entering plan mode, write the file there.

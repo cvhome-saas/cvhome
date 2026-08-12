@@ -41,8 +41,8 @@ consuming it through `billing-external-api`.
 
 ## 1. Modules
 
-New tree `store-core/billing/`, package root `com.asrevo.cvhome.billing.*`. Follows the standard split;
-copy `store-core/control-plane`'s module shapes (each library module is `build.gradle` + `lombok.config` +
+New tree `../../store-core/billing`, package root `com.asrevo.cvhome.billing.*`. Follows the standard split;
+copy `store-core/control-plane`'s module shapes (each library module is `build.gradle` + `../../lombok.config` +
 sources).
 
 ```
@@ -371,8 +371,8 @@ not `save`, which could become an `UPDATE`.
 
 ## 7. Registration (all mandatory — miss one and it is unreachable)
 
-1. **`settings.gradle`** — the four `'store-core:billing:billing-*'` entries.
-2. **`store-commons/autoconfigure/src/main/resources/common-config.yml`** — a `billing` block under
+1. **`../../settings.gradle`** — the four `'store-core:billing:billing-*'` entries.
+2. **`../../store-commons/autoconfigure/src/main/resources/common-config.yml`** — a `billing` block under
    `com.asrevo.cvhome.services`, key **== `spring.application.name`** (`server.port` resolves through it),
    `port: 8021` (free: 8000/8001/8010/8020 taken in the core band), `domain: ${…app.domain}`,
    `namespace: store-core.cvhome.lcl`, `gateway-service-name: store-core-gateway`.
@@ -383,7 +383,7 @@ not `save`, which could become an `UPDATE`.
    (`path("/billing/**")`, `stripPrefix(1).tokenRelay().preserveHostHeader()`, `uri("lb://billing")`) **and**
    `"billing"` in the `backendServices` array. That array is negated to build the seller-ui catch-all, so
    without the second edit every `/billing/**` call returns seller-ui's shell HTML.
-6. **`extra/scripts/run-lcl.sh`** — `"billing|:store-core:billing:billing-service|8021"` after control-plane,
+6. **`../../extra/scripts/run-lcl.sh`** — `"billing|:store-core:billing:billing-service|8021"` after control-plane,
    before gateway.
 7. **`configure-domain.sh`** — nothing; billing is reached by path, not its own hostname.
 8. **`application.yml`** — `name: billing`, imports `common-config.yml` + `plan-catalog.yml`, the store-core
@@ -422,7 +422,7 @@ Never hand-roll a `@ControllerAdvice`, argument resolver, JWT decoder or permiss
    `ManagerStoreDto`.
 6. **Layer (d).** `StoreEntitlements` + write-gate interceptor + quota calls, **one PR per pod service** so
    each is QA'd against a real store. Backfill the downgrade usage pre-check.
-7. **seller-ui.** Rewire `store-core/seller-ui/src/app/pages/subscription-and-usage/` from control-plane's
+7. **seller-ui.** Rewire `../../store-core/seller-ui/src/app/pages/subscription-and-usage` from control-plane's
    org endpoints to `/billing/**` per-store endpoints. Separate design.
 8. **Retire control-plane's org-level subscription** — delete `controlplane/subscription/**`, the
    `subscription` schema and the three modules, after migrating each org's plan onto its stores. Last.
@@ -441,7 +441,7 @@ Never hand-roll a `@ControllerAdvice`, argument resolver, JWT decoder or permiss
 ./gradlew :store-core:gateway:gateway-service:build              # phases 1 and 5 touch it
 ```
 
-Plus the error-handling grep gate over `store-core/billing` — zero hits for `throws BaseException` or any
+Plus the error-handling grep gate over `../../store-core/billing` — zero hits for `throws BaseException` or any
 category base, and no `catch (BaseException)` + `switch (category())`.
 
 **Stack:** `./extra/scripts/run-lcl.sh --list` shows `billing`; check `lsof -i :8000` first; background the

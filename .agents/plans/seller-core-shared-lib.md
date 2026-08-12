@@ -2,7 +2,7 @@
 
 ## Context
 
-`store-core/seller-ui` is a single-project Angular 20 CLI workspace: ~360 `.ts` files under `src/`, no
+`../../store-core/seller-ui` is a single-project Angular 20 CLI workspace: ~360 `.ts` files under `src/`, no
 barrels, no path aliases, every import a deep relative path (`../../../core/errors/api-error`). Domain
 logic — HTTP services, DTOs, the error stack, validators, table state — sits interleaved with Nebular
 components and facades in `src/app/pages/**`. Nothing is reusable outside this app, and the boundary
@@ -13,7 +13,7 @@ The goal: move everything that is **not** UI logic into a real Angular library a
 compiler-enforced boundary (it cannot import back into `src/app`).
 
 **Decisions locked with the user:**
-- Location: `projects/` inside the existing seller-ui workspace. No Gradle or `settings.gradle` changes.
+- Location: `projects/` inside the existing seller-ui workspace. No Gradle or `../../settings.gradle` changes.
 - Consumers: future Angular apps. The lib must be self-contained and ship as a real package.
 - Scope: core tier **and** all feature domain services + models. Components, facades, templates,
   routes, and `NotificationService` stay in the app.
@@ -290,6 +290,6 @@ edit as a second store to confirm the `store`/`pod` param plumbing survived Step
 ## Follow-ups (separate PRs, deliberately out of scope)
 
 1. Flip `strictNullChecks: true` in `tsconfig.lib.json` and fix the nullability the loose flags hide.
-2. Migrate `uaa-fe` (`store-core/uaa/src/main/resources/uaa-fe`) onto the lib — it duplicates
+2. Migrate `uaa-fe` (`../../store-core/uaa/src/main/resources/uaa-fe`) onto the lib — it duplicates
    `auth.service`, `error.service`, `roles.ts` and four guards today. It uses `ngx-toastr`, which is
    exactly why `NOTIFICATION_PORT` is a port and not a Nebular-bound service.

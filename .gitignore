@@ -48,3 +48,5 @@ bin/
 # Session ids are per-developer and expire; copy http-client.private.env.json.example to
 # http-client.private.env.json and paste your own. Never commit it.
 http-client.private.env.json
+/.codex/config.toml
+/.codex/hooks.json

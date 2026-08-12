@@ -5,13 +5,13 @@
 
 ## Context
 
-`.claude/plans/claude-plans-help-me-set-plan-curried-f-cached-grove.md` delivered typed s2s errors, but paid for them with a discovery mechanism that costs more than it earns.
+`claude-plans-help-me-set-plan-curried-f-cached-grove.md` delivered typed s2s errors, but paid for them with a discovery mechanism that costs more than it earns.
 
 To answer one question — *which error contract applies to this client?* — the codebase currently carries: a `META-INF/services` file per `-external-api` module, a `ServiceLoader` scan, a lazily-initialised `RemoteErrorRegistry` holder with duplicate-claim warnings and an `EMPTY` fallback, and an `apis()` method on every catalog that exists **solely** to let the registry key by interface. That machinery is justified when registration must be implicit — a plugin classpath, an open set of providers.
 
 This is not that. There are **11 client construction sites** in the whole repo, all in five `ClientsConfig` classes plus `StorePodClientFactory`, and exactly **one** has an error contract today. The plan's own note admits the design was forced: catalogs are keyed by interface because the URI is unreliable, which is a workaround for the fact that nobody was passing the catalog in the first place — even though the call site knows both the interface and the contract.
 
-The cost is not just lines. Registration is invisible: a typo in the services file, or a missing one, degrades silently to `UnmappedRemoteFailureException` with nothing at compile time to catch it. And the wiring is untestable except through the classpath — `store-commons/autoconfigure` needs its own test-scoped services file and a `probe/` fixture package purely to exercise a mechanism that a constructor argument would make trivial.
+The cost is not just lines. Registration is invisible: a typo in the services file, or a missing one, degrades silently to `UnmappedRemoteFailureException` with nothing at compile time to catch it. And the wiring is untestable except through the classpath — `../../store-commons/autoconfigure` needs its own test-scoped services file and a `probe/` fixture package purely to exercise a mechanism that a constructor argument would make trivial.
 
 **Outcome:** the catalog is passed to `WebClientsUtils.build(...)`. `RemoteErrorRegistry`, both services files, and `apis()` are deleted. Error handling for a client is consolidated into one named class, `S2sErrorHandler`, instead of being spread across an interceptor lambda, a status-handler class, and a proxy helper.
 
