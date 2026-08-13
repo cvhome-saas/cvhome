@@ -25,15 +25,14 @@ store-pod/
 
 ## The 4-module pattern in detail
 
-Using `merchant` as the worked example. The same shape holds for `catalog`, `checkout`, `payment`.
+The same shape holds for `merchant`, `catalog`, `checkout`, and `payment`.
 
 ### `-commons` — domain model (leaf)
 
 JPA-annotated entities and read/write DTOs. Applies `java-library`; JPA/Hibernate/Lombok are `compileOnly` so
 the module stays dependency-light. Depends only on `store-pod:commons:store-commons` and `reference-commons`.
 
-Evidence: `MerchantStoreEntity`, `ContentEntity`, `ReadableMerchantStore`, `PersistableMerchantStore`,
-`ReadableContentFull`.
+Evidence: `ReadableMerchantStore` / `PersistableMerchantStore`, catalog's product DTOs, and checkout's order DTOs.
 
 The `Readable*` / `Persistable*` DTO pair is a repo-wide convention: `Readable*` goes out to clients,
 `Persistable*` comes in from them, and the entity is neither.
@@ -43,9 +42,9 @@ The `Readable*` / `Persistable*` DTO pair is a repo-wide convention: `Readable*`
 Repositories, services, facades, and populators that map entity ↔ DTO. Depends on its own `-commons` plus
 `store-cms-commons`.
 
-Evidence: `MerchantRepository`, `ContentRepository`/`ContentRepositoryImpl`, `MerchantStoreService`/`Impl`,
-`ContentService`/`Impl`, `StoreFacade`, `ContentFacade`, `ReadableMerchantStorePopulator`,
-`PersistableMerchantStorePopulator`.
+Evidence: `MerchantRepository`, `MerchantStoreService`/`Impl`, `StoreFacade`,
+`ReadableMerchantStorePopulator`, and `PersistableMerchantStorePopulator`. Content has the equivalent classes in
+its own `content-core` module.
 
 **So: `-commons` = the data model, `-core` = the logic that operates on it.**
 
@@ -134,7 +133,8 @@ Caddy, not Java. Responsibilities, from the `Caddyfile`:
 
    | Path | → | Notes |
    |---|---|---|
-   | `/merchant*` | `merchant:8120` | `handle_path` (prefix stripped) |
+   | `/merchant*` | `merchant:8120` | `handle_path` (prefix stripped; legacy content subpaths are routed to content) |
+   | `/content*` | `content:8121` | `handle_path` |
    | `/catalog*` | `catalog:8122` | `handle_path` |
    | `/checkout*` | `checkout:8123` | `handle_path` |
    | `/payment*` | `payment:8125` | `handle_path` |

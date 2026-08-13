@@ -137,3 +137,41 @@ blocks in `content-api.http` now send `pod={{POD_ID}}`; canonical and compatibil
 - Landing-ui dev mode logs an existing Next.js `legacyBehavior` deprecation; CMS rendering still succeeded.
 - Live schema inspection hit PostgreSQL's local `too many clients` limit; automated schema assertions remain
   the evidence for table ownership in this run.
+
+## MER — Merchant modernization follow-up
+
+### MER-01 — Canonical and compatibility store reads agree · critical · [not verified]
+
+- **Steps** — run the first two requests in `merchant-store-api.http` through the platform gateway.
+- **Expect** — both return the same store JSON; landing-ui uses the canonical query-scoped request.
+
+### MER-02 — Path/query tenant mismatch is rejected · critical · [unit only]
+
+- **Steps** — run the mismatch request in `merchant-store-api.http`.
+- **Expect** — 400 Problem Detail with `MERCHANT.STORE.CONTEXT_MISMATCH`; no other store is read.
+- **Observed** — covered by the merchant module build and typed exception contract; gateway execution remains.
+
+### MER-03 — Updates cannot select a tenant from the request body · critical · [not verified]
+
+- **Setup** — authenticate for store 1 and submit an update whose body id is store 2.
+- **Steps** — read both stores before and after the request.
+- **Expect** — only the query-scoped store can be addressed; store 2 is unchanged.
+
+### MER-04 — Store-core read uses the permission evaluator · critical · [not verified]
+
+- **Steps** — read a store through tenancy as its store-core service principal, then repeat without an authorized
+  principal.
+- **Expect** — the service principal succeeds through `STORE-POD.MERCHANT.READ`; the unauthorized caller gets 403.
+
+### MER-05 — Branding metadata follows successful storage · high · [unit only]
+
+- **Steps** — force asset storage to fail during a logo, banner, or slider upload.
+- **Expect** — the named storage error is returned and the prior database metadata remains unchanged.
+- **Observed** — implementation orders storage before persistence; live MinIO failure injection remains.
+
+### MER-06 — Merchant schema contains only merchant data · high · [unit only]
+
+- **Steps** — start the merchant integration test against a fresh PostgreSQL container and inspect its schema.
+- **Expect** — store, language, slider, social-link, and domain tables exist; `sm_sequencer` does not. Enum and
+  uniqueness constraints reject invalid or duplicate data.
+- **Observed** — merchant context/integration test starts successfully against the revised DDL.

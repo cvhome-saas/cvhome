@@ -102,8 +102,7 @@ public class PermissionAccessChecker {
         }
     }
 
-    @SuppressWarnings("java:S1144")
-    private boolean hasReadAccessOnStore(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
+    public boolean hasReadAccessOnStore(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
         if (storeRoleAccessChecker.isOrgAdmin(authentication, requestedStoreId, pod)) {
             return true;
         } else if (storeRoleAccessChecker.isStoreAdmin(authentication, requestedStoreId, pod)) {

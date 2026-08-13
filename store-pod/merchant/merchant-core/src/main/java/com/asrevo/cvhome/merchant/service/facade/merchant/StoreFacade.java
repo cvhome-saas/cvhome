@@ -60,13 +60,14 @@ public interface StoreFacade {
      */
     SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage);
 
-    void update(PersistableMerchantStore store) throws MerchantStoreNotFoundException;
+    void update(StoreMerchantId storeMerchantId, PersistableMerchantStore store)
+            throws MerchantStoreNotFoundException;
 
-    void addLogo(String s, InputContentFile content) throws AssetUploadFailedException;
+    void addLogo(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
 
-    void addBanner(String s, InputContentFile content) throws AssetUploadFailedException;
+    void addBanner(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
 
-    void addSlider(String s, InputContentFile content) throws AssetUploadFailedException;
+    void addSlider(StoreMerchantId storeMerchantId, InputContentFile content) throws AssetUploadFailedException;
 
     void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks);
 
