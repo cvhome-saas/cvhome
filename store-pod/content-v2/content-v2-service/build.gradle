@@ -1,0 +1,67 @@
+plugins {
+    alias(libs.plugins.java.application.conventions)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.hibernate.orm)
+}
+
+group = 'com.asrevo.cvhome'
+
+springBoot {
+    buildInfo()
+}
+
+bootBuildImage {
+    environment["BP_JVM_JLINK_ENABLED"] = "true"
+    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client " +
+            "--add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
+    imageName = createImageName("store-pod/content-v2", project.version)
+    tags = createImageTags("store-pod/content-v2", project.version)
+    docker {
+        publishRegistry {
+            url = System.getenv("REGISTRY")
+            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
+            password = System.getenv("ECR_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation platform(libs.spring.cloud.bom)
+    implementation platform(libs.opentelemetry.instrumentation.bom)
+    implementation libs.spring.cloud.starter.loadbalancer
+    implementation libs.spring.boot.starter.web
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.actuator
+    runtimeOnly libs.micrometer.registry.prometheus
+    implementation libs.spring.boot.starter.restclient
+    implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.oauth2.client
+    implementation libs.spring.boot.starter.security.oauth2.resource.server
+    implementation libs.spring.boot.starter.data.jpa
+    implementation libs.namastack.outbox.starter.jpa
+    runtimeOnly libs.postgresql
+
+    implementation libs.spring.boot.starter.opentelemetry
+    implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
+    implementation libs.aws.sdk.s3
+    implementation libs.caffeine
+
+    implementation project(':store-pod:content-v2:content-v2-core')
+    implementation project(':store-pod:content-v2:content-v2-events')
+    implementation project(':store-pod:merchant:merchant-external-api')
+    implementation project(':store-core:billing:billing-external-api')
+    implementation project(':store-commons:autoconfigure')
+    implementation project(':store-commons:ecs-commons:fargate-task-info')
+    implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testImplementation libs.spring.boot.starter.test
+    testImplementation libs.spring.security.test
+    testImplementation libs.spring.boot.testcontainers
+    testImplementation libs.testcontainers.junit.jupiter
+    testImplementation libs.testcontainers.postgresql
+    testImplementation libs.testcontainers.minio
+    testRuntimeOnly libs.junit.platform.launcher
+}

@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: content
+  config:
+    import: "classpath:common-config.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-pod-507f1f77@service.store-pod.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_pod
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:init-sql/schema.sql
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${spring.application.name}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 52MB
+      file-size-threshold: 1MB

@@ -1,0 +1,64 @@
+### Create two-level menu
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/menus?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "content": {
+    "code": "main-menu",
+    "type": "MENU",
+    "name": "Main menu",
+    "title": "Main menu",
+    "description": "Primary navigation",
+    "slug": "main-menu",
+    "noIndex": true
+  },
+  "handle": "main",
+  "items": [{
+    "label": "Shop",
+    "targetKind": "URL",
+    "targetValue": "/shop",
+    "openNewTab": false,
+    "visible": true,
+    "loginRequired": false,
+    "children": [{
+      "label": "Account",
+      "targetKind": "URL",
+      "targetValue": "/account",
+      "openNewTab": false,
+      "visible": true,
+      "loginRequired": true,
+      "children": []
+    }]
+  }]
+}
+
+> {% client.global.set("MENU_ID", response.body.content.id); %}
+
+### Read normalized menu
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/menus?store={{STORE_ID}}&lang={{LANG}}&handle=main
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+### Excessive depth returns 422 and leaves the old tree intact
+PUT {{SELLER_UI_URL}}/spg/content/api/v2/private/content/menus/{{MENU_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "content": {"code":"main-menu","type":"MENU","name":"Main","noIndex":true},
+  "handle": "main",
+  "items": [{
+    "label":"One","targetKind":"URL","targetValue":"/one","openNewTab":false,"visible":true,
+    "loginRequired":false,"children":[{
+      "label":"Two","targetKind":"URL","targetValue":"/two","openNewTab":false,"visible":true,
+      "loginRequired":false,"children":[{
+        "label":"Three","targetKind":"URL","targetValue":"/three","openNewTab":false,"visible":true,
+        "loginRequired":false,"children":[]
+      }]
+    }]
+  }]
+}
+
+### Cross-store menu lookup is hidden
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/menus?store={{STORE_ID_2}}&lang={{LANG}}&handle=main
+Cookie: SESSION={{SELLER_SESSION_ID}}

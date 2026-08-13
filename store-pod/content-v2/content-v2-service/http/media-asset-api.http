@@ -1,0 +1,19 @@
+### upload an image through both gateways
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/media/assets?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: multipart/form-data; boundary=ContentV2Boundary
+
+--ContentV2Boundary
+Content-Disposition: form-data; name="file"; filename="sample.svg"
+Content-Type: image/svg+xml
+
+< ./fixtures/sample.svg
+--ContentV2Boundary--
+
+### list media for the first store
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/media/assets?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### prove media listing is store scoped
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/media/assets?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

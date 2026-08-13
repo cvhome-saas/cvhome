@@ -1,0 +1,41 @@
+### Published page with public cache headers
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/pages/about?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+> {% client.global.set("CONTENT_ETAG", response.headers.valueOf("ETag")); %}
+
+### Conditional page request returns 304
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/pages/about?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+If-None-Match: {{CONTENT_ETAG}}
+
+### Published post
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/posts/welcome?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Effective banners
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=HOME_HERO&country=SA&authenticated=false
+
+### FAQ JSON-LD
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/faq/{{FAQ_GROUP_ID}}?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Published menu
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/menus/main?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Active privacy policy
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/policies/PRIVACY?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Published content search
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/search?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&query=shipping&limit=25
+
+### Typo-tolerant published content search
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/search?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&query=shiping&limit=25
+
+### Missing locale falls back with explicit metadata
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/pages/about?store={{STORE_ID}}&pod={{POD_ID}}&lang=ar
+
+### Published summary
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/summary?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Sitemap
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/sitemap.xml?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Second store cannot see first-store published routes
+GET {{SELLER_UI_URL}}/spg/content/api/v2/storefront/pages/about?store={{STORE_ID_2}}&pod={{POD_ID}}&lang={{LANG}}

@@ -1,0 +1,38 @@
+### Create policy version
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/policies?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "content": {
+    "code": "privacy-1-0",
+    "type": "POLICY",
+    "name": "Privacy policy",
+    "title": "Privacy policy",
+    "description": "Policy body",
+    "slug": "privacy",
+    "noIndex": false
+  },
+  "policyType": "PRIVACY",
+  "policyVersion": "1.0",
+  "effectiveDate": "2026-08-13",
+  "acceptanceRequired": true,
+  "jurisdiction": "SA",
+  "displayLocations": ["FOOTER", "CHECKOUT"]
+}
+
+> {% client.global.set("POLICY_ID", response.body.content.id); client.global.set("POLICY_VERSION", response.body.content.version); %}
+
+### Publish policy version
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/policies/{{POLICY_ID}}/publish?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SELLER_SESSION_ID}}
+If-Match: {{POLICY_VERSION}}
+
+### Re-publishing an immutable version returns 422
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/policies/{{POLICY_ID}}/publish?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SELLER_SESSION_ID}}
+If-Match: {{POLICY_VERSION}}
+
+### List policy version history
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/policies?store={{STORE_ID}}&lang={{LANG}}&type=PRIVACY
+Cookie: SESSION={{SELLER_SESSION_ID}}

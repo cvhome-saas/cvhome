@@ -1,0 +1,52 @@
+### create a draft page
+# @name createContent
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/items?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "v2-about",
+  "type": "PAGE",
+  "name": "About V2",
+  "title": "About V2",
+  "description": "First V2 content item",
+  "slug": "about-v2",
+  "noIndex": false
+}
+
+> {%
+    client.global.set("CONTENT_V2_ID", response.body.id);
+    client.global.set("CONTENT_V2_VERSION", response.body.version);
+%}
+
+### read the content item
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/items/{{CONTENT_V2_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### update using optimistic version
+PATCH {{SELLER_UI_URL}}/spg/content/api/v2/private/content/items/{{CONTENT_V2_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+If-Match: {{CONTENT_V2_VERSION}}
+Content-Type: application/json
+
+{
+  "code": "v2-about",
+  "type": "PAGE",
+  "name": "About V2 updated",
+  "title": "About V2 updated",
+  "description": "Updated V2 content item",
+  "slug": "about-v2",
+  "noIndex": false
+}
+
+### cross-store lookup does not reveal the item
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/items/{{CONTENT_V2_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### stale version is rejected
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/items/{{CONTENT_V2_ID}}/lifecycle/PUBLISHED?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+If-Match: -1
+Content-Type: application/json
+
+{}

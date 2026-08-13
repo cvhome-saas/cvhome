@@ -1,0 +1,26 @@
+### create a post with derived reading time
+# @name createPost
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/posts?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "content": {
+    "code": "v2-first-post",
+    "type": "POST",
+    "name": "First V2 post",
+    "title": "First V2 post",
+    "description": "This post demonstrates the V2 editorial model and derived reading time.",
+    "slug": "first-v2-post",
+    "noIndex": false
+  },
+  "excerpt": "The first editorial post in Content V2.",
+  "author": "HTTP tester",
+  "featured": true
+}
+
+> {% client.global.set("CONTENT_V2_POST_ID", response.body.content.id); %}
+
+### read the post
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/posts/{{CONTENT_V2_POST_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

@@ -1,0 +1,32 @@
+### create a page with typed sanitized blocks
+# @name createPage
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/pages?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "content": {
+    "code": "v2-landing",
+    "type": "PAGE",
+    "name": "V2 landing",
+    "title": "V2 landing",
+    "slug": "v2-landing",
+    "noIndex": false
+  },
+  "template": "LANDING",
+  "showInSitemap": true,
+  "blocks": [
+    {"type": "RICH_TEXT", "html": "<p>Hello <strong>V2</strong><script>bad()</script></p>"},
+    {"type": "CTA", "label": "Shop", "url": "/products"}
+  ]
+}
+
+> {% client.global.set("CONTENT_V2_PAGE_ID", response.body.content.id); %}
+
+### read the page
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/pages/{{CONTENT_V2_PAGE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### cross-store page lookup does not reveal the page
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/pages/{{CONTENT_V2_PAGE_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

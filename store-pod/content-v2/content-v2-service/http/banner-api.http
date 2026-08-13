@@ -1,0 +1,47 @@
+### Create a banner draft
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/banners?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "content": {
+    "code": "summer-hero",
+    "type": "BANNER",
+    "name": "Summer hero",
+    "title": "Summer collection",
+    "description": "Explore the summer collection",
+    "slug": "summer-hero",
+    "noIndex": true
+  },
+  "placement": "HOME_HERO",
+  "position": 0,
+  "targetKind": "URL",
+  "targetValue": "/summer",
+  "backgroundColor": "#FFFFFF",
+  "foregroundColor": "#111111",
+  "loginTarget": "ANY",
+  "countryCodes": ["SA"],
+  "artwork": {
+    "desktopMediaId": null,
+    "mobileMediaId": null,
+    "altText": "Summer collection"
+  }
+}
+
+> {% client.global.set("BANNER_ID", response.body.content.id); client.global.set("BANNER_VERSION", response.body.content.version); %}
+
+### List placement in deterministic order
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/banners?store={{STORE_ID}}&lang={{LANG}}&placement=HOME_HERO
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+### Publication without default-language desktop artwork returns 422
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/banners/{{BANNER_ID}}/lifecycle/PUBLISHED?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+If-Match: {{BANNER_VERSION}}
+
+{}
+
+### Cross-store lookup does not expose the banner
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/banners?store={{STORE_ID_2}}&lang={{LANG}}&placement=HOME_HERO
+Cookie: SESSION={{SELLER_SESSION_ID}}

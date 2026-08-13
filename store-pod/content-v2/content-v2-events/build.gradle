@@ -1,0 +1,11 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-pod:content-v2:content-v2-commons')
+    api libs.namastack.outbox.api
+    compileOnly libs.spring.data.commons
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

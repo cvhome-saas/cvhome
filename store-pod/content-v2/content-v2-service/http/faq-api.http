@@ -1,0 +1,52 @@
+### Create FAQ group
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/faq/groups?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "code": "orders",
+  "name": "Orders",
+  "position": 0
+}
+
+> {% client.global.set("FAQ_GROUP_ID", response.body.id); %}
+
+### Create FAQ entry
+POST {{SELLER_UI_URL}}/spg/content/api/v2/private/content/faq?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "content": {
+    "code": "faq-track-order",
+    "type": "FAQ",
+    "name": "How can I track my order?",
+    "title": "How can I track my order?",
+    "description": "Open your account and select the order.",
+    "slug": "track-order",
+    "noIndex": false
+  },
+  "groupId": {{FAQ_GROUP_ID}},
+  "position": 0,
+  "references": [{"kind": "PAGE", "value": "orders"}]
+}
+
+> {% client.global.set("FAQ_ID", response.body.content.id); %}
+
+### List group entries
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/faq?store={{STORE_ID}}&lang={{LANG}}&groupId={{FAQ_GROUP_ID}}
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+### Atomic reorder — duplicate membership returns 422
+PUT {{SELLER_UI_URL}}/spg/content/api/v2/private/content/faq/order?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SELLER_SESSION_ID}}
+
+{
+  "groupId": {{FAQ_GROUP_ID}},
+  "orderedFaqIds": [{{FAQ_ID}}, {{FAQ_ID}}]
+}
+
+### Second store cannot address the first store's group
+GET {{SELLER_UI_URL}}/spg/content/api/v2/private/content/faq?store={{STORE_ID_2}}&lang={{LANG}}&groupId={{FAQ_GROUP_ID}}
+Cookie: SESSION={{SELLER_SESSION_ID}}

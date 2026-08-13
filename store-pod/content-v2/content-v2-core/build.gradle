@@ -1,0 +1,21 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-pod:content-v2:content-v2-commons')
+    api project(':store-pod:content-v2:content-v2-events')
+    implementation libs.jackson.databind
+    implementation libs.apache.tika.core
+    implementation libs.pdfbox
+    implementation libs.twelvemonkeys.imageio.core
+    implementation libs.twelvemonkeys.imageio.jpeg
+    implementation libs.owasp.java.html.sanitizer
+    implementation libs.aws.sdk.s3
+    implementation project(':store-core:billing:billing-external-api')
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
+}
