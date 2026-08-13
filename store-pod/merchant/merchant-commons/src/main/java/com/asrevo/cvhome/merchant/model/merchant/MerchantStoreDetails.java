@@ -17,11 +17,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class MerchantStoreEntity extends MerchantStorePricingBase implements Serializable {
+public class MerchantStoreDetails extends MerchantStorePricingBase implements Serializable {
 
-    /**
-     *
-     */
     @Serial
     private static final long serialVersionUID = 1L;
 

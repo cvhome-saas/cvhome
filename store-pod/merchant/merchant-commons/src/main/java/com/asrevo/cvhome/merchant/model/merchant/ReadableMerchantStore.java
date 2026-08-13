@@ -18,7 +18,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadableMerchantStore extends MerchantStoreEntity implements ReadableAuditable, Serializable {
+public class ReadableMerchantStore extends MerchantStoreDetails implements ReadableAuditable, Serializable {
 
     /**
      *

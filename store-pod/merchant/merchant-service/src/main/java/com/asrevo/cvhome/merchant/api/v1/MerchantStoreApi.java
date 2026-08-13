@@ -30,6 +30,7 @@ import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.errors.DefaultStoreNotRemovableException;
 import com.asrevo.cvhome.merchant.errors.DuplicateMerchantStoreException;
+import com.asrevo.cvhome.merchant.errors.MerchantStoreContextMismatchException;
 import com.asrevo.cvhome.merchant.errors.MerchantStoreNotFoundException;
 import com.asrevo.cvhome.merchant.errors.UploadedFileUnreadableException;
 import com.asrevo.cvhome.merchant.model.merchant.PersistableMerchantStore;
@@ -70,10 +71,14 @@ public class MerchantStoreApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-    public ReadableMerchantStore store(@PathVariable String code,
-                                       @RequestParam(value = "lang", required = false) String lang)
-            throws MerchantStoreNotFoundException {
-        return storeFacade.getByMerchantStoreId(new StoreMerchantId(code), new LanguageCode(lang));
+    public ReadableMerchantStore store(@PathVariable String code, StoreMerchantId merchantStore,
+                                       LanguageCode language)
+            throws MerchantStoreNotFoundException, MerchantStoreContextMismatchException {
+        StoreMerchantId pathStore = new StoreMerchantId(code);
+        if (!pathStore.equals(merchantStore)) {
+            throw MerchantStoreContextMismatchException.of(pathStore, merchantStore);
+        }
+        return storeFacade.getByMerchantStoreId(merchantStore, language);
     }
 
     @GetMapping(value = {"/private/store"}, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,7 +88,7 @@ public class MerchantStoreApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
-    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*') or hasAnyAuthority('SCOPE_STORE_CORE')")
+    @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.READ')")
     public ReadableMerchantStore storeFull(StoreMerchantId merchantStore, LanguageCode language)
             throws MerchantStoreNotFoundException {
         return storeFacade.getByMerchantStoreId(merchantStore, language);
@@ -120,7 +125,7 @@ public class MerchantStoreApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
     public void update(StoreMerchantId merchantStore, @Valid @RequestBody PersistableMerchantStore store)
             throws MerchantStoreNotFoundException {
-        storeFacade.update(store);
+        storeFacade.update(merchantStore, store);
     }
 
     @ResponseStatus(HttpStatus.OK)

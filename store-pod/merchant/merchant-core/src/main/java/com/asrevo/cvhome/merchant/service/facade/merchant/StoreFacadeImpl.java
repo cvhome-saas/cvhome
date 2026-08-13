@@ -110,8 +110,9 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     @Override
-    public void update(PersistableMerchantStore store) throws MerchantStoreNotFoundException {
-        MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, new StoreMerchantId(store.getId()),
+    public void update(StoreMerchantId storeMerchantId, PersistableMerchantStore store)
+            throws MerchantStoreNotFoundException {
+        MerchantStore mStore = mergePersistableMerchantStoreToMerchantStore(store, storeMerchantId,
                 LanguageCode.defaultLanguage());
 
         updateMerchantStore(mStore);
@@ -163,18 +164,18 @@ public class StoreFacadeImpl implements StoreFacade {
     @Override
     public void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
         MerchantStore store = getByMerchantStoreId(storeMerchantId);
+        addLogo(storeMerchantId, cmsContentImage);
         store.setStoreLogo(cmsContentImage.getFileName());
         saveMerchantStore(store);
-        addLogo(storeMerchantId.getId(), cmsContentImage);
     }
 
     @SneakyThrows
     @Override
     public void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
         MerchantStore store = getByMerchantStoreId(storeMerchantId);
+        addBanner(storeMerchantId, cmsContentImage);
         store.setStoreBanner(cmsContentImage.getFileName());
         saveMerchantStore(store);
-        addBanner(storeMerchantId.getId(), cmsContentImage);
     }
 
     @SneakyThrows
@@ -189,31 +190,31 @@ public class StoreFacadeImpl implements StoreFacade {
                 .orElse(0);
         SliderImage sliderImage = new SliderImage(nextPriority, cmsContentImage.getFileName());
         sliderImages.add(sliderImage);
+        addSlider(storeMerchantId, cmsContentImage);
         store.setSliderImages(sliderImages);
         saveMerchantStore(store);
-        addSlider(storeMerchantId.getId(), cmsContentImage);
         return sliderImage;
     }
 
     @Override
-    public void addLogo(String merchantStoreCode, InputContentFile cmsContentImage)
+    public void addLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
             throws AssetUploadFailedException {
         cmsContentImage.setFileContentType(FileContentType.LOGO);
-        addImageToAssets(merchantStoreCode, cmsContentImage);
+        addImageToAssets(storeMerchantId, cmsContentImage);
     }
 
     @Override
-    public void addBanner(String merchantStoreCode, InputContentFile cmsContentImage)
+    public void addBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
             throws AssetUploadFailedException {
         cmsContentImage.setFileContentType(FileContentType.BANNER);
-        addImageToAssets(merchantStoreCode, cmsContentImage);
+        addImageToAssets(storeMerchantId, cmsContentImage);
     }
 
     @Override
-    public void addSlider(String merchantStoreCode, InputContentFile cmsContentImage)
+    public void addSlider(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
             throws AssetUploadFailedException {
         cmsContentImage.setFileContentType(FileContentType.SLIDER);
-        addImageToAssets(merchantStoreCode, cmsContentImage);
+        addImageToAssets(storeMerchantId, cmsContentImage);
     }
 
     @Override
@@ -226,20 +227,20 @@ public class StoreFacadeImpl implements StoreFacade {
         merchantStoreService.updateSliderImages(id, sliderImages);
     }
 
-    private void addImageToAssets(String merchantStoreCode, InputContentFile contentImage)
+    private void addImageToAssets(StoreMerchantId storeMerchantId, InputContentFile contentImage)
             throws AssetUploadFailedException {
 
         if (contentImage.getFile() == null) {
             throw new IllegalArgumentException("File is null");
         }
         try {
-            log.info("Adding content image for merchant id {}", merchantStoreCode);
+            log.info("Adding content image for merchant id {}", storeMerchantId);
 
             String p = contentImage.getPath();
             Optional<String> path = Optional.ofNullable(p);
             // The blanket catch that used to sit here re-flattened AssetUploadFailedException, which already names the
             // key that failed, back into an untyped ServiceException.
-            assetsManager.addFile(merchantStoreCode, path, contentImage);
+            assetsManager.addFile(storeMerchantId.getId(), path, contentImage);
 
         } finally {
             try {

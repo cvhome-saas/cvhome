@@ -10,7 +10,7 @@ export class StoreService {
      */
     public static getStore = async (storeContext: StoreContext): Promise<Store> => {
         return apiFetch<Store>(
-            `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/store/${storeContext.store}?store=${storeContext.store}&lang=${storeContext.locale}`,
+            `${storeBaseServiceUrl('merchant', storeContext)}/api/v1/store?store=${storeContext.store}&lang=${storeContext.locale}`,
             get());
     }
 }

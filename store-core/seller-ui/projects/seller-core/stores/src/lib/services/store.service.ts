@@ -76,7 +76,7 @@ export class StoreService {
   }
 
   updateStore(store: PersistableMerchantStore): Observable<void> {
-    return this.crudService.put(`/spg/merchant/api/v1/private/store`, store);
+    return this.crudService.put(`/spg/merchant/api/v1/private/store`, store, {store: store.id});
   }
 
   // PAGE CONTENT
@@ -143,7 +143,7 @@ export class StoreService {
   }
 
   updateStoreSocialLinks(storeId: string, request: {socialLinks: SocialLink[]} & Record<string, unknown>): Observable<void> {
-    return this.crudService.put(`/spg/merchant/api/v1/private/store/social-links`, request);
+    return this.crudService.put(`/spg/merchant/api/v1/private/store/social-links`, request, {store: storeId});
   }
 
   getSupportedSocialLoginProviders(): Observable<string[]> {

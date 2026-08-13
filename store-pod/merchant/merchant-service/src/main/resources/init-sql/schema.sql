@@ -1,9 +1,4 @@
 create schema if not exists merchant;
-create table if not exists merchant.sm_sequencer
-(
-    seq_name  varchar(255) not null primary key,
-    seq_count bigint
-);
 create table if not exists merchant.merchant_store
 (
     store_merchant_id                 varchar(50)  not null primary key,
@@ -17,8 +12,14 @@ create table if not exists merchant.merchant_store
     invoice_template                  varchar(25),
     lineage                           varchar(255),
     org                               varchar(255) not null,
-    theme                             varchar(25)  not null,
-    color_theme                       varchar(25)  not null,
+    theme                             varchar(25)  not null
+        check (theme in ('BASIS','MODERN','JEWELERY','BEAUTY','FURNITURE','SPORTS','ELECTRONICS','FOOD','GLASSES',
+                         'COSMETICS','WATCHES','BABY','TOOLS')),
+    color_theme                       varchar(25)  not null
+        check (color_theme in ('LIGHT','DARK','NATURE','OCEAN','MIDNIGHT','FOREST_WHISPER','DESERT_MIRAGE',
+                               'MIDNIGHT_DUSK','ROSE','LAVENDER','AURORA_LIGHTS','CYBERPUNK','AUTUMN_HARVEST',
+                               'CYBER_NEON','SUNSET','FOREST','DESERT','SKY','EARTH','FIRE','ICE','BLOSSOM','GOLDEN',
+                               'GRAPE','PEACH','MINT','SAND','RAINBOW','NEON','PASTEL')),
     seizeunitcode                     varchar(5),
     store_email                       varchar(60)  not null,
     store_logo                        varchar(100),
@@ -51,20 +52,22 @@ create table if not exists merchant.merchant_slider_images
     store_merchant_id varchar(50)  not null
         constraint fk6qg1wx3ow5v07pswgwf8dbguf references merchant.merchant_store,
     priority          int,
-    name              varchar(100) not null
+    name              varchar(100) not null,
+    constraint merchant_slider_images_store_priority_unique unique (store_merchant_id, priority)
 );
 create table if not exists merchant.social_links
 (
     store_merchant_id varchar(50) not null
         constraint fkfh74uew5thxc4fpf90vs8ebsy references merchant.merchant_store,
     provider          varchar(10),
-    url               varchar(100)
+    url               varchar(100),
+    constraint social_links_store_provider_unique unique (store_merchant_id, provider)
 );
 
 create table if not exists merchant.store_domains
 (
     store_merchant_id varchar(50) not null,
-    domain            varchar(100),
-    domain_type       varchar(15) not null,
+    domain            varchar(100) not null unique,
+    domain_type       varchar(15) not null check (domain_type in ('SUB_DOMAIN','CUSTOM_DOMAIN')),
     constraint FKpw0mfwlhf9uay27vw3sbal8ao foreign key (store_merchant_id) references merchant.merchant_store
 );

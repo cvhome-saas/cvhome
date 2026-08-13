@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.asrevo.cvhome.commons.domain.Domain;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.errors.MerchantStoreNotFoundException;
 import com.asrevo.cvhome.merchant.service.AskTlsService;
 import com.asrevo.cvhome.merchant.service.LookupDomainHeadersService;
-import com.asrevo.cvhome.merchant.service.RoutingService;
+import com.asrevo.cvhome.merchant.services.merchant.MerchantRoutingService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RouterController {
 
-    public final RoutingService routingService;
+    private final MerchantRoutingService merchantRoutingService;
 
     private final AskTlsService askTlsService;
 
@@ -54,22 +55,23 @@ public class RouterController {
     @GetMapping("private/allocates")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public Set<ManagerStoreDomain> allocatedDomains(StoreMerchantId merchantStore) {
-        return routingService.domains(merchantStore);
+    public Set<ManagerStoreDomain> allocatedDomains(StoreMerchantId merchantStore)
+            throws MerchantStoreNotFoundException {
+        return merchantRoutingService.domains(merchantStore);
     }
 
     @PostMapping("private/allocate")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void allocate(StoreMerchantId merchantStore, Domain domain) {
-        routingService.addDomain(merchantStore, domain);
+    public void allocate(StoreMerchantId merchantStore, Domain domain) throws MerchantStoreNotFoundException {
+        merchantRoutingService.addDomain(merchantStore, domain);
     }
 
     @DeleteMapping("private/remove")
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.MERCHANT.*')")
-    public void remove(StoreMerchantId merchantStore, Domain domain) {
-        routingService.removeDomain(merchantStore, domain);
+    public void remove(StoreMerchantId merchantStore, Domain domain) throws MerchantStoreNotFoundException {
+        merchantRoutingService.removeDomain(merchantStore, domain);
     }
 
 }

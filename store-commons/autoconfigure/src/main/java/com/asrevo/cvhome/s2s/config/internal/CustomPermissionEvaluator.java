@@ -20,6 +20,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String STORE_CREATE = "STORE-POD.MERCHANT.STORE-CREATE";
     private static final String CATALOG_RESERVE = "STORE-POD.CATALOG.RESERVE";
     private static final String MERCHANT_ALL = "STORE-POD.MERCHANT.*";
+    private static final String MERCHANT_READ = "STORE-POD.MERCHANT.READ";
     private static final String CONTENT_ALL = "STORE-POD.CONTENT.*";
     private static final String CATALOG_ALL = "STORE-POD.CATALOG.*";
     private static final String CHECKOUT_ALL = "STORE-POD.CHECKOUT.*";
@@ -45,7 +46,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                                  Object permission) {
         String action = (String) permission;
         return switch (action) {
-            case STORE_CREATE, CATALOG_RESERVE, MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
+            case STORE_CREATE, CATALOG_RESERVE, MERCHANT_ALL, MERCHANT_READ, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
                  CUA_ALL, PAYMENT_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
             default -> hasStoreCorePermission(authentication, targetId, action);
         };
@@ -56,6 +57,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
             case CATALOG_RESERVE -> checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
+
+            case MERCHANT_READ -> checker.hasReadAccessOnStore(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
                  CUA_ALL, PAYMENT_ALL -> checker.hasManageAccessOnStore(authentication,
