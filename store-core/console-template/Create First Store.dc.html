@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+html,body{margin:0;padding:0}
+body{background:#eff3f8;font-family:Inter,system-ui,sans-serif;color:#334155;-webkit-font-smoothing:antialiased}
+a{color:#059669;text-decoration:none}
+a:hover{color:#047857}
+*{box-sizing:border-box}
+::selection{background:#d1fae5}
+@keyframes sk-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes sk-in{from{opacity:0}to{opacity:1}}
+@keyframes sk-spin{to{transform:rotate(360deg)}}
+@keyframes sk-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes sk-stripe{to{background-position:28px 0}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;min-width:1280px;background:#eff3f8">
+  <div style="display:flex;align-items:center;gap:1rem;height:49px;padding:0 2rem;background:#ecfdf5;border-bottom:1px solid #a7f3d0;animation:sk-in .4s ease both">
+    <i class="pi pi-sparkles" style="color:#059669;font-size:1rem"></i>
+    <span style="font-size:.875rem;color:#065f46">Your 14-day trial is active — this first store provisions on the trial, no card required.</span>
+    <div style="flex:1"></div>
+    <button style="display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .8125rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,box-shadow .2s" style-hover="background:#059669;border-color:#059669;box-shadow:0 4px 10px rgba(16,185,129,.35)">Upgrade plan<i class="pi pi-arrow-up-right" style="font-size:.7rem"></i></button>
+    <i class="pi pi-times" style="color:#64748b;font-size:.8rem;cursor:pointer;padding:.25rem"></i>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:1.5rem 2rem 3.5rem">
+
+    <main style="width:100%;max-width:1180px;min-width:0;display:flex;flex-direction:column;gap:1.5rem">
+
+      <div style="position:relative;z-index:50;display:flex;flex-wrap:nowrap;overflow:hidden;align-items:center;gap:1rem;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:.85rem 1.25rem;box-shadow:0 1px 2px rgba(18,18,23,.05);animation:sk-up .45s .05s ease both">
+        <div style="flex:none;display:flex;align-items:center;gap:.7rem">
+          <div style="width:32px;height:32px;flex:none;border-radius:8px;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font:700 .85rem Inter,sans-serif">A</div>
+          <span style="font:700 1rem Inter,sans-serif;color:#0f172a;letter-spacing:-.01em;white-space:nowrap">Acme Supply Holdings</span>
+        </div>
+        <div style="flex:none;width:1px;height:24px;background:#e2e8f0"></div>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.5rem;font:500 .8125rem Inter,sans-serif;color:#64748b">
+          <i class="pi pi-home" style="font-size:.8rem"></i><a href="First Run.dc.html" style="color:#64748b">Getting started</a>
+          <i class="pi pi-angle-right" style="font-size:.7rem;color:#cbd5e1"></i><span style="color:#1e293b;font-weight:600">Create your first store</span>
+        </div>
+        <div style="flex:1;min-width:.5rem"></div>
+        <a href="First Run.dc.html" style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.5rem;padding:.5rem .85rem;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:6px;font:600 .8125rem Inter,sans-serif;transition:background-color .2s,border-color .2s" style-hover="background:#f1f5f9;border-color:#cbd5e1;color:#334155"><i class="pi pi-arrow-left" style="font-size:.7rem"></i>Back to console</a>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.45rem;padding:.45rem .6rem;border-radius:8px;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">
+          <i class="pi pi-globe" style="font-size:.95rem;color:#475569"></i>
+          <span style="font:600 .8125rem Inter,sans-serif;color:#1e293b">EN</span>
+          <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+        </div>
+        <div style="flex:none;width:1px;height:24px;background:#e2e8f0"></div>
+        <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.25rem .35rem;border-radius:8px;transition:background-color .2s" style-hover="background:#f1f5f9">
+          <div style="width:32px;height:32px;border-radius:50%;background:#d1fae5;color:#047857;display:flex;align-items:center;justify-content:center;font:600 .75rem Inter,sans-serif">JD</div>
+          <span style="font:600 .8125rem Inter,sans-serif;color:#1e293b">Jordan Diaz</span>
+          <i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;gap:1rem;animation:sk-up .45s .1s ease both">
+        <div style="flex:0 1 auto;min-width:0">
+          <h1 style="margin:0;font:600 1.75rem Inter,sans-serif;color:#0f172a;letter-spacing:-.02em">Create your first store</h1>
+          <p style="margin:.35rem 0 0;font:400 .875rem Inter,sans-serif;color:#64748b">{{ subtitle }}</p>
+        </div>
+        <div style="flex:1"></div>
+        <sc-if value="{{ isForm }}" hint-placeholder-val="{{ true }}">
+          <a href="First Run.dc.html" style="flex:none;padding:.55rem .85rem;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:6px;font:500 .8125rem Inter,sans-serif;transition:background-color .2s,border-color .2s" style-hover="background:#f1f5f9;border-color:#cbd5e1">Cancel</a>
+        </sc-if>
+      </div>
+
+      <!-- ============ FORM ============ -->
+      <sc-if value="{{ isForm }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:1.5rem;align-items:start;animation:sk-up .45s .15s ease both">
+
+          <div style="min-width:0;display:flex;flex-direction:column;gap:1.5rem">
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.15rem 1.5rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Store identity</h2>
+                <p style="margin:.25rem 0 0;font:400 .8125rem Inter,sans-serif;color:#64748b">Branding, domains and content are configured after provisioning</p>
+              </div>
+              <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem">
+                <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.25rem">
+                  <div>
+                    <label style="display:block;font:600 .8125rem Inter,sans-serif;color:#1e293b;margin-bottom:.4rem">Store name <span style="color:#ef4444">*</span></label>
+                    <div style="padding:.6rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font:400 .875rem Inter,sans-serif;color:#1e293b;transition:border-color .2s,box-shadow .2s" style-hover="border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.12)">Acme Supply EU</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font:600 .8125rem Inter,sans-serif;color:#1e293b;margin-bottom:.4rem">Store code <span style="color:#ef4444">*</span></label>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem .75rem;border:1px solid #a7f3d0;border-radius:6px">
+                      <span style="flex:1;font:400 .875rem ui-monospace,Menlo,monospace;color:#1e293b">acme-eu</span>
+                      <i class="pi pi-check-circle" style="font-size:.8rem;color:#10b981"></i>
+                    </div>
+                    <div style="margin-top:.35rem;font:400 .75rem Inter,sans-serif;color:#047857">Available · used in the tenant identifier</div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+                  <div>
+                    <label style="display:block;font:600 .8125rem Inter,sans-serif;color:#1e293b;margin-bottom:.4rem">Country of operation <span style="color:#ef4444">*</span></label>
+                    <div style="display:flex;align-items:center;padding:.6rem .75rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;transition:border-color .2s" style-hover="border-color:#10b981"><span style="flex:1;font:400 .875rem Inter,sans-serif;color:#1e293b">Germany</span><i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i></div>
+                    <div style="margin-top:.35rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">Sets default currency, tax rules and data residency</div>
+                  </div>
+                  <div>
+                    <label style="display:block;font:600 .8125rem Inter,sans-serif;color:#1e293b;margin-bottom:.4rem">Base currency</label>
+                    <div style="display:flex;align-items:center;padding:.6rem .75rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;transition:border-color .2s" style-hover="border-color:#10b981"><span style="flex:1;font:400 .875rem Inter,sans-serif;color:#1e293b">EUR — Euro</span><i class="pi pi-chevron-down" style="font-size:.6rem;color:#94a3b8"></i></div>
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font:600 .8125rem Inter,sans-serif;color:#1e293b;margin-bottom:.4rem">Provisional subdomain</label>
+                  <div style="display:flex;align-items:center;padding:.6rem .75rem;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc">
+                    <span style="flex:1;font:400 .875rem ui-monospace,Menlo,monospace;color:#475569">acme-eu.myshop.io</span>
+                    <span style="padding:.15rem .45rem;border-radius:4px;background:#e2e8f0;color:#475569;font:600 .625rem Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase">Auto</span>
+                  </div>
+                  <div style="margin-top:.35rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">Attach a custom domain later in Store management → Store domain</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="display:flex;align-items:center;padding:1.15rem 1.5rem;border-bottom:1px solid #f1f5f9">
+                <div>
+                  <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Hosting region</h2>
+                  <p style="margin:.25rem 0 0;font:400 .8125rem Inter,sans-serif;color:#64748b">Where the store is physically provisioned — this cannot be changed afterwards</p>
+                </div>
+                <div style="flex:1"></div>
+                <span style="display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;border-radius:4px;background:#fef3c7;color:#92400e;font:600 .6875rem Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase"><i class="pi pi-lock" style="font-size:.65rem"></i>Permanent</span>
+              </div>
+              <div style="padding:1.5rem;display:flex;flex-direction:column;gap:.75rem">
+                <sc-for list="{{ regions }}" as="rg" hint-placeholder-count="4">
+                  <div onClick="{{ rg.pick }}" style="{{ rg.cardStyle }}">
+                    <div style="{{ rg.radioStyle }}"><sc-if value="{{ rg.on }}" hint-placeholder-val="{{ false }}"><div style="width:8px;height:8px;border-radius:50%;background:#fff"></div></sc-if></div>
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:.6rem">
+                        <span style="font:600 .875rem Inter,sans-serif;color:#1e293b">{{ rg.label }}</span>
+                        <span style="font:400 .75rem ui-monospace,Menlo,monospace;color:#94a3b8">{{ rg.code }}</span>
+                        <sc-if value="{{ rg.recommended }}" hint-placeholder-val="{{ false }}"><span style="padding:.1rem .4rem;border-radius:4px;background:#ecfdf5;color:#047857;font:600 .625rem Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase">Recommended</span></sc-if>
+                        <sc-if value="{{ rg.locked }}" hint-placeholder-val="{{ false }}"><span style="padding:.1rem .4rem;border-radius:4px;background:#f1f5f9;color:#475569;font:600 .625rem Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase">Pro plan</span></sc-if>
+                      </div>
+                      <div style="margin-top:.25rem;font:400 .8125rem Inter,sans-serif;color:#64748b">{{ rg.meta }}</div>
+                    </div>
+                    <div style="text-align:right;flex:none">
+                      <div style="font:600 .8125rem Inter,sans-serif;color:{{ rg.latColor }}">{{ rg.latency }}</div>
+                      <div style="font:400 .6875rem Inter,sans-serif;color:#94a3b8">to customers</div>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="display:flex;gap:.6rem;padding:.75rem .85rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px">
+                  <i class="pi pi-shield" style="font-size:.8rem;color:#3b82f6;margin-top:.1rem"></i>
+                  <span style="font:400 .8125rem/1.55 Inter,sans-serif;color:#475569">{{ residencyNote }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.15rem 1.5rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">Subscription tier</h2>
+                <p style="margin:.25rem 0 0;font:400 .8125rem Inter,sans-serif;color:#64748b">Determines the resources allocated to this store's server</p>
+              </div>
+              <div style="padding:1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+                <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
+                  <div onClick="{{ pl.pick }}" style="{{ pl.cardStyle }}">
+                    <div style="display:flex;align-items:center;gap:.5rem">
+                      <div style="{{ pl.radioStyle }}"><sc-if value="{{ pl.on }}" hint-placeholder-val="{{ false }}"><div style="width:8px;height:8px;border-radius:50%;background:#fff"></div></sc-if></div>
+                      <span style="flex:1;font:600 .875rem Inter,sans-serif;color:{{ pl.titleColor }}">{{ pl.label }}</span>
+                    </div>
+                    <div style="margin-top:.65rem;font:600 1.25rem Inter,sans-serif;color:#0f172a">{{ pl.price }}</div>
+                    <div style="margin-top:.9rem;display:flex;flex-direction:column;gap:.4rem">
+                      <sc-for list="{{ pl.specs }}" as="sp" hint-placeholder-count="4">
+                        <div style="display:flex;align-items:center;gap:.45rem">
+                          <i class="pi pi-check" style="font-size:.6rem;color:#10b981"></i>
+                          <span style="font:400 .75rem Inter,sans-serif;color:#475569">{{ sp.text }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="min-width:0;display:flex;flex-direction:column;gap:1.5rem">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.1rem 1.25rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1rem Inter,sans-serif;color:#0f172a">Provisioning summary</h2>
+              </div>
+              <div style="padding:1.1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.6rem">
+                <sc-for list="{{ summary }}" as="su" hint-placeholder-count="6">
+                  <div style="display:flex;gap:.75rem">
+                    <span style="flex:1;font:400 .8125rem Inter,sans-serif;color:#64748b">{{ su.label }}</span>
+                    <span style="text-align:right;font:600 .8125rem Inter,sans-serif;color:{{ su.color }}">{{ su.value }}</span>
+                  </div>
+                </sc-for>
+                <div style="margin-top:.35rem;padding-top:.9rem;border-top:1px solid #f1f5f9;display:flex;gap:.55rem">
+                  <i class="pi pi-clock" style="font-size:.8rem;color:#f59e0b;margin-top:.1rem"></i>
+                  <span style="font:400 .75rem/1.55 Inter,sans-serif;color:#475569">Provisioning takes about a minute. You can leave this page — the store appears in the switcher as soon as it is live.</span>
+                </div>
+                <button onClick="{{ start }}" style="margin-top:.5rem;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .875rem Inter,sans-serif;cursor:pointer;transition:background-color .2s,box-shadow .2s" style-hover="background:#059669;border-color:#059669;box-shadow:0 4px 10px rgba(16,185,129,.35)"><i class="pi pi-server" style="font-size:.8rem"></i>Provision store</button>
+                <div style="text-align:center;font:400 .75rem Inter,sans-serif;color:#94a3b8">Billing starts when the store goes live</div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.1rem 1.25rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1rem Inter,sans-serif;color:#0f172a">What gets created</h2>
+              </div>
+              <div style="padding:1.1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.7rem">
+                <sc-for list="{{ artifacts }}" as="ar" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:flex-start;gap:.6rem">
+                    <i class="{{ ar.icon }}" style="font-size:.8rem;color:#64748b;margin-top:.15rem;width:.9rem"></i>
+                    <div>
+                      <div style="font:500 .8125rem Inter,sans-serif;color:#1e293b">{{ ar.label }}</div>
+                      <div style="margin-top:.1rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">{{ ar.meta }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05);padding:1.1rem 1.25rem">
+              <div style="display:flex;align-items:center;gap:.6rem">
+                <i class="pi pi-info-circle" style="font-size:.85rem;color:#3b82f6"></i>
+                <span style="font:600 .8125rem Inter,sans-serif;color:#1e293b">Plan limit</span>
+              </div>
+              <div style="margin-top:.6rem;font:400 .8125rem/1.6 Inter,sans-serif;color:#475569">The trial includes one store in one region. Add more stores, regions and team seats by upgrading before the trial ends.</div>
+              <div style="margin-top:.75rem;height:6px;border-radius:3px;background:#f1f5f9;overflow:hidden"><div style="height:100%;width:8%;background:#10b981;border-radius:3px"></div></div>
+              <div style="margin-top:.4rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">0 of 1 stores used</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ PROVISIONING ============ -->
+      <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:1.5rem;align-items:start;animation:sk-up .4s ease both">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+            <div style="display:flex;align-items:center;gap:1rem;padding:1.25rem 1.5rem;border-bottom:1px solid #f1f5f9">
+              <div style="width:40px;height:40px;flex:none;border-radius:8px;background:{{ headBg }};display:flex;align-items:center;justify-content:center"><i class="{{ headIcon }}" style="font-size:1rem;color:{{ headColor }};{{ headSpin }}"></i></div>
+              <div style="flex:1;min-width:0">
+                <h2 style="margin:0;font:600 1.0625rem Inter,sans-serif;color:#0f172a">{{ headTitle }}</h2>
+                <p style="margin:.2rem 0 0;font:400 .8125rem Inter,sans-serif;color:#64748b">{{ headMeta }}</p>
+              </div>
+              <div style="text-align:right;flex:none">
+                <div style="font:600 1.375rem Inter,sans-serif;color:#0f172a">{{ pct }}</div>
+                <div style="font:400 .6875rem Inter,sans-serif;color:#94a3b8">{{ etaLabel }}</div>
+              </div>
+            </div>
+            <div style="padding:0 1.5rem">
+              <div style="height:8px;margin-top:1.25rem;border-radius:4px;background:#f1f5f9;overflow:hidden">
+                <div style="{{ barStyle }}"></div>
+              </div>
+            </div>
+            <div style="padding:1.5rem;display:flex;flex-direction:column;gap:.15rem">
+              <sc-for list="{{ tasks }}" as="tk" hint-placeholder-count="7">
+                <div style="{{ tk.rowStyle }}">
+                  <div style="{{ tk.dotStyle }}"><i class="{{ tk.icon }}" style="font-size:.65rem;color:{{ tk.iconColor }};{{ tk.spin }}"></i></div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:{{ tk.weight }} .8125rem Inter,sans-serif;color:{{ tk.color }}">{{ tk.label }}</div>
+                    <div style="margin-top:.15rem;font:400 .75rem Inter,sans-serif;color:#94a3b8">{{ tk.meta }}</div>
+                  </div>
+                  <span style="font:400 .75rem ui-monospace,Menlo,monospace;color:#94a3b8;white-space:nowrap">{{ tk.stamp }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:1rem;padding:1.15rem 1.5rem;background:#ecfdf5;border-top:1px solid #a7f3d0">
+                <i class="pi pi-check-circle" style="font-size:1rem;color:#10b981"></i>
+                <span style="flex:1;font:500 .875rem Inter,sans-serif;color:#065f46">Acme Supply EU is live on eu-central-1 · node fra-07 · acme-eu.myshop.io</span>
+                <a href="Admin Dashboard.dc.html" style="padding:.55rem .85rem;background:#fff;color:#334155;border:1px solid #a7f3d0;border-radius:6px;font:500 .8125rem Inter,sans-serif;transition:background-color .2s" style-hover="background:#f0fdf4">Go to console</a>
+                <a href="Storefront Builder.dc.html" style="display:flex;align-items:center;gap:.5rem;padding:.55rem .95rem;background:#10b981;color:#fff;border:1px solid #10b981;border-radius:6px;font:600 .8125rem Inter,sans-serif;transition:background-color .2s,box-shadow .2s" style-hover="background:#059669;box-shadow:0 4px 10px rgba(16,185,129,.35)"><i class="pi pi-objects-column" style="font-size:.75rem"></i>Build home page</a>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="min-width:0;display:flex;flex-direction:column;gap:1.5rem">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.1rem 1.25rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1rem Inter,sans-serif;color:#0f172a">Assigned infrastructure</h2>
+              </div>
+              <div style="padding:1.1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.6rem">
+                <sc-for list="{{ infra }}" as="inf" hint-placeholder-count="6">
+                  <div style="display:flex;gap:.75rem">
+                    <span style="flex:1;font:400 .8125rem Inter,sans-serif;color:#64748b">{{ inf.label }}</span>
+                    <span style="text-align:right;font:{{ inf.weight }} .8125rem {{ inf.font }};color:{{ inf.color }}">{{ inf.value }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(18,18,23,.05)">
+              <div style="padding:1.1rem 1.25rem;border-bottom:1px solid #f1f5f9">
+                <h2 style="margin:0;font:600 1rem Inter,sans-serif;color:#0f172a">Next steps</h2>
+              </div>
+              <div style="padding:.85rem 1rem 1.1rem;display:flex;flex-direction:column;gap:.15rem">
+                <a href="Store Management.dc.html" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .65rem;border-radius:8px;color:#334155;font:500 .8125rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-palette" style="font-size:.8rem;width:.9rem"></i><span style="flex:1">Upload logo and banner</span><i class="pi pi-angle-right" style="font-size:.75rem;color:#cbd5e1"></i></a>
+                <a href="Store Management.dc.html" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .65rem;border-radius:8px;color:#334155;font:500 .8125rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-globe" style="font-size:.8rem;width:.9rem"></i><span style="flex:1">Attach a custom domain</span><i class="pi pi-angle-right" style="font-size:.75rem;color:#cbd5e1"></i></a>
+                <a href="Store Management.dc.html" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .65rem;border-radius:8px;color:#334155;font:500 .8125rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-credit-card" style="font-size:.8rem;width:.9rem"></i><span style="flex:1">Connect a payment gateway</span><i class="pi pi-angle-right" style="font-size:.75rem;color:#cbd5e1"></i></a>
+                <a href="Add Product.dc.html" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .65rem;border-radius:8px;color:#334155;font:500 .8125rem Inter,sans-serif;text-decoration:none;transition:background-color .2s,color .2s" style-hover="background:#f1f5f9;color:#059669"><i class="pi pi-box" style="font-size:.8rem;width:.9rem"></i><span style="flex:1">Add your first product</span><i class="pi pi-angle-right" style="font-size:.75rem;color:#cbd5e1"></i></a>
+              </div>
+            </div>
+
+            <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ reset }}" style="text-align:center;padding:.7rem;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font:500 .8125rem Inter,sans-serif;color:#334155;cursor:pointer;transition:background-color .2s" style-hover="background:#f1f5f9">Provision another store</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1500,&quot;height&quot;:1250}}">
+const REGIONS = [
+  { key: 'eu', label: 'EU Central · Frankfurt', code: 'eu-central-1', meta: 'GDPR data residency · 6 nodes available', latency: '18 ms', recommended: true,
+    residency: 'Customer and order data stays inside the EU. Backups replicate to eu-west-1 (Dublin) only.' },
+  { key: 'us', label: 'US West · Oregon', code: 'us-west-2', meta: '11 nodes available · lowest cost', latency: '142 ms',
+    residency: 'Data is stored in the United States. Selling into the EU from this region requires a processing addendum.' },
+  { key: 'me', label: 'Middle East · Bahrain', code: 'me-south-1', meta: 'Arabic locale pack preinstalled · 3 nodes available', latency: '96 ms',
+    residency: 'Data stays in the GCC region. Local invoicing and VAT formats are applied by default.' },
+  { key: 'ap', label: 'Asia Pacific · Singapore', code: 'ap-southeast-1', meta: 'Requires the Pro plan or above', latency: '210 ms', locked: true,
+    residency: 'Data stays in Singapore. Available on Pro and Enterprise subscriptions only.' },
+];
+
+const PLANS = [
+  { key: 'starter', label: 'Starter', price: '$29/mo', specs: ['1 vCPU · 2 GB RAM', '5 GB media storage', '10k orders / month', 'Shared node'] },
+  { key: 'growth', label: 'Growth', price: '$99/mo', specs: ['2 vCPU · 8 GB RAM', '50 GB media storage', '100k orders / month', 'Dedicated node'] },
+  { key: 'pro', label: 'Pro', price: '$299/mo', specs: ['8 vCPU · 32 GB RAM', '500 GB media storage', 'Unlimited orders', 'Dedicated + hot standby'] },
+];
+
+const TASKS = [
+  { label: 'Validating store code and plan limits', meta: 'tenant acme-eu reserved', stamp: '0:02' },
+  { label: 'Allocating node in eu-central-1', meta: 'assigned fra-07 · 2 vCPU · 8 GB RAM', stamp: '0:09' },
+  { label: 'Creating tenant database', meta: 'schema acme_eu · pg-14 · encrypted at rest', stamp: '0:21' },
+  { label: 'Seeding catalogue, tax and locale defaults', meta: 'EUR · de-DE · German VAT rules', stamp: '0:34' },
+  { label: 'Issuing TLS certificate', meta: 'acme-eu.myshop.io · Let\u2019s Encrypt', stamp: '0:44' },
+  { label: 'Warming CDN edge and object storage', meta: '18 edge locations · 50 GB bucket', stamp: '0:52' },
+  { label: 'Running health checks and going live', meta: 'storefront, admin API and webhooks responding', stamp: '1:04' },
+];
+
+class Component extends DCLogic {
+  state = { phase: 'form', region: 'eu', plan: 'growth', done: 0, elapsed: 0 };
+
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  run() {
+    clearInterval(this.timer);
+    this.setState({ phase: 'running', done: 0, elapsed: 0 });
+    this.timer = setInterval(() => {
+      this.setState(s => {
+        const elapsed = s.elapsed + 1;
+        const done = Math.min(TASKS.length, Math.floor(elapsed / 2.2));
+        if (done >= TASKS.length) clearInterval(this.timer);
+        return { elapsed, done };
+      });
+    }, 420);
+  }
+
+  radio(on) {
+    return 'width:18px;height:18px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background-color .2s,border-color .2s;border:1px solid ' +
+      (on ? '#10b981' : '#cbd5e1') + ';background:' + (on ? '#10b981' : '#fff');
+  }
+
+  renderVals() {
+    const st = this.state;
+    const region = REGIONS.find(r => r.key === st.region) || REGIONS[0];
+    const plan = PLANS.find(p => p.key === st.plan) || PLANS[1];
+    const running = st.phase === 'running';
+    const done = st.done;
+    const isDone = done >= TASKS.length;
+    const pct = Math.round(done / TASKS.length * 100);
+
+    const regions = REGIONS.map(r => {
+      const on = st.region === r.key;
+      return { label: r.label, code: r.code, meta: r.meta, latency: r.latency,
+        recommended: !!r.recommended, locked: !!r.locked, on,
+        latColor: r.recommended ? '#047857' : '#475569',
+        pick: () => { if (!r.locked) this.setState({ region: r.key }); },
+        radioStyle: this.radio(on),
+        cardStyle: 'display:flex;align-items:center;gap:.85rem;padding:.9rem 1rem;border-radius:10px;transition:border-color .2s,background-color .2s,box-shadow .2s;border:1px solid ' +
+          (on ? '#a7f3d0' : '#e2e8f0') + ';background:' + (on ? '#f0fdf4' : '#fff') +
+          (r.locked ? ';opacity:.6;cursor:not-allowed' : ';cursor:pointer'),
+      };
+    });
+
+    const plans = PLANS.map(p => {
+      const on = st.plan === p.key;
+      return { label: p.label, price: p.price, on,
+        specs: p.specs.map(text => ({ text })),
+        titleColor: on ? '#047857' : '#1e293b',
+        radioStyle: this.radio(on),
+        pick: () => this.setState({ plan: p.key }),
+        cardStyle: 'padding:1rem;border-radius:10px;cursor:pointer;transition:border-color .2s,background-color .2s;border:1px solid ' +
+          (on ? '#a7f3d0' : '#e2e8f0') + ';background:' + (on ? '#f0fdf4' : '#fff'),
+      };
+    });
+
+    const summary = [
+      { label: 'Store name', value: 'Acme Supply EU', color: '#1e293b' },
+      { label: 'Tenant', value: 'acme-eu', color: '#1e293b' },
+      { label: 'Region', value: region.code, color: '#047857' },
+      { label: 'Country · currency', value: 'Germany · EUR', color: '#1e293b' },
+      { label: 'Plan', value: plan.label + ' · ' + plan.price, color: '#1e293b' },
+      { label: 'Resources', value: plan.specs[0], color: '#475569' },
+      { label: 'Estimated time', value: '~1 minute', color: '#475569' },
+    ];
+
+    const artifacts = [
+      { label: 'Dedicated tenant database', meta: 'Encrypted at rest, isolated from other stores', icon: 'pi pi-database' },
+      { label: 'Node assignment', meta: 'A physical server in ' + region.code, icon: 'pi pi-server' },
+      { label: 'Provisional subdomain + TLS', meta: 'acme-eu.myshop.io with a managed certificate', icon: 'pi pi-globe' },
+      { label: 'Locale and tax defaults', meta: 'Seeded from the country of operation', icon: 'pi pi-percentage' },
+      { label: 'Admin access for you', meta: 'Jordan Diaz added as store owner', icon: 'pi pi-user' },
+    ];
+
+    const tasks = TASKS.map((t, i) => {
+      const isDoneRow = i < done;
+      const active = i === done && !isDone;
+      return { label: t.label, meta: t.meta,
+        stamp: isDoneRow ? t.stamp : (active ? 'running…' : 'queued'),
+        icon: isDoneRow ? 'pi pi-check' : (active ? 'pi pi-spinner' : 'pi pi-minus'),
+        spin: active ? 'animation:sk-spin 1s linear infinite' : '',
+        iconColor: isDoneRow || active ? '#fff' : '#94a3b8',
+        color: isDoneRow ? '#334155' : (active ? '#065f46' : '#94a3b8'),
+        weight: active ? '600' : '500',
+        dotStyle: 'width:24px;height:24px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:' +
+          (isDoneRow ? '#10b981' : (active ? '#059669' : '#f1f5f9')),
+        rowStyle: 'display:flex;align-items:center;gap:.85rem;padding:.7rem .5rem;border-radius:8px;transition:background-color .2s;' +
+          (active ? 'background:#f0fdf4' : ''),
+      };
+    });
+
+    const infra = [
+      { label: 'Region', value: region.code, mono: true },
+      { label: 'Node', value: done >= 2 ? 'fra-07' : 'assigning…', mono: true },
+      { label: 'Database', value: done >= 3 ? 'acme_eu · pg-14' : 'pending', mono: true },
+      { label: 'Resources', value: plan.specs[0] },
+      { label: 'Storage', value: plan.specs[1] },
+      { label: 'Certificate', value: done >= 5 ? 'issued' : 'pending' },
+    ].map(i => ({ label: i.label, value: i.value,
+      font: i.mono ? 'ui-monospace,Menlo,monospace' : 'Inter,sans-serif',
+      weight: i.mono ? '500' : '600',
+      color: /pending|assigning/.test(String(i.value)) ? '#94a3b8' : '#1e293b',
+    }));
+
+    return {
+      regions, plans, summary, artifacts, tasks, infra,
+      isForm: !running, isRunning: running, isDone,
+      residencyNote: region.residency,
+      subtitle: running
+        ? (isDone ? 'Acme Supply EU · live in ' + region.code : 'Provisioning Acme Supply EU in ' + region.code + ' — this takes about a minute')
+        : 'Provision a new store on a server in the region you sell from',
+      start: () => this.run(),
+      reset: () => { clearInterval(this.timer); this.setState({ phase: 'form', done: 0, elapsed: 0 }); },
+      pct: pct + '%',
+      etaLabel: isDone ? 'complete' : 'about ' + Math.max(5, 62 - Math.round(st.elapsed * 2.4)) + 's left',
+      barStyle: 'height:100%;border-radius:4px;transition:width .35s ease;width:' + Math.max(4, pct) + '%;' +
+        (isDone ? 'background:#10b981'
+          : 'background:repeating-linear-gradient(115deg,#10b981 0 14px,#34d399 14px 28px);background-size:28px 100%;animation:sk-stripe .7s linear infinite'),
+      headIcon: isDone ? 'pi pi-check-circle' : 'pi pi-server',
+      headSpin: '',
+      headBg: isDone ? '#ecfdf5' : '#fffbeb',
+      headColor: isDone ? '#10b981' : '#f59e0b',
+      headTitle: isDone ? 'Store provisioned' : 'Provisioning store',
+      headMeta: isDone
+        ? 'Completed in 1:04 · ' + TASKS.length + ' of ' + TASKS.length + ' steps'
+        : 'Step ' + Math.min(TASKS.length, done + 1) + ' of ' + TASKS.length + ' · do not close the browser tab if you want live updates',
+      showPendingStore: running,
+      pendingName: 'Acme Supply EU',
+      pendingPct: isDone ? 'live' : pct + '%',
+    };
+  }
+}
+</script>
+</body>
+</html>
