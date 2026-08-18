@@ -75,8 +75,8 @@ export interface OrderRow {
    * string here would keep its old language after a switch. `text` is the server's own formatting
    * where it sends any; it is null on every order the running stack returns.
    *
-   * There is no item count: the list endpoint sends no `products` — see lessons.md, "Orders — the
-   * list omits line items".
+   * There is no item count: the list endpoint sends no `products` — see lessons.md, "Orders — the list omits
+   * line items and the customer".
    */
   readonly total: {readonly value: number | null; readonly currency: string | null; readonly text: string | null};
   readonly placedOn: string;

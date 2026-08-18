@@ -202,7 +202,7 @@ export interface PersistableOrderStatusHistory {
  * So the number is read back out and formatted with everything else. Grouping separators are
  * dropped and the last `.` or `,` is taken as the decimal point, which covers both the English form
  * the server emits today and a European one if it ever changes. Anything unparseable falls back to
- * the server's own string — see lessons.md, "Orders — line prices arrive formatted".
+ * the server's own string — see lessons.md, "Orders — line prices arrive formatted, with no number behind them".
  */
 export function parseAmount(formatted: string | undefined): number | null {
   if (!formatted) {

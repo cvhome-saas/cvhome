@@ -232,7 +232,7 @@ export class OrdersFacade {
    * The tab strip.
    *
    * No badges. The counts that used to sit here came from a "late orders" figure nothing reports —
-   * see lessons.md, "Orders — no stale-order signal is available to this page either".
+   * see lessons.md, "Orders — no stale-order signal".
    */
   readonly tabs = computed<readonly TabItem[]>(() => {
     this.transloco.activeLang();
