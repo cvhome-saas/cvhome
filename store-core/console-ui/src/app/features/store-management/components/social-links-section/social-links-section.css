@@ -1,0 +1,54 @@
+.links {
+  gap: 0.9rem;
+}
+
+.link-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.link-name {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.6rem;
+  inline-size: 9.5rem;
+  padding-block-start: 0.65rem;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  --icon-size: 1rem;
+}
+
+.link-name app-icon {
+  flex: none;
+  color: var(--secondary-foreground);
+}
+
+.link-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-field .control > input::placeholder {
+  color: var(--foreground-subtle);
+}
+
+.link-field app-icon.ok {
+  color: var(--chart-1-foreground);
+  --icon-size: 0.8rem;
+}
+
+/* Narrow enough that a fixed label column would leave no room for the URL. */
+@container settings (max-width: 34rem) {
+  .link-row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .link-name {
+    inline-size: auto;
+    padding-block-start: 0;
+  }
+}

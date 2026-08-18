@@ -1,0 +1,192 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="context()">
+    <app-date-range-picker [value]="dateRange()" (valueChange)="dateRange.set($event)" />
+    <app-export-button
+      [target]="report()"
+      fileName="orders"
+      [title]="heading().title"
+      [subtitle]="exportSubtitle()"
+      [disabled]="isLoading() || isEmpty()"
+    />
+    <button class="primary-action" type="button" (click)="createOrder()">
+      <app-icon name="plus" />
+      {{ t('orders.createOrder') }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button type="button" (click)="facade.retry()">{{ t('dashboard.tryAgain') }}</button>
+    </div>
+  }
+
+  <app-busy-overlay [busy]="isLoading()" [label]="t('orders.loading')">
+    @if (isEmpty()) {
+      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
+      <div class="first-load" aria-hidden="true"></div>
+    } @else {
+      <div class="report" #report>
+        <app-kpi-grid [label]="t('orders.metricsLabel')" [data]="kpis()" />
+
+        <app-panel class="orders-panel" [title]="t('orders.allOrders')" [subtitle]="subtitle()">
+          <div panelAction class="panel-controls">
+            <app-tab-switcher
+              [tabs]="tabs()"
+              [(active)]="activeTab"
+              [label]="t('orders.filterByStatus')"
+              panelId="orders-table"
+            />
+
+            <!-- Dismissed by the shell's document click handler, as the toolbar menus are. -->
+            <div class="menu channel-filter">
+              <button
+                class="channel-trigger"
+                type="button"
+                [attr.aria-expanded]="channelOpen()"
+                aria-haspopup="listbox"
+                (click)="channelOpen.set(!channelOpen())"
+              >
+                <app-icon name="filter" />
+                {{ channelLabel() }}
+                <app-icon name="chevronDown" />
+              </button>
+
+              @if (channelOpen()) {
+                <div class="popover" role="listbox" [attr.aria-label]="t('orders.filterByChannel')">
+                  @for (option of channels(); track option.key) {
+                    <button
+                      type="button"
+                      role="option"
+                      [class.selected]="option.key === facade.channel()"
+                      [attr.aria-selected]="option.key === facade.channel()"
+                      (click)="pickChannel(option.key)"
+                    >
+                      {{ option.label }}
+                      @if (option.key === facade.channel()) {
+                        <app-icon name="check" />
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (showLateNotice()) {
+            <app-notice-bar tone="amber" icon="alertCircle" [message]="lateNotice()">
+              <button class="notice-primary" type="button" (click)="markProcessed()">
+                <app-icon name="send" />
+                {{ t('orders.markAsProcessed') }}
+              </button>
+              <button class="notice-secondary" type="button" (click)="printPickingLists()">
+                {{ t('orders.printPickingLists') }}
+              </button>
+            </app-notice-bar>
+          }
+
+          @if (orders().length) {
+            <app-data-table id="orders-table" [columns]="columns()" [label]="t('orders.allOrders')">
+              @for (order of orders(); track order.id) {
+                <app-table-row [interactive]="true" (click)="openOrder(order)">
+                  <div class="cell-order" role="cell" [attr.data-label]="t('orders.column.order')">
+                    <!--
+                      The whole row is a click target for pointers, but only this is focusable
+                      — a row of eight tab stops would be far worse to move through.
+                    -->
+                    <button
+                      class="order-id"
+                      type="button"
+                      (click)="$event.stopPropagation(); openOrder(order)"
+                    >
+                      {{ order.id }}
+                    </button>
+                    <span class="order-channel">
+                      <app-icon [name]="channelIconOf(order)" />
+                      {{ t(channelLabelKeyOf(order)) }}
+                    </span>
+                  </div>
+
+                  <div class="cell-customer" role="cell" [attr.data-label]="t('orders.column.customer')">
+                    <span class="customer-mark" aria-hidden="true">{{ initialsOf(order) }}</span>
+                    <span class="customer-copy">
+                      <strong>{{ order.customer }}</strong>
+                      <small>{{ order.city }}</small>
+                    </span>
+                  </div>
+
+                  <div class="cell-status" role="cell" [attr.data-label]="t('orders.column.status')">
+                    <app-badge [tone]="toneOf(order)" shape="square">{{ t(statusLabelKey(order)) }}</app-badge>
+                    @if (order.unfulfilledFor; as overdue) {
+                      <span class="status-late">
+                        <app-icon name="clock" />
+                        {{ t('orders.unfulfilledHours', {count: overdue}) }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="cell-payment" role="cell" [attr.data-label]="t('orders.column.payment')">
+                    <app-icon
+                      class="payment-mark"
+                      [class]="paymentOf(order).tone"
+                      [name]="paymentOf(order).icon"
+                    />
+                    <span class="payment-copy">
+                      <strong>{{ t(paymentLabelKey(order)) }}</strong>
+                      <small>{{ order.paymentMeta }}</small>
+                    </span>
+                  </div>
+
+                  <span class="cell-items" role="cell" [attr.data-label]="t('orders.column.items')">{{ order.items }}</span>
+
+                  <span class="cell-total" role="cell" [attr.data-label]="t('orders.column.total')">{{ order.total }}</span>
+
+                  <div class="cell-placed" role="cell" [attr.data-label]="t('orders.column.placed')">
+                    <strong>{{ order.placedOn }}</strong>
+                    <small>{{ order.placedAt }}</small>
+                  </div>
+
+                  <div class="cell-actions" role="cell" [attr.data-label]="t('orders.column.actions')">
+                    @if (order.status === 'Ordered') {
+                      <button
+                        class="row-action ship"
+                        type="button"
+                        [title]="t('orders.createShipment')"
+                        [attr.aria-label]="t('orders.createShipmentFor', {id: order.id})"
+                        (click)="$event.stopPropagation(); shipOrder(order)"
+                      >
+                        <app-icon name="truck" />
+                      </button>
+                    }
+                    <button
+                      class="row-action"
+                      type="button"
+                      [title]="t('orders.printInvoice')"
+                      [attr.aria-label]="t('orders.printInvoiceFor', {id: order.id})"
+                      (click)="$event.stopPropagation(); printInvoice(order)"
+                    >
+                      <app-icon name="printer" />
+                    </button>
+                  </div>
+                </app-table-row>
+              }
+            </app-data-table>
+          } @else {
+            <p class="table-empty">{{ t('orders.noneMatch') }}</p>
+          }
+
+          <app-pagination
+            [page]="page().pageNumber"
+            [totalPages]="page().totalPages"
+            [totalElements]="page().totalElements"
+            [pageSize]="pageSize"
+            [unit]="t('orders.unit')"
+            [label]="t('orders.pagesLabel')"
+            (pageChange)="onPage($event)"
+          />
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

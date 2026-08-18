@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-17T00:00:00+03:00",
+  "title": "Design System: cvhome Console",
+  "extensions": {
+    "colorMeta": {
+      "text-supporting": {
+        "role": "neutral",
+        "displayName": "Supporting Sage",
+        "canonical": "#b2c1ba"
+      },
+      "text-control": {
+        "role": "neutral",
+        "displayName": "Control Sage",
+        "canonical": "#a7b8b0"
+      },
+      "text-label": {
+        "role": "neutral",
+        "displayName": "Label Sage",
+        "canonical": "#afc0b8"
+      },
+      "text-quiet": {
+        "role": "neutral",
+        "displayName": "Distant Sage",
+        "canonical": "#82978e"
+      },
+      "text-helper": {
+        "role": "neutral",
+        "displayName": "Helper Sage",
+        "canonical": "#8fa39a"
+      },
+      "text-icon": {
+        "role": "neutral",
+        "displayName": "Icon Sage",
+        "canonical": "#b6c5be"
+      }
+    },
+    "typographyMeta": {
+      "auth-headline": {
+        "displayName": "Auth Headline",
+        "purpose": "Task-oriented account-access propositions."
+      },
+      "body-prominent": {
+        "displayName": "Prominent Body",
+        "purpose": "Short auth-story introductions."
+      },
+      "body-compact": {
+        "displayName": "Compact Body",
+        "purpose": "Benefits and dense operational copy."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Tabs, options, links, and trust statements."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Labels, badges, dividers, legal notes, and feedback."
+      }
+    },
+    "source": {
+      "tokens": "src/app/core/theme/theme.ts",
+      "generatedCss": "src/theme.generated.css",
+      "generator": "scripts/generate-theme-css.mjs",
+      "reference": "src/app/features/marketing/marketing.css",
+      "globals": "src/styles.css",
+      "console": "src/app/features/dashboard/dashboard.css",
+      "auth": "src/app/features/auth/auth.css",
+      "note": "theme.ts is the single source of truth; DESIGN.md frontmatter and theme.generated.css are both generated from it and verified by `npm run verify:theme`."
+    },
+    "colorRamps": {
+      "forest": {
+        "ink": "#04120d",
+        "canvas": "#05140f",
+        "surface": "#071a13"
+      },
+      "emerald": {
+        "primary": "#10b981",
+        "bright": "#34d399",
+        "highlight": "#59e2ab",
+        "soft": "#6ee7b7",
+        "pale": "#8cf2c6",
+        "mist": "#a7f3d0"
+      },
+      "semanticCharts": {
+        "blue": "#3b82f6",
+        "cyan": "#06b6d4",
+        "amber": "#f59e0b",
+        "red": "#ef4444",
+        "violet": "#8b5cf6"
+      },
+      "surfaces": {
+        "hairline": "rgb(255 255 255 / 10%)",
+        "hairlineSoft": "rgb(255 255 255 / 7%)",
+        "fill": "rgb(255 255 255 / 2%)",
+        "fillRaised": "rgb(255 255 255 / 6%)",
+        "track": "rgb(255 255 255 / 18%)",
+        "panel": "rgb(4 18 13 / 60%)",
+        "headerVeil": "rgb(5 20 15 / 82%)",
+        "scrim": "rgb(4 18 13 / 72%)"
+      },
+      "categorical": {
+        "note": "Wash + on-dark ink pairs. Colour is never the only signal.",
+        "ink": {
+          "emerald": "#6ee7b7",
+          "blue": "#93c5fd",
+          "cyan": "#67e8f9",
+          "amber": "#fcd34d",
+          "red": "#fca5a5",
+          "violet": "#c4b5fd"
+        },
+        "wash": "16% of the matching chart hue"
+      }
+    },
+    "elevation": {
+      "actionLift": "0 12px 30px rgb(16 185 129 / 25%)",
+      "cardLift": "0 20px 45px rgb(0 0 0 / 20%)",
+      "header": "rgb(5 20 15 / 88%) with backdrop-filter: blur(16px)",
+      "heroAtmosphere": "radial-gradient(circle, rgb(16 185 129 / 27%), transparent 68%) with blur(22px)",
+      "note": "Flat at rest. Both shadows are reactions to interaction; floating chrome (popovers, the toolbar, the mobile drawer) may also carry cardLift."
+    },
+    "motion": {
+      "state": "200-250ms ease",
+      "entrance": "600-700ms ease with short stagger",
+      "atmosphere": "14s ease-in-out infinite",
+      "livePulse": "2.4s ease-in-out infinite",
+      "reducedMotion": "Set animation and transition durations to 0.01ms and disable repeated animation"
+    },
+    "breakpoints": {
+      "compact": "600px",
+      "authStack": "800px",
+      "navigationAndGrid": "900px",
+      "operationsCompactRail": "1180px",
+      "operationsDrawer": "760px",
+      "operationsSingleColumn": "480px"
+    },
+    "componentExtensions": {
+      "buttonPrimary": {
+        "border": "1px solid var(--color-emerald-primary)",
+        "padding": "0.8rem 1.5rem",
+        "minHeight": "48px",
+        "transition": "transform .2s ease, background .2s ease, box-shadow .2s ease",
+        "hover": "translateY(-2px); background var(--color-emerald-bright); actionLift shadow",
+        "focusVisible": "3px solid var(--color-emerald-soft) with 4px offset"
+      },
+      "card": {
+        "border": "1px solid var(--color-surface-hairline)",
+        "restingFill": "var(--color-surface-fill)",
+        "restingShadow": "none",
+        "interactiveHover": "translateY(-3px/-4px); emerald border; cardLift shadow"
+      },
+      "input": {
+        "border": "1px solid var(--color-surface-hairline)",
+        "focus": "border var(--color-surface-accent-edge-strong); background var(--color-surface-accent-wash)"
+      },
+      "authenticationPanel": {
+        "desktop": "two equal viewport columns; story and centered entry",
+        "formMeasure": "26rem, widening to 32rem after stacking",
+        "responsive": "stack at 800px; hide benefits and tighten padding at 480px"
+      },
+      "operationsDashboard": {
+        "world": "Same forest canvas and emerald palette as marketing. Distinguished by density only: compact radii (4/6/8/12px), the operations* type roles, and tight rows.",
+        "radii": "4px labels, 6px fields/actions, 8px rows/icon tiles, 12px work surfaces",
+        "surfaces": "Cards are --color-surface-fill over the canvas with a hairline border and no resting shadow.",
+        "navigation": "280px persistent rail, 76px collapsed rail, off-canvas drawer below 900px",
+        "typography": "Dense Inter ladder from 0.6875rem uppercase labels to a 1.75rem page title",
+        "dataIntegrity": "Illustrative values require a visible nearby label; chart colours remain redundant with text or structure. Chart tracks use --color-surface-track, which is far above the hover fill so it reads as data."
+      }
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "The Controlled Territory",
+    "overview": "cvhome uses one dark forest identity across marketing, authentication, and authenticated administration. All three share the same canvas, emerald signal palette, Inter type, focus ring, and restrained motion. The console is distinguished from marketing by density — compact radii, the operations* type roles, tighter rows — never by a change of palette.",
+    "keyCharacteristics": [
+      "Deep forest canvas with a tightly controlled emerald signal palette, everywhere.",
+      "Restrained Inter typography with a compact operational ladder.",
+      "Authentication uses a responsive story-and-entry split without replacing the marketing frame.",
+      "Operational dashboards use the same dark surfaces at higher density, with compact radii and responsive persistent-to-drawer navigation.",
+      "Every design value is authored in src/app/core/theme/theme.ts and reaches CSS as a generated token."
+    ],
+    "rules": [
+      {
+        "name": "The Emerald Signal Rule",
+        "body": "Emerald communicates action, state, or deliberate emphasis.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat-at-Rest Rule",
+        "body": "Static surfaces use tonal layering and borders; shadows respond to interaction.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Quiet Authority Rule",
+        "body": "Large headings stay light and tightly tracked; compact labels are sturdy and uppercase.",
+        "section": "typography"
+      },
+      {
+        "name": "The Story-and-Entry Rule",
+        "body": "In authentication flows, keep product reassurance and account entry as peer regions on wide screens, then place the story before the form when stacked.",
+        "section": "layout"
+      },
+      {
+        "name": "The Operational Continuity Rule",
+        "body": "Navigation persists on wide screens, collapses before content becomes cramped, and becomes a drawer on mobile.",
+        "section": "layout"
+      },
+      {
+        "name": "The One-World Rule",
+        "body": "There is a single surface treatment. Marketing, authentication, and the console share one canvas, one palette, and one focus ring; only density changes between them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark Territory Rule",
+        "body": "This world is dark by construction. New surfaces use tonal forest layers and translucent white overlays, never isolated light cards.",
+        "section": "colors"
+      },
+      {
+        "name": "The Token Rule",
+        "body": "Every colour, radius, shadow and type step is authored in theme.ts and consumed as a generated custom property. A literal hex value in a stylesheet is a defect.",
+        "section": "tokens"
+      }
+    ],
+    "dos": [
+      "Do preserve the forest-to-emerald hierarchy.",
+      "Do keep authentication forms focused, measured, and tap-friendly.",
+      "Do label illustrative dashboard data and pair semantic chart colours with text or structure.",
+      "Do author new design values in theme.ts and consume them as tokens."
+    ],
+    "donts": [
+      "Don't promote the authentication split into the marketing page layout.",
+      "Don't compress the form before removing secondary story detail.",
+      "Don't introduce light cards or bright page backgrounds anywhere.",
+      "Don't hardcode a hex value, radius, or shadow in a stylesheet."
+    ]
+  }
+}

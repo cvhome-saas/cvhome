@@ -1,0 +1,967 @@
+{
+  "route": {
+    "home": {"title": "cvhome | Commerce, unbordered"},
+    "signIn": {"title": "Sign in | cvhome"},
+    "signUp": {"title": "Create account | cvhome"},
+    "dashboard": {"title": "Dashboard | cvhome"},
+    "orders": {"title": "Orders | cvhome"},
+    "storeManagement": {"title": "Store management | cvhome"},
+    "createStore": {"title": "Create store | cvhome"},
+    "firstRun": {"title": "Getting started | cvhome"},
+    "notFound": {"title": "Page not found | cvhome"}
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "copy": "That console route does not exist yet.",
+    "back": "Return home"
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again, or contact support if it continues.",
+    "trace": "Support reference:",
+    "category": {
+      "validation": "Check the highlighted fields and try again.",
+      "unauthenticated": "Your session has expired. Sign in again.",
+      "forbidden": "You do not have permission to do that.",
+      "notFound": "That record could not be found.",
+      "conflict": "This changed somewhere else. Refresh and try again.",
+      "remote": "The service did not answer in time. Try again.",
+      "internal": "We could not complete that request. Try again."
+    },
+    "code": {
+      "clientSessionMissing": "Sign in to continue."
+    }
+  },
+  "auth": {
+    "accountAccess": "Account access",
+    "accountAction": "Account action",
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "backToHome": "Back to cvhome home",
+    "freeTrialEyebrow": "14 days free",
+    "trustNote": "Trusted by 1,400 merchants across 26 markets.",
+    "signIn.heading": "Welcome back.",
+    "signIn.copy": "Continue through cvhome's authorization server and return to your default market.",
+    "signIn.point1": "Single sign-on available on Scale plans.",
+    "signIn.point2": "Session history and device list live in your profile.",
+    "signIn.point3": "Support answers in under four hours on weekdays.",
+    "signIn.oauthCopy": "Sign in through cvhome UAA. Your organization, stores and permissions are resolved by the authorization server after the handoff.",
+    "signIn.continueWithUaa": "Continue with cvhome UAA",
+    "signIn.twoFactorNote": "Two-factor authentication applies where your organization requires it.",
+    "signUp.heading": "Plant your flag.",
+    "signUp.copy": "Create the account, choose where you want to sell first, and your store is live before you finish reading this page.",
+    "signUp.point1": "One account, as many storefronts as your plan allows.",
+    "signUp.point2": "Regions, currencies and tax rules configured per store.",
+    "signUp.point3": "No card until the trial ends.",
+    "signUp.name": "Name",
+    "signUp.nameFallback": "Enter your name to create the account.",
+    "signUp.company": "Company",
+    "signUp.companyFallback": "Enter your company name.",
+    "signUp.email": "Email",
+    "signUp.emailFallback": "Enter a valid email address.",
+    "signUp.password": "Password",
+    "signUp.passwordFallback": "Enter a password with at least eight characters.",
+    "signUp.showPassword": "Show password",
+    "signUp.hidePassword": "Hide password",
+    "signUp.show": "Show",
+    "signUp.hide": "Hide",
+    "signUp.requestSent": "Account request sent",
+    "signUp.queuedNote": "Thanks - account creation is queued for the backend signup endpoint.",
+    "signUp.legalNote": "Free for 14 days. No card. Close the account and every store with it, whenever you like."
+  },
+  "dashboard": {
+    "heading": {"title": "Home", "context": "{store} · {date}"},
+    "tryAgain": "Try again",
+    "loadingMetrics": "Loading metrics…",
+    "storeMetrics": "Store metrics",
+    "needsAttention": "Needs your attention",
+    "viewAll": "View all",
+    "customerSplitTitle": "New vs. returning customers",
+    "orderStatusBreakdown": "Order status breakdown",
+    "ordersUnit": "orders",
+    "topSellingProducts": "Top selling products",
+    "productReportOptions": "Product report options",
+    "kpi": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "pendingPayments": "Pending payments",
+      "lowStock": "Low stock items",
+      "needsReview": "Needs review"
+    },
+    "attention": {
+      "paymentApprovals": {"label": "Payment approvals waiting", "detail": "Manual bank-transfer transactions to confirm"},
+      "unfulfilledOrders": {"label": "Unfulfilled orders", "detail": "Orders past 24 hours without a status update"},
+      "lowStockProducts": {"label": "Low stock products", "detail": "Below their reorder threshold"}
+    },
+    "orderStatus": {
+      "ordered": "Ordered",
+      "processed": "Processed",
+      "delivered": "Delivered",
+      "refunded": "Refunded",
+      "canceled": "Canceled"
+    },
+    "customerSplit": {
+      "new": "New customers",
+      "returning": "Returning"
+    }
+  },
+  "shared": {
+    "kpiCard": {"vsLastPeriod": "vs last period"},
+    "toast": {
+      "regionLabel": "Notifications",
+      "dismiss": "Dismiss notification",
+      "tone": {
+        "success": "Success:",
+        "info": "Info:",
+        "warning": "Warning:",
+        "danger": "Error:"
+      }
+    },
+    "export": {
+      "generatedAt": "Generated {date}",
+      "pageOfPages": "{page} / {pages}"
+    },
+    "exportButton": {
+      "export": "Export",
+      "preparing": "Preparing…",
+      "preparingAnnouncement": "Preparing the export.",
+      "readyAnnouncement": "Export ready. The download has started.",
+      "failedFallback": "The export failed.",
+      "canvasUnavailable": "Unable to prepare the export canvas.",
+      "failedAnnouncement": "Export failed. {message}"
+    },
+    "dateRangePicker": {
+      "selectRange": "Select date range",
+      "rangeLabel": "{from} to {to}",
+      "rangeLabelOpen": "{from} to ...",
+      "dialogLabel": "Select date range",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "pickEndDate": "pick an end date",
+      "pickStartDate": "Pick a start date",
+      "rangeApplied": "Range applied: {from} to {to}"
+    },
+    "pagination": {
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pageN": "Page {n}",
+      "label": "Pagination",
+      "records": "records",
+      "noRecords": "No {unit}",
+      "summary": "Showing {first}–{last} of {total} {unit}"
+    },
+    "copyField": {
+      "defaultLabel": "value",
+      "copy": "Copy {what}",
+      "copied": "{what} copied to the clipboard.",
+      "failed": "{what} could not be copied. Select it and copy by hand."
+    },
+    "tagInput": {
+      "defaultLabel": "Tags",
+      "defaultPlaceholder": "Add tag…",
+      "removeTag": "Remove {tag}"
+    }
+  },
+  "orders": {
+    "heading": {
+      "title": "Orders",
+      "context": "{store} · Aug 4, 2026",
+      "contextWithCount": "{store} · {count, plural, one {# order} other {# orders}} in the selected period"
+    },
+    "createOrder": "Create order",
+    "loading": "Loading orders…",
+    "metricsLabel": "Order metrics",
+    "allOrders": "All orders",
+    "filterByStatus": "Filter orders by status",
+    "filterByChannel": "Filter orders by channel",
+    "markAsProcessed": "Mark as processed",
+    "printPickingLists": "Print picking lists",
+    "noneMatch": "No orders match this filter.",
+    "unit": "orders",
+    "pagesLabel": "Order pages",
+    "createShipment": "Create shipment",
+    "createShipmentFor": "Create shipment for {id}",
+    "printInvoice": "Print invoice",
+    "printInvoiceFor": "Print invoice for {id}",
+    "column": {
+      "order": "Order",
+      "customer": "Customer",
+      "status": "Status",
+      "payment": "Payment",
+      "items": "Items",
+      "total": "Total",
+      "placed": "Placed",
+      "actions": "Actions"
+    },
+    "status": {
+      "ordered": "Ordered",
+      "processed": "Processed",
+      "delivered": "Delivered",
+      "refunded": "Refunded",
+      "canceled": "Canceled"
+    },
+    "payment": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "failed": "Failed"
+    },
+    "channel": {
+      "all": "All channels",
+      "web": "Web",
+      "phone": "Phone"
+    },
+    "tab": {"all": "All"},
+    "subtitle": {
+      "all": "Every order placed in the selected period",
+      "ordered": "Awaiting picking and packing",
+      "processed": "Packed and handed to a carrier",
+      "delivered": "Confirmed received by the customer",
+      "refunded": "Fully or partially refunded",
+      "canceled": "Canceled before fulfilment"
+    },
+    "lateNotice": "{count, plural, one {# order has} other {# orders have}} been waiting more than 24 hours without a status update.",
+    "unfulfilledHours": "{count}h unfulfilled",
+    "kpi": {
+      "orders": "Orders",
+      "unfulfilled": "Unfulfilled",
+      "late": "Late",
+      "allClear": "All clear",
+      "averageOrderValue": "Average order value",
+      "returnsRate": "Returns rate",
+      "refundedCount": "{count, plural, one {# refunded} other {# refunded}}"
+    },
+    "notAvailable": {
+      "details": "Order details for {id} are not available yet.",
+      "create": "Creating orders from the console is not available yet.",
+      "ship": "Shipping {id} is not available yet.",
+      "invoice": "Invoice for {id} is not available yet.",
+      "bulkFulfilment": "Bulk fulfilment is not available yet.",
+      "pickingLists": "Picking lists are not available yet."
+    }
+  },
+  "storeSettings": {
+    "title": "Store management",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "previewStorefront": "Preview storefront",
+    "discard": "Discard",
+    "saving": "Saving…",
+    "saveChanges": "Save changes",
+    "loading": "Loading store settings…",
+    "sectionsLabel": "Store settings sections",
+    "previewNotAvailable": "Previewing the storefront is not available yet.",
+    "sectionSaved": "{section} saved.",
+    "notAvailable": "{what} is not available yet.",
+    "section": {
+      "branding": "Store branding",
+      "home": "Store home page",
+      "domain": "Store domain",
+      "social": "Store social links",
+      "slider": "Store slider images",
+      "details": "Store details",
+      "socialLogin": "Store social login",
+      "payments": "Store payment config"
+    },
+    "sectionShort": {
+      "branding": "Branding",
+      "home": "Home page",
+      "domain": "Domain",
+      "social": "Social links",
+      "slider": "Slider images",
+      "details": "Details",
+      "socialLogin": "Social login",
+      "payments": "Payment config"
+    },
+    "nav": {
+      "heading": "Settings",
+      "ariaLabel": "Store settings sections",
+      "needsAttention": "Needs your attention",
+      "builderUnavailable": "The home page builder is not available yet.",
+      "homePageBuilder": "Home page builder"
+    },
+    "branding": {
+      "title": "Store branding",
+      "subtitle": "Logo and banner shown across your storefront, invoices and emails.",
+      "logo": "Logo",
+      "banner": "Banner",
+      "dropOrBrowse": "Drop image or browse",
+      "dropBanner": "Drag & drop banner here",
+      "logoHint": "PNG or SVG · square · min 512×512 · max 2 MB",
+      "bannerHint": "JPG or PNG · 1920×480 recommended · max 5 MB",
+      "currentLogoAlt": "Current store logo",
+      "replace": "Replace",
+      "remove": "Remove",
+      "removeNamed": "Remove {name}",
+      "uploaded": "Uploaded",
+      "uploadingLogo": "Uploading a logo",
+      "replacingLogo": "Replacing the logo",
+      "removingLogo": "Removing the logo",
+      "uploadingBanner": "Uploading a banner",
+      "removingBanner": "Removing the banner"
+    },
+    "details": {
+      "title": "Store details",
+      "subtitle": "Identity, contact and locale settings for this store.",
+      "storeName": "Store name",
+      "storeNameFallback": "A store name is required.",
+      "legalName": "Legal entity name",
+      "legalNameFallback": "The registered entity name is required.",
+      "slug": "Store slug",
+      "slugHint": "Used in the storefront URL",
+      "slugFallback": "Lowercase letters, digits and single hyphens only.",
+      "category": "Category",
+      "supportEmail": "Support email",
+      "supportEmailFallback": "Enter an address customers can reach you at.",
+      "supportPhone": "Support phone",
+      "currency": "Default currency",
+      "currencyFallback": "A default currency is required.",
+      "language": "Default language",
+      "languageFallback": "A default language is required.",
+      "timezone": "Timezone",
+      "taxNumber": "Tax / VAT number",
+      "taxHint": "Printed on invoices",
+      "address": "Business address",
+      "shortDescription": "Short description",
+      "upToCharacters": "Up to {max} characters",
+      "shortDescriptionFallback": "Keep this to {max} characters or fewer.",
+      "visibility": "Store visibility",
+      "published": "Store is published",
+      "publishedDescription": "Visible to customers and indexable by search engines",
+      "maintenanceMode": "Maintenance mode",
+      "maintenanceModeDescription": "Show a holding page instead of the storefront",
+      "deleteStore": "Delete this store",
+      "deleteStoreWarning": "Removes products, orders and configuration. This cannot be undone.",
+      "deleteNotAvailable": "Deleting a store from the console is not available yet."
+    },
+    "domain": {
+      "title": "Store domain",
+      "subtitle": "Serve your storefront from your own domain.",
+      "defaultSubdomain": "Default subdomain · always active",
+      "system": "System",
+      "customDomain": "Custom domain",
+      "verify": "Verify",
+      "pattern": "Lowercase letters, digits, hyphens and dots · no protocol or trailing slash",
+      "fallback": "Enter a bare host name, like shop.example.com — no https:// and no trailing slash.",
+      "recordToAdd": "DNS record to add",
+      "dnsType": "Type",
+      "dnsName": "Name",
+      "dnsValue": "Value",
+      "dnsTtl": "TTL",
+      "dnsHint": "Add this at your DNS provider, then hit Verify. Propagation can take up to 24 hours.",
+      "thisDomain": "this domain",
+      "enterBeforeChecking": "Enter a custom domain before checking DNS.",
+      "unverified": {"title": "Not verified yet", "meta": "never checked", "body": "Add the CNAME record below at your DNS provider, then run a check."},
+      "checking": {"title": "Checking DNS…", "meta": "started just now", "body": "Querying authoritative name servers for {domain}. This usually resolves within a minute."},
+      "waiting": {"title": "Waiting for DNS", "meta": "retrying every 5 minutes", "body": "No CNAME record found yet for {domain}. Add the record below at your DNS provider — we keep checking in the background and will email you when it resolves."},
+      "verified": {"title": "Domain verified", "meta": "SSL issued", "body": "{domain} resolves to our edge and a certificate has been issued. Traffic to the default subdomain now redirects here."},
+      "failed": {"title": "Verification failed", "meta": "last check rejected", "body": "A record exists for {domain} but points somewhere else. Correct it to the value below and check again."}
+    },
+    "social": {
+      "title": "Store social links",
+      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
+      "addProfileUrl": "Add profile URL…",
+      "fallback": "Enter a profile URL, like instagram.com/your-store."
+    },
+    "slider": {
+      "title": "Store slider images",
+      "subtitle": "Homepage carousel · drag to reorder · {count} of {capacity} slots used",
+      "addSlide": "Add slide",
+      "addingSlide": "Adding a slide",
+      "reorderUnavailable": "Reordering slides is not available yet.",
+      "linksTo": "Links to {link}",
+      "live": "Live",
+      "scheduled": "Scheduled",
+      "editNamed": "Edit {name}",
+      "deleteNamed": "Delete {name}",
+      "editingSlide": "Editing a slide",
+      "deletingSlide": "Deleting a slide",
+      "dropImages": "Drag & drop slider images",
+      "hint": "1600×640 recommended · up to {capacity} slides",
+      "uploadingImages": "Uploading slider images",
+      "slotsFull": "All {capacity} slots are used. Delete a slide before adding another."
+    },
+    "socialLogin": {
+      "title": "Store social login",
+      "subtitle": "Let customers sign in with an external provider. Secrets are stored encrypted.",
+      "signInWith": "Sign in with {provider}",
+      "appId": "App ID",
+      "appSecret": "App secret",
+      "replace": "Replace",
+      "replacingSecret": "Replacing the {provider} app secret",
+      "callbackUrl": "Callback URL",
+      "callbackHint": "Paste this into the provider's redirect URI allow-list"
+    },
+    "payments": {
+      "title": "Store payment configuration",
+      "subtitle": "Gateway credentials for this store only.",
+      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest and never returned to this screen. You can replace or rotate a value, but not read it back.",
+      "accept": "Accept {gateway}",
+      "apiKey": "API key",
+      "publishable": "(publishable)",
+      "secretKey": "Secret key",
+      "rotate": "Rotate",
+      "rotatingSecret": "Rotating the {gateway} secret key",
+      "webhookSecret": "Webhook secret",
+      "replacingWebhookSecret": "Replacing the {gateway} webhook secret",
+      "endpoint": "Endpoint: {url}"
+    },
+    "home": {
+      "title": "Store home page",
+      "subtitle": "Landing copy and search metadata, written per language.",
+      "writeIn": "Write home page copy in",
+      "landingTitle": "Landing page title",
+      "landingTitleHint": "Shown as the H1 and browser tab title",
+      "landingTitleFallback": "A landing page title is required.",
+      "landingText": "Landing text",
+      "metaDescription": "Meta description",
+      "metaRecommended": "Recommended {min}–{max} characters",
+      "characters": "{count} characters",
+      "tags": "Tags",
+      "tagsLabel": "Home page tags",
+      "fallbackNotice": "Untranslated languages fall back to English.",
+      "empty": "Empty"
+    },
+    "secret": {
+      "endsWith": "•••••••••••••• ends {last4}",
+      "notSet": "•••••••••••••• not set",
+      "lastChanged": "Last changed {date}",
+      "lastRotated": "Last rotated {date}",
+      "neverStored": "No secret stored yet"
+    },
+    "state": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "live": "Live",
+      "off": "Off"
+    },
+    "socialProvider": {
+      "facebook": "Facebook",
+      "x": "X",
+      "tiktok": "TikTok",
+      "instagram": "Instagram",
+      "github": "GitHub"
+    },
+    "loginProvider": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub"
+    },
+    "paymentType": {
+      "cod": "Cash on delivery",
+      "manualTransfer": "Manual bank transfer",
+      "stripe": "Stripe",
+      "paypal": "PayPal"
+    },
+    "paymentDescription": {
+      "cod": "Collected by the courier — nothing to configure",
+      "manualTransfer": "Orders wait until you confirm the transfer",
+      "stripe": "Cards, wallets and local methods",
+      "paypal": "PayPal balance and linked cards"
+    }
+  },
+  "createStore": {
+    "title": "Create store",
+    "cancel": "Cancel",
+    "subtitle": {
+      "form": "Provision a new store on a server in the region you sell from",
+      "running": "Provisioning {name} in {region} — this takes about a minute",
+      "live": "{name} · live in {region}"
+    },
+    "identity": {
+      "title": "Store identity",
+      "subtitle": "Branding, domains and content are configured after provisioning",
+      "storeName": "Store name",
+      "storeNamePlaceholder": "Acme Supply EU",
+      "storeCode": "Store code",
+      "storeCodePlaceholder": "acme-eu",
+      "codeAvailable": "Available · used in the tenant identifier",
+      "country": "Country of operation",
+      "countryHint": "Sets default currency, tax rules and data residency",
+      "currency": "Base currency",
+      "subdomain": "Provisional subdomain",
+      "auto": "Auto",
+      "subdomainHint": "Attach a custom domain later in Store management → Store domain"
+    },
+    "country": {
+      "de": "Germany",
+      "us": "United States",
+      "ae": "United Arab Emirates",
+      "eg": "Egypt",
+      "sg": "Singapore"
+    },
+    "currency": {
+      "eur": "EUR — Euro",
+      "usd": "USD — US Dollar",
+      "aed": "AED — UAE Dirham",
+      "egp": "EGP — Egyptian Pound",
+      "sgd": "SGD — Singapore Dollar"
+    },
+    "region": {
+      "title": "Hosting region",
+      "subtitle": "Where the store is physically provisioned — this cannot be changed afterwards",
+      "permanent": "Permanent",
+      "recommended": "Recommended",
+      "proPlan": "Pro plan",
+      "latencyMs": "{ms} ms",
+      "toCustomers": "to customers",
+      "meta": {
+        "gdpr": "GDPR data residency · {nodes, plural, one {# node} other {# nodes}} available",
+        "shared": "Shared cluster with {store} · {nodes, plural, one {# node} other {# nodes}} available",
+        "arabicPack": "Arabic locale pack preinstalled · {nodes, plural, one {# node} other {# nodes}} available",
+        "proOnly": "Requires the Pro plan or above"
+      },
+      "eu": {
+        "label": "EU Central · Frankfurt",
+        "residency": "Customer and order data stays inside the EU. Backups replicate to eu-west-1 (Dublin) only."
+      },
+      "us": {
+        "label": "US West · Oregon",
+        "residency": "Data is stored in the United States. Selling into the EU from this region requires a processing addendum."
+      },
+      "me": {
+        "label": "Middle East · Bahrain",
+        "residency": "Data stays in the GCC region. Local invoicing and VAT formats are applied by default."
+      },
+      "ap": {
+        "label": "Asia Pacific · Singapore",
+        "residency": "Data stays in Singapore. Available on Pro and Enterprise subscriptions only."
+      }
+    },
+    "plan": {
+      "title": "Subscription tier",
+      "subtitle": "Determines the resources allocated to this store's server",
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro",
+      "priceMonthly": "${amount}/mo",
+      "spec": {
+        "cpuRam": "{cpu} vCPU · {ram} GB RAM",
+        "mediaStorage": "{gb} GB media storage",
+        "ordersPerMonth": "{count, plural, one {# order} other {# orders}} / month",
+        "ordersUnlimited": "Unlimited orders",
+        "sharedNode": "Shared node",
+        "dedicatedNode": "Dedicated node",
+        "dedicatedHotStandby": "Dedicated + hot standby"
+      }
+    },
+    "summaryPanel": {
+      "title": "Provisioning summary",
+      "note": "Provisioning takes about a minute. You can leave this page — the store appears in the switcher as soon as it is live.",
+      "provision": "Provision store",
+      "billingNote": "Billing starts when the store goes live"
+    },
+    "summary": {
+      "storeName": "Store name",
+      "pendingName": "—",
+      "pendingSubdomain": "—",
+      "tenant": "Tenant",
+      "region": "Region",
+      "countryCurrency": "Country · currency",
+      "plan": "Plan",
+      "resources": "Resources",
+      "estimatedTime": "Estimated time",
+      "estimatedTimeValue": "~1 minute"
+    },
+    "artifactsPanel": {"title": "What gets created"},
+    "artifact": {
+      "database": {"label": "Dedicated tenant database", "detail": "Encrypted at rest, isolated from other stores"},
+      "node": {"label": "Node assignment", "detail": "A physical server in {region}"},
+      "domain": {"label": "Provisional subdomain + TLS", "detail": "{domain} with a managed certificate"},
+      "locale": {"label": "Locale and tax defaults", "detail": "Seeded from the country of operation"},
+      "owner": {"label": "Admin access for you", "detail": "{name} added as store owner"}
+    },
+    "limitPanel": {
+      "title": "Plan limit",
+      "copy": "Free plan allows {limit} stores. This will be your {next}th — it provisions on a trial and needs an upgrade within 14 days.",
+      "used": "{used} of {limit} stores used"
+    },
+    "task": {
+      "validate": {"label": "Validating store code and plan limits", "detail": "tenant {code} reserved"},
+      "allocate": {"label": "Allocating node in {region}", "detail": "assigned {node} · {region}"},
+      "database": {"label": "Creating tenant database", "detail": "schema {schema} · pg-14 · encrypted at rest"},
+      "seed": {"label": "Seeding catalogue, tax and locale defaults", "detail": "{currency} defaults applied"},
+      "tls": {"label": "Issuing TLS certificate", "detail": "{domain} · Let’s Encrypt"},
+      "cdn": {"label": "Warming CDN edge and object storage", "detail": "{edges} edge locations · {gb} GB bucket"},
+      "live": {"label": "Running health checks and going live", "detail": "storefront, admin API and webhooks responding"}
+    },
+    "progress": {
+      "running": "running…",
+      "queued": "queued",
+      "runningTitle": "Provisioning store",
+      "doneTitle": "Store provisioned",
+      "stepMeta": "Step {step} of {count} · do not close the browser tab if you want live updates",
+      "doneMeta": "Completed · {count} of {count} steps",
+      "etaRemaining": "about {seconds}s left",
+      "etaComplete": "complete",
+      "assigning": "assigning…",
+      "pending": "pending",
+      "issued": "issued",
+      "liveBanner": "{name} is live on {region} · node {node} · {domain}",
+      "configureStore": "Configure store",
+      "buildHomePage": "Build home page",
+      "provisionAnother": "Provision another store"
+    },
+    "infraPanel": {"title": "Assigned infrastructure"},
+    "infra": {
+      "node": "Node",
+      "database": "Database",
+      "resources": "Resources",
+      "storage": "Storage",
+      "certificate": "Certificate"
+    },
+    "nextStepsPanel": {"title": "Next steps"},
+    "nextStep": {
+      "logo": "Upload logo and banner",
+      "domain": "Attach a custom domain",
+      "payments": "Connect a payment gateway",
+      "product": "Add your first product"
+    },
+    "notAvailable": "{what} is not available yet."
+  },
+  "firstRun": {
+    "heading": {"title": "Getting started", "context": "No store yet · create one to open the console"},
+    "loading": "Loading your setup…",
+    "notAvailable": "{what} is not available yet.",
+    "notice": {
+      "pending": "Start your 14-day trial to create your first store. No card required.",
+      "active": "Your 14-day trial is active — {days} days left, no card on file.",
+      "startTrial": "Start 14-day trial",
+      "viewPlans": "View plans"
+    },
+    "hero": {
+      "stepOf": "Step {step} of {total}",
+      "startTrial": "Start 14-day trial",
+      "createStore": "Create store",
+      "trialRequired": "Start your trial to unlock store provisioning.",
+      "pending": {
+        "title": "Start your trial, then create your store",
+        "copy": "Your 14-day trial unlocks store provisioning. Start it and you can name your first store and pick its region straight away — no card, cancel any time.",
+        "meta": "No card required · 14 days free"
+      },
+      "ready": {
+        "title": "Create your first store",
+        "copy": "Nothing else in cvhome works until a store exists — products, orders and payments all belong to one. Pick a region and a name; provisioning takes about a minute.",
+        "meta": "~1 minute · you can create more later"
+      }
+    },
+    "progress": {"title": "Setup progress", "locked": "Locked"},
+    "step": {
+      "createStore": {"label": "Create your first store", "meta": "Region, name and plan · ~1 min"},
+      "addProducts": {"label": "Add your first products", "meta": "One at a time or import a CSV"},
+      "designHome": {"label": "Design the home page", "meta": "Hero, categories and promos"},
+      "connectPayments": {"label": "Connect a payment gateway", "meta": "Required before you can take orders"}
+    },
+    "feature": {
+      "title": "Watch: create a store in 2 minutes",
+      "copy": "A short walkthrough from an empty account to a live storefront — region, plan, first product and the home page.",
+      "duration": "2:14"
+    },
+    "guides": {"title": "More short guides"},
+    "guide": {
+      "meta": "{duration} · {section}",
+      "section": {"products": "Products", "storefront": "Storefront", "payments": "Payments", "content": "Content"},
+      "csvImport": {"title": "Import a catalogue from CSV", "duration": "3:05"},
+      "homePage": {"title": "Build the home page", "duration": "4:20"},
+      "goLive": {"title": "Connect Stripe and go live", "duration": "2:48"},
+      "secondLanguage": {"title": "Sell in a second language", "duration": "3:36"}
+    },
+    "nextUp": {
+      "title": "What comes after that",
+      "subtitle": "Unlocks the moment your store is provisioned",
+      "catalogue": {
+        "title": "Fill the catalogue",
+        "copy": "Add products with images, pricing and stock per location — or import an existing catalogue as a CSV."
+      },
+      "storefront": {
+        "title": "Shape the storefront",
+        "copy": "Build the home page from hero, carousel, category and product blocks, in each language you sell in."
+      },
+      "payments": {
+        "title": "Take the first payment",
+        "copy": "Connect Stripe, PayPal or a regional gateway. Test mode first, then flip it live."
+      }
+    },
+    "plan": {
+      "title": "Your plan",
+      "meta": "14 days left · no card on file",
+      "freeTrial": "Free trial",
+      "comparePlans": "Compare plans",
+      "footnote": "The free plan runs one store in one region with a cvhome subdomain. Custom domains, extra stores and team seats come with Growth."
+    },
+    "limit": {
+      "of": "of {cap}",
+      "growthAllows": "Growth allows {amount}",
+      "stores": "Stores",
+      "products": "Products",
+      "seats": "Team seats",
+      "storage": "Media storage"
+    },
+    "help": {
+      "title": "Want us to set the first store up with you?",
+      "copy": "A 15-minute call covering regions, currency and catalogue import. Free on every plan.",
+      "bookCall": "Book a call"
+    }
+  },
+  "marketing": {
+    "brandHome": "cvhome home",
+    "toggleNavigation": "Toggle navigation",
+    "primaryNavigation": "Primary navigation",
+    "metricsAriaLabel": "Platform metrics",
+    "footerNavigation": "Footer navigation",
+    "nav": {
+      "why": "Why cvhome",
+      "merchants": "Merchants",
+      "reviews": "Reviews",
+      "contact": "Contact",
+      "pricing": "Pricing",
+      "openStore": "Open a store"
+    },
+    "hero": {
+      "status": "Commerce, unbordered",
+      "headline": "Sell anywhere.<br><strong>Rule everywhere.</strong>",
+      "copy": "cvhome is the operating table for merchants who outgrew one storefront. Many markets, many languages, many currencies. One command.",
+      "begin": "Begin",
+      "seeItLive": "See it live"
+    },
+    "metric": {
+      "timeToOpen": "To open a market",
+      "continents": "Continents",
+      "languages": "Languages",
+      "uptime": "Uptime"
+    },
+    "story": {
+      "heading": "Most platforms give you a store. We give you a <em>territory</em>."
+    },
+    "pillar": {
+      "openMarket": {
+        "title": "Open a market in a minute",
+        "copy": "A new store is a decision, not a project. Choose where you want to sell and it is standing before the coffee cools."
+      },
+      "localLanguage": {
+        "title": "Speak the local language",
+        "copy": "Every word your customers read, in their language and their currency, without running four teams to keep it true."
+      },
+      "oneSeat": {
+        "title": "One seat, every store",
+        "copy": "Switch markets the way you switch tabs. The numbers, the orders and the shelves all answer to the same login."
+      }
+    },
+    "stores": {
+      "heading": "Merchants already <em>on the map</em>.",
+      "subheading": "Four live storefronts, one account",
+      "live": "Live"
+    },
+    "store": {
+      "since": "Since {year}",
+      "acme": {"trade": "Workplace supplies"},
+      "northline": {"trade": "Lab consumables"},
+      "harborPoint": {"trade": "Cafe wholesale"},
+      "vantage": {"trade": "Furniture trade"}
+    },
+    "reviews": {
+      "heading": "What merchants say <em>after a year</em>.",
+      "ratedAriaLabel": "Rated {rating} out of 5",
+      "averageFrom": "4.8 average from {count} reviews",
+      "startTrial": "Start your own trial"
+    },
+    "review": {
+      "marta": {
+        "role": "Founder, Nordwerk Interiors",
+        "market": "Poland · 3 stores",
+        "quote": "We ran three storefronts on three different tools before this. Consolidating them took an afternoon, and I finally see one stock number instead of three that disagree."
+      },
+      "tobias": {
+        "role": "Head of Ecommerce, Fjord Supply",
+        "market": "Sweden · 5 stores",
+        "quote": "Opening a new market used to be a project with a budget. Now it is a form. The tax and currency rules come preconfigured per region, which is the part I dreaded."
+      },
+      "amina": {
+        "role": "Operations lead, Souk Modern",
+        "market": "UAE · 2 stores",
+        "quote": "Arabic and English side by side in the same product form is what sold us. Translators work in the admin directly instead of passing spreadsheets back and forth."
+      },
+      "daniel": {
+        "role": "Managing director, Ridgeline Tools",
+        "market": "UK · 4 stores",
+        "quote": "Support answered a payout question in under two hours on a Saturday. That mattered more than any feature on the pricing page."
+      },
+      "camille": {
+        "role": "Brand director, Atelier Vert",
+        "market": "France · 1 store",
+        "quote": "The storefront builder gave us something on brand without a developer. We hired one later for the checkout, not for the basics."
+      },
+      "priya": {
+        "role": "Merchandising manager, Acme Supply",
+        "market": "Netherlands · 6 stores",
+        "quote": "Banners, pages and FAQ entries all publish per store per language. Our seasonal campaigns went from a two-week scramble to a Monday morning."
+      }
+    },
+    "reviewStat": {
+      "averageRating": "Average rating across 312 reviews",
+      "wouldRecommend": "Would recommend to another merchant",
+      "medianTime": "Median time on the platform"
+    },
+    "quote": {
+      "text": "“We opened Germany on a Tuesday morning and took our first order before lunch.”",
+      "attribution": "Head of Commerce · Acme Supply Holdings"
+    },
+    "pricing": {
+      "heading": "One price. Per store.",
+      "billingCycle": "Billing cycle",
+      "monthly": "Monthly",
+      "yearly": "Yearly −20%",
+      "perMonth": "/mo",
+      "billedYearly": "billed yearly",
+      "billedMonthly": "billed monthly",
+      "note": "Every plan is the whole platform. The account is free — you only pay for stores you open."
+    },
+    "plan": {
+      "starter": {"name": "Starter", "description": "For the first market. Everything works, at a smaller scale.", "action": "Start free"},
+      "growth": {"name": "Growth", "description": "For merchants running several markets at once, with room to spare.", "action": "Start 14-day trial"},
+      "pro": {"name": "Pro", "description": "For operations that cannot afford a quiet hour anywhere on the map.", "action": "Talk to us"}
+    },
+    "contact": {
+      "heading": "Talk to someone who <em>runs stores</em>.",
+      "intro": "Migration questions, tax setup in a new market, or a plan that does not fit the pricing page. Our team answers in under four hours on weekdays.",
+      "address": "Prinsengracht 263, Amsterdam · Mon–Fri, 09:00–18:00 CET",
+      "formHeading": "Send us a note",
+      "formIntro": "No sales sequence. One reply from the person who can answer.",
+      "name": "Name",
+      "company": "Company",
+      "workEmail": "Work email",
+      "whatDoYouNeed": "What do you need?",
+      "message": "Message",
+      "messageSent": "Message sent",
+      "sendMessage": "Send message",
+      "thanksNote": "Thanks — we have your note and will reply shortly.",
+      "replyNote": "We reply within four hours on weekdays. No card, no sales sequence."
+    },
+    "channel": {
+      "email": {"title": "Email us", "detail": "For migrations, pricing and partnership questions."},
+      "chat": {"title": "Live chat", "detail": "In the console, bottom right. Weekdays 09:00–18:00 CET."},
+      "call": {"title": "Call sales", "detail": "For teams running more than five storefronts."}
+    },
+    "contactTopic": {
+      "migratingStores": "Migrating stores",
+      "newMarketSetup": "New market setup",
+      "customPlan": "Custom plan",
+      "somethingElse": "Something else"
+    },
+    "contactHint": {
+      "migratingStores": "We run four storefronts on two other platforms and want to consolidate before the autumn season.",
+      "newMarketSetup": "We are opening in Germany and Poland next quarter and need help with tax and currency setup.",
+      "customPlan": "We expect around 20 stores across 6 markets. The published tiers do not cover that.",
+      "somethingElse": "Tell us what you are trying to do and who it is for."
+    },
+    "footer": {
+      "console": "Console",
+      "copyright": "© {year} cvhome"
+    }
+  },
+  "shell": {
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "orders": "Orders",
+      "storeManagement": "Store management",
+      "createStore": "Create store",
+      "firstRun": "Getting started"
+    },
+    "toolbar": {
+      "breadcrumbNav": "Breadcrumb",
+      "search": "Search orders and products",
+      "searchPlaceholder": "Search orders, products…",
+      "notificationsAriaLabel": "Notifications, {count, plural, =0 {no unread} one {# unread} other {# unread}}",
+      "languageAriaLabel": "Language, {name}",
+      "themeAriaLabel": "Theme, {name}"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "newCount": "{count, plural, =0 {No new} one {# new} other {# new}}",
+      "markAllRead": "Mark all read",
+      "viewAll": "View all notifications",
+      "time": {
+        "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
+        "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+        "yesterday": "Yesterday"
+      },
+      "item": {
+        "newOrder": {
+          "title": "New order #{orderId}",
+          "detail": "{customer} · {amount} · {count, plural, one {# item} other {# items}}"
+        },
+        "paymentAwaiting": {
+          "title": "Payment awaiting approval",
+          "detail": "Bank transfer of {amount} needs confirmation"
+        },
+        "outOfStock": {
+          "title": "{product} out of stock",
+          "detail": "{units, plural, =0 {0 units left} one {# unit left} other {# units left}} · {orders, plural, one {# open order affected} other {# open orders affected}}"
+        },
+        "teamJoined": {
+          "title": "{name} joined your team",
+          "detail": "Invited as {role} · {store}"
+        },
+        "refundIssued": {
+          "title": "Refund issued for order #{orderId}",
+          "detail": "{amount} returned to customer"
+        }
+      }
+    },
+    "profile": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logOut": "Log out"
+    },
+    "theme": {
+      "forest": {"label": "Forest", "hint": "Emerald on deep green"},
+      "midnight": {"label": "Midnight", "hint": "Indigo on slate"},
+      "daylight": {"label": "Daylight", "hint": "Emerald on white"}
+    },
+    "nav": {
+      "ariaLabel": "Console",
+      "openNavigation": "Open navigation",
+      "closeNavigation": "Close navigation",
+      "expandMenu": "Expand menu",
+      "collapseMenu": "Collapse menu",
+      "firstRunDisabled": "Create your first store to unlock this section.",
+      "group": {
+        "seller": "Seller",
+        "organization": "Organization",
+        "storefront": "Storefront",
+        "commerce": "Commerce"
+      },
+      "item": {
+        "home": "Home",
+        "storeManagement": "Store management",
+        "userManagement": "User management",
+        "customers": "Customers",
+        "contentManagement": "Content management",
+        "inventory": "Inventory",
+        "orders": "Orders",
+        "payments": "Payments"
+      }
+    },
+    "planBanner": {
+      "ariaLabel": "Plan notice",
+      "notice": "You're on the Free plan — upgrade to add more stores, users and premium features.",
+      "upgrade": "Upgrade plan",
+      "dismiss": "Dismiss plan notice"
+    },
+    "store": {
+      "ariaLabel": "Stores",
+      "title": "Store",
+      "optionsAriaLabel": "Store options",
+      "defaultStore": "Default store",
+      "setCurrentAsDefault": "Set current as default",
+      "opensOnLogin": "Opens on login · now {name}",
+      "doneReordering": "Done reordering",
+      "reorderStores": "Reorder stores",
+      "manageAllStores": "Manage all stores",
+      "loading": "Loading stores…",
+      "noStoreYet": "No store yet",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "createStore": "Create store"
+    }
+  }
+}

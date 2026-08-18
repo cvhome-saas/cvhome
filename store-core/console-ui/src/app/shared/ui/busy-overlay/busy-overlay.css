@@ -1,0 +1,82 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+.busy-content {
+  transition: opacity var(--default-transition-duration) ease;
+}
+
+:host([aria-busy='true']) .busy-content {
+  opacity: 0.45;
+}
+
+.busy-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: start center;
+  /* Anchored to the top of the refreshing region, and sticky so it survives scrolling. */
+  padding-block-start: 1.25rem;
+  pointer-events: none;
+}
+
+.busy-badge {
+  position: sticky;
+  top: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--card);
+  box-shadow: var(--lift);
+}
+
+.busy-spinner {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 2px solid var(--track);
+  border-block-start-color: var(--primary);
+  border-radius: 50%;
+  animation: busy-spin 0.7s linear infinite;
+}
+
+.busy-label {
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+@keyframes busy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes busy-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.busy-in {
+  animation: busy-fade 0.18s ease-out;
+}
+
+.busy-out {
+  animation: busy-fade 0.15s ease-in reverse;
+}
+
+/*
+ * The global reduced-motion rule collapses every animation to 0.01ms, which would leave
+ * the spinner frozen mid-rotation and reading as broken. Drop the ring and let the label
+ * carry the message instead.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .busy-spinner {
+    display: none;
+  }
+}

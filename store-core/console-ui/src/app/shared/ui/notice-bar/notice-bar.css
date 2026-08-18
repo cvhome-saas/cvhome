@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 0.7rem 1.25rem;
+  border-block-end: 1px solid var(--border-soft);
+  background: var(--input);
+  color: var(--foreground);
+  --icon-size: 0.9rem;
+  --notice-ink: var(--muted-foreground);
+}
+
+.notice-copy {
+  flex: 1;
+  min-inline-size: 12rem;
+  margin: 0;
+  color: var(--notice-ink);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+:host > app-icon {
+  flex: none;
+  color: var(--notice-ink);
+}
+
+:host(.green) {
+  background: var(--chart-1-wash);
+  --notice-ink: var(--chart-1-foreground);
+}
+
+:host(.blue) {
+  background: var(--chart-2-wash);
+  --notice-ink: var(--chart-2-foreground);
+}
+
+:host(.cyan) {
+  background: var(--chart-3-wash);
+  --notice-ink: var(--chart-3-foreground);
+}
+
+:host(.amber) {
+  background: var(--chart-4-wash);
+  --notice-ink: var(--chart-4-foreground);
+}
+
+:host(.red) {
+  background: var(--chart-5-wash);
+  --notice-ink: var(--chart-5-foreground);
+}
+
+:host(.violet) {
+  background: var(--chart-6-wash);
+  --notice-ink: var(--chart-6-foreground);
+}

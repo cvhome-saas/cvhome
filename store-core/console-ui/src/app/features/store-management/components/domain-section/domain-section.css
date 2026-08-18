@@ -1,0 +1,143 @@
+.domain-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.scheme {
+  flex: none;
+  color: var(--foreground-subtle);
+  font-size: var(--text-sm);
+}
+
+/* Tone of the field's state mark, matching the status panel below it. */
+.control > app-icon.green { color: var(--chart-1-foreground); }
+.control > app-icon.blue { color: var(--chart-2-foreground); }
+.control > app-icon.amber { color: var(--chart-4-foreground); }
+.control > app-icon.red { color: var(--chart-5-foreground); }
+.control > app-icon.slate { color: var(--muted-foreground); }
+
+/* ---- Status panel ------------------------------------------------------------------- */
+
+.status {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  --status-ink: var(--muted-foreground);
+  --icon-size: 0.95rem;
+}
+
+.status.green {
+  border-color: var(--edge);
+  background: var(--chart-1-wash);
+  --status-ink: var(--chart-1-foreground);
+}
+
+.status.blue {
+  background: var(--chart-2-wash);
+  --status-ink: var(--chart-2-foreground);
+}
+
+.status.amber {
+  background: var(--chart-4-wash);
+  --status-ink: var(--chart-4-foreground);
+}
+
+.status.red {
+  background: var(--chart-5-wash);
+  --status-ink: var(--chart-5-foreground);
+}
+
+.status-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.status-head app-icon {
+  flex: none;
+  color: var(--status-ink);
+}
+
+.status-head strong {
+  color: var(--status-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.status-meta {
+  margin-inline-start: auto;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.status-body {
+  margin: 0.5rem 0 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* ---- DNS record --------------------------------------------------------------------- */
+
+.dns {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.dns-head,
+.dns-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr 1.4fr 4.5rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.6rem 1rem;
+}
+
+.dns-head {
+  border-block-end: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dns-row {
+  padding-block: 0.6rem;
+  color: var(--foreground-strong);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+}
+
+/* The value already sits in a bordered copy field; a second frame around it reads as a box. */
+.dns-row app-copy-field {
+  margin-inline: -0.4rem;
+}
+
+.dns-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 0.6rem;
+  --icon-size: 0.8rem;
+}
+
+@container settings (max-width: 40rem) {
+  .domain-row {
+    flex-wrap: wrap;
+  }
+
+  /* Four monospace columns stop fitting long before the card does. */
+  .dns {
+    overflow-x: auto;
+  }
+
+  .dns-head,
+  .dns-row {
+    min-inline-size: 30rem;
+  }
+}

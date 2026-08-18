@@ -1,0 +1,211 @@
+<!--
+THESIS: cvhome turns multi-market commerce into one controlled territory, not another generic storefront.
+OWN-WORLD: deep forest surfaces, precise emerald signals, restrained typography, and map-like breadth.
+COMPOSITION: a commanding first viewport opens into proof, merchants, testimony, pricing, and direct contact.
+BEHAVIOR: one calm atmospheric drift, tactile billing and topic controls, and a responsive navigation drawer.
+RISK: the dark palette is protected with high-contrast type, generous spacing, and visible focus states.
+-->
+<div class="marketing-shell" *transloco="let t">
+  <header class="site-header">
+    <a class="brand" href="#top" [attr.aria-label]="t('marketing.brandHome')">{{ brandName }}</a>
+    <button class="menu-button" type="button" (click)="facade.menuOpen.set(!facade.menuOpen())" [attr.aria-expanded]="facade.menuOpen()" aria-controls="primary-navigation">
+      <span></span><span></span><span></span><span class="sr-only">{{ t('marketing.toggleNavigation') }}</span>
+    </button>
+    <nav id="primary-navigation" [class.open]="facade.menuOpen()" [attr.aria-label]="t('marketing.primaryNavigation')">
+      <a href="#story" (click)="facade.menuOpen.set(false)">{{ t('marketing.nav.why') }}</a>
+      <a href="#stores" (click)="facade.menuOpen.set(false)">{{ t('marketing.nav.merchants') }}</a>
+      <a href="#reviews" (click)="facade.menuOpen.set(false)">{{ t('marketing.nav.reviews') }}</a>
+      <a href="#contact" (click)="facade.menuOpen.set(false)">{{ t('marketing.nav.contact') }}</a>
+      <a href="#pricing" (click)="facade.menuOpen.set(false)">{{ t('marketing.nav.pricing') }}</a>
+      <a href="/sign-in">{{ t('auth.signIn') }}</a>
+      <a class="button button-small" href="/sign-up">{{ t('marketing.nav.openStore') }}</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="status"><span aria-hidden="true"></span>{{ t('marketing.hero.status') }}</p>
+        <h1 [innerHTML]="t('marketing.hero.headline')"></h1>
+        <p class="hero-copy">{{ t('marketing.hero.copy') }}</p>
+        <div class="hero-actions">
+          <a class="button" href="/sign-up">{{ t('marketing.hero.begin') }}<app-icon name="arrowRight" /></a>
+          <a class="button button-secondary" href="/dashboard">{{ t('marketing.hero.seeItLive') }}</a>
+        </div>
+      </div>
+    </section>
+
+    <hr class="hairline">
+
+    <section class="metrics" [attr.aria-label]="t('marketing.metricsAriaLabel')">
+      @for (metric of facade.metrics(); track metric.label) {
+        <div><strong>{{ metric.value }}</strong><span>{{ metric.label }}</span></div>
+      }
+    </section>
+
+    <hr class="hairline">
+
+    <section class="content-section story" id="story">
+      <div class="section-inner">
+        <h2 [innerHTML]="t('marketing.story.heading')"></h2>
+        <div class="pillars">
+          @for (pillar of facade.pillars(); track pillar.title) {
+            <article><span class="rule"></span><h3>{{ pillar.title }}</h3><p>{{ pillar.copy }}</p></article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section bordered" id="stores">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2 [innerHTML]="t('marketing.stores.heading')"></h2>
+          <p>{{ t('marketing.stores.subheading') }}</p>
+        </div>
+        <div class="store-grid">
+          @for (store of facade.stores(); track store.name) {
+            <a class="store" href="/oauth2/authorization/uaa">
+              <div class="store-mark" [class]="'store-mark ' + store.tone">
+                <strong>{{ store.mark }}</strong>
+                <span class="live"><i aria-hidden="true"></i>{{ t('marketing.stores.live') }}</span>
+              </div>
+              <div class="store-copy">
+                <h3>{{ store.name }}</h3>
+                <p>{{ store.trade }}</p>
+                <small><app-icon name="mapPin" />{{ store.market }}<b>{{ store.since }}</b></small>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section bordered" id="reviews">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2 [innerHTML]="t('marketing.reviews.heading')"></h2>
+          <div class="rating">
+            <span class="stars" role="img" [attr.aria-label]="t('marketing.reviews.ratedAriaLabel', {rating: '4.8'})">
+              @for (slot of facade.ratingSlots; track slot) {
+                <app-icon name="star" [filled]="true" />
+              }
+            </span>
+            <small>{{ t('marketing.reviews.averageFrom', {count: 312}) }}</small>
+          </div>
+        </div>
+
+        <div class="review-grid">
+          @for (review of facade.reviews(); track review.name) {
+            <article class="review">
+              <div class="review-head">
+                <span class="stars" role="img" [attr.aria-label]="t('marketing.reviews.ratedAriaLabel', {rating: review.rating})">
+                  @for (slot of facade.ratingSlots; track slot) {
+                    <app-icon name="star" [filled]="slot <= review.rating" [class.empty]="slot > review.rating" />
+                  }
+                </span>
+                <small>{{ review.market }}</small>
+              </div>
+              <blockquote>{{ review.quote }}</blockquote>
+              <footer>
+                <span class="avatar">{{ review.initials }}</span>
+                <p><strong>{{ review.name }}</strong><small>{{ review.role }}</small></p>
+              </footer>
+            </article>
+          }
+        </div>
+
+        <div class="review-stats">
+          @for (stat of facade.reviewStats(); track stat.label) {
+            <p><strong>{{ stat.value }}</strong><span>{{ stat.label }}</span></p>
+          }
+          <a class="button button-secondary button-small" href="/sign-up">{{ t('marketing.reviews.startTrial') }}<app-icon name="arrowRight" /></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section">
+      <app-icon name="bolt" [filled]="true" />
+      <p>{{ t('marketing.quote.text') }}</p>
+      <span>{{ t('marketing.quote.attribution') }}</span>
+    </section>
+
+    <section class="content-section pricing" id="pricing">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>{{ t('marketing.pricing.heading') }}</h2>
+          <div class="billing" role="group" [attr.aria-label]="t('marketing.pricing.billingCycle')">
+            <button type="button" [class.active]="!facade.yearlyBilling()" (click)="facade.yearlyBilling.set(false)">{{ t('marketing.pricing.monthly') }}</button>
+            <button type="button" [class.active]="facade.yearlyBilling()" (click)="facade.yearlyBilling.set(true)">{{ t('marketing.pricing.yearly') }}</button>
+          </div>
+        </div>
+        <div class="plan-grid">
+          @for (plan of facade.plans(); track plan.nameKey) {
+            <article class="plan" [class.featured]="plan.featured">
+              <h3>{{ plan.name }}</h3>
+              <p class="price"><strong>${{ price(plan) }}</strong><span>{{ t('marketing.pricing.perMonth') }}</span></p>
+              <small [class.yearly]="facade.yearlyBilling()">{{ facade.yearlyBilling() ? t('marketing.pricing.billedYearly') : t('marketing.pricing.billedMonthly') }}</small>
+              <p class="blurb">{{ plan.description }}</p>
+              <a class="button" [class.button-secondary]="!plan.featured" [href]="plan.nameKey === 'marketing.plan.pro.name' ? '#contact' : '/sign-up'">{{ plan.action }}</a>
+            </article>
+          }
+        </div>
+        <p class="pricing-note">{{ t('marketing.pricing.note') }}</p>
+      </div>
+    </section>
+
+    <section class="content-section bordered contact" id="contact">
+      <div class="section-inner contact-grid">
+        <div>
+          <h2 [innerHTML]="t('marketing.contact.heading')"></h2>
+          <p class="contact-intro">{{ t('marketing.contact.intro') }}</p>
+
+          <div class="channels">
+            @for (channel of facade.channels(); track channel.title) {
+              <a class="channel" [href]="channel.href ?? null" [attr.role]="channel.href ? null : 'group'">
+                <app-icon [name]="channel.icon" />
+                <span class="channel-copy"><strong>{{ channel.title }}</strong><span>{{ channel.detail }}</span></span>
+                <b>{{ channel.value }}</b>
+              </a>
+            }
+          </div>
+
+          <p class="address"><app-icon name="mapPin" />{{ t('marketing.contact.address') }}</p>
+        </div>
+
+        <form [formGroup]="contactForm" (ngSubmit)="sendMessage()">
+          <h3>{{ t('marketing.contact.formHeading') }}</h3>
+          <p class="form-intro">{{ t('marketing.contact.formIntro') }}</p>
+
+          <div class="field-row">
+            <label>{{ t('marketing.contact.name') }}<input formControlName="name" autocomplete="name" required></label>
+            <label>{{ t('marketing.contact.company') }}<input formControlName="organization" autocomplete="organization"></label>
+          </div>
+          <label>{{ t('marketing.contact.workEmail') }}<input type="email" formControlName="email" autocomplete="email" required></label>
+          <fieldset>
+            <legend>{{ t('marketing.contact.whatDoYouNeed') }}</legend>
+            <div class="topics">
+              @for (topic of facade.topics(); track topic.id) {
+                <button type="button" [class.active]="facade.selectedTopic() === topic.id" (click)="selectTopic(topic.id)">{{ topic.label }}</button>
+              }
+            </div>
+          </fieldset>
+          <label>{{ t('marketing.contact.message') }}<textarea formControlName="message" rows="4" [attr.placeholder]="facade.messageHint()" required></textarea></label>
+          <button class="button submit" type="submit" [disabled]="facade.messageSent()">
+            {{ facade.messageSent() ? t('marketing.contact.messageSent') : t('marketing.contact.sendMessage') }}
+            <app-icon [name]="facade.messageSent() ? 'check' : 'arrowRight'" />
+          </button>
+          <small class="form-note" aria-live="polite">{{ facade.messageSent() ? t('marketing.contact.thanksNote') : t('marketing.contact.replyNote') }}</small>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <strong>{{ brandName }}</strong>
+      <nav [attr.aria-label]="t('marketing.footerNavigation')"><a href="#story">{{ t('marketing.nav.why') }}</a><a href="#pricing">{{ t('marketing.nav.pricing') }}</a><a href="/oauth2/authorization/uaa">{{ t('marketing.footer.console') }}</a></nav>
+      <span>{{ t('marketing.footer.copyright', {year: 2026}) }}</span>
+    </div>
+  </footer>
+</div>

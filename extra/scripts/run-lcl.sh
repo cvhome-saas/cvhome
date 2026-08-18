@@ -62,6 +62,7 @@ JAVA_SERVICES=(
 # compiles it on demand.
 NODE_SERVICES=(
     "seller-ui|store-core/seller-ui|start|8010|"
+    "console-ui|store-core/console-ui|start|8011|"
     "landing-ui|store-pod/landing-ui|dev|8110|build:libs-types build:libs-services build:libs-hooks"
 )
 

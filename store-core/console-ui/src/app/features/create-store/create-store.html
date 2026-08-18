@@ -1,0 +1,264 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading()" [context]="facade.liveSubtitle()">
+    <!-- Nothing to cancel back to on a first run: store management needs a store. -->
+    @if (facade.phase() === 'form' && !shell.firstRun()) {
+      <a routerLink="/store-management" class="secondary-action">{{ t('createStore.cancel') }}</a>
+    }
+  </app-page-header>
+
+  @if (facade.phase() === 'form') {
+    <div class="create-store-grid">
+      <div class="column-main">
+        <app-panel [title]="t('createStore.identity.title')" [subtitle]="t('createStore.identity.subtitle')">
+          <form class="panel-pad identity-grid" [formGroup]="facade.form">
+            <div class="field">
+              <label for="store-name">{{ t('createStore.identity.storeName') }} <span class="required">*</span></label>
+              <input id="store-name" class="control" type="text" formControlName="name" [placeholder]="t('createStore.identity.storeNamePlaceholder')" />
+            </div>
+
+            <div class="field">
+              <label for="store-code">{{ t('createStore.identity.storeCode') }} <span class="required">*</span></label>
+              <span class="control">
+                <input id="store-code" class="mono" type="text" formControlName="code" [placeholder]="t('createStore.identity.storeCodePlaceholder')" />
+                @if (facade.form.controls.code.value) {
+                  <app-icon name="checkCircle" class="ok" />
+                }
+              </span>
+              @if (facade.form.controls.code.value) {
+                <p class="field-hint ok">{{ t('createStore.identity.codeAvailable') }}</p>
+              }
+            </div>
+
+            <div class="field">
+              <label for="store-country">{{ t('createStore.identity.country') }} <span class="required">*</span></label>
+              <select id="store-country" class="control" formControlName="countryId">
+                @for (country of facade.countries; track country.id) {
+                  <option [value]="country.id">{{ t(country.labelKey) }}</option>
+                }
+              </select>
+              <p class="field-hint">{{ t('createStore.identity.countryHint') }}</p>
+            </div>
+
+            <div class="field">
+              <label for="store-currency">{{ t('createStore.identity.currency') }}</label>
+              <select id="store-currency" class="control" formControlName="currencyCode">
+                @for (country of facade.countries; track country.currencyCode) {
+                  <option [value]="country.currencyCode">{{ t(country.currencyLabelKey) }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field field-wide">
+              <p class="field-label">{{ t('createStore.identity.subdomain') }}</p>
+              <span class="control readonly">
+                <span class="mono">{{ facade.subdomain() || '—' }}</span>
+                <app-badge tone="slate" shape="square">{{ t('createStore.identity.auto') }}</app-badge>
+              </span>
+              <p class="field-hint">{{ t('createStore.identity.subdomainHint') }}</p>
+            </div>
+          </form>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.region.title')" [subtitle]="t('createStore.region.subtitle')">
+          <app-badge panelAction tone="amber" shape="square">
+            <app-icon name="lock" />{{ t('createStore.region.permanent') }}
+          </app-badge>
+
+          <div class="panel-pad panel-stack">
+          <div class="region-list">
+            @for (region of facade.regions; track region.id) {
+              <button
+                type="button"
+                class="region-card"
+                [class.selected]="region.id === facade.regionId()"
+                [class.locked]="region.locked"
+                [disabled]="region.locked"
+                [attr.aria-pressed]="region.id === facade.regionId()"
+                (click)="pickRegion(region)"
+              >
+                <span class="radio" aria-hidden="true"></span>
+                <span class="region-copy">
+                  <span class="region-name">
+                    <strong>{{ t(region.labelKey) }}</strong>
+                    <code>{{ region.code }}</code>
+                    @if (region.recommended) {
+                      <app-badge tone="green" shape="square">{{ t('createStore.region.recommended') }}</app-badge>
+                    }
+                    @if (region.locked) {
+                      <app-badge tone="slate" shape="square">{{ t('createStore.region.proPlan') }}</app-badge>
+                    }
+                  </span>
+                  <span class="region-meta">{{ t(region.metaKey, region.metaParams) }}</span>
+                </span>
+                <span class="region-latency" [class.recommended]="region.recommended">
+                  <strong>{{ t('createStore.region.latencyMs', {ms: region.latencyMs}) }}</strong>
+                  <small>{{ t('createStore.region.toCustomers') }}</small>
+                </span>
+              </button>
+            }
+          </div>
+
+          <div class="residency-note">
+            <app-icon name="shield" />
+            <span>{{ t(facade.selectedRegion().residencyKey) }}</span>
+          </div>
+          </div>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.plan.title')" [subtitle]="t('createStore.plan.subtitle')">
+          <div class="panel-pad plan-grid">
+            @for (plan of facade.plans; track plan.id) {
+              <button
+                type="button"
+                class="plan-card"
+                [class.selected]="plan.id === facade.planId()"
+                [attr.aria-pressed]="plan.id === facade.planId()"
+                (click)="pickPlan(plan)"
+              >
+                <span class="plan-head">
+                  <span class="radio" aria-hidden="true"></span>
+                  <strong>{{ t(plan.labelKey) }}</strong>
+                </span>
+                <span class="plan-price">{{ t('createStore.plan.priceMonthly', {amount: plan.monthlyPrice}) }}</span>
+                <ul class="plan-specs">
+                  @for (spec of plan.specs; track spec.key) {
+                    <li><app-icon name="check" />{{ t(spec.key, spec.params) }}</li>
+                  }
+                </ul>
+              </button>
+            }
+          </div>
+        </app-panel>
+      </div>
+
+      <div class="column-side">
+        <app-panel [title]="t('createStore.summaryPanel.title')">
+          <div class="panel-pad panel-stack">
+          <div class="summary-rows">
+            @for (row of facade.summary(); track row.label) {
+              <div class="summary-row">
+                <span class="summary-label">{{ row.label }}</span>
+                <span class="summary-value" [class.accent]="row.tone === 'accent'">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+          <div class="summary-note">
+            <app-icon name="clock" />
+            <span>{{ t('createStore.summaryPanel.note') }}</span>
+          </div>
+          <button type="button" class="primary-action provision-btn" [disabled]="facade.form.invalid" (click)="submit()">
+            <app-icon name="server" />{{ t('createStore.summaryPanel.provision') }}
+          </button>
+          <p class="billing-note">{{ t('createStore.summaryPanel.billingNote') }}</p>
+          </div>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.artifactsPanel.title')">
+          <div class="panel-pad artifact-list">
+            @for (artifact of facade.artifacts(); track artifact.id) {
+              <div class="artifact-row">
+                <app-icon [name]="artifact.icon" />
+                <span>
+                  <strong>{{ artifact.label }}</strong>
+                  <small>{{ artifact.detail }}</small>
+                </span>
+              </div>
+            }
+          </div>
+        </app-panel>
+
+        <div class="limit-card">
+          <div class="limit-head">
+            <app-icon name="alertCircle" />
+            <strong>{{ t('createStore.limitPanel.title') }}</strong>
+          </div>
+          <p class="limit-copy">
+            {{ t('createStore.limitPanel.copy', {limit: facade.storeLimit, next: facade.storesUsed() + 1}) }}
+          </p>
+          <app-progress-track class="limit-track" [value]="(facade.storesUsed() / facade.storeLimit) * 100" />
+          <p class="limit-note">{{ t('createStore.limitPanel.used', {used: facade.storesUsed(), limit: facade.storeLimit}) }}</p>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="create-store-grid">
+      <div class="column-main">
+        <div class="progress-card">
+          <header class="progress-head">
+            <span class="progress-icon" [class.done]="facade.isDone()">
+              <app-icon [name]="facade.isDone() ? 'checkCircle' : 'server'" [class.spin]="!facade.isDone()" />
+            </span>
+            <span class="progress-copy">
+              <h2>{{ facade.headline() }}</h2>
+              <p>{{ facade.headMeta() }}</p>
+            </span>
+            <span class="progress-pct">
+              <strong>{{ facade.progressPercent() }}%</strong>
+              <small>{{ facade.etaLabel() }}</small>
+            </span>
+          </header>
+
+          <app-progress-track class="run-track" [class.done]="facade.isDone()" [value]="facade.progressPercent()" />
+
+          <ul class="task-list">
+            @for (task of facade.tasks(); track task.id) {
+              <li [class]="task.status">
+                <span class="task-dot">
+                  <app-icon
+                    [name]="task.status === 'done' ? 'check' : task.status === 'active' ? 'server' : 'minus'"
+                    [class.spin]="task.status === 'active'"
+                  />
+                </span>
+                <span class="task-copy">
+                  <strong>{{ task.label }}</strong>
+                  <small>{{ task.detail }}</small>
+                </span>
+                <span class="task-stamp">{{ task.stamp }}</span>
+              </li>
+            }
+          </ul>
+
+          @if (facade.isDone()) {
+            <div class="done-banner">
+              <app-icon name="checkCircle" />
+              <span>{{ facade.liveBanner() }}</span>
+              <a routerLink="/store-management/branding" class="secondary-action">{{ t('createStore.progress.configureStore') }}</a>
+              <a routerLink="/store-management/home" class="primary-action">
+                <app-icon name="layoutGrid" />{{ t('createStore.progress.buildHomePage') }}
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="column-side">
+        <app-panel [title]="t('createStore.infraPanel.title')">
+          <div class="panel-pad summary-rows">
+            @for (row of facade.infra(); track row.label) {
+              <div class="summary-row">
+                <span class="summary-label">{{ row.label }}</span>
+                <span class="summary-value" [class.pending]="row.pending">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.nextStepsPanel.title')">
+          <div class="panel-pad next-steps">
+            @for (step of facade.nextSteps; track step.id) {
+              <button type="button" class="next-step" (click)="followNextStep(step)">
+                <app-icon [name]="step.icon" />
+                <span>{{ t(step.labelKey) }}</span>
+                <app-icon name="chevronRight" [flip]="true" />
+              </button>
+            }
+          </div>
+        </app-panel>
+
+        @if (facade.isDone()) {
+          <button type="button" class="reset-btn" (click)="facade.reset()">{{ t('createStore.progress.provisionAnother') }}</button>
+        }
+      </div>
+    </div>
+  }
+</ng-container>

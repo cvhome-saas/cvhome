@@ -1,0 +1,116 @@
+/*
+ * Daylight — the light workspace.
+ *
+ * This is the one theme that is not a re-hue. Inverting a dark palette produces mud, so
+ * the decisions are made again from the light side:
+ *
+ *   Alphas flip. Every translucent layer on dark is white over a dark field; here it is
+ *   black over a light one, and at lower percentages, because black over white separates
+ *   far more aggressively than white over near-black at the same alpha.
+ *
+ *   The categorical inks move a full four steps, 300 -> 700. The -300s exist to glow on a
+ *   dark field and land near 1.5:1 on white; the -700s are their legible counterparts.
+ *   The fills (--chart-N) and washes do not move — a 500 fill reads on both, and a 16%
+ *   wash is a pale tint on white just as it is a dark tint on forest.
+ *
+ *   The contrast ladder compresses. On dark there is room for five descending text steps;
+ *   on white everything below sage-600 falls under 3:1, so --muted-foreground and
+ *   --foreground-subtle share a value rather than inventing an illegible one.
+ *
+ * The primary pairing is deliberately unchanged: emerald-500 with near-black ink, exactly
+ * as on Forest. Per the design system, a control does not change colour because of where
+ * it lives — and emerald with white ink is only 2.3:1, so this is also the only pairing
+ * that works.
+ */
+
+[data-theme='daylight'] {
+  color-scheme: light;
+
+  --background: var(--color-sage-50);
+  --foreground: var(--color-sage-900);
+  --foreground-strong: var(--color-forest-950);
+  --foreground-subtle: var(--color-sage-700);
+  --foreground-quiet: var(--color-sage-600);
+
+  /* On light the card is the *brighter* plane; the canvas recedes behind it. */
+  --card: var(--color-white);
+  --card-foreground: var(--foreground-strong);
+
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-sage-900);
+
+  --primary: var(--color-emerald-500);
+  --primary-foreground: var(--color-forest-950);
+
+  --secondary: --alpha(var(--color-forest-950) / 5%);
+  --secondary-foreground: var(--color-sage-800);
+
+  --muted: --alpha(var(--color-forest-950) / 3%);
+  --muted-foreground: var(--color-sage-700);
+
+  --accent: --alpha(var(--color-emerald-500) / 10%);
+  /* The -300 ink of the dark themes is invisible here; emerald-700 is its counterpart. */
+  --accent-foreground: var(--color-emerald-700);
+
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-white);
+
+  --border: --alpha(var(--color-forest-950) / 12%);
+  --input: --alpha(var(--color-forest-950) / 6%);
+  --ring: var(--color-emerald-600);
+
+  --chart-1: var(--color-emerald-500);
+  --chart-1-foreground: var(--color-emerald-700);
+  --chart-1-wash: --alpha(var(--color-emerald-500) / 16%);
+
+  --chart-2: var(--color-blue-500);
+  --chart-2-foreground: var(--color-blue-700);
+  --chart-2-wash: --alpha(var(--color-blue-500) / 16%);
+
+  --chart-3: var(--color-cyan-500);
+  --chart-3-foreground: var(--color-cyan-700);
+  --chart-3-wash: --alpha(var(--color-cyan-500) / 16%);
+
+  --chart-4: var(--color-amber-500);
+  --chart-4-foreground: var(--color-amber-700);
+  --chart-4-wash: --alpha(var(--color-amber-500) / 16%);
+
+  --chart-5: var(--color-red-500);
+  --chart-5-foreground: var(--color-red-700);
+  --chart-5-wash: --alpha(var(--color-red-500) / 16%);
+
+  --chart-6: var(--color-violet-500);
+  --chart-6-foreground: var(--color-violet-700);
+  --chart-6-wash: --alpha(var(--color-violet-500) / 16%);
+
+  /* Emerald steps darken by one on light so hovers and links stay legible. */
+  --primary-emphasis: var(--color-emerald-600);
+  --primary-soft: var(--color-emerald-700);
+  --primary-muted: var(--color-emerald-800);
+
+  --border-soft: --alpha(var(--color-forest-950) / 7%);
+  --edge: --alpha(var(--color-emerald-600) / 45%);
+  --edge-strong: --alpha(var(--color-emerald-600) / 60%);
+
+  /* Illustration fills, not text — they stay dark against the light page on purpose. */
+  --seat-1: var(--color-emerald-800);
+  --seat-2: var(--color-teal-900);
+  --seat-3: var(--color-slate-800);
+  --seat-3-foreground: var(--color-slate-200);
+
+  --accent-strong: --alpha(var(--color-emerald-500) / 18%);
+  --accent-veil: --alpha(var(--color-emerald-500) / 8%);
+
+  --track: --alpha(var(--color-forest-950) / 12%);
+
+  --panel: --alpha(var(--color-white) / 75%);
+  --header-veil: --alpha(var(--color-sage-50) / 85%);
+  /* The scrim still darkens — dimming is a shadow, not an inversion. */
+  --scrim: --alpha(var(--color-forest-950) / 40%);
+
+  /* Shadows lighten: the same opacity that reads as depth on dark reads as dirt on white. */
+  --lift: 0 20px 45px rgb(4 18 13 / 10%);
+  --lift-primary: 0 12px 30px --alpha(var(--color-emerald-500) / 28%);
+
+  --glow-color: --alpha(var(--color-emerald-500) / 16%);
+}

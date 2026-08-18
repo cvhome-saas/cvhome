@@ -1,0 +1,67 @@
+.visibility {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.switch-row {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+/* A published store is the state worth marking — the row itself says which one is on. */
+.switch-row.on {
+  border-color: var(--edge);
+  background: var(--accent-veil);
+}
+
+.danger-zone {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--chart-5-wash);
+  border-radius: var(--radius-lg);
+  background: var(--chart-5-wash);
+  --icon-size: 1rem;
+}
+
+.danger-zone > app-icon {
+  flex: none;
+  margin-block-start: 0.1rem;
+  color: var(--chart-5-foreground);
+}
+
+.danger-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.danger-copy strong {
+  color: var(--chart-5-foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.danger-copy span {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.danger-zone .danger-action {
+  flex: none;
+  border-color: var(--chart-5-foreground);
+  background: var(--muted);
+}
+
+@container settings (max-width: 34rem) {
+  .danger-zone {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,505 @@
+:host {
+  display: block;
+}
+
+.toolbar {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--header-veil);
+  box-shadow: var(--lift);
+  backdrop-filter: blur(18px);
+  animation: toolbar-in 0.45s 0.05s ease both;
+}
+
+.breadcrumb {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  --icon-size: 0.8rem;
+}
+
+.breadcrumb app-icon:nth-of-type(2) {
+  color: var(--foreground-quiet);
+  --icon-size: 0.7rem;
+}
+
+.breadcrumb strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  inline-size: 230px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--default-transition-duration),
+    box-shadow var(--default-transition-duration);
+  --icon-size: 0.8rem;
+}
+
+.search app-icon {
+  color: var(--foreground-subtle);
+}
+
+.search input {
+  inline-size: 100%;
+  min-width: 0;
+  block-size: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+}
+
+.search input::placeholder {
+  color: var(--foreground-subtle);
+}
+
+.search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--chart-1-wash);
+}
+
+.menu {
+  position: relative;
+}
+
+.icon-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--secondary-foreground);
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.icon-button:hover {
+  background: var(--input);
+}
+
+/*
+ * The count on the bell. Deliberately not called `.unread`: the notification rows carry
+ * that class for their own read state, and a bare `.unread` rule laid this badge's
+ * absolute positioning over every row in the popover.
+ */
+.unread-count {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+  display: grid;
+  place-items: center;
+  min-inline-size: 16px;
+  block-size: 16px;
+  padding: 0 0.2rem;
+  border-radius: var(--radius-full);
+  background: var(--chart-5);
+  color: var(--primary-foreground);
+  font-size: var(--text-4xs);
+  font-weight: 600;
+  animation: toolbar-pulse 2.4s infinite;
+}
+
+.language-toggle,
+.profile-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.language-toggle:hover,
+.profile-toggle:hover {
+  background: var(--input);
+}
+
+.language-toggle > app-icon:first-child,
+.profile-toggle > app-icon:first-child {
+  color: var(--secondary-foreground);
+  --icon-size: 0.95rem;
+}
+
+.language-toggle > app-icon:last-child,
+.profile-toggle > app-icon:last-child {
+  color: var(--foreground-subtle);
+  --icon-size: 0.6rem;
+}
+
+.profile-toggle {
+  gap: 0.6rem;
+  padding: 0.25rem 0.35rem;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 50%;
+  background: var(--chart-1-wash);
+  color: var(--primary-soft);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+.toolbar-divider {
+  inline-size: 1px;
+  block-size: 24px;
+  background: var(--border);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--input);
+  color: var(--secondary-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+.pill.red {
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+/* Popovers ---------------------------------------------------------------- */
+/* Items and separators are styled globally in `styles.css`, beside `.popover` itself. */
+
+.notifications {
+  inline-size: 360px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.notifications > header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.notifications > header strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+}
+
+.notifications > header button {
+  margin-inline-start: auto;
+  border: 0;
+  background: none;
+  color: var(--primary-emphasis);
+  font-size: var(--text-2xs);
+  cursor: pointer;
+}
+
+.notifications ul {
+  max-block-size: min(340px, calc(100vh - 260px));
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.notifications li > button {
+  inline-size: 100%;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-inline-start: 2px solid transparent;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.notifications li > button:hover {
+  background: var(--input);
+}
+
+.notifications li.unread > button {
+  background: var(--muted);
+}
+
+.notifications li.unread.green > button { border-inline-start-color: var(--primary); }
+.notifications li.unread.amber > button { border-inline-start-color: var(--chart-4); }
+.notifications li.unread.red > button { border-inline-start-color: var(--chart-5); }
+.notifications li.unread.blue > button { border-inline-start-color: var(--chart-2); }
+
+.notification-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+  color: var(--muted-foreground);
+  --icon-size: 0.8rem;
+}
+
+.notification-icon.green { background: var(--chart-1-wash); color: var(--chart-1-foreground); }
+.notification-icon.blue { background: var(--chart-2-wash); color: var(--chart-2-foreground); }
+.notification-icon.cyan { background: var(--chart-3-wash); color: var(--chart-3-foreground); }
+.notification-icon.amber { background: var(--chart-4-wash); color: var(--chart-4-foreground); }
+.notification-icon.red { background: var(--chart-5-wash); color: var(--chart-5-foreground); }
+.notification-icon.violet { background: var(--chart-6-wash); color: var(--chart-6-foreground); }
+
+.notification-copy {
+  flex: 1;
+  min-width: 0;
+  display: block;
+}
+
+.notification-copy strong {
+  display: block;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.notification-copy > span {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.notification-copy small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+.notifications li:not(.unread) .notification-copy strong {
+  color: var(--secondary-foreground);
+  font-weight: 500;
+}
+
+.notifications li:not(.unread) .notification-copy > span { color: var(--foreground-subtle); }
+.notifications li:not(.unread) .notification-copy small { color: var(--foreground-quiet); }
+
+.notifications footer {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--border-soft);
+  text-align: center;
+}
+
+.notifications footer button {
+  inline-size: 100%;
+  border: 0;
+  background: none;
+  color: var(--primary-emphasis);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.language-menu {
+  inline-size: 180px;
+}
+
+.language-menu a {
+  justify-content: flex-start;
+  gap: 0.65rem;
+  padding: 0.6rem 0.7rem;
+}
+
+.language-menu b {
+  inline-size: 22px;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+}
+
+.language-menu .selected {
+  color: var(--primary-soft);
+}
+
+.language-menu .selected b {
+  color: var(--primary-emphasis);
+}
+
+.profile-menu > header {
+  padding: 0.65rem 0.6rem 0.75rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.profile-menu > header strong {
+  display: block;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+}
+
+.profile-menu > header span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.profile-menu .sign-out {
+  color: var(--destructive);
+}
+
+.profile-menu .sign-out:hover {
+  background: var(--chart-5-wash);
+  color: var(--destructive);
+}
+
+@media (max-width: 56.25rem) {
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb {
+    order: -1;
+    flex: 1 0 100%;
+    padding-inline-start: 3rem;
+  }
+
+  .search {
+    flex: 1;
+    inline-size: auto;
+  }
+
+  .profile-toggle strong {
+    display: none;
+  }
+
+  .notifications {
+    inline-size: min(360px, calc(100vw - 2rem));
+  }
+}
+
+@keyframes toolbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes toolbar-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Theme menu -------------------------------------------------------------- */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.theme-toggle:hover {
+  background: var(--input);
+}
+
+.theme-toggle > app-icon {
+  color: var(--foreground-subtle);
+  --icon-size: 0.6rem;
+}
+
+/*
+ * Canvas over accent, split on the diagonal — the two decisions a theme actually makes.
+ * The trigger reads the active theme through the semantic tokens; the menu rows cannot,
+ * because their theme is not applied yet, so each names its own palette directly.
+ */
+.swatch {
+  flex: none;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--card) 0 50%, var(--primary) 50% 100%);
+}
+
+.theme-menu {
+  inline-size: 232px;
+}
+
+[data-theme-preview='forest'] .swatch {
+  background: linear-gradient(135deg, #071a13 0 50%, #10b981 50% 100%);
+}
+
+[data-theme-preview='midnight'] .swatch {
+  background: linear-gradient(135deg, #0f172a 0 50%, #6366f1 50% 100%);
+}
+
+[data-theme-preview='daylight'] .swatch {
+  background: linear-gradient(135deg, #ffffff 0 50%, #10b981 50% 100%);
+}
+
+.theme-copy {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.theme-copy strong {
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.theme-copy small {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-weight: 500;
+}
+
+.theme-menu .selected {
+  color: var(--primary-soft);
+}
+
+.theme-menu .selected app-icon {
+  color: var(--primary-emphasis);
+}

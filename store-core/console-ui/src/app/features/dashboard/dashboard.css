@@ -1,0 +1,133 @@
+/*
+ * Page-level layout only. The console frame (banner, rail, toolbar) belongs to
+ * ConsoleShell, and each widget carries its own card chrome.
+ */
+
+:host {
+  display: contents;
+}
+
+/* Sits below the page header so the date picker popover is never covered. */
+app-kpi-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-row {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 1.5rem;
+}
+
+.panel-row > * {
+  animation: panel-in 0.5s 0.42s ease both;
+}
+
+.panel-row > *:nth-child(2) {
+  animation-delay: 0.48s;
+}
+
+/* Projected into a widget's panel header. */
+.link {
+  border: 0;
+  background: none;
+  color: var(--primary-emphasis);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--primary-soft);
+}
+
+.icon-button.small {
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+  --icon-size: 0.85rem;
+}
+
+.icon-button.small:hover {
+  background: var(--input);
+}
+
+@media (max-width: 73.75rem) {
+  .panel-row {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-row > *:nth-child(2) {
+    animation-delay: 0.42s;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* Reserves the widgets' height on a first load, so the veil has something to cover. */
+.first-load {
+  block-size: 60vh;
+}
+
+.load-error {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--chart-5-wash);
+  border-radius: var(--radius-xl);
+  background: var(--chart-5-wash);
+  color: var(--foreground);
+  --icon-size: 1rem;
+}
+
+.load-error app-icon {
+  flex: none;
+  color: var(--chart-5-foreground);
+}
+
+.load-error p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.load-error button {
+  flex: none;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--chart-5-foreground);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.load-error button:hover {
+  background: var(--chart-5-wash);
+}
+
+/*
+ * The page owns the widgets' rhythm. It cannot be set on the overlay's inner wrapper —
+ * that element belongs to BusyOverlay's template and is out of this stylesheet's reach.
+ */
+.widgets {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}

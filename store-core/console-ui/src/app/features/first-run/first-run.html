@@ -1,0 +1,176 @@
+<ng-container *transloco="let t">
+  <app-notice-bar class="trial-notice" [message]="notice().message" [icon]="notice().icon" [tone]="notice().tone">
+    @if (trialPending()) {
+      <button type="button" class="trial-start" (click)="facade.startTrial()">
+        {{ t('firstRun.notice.startTrial') }}
+        <app-icon name="arrowRight" [flip]="true" />
+      </button>
+    }
+    <button type="button" class="trial-plans" (click)="notAvailable(t('firstRun.notice.viewPlans'))">
+      {{ t('firstRun.notice.viewPlans') }}
+    </button>
+  </app-notice-bar>
+
+  <app-page-header [title]="heading().title" [context]="heading().context" />
+
+  @if (error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button type="button" (click)="facade.retry()">{{ t('dashboard.tryAgain') }}</button>
+    </div>
+  }
+
+  <app-busy-overlay [busy]="isLoading()" [label]="t('firstRun.loading')">
+    @if (isEmpty()) {
+      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
+      <div class="first-load" aria-hidden="true"></div>
+    } @else {
+      <div class="sections">
+        <!-- The one thing to do, beside the path it starts. -->
+        <div class="split">
+          <section class="hero">
+            <app-badge tone="green">
+              <span class="hero-pulse" aria-hidden="true"></span>
+              {{ stepBadge() }}
+            </app-badge>
+            <h2 class="hero-title">{{ hero().title }}</h2>
+            <p class="hero-copy">{{ hero().copy }}</p>
+            <div class="hero-actions">
+              @if (trialPending()) {
+                <button type="button" class="primary-action" (click)="facade.startTrial()">
+                  <app-icon name="play" [filled]="true" />
+                  {{ t('firstRun.hero.startTrial') }}
+                </button>
+                <!-- Provisioning is a trial entitlement, so the link is inert until it starts. -->
+                <span class="primary-action disabled" [title]="t('firstRun.hero.trialRequired')" aria-disabled="true">
+                  <app-icon name="plus" />
+                  {{ t('firstRun.hero.createStore') }}
+                </span>
+              } @else {
+                <a class="primary-action" routerLink="/store-management/create">
+                  <app-icon name="plus" />
+                  {{ t('firstRun.hero.createStore') }}
+                </a>
+              }
+              <span class="hero-meta">{{ hero().meta }}</span>
+            </div>
+          </section>
+
+          <div class="progress-card">
+            <header class="progress-head">
+              <span class="progress-copy">
+                <h2>{{ t('firstRun.progress.title') }}</h2>
+              </span>
+              <span class="progress-pct">
+                <strong>{{ progressPct() }}%</strong>
+              </span>
+            </header>
+
+            <app-progress-track class="run-track" [value]="progressPct()" />
+
+            <ol class="task-list">
+              @for (step of steps(); track step.id) {
+                <li [class.active]="step.active">
+                  <span class="task-dot">{{ step.position }}</span>
+                  <span class="task-copy">
+                    <strong>{{ step.label }}</strong>
+                    <small>{{ step.meta }}</small>
+                  </span>
+                  @if (step.locked) {
+                    <app-icon name="lock" [label]="t('firstRun.progress.locked')" class="task-lock" />
+                  }
+                </li>
+              }
+            </ol>
+          </div>
+        </div>
+
+        <!-- Watch it done once, then the shorter guides. -->
+        <div class="split">
+          @if (feature(); as video) {
+            <button type="button" class="feature-video" (click)="notAvailable(video.title)">
+              <span class="feature-play"><app-icon name="play" [filled]="true" /></span>
+              <span class="feature-title">{{ video.title }}</span>
+              <span class="feature-copy">{{ video.copy }}</span>
+              <span class="feature-duration">{{ video.duration }}</span>
+            </button>
+          }
+
+          <app-panel [title]="t('firstRun.guides.title')">
+            <div class="guide-list">
+              @for (guide of guides(); track guide.id) {
+                <button type="button" class="guide-row" (click)="notAvailable(guide.title)">
+                  <span class="guide-icon"><app-icon name="play" [filled]="true" /></span>
+                  <span class="guide-copy">
+                    <strong>{{ guide.title }}</strong>
+                    <small>{{ guide.meta }}</small>
+                  </span>
+                  <app-icon name="chevronRight" [flip]="true" class="guide-chevron" />
+                </button>
+              }
+            </div>
+          </app-panel>
+        </div>
+
+        <!-- What the store unlocks, shown locked so the order is not a surprise. -->
+        <section class="next-up">
+          <header class="section-head">
+            <h2>{{ t('firstRun.nextUp.title') }}</h2>
+            <span>{{ t('firstRun.nextUp.subtitle') }}</span>
+          </header>
+          <div class="next-up-grid">
+            @for (card of nextUp(); track card.id) {
+              <article class="next-up-card">
+                <div class="next-up-head">
+                  <span class="next-up-icon"><app-icon [name]="card.icon" /></span>
+                  <h3>{{ card.title }}</h3>
+                  <app-icon name="lock" [label]="t('firstRun.progress.locked')" class="next-up-lock" />
+                </div>
+                <p>{{ card.copy }}</p>
+              </article>
+            }
+          </div>
+        </section>
+
+        <app-panel [title]="t('firstRun.plan.title')" [meta]="t('firstRun.plan.meta')">
+          <app-badge panelAction tone="green">{{ t('firstRun.plan.freeTrial') }}</app-badge>
+          <button panelAction type="button" class="secondary-action" (click)="notAvailable(t('firstRun.plan.comparePlans'))">
+            {{ t('firstRun.plan.comparePlans') }}
+            <app-icon name="arrowUpRight" [flip]="true" />
+          </button>
+
+          <div class="limit-grid">
+            @for (limit of limits(); track limit.id) {
+              <div class="limit">
+                <p class="limit-figure">
+                  <strong>{{ limit.used }}</strong>
+                  <span>{{ t('firstRun.limit.of', {cap: limit.cap}) }}</span>
+                </p>
+                <p class="limit-label">{{ limit.label }}</p>
+                <app-progress-track class="limit-track" [value]="limit.pct" />
+                <p class="limit-note">{{ limit.note }}</p>
+              </div>
+            }
+          </div>
+
+          <p class="plan-footnote">
+            <app-icon name="info" />
+            {{ t('firstRun.plan.footnote') }}
+          </p>
+        </app-panel>
+
+        <section class="help">
+          <span class="help-icon"><app-icon name="messageCircle" /></span>
+          <span class="help-copy">
+            <strong>{{ t('firstRun.help.title') }}</strong>
+            <small>{{ t('firstRun.help.copy') }}</small>
+          </span>
+          <button type="button" class="secondary-action" (click)="notAvailable(t('firstRun.help.bookCall'))">
+            {{ t('firstRun.help.bookCall') }}
+          </button>
+        </section>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

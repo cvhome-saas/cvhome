@@ -1,0 +1,14 @@
+/* The language track sits in the panel header, where the mockup puts it. */
+.lang-track {
+  flex: none;
+}
+
+/* Shorter than the landing text: it is a sentence and a half, not a paragraph. */
+textarea.meta {
+  min-block-size: 4.5rem;
+}
+
+.fallback-notice {
+  border-radius: var(--radius-lg);
+  border-block-end: 0;
+}

@@ -1,0 +1,35 @@
+<main class="auth-shell" *transloco="let t">
+  <app-auth-story [story]="facade.signUpStory()" />
+
+  <section class="auth-entry" [attr.aria-label]="t('auth.accountAccess')">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="auth-tabs" role="group" [attr.aria-label]="t('auth.accountAction')">
+        <a routerLink="/sign-up" class="active" aria-current="page">{{ t('auth.createAccount') }}</a>
+        <a routerLink="/sign-in">{{ t('auth.signIn') }}</a>
+      </div>
+
+      <div class="auth-fields">
+        <label>{{ t('auth.signUp.name') }}<input formControlName="name" type="text" autocomplete="name" required><app-field-error [control]="form.controls.name" [fallback]="t('auth.signUp.nameFallback')" /></label>
+        <label>{{ t('auth.signUp.company') }}<input formControlName="organization" type="text" autocomplete="organization" required><app-field-error [control]="form.controls.organization" [fallback]="t('auth.signUp.companyFallback')" /></label>
+        <label>{{ t('auth.signUp.email') }}<input formControlName="email" type="email" autocomplete="email" required><app-field-error [control]="form.controls.email" [fallback]="t('auth.signUp.emailFallback')" /></label>
+        <label>{{ t('auth.signUp.password') }}
+          <span class="password-field">
+            <input formControlName="password" [type]="facade.passwordVisible() ? 'text' : 'password'" autocomplete="new-password" minlength="8" required>
+            <button type="button" (click)="facade.passwordVisible.set(!facade.passwordVisible())" [attr.aria-label]="facade.passwordVisible() ? t('auth.signUp.hidePassword') : t('auth.signUp.showPassword')">
+              <span aria-hidden="true">{{ facade.passwordVisible() ? t('auth.signUp.hide') : t('auth.signUp.show') }}</span>
+            </button>
+          </span>
+          <app-field-error [control]="form.controls.password" [fallback]="t('auth.signUp.passwordFallback')" />
+        </label>
+
+        <button class="auth-submit" type="submit" [disabled]="facade.submitted()">
+          {{ facade.submitted() ? t('auth.signUp.requestSent') : t('auth.createAccount') }}
+          @if (!facade.submitted()) { <span aria-hidden="true">→</span> }
+        </button>
+
+        <p class="integration-note" aria-live="polite">{{ facade.submitted() ? t('auth.signUp.queuedNote') : '' }}</p>
+        <p class="legal">{{ t('auth.signUp.legalNote') }}</p>
+      </div>
+    </form>
+  </section>
+</main>

@@ -1,0 +1,105 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="t('storeSettings.title')" [context]="context()">
+    <!--
+      Suppressed until something has loaded: on a failed first load "Unpublished" would be a
+      claim about the store rather than about the request.
+    -->
+    @if (!isEmpty()) {
+      @if (isPublished()) {
+        <app-badge tone="green">{{ t('storeSettings.published') }}</app-badge>
+      } @else {
+        <app-badge tone="slate">{{ t('storeSettings.unpublished') }}</app-badge>
+      }
+    }
+
+    <button class="secondary-action" type="button" (click)="previewStorefront()">
+      <app-icon name="externalLink" />
+      {{ t('storeSettings.previewStorefront') }}
+    </button>
+
+    @if (isDirty()) {
+      <button class="secondary-action" type="button" (click)="facade.discard()">{{ t('storeSettings.discard') }}</button>
+    }
+
+    <button class="primary-action" type="button" [disabled]="!canSave()" (click)="facade.save()">
+      <app-icon name="check" />
+      {{ isSaving() ? t('storeSettings.saving') : t('storeSettings.saveChanges') }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button type="button" (click)="facade.retry()">{{ t('dashboard.tryAgain') }}</button>
+    </div>
+  }
+
+  <app-busy-overlay [busy]="isLoading()" [label]="t('storeSettings.loading')">
+    @if (isEmpty()) {
+      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
+      <div class="first-load" aria-hidden="true"></div>
+    } @else if (settings(); as store) {
+      <!--
+        The region owns the container; the grid inside it is what the container query restyles.
+        They cannot be the same element — a container query never matches its own container.
+      -->
+      <div class="settings-region">
+        <div class="settings-layout">
+          <app-settings-nav class="settings-rail" [sections]="sections()" [active]="section()" />
+
+          <app-tab-switcher
+            class="settings-tabs"
+            [tabs]="tabs()"
+            [active]="section()"
+            (activeChange)="pickSection($event)"
+            [label]="t('storeSettings.sectionsLabel')"
+            panelId="settings-section"
+          />
+
+          <div class="settings-section" id="settings-section">
+            @switch (section()) {
+              @case ('branding') {
+                <app-branding-section [branding]="store.branding" [storeName]="store.storeName" />
+              }
+              @case ('home') {
+                <app-home-section
+                  [forms]="forms.home.controls"
+                  [locales]="languages"
+                  [(language)]="activeLanguage"
+                />
+              }
+              @case ('domain') {
+                <app-domain-section
+                  [form]="forms.domain"
+                  [subdomain]="subdomain()"
+                  [status]="domainStatus()"
+                  [record]="customDomainRecord()"
+                  (verify)="facade.verifyDomain()"
+                />
+              }
+              @case ('social') {
+                <app-social-links-section [form]="forms.social" [links]="store.socialLinks" />
+              }
+              @case ('slider') {
+                <app-slider-section [slides]="store.slides" />
+              }
+              @case ('details') {
+                <app-details-section [form]="forms.details" />
+              }
+              @case ('social-login') {
+                <app-social-login-section
+                  [form]="forms['social-login']"
+                  [providers]="store.socialLogin"
+                />
+              }
+              @case ('payments') {
+                <app-payments-section [form]="forms.payments" [gateways]="store.payments" />
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>
