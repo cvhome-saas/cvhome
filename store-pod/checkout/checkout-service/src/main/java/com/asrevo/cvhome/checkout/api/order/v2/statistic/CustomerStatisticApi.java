@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.checkout.api.order.v2.statistic;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -47,8 +46,8 @@ public class CustomerStatisticApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public StatisticList customerStatistic(StoreMerchantId merchantStore, LanguageCode language,
                                            @RequestBody StatisticRange range) {
-        List<StatisticEntry> entries = orderRepository.customerStatistic(Date.from(range.fromDate().toInstant()),
-                Date.from(range.toDate().toInstant()), merchantStore);
+        List<StatisticEntry> entries = orderRepository.customerStatistic(range.fromDate().toInstant(),
+                range.toDate().toInstant(), merchantStore);
         return new StatisticList(entries);
     }
 

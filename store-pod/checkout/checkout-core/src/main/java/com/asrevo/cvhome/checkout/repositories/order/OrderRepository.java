@@ -2,7 +2,6 @@ package com.asrevo.cvhome.checkout.repositories.order;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             and o.datePurchased between :from and :to
             group by date_trunc('day',o.datePurchased),o.status
             """)
-    List<StatisticEntry> orderStatistic(@Param("from") Date from, @Param("to") Date to,
+    List<StatisticEntry> orderStatistic(@Param("from") Instant from, @Param("to") Instant to,
                                         @Param("storeId") StoreMerchantId storeMerchantId);
 
     @Query("""
@@ -63,7 +62,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             and o.datePurchased between :from and :to
             group by o.billing.country
             """)
-    List<StatisticEntry> customerStatistic(@Param("from") Date from, @Param("to") Date to,
+    List<StatisticEntry> customerStatistic(@Param("from") Instant from, @Param("to") Instant to,
                                            @Param("storeId") StoreMerchantId storeMerchantId);
 
     default Page<Order> listOrders(StoreMerchantId store, OrderCriteria criteria, Pageable pageable) {
