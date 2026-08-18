@@ -1,14 +1,47 @@
 {
   "route": {
-    "home": {"title": "cvhome | Commerce, unbordered"},
-    "signIn": {"title": "Sign in | cvhome"},
-    "signUp": {"title": "Create account | cvhome"},
-    "dashboard": {"title": "Dashboard | cvhome"},
-    "orders": {"title": "Orders | cvhome"},
-    "storeManagement": {"title": "Store management | cvhome"},
-    "createStore": {"title": "Create store | cvhome"},
-    "firstRun": {"title": "Getting started | cvhome"},
-    "notFound": {"title": "Page not found | cvhome"}
+    "home": {
+      "title": "cvhome | Commerce, unbordered"
+    },
+    "signIn": {
+      "title": "Sign in | cvhome"
+    },
+    "signUp": {
+      "title": "Create account | cvhome"
+    },
+    "dashboard": {
+      "title": "Dashboard | cvhome"
+    },
+    "orders": {
+      "title": "Orders | cvhome"
+    },
+    "storeManagement": {
+      "title": "Store management | cvhome"
+    },
+    "createStore": {
+      "title": "Create store | cvhome"
+    },
+    "firstRun": {
+      "title": "Getting started | cvhome"
+    },
+    "notFound": {
+      "title": "Page not found | cvhome"
+    },
+    "terms": {
+      "title": "Terms of service | cvhome"
+    },
+    "privacyPolicy": {
+      "title": "Privacy policy | cvhome"
+    },
+    "subscriptionSuccess": {
+      "title": "Subscription confirmed | cvhome"
+    },
+    "subscriptionFail": {
+      "title": "Subscription not completed | cvhome"
+    },
+    "signOut": {
+      "title": "Signing out | cvhome"
+    }
   },
   "notFound": {
     "heading": "Page not found",
@@ -52,10 +85,6 @@
     "signUp.point1": "One account, as many storefronts as your plan allows.",
     "signUp.point2": "Regions, currencies and tax rules configured per store.",
     "signUp.point3": "No card until the trial ends.",
-    "signUp.name": "Name",
-    "signUp.nameFallback": "Enter your name to create the account.",
-    "signUp.company": "Company",
-    "signUp.companyFallback": "Enter your company name.",
     "signUp.email": "Email",
     "signUp.emailFallback": "Enter a valid email address.",
     "signUp.password": "Password",
@@ -64,12 +93,23 @@
     "signUp.hidePassword": "Hide password",
     "signUp.show": "Show",
     "signUp.hide": "Hide",
-    "signUp.requestSent": "Account request sent",
-    "signUp.queuedNote": "Thanks - account creation is queued for the backend signup endpoint.",
-    "signUp.legalNote": "Free for 14 days. No card. Close the account and every store with it, whenever you like."
+    "signUp.legalNote": "Free for 14 days. No card. Close the account and every store with it, whenever you like.",
+    "signUp.firstName": "First name",
+    "signUp.firstNameFallback": "Enter your first name.",
+    "signUp.lastName": "Last name",
+    "signUp.lastNameFallback": "Enter your last name.",
+    "signUp.repeatPassword": "Repeat password",
+    "signUp.repeatPasswordFallback": "Repeat your password.",
+    "signUp.passwordMismatch": "The two passwords do not match.",
+    "signUp.creating": "Creating account…",
+    "signUp.created": "Account created. Sign in to continue.",
+    "signingOut": "Signing you out…"
   },
   "dashboard": {
-    "heading": {"title": "Home", "context": "{store} · {date}"},
+    "heading": {
+      "title": "Home",
+      "context": "{store} · {date}"
+    },
     "tryAgain": "Try again",
     "loadingMetrics": "Loading metrics…",
     "storeMetrics": "Store metrics",
@@ -88,9 +128,18 @@
       "needsReview": "Needs review"
     },
     "attention": {
-      "paymentApprovals": {"label": "Payment approvals waiting", "detail": "Manual bank-transfer transactions to confirm"},
-      "unfulfilledOrders": {"label": "Unfulfilled orders", "detail": "Orders past 24 hours without a status update"},
-      "lowStockProducts": {"label": "Low stock products", "detail": "Below their reorder threshold"}
+      "paymentApprovals": {
+        "label": "Payment approvals waiting",
+        "detail": "Manual bank-transfer transactions to confirm"
+      },
+      "unfulfilledOrders": {
+        "label": "Unfulfilled orders",
+        "detail": "Orders past 24 hours without a status update"
+      },
+      "lowStockProducts": {
+        "label": "Low stock products",
+        "detail": "Below their reorder threshold"
+      }
     },
     "orderStatus": {
       "ordered": "Ordered",
@@ -105,7 +154,9 @@
     }
   },
   "shared": {
-    "kpiCard": {"vsLastPeriod": "vs last period"},
+    "kpiCard": {
+      "vsLastPeriod": "vs last period"
+    },
     "toast": {
       "regionLabel": "Notifications",
       "dismiss": "Dismiss notification",
@@ -210,7 +261,9 @@
       "web": "Web",
       "phone": "Phone"
     },
-    "tab": {"all": "All"},
+    "tab": {
+      "all": "All"
+    },
     "subtitle": {
       "all": "Every order placed in the selected period",
       "ordered": "Awaiting picking and packing",
@@ -350,11 +403,31 @@
       "dnsHint": "Add this at your DNS provider, then hit Verify. Propagation can take up to 24 hours.",
       "thisDomain": "this domain",
       "enterBeforeChecking": "Enter a custom domain before checking DNS.",
-      "unverified": {"title": "Not verified yet", "meta": "never checked", "body": "Add the CNAME record below at your DNS provider, then run a check."},
-      "checking": {"title": "Checking DNS…", "meta": "started just now", "body": "Querying authoritative name servers for {domain}. This usually resolves within a minute."},
-      "waiting": {"title": "Waiting for DNS", "meta": "retrying every 5 minutes", "body": "No CNAME record found yet for {domain}. Add the record below at your DNS provider — we keep checking in the background and will email you when it resolves."},
-      "verified": {"title": "Domain verified", "meta": "SSL issued", "body": "{domain} resolves to our edge and a certificate has been issued. Traffic to the default subdomain now redirects here."},
-      "failed": {"title": "Verification failed", "meta": "last check rejected", "body": "A record exists for {domain} but points somewhere else. Correct it to the value below and check again."}
+      "unverified": {
+        "title": "Not verified yet",
+        "meta": "never checked",
+        "body": "Add the CNAME record below at your DNS provider, then run a check."
+      },
+      "checking": {
+        "title": "Checking DNS…",
+        "meta": "started just now",
+        "body": "Querying authoritative name servers for {domain}. This usually resolves within a minute."
+      },
+      "waiting": {
+        "title": "Waiting for DNS",
+        "meta": "retrying every 5 minutes",
+        "body": "No CNAME record found yet for {domain}. Add the record below at your DNS provider — we keep checking in the background and will email you when it resolves."
+      },
+      "verified": {
+        "title": "Domain verified",
+        "meta": "SSL issued",
+        "body": "{domain} resolves to our edge and a certificate has been issued. Traffic to the default subdomain now redirects here."
+      },
+      "failed": {
+        "title": "Verification failed",
+        "meta": "last check rejected",
+        "body": "A record exists for {domain} but points somewhere else. Correct it to the value below and check again."
+      }
     },
     "social": {
       "title": "Store social links",
@@ -562,13 +635,30 @@
       "estimatedTime": "Estimated time",
       "estimatedTimeValue": "~1 minute"
     },
-    "artifactsPanel": {"title": "What gets created"},
+    "artifactsPanel": {
+      "title": "What gets created"
+    },
     "artifact": {
-      "database": {"label": "Dedicated tenant database", "detail": "Encrypted at rest, isolated from other stores"},
-      "node": {"label": "Node assignment", "detail": "A physical server in {region}"},
-      "domain": {"label": "Provisional subdomain + TLS", "detail": "{domain} with a managed certificate"},
-      "locale": {"label": "Locale and tax defaults", "detail": "Seeded from the country of operation"},
-      "owner": {"label": "Admin access for you", "detail": "{name} added as store owner"}
+      "database": {
+        "label": "Dedicated tenant database",
+        "detail": "Encrypted at rest, isolated from other stores"
+      },
+      "node": {
+        "label": "Node assignment",
+        "detail": "A physical server in {region}"
+      },
+      "domain": {
+        "label": "Provisional subdomain + TLS",
+        "detail": "{domain} with a managed certificate"
+      },
+      "locale": {
+        "label": "Locale and tax defaults",
+        "detail": "Seeded from the country of operation"
+      },
+      "owner": {
+        "label": "Admin access for you",
+        "detail": "{name} added as store owner"
+      }
     },
     "limitPanel": {
       "title": "Plan limit",
@@ -576,13 +666,34 @@
       "used": "{used} of {limit} stores used"
     },
     "task": {
-      "validate": {"label": "Validating store code and plan limits", "detail": "tenant {code} reserved"},
-      "allocate": {"label": "Allocating node in {region}", "detail": "assigned {node} · {region}"},
-      "database": {"label": "Creating tenant database", "detail": "schema {schema} · pg-14 · encrypted at rest"},
-      "seed": {"label": "Seeding catalogue, tax and locale defaults", "detail": "{currency} defaults applied"},
-      "tls": {"label": "Issuing TLS certificate", "detail": "{domain} · Let’s Encrypt"},
-      "cdn": {"label": "Warming CDN edge and object storage", "detail": "{edges} edge locations · {gb} GB bucket"},
-      "live": {"label": "Running health checks and going live", "detail": "storefront, admin API and webhooks responding"}
+      "validate": {
+        "label": "Validating store code and plan limits",
+        "detail": "tenant {code} reserved"
+      },
+      "allocate": {
+        "label": "Allocating node in {region}",
+        "detail": "assigned {node} · {region}"
+      },
+      "database": {
+        "label": "Creating tenant database",
+        "detail": "schema {schema} · pg-14 · encrypted at rest"
+      },
+      "seed": {
+        "label": "Seeding catalogue, tax and locale defaults",
+        "detail": "{currency} defaults applied"
+      },
+      "tls": {
+        "label": "Issuing TLS certificate",
+        "detail": "{domain} · Let’s Encrypt"
+      },
+      "cdn": {
+        "label": "Warming CDN edge and object storage",
+        "detail": "{edges} edge locations · {gb} GB bucket"
+      },
+      "live": {
+        "label": "Running health checks and going live",
+        "detail": "storefront, admin API and webhooks responding"
+      }
     },
     "progress": {
       "running": "running…",
@@ -601,7 +712,9 @@
       "buildHomePage": "Build home page",
       "provisionAnother": "Provision another store"
     },
-    "infraPanel": {"title": "Assigned infrastructure"},
+    "infraPanel": {
+      "title": "Assigned infrastructure"
+    },
     "infra": {
       "node": "Node",
       "database": "Database",
@@ -609,7 +722,9 @@
       "storage": "Storage",
       "certificate": "Certificate"
     },
-    "nextStepsPanel": {"title": "Next steps"},
+    "nextStepsPanel": {
+      "title": "Next steps"
+    },
     "nextStep": {
       "logo": "Upload logo and banner",
       "domain": "Attach a custom domain",
@@ -619,7 +734,10 @@
     "notAvailable": "{what} is not available yet."
   },
   "firstRun": {
-    "heading": {"title": "Getting started", "context": "No store yet · create one to open the console"},
+    "heading": {
+      "title": "Getting started",
+      "context": "No store yet · create one to open the console"
+    },
     "loading": "Loading your setup…",
     "notAvailable": "{what} is not available yet.",
     "notice": {
@@ -644,26 +762,60 @@
         "meta": "~1 minute · you can create more later"
       }
     },
-    "progress": {"title": "Setup progress", "locked": "Locked"},
+    "progress": {
+      "title": "Setup progress",
+      "locked": "Locked"
+    },
     "step": {
-      "createStore": {"label": "Create your first store", "meta": "Region, name and plan · ~1 min"},
-      "addProducts": {"label": "Add your first products", "meta": "One at a time or import a CSV"},
-      "designHome": {"label": "Design the home page", "meta": "Hero, categories and promos"},
-      "connectPayments": {"label": "Connect a payment gateway", "meta": "Required before you can take orders"}
+      "createStore": {
+        "label": "Create your first store",
+        "meta": "Region, name and plan · ~1 min"
+      },
+      "addProducts": {
+        "label": "Add your first products",
+        "meta": "One at a time or import a CSV"
+      },
+      "designHome": {
+        "label": "Design the home page",
+        "meta": "Hero, categories and promos"
+      },
+      "connectPayments": {
+        "label": "Connect a payment gateway",
+        "meta": "Required before you can take orders"
+      }
     },
     "feature": {
       "title": "Watch: create a store in 2 minutes",
       "copy": "A short walkthrough from an empty account to a live storefront — region, plan, first product and the home page.",
       "duration": "2:14"
     },
-    "guides": {"title": "More short guides"},
+    "guides": {
+      "title": "More short guides"
+    },
     "guide": {
       "meta": "{duration} · {section}",
-      "section": {"products": "Products", "storefront": "Storefront", "payments": "Payments", "content": "Content"},
-      "csvImport": {"title": "Import a catalogue from CSV", "duration": "3:05"},
-      "homePage": {"title": "Build the home page", "duration": "4:20"},
-      "goLive": {"title": "Connect Stripe and go live", "duration": "2:48"},
-      "secondLanguage": {"title": "Sell in a second language", "duration": "3:36"}
+      "section": {
+        "products": "Products",
+        "storefront": "Storefront",
+        "payments": "Payments",
+        "content": "Content"
+      },
+      "csvImport": {
+        "title": "Import a catalogue from CSV",
+        "duration": "3:05"
+      },
+      "homePage": {
+        "title": "Build the home page",
+        "duration": "4:20"
+      },
+      "goLive": {
+        "title": "Connect Stripe and go live",
+        "duration": "2:48"
+      },
+      "secondLanguage": {
+        "title": "Sell in a second language",
+        "duration": "3:36"
+      }
     },
     "nextUp": {
       "title": "What comes after that",
@@ -753,10 +905,18 @@
     },
     "store": {
       "since": "Since {year}",
-      "acme": {"trade": "Workplace supplies"},
-      "northline": {"trade": "Lab consumables"},
-      "harborPoint": {"trade": "Cafe wholesale"},
-      "vantage": {"trade": "Furniture trade"}
+      "acme": {
+        "trade": "Workplace supplies"
+      },
+      "northline": {
+        "trade": "Lab consumables"
+      },
+      "harborPoint": {
+        "trade": "Cafe wholesale"
+      },
+      "vantage": {
+        "trade": "Furniture trade"
+      }
     },
     "reviews": {
       "heading": "What merchants say <em>after a year</em>.",
@@ -813,12 +973,12 @@
       "perMonth": "/mo",
       "billedYearly": "billed yearly",
       "billedMonthly": "billed monthly",
-      "note": "Every plan is the whole platform. The account is free — you only pay for stores you open."
-    },
-    "plan": {
-      "starter": {"name": "Starter", "description": "For the first market. Everything works, at a smaller scale.", "action": "Start free"},
-      "growth": {"name": "Growth", "description": "For merchants running several markets at once, with room to spare.", "action": "Start 14-day trial"},
-      "pro": {"name": "Pro", "description": "For operations that cannot afford a quiet hour anywhere on the map.", "action": "Talk to us"}
+      "note": "Every plan is the whole platform. The account is free — you only pay for stores you open.",
+      "perYear": "/yr",
+      "startFree": "Start free",
+      "startTrial": "Start {days}-day trial",
+      "choosePlan": "Choose this plan",
+      "unavailable": "Prices are unavailable right now. Please try again shortly."
     },
     "contact": {
       "heading": "Talk to someone who <em>runs stores</em>.",
@@ -831,15 +991,22 @@
       "workEmail": "Work email",
       "whatDoYouNeed": "What do you need?",
       "message": "Message",
-      "messageSent": "Message sent",
       "sendMessage": "Send message",
-      "thanksNote": "Thanks — we have your note and will reply shortly.",
-      "replyNote": "We reply within four hours on weekdays. No card, no sales sequence."
+      "notConnectedNote": "This form is not connected yet — please use one of the channels above and we will pick it up from there."
     },
     "channel": {
-      "email": {"title": "Email us", "detail": "For migrations, pricing and partnership questions."},
-      "chat": {"title": "Live chat", "detail": "In the console, bottom right. Weekdays 09:00–18:00 CET."},
-      "call": {"title": "Call sales", "detail": "For teams running more than five storefronts."}
+      "email": {
+        "title": "Email us",
+        "detail": "For migrations, pricing and partnership questions."
+      },
+      "chat": {
+        "title": "Live chat",
+        "detail": "In the console, bottom right. Weekdays 09:00–18:00 CET."
+      },
+      "call": {
+        "title": "Call sales",
+        "detail": "For teams running more than five storefronts."
+      }
     },
     "contactTopic": {
       "migratingStores": "Migrating stores",
@@ -856,6 +1023,43 @@
     "footer": {
       "console": "Console",
       "copyright": "© {year} cvhome"
+    },
+    "entitlement": {
+      "MAX_PRODUCTS": {
+        "limit": "Up to {count} products",
+        "unlimited": "Unlimited products",
+        "granted": "Product catalog"
+      },
+      "MAX_ORDERS_MONTH": {
+        "limit": "Up to {count} orders a month",
+        "unlimited": "Unlimited orders",
+        "granted": "Order processing"
+      },
+      "MAX_ACCOUNTS": {
+        "limit": "Up to {count} staff accounts",
+        "unlimited": "Unlimited staff accounts",
+        "granted": "Staff accounts"
+      },
+      "MAX_STORAGE_MB": {
+        "limit": "{count} MB of media storage",
+        "unlimited": "Unlimited media storage",
+        "granted": "Media storage"
+      },
+      "CUSTOM_DOMAIN": {
+        "limit": "Custom domain",
+        "unlimited": "Custom domain",
+        "granted": "Custom domain"
+      },
+      "ANALYTICS": {
+        "limit": "Analytics dashboards",
+        "unlimited": "Analytics dashboards",
+        "granted": "Analytics dashboards"
+      },
+      "PRIORITY_SUPPORT": {
+        "limit": "Priority support",
+        "unlimited": "Priority support",
+        "granted": "Priority support"
+      }
     }
   },
   "shell": {
@@ -913,9 +1117,18 @@
       "logOut": "Log out"
     },
     "theme": {
-      "forest": {"label": "Forest", "hint": "Emerald on deep green"},
-      "midnight": {"label": "Midnight", "hint": "Indigo on slate"},
-      "daylight": {"label": "Daylight", "hint": "Emerald on white"}
+      "forest": {
+        "label": "Forest",
+        "hint": "Emerald on deep green"
+      },
+      "midnight": {
+        "label": "Midnight",
+        "hint": "Indigo on slate"
+      },
+      "daylight": {
+        "label": "Daylight",
+        "hint": "Emerald on white"
+      }
     },
     "nav": {
       "ariaLabel": "Console",
@@ -962,6 +1175,31 @@
       "moveUp": "Move {name} up",
       "moveDown": "Move {name} down",
       "createStore": "Create store"
+    }
+  },
+  "legal": {
+    "backToHome": "← Back to home",
+    "pending": "This document has not been published yet. Until it is, the terms you are bound by are the ones agreed in your contract — write to us and we will send you the current text.",
+    "contactUs": "Contact us",
+    "terms": {
+      "title": "Terms of service",
+      "lede": "The agreement between you and cvhome for the use of the platform and the stores you open on it."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "lede": "What we collect about you and the shoppers of your stores, why we hold it, and how long for."
+    }
+  },
+  "subscription": {
+    "toConsole": "Go to the console",
+    "backToPricing": "Back to pricing",
+    "success": {
+      "title": "Subscription confirmed",
+      "copy": "Your plan is active. It may take a moment to appear in the console while the payment settles."
+    },
+    "fail": {
+      "title": "Subscription not completed",
+      "copy": "Nothing was charged. You can try again from the pricing page, or use another card."
     }
   }
 }

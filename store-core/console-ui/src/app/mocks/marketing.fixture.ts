@@ -3,7 +3,6 @@ import {
   MarketingChannel,
   MarketingMetric,
   MarketingPillar,
-  MarketingPlan,
   MarketingReview,
   MarketingStat,
   MarketingStore,
@@ -84,18 +83,6 @@ export const MARKETING_REVIEW_STATS: readonly MarketingStat[] = [
   {value: '4.8 / 5', labelKey: 'marketing.reviewStat.averageRating'},
   {value: '94%', labelKey: 'marketing.reviewStat.wouldRecommend'},
   {value: '18 months', labelKey: 'marketing.reviewStat.medianTime'},
-];
-
-export const MARKETING_PLANS: readonly MarketingPlan[] = [
-  {nameKey: 'marketing.plan.starter.name', monthlyPrice: 29, descriptionKey: 'marketing.plan.starter.description', actionKey: 'marketing.plan.starter.action'},
-  {
-    nameKey: 'marketing.plan.growth.name',
-    monthlyPrice: 99,
-    descriptionKey: 'marketing.plan.growth.description',
-    actionKey: 'marketing.plan.growth.action',
-    featured: true,
-  },
-  {nameKey: 'marketing.plan.pro.name', monthlyPrice: 299, descriptionKey: 'marketing.plan.pro.description', actionKey: 'marketing.plan.pro.action'},
 ];
 
 export const MARKETING_CHANNELS: readonly MarketingChannel[] = [

@@ -1,3 +1,5 @@
+import type {BillingInterval, EntitlementKey} from '@models/billing';
+
 export interface MarketingMetric {
   /** A number or symbol, not prose — "60s", "99.95%" — so it is not translated. */
   readonly value: string;
@@ -47,12 +49,38 @@ export interface MarketingChannel {
   readonly href?: string;
 }
 
-export interface MarketingPlan {
-  readonly nameKey: string;
-  readonly monthlyPrice: number;
-  readonly descriptionKey: string;
-  readonly actionKey: string;
-  readonly featured?: boolean;
+/**
+ * A ceiling or capability a plan grants, ready for the pricing card to label.
+ *
+ * `limit` is null for a capability (`CUSTOM_DOMAIN`) and for a ceiling the catalog leaves off, which it defines as
+ * unlimited. The two read differently on the card, so the distinction is carried rather than flattened to a number.
+ */
+export interface PlanFeature {
+  readonly key: EntitlementKey;
+  readonly limit: number | null;
+  readonly unlimited: boolean;
+}
+
+/** A catalog plan as the pricing section renders it. Everything here comes from billing; nothing is authored. */
+export interface PricingPlan {
+  /** The `plan_price` id — what a checkout is opened against, not the plan id. */
+  readonly priceId: string;
+  /** The stable handle (`FREE`, `BASIC`, `PRO`). Used for tracking and tests, never shown. */
+  readonly code: string;
+  readonly name: string;
+  readonly description: string | null;
+  /** Major units — `minorUnits / 100`, the way every price on this page is shown. */
+  readonly amount: number;
+  readonly currency: string;
+  readonly interval: BillingInterval;
+  readonly trialDays: number;
+  readonly features: readonly PlanFeature[];
+  readonly free: boolean;
+  /**
+   * Presentation only. The billing catalog has no "recommended plan" flag, so the console highlights the middle
+   * paid tier — see lessons.md, "Marketing — no recommended-plan flag in the billing catalog".
+   */
+  readonly featured: boolean;
 }
 
 /** A stable id for a contact topic — never the display string, which the topic switches. */

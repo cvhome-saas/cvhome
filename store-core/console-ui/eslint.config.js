@@ -27,6 +27,40 @@ module.exports = tseslint.config(
     },
   },
   {
+    // Dependency direction: features -> layouts -> shared -> api -> core -> models.
+    // `api/` holds the HTTP tier ported from seller-core; only features may reach it, and it must never
+    // reach back up. Enforced here because the tier is new and the mistake it prevents — a shared
+    // component fetching its own data — is the one that made seller-ui's pages untestable.
+    files: ['src/app/core/**/*.ts', 'src/app/shared/**/*.ts', 'src/app/models/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {group: ['@api/*'], message: 'core/, shared/ and models/ must not depend on the api tier.'},
+            {group: ['@features/*'], message: 'core/, shared/ and models/ must not depend on features.'},
+            {group: ['@layouts/*'], message: 'core/, shared/ and models/ must not depend on layouts.'},
+            {group: ['@mocks/*'], message: 'Fixtures are for features and specs, never for core/ or shared/.'},
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/app/api/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {group: ['@features/*', '@layouts/*', '@shared/*'], message: 'The api tier must not depend on the UI.'},
+            {group: ['@mocks/*'], message: 'The api tier talks to the backend; it never reads a fixture.'},
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.html'],
     // src/index.html is the static host page rendered before Angular boots — it isn't a
     // component template, so Transloco bindings don't apply there.

@@ -139,17 +139,34 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
             <button type="button" [class.active]="facade.yearlyBilling()" (click)="facade.yearlyBilling.set(true)">{{ t('marketing.pricing.yearly') }}</button>
           </div>
         </div>
-        <div class="plan-grid">
-          @for (plan of facade.plans(); track plan.nameKey) {
-            <article class="plan" [class.featured]="plan.featured">
-              <h3>{{ plan.name }}</h3>
-              <p class="price"><strong>${{ price(plan) }}</strong><span>{{ t('marketing.pricing.perMonth') }}</span></p>
-              <small [class.yearly]="facade.yearlyBilling()">{{ facade.yearlyBilling() ? t('marketing.pricing.billedYearly') : t('marketing.pricing.billedMonthly') }}</small>
-              <p class="blurb">{{ plan.description }}</p>
-              <a class="button" [class.button-secondary]="!plan.featured" [href]="plan.nameKey === 'marketing.plan.pro.name' ? '#contact' : '/sign-up'">{{ plan.action }}</a>
-            </article>
-          }
-        </div>
+        @if (facade.plansFailed()) {
+          <p class="pricing-note" role="status">{{ t('marketing.pricing.unavailable') }}</p>
+        } @else if (!facade.plansLoaded()) {
+          <div class="plan-grid" aria-busy="true">
+            @for (slot of [1, 2, 3]; track slot) {
+              <article class="plan plan-placeholder" aria-hidden="true"></article>
+            }
+          </div>
+        } @else {
+          <div class="plan-grid">
+            @for (plan of facade.plans(); track plan.priceId) {
+              <article class="plan" [class.featured]="plan.featured">
+                <h3>{{ plan.name }}</h3>
+                <p class="price"><strong>{{ plan.amount | currency: plan.currency : 'symbol' : '1.0-2' }}</strong><span>{{ plan.interval === 'YEAR' ? t('marketing.pricing.perYear') : t('marketing.pricing.perMonth') }}</span></p>
+                <small [class.yearly]="facade.yearlyBilling()">{{ facade.yearlyBilling() ? t('marketing.pricing.billedYearly') : t('marketing.pricing.billedMonthly') }}</small>
+                @if (plan.description) {
+                  <p class="blurb">{{ plan.description }}</p>
+                }
+                <ul class="plan-features">
+                  @for (feature of plan.features; track feature) {
+                    <li><app-icon name="check" />{{ feature }}</li>
+                  }
+                </ul>
+                <a class="button" [class.button-secondary]="!plan.featured" href="/sign-up">{{ plan.action }}</a>
+              </article>
+            }
+          </div>
+        }
         <p class="pricing-note">{{ t('marketing.pricing.note') }}</p>
       </div>
     </section>
@@ -173,7 +190,7 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
           <p class="address"><app-icon name="mapPin" />{{ t('marketing.contact.address') }}</p>
         </div>
 
-        <form [formGroup]="contactForm" (ngSubmit)="sendMessage()">
+        <form [formGroup]="contactForm">
           <h3>{{ t('marketing.contact.formHeading') }}</h3>
           <p class="form-intro">{{ t('marketing.contact.formIntro') }}</p>
 
@@ -191,11 +208,11 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
             </div>
           </fieldset>
           <label>{{ t('marketing.contact.message') }}<textarea formControlName="message" rows="4" [attr.placeholder]="facade.messageHint()" required></textarea></label>
-          <button class="button submit" type="submit" [disabled]="facade.messageSent()">
-            {{ facade.messageSent() ? t('marketing.contact.messageSent') : t('marketing.contact.sendMessage') }}
-            <app-icon [name]="facade.messageSent() ? 'check' : 'arrowRight'" />
+          <button class="button submit" type="submit" [disabled]="!facade.contactSubmitAvailable">
+            {{ t('marketing.contact.sendMessage') }}
+            <app-icon name="arrowRight" />
           </button>
-          <small class="form-note" aria-live="polite">{{ facade.messageSent() ? t('marketing.contact.thanksNote') : t('marketing.contact.replyNote') }}</small>
+          <small class="form-note">{{ t('marketing.contact.notConnectedNote') }}</small>
         </form>
       </div>
     </section>

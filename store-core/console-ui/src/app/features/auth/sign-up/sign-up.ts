@@ -17,12 +17,14 @@ import {SignUpFormService} from '../services/sign-up-form.service';
 export class SignUp {
   protected readonly facade = inject(AuthFacade);
   protected readonly form = inject(SignUpFormService).create();
+  /** The nested group the template binds to and the server names its field errors against. */
+  protected readonly user = this.form.controls.user;
 
   protected submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.facade.createAccount(this.form.getRawValue());
+    this.facade.createAccount(this.form.getRawValue(), this.form);
   }
 }

@@ -1,18 +1,20 @@
-import {Injectable, Signal, WritableSignal, computed, inject, signal} from '@angular/core';
+import {PLATFORM_ID, Injectable, Signal, WritableSignal, computed, inject, signal} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {ContactRequest, ContactTopicId} from '@models/marketing';
+import type {BillingInterval, PlanView} from '@models/billing';
+import {ContactTopicId, PlanFeature} from '@models/marketing';
 import {
   CONTACT_MESSAGE_HINT_KEYS,
   CONTACT_TOPICS,
   MARKETING_CHANNELS,
   MARKETING_METRICS,
   MARKETING_PILLARS,
-  MARKETING_PLANS,
   MARKETING_REVIEWS,
   MARKETING_REVIEW_STATS,
   MARKETING_STORES,
 } from '@mocks/marketing.fixture';
+import {toPricingPlans} from '../mappers/pricing.mapper';
 import {MarketingApi} from '../services/marketing.api.service';
 
 /** The five slots of a review card's rating row, so the template can draw filled and empty stars. */
@@ -22,11 +24,24 @@ export const RATING_SLOTS: readonly number[] = [1, 2, 3, 4, 5];
 export class MarketingFacade {
   private readonly api = inject(MarketingApi);
   private readonly transloco = inject(TranslocoService);
+  private readonly platformId = inject(PLATFORM_ID);
 
+  /** The catalog as billing returned it; null until it arrives, which is also the state SSR renders in. */
+  private readonly catalog = signal<readonly PlanView[] | null>(null);
+
+  readonly plansFailed = signal(false);
   readonly yearlyBilling = signal(false);
   readonly menuOpen = signal(false);
   readonly selectedTopic: WritableSignal<ContactTopicId> = signal(CONTACT_TOPICS[0].id);
-  readonly messageSent = signal(false);
+  /**
+   * TODO(lessons.md): contact form — no backend endpoint exists. See lessons.md,
+   * "Marketing — contact form has no endpoint".
+   *
+   * A constant rather than a signal because there is nothing to toggle: the form is composed and validated, but
+   * there is nowhere to post it. seller-ui's version calls `form.reset({})` and reports success, which loses the
+   * message silently; this says so instead and points at the channels above, which are real.
+   */
+  readonly contactSubmitAvailable = false;
 
   readonly ratingSlots = RATING_SLOTS;
 
@@ -78,17 +93,20 @@ export class MarketingFacade {
     }));
   });
 
+  readonly plansLoaded = computed(() => this.catalog() !== null);
+
   readonly plans = computed(() => {
     this.transloco.activeLang();
-    return MARKETING_PLANS.map((plan) => ({
-      // Kept alongside the translated name so the template can single out a plan (the
-      // "talk to us" tier routes to #contact) without comparing display text.
-      nameKey: plan.nameKey,
-      name: this.transloco.translate(plan.nameKey),
-      monthlyPrice: plan.monthlyPrice,
-      description: this.transloco.translate(plan.descriptionKey),
-      action: this.transloco.translate(plan.actionKey),
-      featured: plan.featured,
+    const catalog = this.catalog();
+    if (!catalog) {
+      return [];
+    }
+    const interval: BillingInterval = this.yearlyBilling() ? 'YEAR' : 'MONTH';
+
+    return toPricingPlans(catalog, interval).map((plan) => ({
+      ...plan,
+      features: plan.features.map((feature) => this.featureLabel(feature)),
+      action: this.actionLabel(plan.free, plan.trialDays),
     }));
   });
 
@@ -117,11 +135,40 @@ export class MarketingFacade {
     return this.transloco.translate(key);
   });
 
-  price(plan: {monthlyPrice: number}): number {
-    return this.yearlyBilling() ? Math.round(plan.monthlyPrice * 0.8) : plan.monthlyPrice;
+  /**
+   * Loads the plan catalog. Browser-only and called from the component, not the constructor: `/` is prerendered, and
+   * `SelectedStoreRequestContext.params()` throws on the server by design. The section renders its full layout
+   * without plans and fills them in on the client.
+   */
+  loadPlans(): void {
+    if (!isPlatformBrowser(this.platformId) || this.catalog() !== null) {
+      return;
+    }
+    this.api.plans().subscribe({
+      next: (plans) => this.catalog.set(plans),
+      // Swallowed rather than toasted: a visitor reading a landing page cannot act on a billing outage, and the
+      // rest of the page is still worth reading. The section says the prices are unavailable instead of showing none.
+      error: () => this.plansFailed.set(true),
+    });
   }
 
-  sendMessage(request: ContactRequest): void {
-    this.api.sendContactMessage(request).subscribe(() => this.messageSent.set(true));
+  /** One feature line — a ceiling with its number, an unlimited ceiling, or a plain capability. */
+  private featureLabel(feature: PlanFeature): string {
+    if (feature.unlimited) {
+      return this.transloco.translate(`marketing.entitlement.${feature.key}.unlimited`);
+    }
+    if (feature.limit !== null) {
+      return this.transloco.translate(`marketing.entitlement.${feature.key}.limit`, {count: feature.limit});
+    }
+    return this.transloco.translate(`marketing.entitlement.${feature.key}.granted`);
+  }
+
+  private actionLabel(free: boolean, trialDays: number): string {
+    if (free) {
+      return this.transloco.translate('marketing.pricing.startFree');
+    }
+    return trialDays > 0
+      ? this.transloco.translate('marketing.pricing.startTrial', {days: trialDays})
+      : this.transloco.translate('marketing.pricing.choosePlan');
   }
 }

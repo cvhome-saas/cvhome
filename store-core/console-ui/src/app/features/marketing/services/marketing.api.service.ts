@@ -1,12 +1,20 @@
-import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
+import {Injectable, inject} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import {ContactRequest} from '@models/marketing';
+import {SubscriptionService} from '@api/billing/subscription.service';
+import type {PlanView} from '@models/billing';
 
 @Injectable({providedIn: 'root'})
 export class MarketingApi {
-  sendContactMessage(request: ContactRequest): Observable<void> {
-    void request;
-    return of(void 0);
+  private readonly subscriptions = inject(SubscriptionService);
+
+  /**
+   * The public plan catalog.
+   *
+   * Handed over unshaped, and fetched once: the response carries every interval a plan sells at, so re-fetching on
+   * the monthly/yearly toggle would ask the server for what it already said. The facade re-shapes it instead.
+   */
+  plans(): Observable<PlanView[]> {
+    return this.subscriptions.plans();
   }
 }

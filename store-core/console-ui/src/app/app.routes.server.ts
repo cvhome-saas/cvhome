@@ -14,6 +14,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
+    path: 'terms',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'privacy-policy',
+    renderMode: RenderMode.Prerender,
+  },
+  {
     // Client-only like the rest of the console: its guard asks the store directory, which
     // is per-account state the server does not hold.
     path: 'getting-started',

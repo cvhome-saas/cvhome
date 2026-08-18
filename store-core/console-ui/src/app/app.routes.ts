@@ -12,7 +12,38 @@ export const routes: Routes = [
         loadComponent: () => import('@features/marketing/marketing').then((page) => page.Marketing),
         data: {titleKey: 'route.home.title'},
       },
+      {
+        path: 'terms',
+        loadComponent: () => import('@features/legal/legal-page').then((page) => page.LegalPage),
+        data: {titleKey: 'route.terms.title', document: 'terms'},
+      },
+      {
+        path: 'privacy-policy',
+        loadComponent: () => import('@features/legal/legal-page').then((page) => page.LegalPage),
+        data: {titleKey: 'route.privacyPolicy.title', document: 'privacy'},
+      },
+      {
+        // Where the hosted checkout returns to. Client-rendered: nothing here is worth prerendering, and both
+        // outcomes are reachable by URL alone.
+        path: 'subscription/success',
+        loadComponent: () =>
+          import('@features/subscription/subscription-outcome').then((page) => page.SubscriptionOutcome),
+        data: {titleKey: 'route.subscriptionSuccess.title', succeeded: true},
+      },
+      {
+        path: 'subscription/fail',
+        loadComponent: () =>
+          import('@features/subscription/subscription-outcome').then((page) => page.SubscriptionOutcome),
+        data: {titleKey: 'route.subscriptionFail.title', succeeded: false},
+      },
     ],
+  },
+  {
+    // Not under a shell: it paints one line and immediately hands the browser to the gateway.
+    path: 'external-logout-link',
+    loadComponent: () =>
+      import('@features/auth/external-logout-link/external-logout-link').then((page) => page.ExternalLogoutLink),
+    data: {titleKey: 'route.signOut.title'},
   },
   {
     path: 'sign-in',

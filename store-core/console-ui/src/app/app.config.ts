@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(withInterceptors([apiErrorInterceptor])),
     provideTheme(),
-    {provide: CONSOLE_CORE_CONFIG, useValue: {apiUrl: environment.apiUrl, loginUrl: environment.loginUrl}},
+    {provide: CONSOLE_CORE_CONFIG, useValue: {apiUrl: environment.apiUrl, loginUrl: environment.loginUrl, logoutUrl: environment.logoutUrl}},
     {provide: NOTIFICATION_PORT, useExisting: ToastService},
     {provide: ErrorHandler, useClass: GlobalErrorHandler},
     {provide: LANG_STORAGE, useExisting: BrowserLangStorage},

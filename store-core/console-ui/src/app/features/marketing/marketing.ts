@@ -1,4 +1,5 @@
-import {Component, inject} from '@angular/core';
+import {Component, OnInit, inject} from '@angular/core';
+import {CurrencyPipe} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
@@ -9,19 +10,19 @@ import {MarketingFacade} from './facades/marketing.facade';
 
 @Component({
   selector: 'app-marketing',
-  imports: [ReactiveFormsModule, Icon, TranslocoDirective],
+  imports: [CurrencyPipe, ReactiveFormsModule, Icon, TranslocoDirective],
   templateUrl: './marketing.html',
   styleUrl: './marketing.css',
 })
-export class Marketing {
+export class Marketing implements OnInit {
   protected readonly facade = inject(MarketingFacade);
   protected readonly contactForm = inject(ContactFormService).create();
 
   // Brand name, not translated — same as Stripe/PayPal elsewhere in the app.
   protected readonly brandName = 'cvhome';
 
-  protected price(plan: {monthlyPrice: number}): number {
-    return this.facade.price(plan);
+  ngOnInit(): void {
+    this.facade.loadPlans();
   }
 
   protected selectTopic(topic: ContactTopicId): void {
@@ -29,11 +30,4 @@ export class Marketing {
     this.contactForm.controls.topic.setValue(topic);
   }
 
-  protected sendMessage(): void {
-    if (this.contactForm.invalid) {
-      this.contactForm.markAllAsTouched();
-      return;
-    }
-    this.facade.sendMessage(this.contactForm.getRawValue());
-  }
 }
