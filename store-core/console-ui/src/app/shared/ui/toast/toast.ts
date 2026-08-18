@@ -77,7 +77,7 @@ export class ToastService implements NotificationPort {
   }
 
   private push(tone: ToastTone, text: string): void {
-    const id = crypto.randomUUID();
+    const id = nextId();
     const durationMs = TONE_DURATION_MS[tone];
     this.messagesState.update((messages) => [...messages, {id, tone, text, durationMs}]);
 
@@ -97,4 +97,19 @@ export class ToastService implements NotificationPort {
       this.timers.delete(id);
     }
   }
+}
+
+/**
+ * An id for one live toast.
+ *
+ * `crypto.randomUUID` exists only in a secure context, and the console is reached over plain HTTP
+ * in development and behind any gateway that terminates TLS elsewhere. It threw there, which took
+ * down every toast in the app — including the ones reporting that something failed, so a failure
+ * looked like nothing happening at all. These ids never leave the browser and only have to be
+ * unique among the handful of toasts on screen, so a counter is enough.
+ */
+let sequence = 0;
+
+function nextId(): string {
+  return typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `toast-${++sequence}`;
 }

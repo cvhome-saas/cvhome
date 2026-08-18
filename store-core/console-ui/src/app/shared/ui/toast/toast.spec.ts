@@ -72,4 +72,24 @@ describe('ToastService', () => {
     tick(1);
     expect(service.messages().length).toBe(0);
   }));
+
+  it('still raises a toast where crypto.randomUUID does not exist', () => {
+    // Insecure origins — plain HTTP in development — do not expose it. It threw there, and every
+    // toast in the app went silent, error reports included.
+    const original = crypto.randomUUID;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (crypto as any).randomUUID = undefined;
+    try {
+      const service = TestBed.inject(ToastService);
+      service.info('One');
+      service.info('Two');
+
+      expect(service.messages().length).toBe(2);
+      // Distinct, or `@for`'s track would collapse them into one.
+      expect(service.messages()[0].id).not.toBe(service.messages()[1].id);
+    } finally {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (crypto as any).randomUUID = original;
+    }
+  });
 });
