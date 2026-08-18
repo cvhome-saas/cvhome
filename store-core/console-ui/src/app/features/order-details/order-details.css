@@ -1,3 +1,16 @@
+/*
+ * The page's own stack.
+ *
+ * Everything the page renders sits inside a single `busy-overlay` slot, so the shell's own 1.5rem
+ * rhythm stops at that boundary and the blocks below were flush against one another. The gap is
+ * the same one the template's main column uses, and the orders list solves this the same way.
+ */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 /* ---- Identity line ---------------------------------------------------------------------- */
 
 .order-head {
