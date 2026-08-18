@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
-import {firstRunOnly, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
+import {consoleContext, firstRunOnly, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
 
 export const routes: Routes = [
   {
@@ -73,7 +73,7 @@ export const routes: Routes = [
     // the only way on. `firstRunOnly` hands over to the console once one exists.
     path: 'getting-started',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, firstRunOnly],
+    canActivate: [canAccessSecuredPages, consoleContext, firstRunOnly],
     children: [
       {
         path: '',
@@ -85,7 +85,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
     children: [
       {
         path: '',
@@ -98,7 +98,7 @@ export const routes: Routes = [
   {
     path: 'orders',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
     children: [
       {
         path: '',
@@ -110,9 +110,10 @@ export const routes: Routes = [
   {
     path: 'store-management',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    // Authentication is required for the whole branch; a *store* is not, because `create` below is the
-    // only way out of first run and by definition runs without one.
-    canActivate: [canAccessSecuredPages],
+    // Authentication and the store list for the whole branch; a *store* is not required, because
+    // `create` below is the only way out of first run — but the rail still renders on it, so the list
+    // has to load there too.
+    canActivate: [canAccessSecuredPages, consoleContext],
     children: [
       // Static before the section param, so this does not get swallowed as a section name.
       {

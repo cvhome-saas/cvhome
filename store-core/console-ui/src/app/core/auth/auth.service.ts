@@ -6,12 +6,36 @@ import {Router} from "@angular/router";
 import {Roles} from './roles';
 import {CrudService} from "../http/crud.service";
 
-/** Raw shape of Spring Security's Authentication object as returned by
- *  AuthController#me (declared `Object` on the Java side — genuinely
- *  untyped; this is the default serialization of the JWT-backed principal). */
+/**
+ * Raw shape of Spring Security's Authentication object as returned by AuthController#me (declared
+ * `Object` on the Java side — genuinely untyped; this is the default serialization of the OIDC
+ * principal).
+ *
+ * Verified against the running stack, because the previous typing was wrong about it. `principal.claims`
+ * holds the **ID token's** claims and nothing else — `sub, aud, azp, auth_time, iss, exp, iat, nonce,
+ * jti, sid`. It does **not** carry `given_name`, `family_name`, `email`, `preferred_username` or
+ * `user_type`, all of which the old `AuthUser` declared and read from there; every one of them was
+ * silently `undefined`. The OIDC standard fields are serialized as camelCase getters on the principal
+ * itself, and are all null today because uaa does not enrich the ID token — see lessons.md, "Shell —
+ * uaa's ID token carries no profile claims".
+ */
 interface AuthenticationResponse {
-  principal: {claims: AuthUser};
+  principal: {
+    claims: IdTokenClaims;
+    /** OIDC standard fields. Present as keys, null in practice until uaa fills them in. */
+    givenName: string | null;
+    familyName: string | null;
+    email: string | null;
+    preferredUsername: string | null;
+    /** The username. The only identity actually populated today. */
+    name: string;
+  };
   authorities: {authority: string}[];
+}
+
+/** What the ID token actually carries. */
+interface IdTokenClaims {
+  sub: string;
 }
 
 @Injectable({
@@ -41,8 +65,15 @@ export class AuthService {
               url: "/api/v1/auth/me",
             });
           }
-          this.authUser = it.principal.claims;
-          this.authUser.authorities = it.authorities.map(a => a.authority)
+          const principal = it.principal;
+          this.authUser = {
+            sub: principal.claims.sub,
+            username: principal.name,
+            givenName: principal.givenName,
+            familyName: principal.familyName,
+            email: principal.email,
+            authorities: it.authorities.map(a => a.authority),
+          };
           return this.authUser;
         }))
     }
@@ -70,18 +101,18 @@ export class AuthService {
   }
 }
 
+/**
+ * The signed-in principal, as far as uaa will describe it.
+ *
+ * Everything but `sub`, `username` and `authorities` is null today. The nullability is not defensive
+ * typing — it is what the endpoint returns.
+ */
 export interface AuthUser {
-  sub: string
-  email_verified: boolean,
-  preferred_username: string
-  given_name: string
-  family_name: string
-  user_type: UserType
-  authorities: string[]
-}
-
-export enum UserType {
-  SUPPER_USER = 'SUPPER_USER',
-  ORG_USER = 'ORG_USER',
-  MANAGED_USER = 'MANAGED_USER'
+  readonly sub: string;
+  /** uaa's username, e.g. `org1-admin`. The only human-readable identity currently available. */
+  readonly username: string;
+  readonly givenName: string | null;
+  readonly familyName: string | null;
+  readonly email: string | null;
+  readonly authorities: readonly string[];
 }

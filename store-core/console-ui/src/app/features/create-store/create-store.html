@@ -13,7 +13,7 @@
           <form class="panel-pad identity-grid" [formGroup]="facade.form">
             <div class="field">
               <label for="store-name">{{ t('createStore.identity.storeName') }} <span class="required">*</span></label>
-              <span class="control">
+              <span class="control" [class.invalid]="facade.form.controls.name.hasError('nameTaken')">
                 <input id="store-name" type="text" formControlName="name" [placeholder]="t('createStore.identity.storeNamePlaceholder')" />
                 @if (facade.form.controls.name.pending) {
                   <app-icon name="clock" class="spin" />

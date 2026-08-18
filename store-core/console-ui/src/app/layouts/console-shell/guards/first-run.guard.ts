@@ -11,16 +11,24 @@ export const FIRST_RUN_ROUTE = '/getting-started';
 const CONSOLE_HOME = '/dashboard';
 
 /**
- * How many stores this account owns — and, as a side effect, the point at which the store list is
- * fetched at all.
+ * Resolves the store list before the route activates, and always allows.
  *
- * This is load-bearing beyond the count. `SelectedStoreRequestContext` reads the list *synchronously*
- * from inside `CrudService.getParams()` to stamp `?store=&pod=`, so the list has to be resolved before
- * any store-scoped request goes out. These guards run before every console route activates and no
- * console page exists outside one, which makes this the one place that is both early enough and never
- * on the path of the prerendered marketing and sign-in routes. `load()` is cached, so calling it on
- * every navigation costs one request per session.
+ * This is the load point for the whole console. `SelectedStoreRequestContext` reads the list
+ * *synchronously* from inside `CrudService.getParams()` to stamp `?store=&pod=`, so it has to be
+ * resolved before any store-scoped request goes out — and the shell's rail has to know the account's
+ * stores whether or not the current page needs one.
+ *
+ * Separate from `requiresStore` because `store-management/create` is reachable *without* a store and
+ * still renders the rail: folding the fetch into `requiresStore` left that page telling an account with
+ * two stores that it had none.
+ *
+ * `load()` is cached, so applying this to every console route costs one request per session.
  */
+export const consoleContext: CanActivateFn = () =>
+  inject(SelectedStoreService)
+    .load()
+    .pipe(map(() => true));
+
 function storeCount(): Observable<number> {
   return inject(SelectedStoreService)
     .load()

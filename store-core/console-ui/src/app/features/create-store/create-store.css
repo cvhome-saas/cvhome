@@ -133,6 +133,17 @@
   border-color: var(--primary);
 }
 
+/*
+ * An invalid field keeps its error border even while focused. Without the specificity the
+ * `:focus-within` rule above wins and the control reads as accepted while the hint below it says the
+ * name is taken — which is what it did on first pass.
+ */
+.control.invalid,
+.control.invalid:hover,
+.control.invalid:focus-within {
+  border-color: var(--destructive);
+}
+
 input.control,
 select.control {
   display: block;
@@ -179,6 +190,10 @@ select.control:focus {
 
 .field-hint.ok {
   color: var(--chart-1-foreground);
+}
+
+.field-hint.error {
+  color: var(--destructive);
 }
 
 /* ---- Hosting region -------------------------------------------------------------------- */

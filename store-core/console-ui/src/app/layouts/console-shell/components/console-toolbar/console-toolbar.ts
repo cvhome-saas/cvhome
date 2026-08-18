@@ -125,7 +125,9 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
           <div class="popover profile-menu">
             <header>
               <strong>{{ shell.user()?.name ?? t('shell.profile.loading') }}</strong>
-              <span>{{ shell.user()?.email ?? '' }}</span>
+              @if (shell.user()?.email; as email) {
+                <span>{{ email }}</span>
+              }
             </header>
             <button type="button"><app-icon name="user" />{{ t('shell.profile.profile') }}</button>
             <button type="button"><app-icon name="cog" />{{ t('shell.profile.settings') }}</button>

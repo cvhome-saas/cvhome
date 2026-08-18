@@ -57,7 +57,9 @@ export interface ConsoleNotification {
 }
 
 export interface ConsoleUser {
+  /** The person's name if uaa knows one, otherwise their username. */
   readonly name: string;
   readonly initials: string;
-  readonly email: string;
+  /** Null today — uaa's ID token carries no email. The profile menu omits the line rather than faking it. */
+  readonly email: string | null;
 }

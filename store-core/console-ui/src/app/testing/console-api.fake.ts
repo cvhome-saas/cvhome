@@ -13,7 +13,8 @@ import type {ProvisioningState} from '@models/tenancy';
  */
 export class FakeConsoleApi {
   stores: readonly ConsoleStore[] = [];
-  user: ConsoleUser = {name: 'Jordan Diaz', initials: 'JD', email: 'jordan@acmesupply.co'};
+  /** Shaped like what uaa actually yields today: a username, no email. */
+  user: ConsoleUser = {name: 'org1-admin', initials: 'OR', email: null};
 
   readonly navigation = CONSOLE_NAVIGATION;
 

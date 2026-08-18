@@ -188,7 +188,9 @@ export class CreateStoreFacade {
    * What gets created, as the design's "artifacts" list.
    *
    * Kept because the resources are real — a store does get a database, a node and a locale — but the
-   * per-item detail no longer claims values (`fra-07`, `pg-14`) the server never reported.
+   * detail lines no longer name a region, a subdomain or an owner. Nothing knows any of those before
+   * provisioning: the old copy interpolated params the fixture supplied, and once those went the lines
+   * rendered the word "undefined" to the operator.
    */
   readonly artifacts = computed<readonly ArtifactRow[]>(() => {
     this.transloco.activeLang();
@@ -196,7 +198,7 @@ export class CreateStoreFacade {
     return PROVISIONING_ARTIFACTS.map((artifact) => ({
       id: artifact.id,
       label: t(artifact.labelKey),
-      detail: t(artifact.detailKey, artifact.detailParams),
+      detail: t(artifact.detailKey),
       icon: artifact.icon,
     }));
   });

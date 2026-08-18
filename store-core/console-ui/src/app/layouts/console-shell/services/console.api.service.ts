@@ -2,7 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, map, of} from 'rxjs';
 
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {UserService} from '@core/auth/user.service';
+import {AuthService} from '@core/auth/auth.service';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {CONSOLE_NAVIGATION} from '@mocks/console.fixture';
 import type {ConsoleStore, ConsoleUser, StoreDirectory} from '@models/console';
@@ -19,24 +19,33 @@ import type {CreateStoreRequest, ManagerStore} from '@models/tenancy';
 export class ConsoleApi {
   private readonly selection = inject(SelectedStoreService);
   private readonly stores = inject(ManagerStoreService);
-  private readonly users = inject(UserService);
+  private readonly auth = inject(AuthService);
 
   readonly navigation = CONSOLE_NAVIGATION;
 
   /**
-   * The signed-in operator.
+   * The signed-in operator, as far as uaa will describe them.
    *
-   * Initials are derived here rather than sent: they are a rendering of the name, and a server that
-   * computed them would have to agree with the console about a rule it has no reason to know.
+   * In practice that is the **username** and nothing else. Verified against the running stack: the ID
+   * token carries only `sub, aud, azp, auth_time, iss, exp, iat, nonce, jti, sid`, and the principal's
+   * `givenName`, `familyName` and `email` are all null. So the toolbar shows `org1-admin`, not a person.
+   *
+   * `GET /tenancy/api/v1/user-account/current` would have the real name — and is broken for every
+   * caller: it binds `@AuthenticationPrincipal Principal`, and a JWT principal is a `Jwt`, which does
+   * not implement `java.security.Principal`, so the parameter is null and the method NPEs to a 500.
+   * Both gaps are in lessons.md.
+   *
+   * `auth/me` also costs nothing here: the auth guard fetches and caches it before any console route
+   * renders.
    */
   loadUser(): Observable<ConsoleUser> {
-    return this.users.getCurrentAccount().pipe(
+    return this.auth.getAuthUser().pipe(
       map((account) => {
-        const name = [account.firstName, account.lastName].filter(Boolean).join(' ').trim();
+        const name = [account.givenName, account.familyName].filter(Boolean).join(' ').trim();
         return {
-          name: name || account.emailAddress,
-          initials: initialsOf(account.firstName, account.lastName, account.emailAddress),
-          email: account.emailAddress,
+          name: name || account.username,
+          initials: initialsOf(account.givenName, account.familyName, account.username),
+          email: account.email,
         };
       }),
     );
@@ -77,8 +86,8 @@ function toConsoleStore(store: ManagerStore): ConsoleStore {
   return {id: store.id, name: store.name, provisioningState: store.provisioningState, status: store.status};
 }
 
-/** First letters of the given and family name, or the email's first two, upper-cased. */
-function initialsOf(firstName: string | undefined, lastName: string | undefined, email: string): string {
-  const letters = [firstName?.trim()[0], lastName?.trim()[0]].filter(Boolean).join('');
-  return (letters || email.slice(0, 2)).toUpperCase();
+/** First letters of the given and family name, or the username's first two, upper-cased. */
+function initialsOf(givenName: string | null, familyName: string | null, username: string): string {
+  const letters = [givenName?.trim()[0], familyName?.trim()[0]].filter(Boolean).join('');
+  return (letters || username.slice(0, 2)).toUpperCase();
 }

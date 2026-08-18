@@ -336,3 +336,47 @@ requirements document, with the entry here reduced to a link. There is already o
   `nb-search` in the header.
 - **Status:** carried over as-is; not addressed in this module.
 
+## Shell — uaa's ID token carries no profile claims
+
+**Found by reading what `/api/v1/auth/me` actually returns, against the running stack.**
+
+- **Screen:** the toolbar's profile menu, which shows a name and an email address.
+- **What is missing:** the name and the email. `principal.claims` holds the **ID token's** claims and
+  only those — `sub, aud, azp, auth_time, iss, exp, iat, nonce, jti, sid`. The OIDC standard fields are
+  serialized on the principal itself (`givenName`, `familyName`, `email`, `preferredUsername`,
+  `fullName`) and every one of them is `null`. The only human-readable identity available is
+  `principal.name`, the username — `org1-admin`.
+- **A pre-existing bug this surfaced:** `AuthService`'s `AuthUser` declared `given_name`,
+  `family_name`, `preferred_username`, `email_verified` and `user_type` and read them from
+  `principal.claims`. None of them is there; all five were silently `undefined` and had been since the
+  interface was written. Nothing rendered them until this module, so nothing noticed. The interface now
+  describes what the endpoint returns.
+- **Why it matters:** `JwtCustomizerConfig` spreads user metadata and roles into the **access token**,
+  but this endpoint exposes the ID-token principal, which uaa does not enrich. So the console shows a
+  username where the design shows a person.
+- **Expected contract:** have uaa request and populate the `profile` and `email` scopes on the ID token,
+  so `givenName`, `familyName` and `email` arrive; or expose the access token's claims here instead.
+- **Placeholder:** documented in `console.api.service.ts` (`loadUser`) and `auth.service.ts`.
+
+## Shell — user-account/current is broken for JWT callers
+
+- **Screen:** the toolbar's profile menu. This is the endpoint that *should* answer it.
+- **What is broken:** `GET /tenancy/api/v1/user-account/current` returns **500 for every caller**.
+  `UserAccountApi.current` binds `@AuthenticationPrincipal Principal principal`, but the authenticated
+  principal is a `Jwt`, which does not implement `java.security.Principal`. The argument resolves to
+  null and `principal.getName()` throws:
+  ```
+  java.lang.NullPointerException: Cannot invoke "java.security.Principal.getName()"
+      because "principal" is null
+  ```
+  It also carries **no `@PreAuthorize`**, so an unauthenticated request reaches the method body and gets
+  a 500 where it should get a 401.
+- **Why it matters:** it is the only endpoint that returns the signed-in user's real name and email —
+  the two things the previous entry says the token does not carry. Both routes to an identity are
+  therefore closed. seller-ui never hit this because it reads users by id, not `current`.
+- **Expected contract:** bind `@AuthenticationPrincipal Jwt` (or take the `Authentication` and read
+  `getName()`), and add an authentication requirement so an anonymous call is refused rather than
+  crashing.
+- **Placeholder:** documented in `console.api.service.ts` (`loadUser`), which deliberately does not call
+  it.
+

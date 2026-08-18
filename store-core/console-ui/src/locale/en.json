@@ -620,11 +620,11 @@
       },
       "node": {
         "label": "Node assignment",
-        "detail": "A physical server in {region}"
+        "detail": "A physical server, chosen by the pod registry"
       },
       "domain": {
         "label": "Provisional subdomain + TLS",
-        "detail": "{domain} with a managed certificate"
+        "detail": "A storefront address with a managed certificate"
       },
       "locale": {
         "label": "Locale and tax defaults",
@@ -632,7 +632,7 @@
       },
       "owner": {
         "label": "Admin access for you",
-        "detail": "{name} added as store owner"
+        "detail": "Your account, added as store owner"
       }
     },
     "progress": {

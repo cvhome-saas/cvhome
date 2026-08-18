@@ -1,7 +1,7 @@
 import {Route} from '@angular/router';
 
 import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
-import {requiresStore} from '@layouts/console-shell/guards/first-run.guard';
+import {consoleContext, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
 import {routes} from './app.routes';
 
 /**
@@ -41,13 +41,22 @@ describe('app routes', () => {
     expect(guards.indexOf(canAccessSecuredPages)).toBeLessThan(guards.indexOf(requiresStore));
   });
 
+  for (const path of CONSOLE_ROUTES) {
+    it(`loads the store list before /${path} activates`, () => {
+      // The request context reads the list synchronously on every later request, and the rail renders
+      // on every console page — including the one that does not require a store.
+      expect(find(path).canActivate).toContain(consoleContext);
+    });
+  }
+
   it('keeps store creation reachable without a store — it is the only way out of first run', () => {
     const branch = find('store-management');
     const create = branch.children?.find((child) => child.path === 'create');
 
     expect(create).toBeDefined();
     expect(create!.canActivate ?? []).not.toContain(requiresStore);
-    // Still behind authentication, via the parent.
+    // Still behind authentication, and still loading the rail's stores, via the parent.
     expect(branch.canActivate).toContain(canAccessSecuredPages);
+    expect(branch.canActivate).toContain(consoleContext);
   });
 });
