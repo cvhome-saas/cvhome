@@ -1,4 +1,4 @@
-# console-ui go-live — migration framework, and Module 2
+# console-ui go-live — migration framework, and Module 3
 
 ## Context
 
@@ -45,7 +45,7 @@ side by side, and committed in its own phases. Design blocks with no backend beh
 | i18n | console-ui's own **Transloco** throughout. seller-core's two `@ngx-translate/core` call sites are rewritten during the port, not bridged by a token. No `TRANSLATION_PORT`, no adapter, and `@ngx-translate/core` never enters console-ui's `package.json`. |
 | console-ui's `core/` tier | **Authoritative.** Its `errors/`, `http/crud.service.ts`, `table/`, `auth/`, `platform/` are the ones that run. Ported services inject *these*, never a second copy. |
 | Strictness | Ported code is hardened to console-ui's `strict: true` as part of the port. This is a feature, not a tax — see below. |
-| Module order | Marketing/auth first (done), then console shell and store context. |
+| Module order | Marketing/auth, then console shell and store context (both done), then the dashboard. |
 
 ### Why the copy is cheaper than the link, here
 
@@ -239,185 +239,163 @@ What it established, which Module 2 builds on:
   can answer.
 
 ---
+## Module 2 — Console shell and store context — **done**
 
-## Module 2 — Console shell and store context
+Shipped in three commits. What it established, which Module 3 depends on:
 
-### Why this module is next, and why it is the hard one
+- **The console is authenticated.** `canAccessSecuredPages` gates every `ConsoleShell` route.
+- **`?store=&pod=` is real.** `SelectedStoreService` reads `POST /store-manager/list`; a `consoleContext`
+  guard resolves it before any console route activates, because the request context reads the list
+  synchronously. `FirstRunMock` and the hardcoded stores are gone. **Every endpoint Module 3 calls is
+  store-scoped, and this is what scopes it.**
+- `api/tenancy/`, `api/pod-registry/` joined `api/billing/` and `api/signup/` in the ported tier.
+- QA against the live stack found that `user-account/current` 500s for every caller, that `AuthUser` had
+  been mistyped since it was written, and two regressions of my own. `lessons.md` reached 22 entries.
 
-Every remaining module is a reading of one store. `SelectedStoreRequestContext.params()` stamps
-`?store=&pod=` onto every request and throws rather than guess, so until the real store list loads
-there is nothing to scope a dashboard, an order list or a catalogue to. Module 2 is what turns
-that key.
+---
 
-It is also the module where the console stops being anonymous. `canAccessSecuredPages` has existed
-in `core/auth/` since the app was scaffolded and **`app.routes.ts` references it nowhere** — every
-console route is currently reachable signed-out, rendering fixtures. That is the single largest
-correctness gap in the app today.
+## Module 3 — Dashboard
+
+### Why this one is mostly a subtraction
+
+The console's dashboard mockup is the most data-hungry screen in the app: four KPI tiles, a
+three-row attention queue, a new-vs-returning donut, an order-status chart and a top-products list.
+Behind it there are **three endpoints**, all on checkout, all returning the same three-column shape.
+
+That mismatch — not the wiring — is the work. seller-ui's client dashboard shows exactly three charts
+because three is what exists; the new design asks for eleven figures. This module ships the three, adds
+the two more that turn out to be derivable, and is explicit on screen about the rest.
 
 ### seller-ui today
 
-The header (`theme/components/header/`) carries an `nb-select` of the stores the user can reach;
-nearly every screen is scoped to the current selection and changing it reloads the page's data. It
-is disabled on routes where a store context is meaningless
-(`STORE_SELECT_DISABLED_ROUTE_PREFIXES`: store-management, subscription-and-usage, org-management).
-`canAccessSecuredPages` guards `/pages/**` from `pages-routing.module.ts`. Store creation lives at
-`/pages/store-management/create-store`. Provisioning is asynchronous and surfaced only as a status
-column in the stores list.
+`/pages` renders one of two dashboards by role. The merchant one
+(`src/app/pages/home/`) has a from-date/to-date range driving three ECharts panels: order status
+breakdown, customer countries, top selling products. All three come from
+`seller-core/analytics`'s `StatisticApiService`.
 
-### console-ui today
-
-`ConsoleApi` (`layouts/console-shell/services/console.api.service.ts`) serves the whole chrome from
-fixtures and holds mutable in-memory state for stores, pin and order.
-`core/store-context/selected-store.service.ts` hardcodes three "Acme" stores and an invented
-`DEFAULT_POD_ID`. `core/store-context/first-run-mock.ts` fakes the zero-store account behind
-`?firstRun=1` — its own comment says it comes out once a stores endpoint exists.
-`features/create-store` runs a seven-row provisioning checklist on a timer.
-
-Design reference: `console-template/Create Store.dc.html`, `Create First Store.dc.html`,
-`First Run.dc.html`, `First Run with Nav.dc.html`, and the shell in `Admin Dashboard.dc.html`.
+Worth copying: `orders-statistic.component.ts:30` derives its series from the response
+(`[...new Set(data.entries.map(it => it.name))]`) rather than hardcoding a status list. That is the
+right instinct and this module keeps it — see the status-label note below.
 
 ### API surface to port
 
-| From | To | Endpoint |
+All three statistics take `POST` with a `StatisticRange {fromDate, toDate}` body and answer
+`{entries: [{date, name, value}]}` (`commons/domain/StatisticEntry`). Store scoping rides on the query
+string, which Module 2 made real.
+
+| From | To | Endpoint | What it actually returns |
+|---|---|---|---|
+| `seller-core/analytics/.../statistic.api.service.ts` | `api/analytics/statistic.service.ts` | `POST /spg/checkout/api/v2/private/order-statistic` | `(day, orderStatus, count)` grouped by both |
+| same | same | `POST /spg/checkout/api/v2/private/customer-statistic` | `(null, billing.country, count)` — **orders by country**, despite the name |
+| same | same | `POST /spg/checkout/api/v2/private/product-statistic` | `(null, sku, count)` — **order lines per SKU**, not units or money |
+| `seller-core/payments/.../payment.service.ts` | `api/payment/payment.service.ts` | `GET /spg/payment/api/v1/private/payment/transactions` | paged `ReadableList`; only `totalElements` is read here |
+
+**Port only the read half of `PaymentService`.** Approve and reject belong to the payments module.
+
+**Do not port the three platform-admin statistics** (`store-statistic`, `org-statistic`,
+`subscription-statistic` on tenancy). They feed seller-ui's *admin* dashboard, which is Module 12.
+
+### What each panel gets
+
+| Panel | Backing | Verdict |
 |---|---|---|
-| `seller-core/src/lib/store/store.service.ts` (`ManagerStoreService.list`) | `api/tenancy/manager-store.service.ts` | `POST /tenancy/api/v1/store-manager/list`, body `{}` + `Pageable` |
-| `seller-core/stores/.../store.service.ts` (`createStore`, `checkIfStoreExist`) | same file | `POST /tenancy/api/v1/store-manager/private/store`, `GET …/private/store/unique?name=` |
-| — (new) | same file | `GET /tenancy/api/v1/store-manager/store-info?store=` — provisioning state |
-| `seller-core/stores/.../pod.service.ts` (`listPods`) | `api/pod-registry/pod.service.ts` | `GET /pod-registry/api/v1/pod/list` |
-| console-ui `core/auth/user.service.ts` (already present, unused) | reused as-is | `GET /tenancy/api/v1/user-account/current` |
-| `seller-core/src/lib/models/commons.ts` | `models/tenancy.ts` | `ManagerStoreDto`, `PodRef`, `ProvisioningState`, `StoreStatus` |
-
-**Do not port `ManagerStoreService.create()`.** It posts to `/tenancy/api/v1/store-manager/create`,
-which **does not exist** — `StoreManagerApi` maps create at `private/store`. It is dead code in
-seller-core; the working path is `seller-core/stores`' `StoreService.createStore`. Record it under
-Deviations.
-
-**Correct the DTO while porting.** seller-core's `ManagerStore` is missing two fields the server
-sends (`status: StoreStatus`, `billingStatus: SubscriptionStatus | null`) and types
-`provisioningState` as a bare `string` where it is a four-value enum. `billingStatus` is
-**nullable by design** and must render as "unknown", never as a problem — a billing outage is not a
-reason to tell a merchant their store has lapsed.
+| Order status breakdown | `order-statistic`, summed over the range per status | **real** |
+| Orders by customer country (donut) | `customer-statistic` | **real** — retitled, see below |
+| Top selling products | `product-statistic` | **real** — SKU and order count, see below |
+| KPI: Orders | sum of `order-statistic` | **derived** |
+| KPI: Orders delta | a second `order-statistic` over the preceding window of equal length | **derived** |
+| KPI: Pending payments | `transactions?status=WAITING_VERIFICATION&count=1` → `totalElements` | **derived** |
+| Attention: payment approvals | the same count | **derived** |
+| Attention: awaiting fulfilment | `order-statistic`, statuses before SHIPPED | **derived**, retitled |
+| KPI: Revenue | — | **none** → rendered unavailable |
+| KPI: Low stock items | — | **none** → rendered unavailable |
+| Attention: low stock products | — | **none** → row removed |
+| New vs returning customers | — | **none** → panel repurposed |
 
 ### Decisions (settled with the user)
 
 | Question | Decision |
 |---|---|
-| Pin default store / reorder rail | **Removed.** No user-preferences endpoint exists anywhere. Both controls come out with a `TODO(lessons.md)` rather than being faked or persisted per-browser. |
-| Hosting region picker | **Becomes a real pod picker**, sourced from `GET /pod-registry/api/v1/pod/list` and sent as `pod: {id}`. |
-| Plan card in create-store | **TODO.** Store creation calls billing for a quota check, not a plan choice. |
-| Provisioning checklist | **Replaced by polling** `store-info` for the real `ProvisioningState`, including `FAILED_PROVISIONING`, which the timer can never reach and the console cannot currently show at all. |
+| Revenue and Low stock tiles | **Keep all four tiles**; render these two with an em dash and a "Not available yet" flag on a muted tone. The gap is visible on screen, not only in `lessons.md`. `KpiCard` already has the `flag` input for exactly this — no component change. |
+| New-vs-returning donut | **Retitled** to "Orders by customer country" and sliced by the countries the endpoint returns, which is what seller-ui shows and what the query computes. |
+| Top products | **SKU, counted in orders.** `ACME-HDPH-01 · 48 orders`, not `Wireless Headphones · 482 sales`. The fixture's "sales" implied units or money and it is neither. No catalog lookup. |
 
-### The one architectural problem: sync context, async list
+### Three things the port has to get right
 
-`SelectedStoreRequestContext.params()` is called **synchronously** inside `CrudService.getParams()`
-on every request, but the real store list arrives over HTTP. The list must therefore be resolved
-before any store-scoped request is issued.
+**The dates are fixtures and must go.** `dashboard.facade.ts` hardcodes
+`DEFAULT_RANGE = {from: new Date(2026, 6, 5), to: new Date(2026, 7, 4)}` and a `HEADING_DATE` of
+`new Date(2026, 7, 4)`. Against real data these are simply wrong. The default becomes the last 30 days
+ending today, and the heading's date becomes today.
 
-**Load it in the guard.** `requiresStore` already runs before every console route activates and
-already asks for the store count; it becomes the point where the directory is fetched and cached in
-`SelectedStoreService`. `ConsoleApi.loadStores()` then reads the cache rather than fetching. This
-keeps `params()` synchronous, costs no new mechanism, and — importantly — keeps the fetch off the
-prerendered marketing and auth routes, which must not pay for it.
+**Status labels cannot be translated blindly.** The real `OrderStatus` enum is ten values — `CREATED,
+PENDING_PAYMENT, CONFIRMED, PROCESSING, SHIPPED, DELIVERING, DELIVERED, COMPLETED, CANCELLED,
+RETURNED` — and neither UI's five-value list (`ORDERED/PROCESSED/DELIVERED/REFUNDED/CANCELED`) matches
+it. Follow seller-ui and derive the series from the response, then label each through a known-key map
+with a humanized fallback: Transloco's `StrictMissingHandler` **throws** on an unknown key, so
+`translate('dashboard.orderStatus.' + name)` on an unexpected status would crash the page. Same shape
+as the entitlement labels in Module 1. Tones come from a stable map so a status keeps its colour
+between renders, cycling the categorical palette for anything unmapped.
 
-Rejected: `provideAppInitializer`, which would fetch on every entry to `/` and `/sign-in` for
-visitors who are not signed in at all.
-
-### Mapping
-
-| seller-ui / design capability | console-ui destination | Backing |
-|---|---|---|
-| Auth gate on the console | `canAccessSecuredPages` on every `ConsoleShell` route | `GET /api/v1/auth/me` — **real, already written** |
-| Store selector | `store-switcher` | `POST /store-manager/list` — **real** |
-| Signed-in identity (name, initials, email) | `ConsoleShellFacade.user` | `GET /user-account/current` — **real** |
-| First-run (zero stores) | `firstRun` computed, guards | real empty list; `FirstRunMock` **deleted** |
-| Create store | `features/create-store` | `POST …/private/store` — **real** |
-| Live store-name check | create-store form | `GET …/private/store/unique?name=` — **real** |
-| Hosting region | pod picker | `GET /pod-registry/api/v1/pod/list` — real, but see gap |
-| Provisioning progress | polled state | `GET …/store-info?store=` — **real** |
-| Organization name in the shell | `ConsoleShellFacade.organization` | **no endpoint** → TODO |
-| Notification bell + feed | `console-toolbar` | **no endpoint** → TODO |
-| Sidebar badge counts (12 / 5 / 7) | `CONSOLE_NAVIGATION` | **no endpoint** → removed, TODO |
-| Default store / rail order | removed | **no endpoint** → TODO |
-| Plan selection at create | removed from form | **no endpoint** → TODO |
-| Global search | `console-toolbar` | already dead in both UIs → TODO |
+**The payment count must not be able to blank the dashboard.** `loadSnapshot` fans out five requests;
+the three statistics are required, but a payments outage should cost the two payment figures and
+nothing else. `catchError(() => of(null))` on that one leg, and the tile reports unavailable rather
+than zero — reporting zero pending approvals when the service is down is the worst possible answer.
 
 ### Implementation
 
-- **Port** the table above into `src/app/api/tenancy/` and `src/app/api/pod-registry/`, with
-  `models/tenancy.ts` and `models/pod.ts`, following the standing port checklist. Correct the DTO
-  as noted; harden to `strict: true`.
-- **`SelectedStoreService`** loses `STORES` and `DEFAULT_POD_ID` and gains a `load()` returning a
-  cached `Observable` of the real directory, plus the existing synchronous accessors reading that
-  cache. `addStore` stays — create-store still needs to register a new store without a refetch.
-  Keep the `cvhome.console.store` storage key: which store is *open* is genuinely a per-browser
-  concern, unlike a default.
-- **Delete `core/store-context/first-run-mock.ts`** and every reference. An empty list is now the
-  real signal, exactly as its own comment anticipated.
-- **`ConsoleApi`** keeps its shape but `loadStores()` reads `SelectedStoreService`, `addStore()`
-  calls the real create, and `pinDefaultStore`/`reorderStores` are **removed** along with
-  `ConsoleShellFacade.pinStore`, `toggleReorder`, `moveStore`, `reordering`, `defaultStoreId`,
-  `defaultStore`, and the pin/reorder UI in `store-switcher`. `StoreDirectory.defaultStoreId` comes
-  off the model.
-- **Auth**: add `canAccessSecuredPages` to the `ConsoleShell` routes in `app.routes.ts`
-  (`getting-started`, `dashboard`, `orders`, `store-management`), ordered before `requiresStore` so
-  an unauthenticated visitor is sent to uaa rather than to getting-started. `ConsoleUser` is built
-  from `/user-account/current`; drop `CONSOLE_USER`.
-- **Navigation** stays a client-side constant — it is a map of the app, not server data — but the
-  invented badge counts come off. Items with no `route` keep rendering and leading nowhere, which
-  is the existing convention.
-- **create-store**: real form (name + the merchant fields tenancy forwards), live uniqueness check,
-  optional pod, then poll `store-info`. Delete the timer, `TASK_STAMPS_SECONDS`, `TICKS_PER_TASK`
-  and `PROVISIONING_TASKS`. Handle `FAILED_PROVISIONING` and a polling timeout honestly — the store
-  row exists either way, so the page must not imply it can be re-created.
-- **`create-store.fixture.ts`** loses `HOSTING_REGIONS`, `STORE_PLANS`, `PROVISIONING_TASKS` and
-  their defaults; `COUNTRIES` stays (reference data, and seller-ui reads the same list from a static
-  JSON asset).
+- **Port** into `src/app/api/analytics/statistic.service.ts` and `src/app/api/payment/payment.service.ts`,
+  with `src/app/models/statistics.ts` and `src/app/models/payment.ts`, following the standing checklist.
+  `StatisticsParams` loses its `store` field: the request context supplies it now.
+- **`DashboardApi.loadSnapshot(range)`** becomes the assembly point — `forkJoin` of the five calls,
+  reducing entries into the existing `DashboardSnapshot`. This keeps the facade, the page and every
+  widget untouched, which is the whole point of the `*.api.service.ts` seam.
+- **`models/dashboard.ts`** gains what the shapes now need: `Kpi.value` becomes `string | null`
+  (null renders the em dash), `OrderStatus.labelKey` becomes a resolved `label`, and `Product` becomes
+  `{sku, orders}`. `CustomerSplitSegment.labelKey` becomes `label` — a country code is data, not copy.
+- **`dashboard.fixture.ts`** is deleted outright; nothing on this page is authored any more.
+- Locale: add `dashboard.orderStatus.*` for the ten real statuses, `dashboard.kpi.unavailable`, the
+  retitled donut and products headings, and remove the keys for the five invented statuses.
 
 ### Backend gaps → `lessons.md`
 
-1. **No user-preferences endpoint** — default store and rail order. Expected: a small per-user
-   preferences document on tenancy, or `defaultStore` on `ReadableUser`.
-2. **An org admin cannot read its own organization** — `OrgManagerApi` is super-admin only on every
-   method, so the shell has an org **id** from the principal and no name. Expected: a
-   `GET /tenancy/api/v1/org/current` returning at least `{id, name}`.
-3. **No merchant-readable list of placeable pods.** `PodService.listPlaceablePublicPods()` exists
-   and is *not exposed on any endpoint*; `pod/list` returns only the caller org's own private pods,
-   which is empty for a normal merchant. So the pod picker will usually have nothing in it and the
-   page must fall back to "assigned automatically". `Pod` also carries no region, latency or data
-   residency, all of which the design shows.
-4. **No notifications service** — bell, unread count, feed, "mark all read". Nothing exists.
-5. **No sidebar badge counts** — the design shows unread/attention counts per section; each would
-   need a cheap count endpoint on its own service.
-6. **No plan selection at store creation** — billing is asked for a quota decision, not a plan. A
-   subscription belongs to a store, so this is arguably correct and the console should offer the
-   plan step *after* provisioning; recorded so the design's plan card is not mistaken for missing work.
-7. **Provisioning has four states and no detail** — no per-step progress, no failure reason, no
-   retry. `FAILED_PROVISIONING` leaves a store row the merchant cannot act on.
-8. **No global search** (carried forward from the template review).
+1. **No revenue anywhere.** Every statistic is a `count(...)`; nothing sums `order.total`. The single
+   most prominent figure in the design has no source. Expected: a `revenue-statistic` returning
+   `(day, currency, sum)` — note it must be per currency, since a store can take more than one.
+2. **No stock levels.** `ProductCriteria` has no quantity or threshold field, so "low stock" cannot be
+   asked for. Expected: a threshold filter on the product query, or a count endpoint.
+3. **No new-vs-returning split.** Nothing records a customer's first order date.
+4. **`customer-statistic` is misnamed** — it groups *orders* by billing country and counts orders, not
+   customers. A store with one loyal customer in Germany reads the same as one with forty.
+5. **`product-statistic` returns no product name** and counts order lines rather than units — a ten-unit
+   order counts once. Expected: the product's name and localized title, plus `sum(quantity)`.
+6. **No "stale order" signal.** The design's "past 24 hours without a status update" needs the last
+   history timestamp; the statistic has only the purchase date, so the row is retitled to what can be
+   computed.
+7. **Counting requires fetching.** `totalElements` is only reachable by asking for a page of rows. Cheap
+   at `count=1`, but a real counts endpoint would serve the attention queue and the sidebar badges
+   (already logged in Module 2) at once.
 
 ### Testing
 
-Both UIs, two tabs, `seller-ui.gateway.com:8000` and `console-ui.gateway.com:8000`, signed in as
-the same org admin.
+Both UIs, signed in as the same org admin, `ORG1-STORE1` open in each.
 
-- **Auth**: open `/dashboard` signed out → redirected to uaa, not to getting-started. Sign in →
-  land back on `/dashboard`. This is new behaviour; confirm it does not trap the marketing routes.
-- **Store list**: the switcher shows the same stores as seller-ui's header select, same names, same
-  count. Switching stores changes `?store=&pod=` on the next request — check the network tab, and
-  that the pod id matches the store's real pod, not the invented `507f1f77…`.
-- **First run**: an org with no stores lands on `/getting-started` and cannot reach `/dashboard`.
-  Confirm without `?firstRun=1`, which no longer exists.
-- **Create**: create a store from console-ui, watch it provision, confirm it appears in seller-ui's
-  header select after a reload — the strongest single proof the two agree.
-- Duplicate name → the live uniqueness check blocks before submit; confirm seller-ui behaves the same.
-- Force `FAILED_PROVISIONING` if a pod can be drained, or stub it, and confirm the page says so.
-- Arabic and all three themes on the shell; 1440 / 900 / 420.
+- The order-status chart shows the same statuses and totals as seller-ui's ECharts panel over the same
+  from/to dates. This is the one direct numeric comparison available.
+- Same for customer countries and top products — noting seller-ui prints the raw SKU too.
+- Switch stores in the rail: every figure refetches and changes. Confirm each request carries the new
+  `?store=`, which is what Module 2 built.
+- Change the date range: five requests go out, and the previous-period call spans the correctly
+  offset window.
+- A store with no orders in range: the charts say so rather than rendering empty axes.
+- Stop the payment pod (or point the status at a nonexistent value): the three charts still render and
+  only the payment figures report unavailable.
+- Revenue and Low stock read "Not available yet" in both locales and all three themes.
 
 ### Commits
 
-1. `plan(console-ui): console shell and store context` — this document.
-2. `feat(console-ui): console shell and store context on real APIs`.
-3. `fix(console-ui): console shell after QA`.
+1. `plan(console-ui): dashboard` — this document.
+2. `feat(console-ui): dashboard on real statistics`.
+3. `fix(console-ui): dashboard after QA`.
 
 ---
 
@@ -425,28 +403,27 @@ the same org admin.
 
 **seller-ui: not modified.** Read-only reference.
 
-**New in console-ui:** `src/app/api/tenancy/manager-store.service.ts`,
-`src/app/api/pod-registry/pod.service.ts`, `src/app/models/tenancy.ts`, `src/app/models/pod.ts`.
+**New in console-ui:** `src/app/api/analytics/statistic.service.ts`,
+`src/app/api/payment/payment.service.ts`, `src/app/models/statistics.ts`, `src/app/models/payment.ts`.
 
-**Changed in console-ui:** `src/app/core/store-context/selected-store.service.ts`,
-`src/app/app.routes.ts`, `src/app/layouts/console-shell/services/console.api.service.ts`,
-`.../facades/console-shell.facade.ts`, `.../guards/first-run.guard.ts`,
-`.../components/store-switcher/store-switcher.ts`, `.../components/console-toolbar/*`,
-`src/app/features/create-store/**`, `src/app/models/console.ts`,
-`src/app/mocks/console.fixture.ts`, `src/app/mocks/create-store.fixture.ts`, `lessons.md`.
+**Changed in console-ui:** `src/app/features/dashboard/services/dashboard.api.service.ts` (the
+assembly point — most of the module's code), `.../facades/dashboard.facade.ts` (real dates, resolved
+labels), `src/app/models/dashboard.ts`, `src/app/features/dashboard/dashboard.html` (retitled panels,
+one attention row fewer), `src/locale/{en,ar}.json`, `lessons.md`.
 
-**Deleted:** `src/app/core/store-context/first-run-mock.ts`.
+**Deleted:** `src/app/mocks/dashboard.fixture.ts`.
 
-**Reused, already present:** `src/app/core/auth/auth-guard.service.ts`,
-`src/app/core/auth/auth.service.ts`, `src/app/core/auth/user.service.ts`,
-`src/app/core/http/crud.service.ts`, `src/app/core/http/request-context.ts`.
+**Reused, already present:** `src/app/api/tenancy/selected-store.service.ts` and
+`selected-store-request-context.ts` (store scoping), `src/app/core/http/crud.service.ts`,
+`src/app/shared/ui/{kpi-card,kpi-grid,action-list,donut-chart,bar-chart,ranked-list,date-range-picker}`
+— every widget this page needs already exists and none of them changes.
 
 ## Verification
 
 1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
    `git -C store-core/seller-ui status --porcelain` empty.
-2. `grep -rn "FirstRunMock\|firstRun=1" src` → no hits.
-3. `grep -rn "507f1f77bcf86cd799439011\|Acme Supply Co" src` → no hits outside specs.
-4. `grep -rn "from 'seller-core" src` → no hits.
-5. The two-tab comparison above, driven through Chrome.
+2. `grep -rn "dashboard.fixture" src` → no hits.
+3. `grep -rn "new Date(2026" src` → no hits; the dashboard's dates are real.
+4. The two-tab comparison above, driven through Chrome.
+5. Network tab: five requests per range change, each carrying `?store=` and `?pod=`.
 6. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
