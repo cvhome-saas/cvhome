@@ -6,9 +6,9 @@ import {translateSignal} from '@jsverse/transloco';
 import {filter, map, startWith} from 'rxjs';
 
 import {CONSOLE_LOCALES, LocaleCode, LocaleService} from '@core/i18n/locale.service';
-import {SelectedStoreService} from '@core/store-context/selected-store.service';
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {THEME} from '@core/theme/theme.provider';
-import type {ConsoleStore} from '@models/console';
+import type {ConsoleNotification, ConsoleStore} from '@models/console';
 import {ConsoleApi} from '../services/console.api.service';
 
 /** Which of the shell's popovers is open. Only one at a time. */
@@ -35,12 +35,31 @@ export class ConsoleShellFacade {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly selection = inject(SelectedStoreService);
-  private readonly shell = this.api.loadShell();
 
-  readonly organization = this.shell.organization;
-  readonly user = this.shell.user;
-  readonly navigation = this.shell.navigation;
-  readonly notifications = this.shell.notifications;
+  readonly navigation = this.api.navigation;
+
+  /**
+   * The signed-in operator. Null until the request answers, which the toolbar renders as a neutral
+   * placeholder rather than inventing a name.
+   */
+  private readonly identity = rxResource({stream: () => this.api.loadUser()});
+  readonly user = this.identity.value;
+
+  /**
+   * TODO(lessons.md): the organization's name — no endpoint. See lessons.md, "Shell — an org admin
+   * cannot read its own organization".
+   *
+   * `OrgManagerApi` is super-admin only on every method, so the console holds an org *id* from the
+   * principal and has no way to resolve a name for it. The toolbar shows nothing here rather than the
+   * fixture's "ACME".
+   */
+  readonly organization: string | null = null;
+
+  /**
+   * TODO(lessons.md): notifications — no service exists. See lessons.md, "Shell — no notifications
+   * service". The bell is rendered disabled rather than opening an empty popover that looks broken.
+   */
+  readonly notifications: readonly ConsoleNotification[] = [];
 
   readonly bannerVisible = signal(true);
   readonly navCollapsed = signal(false);
@@ -54,24 +73,16 @@ export class ConsoleShellFacade {
   private readonly directory = rxResource({stream: () => this.api.loadStores()});
 
   /**
-   * The rail's order, seeded from the response and writable so a move lands immediately.
+   * The rail's stores, in the order tenancy returned them.
    *
-   * Waiting for the save before repainting would drag the row out from under the pointer;
-   * `moveStore` puts the previous order back if the save fails.
+   * There is no client-side ordering: a rail order the operator arranges would have to live somewhere,
+   * and nothing on the backend can hold it — see lessons.md, "Shell — no user-preferences endpoint".
    */
-  private readonly ordered = linkedSignal<readonly ConsoleStore[]>(
-    () => this.directory.value()?.stores ?? [],
-  );
-
-  readonly stores = this.ordered.asReadonly();
+  readonly stores = computed<readonly ConsoleStore[]>(() => this.directory.value()?.stores ?? []);
   readonly storesLoading = this.directory.isLoading;
 
-  /** Which store the console is working in, and which one it opens on. */
+  /** Which store the console is working in. */
   readonly currentStoreId = linkedSignal(() => this.directory.value()?.currentStoreId ?? null);
-  readonly defaultStoreId = linkedSignal(() => this.directory.value()?.defaultStoreId ?? null);
-
-  /** True while the rail shows move controls instead of plain store rows. */
-  readonly reordering = signal(false);
 
   /**
    * True when the account owns no store yet.
@@ -95,11 +106,6 @@ export class ConsoleShellFacade {
 
   readonly currentStore = computed(
     () => this.stores().find((store) => store.id === this.currentStoreId()) ?? null,
-  );
-
-  /** Name of the pinned store, for the menu's note. */
-  readonly defaultStore = computed(
-    () => this.stores().find((store) => store.id === this.defaultStoreId())?.name ?? '—',
   );
 
   readonly unreadCount = computed(
@@ -192,56 +198,9 @@ export class ConsoleShellFacade {
     this.closeMobileNav();
   }
 
-  /**
-   * Records a store the operator just provisioned and opens it.
-   *
-   * Reloads the directory rather than pushing onto `ordered` directly, so the rail, the
-   * pin state and `firstRun` all settle from one answer — and so the guards, which ask
-   * the API the same question, cannot disagree with what the rail is showing.
-   */
-  registerStore(name: string): void {
-    this.api.addStore(name).subscribe((store) => {
-      this.directory.reload();
-      this.currentStoreId.set(store.id);
-    });
-  }
-
-  /** Pins a store as the one login lands on. Defaults to whichever store is open. */
-  pinStore(storeId?: string): void {
-    const id = storeId ?? this.currentStoreId();
-    this.closeMenus();
-    if (!id) {
-      return;
-    }
-    this.api.pinDefaultStore(id).subscribe(() => this.defaultStoreId.set(id));
-  }
-
-  toggleReorder(): void {
-    this.reordering.update((on) => !on);
-    this.closeMenus();
-  }
-
-  /**
-   * Moves a store one place up (`-1`) or down (`1`) the rail and saves the new order.
-   *
-   * One step at a time rather than drag-and-drop: it works from the keyboard, and the rail
-   * is short enough that dragging would buy nothing.
-   */
-  moveStore(storeId: string, offset: -1 | 1): void {
-    const previous = this.stores();
-    const from = previous.findIndex((store) => store.id === storeId);
-    const to = from + offset;
-    if (from < 0 || to < 0 || to >= previous.length) {
-      return;
-    }
-
-    const next = [...previous];
-    next.splice(to, 0, ...next.splice(from, 1));
-    this.ordered.set(next);
-
-    this.api.reorderStores(next.map((store) => store.id)).subscribe({
-      error: () => this.ordered.set(previous),
-    });
+  /** Re-reads the directory. Called once a store has been created, so the rail and the guards agree. */
+  refreshStores(): void {
+    this.directory.reload();
   }
 
   private deepestRouteData(): Record<string, unknown> {

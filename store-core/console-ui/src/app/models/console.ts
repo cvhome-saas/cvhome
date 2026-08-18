@@ -1,3 +1,5 @@
+import type {ProvisioningState, StoreStatus} from '@models/tenancy';
+
 import {IconName} from '@shared/ui/icon/icon-paths';
 import type {Tone} from '@shared/ui/tone';
 
@@ -23,18 +25,20 @@ export interface NavigationSection {
 export interface ConsoleStore {
   readonly id: string;
   readonly name: string;
+  /** Carried so the rail can mark a store that is still building, or that failed to. */
+  readonly provisioningState: ProvisioningState;
+  /** Only `ACTIVE` is operable; the rail dims the rest rather than hiding them. */
+  readonly status: StoreStatus;
 }
 
 /**
- * The stores a user can switch between, with the two preferences that order and open them.
+ * The stores a user can switch between, and which one is open.
  *
- * One payload because the list is meaningless without knowing which store is open and which
- * one login lands on — the eventual endpoint should answer all three in a single round trip.
+ * There is no `defaultStoreId`: nothing on the backend can remember one — see lessons.md,
+ * "Shell — no user-preferences endpoint".
  */
 export interface StoreDirectory {
   readonly stores: readonly ConsoleStore[];
-  /** Store the console opens on, marked with a pin in the rail. Null before the first one exists. */
-  readonly defaultStoreId: string | null;
   /** Null while the account owns no store — the condition the first-run guards read. */
   readonly currentStoreId: string | null;
 }

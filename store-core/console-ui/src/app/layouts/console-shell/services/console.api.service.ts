@@ -1,102 +1,84 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable, defer, delay, of} from 'rxjs';
+import {Observable, map, of} from 'rxjs';
 
-import {FirstRunMock} from '@core/store-context/first-run-mock';
-import {SelectedStoreService} from '@core/store-context/selected-store.service';
-import {
-  CONSOLE_DEFAULT_STORE_ID,
-  CONSOLE_NAVIGATION,
-  CONSOLE_NOTIFICATIONS,
-  CONSOLE_ORGANIZATION,
-  CONSOLE_STORES,
-  CONSOLE_USER,
-} from '@mocks/console.fixture';
-import type {ConsoleStore, StoreDirectory} from '@models/console';
-
-/** Round-trip the store mocks pretend to take, so loading and pending states are exercised. */
-const LATENCY_MS = 250;
+import {ManagerStoreService} from '@api/tenancy/manager-store.service';
+import {UserService} from '@core/auth/user.service';
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
+import {CONSOLE_NAVIGATION} from '@mocks/console.fixture';
+import type {ConsoleStore, ConsoleUser, StoreDirectory} from '@models/console';
+import type {CreateStoreRequest, ManagerStore} from '@models/tenancy';
 
 /**
- * Supplies the console chrome: identity, navigation, stores and notifications.
+ * Supplies the console chrome: identity, navigation and stores.
  *
- * Everything about stores is already asynchronous, and the ordering and pin state it hands
- * back is held here rather than in the facade — that is server state, and swapping these
- * three methods for `HttpClient` calls should not touch anything above.
+ * Navigation stays a constant. It is a map of this application — which pages exist and how they are
+ * grouped — not data any service owns, and an endpoint for it would only let the backend break the
+ * front end's routing.
  */
 @Injectable({providedIn: 'root'})
 export class ConsoleApi {
   private readonly selection = inject(SelectedStoreService);
-  private readonly firstRunMock = inject(FirstRunMock);
+  private readonly stores = inject(ManagerStoreService);
+  private readonly users = inject(UserService);
 
-  /** Stands in for the rows a stores endpoint would own, order included. */
-  private stores: readonly ConsoleStore[] = this.firstRunMock.active() ? [] : CONSOLE_STORES;
-  private defaultStoreId: string | null = this.firstRunMock.active() ? null : CONSOLE_DEFAULT_STORE_ID;
+  readonly navigation = CONSOLE_NAVIGATION;
 
-  loadShell() {
-    return {
-      organization: CONSOLE_ORGANIZATION,
-      user: CONSOLE_USER,
-      navigation: CONSOLE_NAVIGATION,
-      notifications: CONSOLE_NOTIFICATIONS,
-    };
-  }
-
-  /** The stores this user may switch to, in their saved order. */
-  loadStores(): Observable<StoreDirectory> {
-    // Deferred so a re-subscribe reads the state as it is now, not as it was at call time.
-    return defer(() =>
-      of<StoreDirectory>({
-        stores: this.stores,
-        defaultStoreId: this.defaultStoreId,
-        // No first element to fall back on before the account owns a store.
-        currentStoreId: this.selection.currentSelectedStore()?.id ?? this.stores[0]?.id ?? null,
+  /**
+   * The signed-in operator.
+   *
+   * Initials are derived here rather than sent: they are a rendering of the name, and a server that
+   * computed them would have to agree with the console about a rule it has no reason to know.
+   */
+  loadUser(): Observable<ConsoleUser> {
+    return this.users.getCurrentAccount().pipe(
+      map((account) => {
+        const name = [account.firstName, account.lastName].filter(Boolean).join(' ').trim();
+        return {
+          name: name || account.emailAddress,
+          initials: initialsOf(account.firstName, account.lastName, account.emailAddress),
+          email: account.emailAddress,
+        };
       }),
-    ).pipe(delay(LATENCY_MS));
+    );
   }
 
   /**
-   * Registers a store the operator just provisioned, and opens it.
+   * The stores this operator may switch to.
    *
-   * This is what ends first run: the directory stops being empty, so the guards let the
-   * rest of the console through. The id is minted here because the mock layer is the only
-   * thing standing in for the server that would issue one.
+   * Read from `SelectedStoreService`'s cache rather than fetched: the guard has already loaded it by the
+   * time any console page renders, and a second fetch here could disagree with the list the request
+   * context is stamping onto every other request.
    */
-  addStore(name: string): Observable<ConsoleStore> {
-    return defer(() => {
-      const id = this.mintStoreId();
-      const store: ConsoleStore = {id, name};
-      this.stores = [...this.stores, store];
-      this.defaultStoreId ??= id;
-      this.selection.addStore(id, name);
-      this.firstRunMock.clear();
-      return of(store);
-    }).pipe(delay(LATENCY_MS));
+  loadStores(): Observable<StoreDirectory> {
+    return of<StoreDirectory>({
+      stores: this.selection.stores.map(toConsoleStore),
+      currentStoreId: this.selection.currentSelectedStore()?.id ?? null,
+    });
   }
 
-  /** Shaped like the 24-character hex ids the rest of the fixtures use. */
-  private mintStoreId(): string {
-    const random = Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padStart(6, '0');
-    return `${Date.now().toString(16).padStart(12, '0')}${random}`.slice(0, 24).padEnd(24, '0');
+  /**
+   * Creates a store and opens it.
+   *
+   * Answers as soon as the row exists — provisioning runs on after that, and the create page polls
+   * `storeInfo` for it. The store is registered locally straight away so the request context can scope
+   * that poll.
+   */
+  createStore(request: CreateStoreRequest): Observable<ManagerStore> {
+    return this.stores.create(request).pipe(
+      map((store) => {
+        this.selection.addStore(store);
+        return store;
+      }),
+    );
   }
+}
 
-  /** Makes a store the one the console opens on. */
-  pinDefaultStore(storeId: string): Observable<void> {
-    return defer(() => {
-      this.defaultStoreId = storeId;
-      return of(void 0);
-    }).pipe(delay(LATENCY_MS));
-  }
+function toConsoleStore(store: ManagerStore): ConsoleStore {
+  return {id: store.id, name: store.name, provisioningState: store.provisioningState, status: store.status};
+}
 
-  /** Saves the rail's order. Ids not in the list keep their place at the end. */
-  reorderStores(storeIds: readonly string[]): Observable<readonly ConsoleStore[]> {
-    return defer(() => {
-      const ranks = new Map(storeIds.map((id, index) => [id, index]));
-      this.stores = [...this.stores].sort(
-        (a, b) => (ranks.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (ranks.get(b.id) ?? Number.MAX_SAFE_INTEGER),
-      );
-      return of(this.stores);
-    }).pipe(delay(LATENCY_MS));
-  }
+/** First letters of the given and family name, or the email's first two, upper-cased. */
+function initialsOf(firstName: string | undefined, lastName: string | undefined, email: string): string {
+  const letters = [firstName?.trim()[0], lastName?.trim()[0]].filter(Boolean).join('');
+  return (letters || email.slice(0, 2)).toUpperCase();
 }

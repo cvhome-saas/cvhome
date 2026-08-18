@@ -20,8 +20,13 @@ import {StoreSwitcher} from '../store-switcher/store-switcher';
   template: `
     <aside class="sidebar" [class.mobile-open]="shell.mobileNavOpen()" *transloco="let t">
       <header class="sidebar-head">
-        <span class="org-mark" aria-hidden="true">{{ shell.organization.charAt(0) }}</span>
-        <strong class="nav-label">{{ shell.organization }}</strong>
+        <!--
+          TODO(lessons.md): the organization's name. OrgManagerApi is super-admin only on every
+          method, so an org admin cannot read its own org — see lessons.md, "Shell — an org admin
+          cannot read its own organization". The brand stands in until there is a name to show.
+        -->
+        <span class="org-mark" aria-hidden="true">{{ brandName.charAt(0) }}</span>
+        <strong class="nav-label">{{ brandName }}</strong>
         <button
           class="nav-toggle"
           type="button"
@@ -89,6 +94,9 @@ import {StoreSwitcher} from '../store-switcher/store-switcher';
 })
 export class ConsoleSidebar {
   protected readonly shell = inject(ConsoleShellFacade);
+
+  // Brand name, not translated — same convention as the marketing page.
+  protected readonly brandName = 'cvhome';
 
   /**
    * Collapsing the rail is meaningless while it is a drawer — the mobile layout pins it to

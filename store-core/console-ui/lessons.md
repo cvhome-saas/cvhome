@@ -214,3 +214,125 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Expected contract:** either a `trialAvailable` boolean on the authenticated bootstrap (so the console can
   stop promising a trial that is spent), or drop the per-price `trialDays` concept if the org trial is the
   only one that will ever be granted — two trial mechanisms where one is always zero is a trap.
+
+---
+
+## Shell — no user-preferences endpoint
+
+- **Screen:** the store switcher at the foot of the sidebar (`Admin Dashboard.dc.html`), which designs a
+  "set as default" pin and a reorder mode.
+- **What the UI needs:** to remember, per account, which store the console opens on and what order the
+  rail lists them in.
+- **What is missing:** anywhere to put either. `UserAccountApi` has create/update/list/enable/disable and
+  no preferences; `ReadableUser` carries no `defaultStore`; nothing in tenancy holds a per-user document.
+- **Why it is required:** an operator with several stores lands on an arbitrary one every session. The pin
+  is the fix, and it is worthless if it does not follow them to another machine — which is exactly why it
+  was not persisted in browser storage as a stand-in.
+- **Decision:** both controls were **removed**, not faked. `cvhome.console.store` still records which store
+  is *open*, which is genuinely a property of the tab rather than the account.
+- **Expected contract:** `GET`/`PUT /tenancy/api/v1/user-account/preferences` returning
+  `{defaultStore: string | null, storeOrder: string[]}`, or a `defaultStore` field on `ReadableUser`.
+- **Placeholder:** `TODO(lessons.md)` in `store-switcher.ts`.
+
+## Shell — an org admin cannot read its own organization
+
+- **Screen:** the sidebar header, which shows the organization's name and initial.
+- **What the UI needs:** the name of the org the signed-in user belongs to.
+- **What is missing:** every method on `OrgManagerApi` is `@PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")`,
+  including `find-one`. The principal carries an org **id** (uaa spreads user metadata into the token
+  claims), so the console knows *which* org and can learn nothing else about it.
+- **Why it is required:** the org name is the first thing in the sidebar, and it is the only place the
+  console tells a user which tenant they are working in. It also has nowhere else to come from — an
+  organization has no display name anywhere in the console today.
+- **Decision:** the sidebar shows the product's own brand until there is a name to show, rather than the
+  fixture's "ACME".
+- **Expected contract:** `GET /tenancy/api/v1/org/current` → `{id, name}`, scoped to the caller's own org
+  and readable by any authenticated principal that has one.
+- **Placeholder:** `TODO(lessons.md)` in `console-sidebar.ts` and `console-shell.facade.ts`.
+
+## Shell — no merchant-readable list of placeable pods
+
+- **Screen:** create store, the "hosting region" section of `Create Store.dc.html` — region cards with a
+  latency figure and a data-residency note.
+- **What the UI needs:** the regions a merchant may place a store in, with something meaningful to choose
+  between.
+- **What is missing:** two things.
+  1. **The list.** `GET /pod-registry/api/v1/pod/list` scopes to the caller: a super admin sees every pod,
+     an org admin sees only *its own private* pods. The shared pods a normal merchant is actually placed
+     into are found by `PodServiceImpl.listPlaceablePublicPods()` — which exists, is covered by tests, and
+     **is exposed on no endpoint at all**. So for an ordinary merchant the list comes back empty.
+  2. **The content.** `Pod` is `{id, name, shortenPodId, endpoint, orgId}`. There is no region, no
+     latency, no data-residency jurisdiction — none of what the design's cards are made of.
+- **Why it is required:** placement is permanent (`Create Store.dc.html` marks it so), and it decides
+  where a merchant's customer data lives. That is not a decision to make for someone silently.
+- **Decision:** the section renders **only when the operator actually has pods to choose from**, listing
+  the real ones; otherwise it is omitted and the registry places the store, which is what already happens.
+  The chosen pod is sent as `pod: {id}` — a hint the registry honours only if it finds it eligible.
+- **Expected contract:** expose `listPlaceablePublicPods()` as `GET /pod-registry/api/v1/pod/public/placeable`,
+  and add `region`, `jurisdiction` and a capacity or health hint to `Pod`.
+- **Placeholder:** `TODO(lessons.md)` in `create-store.html` and `pod.service.ts`.
+
+## Shell — provisioning has four states and no detail
+
+- **Screen:** create store, the progress screen.
+- **What the UI needs:** to show what is happening while a store is built, and what to do when it is not.
+- **What is missing:** anything beyond `ProvisioningState` — `NOT_STARTED`, `IN_PROGRESS`, `SUCCESSFULLY`,
+  `FAILED` — read by re-fetching the store's row from
+  `GET /tenancy/api/v1/store-manager/store-info?store=`. There is no per-step progress, no percentage, no
+  estimate, no failure reason, and **no retry**: `FAILED_PROVISIONING` leaves a store row the merchant can
+  see and cannot act on.
+- **Why it is required:** provisioning is the first thing a new merchant watches the product do, and a
+  failure there is unrecoverable from the console.
+- **Decision:** the seven-row checklist that animated on a client-side timer is **gone**. It reported
+  success at a fixed moment regardless of what the server was doing, invented per-task timestamps and node
+  names (`fra-07`, `pg-14`), and could never reach a failure state at all. The page now polls the real
+  state, shows the four outcomes honestly, and stops after two minutes saying it lost track rather than
+  claiming a failure it cannot see.
+- **Expected contract:** a failure reason on the store row, and an idempotent
+  `POST /store-manager/private/store/{id}/reprovision` — the row already exists, so the console must not
+  offer "create it again".
+- **Placeholder:** `TODO(lessons.md)` in `create-store.html` and `create-store.facade.ts`.
+
+## Shell — no notifications service
+
+- **Screen:** the toolbar bell, its unread count, the popover feed, "mark all read" and "view all"
+  (`Admin Dashboard.dc.html`).
+- **What is missing:** all of it. No service, no events, no read-state, and no notifications page for
+  "view all" to lead to.
+- **Decision:** the bell was **removed** rather than shown disabled or opening an empty popover. A bell is
+  a promise that something will appear in it.
+- **Expected contract:** a per-user feed scoped by org and store —
+  `GET /notifications?unread=`, `POST /notifications/read`, with a websocket or poll for the count. Most of
+  the entries the design shows (new order, payment held, low stock) are events other services already
+  publish, so this is plausibly a consumer rather than a new source of truth.
+
+## Shell — no sidebar badge counts
+
+- **Screen:** the sidebar, which shows counts against Inventory, Orders and Payments.
+- **What is missing:** any cheap count endpoint. The numbers in the fixture (12, 5, 7) were invented.
+- **Decision:** removed. A number in a navigation rail is read as fact.
+- **Expected contract:** one small count per section, ideally batched —
+  `GET /spg/.../attention-counts?store=` → `{orders: n, payments: n, inventory: n}` — since three separate
+  round trips to paint a sidebar is a poor trade.
+
+## Shell — no plan selection at store creation
+
+- **Screen:** create store, the plan cards and the "stores used" allowance meter.
+- **What is missing:** the concept. Creating a store asks billing for a **quota decision**
+  (`ExternalStoreQuotaApi.private/store-create`, which answers yes or refuses with
+  `StoreQuotaRefusedException`), not for a plan. A subscription belongs to a store, so there is nothing to
+  subscribe to until the store exists. The allowance meter is worse: every entitlement read is
+  store-scoped, so the console cannot learn the org's store ceiling before it tries and is refused.
+- **Decision:** both were removed. This is recorded so the design's plan card is not mistaken for missing
+  work — the sequencing in the design is arguably wrong, and the plan step probably belongs *after*
+  provisioning.
+- **Expected contract:** either an org-scoped entitlement read for the store ceiling, or accept that the
+  refusal is the answer and surface it well when it arrives.
+
+## Shell — no global search
+
+- **Screen:** the toolbar's "Search orders, products…" box.
+- **What is missing:** any cross-entity search. Dead in seller-ui too, where it is a decorative
+  `nb-search` in the header.
+- **Status:** carried over as-is; not addressed in this module.
+

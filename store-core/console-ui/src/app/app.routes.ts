@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
 import {firstRunOnly, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
 
 export const routes: Routes = [
@@ -72,7 +73,7 @@ export const routes: Routes = [
     // the only way on. `firstRunOnly` hands over to the console once one exists.
     path: 'getting-started',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [firstRunOnly],
+    canActivate: [canAccessSecuredPages, firstRunOnly],
     children: [
       {
         path: '',
@@ -84,7 +85,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [requiresStore],
+    canActivate: [canAccessSecuredPages, requiresStore],
     children: [
       {
         path: '',
@@ -97,7 +98,7 @@ export const routes: Routes = [
   {
     path: 'orders',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [requiresStore],
+    canActivate: [canAccessSecuredPages, requiresStore],
     children: [
       {
         path: '',
@@ -109,6 +110,9 @@ export const routes: Routes = [
   {
     path: 'store-management',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    // Authentication is required for the whole branch; a *store* is not, because `create` below is the
+    // only way out of first run and by definition runs without one.
+    canActivate: [canAccessSecuredPages],
     children: [
       // Static before the section param, so this does not get swallowed as a section name.
       {
@@ -123,6 +127,7 @@ export const routes: Routes = [
         // the only exit from first run.
         path: ':section',
         loadComponent: () => import('@features/store-management/store-management').then((page) => page.StoreManagement),
+        // Authentication is already asserted by the parent; this adds only the store requirement.
         canActivate: [requiresStore],
         data: {titleKey: 'route.storeManagement.title', breadcrumbKey: 'shell.breadcrumb.storeManagement'},
       },

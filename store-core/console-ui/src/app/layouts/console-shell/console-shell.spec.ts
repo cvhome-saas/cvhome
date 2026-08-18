@@ -4,7 +4,9 @@ import {provideRouter} from '@angular/router';
 import {RouterTestingHarness} from '@angular/router/testing';
 
 import {translocoTesting} from '@testing/transloco-testing';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {ConsoleShell} from './console-shell';
+import {ConsoleApi} from './services/console.api.service';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
 
 @Component({selector: 'app-test-page', template: `<p class="test-page">{{ 'Inventory page' }}</p>`})
@@ -14,7 +16,11 @@ describe('ConsoleShell', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ConsoleShell, ...translocoTesting().imports],
-      providers: [provideRouter([]), ...translocoTesting().providers],
+      providers: [
+        provideRouter([]),
+        ...translocoTesting().providers,
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
+      ],
     }).compileComponents();
   });
 
@@ -89,6 +95,7 @@ describe('ConsoleShell', () => {
           },
         ]),
         ...translocoTesting().providers,
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
       ],
     }).compileComponents();
 

@@ -10,7 +10,7 @@ import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
 import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
 import {ToastService} from '@shared/ui/toast/toast';
-import type {HostingRegionOption, NextStepLink, StorePlanOption} from '@models/create-store';
+import type {NextStepLink} from '@models/create-store';
 import {CreateStoreFacade} from './facades/create-store.facade';
 
 /**
@@ -39,14 +39,6 @@ export class CreateStore {
     this.transloco.activeLang();
     return this.transloco.translate('createStore.title');
   });
-
-  protected pickRegion(region: HostingRegionOption): void {
-    this.facade.selectRegion(region);
-  }
-
-  protected pickPlan(plan: StorePlanOption): void {
-    this.facade.selectPlan(plan);
-  }
 
   protected submit(): void {
     this.facade.start();

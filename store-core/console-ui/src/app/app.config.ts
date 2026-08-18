@@ -17,6 +17,8 @@ import {provideTranslocoPersistLang} from '@jsverse/transloco-persist-lang';
 
 import { routes } from './app.routes';
 import type {LocaleCode} from '@core/i18n/locale.service';
+import {REQUEST_CONTEXT} from '@core/http/request-context';
+import {SelectedStoreRequestContext} from '@api/tenancy/selected-store-request-context';
 import {CONSOLE_CORE_CONFIG} from '@core/config/console-core.config';
 import {GlobalErrorHandler} from '@core/errors/global-error-handler';
 import {apiErrorInterceptor} from '@core/errors/api-error.interceptor';
@@ -40,6 +42,9 @@ export const appConfig: ApplicationConfig = {
     provideTheme(),
     {provide: CONSOLE_CORE_CONFIG, useValue: {apiUrl: environment.apiUrl, loginUrl: environment.loginUrl, logoutUrl: environment.logoutUrl}},
     {provide: NOTIFICATION_PORT, useExisting: ToastService},
+    // The token carries only the contract; the implementation reads the store list, so it lives in the
+    // api tier and is wired here rather than through a default factory on the token.
+    {provide: REQUEST_CONTEXT, useExisting: SelectedStoreRequestContext},
     {provide: ErrorHandler, useClass: GlobalErrorHandler},
     {provide: LANG_STORAGE, useExisting: BrowserLangStorage},
     provideTransloco({

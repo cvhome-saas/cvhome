@@ -37,44 +37,12 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
         <input type="search" [placeholder]="t('shell.toolbar.searchPlaceholder')" autocomplete="off" />
       </label>
 
-      <div class="menu">
-        <button
-          class="icon-button"
-          type="button"
-          [attr.aria-label]="t('shell.toolbar.notificationsAriaLabel', {count: shell.unreadCount()})"
-          [attr.aria-expanded]="shell.openMenu() === 'notifications'"
-          (click)="shell.toggleMenu('notifications')"
-        >
-          <app-icon name="bell" />
-          <b class="unread-count">{{ shell.unreadCount() }}</b>
-        </button>
-        @if (shell.openMenu() === 'notifications') {
-          <div class="popover notifications">
-            <header>
-              <strong>{{ t('shell.notifications.title') }}</strong>
-              <span class="pill red">{{ t('shell.notifications.newCount', {count: shell.unreadCount()}) }}</span>
-              <button type="button">{{ t('shell.notifications.markAllRead') }}</button>
-            </header>
-            <ul>
-              @for (notification of shell.notifications; track notification.id) {
-                <li [class]="notification.tone" [class.unread]="notification.unread">
-                  <button type="button">
-                    <span class="notification-icon" [class]="notification.tone">
-                      <app-icon [name]="notification.icon" />
-                    </span>
-                    <span class="notification-copy">
-                      <strong>{{ t(notification.titleKey, notification.titleParams) }}</strong>
-                      <span>{{ t(notification.detailKey, notification.detailParams) }}</span>
-                      <small>{{ t(notification.timeKey, notification.timeParams) }}</small>
-                    </span>
-                  </button>
-                </li>
-              }
-            </ul>
-            <footer><button type="button">{{ t('shell.notifications.viewAll') }}</button></footer>
-          </div>
-        }
-      </div>
+      <!--
+        TODO(lessons.md): the notification bell, its unread count, the feed, "mark all read" and
+        "view all" were all fixture. No notifications service exists — see lessons.md, "Shell — no
+        notifications service". Removed rather than shown disabled: a bell is a promise that
+        something will appear in it.
+      -->
 
       <div class="menu">
         <button
@@ -149,20 +117,20 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
           [attr.aria-expanded]="shell.openMenu() === 'profile'"
           (click)="shell.toggleMenu('profile')"
         >
-          <span class="avatar" aria-hidden="true">{{ shell.user.initials }}</span>
-          <strong>{{ shell.user.name }}</strong>
+          <span class="avatar" aria-hidden="true">{{ shell.user()?.initials ?? '' }}</span>
+          <strong>{{ shell.user()?.name ?? t('shell.profile.loading') }}</strong>
           <app-icon name="chevronDown" />
         </button>
         @if (shell.openMenu() === 'profile') {
           <div class="popover profile-menu">
             <header>
-              <strong>{{ shell.user.name }}</strong>
-              <span>{{ shell.user.email }}</span>
+              <strong>{{ shell.user()?.name ?? t('shell.profile.loading') }}</strong>
+              <span>{{ shell.user()?.email ?? '' }}</span>
             </header>
             <button type="button"><app-icon name="user" />{{ t('shell.profile.profile') }}</button>
             <button type="button"><app-icon name="cog" />{{ t('shell.profile.settings') }}</button>
             <hr />
-            <a class="sign-out" routerLink="/sign-in"><app-icon name="signOut" />{{ t('shell.profile.logOut') }}</a>
+            <a class="sign-out" routerLink="/external-logout-link"><app-icon name="signOut" />{{ t('shell.profile.logOut') }}</a>
           </div>
         }
       </div>

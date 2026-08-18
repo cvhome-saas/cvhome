@@ -1,8 +1,10 @@
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
-import {throwError} from 'rxjs';
+import {of} from 'rxjs';
 
+import type {StoreDirectory} from '@models/console';
 import {translocoTesting} from '@testing/transloco-testing';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 import {ConsoleApi} from '../../services/console.api.service';
 import {StoreSwitcher} from './store-switcher';
@@ -13,7 +15,11 @@ describe('StoreSwitcher', () => {
     localStorage.removeItem('cvhome.console.store');
     TestBed.configureTestingModule({
       imports: [...translocoTesting().imports],
-      providers: [provideRouter([]), ...translocoTesting().providers],
+      providers: [
+        provideRouter([]),
+        ...translocoTesting().providers,
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
+      ],
     });
   });
 
@@ -63,63 +69,30 @@ describe('StoreSwitcher', () => {
     expect(element.querySelector('.store.current .store-name')?.textContent?.trim()).toBe(second.name);
   }));
 
-  it('pins the open store as the default, once the save lands', fakeAsync(() => {
-    const {fixture, facade, element} = switcher();
-    facade.selectStore(facade.stores()[2].id);
-    facade.toggleMenu('store');
-    fixture.detectChanges();
-
-    (element.querySelector('.store-menu button') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    // Nothing moves until the API confirms.
-    expect(facade.defaultStoreId()).toBe(facade.stores()[0].id);
-
-    tick(500);
-    fixture.detectChanges();
-    expect(facade.defaultStore()).toBe(facade.stores()[2].name);
-    expect(element.querySelectorAll('.store')[2].querySelector('app-icon[name="pin"]')).not.toBeNull();
-  }));
-
-  it('moves a store down the rail and saves the order', fakeAsync(() => {
-    const {fixture, facade, element} = switcher();
+  it('marks a store that is still building, and one that failed', fakeAsync(() => {
     const api = TestBed.inject(ConsoleApi);
-    spyOn(api, 'reorderStores').and.callThrough();
-    const [first, second] = facade.stores();
+    spyOn(api, 'loadStores').and.returnValue(
+      of({
+        stores: [
+          {id: 'a', name: 'Building', provisioningState: 'IN_PROGRESS_PROVISIONING', status: 'ACTIVE'},
+          {id: 'b', name: 'Broken', provisioningState: 'FAILED_PROVISIONING', status: 'ACTIVE'},
+        ],
+        currentStoreId: 'a',
+      } satisfies StoreDirectory),
+    );
 
-    facade.toggleReorder();
-    fixture.detectChanges();
-    (element.querySelectorAll('.store-move button')[1] as HTMLButtonElement).click();
-    fixture.detectChanges();
+    const {element} = switcher();
+    const rows = [...element.querySelectorAll('.store-list li')];
 
-    // Optimistic: the row moves before the save returns.
-    expect(names(element).slice(0, 2)).toEqual([second.name, first.name]);
-    expect(api.reorderStores).toHaveBeenCalledWith([second.id, first.id, facade.stores()[2].id]);
-    tick(500);
+    expect(rows.length).toBe(2);
+    expect(rows[0].querySelector('.store-flags app-icon')).not.toBeNull();
+    expect(rows[1].querySelector('.store-flags app-icon')).not.toBeNull();
   }));
 
-  it('puts the order back if the save fails', fakeAsync(() => {
-    const {fixture, facade, element} = switcher();
-    const api = TestBed.inject(ConsoleApi);
-    const before = names(element);
-    spyOn(api, 'reorderStores').and.returnValue(throwError(() => new Error('save failed')));
+  it('offers no pin or reorder controls — neither has anywhere to be saved', fakeAsync(() => {
+    const {element} = switcher();
 
-    facade.moveStore(facade.stores()[0].id, 1);
-    fixture.detectChanges();
-
-    expect(names(element)).toEqual(before);
-  }));
-
-  it('offers move controls only while reordering, and stops at the ends', fakeAsync(() => {
-    const {fixture, facade, element} = switcher();
-    expect(element.querySelectorAll('.store-move').length).toBe(0);
-
-    facade.toggleReorder();
-    fixture.detectChanges();
-
-    const moves = element.querySelectorAll<HTMLButtonElement>('.store-move button');
-    expect(moves.length).toBe(facade.stores().length * 2);
-    // First store cannot move up, last cannot move down.
-    expect(moves[0].disabled).toBeTrue();
-    expect(moves[moves.length - 1].disabled).toBeTrue();
+    expect(element.querySelector('.store-menu')).toBeNull();
+    expect(element.querySelector('.store-move')).toBeNull();
   }));
 });

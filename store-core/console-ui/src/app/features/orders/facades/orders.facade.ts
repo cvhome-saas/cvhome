@@ -2,6 +2,8 @@ import {computed, inject, Injectable, linkedSignal, signal} from '@angular/core'
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
+
 import type {PageT} from '@core/table/table.types';
 import type {ChannelFilter, OrderRow, OrderTab, OrdersSnapshot} from '@models/orders';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
@@ -58,6 +60,7 @@ export const CHANNEL_FILTERS: readonly {key: ChannelFilter; labelKey: string}[] 
 export class OrdersFacade {
   private readonly api = inject(OrdersApi);
   private readonly transloco = inject(TranslocoService);
+  private readonly shell = inject(ConsoleShellFacade);
 
   readonly dateRange = signal<DateRangeValue>(DEFAULT_RANGE);
   readonly activeTab = signal<OrderTab>('all');
@@ -71,7 +74,7 @@ export class OrdersFacade {
     this.transloco.activeLang();
     return {
       title: this.transloco.translate('orders.heading.title'),
-      context: this.transloco.translate('orders.heading.context', {store: 'Acme Supply Co.'}),
+      context: this.transloco.translate('orders.heading.context', {store: this.shell.currentStore()?.name ?? ''}),
     };
   });
 
@@ -149,7 +152,7 @@ export class OrdersFacade {
     return total === undefined
       ? this.heading().context
       : this.transloco.translate('orders.heading.contextWithCount', {
-          store: 'Acme Supply Co.',
+          store: this.shell.currentStore()?.name ?? '',
           count: total,
         });
   });

@@ -1,8 +1,10 @@
-import {CONSOLE_STORES} from '@mocks/console.fixture';
 import type {StoreSettings} from '@models/store-settings';
 
 /** The default subdomain every store is served from, before any custom domain. */
 export const STORE_SUBDOMAIN = 'acme-supply.myshop.io';
+
+/** Placeholder store name. Store settings are still fixture-backed until their own module. */
+const STORE_NAME = 'Acme Supply Co.';
 
 /** The custom domain the mockup is mid-way through verifying. */
 export const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
@@ -20,7 +22,7 @@ export const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
  */
 export const STORE_SETTINGS: StoreSettings = {
   // Kept in step with the shell's switcher, so the page and the rail name the same store.
-  storeName: CONSOLE_STORES[0].name,
+  storeName: STORE_NAME,
 
   branding: {
     logo: {name: 'acme-logo.svg', url: null},
@@ -98,7 +100,7 @@ export const STORE_SETTINGS: StoreSettings = {
   ],
 
   details: {
-    name: CONSOLE_STORES[0].name,
+    name: STORE_NAME,
     legalName: 'Acme Supply Holdings LLC',
     slug: 'acme-supply',
     category: 'Business & industrial supplies',

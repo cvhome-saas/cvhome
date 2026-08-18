@@ -1,48 +1,29 @@
 import {DestroyRef, computed, inject, Injectable, signal} from '@angular/core';
-import {NonNullableFormBuilder, Validators} from '@angular/forms';
+import {rxResource, takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AbstractControl, AsyncValidatorFn, NonNullableFormBuilder, ValidationErrors, Validators} from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
-import {Subscription, interval} from 'rxjs';
+import {EMPTY, Observable, Subscription, catchError, first, map, of, switchMap, timer} from 'rxjs';
 
+import {ManagerStoreService} from '@api/tenancy/manager-store.service';
+import {PodService} from '@api/pod-registry/pod.service';
+import {ApiErrorService} from '@core/errors/api-error.service';
+import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import {CONSOLE_USER} from '@mocks/console.fixture';
-import {
-  COUNTRIES,
-  DEFAULT_COUNTRY_ID,
-  DEFAULT_PLAN_ID,
-  DEFAULT_REGION_ID,
-  HOSTING_REGIONS,
-  NEXT_STEPS,
-  PROVISIONING_ARTIFACTS,
-  PROVISIONING_TASKS,
-  STORE_PLANS,
-} from '@mocks/create-store.fixture';
-import {SLUG_PATTERN} from '@models/store-settings';
-import type {CreateStorePhase, HostingRegionOption, StorePlanOption} from '@models/create-store';
+import {COUNTRIES, DEFAULT_COUNTRY_ID, NEXT_STEPS, PROVISIONING_ARTIFACTS} from '@mocks/create-store.fixture';
+import type {CreateStorePhase} from '@models/create-store';
+import type {Pod} from '@models/pod';
+import type {ManagerStore, ProvisioningState} from '@models/tenancy';
 
-/** Stores this account already has, on the Free plan — the fixture the sidebar rail uses too. */
-const FREE_PLAN_STORE_LIMIT = 3;
+/** How often the new store's row is re-read while it builds. */
+const POLL_MS = 2000;
 
-/** Fake per-task completion timestamps, in seconds — cosmetic, not derived from real timing. */
-const TASK_STAMPS_SECONDS: readonly number[] = [2, 9, 21, 34, 44, 52, 64];
-
-const TICK_MS = 420;
-/** Ticks per completed task — chosen so the demo run finishes in a handful of seconds. */
-const TICKS_PER_TASK = 2.2;
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function formatStamp(totalSeconds: number): string {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-}
+/**
+ * How long to keep polling before giving up on an answer.
+ *
+ * Giving up is not the same as failing: the store row exists either way and provisioning may still
+ * finish server-side, so the page says it lost track rather than that anything went wrong.
+ */
+const POLL_TIMEOUT_MS = 120_000;
 
 export interface SummaryRow {
   readonly label: string;
@@ -57,16 +38,6 @@ export interface ArtifactRow {
   readonly icon: (typeof PROVISIONING_ARTIFACTS)[number]['icon'];
 }
 
-export type TaskStatus = 'done' | 'active' | 'queued';
-
-export interface TaskRow {
-  readonly id: string;
-  readonly label: string;
-  readonly detail: string;
-  readonly status: TaskStatus;
-  readonly stamp: string;
-}
-
 export interface InfraRow {
   readonly label: string;
   readonly value: string;
@@ -74,12 +45,14 @@ export interface InfraRow {
 }
 
 /**
- * Drives the "Create store" flow: a form that captures identity, region and plan, and a
- * simulated provisioning run once it is submitted.
+ * Drives the "Create store" flow.
  *
- * There is no real backend for store creation yet, so `start()` runs a scripted checklist
- * against a client-side timer rather than polling a job — the same trade the rest of the
- * console makes with fixture-backed facades, just animated instead of static.
+ * Provisioning is asynchronous on the server: `POST store-manager/private/store` answers as soon as the
+ * row exists, with `provisioningState` still in progress, and the only way to watch the rest is to
+ * re-read the row. There is no per-step progress, no failure reason and no retry — see lessons.md,
+ * "Shell — provisioning has four states and no detail". An earlier revision of this file animated a
+ * seven-row checklist against a client-side timer, which meant the page reported success at a fixed
+ * moment regardless of what the server was doing, and could never show a failure at all.
  */
 @Injectable({providedIn: 'root'})
 export class CreateStoreFacade {
@@ -87,46 +60,50 @@ export class CreateStoreFacade {
   private readonly transloco = inject(TranslocoService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly shell = inject(ConsoleShellFacade);
+  private readonly console = inject(ConsoleApi);
+  private readonly stores = inject(ManagerStoreService);
+  private readonly pods = inject(PodService);
+  private readonly apiErrors = inject(ApiErrorService);
 
   readonly countries = COUNTRIES;
-  readonly regions = HOSTING_REGIONS;
-  readonly plans = STORE_PLANS;
+  readonly nextSteps = NEXT_STEPS;
+
+  /**
+   * The pods this operator may ask for.
+   *
+   * Normally empty — `pod/list` returns only an org's own private pods — in which case the form drops
+   * the control entirely and the registry places the store. See lessons.md.
+   */
+  private readonly podList = rxResource({stream: () => this.pods.list()});
+  readonly pods$ = computed<readonly Pod[]>(() => this.podList.value() ?? []);
+  readonly podChoiceAvailable = computed(() => this.pods$().length > 0);
 
   readonly form = this.fb.group({
-    name: this.fb.control('', [Validators.required, Validators.minLength(2)]),
-    code: this.fb.control('', [Validators.required, Validators.pattern(SLUG_PATTERN)]),
+    name: this.fb.control('', {
+      validators: [Validators.required, Validators.minLength(2)],
+      asyncValidators: [this.uniqueName()],
+    }),
     countryId: this.fb.control(DEFAULT_COUNTRY_ID, Validators.required),
     currencyCode: this.fb.control(
-      COUNTRIES.find((country) => country.id === DEFAULT_COUNTRY_ID)!.currencyCode,
+      COUNTRIES.find((country) => country.id === DEFAULT_COUNTRY_ID)?.currencyCode ?? 'EUR',
       Validators.required,
     ),
+    podId: this.fb.control(''),
   });
 
-  readonly regionId = signal(DEFAULT_REGION_ID);
-  readonly planId = signal(DEFAULT_PLAN_ID);
-
   readonly phase = signal<CreateStorePhase>('form');
-  readonly doneCount = signal(0);
-  readonly elapsedTicks = signal(0);
+  readonly submitting = signal(false);
 
-  /** Captured when the run starts, so the progress screen does not chase later edits. */
-  private readonly runSnapshot = signal<{
-    name: string;
-    code: string;
-    region: HostingRegionOption;
-    plan: StorePlanOption;
-    currencyCode: string;
-  } | null>(null);
+  /** The store as the server last described it. Null until create answers. */
+  readonly store = signal<ManagerStore | null>(null);
 
-  private subscription: Subscription | null = null;
+  /** Set when polling ran out of time rather than reaching a settled state. */
+  readonly timedOut = signal(false);
+
+  private poll: Subscription | null = null;
 
   constructor() {
-    this.form.controls.name.valueChanges.subscribe((name) => {
-      if (this.form.controls.code.pristine) {
-        this.form.controls.code.setValue(slugify(name), {emitEvent: false});
-      }
-    });
-    this.form.controls.countryId.valueChanges.subscribe((countryId) => {
+    this.form.controls.countryId.valueChanges.pipe(takeUntilDestroyed()).subscribe((countryId) => {
       if (this.form.controls.currencyCode.pristine) {
         const country = COUNTRIES.find((candidate) => candidate.id === countryId);
         if (country) {
@@ -134,258 +111,249 @@ export class CreateStoreFacade {
         }
       }
     });
-    this.destroyRef.onDestroy(() => this.subscription?.unsubscribe());
+    this.destroyRef.onDestroy(() => this.poll?.unsubscribe());
   }
 
   readonly selectedCountry = computed(
     () => this.countries.find((country) => country.id === this.form.controls.countryId.value) ?? this.countries[0],
   );
-  readonly selectedRegion = computed(
-    () => this.regions.find((region) => region.id === this.regionId()) ?? this.regions[0],
-  );
-  readonly selectedPlan = computed(
-    () => this.plans.find((plan) => plan.id === this.planId()) ?? this.plans[0],
+
+  readonly provisioningState = computed<ProvisioningState | null>(
+    () => this.store()?.provisioningState ?? null,
   );
 
-  readonly subdomain = computed(() => {
-    const code = this.form.controls.code.value;
-    return code ? `${code}.myshop.io` : '';
-  });
+  readonly isDone = computed(() => this.provisioningState() === 'SUCCESSFULLY_PROVISIONING');
+  readonly hasFailed = computed(() => this.provisioningState() === 'FAILED_PROVISIONING');
 
-  /** Live rather than a captured fixture length, so first run reads 0 and not 3. */
+  /** How many stores the account holds. Live rather than a captured fixture, so first run reads 0. */
   readonly storesUsed = computed(() => this.shell.stores().length);
-  readonly storeLimit = FREE_PLAN_STORE_LIMIT;
-  readonly overLimit = computed(() => this.storesUsed() >= this.storeLimit);
 
-  selectRegion(region: HostingRegionOption): void {
-    if (!region.locked) {
-      this.regionId.set(region.id);
+  /** The pod the registry actually placed the store on, resolved to a name when one is known. */
+  readonly assignedPod = computed(() => {
+    const podId = this.store()?.podId.id;
+    if (!podId) {
+      return null;
     }
-  }
-
-  selectPlan(plan: StorePlanOption): void {
-    this.planId.set(plan.id);
-  }
+    const known = this.pods$().find((pod) => pod.id?.id === podId);
+    return known ? known.name : podId;
+  });
 
   readonly summary = computed<readonly SummaryRow[]>(() => {
     this.transloco.activeLang();
     const t = (key: string, params?: Record<string, unknown>) => this.transloco.translate(key, params);
     const country = this.selectedCountry();
-    const region = this.selectedRegion();
-    const plan = this.selectedPlan();
-    const name = this.form.controls.name.value || t('createStore.summary.pendingName');
 
     return [
-      {label: t('createStore.summary.storeName'), value: name, tone: 'default'},
-      {label: t('createStore.summary.tenant'), value: this.form.controls.code.value || '—', tone: 'default'},
-      {label: t('createStore.summary.region'), value: region.code, tone: 'accent'},
       {
-        label: t('createStore.summary.countryCurrency'),
-        value: `${t(country.labelKey)} · ${country.currencyCode}`,
+        label: t('createStore.summary.storeName'),
+        value: this.form.controls.name.value || t('createStore.summary.pendingName'),
         tone: 'default',
       },
-      {label: t('createStore.summary.plan'), value: `${t(plan.labelKey)} · ${t('createStore.plan.priceMonthly', {amount: plan.monthlyPrice})}`, tone: 'default'},
-      {label: t('createStore.summary.resources'), value: t(plan.specs[0].key, plan.specs[0].params), tone: 'default'},
-      {label: t('createStore.summary.estimatedTime'), value: t('createStore.summary.estimatedTimeValue'), tone: 'default'},
+      {
+        label: t('createStore.summary.countryCurrency'),
+        value: `${t(country.labelKey)} · ${this.form.controls.currencyCode.value}`,
+        tone: 'default',
+      },
+      {
+        label: t('createStore.summary.region'),
+        value: this.podChoiceAvailable()
+          ? (this.pods$().find((pod) => pod.id?.id === this.form.controls.podId.value)?.name ??
+             t('createStore.summary.regionAutomatic'))
+          : t('createStore.summary.regionAutomatic'),
+        tone: 'accent',
+      },
     ];
-  });
-
-  readonly artifacts = computed<readonly ArtifactRow[]>(() => {
-    this.transloco.activeLang();
-    const t = (key: string, params?: Record<string, unknown>) => this.transloco.translate(key, params);
-    const region = this.selectedRegion();
-    const subdomain = this.subdomain() || t('createStore.summary.pendingSubdomain');
-
-    return PROVISIONING_ARTIFACTS.map((artifact) => {
-      const params =
-        artifact.id === 'node'
-          ? {region: region.code}
-          : artifact.id === 'domain'
-            ? {domain: subdomain}
-            : artifact.id === 'owner'
-              ? {name: CONSOLE_USER.name}
-              : artifact.detailParams;
-      return {
-        id: artifact.id,
-        label: t(artifact.labelKey),
-        detail: t(artifact.detailKey, params),
-        icon: artifact.icon,
-      };
-    });
-  });
-
-  readonly tasks = computed<readonly TaskRow[]>(() => {
-    this.transloco.activeLang();
-    const t = (key: string, params?: Record<string, unknown>) => this.transloco.translate(key, params);
-    const done = this.doneCount();
-    const snapshot = this.runSnapshot();
-
-    return PROVISIONING_TASKS.map((task, index) => {
-      const status: TaskStatus = index < done ? 'done' : index === done ? 'active' : 'queued';
-      const params = (snapshot ? this.taskParamsFor(task.id, snapshot) : undefined) ?? task.detailParams;
-
-      return {
-        id: task.id,
-        label: t(task.labelKey, params),
-        detail: t(task.detailKey, params),
-        status,
-        stamp:
-          status === 'done'
-            ? formatStamp(TASK_STAMPS_SECONDS[index])
-            : status === 'active'
-              ? t('createStore.progress.running')
-              : t('createStore.progress.queued'),
-      };
-    });
   });
 
   readonly infra = computed<readonly InfraRow[]>(() => {
     this.transloco.activeLang();
     const t = (key: string, params?: Record<string, unknown>) => this.transloco.translate(key, params);
-    const done = this.doneCount();
-    const snapshot = this.runSnapshot();
-    if (!snapshot) {
+    const store = this.store();
+    if (!store) {
       return [];
     }
 
     return [
-      {label: t('createStore.summary.region'), value: snapshot.region.code, pending: false},
-      {label: t('createStore.infra.node'), value: done >= 2 ? 'fra-07' : t('createStore.progress.assigning'), pending: done < 2},
-      {label: t('createStore.infra.database'), value: done >= 3 ? `${snapshot.code.replace(/-/g, '_')} · pg-14` : t('createStore.progress.pending'), pending: done < 3},
-      {label: t('createStore.infra.resources'), value: t(snapshot.plan.specs[0].key, snapshot.plan.specs[0].params), pending: false},
-      {label: t('createStore.infra.storage'), value: t(snapshot.plan.specs[1].key, snapshot.plan.specs[1].params), pending: false},
-      {label: t('createStore.infra.certificate'), value: done >= 5 ? t('createStore.progress.issued') : t('createStore.progress.pending'), pending: done < 5},
+      {label: t('createStore.infra.storeId'), value: store.id, pending: false},
+      {
+        label: t('createStore.summary.region'),
+        value: this.assignedPod() ?? t('createStore.progress.assigning'),
+        pending: this.assignedPod() === null,
+      },
+      {label: t('createStore.infra.status'), value: this.stateLabel(), pending: !this.isDone()},
     ];
   });
 
-  readonly isDone = computed(() => this.doneCount() >= PROVISIONING_TASKS.length);
-  readonly progressPercent = computed(() => Math.round((this.doneCount() / PROVISIONING_TASKS.length) * 100));
-
-  readonly nextSteps = NEXT_STEPS;
-
-  readonly liveSubtitle = computed(() => {
+  /**
+   * What gets created, as the design's "artifacts" list.
+   *
+   * Kept because the resources are real — a store does get a database, a node and a locale — but the
+   * per-item detail no longer claims values (`fra-07`, `pg-14`) the server never reported.
+   */
+  readonly artifacts = computed<readonly ArtifactRow[]>(() => {
     this.transloco.activeLang();
-    const snapshot = this.runSnapshot();
-    if (!snapshot) {
-      return this.transloco.translate('createStore.subtitle.form');
-    }
-    return this.isDone()
-      ? this.transloco.translate('createStore.subtitle.live', {name: snapshot.name, region: snapshot.region.code})
-      : this.transloco.translate('createStore.subtitle.running', {name: snapshot.name, region: snapshot.region.code});
+    const t = (key: string, params?: Record<string, unknown>) => this.transloco.translate(key, params);
+    return PROVISIONING_ARTIFACTS.map((artifact) => ({
+      id: artifact.id,
+      label: t(artifact.labelKey),
+      detail: t(artifact.detailKey, artifact.detailParams),
+      icon: artifact.icon,
+    }));
   });
 
   readonly headline = computed(() => {
     this.transloco.activeLang();
+    if (this.hasFailed()) {
+      return this.transloco.translate('createStore.progress.failedTitle');
+    }
     return this.isDone()
       ? this.transloco.translate('createStore.progress.doneTitle')
       : this.transloco.translate('createStore.progress.runningTitle');
   });
 
-  readonly headMeta = computed(() => {
+  readonly stateNote = computed(() => {
     this.transloco.activeLang();
-    const done = this.doneCount();
+    if (this.hasFailed()) {
+      return this.transloco.translate('createStore.progress.failedNote');
+    }
+    if (this.timedOut()) {
+      return this.transloco.translate('createStore.progress.timedOutNote');
+    }
     return this.isDone()
-      ? this.transloco.translate('createStore.progress.doneMeta', {count: PROVISIONING_TASKS.length})
-      : this.transloco.translate('createStore.progress.stepMeta', {
-          step: Math.min(PROVISIONING_TASKS.length, done + 1),
-          count: PROVISIONING_TASKS.length,
-        });
+      ? this.transloco.translate('createStore.progress.doneNote')
+      : this.transloco.translate('createStore.progress.runningNote');
   });
 
-  readonly etaLabel = computed(() => {
+  readonly liveSubtitle = computed(() => {
     this.transloco.activeLang();
-    if (this.isDone()) {
-      return this.transloco.translate('createStore.progress.etaComplete');
+    const store = this.store();
+    if (!store) {
+      return this.transloco.translate('createStore.subtitle.form');
     }
-    const secondsLeft = Math.max(5, 62 - Math.round(this.elapsedTicks() * 2.4));
-    return this.transloco.translate('createStore.progress.etaRemaining', {seconds: secondsLeft});
+    return this.transloco.translate(
+      this.isDone() ? 'createStore.subtitle.live' : 'createStore.subtitle.running',
+      {name: store.name},
+    );
   });
 
-  readonly liveBanner = computed(() => {
-    this.transloco.activeLang();
-    const snapshot = this.runSnapshot();
-    if (!snapshot) {
-      return '';
-    }
-    return this.transloco.translate('createStore.progress.liveBanner', {
-      name: snapshot.name,
-      region: snapshot.region.code,
-      node: 'fra-07',
-      domain: `${snapshot.code}.myshop.io`,
-    });
-  });
-
+  /**
+   * Creates the store, then watches it build.
+   *
+   * The country and currency ride along in the request body: tenancy types only `name` and `pod` and
+   * forwards everything else to the pod untouched, because the rest of a store belongs to merchant's
+   * model rather than tenancy's.
+   */
   start(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.submitting()) {
       this.form.markAllAsTouched();
       return;
     }
+    this.submitting.set(true);
+    this.timedOut.set(false);
 
-    this.subscription?.unsubscribe();
-    this.runSnapshot.set({
-      name: this.form.controls.name.value,
-      code: this.form.controls.code.value,
-      region: this.selectedRegion(),
-      plan: this.selectedPlan(),
-      currencyCode: this.form.controls.currencyCode.value,
-    });
-    this.doneCount.set(0);
-    this.elapsedTicks.set(0);
-    this.phase.set('running');
+    const {name, countryId, currencyCode, podId} = this.form.getRawValue();
 
-    this.subscription = interval(TICK_MS).subscribe(() => {
-      const elapsed = this.elapsedTicks() + 1;
-      this.elapsedTicks.set(elapsed);
-      const done = Math.min(PROVISIONING_TASKS.length, Math.floor(elapsed / TICKS_PER_TASK));
-      this.doneCount.set(done);
-      if (done >= PROVISIONING_TASKS.length) {
-        this.subscription?.unsubscribe();
-        this.subscription = null;
-        this.registerProvisionedStore();
-      }
-    });
+    this.console
+      .createStore({
+        name,
+        country: countryId,
+        currency: currencyCode,
+        ...(podId ? {pod: {id: podId}} : {}),
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (store) => {
+          this.submitting.set(false);
+          this.store.set(store);
+          this.phase.set('running');
+          // The rail and the guards ask the same question this page just changed the answer to.
+          this.shell.refreshStores();
+          this.watch(store);
+        },
+        error: (error: unknown) => {
+          this.submitting.set(false);
+          // Quota refusals and duplicate names both arrive as field-less problems; applyToForm binds
+          // what it can and toasts the rest, which is the right split for a form this small.
+          this.apiErrors.applyToForm(error, this.form);
+        },
+      });
   }
 
-  /**
-   * Hands the finished store to the console chrome.
-   *
-   * Until this runs the store exists only as a completed animation: the rail would still
-   * show none, and on a first run the guards would bounce the operator straight back to
-   * getting-started from every link on this page. Registering it is what makes the
-   * provisioning real to the rest of the app.
-   */
-  private registerProvisionedStore(): void {
-    const snapshot = this.runSnapshot();
-    if (snapshot) {
-      this.shell.registerStore(snapshot.name);
-    }
-  }
-
+  /** Back to the form. Only offered when nothing was created. */
   reset(): void {
-    this.subscription?.unsubscribe();
-    this.subscription = null;
-    this.doneCount.set(0);
-    this.elapsedTicks.set(0);
+    this.poll?.unsubscribe();
+    this.poll = null;
+    this.store.set(null);
+    this.timedOut.set(false);
     this.phase.set('form');
   }
 
-  private taskParamsFor(
-    taskId: string,
-    snapshot: NonNullable<ReturnType<CreateStoreFacade['runSnapshot']>>,
-  ): Record<string, string | number> | undefined {
-    switch (taskId) {
-      case 'validate':
-        return {code: snapshot.code};
-      case 'allocate':
-        return {node: 'fra-07', region: snapshot.region.code};
-      case 'database':
-        return {schema: snapshot.code.replace(/-/g, '_')};
-      case 'seed':
-        return {currency: snapshot.currencyCode};
-      case 'tls':
-        return {domain: `${snapshot.code}.myshop.io`};
-      default:
-        return undefined;
-    }
+  /**
+   * Re-reads the store until it settles.
+   *
+   * `NOT_STARTED` and `IN_PROGRESS` are both "still working"; the other two are terminal.
+   *
+   * A failed read is swallowed **inside** the `switchMap`, not in the subscriber. An inner error that
+   * reaches the outer stream terminates it, which would stop the polling on the first blip and leave
+   * the page saying "building" forever. The store exists either way; a transient read failure says
+   * nothing about it.
+   */
+  private watch(store: ManagerStore): void {
+    const startedAt = Date.now();
+    this.poll?.unsubscribe();
+
+    this.poll = timer(POLL_MS, POLL_MS)
+      .pipe(
+        switchMap(() => this.stores.storeInfo(store.id).pipe(catchError(() => EMPTY))),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (latest) => {
+          this.store.set(latest);
+          if (settled(latest.provisioningState)) {
+            this.stop();
+            this.shell.refreshStores();
+            return;
+          }
+          if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+            this.timedOut.set(true);
+            this.stop();
+          }
+        },
+      });
   }
+
+  private stop(): void {
+    this.poll?.unsubscribe();
+    this.poll = null;
+  }
+
+  private stateLabel(): string {
+    const state = this.provisioningState();
+    return state
+      ? this.transloco.translate(`createStore.state.${state}`)
+      : this.transloco.translate('createStore.progress.pending');
+  }
+
+  /**
+   * Store names are unique platform-wide, so the server is the only thing that can answer this.
+   * Debounced because it fires on every keystroke.
+   */
+  private uniqueName(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const name = String(control.value ?? '').trim();
+      if (name.length < 2) {
+        return of(null);
+      }
+      return timer(400).pipe(
+        switchMap(() => this.stores.nameExists(name)),
+        map((exists) => (exists ? {nameTaken: true} : null)),
+        first(),
+      );
+    };
+  }
+}
+
+function settled(state: ProvisioningState): boolean {
+  return state === 'SUCCESSFULLY_PROVISIONING' || state === 'FAILED_PROVISIONING';
 }

@@ -3,6 +3,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {ActionItem} from '@shared/ui/action-list/action-list';
 import type {DonutSlice} from '@shared/ui/charts/donut-chart';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
@@ -24,6 +25,7 @@ const DEFAULT_RANGE: DateRangeValue = {from: new Date(2026, 6, 5), to: new Date(
 export class DashboardFacade {
   private readonly api = inject(DashboardApi);
   private readonly transloco = inject(TranslocoService);
+  private readonly shell = inject(ConsoleShellFacade);
   private readonly localeFormat = inject(TranslocoLocaleService);
 
   /** Fixture "now" for the heading's context line — see `heading` below. */
@@ -38,10 +40,10 @@ export class DashboardFacade {
     this.transloco.activeLang();
     return {
       title: this.transloco.translate('dashboard.heading.title'),
-      // "Acme Supply Co." is the open store's name — real data, not UI copy — but the
-      // date follows the active locale like everything else.
+      // The open store's name — real data, read from the shell rather than hardcoded. The date
+      // follows the active locale like everything else.
       context: this.transloco.translate('dashboard.heading.context', {
-        store: 'Acme Supply Co.',
+        store: this.shell.currentStore()?.name ?? '',
         date: this.localeFormat.localizeDate(DashboardFacade.HEADING_DATE, undefined, {dateStyle: 'medium'}),
       }),
     };

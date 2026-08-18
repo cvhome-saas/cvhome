@@ -1,28 +1,17 @@
-import {isPlatformServer} from '@angular/common';
-import {InjectionToken, inject, Injectable, PLATFORM_ID} from '@angular/core';
-import {SelectedStoreService} from '../store-context/selected-store.service';
+import {InjectionToken} from '@angular/core';
 
-export interface RequestContextProvider { params(explicitStore?: string): Record<string, string>; }
-export const REQUEST_CONTEXT = new InjectionToken<RequestContextProvider>('REQUEST_CONTEXT', {providedIn: 'root', factory: () => inject(SelectedStoreRequestContext)});
-@Injectable({providedIn: 'root'})
-export class SelectedStoreRequestContext implements RequestContextProvider {
-  private readonly stores = inject(SelectedStoreService);
-  private readonly platformId = inject(PLATFORM_ID);
-
-  params(explicitStore?: string): Record<string, string> {
-    const store = explicitStore ? this.stores.getStore(explicitStore) : this.stores.currentSelectedStore();
-    if (!store) {
-      // On the server there is no browser storage to resolve a selection from, so silently sending the
-      // request unscoped would query the wrong tenant's data instead of failing. Before BrowserStorage
-      // guarded the underlying localStorage read, that case threw a ReferenceError; this keeps the same
-      // fail-loud contract with a message that says why.
-      if (isPlatformServer(this.platformId)) {
-        throw new Error(
-          'No store context available during server-side rendering — CrudService cannot scope this ' +
-          'request. Restrict the route to RenderMode.Client, or pass an explicit store.');
-      }
-      return {};
-    }
-    return {store: store.id, pod: store.podId.id};
-  }
+/**
+ * What scopes a request to a tenant.
+ *
+ * A token with an interface rather than a concrete service, because resolving "which store am I looking
+ * at" needs the store list, and the store list arrives over HTTP through `CrudService` — which is what
+ * asks this question in the first place. Keeping only the contract here lets the implementation live in
+ * the api tier, where fetching belongs, without `core/` depending upwards on it.
+ *
+ * The app provides `SelectedStoreRequestContext` (`@api/tenancy/selected-store-request-context.ts`).
+ */
+export interface RequestContextProvider {
+  params(explicitStore?: string): Record<string, string>;
 }
+
+export const REQUEST_CONTEXT = new InjectionToken<RequestContextProvider>('REQUEST_CONTEXT');

@@ -546,15 +546,11 @@
       "subtitle": "Branding, domains and content are configured after provisioning",
       "storeName": "Store name",
       "storeNamePlaceholder": "Acme Supply EU",
-      "storeCode": "Store code",
-      "storeCodePlaceholder": "acme-eu",
-      "codeAvailable": "Available · used in the tenant identifier",
       "country": "Country of operation",
       "countryHint": "Sets default currency, tax rules and data residency",
       "currency": "Base currency",
-      "subdomain": "Provisional subdomain",
-      "auto": "Auto",
-      "subdomainHint": "Attach a custom domain later in Store management → Store domain"
+      "nameAvailable": "That name is available.",
+      "nameTaken": "That name is already in use. Store names are unique across the platform."
     },
     "country": {
       "de": "Germany",
@@ -574,10 +570,6 @@
       "title": "Hosting region",
       "subtitle": "Where the store is physically provisioned — this cannot be changed afterwards",
       "permanent": "Permanent",
-      "recommended": "Recommended",
-      "proPlan": "Pro plan",
-      "latencyMs": "{ms} ms",
-      "toCustomers": "to customers",
       "meta": {
         "gdpr": "GDPR data residency · {nodes, plural, one {# node} other {# nodes}} available",
         "shared": "Shared cluster with {store} · {nodes, plural, one {# node} other {# nodes}} available",
@@ -599,42 +591,24 @@
       "ap": {
         "label": "Asia Pacific · Singapore",
         "residency": "Data stays in Singapore. Available on Pro and Enterprise subscriptions only."
-      }
-    },
-    "plan": {
-      "title": "Subscription tier",
-      "subtitle": "Determines the resources allocated to this store's server",
-      "starter": "Starter",
-      "growth": "Growth",
-      "pro": "Pro",
-      "priceMonthly": "${amount}/mo",
-      "spec": {
-        "cpuRam": "{cpu} vCPU · {ram} GB RAM",
-        "mediaStorage": "{gb} GB media storage",
-        "ordersPerMonth": "{count, plural, one {# order} other {# orders}} / month",
-        "ordersUnlimited": "Unlimited orders",
-        "sharedNode": "Shared node",
-        "dedicatedNode": "Dedicated node",
-        "dedicatedHotStandby": "Dedicated + hot standby"
-      }
+      },
+      "automatic": "Assigned automatically",
+      "automaticMeta": "The registry picks the pod with room for your store.",
+      "preferenceNote": "A pod is a preference, not a guarantee — the registry honours it only if it has capacity."
     },
     "summaryPanel": {
       "title": "Provisioning summary",
       "note": "Provisioning takes about a minute. You can leave this page — the store appears in the switcher as soon as it is live.",
       "provision": "Provision store",
-      "billingNote": "Billing starts when the store goes live"
+      "billingNote": "Billing starts when the store goes live",
+      "provisioning": "Creating…"
     },
     "summary": {
       "storeName": "Store name",
       "pendingName": "—",
-      "pendingSubdomain": "—",
-      "tenant": "Tenant",
       "region": "Region",
       "countryCurrency": "Country · currency",
-      "plan": "Plan",
-      "resources": "Resources",
-      "estimatedTime": "Estimated time",
-      "estimatedTimeValue": "~1 minute"
+      "regionAutomatic": "Assigned automatically"
     },
     "artifactsPanel": {
       "title": "What gets created"
@@ -661,67 +635,30 @@
         "detail": "{name} added as store owner"
       }
     },
-    "limitPanel": {
-      "title": "Plan limit",
-      "copy": "Free plan allows {limit} stores. This will be your {next}th — it provisions on a trial and needs an upgrade within 14 days.",
-      "used": "{used} of {limit} stores used"
-    },
-    "task": {
-      "validate": {
-        "label": "Validating store code and plan limits",
-        "detail": "tenant {code} reserved"
-      },
-      "allocate": {
-        "label": "Allocating node in {region}",
-        "detail": "assigned {node} · {region}"
-      },
-      "database": {
-        "label": "Creating tenant database",
-        "detail": "schema {schema} · pg-14 · encrypted at rest"
-      },
-      "seed": {
-        "label": "Seeding catalogue, tax and locale defaults",
-        "detail": "{currency} defaults applied"
-      },
-      "tls": {
-        "label": "Issuing TLS certificate",
-        "detail": "{domain} · Let’s Encrypt"
-      },
-      "cdn": {
-        "label": "Warming CDN edge and object storage",
-        "detail": "{edges} edge locations · {gb} GB bucket"
-      },
-      "live": {
-        "label": "Running health checks and going live",
-        "detail": "storefront, admin API and webhooks responding"
-      }
-    },
     "progress": {
-      "running": "running…",
-      "queued": "queued",
       "runningTitle": "Provisioning store",
       "doneTitle": "Store provisioned",
-      "stepMeta": "Step {step} of {count} · do not close the browser tab if you want live updates",
-      "doneMeta": "Completed · {count} of {count} steps",
-      "etaRemaining": "about {seconds}s left",
-      "etaComplete": "complete",
       "assigning": "assigning…",
       "pending": "pending",
       "issued": "issued",
-      "liveBanner": "{name} is live on {region} · node {node} · {domain}",
+      "liveBanner": "{name} is live.",
       "configureStore": "Configure store",
-      "buildHomePage": "Build home page",
-      "provisionAnother": "Provision another store"
+      "doneNote": "Your store is provisioned and ready to configure.",
+      "runningNote": "This usually takes under a minute. You can leave this page — provisioning continues without it.",
+      "failedTitle": "Provisioning failed",
+      "failedNote": "The store record exists but was not built. It cannot be used until someone looks at it.",
+      "failedBanner": "{name} could not be provisioned. Contact support with the store id above — creating it again would leave a second, broken record.",
+      "timedOutNote": "Still building. We stopped checking, but the server has not.",
+      "timedOutBanner": "This is taking longer than expected. Provisioning has not failed — reopen the store from store management to see where it got to.",
+      "openConsole": "Open the console",
+      "viewStores": "View stores"
     },
     "infraPanel": {
       "title": "Assigned infrastructure"
     },
     "infra": {
-      "node": "Node",
-      "database": "Database",
-      "resources": "Resources",
-      "storage": "Storage",
-      "certificate": "Certificate"
+      "storeId": "Store id",
+      "status": "Status"
     },
     "nextStepsPanel": {
       "title": "Next steps"
@@ -732,7 +669,13 @@
       "payments": "Connect a payment gateway",
       "product": "Add your first product"
     },
-    "notAvailable": "{what} is not available yet."
+    "notAvailable": "{what} is not available yet.",
+    "state": {
+      "NOT_STARTED_PROVISIONING": "Queued",
+      "IN_PROGRESS_PROVISIONING": "Building",
+      "SUCCESSFULLY_PROVISIONING": "Ready",
+      "FAILED_PROVISIONING": "Failed"
+    }
   },
   "firstRun": {
     "heading": {
@@ -1076,47 +1019,14 @@
       "breadcrumbNav": "Breadcrumb",
       "search": "Search orders and products",
       "searchPlaceholder": "Search orders, products…",
-      "notificationsAriaLabel": "Notifications, {count, plural, =0 {no unread} one {# unread} other {# unread}}",
       "languageAriaLabel": "Language, {name}",
       "themeAriaLabel": "Theme, {name}"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "newCount": "{count, plural, =0 {No new} one {# new} other {# new}}",
-      "markAllRead": "Mark all read",
-      "viewAll": "View all notifications",
-      "time": {
-        "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
-        "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
-        "yesterday": "Yesterday"
-      },
-      "item": {
-        "newOrder": {
-          "title": "New order #{orderId}",
-          "detail": "{customer} · {amount} · {count, plural, one {# item} other {# items}}"
-        },
-        "paymentAwaiting": {
-          "title": "Payment awaiting approval",
-          "detail": "Bank transfer of {amount} needs confirmation"
-        },
-        "outOfStock": {
-          "title": "{product} out of stock",
-          "detail": "{units, plural, =0 {0 units left} one {# unit left} other {# units left}} · {orders, plural, one {# open order affected} other {# open orders affected}}"
-        },
-        "teamJoined": {
-          "title": "{name} joined your team",
-          "detail": "Invited as {role} · {store}"
-        },
-        "refundIssued": {
-          "title": "Refund issued for order #{orderId}",
-          "detail": "{amount} returned to customer"
-        }
-      }
     },
     "profile": {
       "profile": "Profile",
       "settings": "Settings",
-      "logOut": "Log out"
+      "logOut": "Log out",
+      "loading": "Signing in…"
     },
     "theme": {
       "forest": {
@@ -1165,17 +1075,8 @@
     "store": {
       "ariaLabel": "Stores",
       "title": "Store",
-      "optionsAriaLabel": "Store options",
-      "defaultStore": "Default store",
-      "setCurrentAsDefault": "Set current as default",
-      "opensOnLogin": "Opens on login · now {name}",
-      "doneReordering": "Done reordering",
-      "reorderStores": "Reorder stores",
-      "manageAllStores": "Manage all stores",
       "loading": "Loading stores…",
       "noStoreYet": "No store yet",
-      "moveUp": "Move {name} up",
-      "moveDown": "Move {name} down",
       "createStore": "Create store"
     }
   },

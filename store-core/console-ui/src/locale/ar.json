@@ -546,15 +546,11 @@
       "subtitle": "يتم إعداد الهوية البصرية والنطاقات والمحتوى بعد التجهيز",
       "storeName": "اسم المتجر",
       "storeNamePlaceholder": "Acme Supply EU",
-      "storeCode": "رمز المتجر",
-      "storeCodePlaceholder": "acme-eu",
-      "codeAvailable": "متاح · يُستخدم في معرّف المستأجر",
       "country": "بلد التشغيل",
       "countryHint": "يحدد العملة الافتراضية وقواعد الضريبة وموقع تخزين البيانات",
       "currency": "العملة الأساسية",
-      "subdomain": "النطاق الفرعي المؤقت",
-      "auto": "تلقائي",
-      "subdomainHint": "يمكنك ربط نطاق مخصص لاحقًا من إدارة المتجر ← نطاق المتجر"
+      "nameAvailable": "هذا الاسم متاح.",
+      "nameTaken": "هذا الاسم مستخدم بالفعل. أسماء المتاجر فريدة على مستوى المنصة."
     },
     "country": {
       "de": "ألمانيا",
@@ -574,10 +570,6 @@
       "title": "منطقة الاستضافة",
       "subtitle": "المكان الفعلي الذي يُجهَّز فيه المتجر — لا يمكن تغييره لاحقًا",
       "permanent": "دائم",
-      "recommended": "موصى به",
-      "proPlan": "خطة Pro",
-      "latencyMs": "{ms} مللي ثانية",
-      "toCustomers": "إلى العملاء",
       "meta": {
         "gdpr": "توافق مع GDPR لتخزين البيانات · {nodes, plural, =0 {لا عقد متاحة} one {عقدة واحدة متاحة} two {عقدتان متاحتان} few {# عقد متاحة} many {# عقدة متاحة} other {# عقدة متاحة}}",
         "shared": "مجموعة مشتركة مع {store} · {nodes, plural, =0 {لا عقد متاحة} one {عقدة واحدة متاحة} two {عقدتان متاحتان} few {# عقد متاحة} many {# عقدة متاحة} other {# عقدة متاحة}}",
@@ -599,42 +591,24 @@
       "ap": {
         "label": "آسيا والمحيط الهادئ · سنغافورة",
         "residency": "تبقى البيانات في سنغافورة. متاحة فقط في اشتراكات Pro وEnterprise."
-      }
-    },
-    "plan": {
-      "title": "فئة الاشتراك",
-      "subtitle": "تحدد الموارد المخصصة لخادم هذا المتجر",
-      "starter": "Starter",
-      "growth": "Growth",
-      "pro": "Pro",
-      "priceMonthly": "${amount}/شهريًا",
-      "spec": {
-        "cpuRam": "{cpu} vCPU · {ram} GB RAM",
-        "mediaStorage": "{gb} GB مساحة تخزين للوسائط",
-        "ordersPerMonth": "{count, plural, =0 {لا طلبات} one {طلب واحد} two {طلبان} few {# طلبات} many {# طلبًا} other {# طلب}} / شهريًا",
-        "ordersUnlimited": "طلبات غير محدودة",
-        "sharedNode": "عقدة مشتركة",
-        "dedicatedNode": "عقدة مخصصة",
-        "dedicatedHotStandby": "عقدة مخصصة + احتياطية جاهزة"
-      }
+      },
+      "automatic": "يُخصَّص تلقائيًا",
+      "automaticMeta": "يختار السجل الـpod الذي يتّسع لمتجرك.",
+      "preferenceNote": "اختيار الـpod تفضيل وليس ضمانًا — يأخذ به السجل فقط إذا توفرت السعة."
     },
     "summaryPanel": {
       "title": "ملخص التجهيز",
       "note": "يستغرق التجهيز نحو دقيقة. يمكنك مغادرة هذه الصفحة — يظهر المتجر في المبدّل حالما يصبح مباشرًا.",
       "provision": "تجهيز المتجر",
-      "billingNote": "تبدأ الفوترة عند تفعيل المتجر"
+      "billingNote": "تبدأ الفوترة عند تفعيل المتجر",
+      "provisioning": "جارٍ الإنشاء…"
     },
     "summary": {
       "storeName": "اسم المتجر",
       "pendingName": "—",
-      "pendingSubdomain": "—",
-      "tenant": "المستأجر",
       "region": "المنطقة",
       "countryCurrency": "البلد · العملة",
-      "plan": "الخطة",
-      "resources": "الموارد",
-      "estimatedTime": "الوقت المقدر",
-      "estimatedTimeValue": "~دقيقة واحدة"
+      "regionAutomatic": "يُخصَّص تلقائيًا"
     },
     "artifactsPanel": {
       "title": "ما الذي سيتم إنشاؤه"
@@ -661,67 +635,30 @@
         "detail": "تمت إضافة {name} كمالك للمتجر"
       }
     },
-    "limitPanel": {
-      "title": "حد الخطة",
-      "copy": "تسمح الخطة المجانية بـ {limit} متاجر. سيكون هذا متجرك رقم {next} — يُجهَّز كتجربة ويحتاج إلى ترقية خلال 14 يومًا.",
-      "used": "تم استخدام {used} من {limit} متاجر"
-    },
-    "task": {
-      "validate": {
-        "label": "التحقق من رمز المتجر وحدود الخطة",
-        "detail": "تم حجز المستأجر {code}"
-      },
-      "allocate": {
-        "label": "تخصيص عقدة في {region}",
-        "detail": "تم تعيين {node} · {region}"
-      },
-      "database": {
-        "label": "إنشاء قاعدة بيانات المستأجر",
-        "detail": "المخطط {schema} · pg-14 · مشفّر أثناء التخزين"
-      },
-      "seed": {
-        "label": "تهيئة الكتالوج والضريبة وإعدادات اللغة الافتراضية",
-        "detail": "تم تطبيق إعدادات {currency}"
-      },
-      "tls": {
-        "label": "إصدار شهادة TLS",
-        "detail": "{domain} · Let’s Encrypt"
-      },
-      "cdn": {
-        "label": "تجهيز حافة CDN وتخزين الكائنات",
-        "detail": "{edges} موقع حافة · {gb} GB سعة تخزين"
-      },
-      "live": {
-        "label": "تشغيل فحوصات الصحة والانتقال إلى البث المباشر",
-        "detail": "واجهة المتجر وواجهة الإدارة والويب هوك تستجيب"
-      }
-    },
     "progress": {
-      "running": "جارٍ التشغيل…",
-      "queued": "في الانتظار",
       "runningTitle": "جارٍ تجهيز المتجر",
       "doneTitle": "تم تجهيز المتجر",
-      "stepMeta": "الخطوة {step} من {count} · لا تُغلق تبويب المتصفح إذا أردت متابعة التحديثات المباشرة",
-      "doneMeta": "اكتمل · {count} من {count} خطوات",
-      "etaRemaining": "يتبقى نحو {seconds} ثانية",
-      "etaComplete": "اكتمل",
       "assigning": "جارٍ التعيين…",
       "pending": "قيد الانتظار",
       "issued": "تم الإصدار",
-      "liveBanner": "{name} مباشر على {region} · عقدة {node} · {domain}",
+      "liveBanner": "{name} يعمل الآن.",
       "configureStore": "إعداد المتجر",
-      "buildHomePage": "بناء الصفحة الرئيسية",
-      "provisionAnother": "تجهيز متجر آخر"
+      "doneNote": "تم تجهيز متجرك وهو جاهز للإعداد.",
+      "runningNote": "يستغرق هذا عادةً أقل من دقيقة. يمكنك مغادرة الصفحة — يستمر التجهيز بدونها.",
+      "failedTitle": "فشل التجهيز",
+      "failedNote": "سجل المتجر موجود لكنه لم يُبنَ. لا يمكن استخدامه حتى يراجعه أحد.",
+      "failedBanner": "تعذّر تجهيز {name}. تواصل مع الدعم مع معرّف المتجر أعلاه — إنشاؤه مجددًا سيترك سجلًا ثانيًا معطّلًا.",
+      "timedOutNote": "ما زال قيد البناء. توقّفنا عن المتابعة، لكن الخادم لم يتوقف.",
+      "timedOutBanner": "يستغرق هذا وقتًا أطول من المتوقع. لم يفشل التجهيز — افتح المتجر من إدارة المتاجر لمعرفة ما وصل إليه.",
+      "openConsole": "فتح لوحة التحكم",
+      "viewStores": "عرض المتاجر"
     },
     "infraPanel": {
       "title": "البنية التحتية المخصصة"
     },
     "infra": {
-      "node": "العقدة",
-      "database": "قاعدة البيانات",
-      "resources": "الموارد",
-      "storage": "التخزين",
-      "certificate": "الشهادة"
+      "storeId": "معرّف المتجر",
+      "status": "الحالة"
     },
     "nextStepsPanel": {
       "title": "الخطوات التالية"
@@ -732,7 +669,13 @@
       "payments": "ربط بوابة دفع",
       "product": "إضافة أول منتج لك"
     },
-    "notAvailable": "{what} غير متاح بعد."
+    "notAvailable": "{what} غير متاح بعد.",
+    "state": {
+      "NOT_STARTED_PROVISIONING": "في الانتظار",
+      "IN_PROGRESS_PROVISIONING": "قيد البناء",
+      "SUCCESSFULLY_PROVISIONING": "جاهز",
+      "FAILED_PROVISIONING": "فشل"
+    }
   },
   "firstRun": {
     "heading": {
@@ -1076,47 +1019,14 @@
       "breadcrumbNav": "مسار التنقل",
       "search": "البحث في الطلبات والمنتجات",
       "searchPlaceholder": "ابحث في الطلبات والمنتجات…",
-      "notificationsAriaLabel": "الإشعارات، {count, plural, =0 {لا يوجد غير مقروء} one {إشعار واحد غير مقروء} two {إشعاران غير مقروءين} few {# إشعارات غير مقروءة} many {# إشعارًا غير مقروء} other {# إشعار غير مقروء}}",
       "languageAriaLabel": "اللغة، {name}",
       "themeAriaLabel": "المظهر، {name}"
-    },
-    "notifications": {
-      "title": "الإشعارات",
-      "newCount": "{count, plural, =0 {لا جديد} one {إشعار واحد جديد} two {إشعاران جديدان} few {# إشعارات جديدة} many {# إشعارًا جديدًا} other {# إشعار جديد}}",
-      "markAllRead": "تحديد الكل كمقروء",
-      "viewAll": "عرض كل الإشعارات",
-      "time": {
-        "minutesAgo": "{count, plural, =0 {الآن} one {منذ دقيقة واحدة} two {منذ دقيقتين} few {منذ # دقائق} many {منذ # دقيقة} other {منذ # دقيقة}}",
-        "hoursAgo": "{count, plural, one {منذ ساعة واحدة} two {منذ ساعتين} few {منذ # ساعات} many {منذ # ساعة} other {منذ # ساعة}}",
-        "yesterday": "أمس"
-      },
-      "item": {
-        "newOrder": {
-          "title": "طلب جديد #{orderId}",
-          "detail": "{customer} · {amount} · {count, plural, one {# عنصر} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
-        },
-        "paymentAwaiting": {
-          "title": "دفعة بانتظار الموافقة",
-          "detail": "تحويل بنكي بقيمة {amount} بحاجة إلى تأكيد"
-        },
-        "outOfStock": {
-          "title": "نفدت الكمية من {product}",
-          "detail": "{units, plural, =0 {لا توجد وحدات متبقية} one {وحدة واحدة متبقية} two {وحدتان متبقيتان} few {# وحدات متبقية} many {# وحدة متبقية} other {# وحدة متبقية}} · {orders, plural, one {طلب واحد مفتوح متأثر} two {طلبان مفتوحان متأثران} few {# طلبات مفتوحة متأثرة} many {# طلبًا مفتوحًا متأثرًا} other {# طلب مفتوح متأثر}}"
-        },
-        "teamJoined": {
-          "title": "انضم {name} إلى فريقك",
-          "detail": "دُعي بصفة {role} · {store}"
-        },
-        "refundIssued": {
-          "title": "تم إصدار استرداد للطلب #{orderId}",
-          "detail": "تم إرجاع {amount} إلى العميل"
-        }
-      }
     },
     "profile": {
       "profile": "الملف الشخصي",
       "settings": "الإعدادات",
-      "logOut": "تسجيل الخروج"
+      "logOut": "تسجيل الخروج",
+      "loading": "جارٍ تسجيل الدخول…"
     },
     "theme": {
       "forest": {
@@ -1165,17 +1075,8 @@
     "store": {
       "ariaLabel": "المتاجر",
       "title": "المتجر",
-      "optionsAriaLabel": "خيارات المتجر",
-      "defaultStore": "المتجر الافتراضي",
-      "setCurrentAsDefault": "تعيين الحالي كافتراضي",
-      "opensOnLogin": "يفتح عند تسجيل الدخول · الآن {name}",
-      "doneReordering": "تم إعادة الترتيب",
-      "reorderStores": "إعادة ترتيب المتاجر",
-      "manageAllStores": "إدارة كل المتاجر",
       "loading": "جارٍ تحميل المتاجر…",
       "noStoreYet": "لا يوجد متجر بعد",
-      "moveUp": "نقل {name} للأعلى",
-      "moveDown": "نقل {name} للأسفل",
       "createStore": "إنشاء متجر"
     }
   },

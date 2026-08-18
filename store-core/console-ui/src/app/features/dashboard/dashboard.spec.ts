@@ -4,6 +4,8 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 
 import type {DashboardSnapshot} from '@models/dashboard';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Dashboard} from './dashboard';
 import {DashboardApi} from './services/dashboard.api.service';
@@ -62,7 +64,9 @@ describe('Dashboard', () => {
     api = new FakeDashboardApi();
     await TestBed.configureTestingModule({
       imports: [Dashboard, ...translocoTesting().imports],
-      providers: [provideRouter([]), {provide: DashboardApi, useValue: api}, ...translocoTesting().providers],
+      providers: [provideRouter([]),
+        // The page header names the open store, which comes from the shell.
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})}, {provide: DashboardApi, useValue: api}, ...translocoTesting().providers],
     }).compileComponents();
   });
 

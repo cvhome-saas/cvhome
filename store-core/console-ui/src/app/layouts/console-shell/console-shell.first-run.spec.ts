@@ -1,43 +1,11 @@
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
-import {Observable, of} from 'rxjs';
 
-import type {ConsoleStore, StoreDirectory} from '@models/console';
 import {translocoTesting} from '@testing/transloco-testing';
+import {FakeConsoleApi, consoleStore} from '@testing/console-api.fake';
 import {ConsoleShell} from './console-shell';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
 import {ConsoleApi} from './services/console.api.service';
-import {
-  CONSOLE_NAVIGATION,
-  CONSOLE_NOTIFICATIONS,
-  CONSOLE_ORGANIZATION,
-  CONSOLE_USER,
-} from '@mocks/console.fixture';
-
-/** The real chrome, over a store directory the spec controls. */
-class FakeConsoleApi {
-  stores: readonly ConsoleStore[] = [];
-
-  loadShell() {
-    return {
-      organization: CONSOLE_ORGANIZATION,
-      user: CONSOLE_USER,
-      navigation: CONSOLE_NAVIGATION,
-      notifications: CONSOLE_NOTIFICATIONS,
-    };
-  }
-
-  loadStores(): Observable<StoreDirectory> {
-    const current = this.stores[0]?.id ?? null;
-    return of({stores: this.stores, defaultStoreId: current, currentStoreId: current});
-  }
-
-  addStore(name: string): Observable<ConsoleStore> {
-    const store: ConsoleStore = {id: `store-${this.stores.length + 1}`, name};
-    this.stores = [...this.stores, store];
-    return of(store);
-  }
-}
 
 /**
  * The shell in first run: an account with no store.
@@ -134,7 +102,8 @@ describe('ConsoleShell (first run)', () => {
     // The reserved height has to agree with the strip's absence, or the layout gaps.
     expect(element.querySelector('.console')?.classList).not.toContain('banner-on');
 
-    facade.registerStore('Acme Supply Co.');
+    api.stores = [consoleStore('store-1', 'Acme Supply Co.')];
+    facade.refreshStores();
     tick();
     fixture.detectChanges();
 
@@ -147,7 +116,8 @@ describe('ConsoleShell (first run)', () => {
       const facade = TestBed.inject(ConsoleShellFacade);
       expect(facade.firstRun()).toBeTrue();
 
-      facade.registerStore('Acme Supply Co.');
+      api.stores = [consoleStore('store-1', 'Acme Supply Co.')];
+      facade.refreshStores();
       tick();
       fixture.detectChanges();
 

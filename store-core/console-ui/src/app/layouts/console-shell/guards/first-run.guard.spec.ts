@@ -3,32 +3,50 @@ import {TestBed} from '@angular/core/testing';
 import {Router, provideRouter} from '@angular/router';
 import {Observable, of} from 'rxjs';
 
-import type {StoreDirectory} from '@models/console';
-import {ConsoleApi} from '../services/console.api.service';
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
+import type {ManagerStore} from '@models/tenancy';
 import {firstRunOnly, requiresStore} from './first-run.guard';
 
 @Component({selector: 'app-stub', template: ''})
 class Stub {}
 
-/** Answers the directory question the guards ask, without the fixture or its latency. */
-class FakeConsoleApi {
-  stores: {id: string; name: string}[] = [];
+/**
+ * Answers the question the guards ask, without a request.
+ *
+ * The guards read the store list rather than a directory now, because loading it is the other half of
+ * what they are for: the request context reads it synchronously on every later request.
+ */
+class FakeSelectedStoreService {
+  stores: ManagerStore[] = [];
+  loads = 0;
 
-  loadStores(): Observable<StoreDirectory> {
-    const current = this.stores[0]?.id ?? null;
-    return of({stores: this.stores, defaultStoreId: current, currentStoreId: current});
+  load(): Observable<readonly ManagerStore[]> {
+    this.loads++;
+    return of(this.stores);
   }
 }
 
+function store(id: string, name: string): ManagerStore {
+  return {
+    id,
+    name,
+    orgId: {id: 'org-1'},
+    podId: {id: 'pod-1'},
+    provisioningState: 'SUCCESSFULLY_PROVISIONING',
+    status: 'ACTIVE',
+    billingStatus: 'ACTIVE',
+  };
+}
+
 describe('first-run guards', () => {
-  let api: FakeConsoleApi;
+  let api: FakeSelectedStoreService;
   let router: Router;
 
   beforeEach(() => {
-    api = new FakeConsoleApi();
+    api = new FakeSelectedStoreService();
     TestBed.configureTestingModule({
       providers: [
-        {provide: ConsoleApi, useValue: api},
+        {provide: SelectedStoreService, useValue: api},
         provideRouter([
           {path: 'getting-started', component: Stub, canActivate: [firstRunOnly]},
           {path: 'dashboard', component: Stub, canActivate: [requiresStore]},
@@ -42,11 +60,7 @@ describe('first-run guards', () => {
     TestBed.createComponent(Stub).detectChanges();
   });
 
-  /**
-   * These cases are `async`, not `fakeAsync`: the guards resolve `ConsoleApi` through a
-   * dynamic `import()`, which is a real module load that a fake clock cannot flush.
-   * Awaiting the navigation is what actually waits for the guard to answer.
-   */
+  /** Awaiting the navigation is what waits for the guard's observable to answer. */
   async function go(url: string): Promise<string> {
     await router.navigateByUrl(url);
     return router.url;
@@ -70,7 +84,7 @@ describe('first-run guards', () => {
 
   describe('once a store exists', () => {
     beforeEach(() => {
-      api.stores = [{id: '65f023632bc46470c104b76f', name: 'Acme Supply Co.'}];
+      api.stores = [store('65f023632bc46470c104b76f', 'Acme Supply Co.')];
     });
 
     it('lets the console through', async () => {
@@ -87,8 +101,16 @@ describe('first-run guards', () => {
   it('follows the directory rather than a decision cached at startup', async () => {
     expect(await go('/dashboard')).toBe('/getting-started');
 
-    api.stores = [{id: '65f023632bc46470c104b76f', name: 'Acme Supply Co.'}];
+    api.stores = [store('65f023632bc46470c104b76f', 'Acme Supply Co.')];
 
     expect(await go('/dashboard')).toBe('/dashboard');
+  });
+
+  it('loads the store list, which is the other half of what these guards are for', async () => {
+    // The request context reads this list synchronously on every later request, so a console route
+    // must never activate before it has been fetched.
+    expect(api.loads).toBe(0);
+    await go('/dashboard');
+    expect(api.loads).toBeGreaterThan(0);
   });
 });

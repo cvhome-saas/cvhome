@@ -1,6 +1,8 @@
-import {EnvironmentInjector, inject} from '@angular/core';
+import {inject} from '@angular/core';
 import {CanActivateFn, Router, UrlTree} from '@angular/router';
-import {Observable, defer, map, switchMap} from 'rxjs';
+import {Observable, map} from 'rxjs';
+
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 
 /** Where a store-less operator is held until they have provisioned one. */
 export const FIRST_RUN_ROUTE = '/getting-started';
@@ -9,21 +11,20 @@ export const FIRST_RUN_ROUTE = '/getting-started';
 const CONSOLE_HOME = '/dashboard';
 
 /**
- * How many stores this account owns.
+ * How many stores this account owns — and, as a side effect, the point at which the store list is
+ * fetched at all.
  *
- * `ConsoleApi` is imported dynamically rather than at the top of the file: guards are
- * referenced from the eagerly-loaded route table, so a static import would pull the console
- * chrome and its fixtures into the initial bundle — the one marketing and the sign-in pages
- * are prerendered from, and which has no use for either. Every route these guards protect
- * loads that chunk a moment later anyway.
+ * This is load-bearing beyond the count. `SelectedStoreRequestContext` reads the list *synchronously*
+ * from inside `CrudService.getParams()` to stamp `?store=&pod=`, so the list has to be resolved before
+ * any store-scoped request goes out. These guards run before every console route activates and no
+ * console page exists outside one, which makes this the one place that is both early enough and never
+ * on the path of the prerendered marketing and sign-in routes. `load()` is cached, so calling it on
+ * every navigation costs one request per session.
  */
 function storeCount(): Observable<number> {
-  const injector = inject(EnvironmentInjector);
-
-  return defer(() => import('../services/console.api.service')).pipe(
-    switchMap((module) => injector.get(module.ConsoleApi).loadStores()),
-    map((directory) => directory.stores.length),
-  );
+  return inject(SelectedStoreService)
+    .load()
+    .pipe(map((stores) => stores.length));
 }
 
 /**

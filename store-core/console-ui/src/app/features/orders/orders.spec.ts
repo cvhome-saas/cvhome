@@ -4,6 +4,8 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 
 import {ORDERS} from '@mocks/orders.fixture';
 import type {OrderRow, OrdersSnapshot} from '@models/orders';
+import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Orders} from './orders';
 import {OrdersApi, type OrdersQuery} from './services/orders.api.service';
@@ -76,7 +78,9 @@ describe('Orders', () => {
     api = new FakeOrdersApi();
     await TestBed.configureTestingModule({
       imports: [Orders, ...translocoTesting().imports],
-      providers: [provideRouter([]), {provide: OrdersApi, useValue: api}, ...translocoTesting().providers],
+      providers: [provideRouter([]),
+        // The page header names the open store, which comes from the shell.
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})}, {provide: OrdersApi, useValue: api}, ...translocoTesting().providers],
     }).compileComponents();
   });
 
