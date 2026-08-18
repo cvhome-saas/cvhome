@@ -96,7 +96,7 @@
                   </div>
 
                   <div class="cell-payment" role="cell" [attr.data-label]="t('orders.column.payment')">
-                    <span class="payment-copy"><strong>{{ order.payment ?? '—' }}</strong></span>
+                    <span class="payment-copy"><strong>{{ paymentLabel(order) }}</strong></span>
                   </div>
 
                   <span class="cell-total" role="cell" [attr.data-label]="t('orders.column.total')">{{ order.total }}</span>

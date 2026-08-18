@@ -6,7 +6,8 @@ import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.f
 
 import type {PageT} from '@core/table/table.types';
 import {ORDER_STATUSES} from '@models/checkout';
-import {orderStatusLabel, type OrderRow, type OrderTab, type OrdersSnapshot} from '@models/orders';
+import type {OrderRow, OrderTab, OrdersSnapshot} from '@models/orders';
+import {StatusLabel} from '@shared/i18n/status-label';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
@@ -60,6 +61,7 @@ export class OrdersFacade {
   private readonly api = inject(OrdersApi);
   private readonly transloco = inject(TranslocoService);
   private readonly shell = inject(ConsoleShellFacade);
+  private readonly statusLabels = inject(StatusLabel);
 
   readonly dateRange = signal<DateRangeValue>(defaultRange());
   readonly activeTab = signal<OrderTab>('all');
@@ -158,13 +160,30 @@ export class OrdersFacade {
   readonly page = computed<PageT<OrderRow>>(() => this.loaded()?.page ?? EMPTY_ORDERS);
   readonly orders = computed<readonly OrderRow[]>(() => this.page().content);
 
-  /** What the strip is showing, said plainly under the panel title. */
+  /**
+   * What the table is showing right now, under the panel title.
+   *
+   * A count and a range rather than a sentence: the page header already says how many orders the
+   * period holds, so restating it in prose here told the operator nothing. This moves with the
+   * filter and with paging, which is the question the line is actually next to.
+   */
   readonly subtitle = computed(() => {
     this.transloco.activeLang();
     const tab = this.activeTab();
-    return tab === 'all'
-      ? this.transloco.translate('orders.subtitle.all')
-      : this.transloco.translate('orders.subtitle.status', {status: orderStatusLabel(tab)});
+    const page = this.page();
+    const status = tab === 'all' ? null : this.statusLabels.label(tab);
+
+    if (!page.content.length) {
+      return status
+        ? this.transloco.translate('orders.subtitle.noneForStatus', {status})
+        : this.transloco.translate('orders.subtitle.none');
+    }
+
+    const from = page.pageNumber * page.size + 1;
+    const params = {from, to: from + page.content.length - 1, total: page.totalElements, status};
+    return status
+      ? this.transloco.translate('orders.subtitle.rangeForStatus', params)
+      : this.transloco.translate('orders.subtitle.range', params);
   });
 
   /** The period line under the page title, once a response says how many orders are in it. */
@@ -189,7 +208,7 @@ export class OrdersFacade {
     this.transloco.activeLang();
     return TABS.map((tab) => ({
       key: tab,
-      label: tab === 'all' ? this.transloco.translate('orders.tab.all') : orderStatusLabel(tab),
+      label: tab === 'all' ? this.transloco.translate('orders.tab.all') : this.statusLabels.label(tab),
     }));
   });
 

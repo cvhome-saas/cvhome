@@ -233,8 +233,10 @@
       "all": "All"
     },
     "subtitle": {
-      "all": "Every order placed in the selected period",
-      "status": "{status} orders in this period"
+      "range": "Showing {from}–{to} of {total, plural, one {# order} other {# orders}}",
+      "rangeForStatus": "{status} · showing {from}–{to} of {total}",
+      "none": "No orders in this period.",
+      "noneForStatus": "No {status} orders in this period."
     },
     "kpi": {
       "orders": "Orders",
@@ -1089,7 +1091,7 @@
     "noHistory": "No status changes recorded yet.",
     "newStatus": "New status",
     "comment": "Comment",
-    "commentPlaceholder": "Visible to the customer",
+    "commentPlaceholder": "Add a note about this order…",
     "recordStatus": "Record status",
     "recording": "Recording…",
     "statusAdded": "Status recorded.",
@@ -1137,6 +1139,33 @@
     },
     "customerStatsUnavailable": "Lifetime figures are not available yet.",
     "emailInvoice": "Email",
-    "emailNotAvailable": "Emailing invoices is not available yet."
+    "emailNotAvailable": "Emailing invoices is not available yet.",
+    "commentVisible": "Visible to the customer"
+  },
+  "status": {
+    "CREATED": "Created",
+    "PENDING_PAYMENT": "Pending payment",
+    "CONFIRMED": "Confirmed",
+    "PROCESSING": "Processing",
+    "SHIPPED": "Shipped",
+    "DELIVERING": "Delivering",
+    "DELIVERED": "Delivered",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled",
+    "RETURNED": "Returned",
+    "PENDING": "Pending",
+    "PAID": "Paid",
+    "FAILED": "Failed",
+    "EXPIRED": "Expired",
+    "WAITING_VERIFICATION": "Awaiting verification",
+    "REJECTED": "Rejected",
+    "AUTHORIZED": "Authorized",
+    "REFUNDED": "Refunded",
+    "AVAILABLE": "Available",
+    "NOT_REQUESTED": "Not requested",
+    "RESERVED": "Reserved",
+    "COMMITTED": "Committed",
+    "RELEASED": "Released",
+    "RESERVATION_FAILED": "Reservation failed"
   }
 }

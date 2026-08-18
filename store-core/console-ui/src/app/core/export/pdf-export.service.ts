@@ -14,11 +14,27 @@ export interface PdfExportRequest {
   readonly title: string;
   /** Second line of the header — typically the period the data covers. */
   readonly subtitle?: string;
+  /**
+   * How the page is built around the capture.
+   *
+   * `report` (the default) is a landscape A4 with the console's own title band and a footer, for
+   * a screen region — a dashboard, a table — being turned into a document.
+   *
+   * `document` is for a region that **already is** a document: an invoice laid out at page
+   * proportions. It goes on a portrait A4, whole, scaled to fit one page, with no header, footer
+   * or page numbers — the sheet has its own letterhead, and a second one above it would be the
+   * console talking over the seller.
+   */
+  readonly layout?: 'report' | 'document';
 }
 
-/** A4 landscape in points, which suits a wide dashboard better than portrait. */
-const PAGE_WIDTH = 841.89;
-const PAGE_HEIGHT = 595.28;
+/** A4 in points. A report is laid out landscape, a document portrait. */
+const A4_LONG = 841.89;
+const A4_SHORT = 595.28;
+
+/** The report layout's page, which the header, footer and slicing are all written against. */
+const PAGE_WIDTH = A4_LONG;
+const PAGE_HEIGHT = A4_SHORT;
 const MARGIN = 36;
 const HEADER_HEIGHT = 58;
 const FOOTER_HEIGHT = 24;
@@ -94,8 +110,47 @@ export class PdfExportService {
       import('jspdf'),
     ]);
 
-    const background = this.theme.color('--background');
+    const asDocument = request.layout === 'document';
+    // A document paints its own paper; a report sits on the console's background.
+    const background = asDocument ? '#ffffff' : this.theme.color('--background');
     const rtl = this.locale.currentLocale().dir === 'rtl';
+
+    if (asDocument) {
+      const canvas = await domToCanvas(request.element, {
+        backgroundColor: background,
+        scale: CAPTURE_SCALE,
+        onCloneNode: (cloned) => {
+          this.settleAnimations(cloned);
+          this.stripVariableFonts(cloned);
+        },
+      });
+
+      const pdf = new jsPDF({orientation: 'portrait', unit: 'pt', format: 'a4'});
+      // Fit the whole sheet on one page: it was drawn as a page, so a page is what it should be.
+      // Slicing it across two — which the report path would do, since the sheet is far taller than
+      // a landscape body — is what made the download stop matching what the screen showed.
+      const scale = Math.min(
+        (A4_SHORT - MARGIN * 2) / canvas.width,
+        (A4_LONG - MARGIN * 2) / canvas.height,
+      );
+      const width = canvas.width * scale;
+      const height = canvas.height * scale;
+
+      pdf.setFillColor(background);
+      pdf.rect(0, 0, A4_SHORT, A4_LONG, 'F');
+      pdf.addImage(
+        canvas.toDataURL('image/png'),
+        'PNG',
+        (A4_SHORT - width) / 2,
+        MARGIN,
+        width,
+        height,
+        undefined,
+        'FAST',
+      );
+      pdf.save(`${request.fileName}.pdf`);
+      return;
+    }
 
     const contentWidth = PAGE_WIDTH - MARGIN * 2;
     // Measured on the live element, before capture — the clone `domToCanvas` renders from

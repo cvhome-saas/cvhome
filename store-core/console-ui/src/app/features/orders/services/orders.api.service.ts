@@ -5,7 +5,7 @@ import {OrdersService, type OrderQuery} from '@api/orders/orders.service';
 import {StatisticService} from '@api/analytics/statistic.service';
 import type {PageRequest, PageT} from '@core/table/table.types';
 import {AWAITING_FULFILMENT, formatMoney, type OrderStatus, type ReadableOrder} from '@models/checkout';
-import {orderStatusLabel, type OrderKpiSource, type OrderRow, type OrdersSnapshot, type OrderTab} from '@models/orders';
+import type {OrderKpiSource, OrderRow, OrdersSnapshot, OrderTab} from '@models/orders';
 import type {StatisticList} from '@models/statistics';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
 
@@ -112,8 +112,9 @@ function toRow(order: ReadableOrder): OrderRow {
     email,
     city: address?.city ?? '—',
     status: order.orderStatus ?? null,
-    // The order's own payment status, humanized the same way its order status is.
-    payment: order.paymentStatus ? orderStatusLabel(order.paymentStatus) : null,
+    // The raw enum, not a label: the row is built once per response and the page has to keep
+    // reading in the language the operator switches to.
+    payment: order.paymentStatus ?? null,
     total: formatMoney(order.total, order.currency),
     placedOn: order.datePurchased ?? '',
   };

@@ -462,20 +462,37 @@
   min-inline-size: 0;
 }
 
+/*
+ * The note field.
+ *
+ * It reads as a field rather than a grey slab: the card surface against the panel's muted body,
+ * room to breathe, and no drag handle — `field-sizing` grows it with what is typed, up to a cap,
+ * which is what a two-line note actually needs. Browsers without `field-sizing` keep the taller
+ * minimum and the manual grip, so nothing is lost there.
+ */
 .composer textarea {
   inline-size: 100%;
-  min-block-size: 3.75rem;
-  padding: 0.7rem 0.85rem;
+  min-block-size: 4.5rem;
+  max-block-size: 14rem;
+  padding: 0.8rem 0.95rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--input);
+  background: var(--card);
   color: var(--foreground-strong);
   font: inherit;
   font-size: var(--text-sm);
+  line-height: 1.6;
   resize: vertical;
+  field-sizing: content;
   transition:
     border-color var(--default-transition-duration),
     box-shadow var(--default-transition-duration);
+}
+
+@supports (field-sizing: content) {
+  .composer textarea {
+    resize: none;
+  }
 }
 
 .composer textarea::placeholder {
@@ -494,6 +511,15 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.6rem;
+}
+
+/* Takes the free space so the status and the action stay grouped at the end. */
+.composer-hint {
+  flex: 1;
+  min-inline-size: 8rem;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
 }
 
 /* The status sits with the action it applies, not stranded at the far end of a row. */

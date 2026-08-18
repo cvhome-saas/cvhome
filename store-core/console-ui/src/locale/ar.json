@@ -233,8 +233,10 @@
       "all": "الكل"
     },
     "subtitle": {
-      "all": "كل طلب تم تقديمه في الفترة المحددة",
-      "status": "طلبات {status} في هذه الفترة"
+      "range": "عرض {from}–{to} من {total, plural, zero {# طلب} one {# طلب} two {# طلبين} few {# طلبات} many {# طلبًا} other {# طلب}}",
+      "rangeForStatus": "{status} · عرض {from}–{to} من {total}",
+      "none": "لا توجد طلبات في هذه الفترة.",
+      "noneForStatus": "لا توجد طلبات {status} في هذه الفترة."
     },
     "kpi": {
       "orders": "الطلبات",
@@ -1089,7 +1091,7 @@
     "noHistory": "لم تُسجَّل أي تغييرات حالة بعد.",
     "newStatus": "الحالة الجديدة",
     "comment": "تعليق",
-    "commentPlaceholder": "مرئي للعميل",
+    "commentPlaceholder": "أضف ملاحظة عن هذا الطلب…",
     "recordStatus": "تسجيل الحالة",
     "recording": "جارٍ التسجيل…",
     "statusAdded": "تم تسجيل الحالة.",
@@ -1137,6 +1139,33 @@
     },
     "customerStatsUnavailable": "إجماليات العميل غير متاحة بعد.",
     "emailInvoice": "إرسال بالبريد",
-    "emailNotAvailable": "إرسال الفواتير بالبريد غير متاح بعد."
+    "emailNotAvailable": "إرسال الفواتير بالبريد غير متاح بعد.",
+    "commentVisible": "مرئي للعميل"
+  },
+  "status": {
+    "CREATED": "أُنشئ",
+    "PENDING_PAYMENT": "بانتظار الدفع",
+    "CONFIRMED": "مؤكد",
+    "PROCESSING": "قيد التجهيز",
+    "SHIPPED": "تم الشحن",
+    "DELIVERING": "قيد التوصيل",
+    "DELIVERED": "تم التوصيل",
+    "COMPLETED": "مكتمل",
+    "CANCELLED": "ملغى",
+    "RETURNED": "مرتجع",
+    "PENDING": "قيد الانتظار",
+    "PAID": "مدفوع",
+    "FAILED": "فشل",
+    "EXPIRED": "منتهي الصلاحية",
+    "WAITING_VERIFICATION": "بانتظار التحقق",
+    "REJECTED": "مرفوض",
+    "AUTHORIZED": "محجوز على البطاقة",
+    "REFUNDED": "مسترد",
+    "AVAILABLE": "متاح",
+    "NOT_REQUESTED": "غير مطلوب",
+    "RESERVED": "محجوز",
+    "COMMITTED": "مخصص",
+    "RELEASED": "أُفرج عنه",
+    "RESERVATION_FAILED": "فشل الحجز"
   }
 }

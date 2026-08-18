@@ -14,7 +14,8 @@ import {
   type OrderStatus,
   type OrderTotal,
 } from '@models/checkout';
-import {STATUS_TONE, orderStatusLabel} from '@models/orders';
+import {STATUS_TONE} from '@models/orders';
+import {StatusLabel} from '@shared/i18n/status-label';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsApi} from '../services/order-details.api.service';
 
@@ -98,6 +99,7 @@ export class OrderDetailsFacade {
   private readonly toasts = inject(ToastService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly shell = inject(ConsoleShellFacade);
+  private readonly statusLabels = inject(StatusLabel);
   private readonly destroyRef = inject(DestroyRef);
 
   /** Set by the component from the route. */
@@ -131,8 +133,7 @@ export class OrderDetailsFacade {
   });
 
   readonly status = computed(() => {
-    const status = this.order()?.orderStatus;
-    return status ? orderStatusLabel(status) : '—';
+    return this.statusLabels.label(this.order()?.orderStatus);
   });
 
   readonly statusTone = computed(() => toneOf(this.order()?.orderStatus));
@@ -188,7 +189,7 @@ export class OrderDetailsFacade {
       orderReference: this.reference(),
       issuedAt: order?.datePurchased ?? null,
       paid: order?.paymentStatus === 'PAID',
-      paymentStatus: order?.paymentStatus ? orderStatusLabel(order.paymentStatus) : '—',
+      paymentStatus: this.statusLabels.label(order?.paymentStatus),
       billing: this.billing(),
       delivery: this.delivery(),
     };
@@ -250,8 +251,8 @@ export class OrderDetailsFacade {
       return [];
     }
     return [
-      {labelKey: 'orderDetails.flag.paymentStatus', value: order.paymentStatus ? orderStatusLabel(order.paymentStatus) : '—'},
-      {labelKey: 'orderDetails.flag.reservationStatus', value: order.reservationStatus ? orderStatusLabel(order.reservationStatus) : '—'},
+      {labelKey: 'orderDetails.flag.paymentStatus', value: this.statusLabels.label(order.paymentStatus)},
+      {labelKey: 'orderDetails.flag.reservationStatus', value: this.statusLabels.label(order.reservationStatus)},
       {labelKey: 'orderDetails.flag.customerAgreed', value: this.yesNo(order.customerAgreed)},
       {labelKey: 'orderDetails.flag.confirmedAddress', value: this.yesNo(order.confirmedAddress)},
     ];
@@ -294,7 +295,7 @@ export class OrderDetailsFacade {
   readonly timeline = computed<readonly TimelineEntry[]>(() => {
     const history = this.detail.hasValue() ? (this.detail.value()?.history ?? []) : [];
     return history.map((entry) => ({
-      status: entry.orderStatus ? orderStatusLabel(entry.orderStatus) : '—',
+      status: this.statusLabels.label(entry.orderStatus),
       tone: toneOf(entry.orderStatus),
       comment: entry.comments?.trim() || null,
       date: entry.date ?? null,
@@ -303,7 +304,7 @@ export class OrderDetailsFacade {
 
   /** The status options, humanized. The server owns the enum, so these are never looked up. */
   readonly statusOptions = computed(() =>
-    ORDER_STATUSES.map((status) => ({value: status, label: orderStatusLabel(status)})),
+    ORDER_STATUSES.map((status) => ({value: status, label: this.statusLabels.label(status)})),
   );
 
   /**

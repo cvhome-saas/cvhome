@@ -19,6 +19,9 @@ export const ICON_PATHS = {
   download: 'M12 3v12m-5-5 5 5 5-5M5 21h14',
   ellipsisH: 'M5 12h.01M12 12h.01M19 12h.01',
   ellipsisV: 'M12 5h.01M12 12h.01M12 19h.01',
+  /* A receipt: a sheet with a torn bottom edge and three ruled lines. Reads as an invoice at
+     12px, which a plain document outline does not. */
+  receipt: 'M5 3h14v18l-3-2-3 2-3-2-3 2V3Zm3 5h8m-8 4h8m-8 4h4',
   fileEdit: 'M14 3H5a2 2 0 0 0-2 2v14h14v-9M13 14l7-7-3-3-7 7-1 4 4-1Z',
   globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm-9-10h18M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20',
   home: 'M3 11 12 3l9 8v10h-6v-6H9v6H3V11Z',

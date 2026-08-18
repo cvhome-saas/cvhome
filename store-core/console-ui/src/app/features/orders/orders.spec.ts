@@ -137,9 +137,10 @@ describe('Orders', () => {
     const element = load();
     const tabs = [...element.querySelectorAll('app-tab-switcher button')].map((b) => b.textContent!.trim());
 
-    // Ten statuses plus "All". Humanized from the enum, so an unexpected one cannot throw.
+    // Ten statuses plus "All", each read from the `status.*` dictionary — "Pending payment", not
+    // the enum humanized into "Pending Payment".
     expect(tabs.length).toBe(11);
-    expect(tabs).toContain('Pending Payment');
+    expect(tabs).toContain('Pending payment');
     expect(tabs).toContain('Delivering');
     expect(tabs).not.toContain('Ordered');
   }));

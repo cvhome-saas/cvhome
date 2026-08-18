@@ -45,7 +45,7 @@
           </div>
 
           <button class="invoice-action" type="button" (click)="openInvoice()">
-            <app-icon name="file" />
+            <app-icon name="receipt" />
             {{ t('orderDetails.invoice') }}
           </button>
         </header>
@@ -169,6 +169,8 @@
                     ></textarea>
 
                     <div class="composer-actions">
+                      <!-- The reassurance stays put once there is text in the field. -->
+                      <p class="composer-hint">{{ t('orderDetails.commentVisible') }}</p>
                       <label class="status-picker">
                         <span>{{ t('orderDetails.newStatus') }}</span>
                         <!--

@@ -1,5 +1,5 @@
 import type {PageT} from '@core/table/table.types';
-import type {OrderStatus} from '@models/checkout';
+import {INVENTORY_STATUSES, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus} from '@models/checkout';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {Tone} from '@shared/ui/tone';
 
@@ -32,13 +32,25 @@ export const STATUS_TONE: Readonly<Record<OrderStatus, Tone>> = {
 };
 
 /**
- * A status as a person reads it.
+ * Every status value the console has a translation for — the three server enums an order carries.
  *
- * Humanized, never translated. The server owns this enum and Transloco is configured to throw on a
- * missing key, so a status added server-side would take the page down if it were looked up. Same
- * rule as the dashboard's chart labels.
+ * The set is what makes translating them safe. Transloco is configured to throw on a missing key,
+ * so a status added server-side would take the page down if it were looked up blind; membership is
+ * checked first and anything unrecognised is humanized instead. See `StatusLabel`.
  */
-export function orderStatusLabel(status: string): string {
+export const KNOWN_STATUSES: ReadonlySet<string> = new Set<string>([
+  ...ORDER_STATUSES,
+  ...PAYMENT_STATUSES,
+  ...INVENTORY_STATUSES,
+]);
+
+/**
+ * A status as a person reads it, in English, from the enum name alone.
+ *
+ * The fallback for a value the console has never seen — and the only rendering available where
+ * there is no injector, such as inside a pure mapping function.
+ */
+export function humanizeStatus(status: string): string {
   return status
     .toLowerCase()
     .split('_')
@@ -56,7 +68,7 @@ export interface OrderRow {
   readonly email: string;
   readonly city: string;
   readonly status: OrderStatus | null;
-  /** The order's own `paymentStatus`, humanized. Null when the order carries none. */
+  /** The order's own `paymentStatus`, as the server's enum name. Null when it carries none. */
   readonly payment: string | null;
   /**
    * Formatted from the order's `total` and `currency`. There is no item count: the list endpoint

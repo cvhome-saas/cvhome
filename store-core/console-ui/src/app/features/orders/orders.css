@@ -80,6 +80,63 @@ app-kpi-grid {
   gap: 0.75rem;
 }
 
+/*
+ * The panel's search field.
+ *
+ * It had no rules at all — an unstyled `input` flush against the panel edge, its placeholder
+ * clipped. It now matches the toolbar's search box, which is the console's one search affordance,
+ * and holds a fixed width so the tab strip beside it scrolls instead of squeezing it.
+ */
+.order-search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  inline-size: 15rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  transition:
+    border-color var(--default-transition-duration),
+    box-shadow var(--default-transition-duration);
+  --icon-size: 0.8rem;
+}
+
+.order-search app-icon {
+  flex: none;
+  color: var(--foreground-subtle);
+}
+
+.order-search input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  block-size: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+}
+
+.order-search input::placeholder {
+  color: var(--foreground-subtle);
+}
+
+.order-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--chart-1-wash);
+}
+
+/* The search drops under the strip before either has to give up its width. */
+@media (max-width: 1200px) {
+  .order-search {
+    inline-size: 100%;
+  }
+}
+
 .notice-primary,
 .notice-secondary {
   display: inline-flex;
@@ -212,18 +269,9 @@ app-kpi-grid {
   min-width: 0;
 }
 
-.cell-items,
 .cell-total {
   font-size: var(--text-xs);
   text-align: end;
-}
-
-.cell-items {
-  color: var(--secondary-foreground);
-  font-weight: 500;
-}
-
-.cell-total {
   color: var(--foreground-strong);
   font-weight: 600;
 }
@@ -288,7 +336,6 @@ app-kpi-grid {
     grid-template-columns: 6.5rem auto minmax(0, 1fr);
   }
 
-  .cell-items,
   .cell-total {
     text-align: start;
   }

@@ -17,7 +17,8 @@ import {Pagination} from '@shared/ui/pagination/pagination';
 import {Panel} from '@shared/ui/panel/panel';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
-import {STATUS_TONE, orderStatusLabel, type OrderRow} from '@models/orders';
+import {STATUS_TONE, type OrderRow} from '@models/orders';
+import {StatusLabel} from '@shared/i18n/status-label';
 import {OrdersFacade} from './facades/orders.facade';
 
 /** The order book's columns. Widths are grid tracks, read straight into the row layout. */
@@ -64,6 +65,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
 })
 export class Orders {
   private readonly toast = inject(ToastService);
+  private readonly statusLabels = inject(StatusLabel);
   private readonly transloco = inject(TranslocoService);
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly router = inject(Router);
@@ -116,7 +118,11 @@ export class Orders {
   }
 
   protected statusLabel(order: OrderRow): string {
-    return order.status ? orderStatusLabel(order.status) : '—';
+    return this.statusLabels.label(order.status);
+  }
+
+  protected paymentLabel(order: OrderRow): string {
+    return this.statusLabels.label(order.payment);
   }
 
   /** First letters of the first two words, as the avatar tile shows them. */

@@ -41,6 +41,33 @@ export const AWAITING_FULFILMENT: readonly OrderStatus[] = [
   'PROCESSING',
 ];
 
+/**
+ * `store-commons` `PaymentStatus`. The order carries it as a bare enum name, typed `string` on the
+ * wire because checkout does not narrow it.
+ */
+export const PAYMENT_STATUSES: readonly string[] = [
+  'PENDING',
+  'PROCESSING',
+  'PAID',
+  'FAILED',
+  'EXPIRED',
+  'CANCELLED',
+  'WAITING_VERIFICATION',
+  'REJECTED',
+  'AUTHORIZED',
+  'REFUNDED',
+];
+
+/** `store-commons` `InventoryStatus`, which the order reports as `reservationStatus`. */
+export const INVENTORY_STATUSES: readonly string[] = [
+  'AVAILABLE',
+  'NOT_REQUESTED',
+  'RESERVED',
+  'COMMITTED',
+  'RELEASED',
+  'RESERVATION_FAILED',
+];
+
 /** Mirrors commons customer address `AddressLocation` → `CustomerAddress`. */
 export interface CustomerAddress {
   readonly postalCode?: string;

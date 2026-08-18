@@ -106,6 +106,8 @@ export class OrderDetails {
         fileName: `invoice-${this.facade.reference().replace('#', '')}`,
         title: this.transloco.translate('orderDetails.invoice'),
         subtitle: this.facade.reference(),
+        // The sheet is already a page — one portrait A4, no console header over the seller's own.
+        layout: 'document',
       });
     } catch {
       this.toasts.danger(this.transloco.translate('orderDetails.invoiceFailed'));
