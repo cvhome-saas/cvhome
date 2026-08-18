@@ -1129,6 +1129,14 @@
     "preparing": "جارٍ التحضير…",
     "print": "طباعة",
     "close": "إغلاق",
-    "invoiceFailed": "تعذّر تحضير الفاتورة."
+    "invoiceFailed": "تعذّر تحضير الفاتورة.",
+    "customerStat": {
+      "orders": "الطلبات",
+      "spent": "الإنفاق",
+      "returns": "المرتجعات"
+    },
+    "customerStatsUnavailable": "إجماليات العميل غير متاحة بعد.",
+    "emailInvoice": "إرسال بالبريد",
+    "emailNotAvailable": "إرسال الفواتير بالبريد غير متاح بعد."
   }
 }

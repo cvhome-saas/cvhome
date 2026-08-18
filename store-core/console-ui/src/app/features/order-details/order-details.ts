@@ -1,6 +1,6 @@
 import {DatePipe} from '@angular/common';
 import {A11yModule} from '@angular/cdk/a11y';
-import {Component, ElementRef, computed, effect, inject, input, signal, viewChild} from '@angular/core';
+import {Component, ElementRef, computed, effect, inject, input, linkedSignal, signal, viewChild} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
@@ -48,14 +48,24 @@ export class OrderDetails {
   protected readonly nextStatus = signal<OrderStatus>('PROCESSING');
   protected readonly comment = signal('');
 
+  /**
+   * Set when the store's logo will not load.
+   *
+   * Store logos are absolute URLs into object storage, and one that 404s or points at a host the
+   * browser cannot reach would print a broken-image glyph on the invoice. The lettermark takes over
+   * instead — the letterhead still reads as the store's. Reset by a change of logo: a different
+   * store deserves its own chance to load.
+   */
+  protected readonly logoBroken = linkedSignal({
+    source: () => this.facade.seller().logo,
+    computation: () => false,
+  });
+
   /** The invoice document, over the page. */
   protected readonly invoiceOpen = signal(false);
   protected readonly exporting = signal(false);
 
   protected readonly invoiceSheet = viewChild<ElementRef<HTMLElement>>('invoiceSheet');
-
-  /** The seller, as the invoice's letterhead. The only part of it the console actually knows. */
-  protected readonly storeName = computed(() => this.shell.currentStore()?.name ?? '');
 
   /** The operator composing the status note, for the composer's avatar. */
   protected readonly operator = computed(() => this.shell.user()?.initials ?? '');
@@ -109,6 +119,22 @@ export class OrderDetails {
     // right tool — a second rendering path would be a second thing to keep in step.
     this.shell.closeMenus();
     window.print();
+  }
+
+  /**
+   * The lifetime figures the mockup puts under the customer. Labels only — see the template.
+   *
+   * TODO(lessons.md): customer lifetime figures — no backend endpoint. See lessons.md,
+   * "Orders — no customer analytics".
+   */
+  protected readonly customerStats = ['orders', 'spent', 'returns'] as const;
+
+  /**
+   * TODO(lessons.md): emailing an invoice — there is no mail service and no invoice record to
+   * send. See lessons.md, "Orders — no invoice service".
+   */
+  protected emailInvoice(): void {
+    this.toasts.info(this.transloco.translate('orderDetails.emailNotAvailable'));
   }
 
   /**

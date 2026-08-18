@@ -133,39 +133,20 @@
   color: var(--destructive);
 }
 
-.fulfilment {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card);
-}
-
-.fulfilment > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  border-block-end: 1px solid var(--border);
-}
-
-.fulfilment h2 {
-  margin: 0;
-  color: var(--foreground-strong);
-  font-size: var(--text-base);
-  font-weight: 600;
-}
-
-.fulfilment-state {
-  color: var(--muted-foreground);
-  font-size: var(--text-2xs);
-}
+/*
+ * The tracker is a panel like every other block on this page, so it takes the shared card chrome
+ * rather than restating it: same surface, same header rhythm, same divider. It had its own, and a
+ * slightly different card sitting above matching ones is exactly the sort of thing you see without
+ * being able to name.
+ */
 
 .stages {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1.1rem;
   margin: 0;
-  padding: 1.25rem;
+  /* Matches the panel header's inline padding, so the stages line up with the title above them. */
+  padding: 1.25rem 1.5rem;
   list-style: none;
 }
 
@@ -593,6 +574,43 @@
   font-size: var(--text-2xs);
 }
 
+/*
+ * The lifetime figures. They are drawn at the weight the mockup gives them because that is the
+ * shape of the answer; the value is an em dash because no service can produce one yet, and a
+ * fabricated number under a real label is worse than an honest blank.
+ */
+.customer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.85rem 0;
+  border-block: 1px solid var(--border-soft);
+}
+
+.customer-stats div {
+  min-inline-size: 0;
+}
+
+.customer-stats dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.customer-stats dd {
+  margin: 0.2rem 0 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-note {
+  margin: -0.35rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
 .contact {
   display: grid;
   gap: 0.55rem;
@@ -793,31 +811,57 @@
   border-block-end: 2px solid #0f172a;
 }
 
+/*
+ * The letterhead reads as a block — mark or logo, trading name, then the address and contact lines
+ * in a quieter grey, the way a printed invoice stacks them.
+ */
 .seller {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
   min-inline-size: 0;
 }
 
 .seller-mark {
   display: grid;
-  flex: none;
   place-items: center;
-  inline-size: 2.15rem;
-  block-size: 2.15rem;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  margin-block-end: 0.6rem;
   border-radius: var(--radius-lg);
   background: var(--primary);
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
+/* Capped rather than stretched: store logos arrive at whatever size the merchant uploaded. */
+.seller-logo {
+  display: block;
+  max-inline-size: 11rem;
+  max-block-size: 3.25rem;
+  margin-block-end: 0.6rem;
+  object-fit: contain;
+}
+
 .seller strong {
+  display: block;
   color: #0f172a;
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.seller p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.seller-contact {
+  color: #334155;
+}
+
+.seller p:first-of-type {
+  margin-block-start: 0.35rem;
 }
 
 .invoice-id {
@@ -971,6 +1015,12 @@
     display: none;
   }
 
+  /* Nothing animates onto paper. */
+  .invoice-sheet,
+  .stage-bar i {
+    animation: none;
+  }
+
   .invoice-layer {
     position: static;
   }
@@ -1010,5 +1060,93 @@
 
   .order-head {
     flex-wrap: wrap;
+  }
+}
+
+/* ---- Motion ------------------------------------------------------------------------------ */
+
+/*
+ * The page arrives rather than appearing: the identity line first, then the tracker, then the two
+ * columns, a beat apart. Short and small — 12px and 320ms — because this is a screen an operator
+ * opens dozens of times a day, and anything longer would be in the way by the third visit.
+ */
+@keyframes order-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.order-head,
+.fulfilment,
+.off-path,
+.order-grid {
+  animation: order-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.fulfilment,
+.off-path {
+  animation-delay: 60ms;
+}
+
+.order-grid {
+  animation-delay: 120ms;
+}
+
+/*
+ * The bars fill after the card has landed, so the progress reads as progress rather than as a
+ * picture of it. One keyframe: it runs from empty to whatever the stage's own transform says.
+ */
+@keyframes stage-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.stage-bar i {
+  animation: stage-fill 620ms cubic-bezier(0.22, 1, 0.36, 1) 220ms backwards;
+}
+
+/* The invoice is a document being placed in front of you, so it comes forward, not sideways. */
+@keyframes invoice-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.99);
+  }
+}
+
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.invoice-scrim,
+.invoice-bar {
+  animation: veil-in 200ms ease-out backwards;
+}
+
+.invoice-sheet {
+  animation: invoice-in 340ms cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-head,
+  .fulfilment,
+  .off-path,
+  .order-grid {
+    animation: none;
+  }
+
+  .stage-bar i,
+  .invoice-scrim,
+  .invoice-bar,
+  .invoice-sheet {
+    animation: none;
   }
 }

@@ -55,11 +55,7 @@
           <span>{{ t('orderDetails.offPath', {status: facade.status()}) }}</span>
         </div>
       } @else {
-        <section class="fulfilment" [attr.aria-label]="t('orderDetails.fulfilment')">
-          <header>
-            <h2>{{ t('orderDetails.fulfilment') }}</h2>
-            <span class="fulfilment-state">{{ facade.status() }}</span>
-          </header>
+        <app-panel class="fulfilment" [title]="t('orderDetails.fulfilment')" [meta]="facade.status()">
           <ol class="stages">
             @for (stage of facade.stages(); track stage.labelKey) {
               <li [class]="stage.state">
@@ -76,7 +72,7 @@
               </li>
             }
           </ol>
-        </section>
+        </app-panel>
       }
 
       <div class="order-grid">
@@ -211,6 +207,24 @@
                 </span>
               </div>
 
+              <!--
+                The mockup's lifetime figures — orders placed, spent, returned. No customer
+                aggregate exists anywhere on the platform, so they are shown as unavailable rather
+                than computed from the one order on screen, which would be a different number
+                wearing the same label.
+                TODO(lessons.md): customer lifetime figures — no backend endpoint. See lessons.md
+                "Orders — no customer analytics".
+              -->
+              <dl class="customer-stats">
+                @for (stat of customerStats; track stat) {
+                  <div>
+                    <dt>{{ t('orderDetails.customerStat.' + stat) }}</dt>
+                    <dd>—</dd>
+                  </div>
+                }
+              </dl>
+              <p class="stats-note">{{ t('orderDetails.customerStatsUnavailable') }}</p>
+
               <ul class="contact">
                 @if (facade.customer().email; as email) {
                   <li>
@@ -295,6 +309,15 @@
               <app-icon name="printer" />
               {{ t('orderDetails.print') }}
             </button>
+            <!--
+              TODO(lessons.md): emailing the invoice — no mail service and no invoice record. See
+              lessons.md, "Orders — no invoice service". The control is here because the operator
+              asks for it; it says so rather than appearing to send.
+            -->
+            <button type="button" (click)="emailInvoice()">
+              <app-icon name="envelope" />
+              {{ t('orderDetails.emailInvoice') }}
+            </button>
             <button class="invoice-close" type="button" [attr.aria-label]="t('orderDetails.close')" (click)="closeInvoice()">
               <app-icon name="x" />
             </button>
@@ -303,13 +326,28 @@
           <div class="invoice-scroll">
             <article class="invoice-sheet" #invoiceSheet>
               <header class="invoice-head">
+                <!--
+                  The letterhead is the selling store as the merchant service describes it — the
+                  same trading address and contact line the old console printed. Only what the
+                  store filled in appears; a tax id and payment terms still have nowhere to come
+                  from. See lessons.md.
+                -->
                 <div class="seller">
-                  <span class="seller-mark" aria-hidden="true">{{ storeName().charAt(0) }}</span>
-                  <strong>{{ storeName() }}</strong>
-                  <!--
-                    The seller's registered address and tax id would go here. The console has the
-                    store's name and nothing else about it — see lessons.md.
-                  -->
+                  @if (!logoBroken() && facade.seller().logo; as logo) {
+                    <img class="seller-logo" [src]="logo" [alt]="facade.seller().name" (error)="logoBroken.set(true)" />
+                  } @else {
+                    <span class="seller-mark" aria-hidden="true">{{ facade.seller().name.charAt(0) }}</span>
+                  }
+                  <strong>{{ facade.seller().name }}</strong>
+                  @for (line of facade.seller().lines; track line) {
+                    <p>{{ line }}</p>
+                  }
+                  @if (facade.seller().email) {
+                    <p class="seller-contact">{{ facade.seller().email }}</p>
+                  }
+                  @if (facade.seller().phone) {
+                    <p class="seller-contact">{{ facade.seller().phone }}</p>
+                  }
                 </div>
                 <div class="invoice-id">
                   <p class="invoice-word">{{ t('orderDetails.invoiceWord') }}</p>

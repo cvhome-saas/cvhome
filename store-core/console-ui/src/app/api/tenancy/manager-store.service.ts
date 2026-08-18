@@ -3,6 +3,7 @@ import {Observable, map} from 'rxjs';
 
 import {CrudService} from '@core/http/crud.service';
 import type {SpringPage} from '@core/table/table.types';
+import type {MerchantStore} from '@models/merchant';
 import type {CreateStoreRequest, EntityExists, ManagerStore} from '@models/tenancy';
 
 /**
@@ -45,6 +46,19 @@ export class ManagerStoreService {
    */
   storeInfo(store: string): Observable<ManagerStore> {
     return this.crudService.get(`${STORE_MANAGER_API_BASE}/store-info`, {store});
+  }
+
+  /**
+   * The store as the *merchant* service describes it — trading name, registered address, contact
+   * email and phone, logo. `storeInfo` above answers with tenancy's own row instead, which carries
+   * none of that.
+   *
+   * Tenancy does not hold this: `StoreManagerApi.getStoreDetailed` forwards to the store's pod and
+   * merges `pod` into the answer, which is why the return type is the pod's `ReadableMerchantStore`
+   * rather than `ManagerStoreDto`. Store-scoped by path, so the id is passed explicitly.
+   */
+  getStoreDetail(store: string): Observable<MerchantStore> {
+    return this.crudService.get(`${STORE_MANAGER_API_BASE}/private/store/${store}`);
   }
 
   /**

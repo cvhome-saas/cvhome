@@ -1129,6 +1129,14 @@
     "preparing": "Preparing…",
     "print": "Print",
     "close": "Close",
-    "invoiceFailed": "The invoice could not be prepared."
+    "invoiceFailed": "The invoice could not be prepared.",
+    "customerStat": {
+      "orders": "Orders",
+      "spent": "Spent",
+      "returns": "Returns"
+    },
+    "customerStatsUnavailable": "Lifetime figures are not available yet.",
+    "emailInvoice": "Email",
+    "emailNotAvailable": "Emailing invoices is not available yet."
   }
 }

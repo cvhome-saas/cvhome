@@ -4,6 +4,7 @@ import {DestroyRef} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {ApiErrorService} from '@core/errors/api-error.service';
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   ORDER_STATUSES,
   formatMoney,
@@ -23,6 +24,16 @@ export interface AddressView {
   readonly lines: readonly string[];
   readonly phone: string | null;
   readonly email: string | null;
+}
+
+/** The seller, as the invoice prints it in its letterhead. */
+export interface SellerView {
+  readonly name: string;
+  /** Resolvable image path, when the store has uploaded a logo. */
+  readonly logo: string | null;
+  readonly lines: readonly string[];
+  readonly email: string | null;
+  readonly phone: string | null;
 }
 
 /**
@@ -86,6 +97,7 @@ export class OrderDetailsFacade {
   private readonly transloco = inject(TranslocoService);
   private readonly toasts = inject(ToastService);
   private readonly apiErrors = inject(ApiErrorService);
+  private readonly shell = inject(ConsoleShellFacade);
   private readonly destroyRef = inject(DestroyRef);
 
   /** Set by the component from the route. */
@@ -95,8 +107,17 @@ export class OrderDetailsFacade {
   readonly submitting = signal(false);
 
   private readonly detail = rxResource({
-    params: () => this.orderId() ?? undefined,
-    stream: ({params}) => this.api.load(params),
+    // The store rides along because the invoice's letterhead is the selling store, and it is read by
+    // path rather than by the request context's `?store=`. Switching stores re-reads both.
+    //
+    // Nothing is requested until the store directory has resolved: every call the page makes is
+    // store-scoped, so firing early would fetch the order once unscoped and again scoped.
+    params: () => {
+      const orderId = this.orderId();
+      const storeId = this.shell.currentStoreId();
+      return orderId === null || storeId === null ? undefined : {orderId, storeId};
+    },
+    stream: ({params}) => this.api.load(params.orderId, params.storeId),
   });
 
   readonly isLoading = this.detail.isLoading;
@@ -156,9 +177,10 @@ export class OrderDetailsFacade {
    * The invoice, as a document.
    *
    * Every figure is read off the order, which is why this can exist at all with no invoice service
-   * behind it. What a real one would add — a stable invoice number, an issue date distinct from the
-   * order date, the seller's registered address and tax id, payment terms — is absent rather than
-   * invented. See lessons.md, "Orders — no invoice service".
+   * behind it — the letterhead aside, which is the selling store read from the merchant service.
+   * What a real invoice service would add — a stable invoice number of its own, an issue date
+   * distinct from the order date, a tax id, payment terms — is absent rather than invented. See
+   * lessons.md, "Orders — no invoice service".
    */
   readonly invoice = computed(() => {
     const order = this.order();
@@ -169,6 +191,31 @@ export class OrderDetailsFacade {
       paymentStatus: order?.paymentStatus ? orderStatusLabel(order.paymentStatus) : '—',
       billing: this.billing(),
       delivery: this.delivery(),
+    };
+  });
+
+  /**
+   * The invoice's letterhead: the selling store as the merchant service describes it.
+   *
+   * Only what the store actually filled in is printed — a blank address line or a lone `undefined`
+   * on an invoice reads as a defect in the seller, not in the console. When the store could not be
+   * read at all, `name` still comes from the rail, which is the one thing the console always knows.
+   */
+  readonly seller = computed<SellerView>(() => {
+    const store = this.detail.hasValue() ? this.detail.value()?.seller : undefined;
+    const countries = this.detail.hasValue() ? this.detail.value()?.countries : undefined;
+    const address = store?.address;
+    const country = this.countryName(address?.country, countries);
+    const name = store?.name?.trim() || this.shell.currentStore()?.name || '';
+
+    return {
+      name,
+      logo: store?.logo?.path?.trim() || null,
+      lines: [address?.address, [address?.postalCode, address?.city].filter(Boolean).join(' '), address?.stateProvince, country]
+        .map((line) => line?.trim())
+        .filter((line): line is string => !!line),
+      email: store?.email?.trim() || null,
+      phone: store?.phone?.trim() || null,
     };
   });
 
@@ -305,7 +352,7 @@ export class OrderDetailsFacade {
       return null;
     }
     const countries = this.detail.hasValue() ? this.detail.value()?.countries : undefined;
-    const country = address.country ? (countries?.get(address.country) ?? address.country) : null;
+    const country = this.countryName(address.country, countries);
 
     return {
       name: [address.firstName, address.lastName].filter(Boolean).join(' ').trim() || '—',
@@ -321,6 +368,31 @@ export class OrderDetailsFacade {
       phone: address.phone ?? null,
       email: email ?? null,
     };
+  }
+
+  /**
+   * An ISO country code as a name.
+   *
+   * Checkout's own list answers first, because that is the platform's truth. It is short — the store
+   * this was written against supports four countries — and an order or a store address may name one
+   * outside it, so `Intl.DisplayNames` resolves the rest from the code itself. That is formatting, not
+   * invented data: the code is what the server sent, and the browser is only spelling it out, in the
+   * reader's language. An unknown code falls through to itself rather than disappearing.
+   */
+  private countryName(code: string | undefined, countries: ReadonlyMap<string, string> | undefined): string | null {
+    if (!code) {
+      return null;
+    }
+    const known = countries?.get(code);
+    if (known) {
+      return known;
+    }
+    try {
+      const names = new Intl.DisplayNames([this.transloco.getActiveLang()], {type: 'region'});
+      return names.of(code) ?? code;
+    } catch {
+      return code;
+    }
   }
 
   private yesNo(value: boolean | undefined): string {

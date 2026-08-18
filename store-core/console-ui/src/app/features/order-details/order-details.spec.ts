@@ -3,7 +3,9 @@ import {provideRouter} from '@angular/router';
 import {Observable, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
+import {ToastService} from '@shared/ui/toast/toast';
 import type {OrderStatus, ReadableOrder} from '@models/checkout';
+import type {MerchantStore} from '@models/merchant';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
@@ -35,8 +37,18 @@ const ORDER: ReadableOrder = {
   delivery: {firstName: 'Maya', lastName: 'Chen', address: '18 Harrison St', city: 'San Francisco', postalCode: '94103', country: 'US'},
 };
 
+/** The selling store as the merchant service sends it — the invoice's letterhead. */
+const SELLER: MerchantStore = {
+  id: 'ORG1-STORE1',
+  name: 'Northline Supply',
+  email: 'billing@northline.example',
+  phone: '+1 415 555 0134',
+  address: {address: '900 Bryant St', city: 'San Francisco', postalCode: '94103', country: 'US'},
+};
+
 const DETAIL: OrderDetail = {
   order: ORDER,
+  seller: SELLER,
   history: [
     {id: 1, orderStatus: 'CREATED', comments: 'Order placed', date: '2026-08-04T10:15:00Z'},
     {id: 2, orderStatus: 'PROCESSING', comments: 'Picking started', date: '2026-08-04T14:00:00Z'},
@@ -51,8 +63,11 @@ class FakeOrderDetailsApi {
   failure = false;
   postFails = false;
 
-  load(orderId: number): Observable<OrderDetail> {
+  stores: string[] = [];
+
+  load(orderId: number, storeId: string): Observable<OrderDetail> {
     this.loads.push(orderId);
+    this.stores.push(storeId);
     return this.failure ? throwError(() => new Error('Unable to load order.')) : of(this.detail);
   }
 
@@ -86,6 +101,10 @@ describe('OrderDetails', () => {
   function load(id = '10482'): HTMLElement {
     fixture = TestBed.createComponent(OrderDetails);
     fixture.componentRef.setInput('id', id);
+    // Twice: the first settles the store directory, and only then does the order — which is scoped
+    // to the selected store — get requested at all.
+    fixture.detectChanges();
+    tick();
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
@@ -187,7 +206,14 @@ describe('OrderDetails', () => {
     const sheet = element.querySelector('.invoice-sheet');
     expect(sheet).not.toBeNull();
     // The whole document, not a copy of the items panel: letterhead, both parties, lines, totals.
-    expect(sheet!.querySelector('.seller')?.textContent).toContain('Acme Supply Co.');
+    const seller = sheet!.querySelector('.seller')!;
+    expect(seller.textContent).toContain('Northline Supply');
+    // The letterhead is the selling store's own trading address and contact line, not just a name.
+    expect(seller.textContent).toContain('900 Bryant St');
+    expect(seller.textContent).toContain('94103 San Francisco');
+    expect(seller.textContent).toContain('United States');
+    expect(seller.textContent).toContain('billing@northline.example');
+    expect(seller.textContent).toContain('+1 415 555 0134');
     expect(sheet!.textContent).toContain('Billed to');
     expect(sheet!.textContent).toContain('Shipped to');
     expect(sheet!.querySelectorAll('.invoice-items tbody tr').length).toBe(2);
@@ -196,6 +222,18 @@ describe('OrderDetails', () => {
     (element.querySelector('.invoice-close') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(element.querySelector('.invoice-sheet')).toBeNull();
+  }));
+
+  it('still prints an invoice when the selling store could not be read', fakeAsync(() => {
+    // A merchant-service outage must not cost the operator the invoice for an order that exists.
+    api.detail = {...DETAIL, seller: null};
+    const element = load();
+    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    // The name still comes from the rail, which is the one thing the console always knows.
+    expect(element.querySelector('.seller')?.textContent).toContain('Acme Supply Co.');
+    expect(element.querySelector('.invoice-items')).not.toBeNull();
   }));
 
   it('renders the timeline oldest first', fakeAsync(() => {
@@ -250,6 +288,31 @@ describe('OrderDetails', () => {
 
     expect(toasts.messages.length).toBe(1);
     expect(api.loads).toEqual([10482]);
+  }));
+
+  it('draws the customer lifetime figures as unavailable rather than computing them', fakeAsync(() => {
+    const element = load();
+    const values = [...element.querySelectorAll('.customer-stats dd')].map((n) => n.textContent!.trim());
+
+    // Three figures, none of them derived from the single order on screen.
+    expect(values).toEqual(['—', '—', '—']);
+    expect(element.querySelector('.stats-note')?.textContent).toContain('not available yet');
+  }));
+
+  it('says emailing an invoice is not available instead of appearing to send it', fakeAsync(() => {
+    // The page toasts through `ToastService` itself, not through the error port the fake covers.
+    const info = spyOn(TestBed.inject(ToastService), 'info');
+    const element = load();
+    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const email = [...element.querySelectorAll('.invoice-bar button')].find((b) =>
+      b.textContent?.includes('Email'),
+    ) as HTMLButtonElement;
+    email.click();
+
+    expect(info).toHaveBeenCalledTimes(1);
+    expect(info.calls.mostRecent().args[0]).toContain('not available yet');
   }));
 
   it('offers no refund, capture, cancel or shipment control — none has an endpoint', fakeAsync(() => {

@@ -1,7 +1,9 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable, forkJoin, map} from 'rxjs';
+import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 
 import {OrdersService} from '@api/orders/orders.service';
+import {ManagerStoreService} from '@api/tenancy/manager-store.service';
+import type {MerchantStore} from '@models/merchant';
 import type {
   OrderStatus,
   PersistableOrderStatusHistory,
@@ -15,13 +17,20 @@ export interface OrderDetail {
   readonly history: readonly ReadableOrderStatusHistory[];
   /** ISO code → country name, for the address panels. */
   readonly countries: ReadonlyMap<string, string>;
+  /**
+   * The selling store, for the invoice's letterhead. Null when it could not be read — the invoice
+   * then prints the store's name alone rather than failing, because an order is still an order when
+   * the merchant service is down.
+   */
+  readonly seller: MerchantStore | null;
 }
 
 /**
  * The order detail screen's data.
  *
- * Three calls, all required: an order with no timeline is a half-rendered page, and the country
- * lookup is what turns `DE` into `Germany` in both address panels.
+ * Four calls. Three are required — an order with no timeline is a half-rendered page, and the
+ * country lookup is what turns `DE` into `Germany` in both address panels. The fourth, the selling
+ * store, backs the invoice's letterhead only, so it is allowed to fail without taking the page.
  *
  * Only one write exists — `addHistory`. The design also asks for refund, capture, cancel, duplicate,
  * shipment creation and address editing; none of them is mapped in checkout. See lessons.md.
@@ -29,15 +38,20 @@ export interface OrderDetail {
 @Injectable({providedIn: 'root'})
 export class OrderDetailsApi {
   private readonly orders = inject(OrdersService);
+  private readonly stores = inject(ManagerStoreService);
 
-  load(orderId: number): Observable<OrderDetail> {
+  load(orderId: number, storeId: string): Observable<OrderDetail> {
     return forkJoin({
       order: this.orders.get(orderId),
       history: this.orders.history(orderId),
       countries: this.orders.countries(),
+      // Optional, unlike the other three: the letterhead is the only thing that reads it, and an
+      // order is still an order when the merchant service cannot be reached.
+      seller: this.stores.getStoreDetail(storeId).pipe(catchError(() => of(null))),
     }).pipe(
-      map(({order, history, countries}) => ({
+      map(({order, history, countries, seller}) => ({
         order,
+        seller,
         // Oldest first is how a timeline reads; the server's order is not guaranteed.
         history: [...history].sort(byDate),
         countries: new Map(

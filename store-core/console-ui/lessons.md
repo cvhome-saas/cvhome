@@ -603,6 +603,11 @@ requirements document, with the entry here reduced to a link. There is already o
   with no detail view, which the feature inventory already calls the thinnest feature in the app.
 - **Expected contract:** `GET …/customers/{id}/summary` → `{orderCount, lifetimeValue, returnRate,
   firstOrderAt}`. The same aggregate would answer the dashboard's new-vs-returning gap.
+- **Placeholder:** `TODO(lessons.md)` on `customerStats` in `order-details.ts`. The three figures are
+  drawn in the customer panel at the weight the design gives them, each reading an em dash under a
+  "Lifetime figures are not available yet" note — the pattern Module 3 set for a figure with no
+  source. Computing them from the one order on screen would be a different number under the same
+  label.
 
 ## Orders — no invoice service
 
@@ -610,11 +615,19 @@ requirements document, with the entry here reduced to a link. There is already o
 - **What is present:** rendering, download and print — every figure on an invoice is already on the
   order, so console-ui builds it from `ReadableOrder` with `core/export/pdf-export.service.ts` and no
   backend at all.
+  The letterhead is real too: `GET store-manager/private/store/{code}` answers with the selling
+  store's trading name, logo, registered address, email and phone — the same source the old console
+  printed from.
 - **What is missing:** everything about an invoice being a *record* rather than a rendering — a
   stable invoice number, storage, a tax point, and emailing it to the customer. The mockup's "Email
-  to customer" and its `INV-10482.pdf` filename both imply a document that exists somewhere.
+  to customer" and its `INV-10482.pdf` filename both imply a document that exists somewhere. The
+  seller's **tax registration number** has no field anywhere on the merchant store either, and an
+  invoice in most jurisdictions is not valid without one.
 - **Expected contract:** an invoice resource with a sequential per-store number issued when the order
   is confirmed, retrievable as a PDF, plus a send endpoint.
+- **Placeholder:** `TODO(lessons.md)` on `emailInvoice()` in `order-details.ts`. The Email control is
+  present in the invoice toolbar, because operators ask for it, and says it is not available yet
+  rather than appearing to send.
 
 ## Orders — no stale-order signal
 
