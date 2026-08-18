@@ -473,3 +473,39 @@ requirements document, with the entry here reduced to a link. There is already o
   the attention queue is a handful of counts rather than a handful of page requests.
 - **Placeholder:** `TODO(lessons.md)` in `dashboard.api.service.ts` (`loadSnapshot`).
 
+## Dashboard — the three merchant statistics 500 for every caller
+
+**This is a live defect, not a missing feature, and it blocks the whole dashboard in both UIs.**
+
+- **Screen:** `/dashboard` in console-ui; `/pages` in seller-ui.
+- **What happens:** `order-statistic`, `customer-statistic` and `product-statistic` all answer
+  `500 COMMON.INTERNAL_ERROR`. The checkout log gives the cause:
+  ```
+  org.springframework.dao.InvalidDataAccessApiUsageException:
+    Argument to query parameter has an incompatible type
+    (java.util.Date is not assignable to java.time.Instant)
+  ```
+  `Order.datePurchased` is an `Instant`, and the three API classes convert the range back to
+  `java.util.Date` before calling the repository:
+  ```java
+  orderRepository.orderStatistic(Date.from(range.fromDate().toInstant()),
+                                 Date.from(range.toDate().toInstant()), merchantStore);
+  ```
+  while `OrderRepository.orderStatistic` / `customerStatistic` and
+  `OrderProductRepository.productStatistic` declare their parameters as `Date`. Hibernate refuses the
+  binding, so the query never runs. Nothing about the request matters — every range, every store,
+  every caller fails identically.
+- **Why it was not noticed:** seller-ui's dashboard renders **blank** when this happens. Its ECharts
+  panels swallow the failure and draw nothing, so the screen looks empty rather than broken.
+  console-ui shows the error and its trace id, which is how it was found.
+- **Expected fix** (six lines, all mechanical, in `store-pod/checkout`):
+  - `OrderRepository.orderStatistic`, `OrderRepository.customerStatistic` and
+    `OrderProductRepository.productStatistic` — change the `@Param("from")` / `@Param("to")` types from
+    `java.util.Date` to `java.time.Instant`.
+  - `OrderStatisticApi`, `CustomerStatisticApi`, `ProductStatisticApi` — drop the `Date.from(...)`
+    wrappers and pass `range.fromDate().toInstant()` / `range.toDate().toInstant()` straight through.
+- **Consequence for this module:** the three real panels are **implemented but unverified against live
+  data**. Their shaping is covered by `dashboard.api.service.spec.ts`; what could not be checked is
+  whether the numbers match seller-ui's, because seller-ui cannot show any either. Re-run the two-tab
+  comparison in the Module 3 plan once checkout is fixed.
+

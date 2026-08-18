@@ -80,9 +80,23 @@ export class DashboardFacade {
     return from && to ? {from, to} : undefined;
   });
 
+  /**
+   * What the page is a reading of: a period **and** a store.
+   *
+   * The store id is in the params even though no argument is built from it — the request context
+   * stamps `?store=` itself. Without it the resource does not re-run when the rail switches stores,
+   * and the page keeps one store's figures under another store's name, which is the worst kind of
+   * wrong: it looks fine.
+   */
+  private readonly query = computed(() => {
+    const range = this.completeRange();
+    const storeId = this.shell.currentStoreId();
+    return range && storeId ? {range, storeId} : undefined;
+  });
+
   private readonly snapshot = rxResource({
-    params: () => this.completeRange(),
-    stream: ({params}) => this.api.loadSnapshot(params),
+    params: () => this.query(),
+    stream: ({params}) => this.api.loadSnapshot(params.range),
   });
 
   /**

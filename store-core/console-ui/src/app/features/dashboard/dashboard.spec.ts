@@ -4,6 +4,7 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 
 import type {DashboardSnapshot} from '@models/dashboard';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
@@ -98,6 +99,17 @@ describe('Dashboard', () => {
     expect(element.querySelector('app-plan-banner')).toBeNull();
   }));
 
+  it('shows an em dash and says so for a figure with no source, never a zero', fakeAsync(() => {
+    const {element} = load();
+    const cards = [...element.querySelectorAll('app-kpi-card')] as HTMLElement[];
+    const revenue = cards.find((card) => card.textContent?.includes('test.revenue'))
+      ?? cards[cards.length - 1];
+
+    // Revenue has no endpoint on the whole platform; a 0 here would be a claim about money.
+    expect(revenue.querySelector('.kpi-value')?.textContent?.trim()).toBe('—');
+    expect(revenue.textContent).toContain('Not available yet');
+  }));
+
   it('requests data for the selected period on load', fakeAsync(() => {
     load();
 
@@ -125,6 +137,19 @@ describe('Dashboard', () => {
     expect(element.querySelector('app-busy-overlay')?.getAttribute('aria-busy')).toBe('false');
     expect(element.querySelector('.busy-veil')).toBeNull();
     expect(element.querySelector('app-kpi-grid')).not.toBeNull();
+  }));
+
+  it('refetches when the open store changes, so figures cannot outlive their store', fakeAsync(() => {
+    load();
+    const shell = TestBed.inject(ConsoleShellFacade);
+    expect(api.requests.length).toBe(1);
+
+    shell.selectStore(CONSOLE_STORES_FAKE[1].id);
+    tick();
+
+    // The store id never reaches the request body — the request context stamps it — but the page is
+    // a reading of one store and must ask again when that changes.
+    expect(api.requests.length).toBe(2);
   }));
 
   it('refetches when the reporting period changes, and re-renders from the response', fakeAsync(() => {
