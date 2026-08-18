@@ -1,4 +1,4 @@
-# console-ui go-live — migration framework, and Module 3
+# console-ui go-live — migration framework, and Module 4
 
 ## Context
 
@@ -45,7 +45,7 @@ side by side, and committed in its own phases. Design blocks with no backend beh
 | i18n | console-ui's own **Transloco** throughout. seller-core's two `@ngx-translate/core` call sites are rewritten during the port, not bridged by a token. No `TRANSLATION_PORT`, no adapter, and `@ngx-translate/core` never enters console-ui's `package.json`. |
 | console-ui's `core/` tier | **Authoritative.** Its `errors/`, `http/crud.service.ts`, `table/`, `auth/`, `platform/` are the ones that run. Ported services inject *these*, never a second copy. |
 | Strictness | Ported code is hardened to console-ui's `strict: true` as part of the port. This is a feature, not a tax — see below. |
-| Module order | Marketing/auth, then console shell and store context (both done), then the dashboard. |
+| Module order | Marketing/auth, console shell and store context, dashboard (all done), then orders. |
 
 ### Why the copy is cheaper than the link, here
 
@@ -253,149 +253,195 @@ Shipped in three commits. What it established, which Module 3 depends on:
   been mistyped since it was written, and two regressions of my own. `lessons.md` reached 22 entries.
 
 ---
+## Module 3 — Dashboard — **done**
 
-## Module 3 — Dashboard
+Shipped in three commits. What it established, which Module 4 reuses:
 
-### Why this one is mostly a subtraction
+- `api/analytics/statistic.service.ts` and `api/payment/payment.service.ts` are ported. **Module 4's KPI
+  row reuses `orderStatistic` directly.**
+- The pattern for a figure with no source: an em dash under a "Not available yet" flag, on a muted
+  tone, rather than a zero or a hidden tile.
+- The pattern for humanizing the server's `OrderStatus` enum instead of translating it — Transloco is
+  configured to **throw** on a missing key, so a status the console has not seen would take the page
+  down. Module 4 needs the same treatment.
+- **A live blocker:** all three merchant statistics 500 for every caller
+  (`java.util.Date is not assignable to java.time.Instant`). Logged in `lessons.md`, not fixed, at the
+  user's direction. It matters here — see the KPI note below.
 
-The console's dashboard mockup is the most data-hungry screen in the app: four KPI tiles, a
-three-row attention queue, a new-vs-returning donut, an order-status chart and a top-products list.
-Behind it there are **three endpoints**, all on checkout, all returning the same three-column shape.
+---
 
-That mismatch — not the wiring — is the work. seller-ui's client dashboard shows exactly three charts
-because three is what exists; the new design asks for eleven figures. This module ships the three, adds
-the two more that turn out to be derivable, and is explicit on screen about the rest.
+## Module 4 — Orders
+
+### Scope
+
+**The list and the detail screen together.** console-ui has only `/orders` today; the detail screen is
+net-new and is the largest single page in the migration. `console-template/Order Details.dc.html` is the
+design reference and carries most of the layout already.
 
 ### seller-ui today
 
-`/pages` renders one of two dashboards by role. The merchant one
-(`src/app/pages/home/`) has a from-date/to-date range driving three ECharts panels: order status
-breakdown, customer countries, top selling products. All three come from
-`seller-core/analytics`'s `StatisticApiService`.
+`/pages/orders/order-list` — filters on customer name, email, phone and status, server-side paging,
+columns Id / name / email / phone / date / status / total / Details.
+`/pages/orders/order-details/:id` — the richest screen in the old app.
 
-Worth copying: `orders-statistic.component.ts:30` derives its series from the response
-(`[...new Set(data.entries.map(it => it.name))]`) rather than hardcoding a status list. That is the
-right instinct and this module keeps it — see the status-label note below.
+Its facade (`order-details.facade.ts`) calls six things. **Three of them do not exist:**
+`updateOrder` → `PATCH /private/orders/{id}/customer`, `refundOrder` → `POST …/refund`,
+`captureOrder` → `POST …/capture`. No such mappings exist anywhere in checkout. So seller-ui's
+editable address panels and its Refund and Capture buttons have always 404'd. Its transactions dialog
+is empty for the same reason, and seller-core says so in a comment: *"No backend endpoint populates
+transactionListData anywhere."*
 
 ### API surface to port
 
-All three statistics take `POST` with a `StatisticRange {fromDate, toDate}` body and answer
-`{entries: [{date, name, value}]}` (`commons/domain/StatisticEntry`). Store scoping rides on the query
-string, which Module 2 made real.
+`ReadableOrderList extends ReadableList<ReadableOrder>` — the list returns **whole orders**, so items,
+totals, billing and customer are all present without a second call.
 
-| From | To | Endpoint | What it actually returns |
-|---|---|---|---|
-| `seller-core/analytics/.../statistic.api.service.ts` | `api/analytics/statistic.service.ts` | `POST /spg/checkout/api/v2/private/order-statistic` | `(day, orderStatus, count)` grouped by both |
-| same | same | `POST /spg/checkout/api/v2/private/customer-statistic` | `(null, billing.country, count)` — **orders by country**, despite the name |
-| same | same | `POST /spg/checkout/api/v2/private/product-statistic` | `(null, sku, count)` — **order lines per SKU**, not units or money |
-| `seller-core/payments/.../payment.service.ts` | `api/payment/payment.service.ts` | `GET /spg/payment/api/v1/private/payment/transactions` | paged `ReadableList`; only `totalElements` is read here |
-
-**Port only the read half of `PaymentService`.** Approve and reject belong to the payments module.
-
-**Do not port the three platform-admin statistics** (`store-statistic`, `org-statistic`,
-`subscription-statistic` on tenancy). They feed seller-ui's *admin* dashboard, which is Module 12.
-
-### What each panel gets
-
-| Panel | Backing | Verdict |
+| From | To | Endpoint |
 |---|---|---|
-| Order status breakdown | `order-statistic`, summed over the range per status | **real** |
-| Orders by customer country (donut) | `customer-statistic` | **real** — retitled, see below |
-| Top selling products | `product-statistic` | **real** — SKU and order count, see below |
-| KPI: Orders | sum of `order-statistic` | **derived** |
-| KPI: Orders delta | a second `order-statistic` over the preceding window of equal length | **derived** |
-| KPI: Pending payments | `transactions?status=WAITING_VERIFICATION&count=1` → `totalElements` | **derived** |
-| Attention: payment approvals | the same count | **derived** |
-| Attention: awaiting fulfilment | `order-statistic`, statuses before SHIPPED | **derived**, retitled |
-| KPI: Revenue | — | **none** → rendered unavailable |
-| KPI: Low stock items | — | **none** → rendered unavailable |
-| Attention: low stock products | — | **none** → row removed |
-| New vs returning customers | — | **none** → panel repurposed |
+| `seller-core/orders/.../orders.service.ts` | `api/orders/orders.service.ts` | `GET /spg/checkout/api/v1/private/orders` — `name`, `id`, `status`, `phone`, `email`, plus `page`/`count` |
+| same | same | `GET …/private/orders/{id}` |
+| same | same | `GET …/private/orders/{id}/history`, `POST` the same path |
+| same | same | `GET …/api/v1/country`, `GET …/api/v1/zones?code=` |
+| `seller-core/orders/.../models/order.model.ts` | `models/checkout.ts` | `ReadableOrder`, `ReadableOrderProduct`, `ReadableBilling`, `ReadableDelivery`, `OrderTotal`, `ReadableOrderStatusHistory`, `PersistableOrderStatusHistory` |
+
+**Do not port `updateOrder`, `refundOrder` or `captureOrder`** — the endpoints do not exist. Record
+under **Deviations**, as with `ManagerStoreService.create()` in Module 2.
+
+`count` is the page-size parameter platform-wide (`ServletWebConfig` sets
+`setSizeParameterName("count")`), which is why `PageRequest` in `@core/table` uses it.
 
 ### Decisions (settled with the user)
 
 | Question | Decision |
 |---|---|
-| Revenue and Low stock tiles | **Keep all four tiles**; render these two with an em dash and a "Not available yet" flag on a muted tone. The gap is visible on screen, not only in `lessons.md`. `KpiCard` already has the `flag` input for exactly this — no component change. |
-| New-vs-returning donut | **Retitled** to "Orders by customer country" and sliced by the countries the endpoint returns, which is what seller-ui shows and what the query computes. |
-| Top products | **SKU, counted in orders.** `ACME-HDPH-01 · 48 orders`, not `Wireless Headphones · 482 sales`. The fixture's "sales" implied units or money and it is neither. No catalog lookup. |
+| Scope | **List and details together**, following `console-template`. |
+| Invented list columns | **Dropped**, with `lessons.md` entries: the channel column and its filter (`ReadableOrder` has no channel), the card-brand line (`Visa •••• 4242` lives in the payment service, not on the order), and the "unfulfilled for 6h" badge (nothing records when a status last changed — the same gap the dashboard hit). |
+| KPI counts | **One `order-statistic` call**, reusing Module 3's ported service, rather than several `?status=X&count=1` list calls. |
 
-### Three things the port has to get right
+**Consequence of the KPI decision, and how it is handled.** `order-statistic` is the endpoint that
+currently 500s. So that leg is made **optional** — `catchError(() => of(null))`, exactly as the
+dashboard treats its payment count. The table, filters and paging come from `GET /private/orders`,
+which works today, and the KPI row reports unavailable until checkout is fixed. Without this the
+entire orders page would be dead on arrival because of a bug in a different endpoint.
 
-**The dates are fixtures and must go.** `dashboard.facade.ts` hardcodes
-`DEFAULT_RANGE = {from: new Date(2026, 6, 5), to: new Date(2026, 7, 4)}` and a `HEADING_DATE` of
-`new Date(2026, 7, 4)`. Against real data these are simply wrong. The default becomes the last 30 days
-ending today, and the heading's date becomes today.
+**Average order value** joins Revenue and Low stock as permanently unavailable: it needs a revenue sum,
+and nothing on the platform provides one.
 
-**Status labels cannot be translated blindly.** The real `OrderStatus` enum is ten values — `CREATED,
-PENDING_PAYMENT, CONFIRMED, PROCESSING, SHIPPED, DELIVERING, DELIVERED, COMPLETED, CANCELLED,
-RETURNED` — and neither UI's five-value list (`ORDERED/PROCESSED/DELIVERED/REFUNDED/CANCELED`) matches
-it. Follow seller-ui and derive the series from the response, then label each through a known-key map
-with a humanized fallback: Transloco's `StrictMissingHandler` **throws** on an unknown key, so
-`translate('dashboard.orderStatus.' + name)` on an unexpected status would crash the page. Same shape
-as the entitlement labels in Module 1. Tones come from a stable map so a status keeps its colour
-between renders, cycling the categorical palette for anything unmapped.
+### The status vocabulary, again
 
-**The payment count must not be able to blank the dashboard.** `loadSnapshot` fans out five requests;
-the three statistics are required, but a payments outage should cost the two payment figures and
-nothing else. `catchError(() => of(null))` on that one leg, and the tile reports unavailable rather
-than zero — reporting zero pending approvals when the service is down is the worst possible answer.
+`OrderStatus` is ten values — `CREATED, PENDING_PAYMENT, CONFIRMED, PROCESSING, SHIPPED, DELIVERING,
+DELIVERED, COMPLETED, CANCELLED, RETURNED`. console-ui's `models/orders.ts` currently declares five
+invented ones (`Ordered | Processed | Delivered | Refunded | Canceled`) with tone maps and translation
+keys for each. All of that is replaced by the real enum, mirrored in `models/checkout.ts` the way
+`ProvisioningState` and `PaymentStatus` already are, with:
+
+- labels **humanized, not translated** — the Module 3 rule;
+- a stable tone map, reusing the one written for the dashboard so a status is the same colour in both;
+- the tab strip populated from the real ten rather than the mockup's five. Ten tabs is more than the
+  mockup shows and the strip scrolls horizontally; that is a deliberate deviation from the template,
+  because grouping them would mean inventing groups the API cannot filter by (`status` takes one value).
+
+### What the detail screen gets
+
+`console-template/Order Details.dc.html` designs roughly twenty blocks. Six have data.
+
+| Block | Backing |
+|---|---|
+| Header, status, placed date | **real** |
+| Items table, unit price, line totals | **real** — `ReadableOrder.products` |
+| Totals: subtotal, shipping, tax, grand total | **real** — `totals[]`, `total`, `tax`, `shipping` |
+| Billing and delivery addresses | **real**, read-only — see below |
+| Customer name, email, phone | **real** |
+| Status history timeline | **real** — `GET …/history` |
+| Add a status change with a comment | **real** — `POST …/history` |
+| Flags: `customerAgreed`, `confirmedAddress`, `paymentStatus`, `reservationStatus` | **real** |
+| Invoice document | **client-rendered** — see below |
+| Refund, Capture | no endpoint → removed |
+| Editing the addresses | no endpoint → **read-only** |
+| Transactions list | no endpoint that links a transaction to an order → removed |
+| Cancel order, Duplicate order, Create shipment | no endpoint → removed |
+| Print picking list, Print packing slip | no endpoint → removed |
+| Internal notes, attachments | no service → removed |
+| Tracking, promised-by, ships-from, shipping method | not on the order → removed |
+| Gateway fee | payment service, unlinked → removed |
+| Customer lifetime spend, returns, "business account" | no customer analytics → removed |
+| Address verification | nothing verifies addresses → removed |
+| Email invoice to customer | no mail service → removed |
+
+**The invoice is worth keeping and is genuinely buildable.** Every figure on it — line items, totals,
+addresses, dates, order reference — is already in `ReadableOrder`. console-ui has
+`core/export/pdf-export.service.ts` and a shared `ExportButton` (both live, used by the dashboard), so
+Download and Print work with no backend at all. Only *emailing* it needs a service.
+
+`GET /country` and `GET /zones?code=` are ported even though the addresses are read-only: the codes on
+an order are ISO strings, and these are what turn `DE` into `Germany`.
 
 ### Implementation
 
-- **Port** into `src/app/api/analytics/statistic.service.ts` and `src/app/api/payment/payment.service.ts`,
-  with `src/app/models/statistics.ts` and `src/app/models/payment.ts`, following the standing checklist.
-  `StatisticsParams` loses its `store` field: the request context supplies it now.
-- **`DashboardApi.loadSnapshot(range)`** becomes the assembly point — `forkJoin` of the five calls,
-  reducing entries into the existing `DashboardSnapshot`. This keeps the facade, the page and every
-  widget untouched, which is the whole point of the `*.api.service.ts` seam.
-- **`models/dashboard.ts`** gains what the shapes now need: `Kpi.value` becomes `string | null`
-  (null renders the em dash), `OrderStatus.labelKey` becomes a resolved `label`, and `Product` becomes
-  `{sku, orders}`. `CustomerSplitSegment.labelKey` becomes `label` — a country code is data, not copy.
-- **`dashboard.fixture.ts`** is deleted outright; nothing on this page is authored any more.
-- Locale: add `dashboard.orderStatus.*` for the ten real statuses, `dashboard.kpi.unavailable`, the
-  retitled donut and products headings, and remove the keys for the five invented statuses.
+- **Port** into `src/app/api/orders/orders.service.ts` with `src/app/models/checkout.ts`, following the
+  standing checklist. Wire DTOs go in `models/checkout.ts`; `models/orders.ts` stays the page's view
+  models, as `models/dashboard.ts` and `models/statistics.ts` are split today.
+- **`orders.api.service.ts`** becomes the list's assembly point: `forkJoin` of the paged list and the
+  optional `order-statistic`, mapping `ReadableOrder` → `OrderRow`. Filters go to the server —
+  `status`, and the free-text search mapped to `name`/`email`/`phone`.
+- **`models/orders.ts`** loses `OrderChannel`, `ORDER_CHANNEL_ICON`, `ORDER_CHANNEL_LABEL_KEY`,
+  `ChannelFilter`, the five-value `OrderStatus` and its label keys, `paymentMeta` and `unfulfilledFor`.
+- **New feature `features/order-details/`** — component, facade, `order-details.api.service.ts`,
+  following the shape of `features/store-management` (a page with sections and a facade).
+  Route `orders/:id` under `ConsoleShell`, guarded by `canAccessSecuredPages` and `consoleContext` +
+  `requiresStore`, with `RenderMode.Client` in `app.routes.server.ts`.
+- **`mocks/orders.fixture.ts` is deleted** — 549 lines, the largest fixture in the app.
+- Locale: real status labels are not translated, so those keys go; add the detail screen's copy, the
+  invoice's, and `orders.kpi.unavailable`.
 
 ### Backend gaps → `lessons.md`
 
-1. **No revenue anywhere.** Every statistic is a `count(...)`; nothing sums `order.total`. The single
-   most prominent figure in the design has no source. Expected: a `revenue-statistic` returning
-   `(day, currency, sum)` — note it must be per currency, since a store can take more than one.
-2. **No stock levels.** `ProductCriteria` has no quantity or threshold field, so "low stock" cannot be
-   asked for. Expected: a threshold filter on the product query, or a count endpoint.
-3. **No new-vs-returning split.** Nothing records a customer's first order date.
-4. **`customer-statistic` is misnamed** — it groups *orders* by billing country and counts orders, not
-   customers. A store with one loyal customer in Germany reads the same as one with forty.
-5. **`product-statistic` returns no product name** and counts order lines rather than units — a ten-unit
-   order counts once. Expected: the product's name and localized title, plus `sum(quantity)`.
-6. **No "stale order" signal.** The design's "past 24 hours without a status update" needs the last
-   history timestamp; the statistic has only the purchase date, so the row is retitled to what can be
-   computed.
-7. **Counting requires fetching.** `totalElements` is only reachable by asking for a page of rows. Cheap
-   at `count=1`, but a real counts endpoint would serve the attention queue and the sidebar badges
-   (already logged in Module 2) at once.
+1. **No refund and no capture.** seller-core calls `POST …/orders/{id}/refund` and `…/capture`; neither
+   is mapped in checkout. Both buttons have always 404'd in seller-ui.
+2. **Order addresses cannot be edited.** `PATCH …/orders/{id}/customer` does not exist either, so
+   seller-ui's editable billing and delivery panels have never saved.
+3. **No link from an order to its payment transactions.** The payment service keys on its own refs; the
+   order carries a `paymentStatus` string and nothing else. seller-core's own comment records that the
+   transactions dialog is never populated.
+4. **No order channel.** Web/phone/marketplace is not recorded anywhere.
+5. **No payment method on the order** — card brand and last four live in the payment service.
+6. **No fulfilment or shipping model at all**: no shipment, no tracking number, no carrier, no
+   promised-by date, no ships-from. The template designs all of them.
+7. **No internal notes.** Distinct from status-history comments, which are customer-visible.
+8. **No cancel and no duplicate.** Cancelling is only expressible as a status-history entry, which is a
+   different thing from a cancellation that releases stock and refunds.
+9. **No customer analytics** — lifetime spend, return rate, account type.
+10. **No invoice service.** Rendering and printing are client-side, but numbering, storage and emailing
+    are not.
 
 ### Testing
 
-Both UIs, signed in as the same org admin, `ORG1-STORE1` open in each.
+Both UIs, same org admin, `ORG1-STORE1` open in each.
 
-- The order-status chart shows the same statuses and totals as seller-ui's ECharts panel over the same
-  from/to dates. This is the one direct numeric comparison available.
-- Same for customer countries and top products — noting seller-ui prints the raw SKU too.
-- Switch stores in the rail: every figure refetches and changes. Confirm each request carries the new
-  `?store=`, which is what Module 2 built.
-- Change the date range: five requests go out, and the previous-period call spans the correctly
-  offset window.
-- A store with no orders in range: the charts say so rather than rendering empty axes.
-- Stop the payment pod (or point the status at a nonexistent value): the three charts still render and
-  only the payment figures report unavailable.
-- Revenue and Low stock read "Not available yet" in both locales and all three themes.
+- The list shows the same orders as seller-ui's `order-list` — same ids, customers, statuses, totals,
+  same total count.
+- Filter by each status: both narrow identically. Search by customer name, email and phone.
+- Paging: `count` is the page-size parameter — confirm page 2 differs and the total is stable.
+- Open an order in both: items, quantities, unit prices, subtotal, shipping, tax and grand total match
+  line for line. This is the module's strongest comparison, and unlike Module 3 it does not depend on
+  the broken statistic endpoint.
+- Add a status change with a comment in console-ui; confirm it appears in seller-ui's history after a
+  reload, and that the order's status moved.
+- The KPI row reports unavailable while `order-statistic` 500s, and the table still works — the point
+  of making that leg optional.
+- Download and print the invoice; check totals and addresses against the order.
+- An order with no delivery address, and one with a status the console has not seen, both render.
+- Arabic and all three themes; 1440 / 900 / 420.
 
 ### Commits
 
-1. `plan(console-ui): dashboard` — this document.
-2. `feat(console-ui): dashboard on real statistics`.
-3. `fix(console-ui): dashboard after QA`.
+1. `plan(console-ui): orders` — this document.
+2. `feat(console-ui): order list on real orders`.
+3. `feat(console-ui): order details`.
+4. `fix(console-ui): orders after QA`.
+
+Four rather than three: the list and the detail screen are independently reviewable, and the detail
+screen is large enough that folding it into one commit would make the diff unreadable.
 
 ---
 
@@ -403,27 +449,28 @@ Both UIs, signed in as the same org admin, `ORG1-STORE1` open in each.
 
 **seller-ui: not modified.** Read-only reference.
 
-**New in console-ui:** `src/app/api/analytics/statistic.service.ts`,
-`src/app/api/payment/payment.service.ts`, `src/app/models/statistics.ts`, `src/app/models/payment.ts`.
+**New in console-ui:** `src/app/api/orders/orders.service.ts`, `src/app/models/checkout.ts`,
+`src/app/features/order-details/{order-details.ts,.html,.css,facades/,services/}`.
 
-**Changed in console-ui:** `src/app/features/dashboard/services/dashboard.api.service.ts` (the
-assembly point — most of the module's code), `.../facades/dashboard.facade.ts` (real dates, resolved
-labels), `src/app/models/dashboard.ts`, `src/app/features/dashboard/dashboard.html` (retitled panels,
-one attention row fewer), `src/locale/{en,ar}.json`, `lessons.md`.
+**Changed in console-ui:** `src/app/features/orders/services/orders.api.service.ts` (the list's
+assembly point), `.../facades/orders.facade.ts`, `.../orders.html` (columns and tabs),
+`src/app/models/orders.ts`, `src/app/app.routes.ts`, `src/app/app.routes.server.ts`,
+`src/locale/{en,ar}.json`, `lessons.md`.
 
-**Deleted:** `src/app/mocks/dashboard.fixture.ts`.
+**Deleted:** `src/app/mocks/orders.fixture.ts`.
 
-**Reused, already present:** `src/app/api/tenancy/selected-store.service.ts` and
-`selected-store-request-context.ts` (store scoping), `src/app/core/http/crud.service.ts`,
-`src/app/shared/ui/{kpi-card,kpi-grid,action-list,donut-chart,bar-chart,ranked-list,date-range-picker}`
-— every widget this page needs already exists and none of them changes.
+**Reused, already present:** `src/app/api/analytics/statistic.service.ts` (the KPI counts),
+`src/app/core/table/table.types.ts` (`PageT`, `PageRequest`, `count` not `size`),
+`src/app/core/export/pdf-export.service.ts` and `shared/ui/export-button` (the invoice),
+`shared/ui/{data-table,pagination,tab-switcher,page-header,panel,badge,busy-overlay,kpi-grid}`.
 
 ## Verification
 
 1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
-   `git -C store-core/seller-ui status --porcelain` empty.
-2. `grep -rn "dashboard.fixture" src` → no hits.
-3. `grep -rn "new Date(2026" src` → no hits; the dashboard's dates are real.
-4. The two-tab comparison above, driven through Chrome.
-5. Network tab: five requests per range change, each carrying `?store=` and `?pod=`.
+   `git -C store-core/seller-ui status --porcelain` empty, and `store-pod` untouched.
+2. `grep -rn "orders.fixture" src` → no hits.
+3. `grep -rn "'Ordered'\|paymentMeta\|unfulfilledFor\|OrderChannel" src` → no hits.
+4. The two-tab comparison above, driven through Chrome — in particular the line-by-line totals check on
+   one order, which is this module's strongest evidence.
+5. Network tab: the list request carries `?store=`, `page`, `count` and the active filter.
 6. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
