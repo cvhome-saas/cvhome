@@ -1,4 +1,4 @@
-# console-ui go-live — migration framework + first module
+# console-ui go-live — migration framework, and Module 2
 
 ## Context
 
@@ -45,7 +45,7 @@ side by side, and committed in its own phases. Design blocks with no backend beh
 | i18n | console-ui's own **Transloco** throughout. seller-core's two `@ngx-translate/core` call sites are rewritten during the port, not bridged by a token. No `TRANSLATION_PORT`, no adapter, and `@ngx-translate/core` never enters console-ui's `package.json`. |
 | console-ui's `core/` tier | **Authoritative.** Its `errors/`, `http/crud.service.ts`, `table/`, `auth/`, `platform/` are the ones that run. Ported services inject *these*, never a second copy. |
 | Strictness | Ported code is hardened to console-ui's `strict: true` as part of the port. This is a feature, not a tax — see below. |
-| First module | Marketing / landing + auth, per the requirements doc. |
+| Module order | Marketing/auth first (done), then console shell and store context. |
 
 ### Why the copy is cheaper than the link, here
 
@@ -79,9 +79,10 @@ is the migration itself, and each module closes a slice of it.
 
 ## The migration framework
 
-Everything below this line is the framework. Only **Module 1** is planned here. Later modules are
-named, not designed — each gets its own planning phase when requested, per the requirements doc's
-constraint against one large plan.
+Everything in this section is the framework, and it governs every module. **Module 1 is done and
+shipped** (see below); **Module 2 is the plan in this document.** Later modules are named, not
+designed — each gets its own planning phase when requested, per the requirements doc's constraint
+against one large plan.
 
 ### Per-module lifecycle
 
@@ -220,201 +221,232 @@ a store until the real store list loads, replacing the hardcoded `STORES` array 
 fixtures, so they are pure api-service swaps.
 
 ---
+## Module 1 — Marketing / landing + auth — **done**
 
-## Module 1 — Marketing / landing + auth
+Shipped in three commits: `plan(console-ui)…`, `feat(console-ui): marketing and auth on real APIs`,
+`fix(console-ui): marketing and auth after QA against the live stack`.
+
+What it established, which Module 2 builds on:
+
+- `src/app/api/` exists as the ported HTTP tier, with the `@api/*` alias and the eslint rule that
+  keeps `core/`, `shared/` and `models/` out of it.
+- The port-by-copy convention above is proven: `models/billing.ts`, `models/signup.ts`,
+  `api/billing/subscription.service.ts`, `api/signup/sign-up.service.ts`.
+- `lessons.md` exists with twelve entries.
+- QA against the live stack found four defects, three of them in claims the UI was making that the
+  backend did not support. **That is the pattern to expect**: the expensive findings in this
+  migration are not wiring errors, they are places where the design asserts something no service
+  can answer.
+
+---
+
+## Module 2 — Console shell and store context
+
+### Why this module is next, and why it is the hard one
+
+Every remaining module is a reading of one store. `SelectedStoreRequestContext.params()` stamps
+`?store=&pod=` onto every request and throws rather than guess, so until the real store list loads
+there is nothing to scope a dashboard, an order list or a catalogue to. Module 2 is what turns
+that key.
+
+It is also the module where the console stops being anonymous. `canAccessSecuredPages` has existed
+in `core/auth/` since the app was scaffolded and **`app.routes.ts` references it nowhere** — every
+console route is currently reachable signed-out, rendering fixtures. That is the single largest
+correctness gap in the app today.
 
 ### seller-ui today
 
-Routes in `src/app/public/public.routes.ts`: `/` (`IndexComponent`, five sections —
-`welcome`, `features`, `pricing`, `subscribe`, `contact`), `/signup`, `/terms`,
-`/privacy-policy`, `/external-logout-link`, `/subscription/success|fail`. SSR for `/`, `/signup`,
-`/terms`, `/privacy-policy`; the rest client-only.
-
-**Exactly one section calls an API.** `public/sections/pricing/facades/pricing.facade.ts` →
-`SubscriptionService.plans()` from `seller-core/subscriptions` →
-`GET billing/api/v1/plan/public/plans[?currency]`, the only billing call with no store and no
-session. Guarded by `isPlatformBrowser` so SSR skips it. Mapping in
-`public/sections/pricing/mappers/pricing.mapper.ts`: `PlanView`/`PlanPriceView` → `Pricing`; the
-free plan is whichever price has `amount.minorUnits === 0`, deliberately detected by price and not
-by code, so a renamed plan keeps working; features come from `plan.entitlements` entries whose
-`flagValue !== false`.
-
-Signup: `public/components/sign-up-form/` (component + `SignUpFormFacade` + `SignUpFormService`)
-→ `SignUpService.signUp()` from `seller-core/signup` →
-`POST /tenancy/api/v1/signup/public/create`, body
-`{user: {firstName, lastName, emailAddress, password}, subscriptionPlan}` → `{status}`. Errors go
-through `ApiErrorService.applyToForm`, which lands `CUA.REGISTRATION.EMAIL_TAKEN` on the field
-that caused it. On success: toast, then redirect after `SIGN_UP_REDIRECT_DELAY_MS = 2000`.
-
-Sign-in is **not a page** — `environment.LOGIN_URL = '/oauth2/authorization/uaa'`, an OAuth2
-redirect handled by the gateway. Contact and newsletter-subscribe have **no backend in seller-ui
-either**: `ContactFacade.submit()` calls `form.reset({})` and `SubscribeComponent.sub()` clears a
-string.
+The header (`theme/components/header/`) carries an `nb-select` of the stores the user can reach;
+nearly every screen is scoped to the current selection and changing it reloads the page's data. It
+is disabled on routes where a store context is meaningless
+(`STORE_SELECT_DISABLED_ROUTE_PREFIXES`: store-management, subscription-and-usage, org-management).
+`canAccessSecuredPages` guards `/pages/**` from `pages-routing.module.ts`. Store creation lives at
+`/pages/store-management/create-store`. Provisioning is asynchronous and surfaced only as a status
+column in the stores list.
 
 ### console-ui today
 
-`features/marketing/marketing.html` (211 lines), route `''`, prerendered. Sections: sticky header
-with nav drawer, hero, metrics strip, `#story` pillars, `#stores`, `#reviews`, pull-quote,
-`#pricing` with a monthly/annual toggle, `#contact`, footer. All content from
-`src/app/mocks/marketing.fixture.ts`; all copy already Transloco keys.
-`features/auth/{sign-in,sign-up}` sit under `AuthShell`, and
-`features/auth/services/auth.api.service.ts#createAccount()` returns `of(void 0)` — a no-op.
-`features/marketing/services/marketing.api.service.ts#sendContactMessage()` likewise.
+`ConsoleApi` (`layouts/console-shell/services/console.api.service.ts`) serves the whole chrome from
+fixtures and holds mutable in-memory state for stores, pin and order.
+`core/store-context/selected-store.service.ts` hardcodes three "Acme" stores and an invented
+`DEFAULT_POD_ID`. `core/store-context/first-run-mock.ts` fakes the zero-store account behind
+`?firstRun=1` — its own comment says it comes out once a stores endpoint exists.
+`features/create-store` runs a seven-row provisioning checklist on a timer.
 
-Design reference: `console-template/cvhome Marketing.dc.html` and `console-template/Sign In.dc.html`.
+Design reference: `console-template/Create Store.dc.html`, `Create First Store.dc.html`,
+`First Run.dc.html`, `First Run with Nav.dc.html`, and the shell in `Admin Dashboard.dc.html`.
 
-### What gets ported
+### API surface to port
 
-| From seller-core | To console-ui | Notes |
+| From | To | Endpoint |
 |---|---|---|
-| `subscriptions/src/lib/models/billing.model.ts` | `src/app/models/billing.ts` | Whole file. `Identifier`, `Money`, `PlanView`, `PlanPriceView`, `EntitlementValue`, `SubscriptionView`, … Keep the doc comment explaining why identifiers stay wrapped as `{id}`. |
-| `subscriptions/src/lib/services/subscription.service.ts` | `src/app/api/billing/subscription.service.ts` | Port `plans()` only for this module. Leave `current/invoices/checkout/changePlan/cancel/resume` for Module 11 rather than porting dead code. |
-| `subscriptions/src/lib/constants/subscription.constants.ts` | `src/app/api/billing/subscription.constants.ts` | Only if the pricing mapper needs it. |
-| `signup/src/lib/domain/types.ts` | `src/app/models/signup.ts` | `SignUpForm`, `PersistableUser`, `SignUpResponse`. |
-| `signup/src/lib/service/sign-up.service.ts` | `src/app/api/signup/sign-up.service.ts` | Whole file — one method, plus the `SIGNUP_API_BASE` constant. |
+| `seller-core/src/lib/store/store.service.ts` (`ManagerStoreService.list`) | `api/tenancy/manager-store.service.ts` | `POST /tenancy/api/v1/store-manager/list`, body `{}` + `Pageable` |
+| `seller-core/stores/.../store.service.ts` (`createStore`, `checkIfStoreExist`) | same file | `POST /tenancy/api/v1/store-manager/private/store`, `GET …/private/store/unique?name=` |
+| — (new) | same file | `GET /tenancy/api/v1/store-manager/store-info?store=` — provisioning state |
+| `seller-core/stores/.../pod.service.ts` (`listPods`) | `api/pod-registry/pod.service.ts` | `GET /pod-registry/api/v1/pod/list` |
+| console-ui `core/auth/user.service.ts` (already present, unused) | reused as-is | `GET /tenancy/api/v1/user-account/current` |
+| `seller-core/src/lib/models/commons.ts` | `models/tenancy.ts` | `ManagerStoreDto`, `PodRef`, `ProvisioningState`, `StoreStatus` |
 
-Both ported services inject console-ui's `@core/http/crud.service`. Neither touches
-`@ngx-translate/core`, so nothing needs rewriting for i18n in this module.
+**Do not port `ManagerStoreService.create()`.** It posts to `/tenancy/api/v1/store-manager/create`,
+which **does not exist** — `StoreManagerApi` maps create at `private/store`. It is dead code in
+seller-core; the working path is `seller-core/stores`' `StoreService.createStore`. Record it under
+Deviations.
+
+**Correct the DTO while porting.** seller-core's `ManagerStore` is missing two fields the server
+sends (`status: StoreStatus`, `billingStatus: SubscriptionStatus | null`) and types
+`provisioningState` as a bare `string` where it is a four-value enum. `billingStatus` is
+**nullable by design** and must render as "unknown", never as a problem — a billing outage is not a
+reason to tell a merchant their store has lapsed.
+
+### Decisions (settled with the user)
+
+| Question | Decision |
+|---|---|
+| Pin default store / reorder rail | **Removed.** No user-preferences endpoint exists anywhere. Both controls come out with a `TODO(lessons.md)` rather than being faked or persisted per-browser. |
+| Hosting region picker | **Becomes a real pod picker**, sourced from `GET /pod-registry/api/v1/pod/list` and sent as `pod: {id}`. |
+| Plan card in create-store | **TODO.** Store creation calls billing for a quota check, not a plan choice. |
+| Provisioning checklist | **Replaced by polling** `store-info` for the real `ProvisioningState`, including `FAILED_PROVISIONING`, which the timer can never reach and the console cannot currently show at all. |
+
+### The one architectural problem: sync context, async list
+
+`SelectedStoreRequestContext.params()` is called **synchronously** inside `CrudService.getParams()`
+on every request, but the real store list arrives over HTTP. The list must therefore be resolved
+before any store-scoped request is issued.
+
+**Load it in the guard.** `requiresStore` already runs before every console route activates and
+already asks for the store count; it becomes the point where the directory is fetched and cached in
+`SelectedStoreService`. `ConsoleApi.loadStores()` then reads the cache rather than fetching. This
+keeps `params()` synchronous, costs no new mechanism, and — importantly — keeps the fetch off the
+prerendered marketing and auth routes, which must not pay for it.
+
+Rejected: `provideAppInitializer`, which would fetch on every entry to `/` and `/sign-in` for
+visitors who are not signed in at all.
 
 ### Mapping
 
-| seller-ui capability | console-ui destination | API |
+| seller-ui / design capability | console-ui destination | Backing |
 |---|---|---|
-| Pricing plan cards, monthly/yearly toggle | `#pricing` section, existing toggle | ported `SubscriptionService.plans()` — **real** |
-| Free plan shown apart | same rule: `minorUnits === 0`, not plan code | same |
-| Plan feature bullets | plan card body | `plan.entitlements`, `flagValue !== false` |
-| Sign up | `features/auth/sign-up` | ported `SignUpService.signUp()` — **real** |
-| Field-level signup errors | `ApiErrorService.applyToForm` (console-ui's own) | RFC7807 `fieldErrors[]` |
-| Sign in | `features/auth/sign-in` | OAuth2 redirect to `loginUrl` |
-| Terms, Privacy policy | **new routes** under `MarketingShell` | static |
-| Subscription success / fail | **new routes**, client-render | static landings |
-| `external-logout-link` | **new route** | `AuthService.logout()` currently navigates here and it does not exist — a live bug |
-| Contact form | `#contact` | no backend → TODO |
-| Newsletter subscribe | not in console design | dropped; recorded here as deliberate |
-| Metrics, pillars, stores, reviews | keep as constants | marketing copy, not data → TODO for a CMS |
+| Auth gate on the console | `canAccessSecuredPages` on every `ConsoleShell` route | `GET /api/v1/auth/me` — **real, already written** |
+| Store selector | `store-switcher` | `POST /store-manager/list` — **real** |
+| Signed-in identity (name, initials, email) | `ConsoleShellFacade.user` | `GET /user-account/current` — **real** |
+| First-run (zero stores) | `firstRun` computed, guards | real empty list; `FirstRunMock` **deleted** |
+| Create store | `features/create-store` | `POST …/private/store` — **real** |
+| Live store-name check | create-store form | `GET …/private/store/unique?name=` — **real** |
+| Hosting region | pod picker | `GET /pod-registry/api/v1/pod/list` — real, but see gap |
+| Provisioning progress | polled state | `GET …/store-info?store=` — **real** |
+| Organization name in the shell | `ConsoleShellFacade.organization` | **no endpoint** → TODO |
+| Notification bell + feed | `console-toolbar` | **no endpoint** → TODO |
+| Sidebar badge counts (12 / 5 / 7) | `CONSOLE_NAVIGATION` | **no endpoint** → removed, TODO |
+| Default store / rail order | removed | **no endpoint** → TODO |
+| Plan selection at create | removed from form | **no endpoint** → TODO |
+| Global search | `console-toolbar` | already dead in both UIs → TODO |
 
 ### Implementation
 
-- **Scaffolding first.** Create `src/app/api/`, add the `@api/*` alias to `tsconfig.json`, extend
-  the eslint dependency-direction rule, create `lessons.md`.
-- **Port** the five files in the table above, following the port checklist. Expect
-  `strictNullChecks` corrections in the billing model's nullable fields (`description`,
-  `planCode`, `amount`, `currentPeriodEnd`, `trialEnd`, `graceUntil`, `pendingPlanChange` are all
-  already `| null`, so this file should port cleanly — confirm rather than assume).
-- **Pricing.** Rewrite `features/marketing/services/marketing.api.service.ts` to delegate to the
-  ported `SubscriptionService`. Port `public/sections/pricing/mappers/pricing.mapper.ts` into
-  `features/marketing/mappers/pricing.mapper.ts`, adapting its `Pricing` output to console-ui's
-  existing `MarketingPlan` (`@models/marketing`) — the mapper is view-shaping, so it belongs in
-  the feature, not in `api/`. Keep the `isPlatformBrowser` guard: the route is **prerendered**,
-  and `SelectedStoreRequestContext.params()` throws on the server. The page must render its full
-  layout without plans and fill them in on the client. Remove `MARKETING_PLANS` from
-  `marketing.fixture.ts`.
-- **Sign up.** `features/auth/services/auth.api.service.ts#createAccount` delegates to the ported
-  `SignUpService`. `sign-up-form.service.ts` gains the `repeatPassword` cross-field validator and
-  the password policy seller-ui enforces. Errors → console-ui's `ApiErrorService.applyToForm`;
-  success → `ToastService` then redirect. `SignUpForm.subscriptionPlan` is in the DTO but absent
-  from seller-ui's form group — decide explicitly during implementation whether console-ui sends
-  the plan chosen on the pricing section (a genuine improvement) or matches seller-ui's omission;
-  record the choice under **Deviations**.
-- **Sign in.** No credential form. The template's email/password fields and Google/Microsoft/Apple
-  buttons have no backing in uaa — replace with the honest OAuth handoff already decided in
-  `.agents/plans/for-those-three-pages-fuzzy-parrot.md`, and log the social providers in
-  `lessons.md`.
-- **New routes** in `app.routes.ts` under `MarketingShell`: `terms`, `privacy-policy`,
-  `subscription/success`, `subscription/fail`, `external-logout-link`. Add the first two to
-  `app.routes.server.ts` as Prerender, the rest as `RenderMode.Client`.
-- **Contact.** Keep the form, keep validation, mark submit with the `TODO(lessons.md)` comment and
-  surface it honestly rather than pretending it sent.
-- Delete every fixture the module stops using; leave the rest.
+- **Port** the table above into `src/app/api/tenancy/` and `src/app/api/pod-registry/`, with
+  `models/tenancy.ts` and `models/pod.ts`, following the standing port checklist. Correct the DTO
+  as noted; harden to `strict: true`.
+- **`SelectedStoreService`** loses `STORES` and `DEFAULT_POD_ID` and gains a `load()` returning a
+  cached `Observable` of the real directory, plus the existing synchronous accessors reading that
+  cache. `addStore` stays — create-store still needs to register a new store without a refetch.
+  Keep the `cvhome.console.store` storage key: which store is *open* is genuinely a per-browser
+  concern, unlike a default.
+- **Delete `core/store-context/first-run-mock.ts`** and every reference. An empty list is now the
+  real signal, exactly as its own comment anticipated.
+- **`ConsoleApi`** keeps its shape but `loadStores()` reads `SelectedStoreService`, `addStore()`
+  calls the real create, and `pinDefaultStore`/`reorderStores` are **removed** along with
+  `ConsoleShellFacade.pinStore`, `toggleReorder`, `moveStore`, `reordering`, `defaultStoreId`,
+  `defaultStore`, and the pin/reorder UI in `store-switcher`. `StoreDirectory.defaultStoreId` comes
+  off the model.
+- **Auth**: add `canAccessSecuredPages` to the `ConsoleShell` routes in `app.routes.ts`
+  (`getting-started`, `dashboard`, `orders`, `store-management`), ordered before `requiresStore` so
+  an unauthenticated visitor is sent to uaa rather than to getting-started. `ConsoleUser` is built
+  from `/user-account/current`; drop `CONSOLE_USER`.
+- **Navigation** stays a client-side constant — it is a map of the app, not server data — but the
+  invented badge counts come off. Items with no `route` keep rendering and leading nowhere, which
+  is the existing convention.
+- **create-store**: real form (name + the merchant fields tenancy forwards), live uniqueness check,
+  optional pod, then poll `store-info`. Delete the timer, `TASK_STAMPS_SECONDS`, `TICKS_PER_TASK`
+  and `PROVISIONING_TASKS`. Handle `FAILED_PROVISIONING` and a polling timeout honestly — the store
+  row exists either way, so the page must not imply it can be re-created.
+- **`create-store.fixture.ts`** loses `HOSTING_REGIONS`, `STORE_PLANS`, `PROVISIONING_TASKS` and
+  their defaults; `COUNTRIES` stays (reference data, and seller-ui reads the same list from a static
+  JSON asset).
 
 ### Backend gaps → `lessons.md`
 
-1. **Contact form** — no lead/enquiry endpoint. Template promises topic routing and "answers in
-   under four hours". Expected: `POST /tenancy/api/v1/contact/public` with
-   `{name, organization, email, topic, message}` → 202.
-2. **Social sign-in** — Google / Microsoft / Apple in `Sign In.dc.html`. Needs uaa providers plus
-   account linking.
-3. **Marketing content is hardcoded** — metrics, pillars, merchant showcase, reviews. Needs a
-   public content endpoint. Related to `Content Management Service - Backend Requirements.md`;
-   link rather than duplicate.
-4. **Password reset / forgot password / email verification** — `Sign In.dc.html` links "Forgot
-   password?"; no screen exists in either UI and no endpoint is known.
-5. **14-day trial** — the template's pill and "Start 14-day trial" CTA. `PlanPriceView.trialDays`
-   exists in the billing model; confirm whether public signup can select a trial.
+1. **No user-preferences endpoint** — default store and rail order. Expected: a small per-user
+   preferences document on tenancy, or `defaultStore` on `ReadableUser`.
+2. **An org admin cannot read its own organization** — `OrgManagerApi` is super-admin only on every
+   method, so the shell has an org **id** from the principal and no name. Expected: a
+   `GET /tenancy/api/v1/org/current` returning at least `{id, name}`.
+3. **No merchant-readable list of placeable pods.** `PodService.listPlaceablePublicPods()` exists
+   and is *not exposed on any endpoint*; `pod/list` returns only the caller org's own private pods,
+   which is empty for a normal merchant. So the pod picker will usually have nothing in it and the
+   page must fall back to "assigned automatically". `Pod` also carries no region, latency or data
+   residency, all of which the design shows.
+4. **No notifications service** — bell, unread count, feed, "mark all read". Nothing exists.
+5. **No sidebar badge counts** — the design shows unread/attention counts per section; each would
+   need a cheap count endpoint on its own service.
+6. **No plan selection at store creation** — billing is asked for a quota decision, not a plan. A
+   subscription belongs to a store, so this is arguably correct and the console should offer the
+   plan step *after* provisioning; recorded so the design's plan card is not mistaken for missing work.
+7. **Provisioning has four states and no detail** — no per-step progress, no failure reason, no
+   retry. `FAILED_PROVISIONING` leaves a store row the merchant cannot act on.
+8. **No global search** (carried forward from the template review).
 
 ### Testing
 
-`extra/scripts/run-lcl.sh` starts both. Two tabs: `seller-ui.gateway.com:8000` and
-`console-ui.gateway.com:8000`.
+Both UIs, two tabs, `seller-ui.gateway.com:8000` and `console-ui.gateway.com:8000`, signed in as
+the same org admin.
 
-- Pricing: same plans, same order (`tier`), same monthly/yearly prices, same free-plan placement,
-  same feature bullets. Check the network tab shows exactly one `billing/api/v1/plan/public/plans`
-  and **no `?store=` or `?pod=`** on it.
-- View-source the prerendered `/`: full layout present, plans absent, no SSR error in the server
-  log.
-- Sign up with a fresh email → both redirect and the account exists. Sign up with a taken email →
-  both show the error on the email field, not as a bare toast.
-- Password mismatch, weak password, empty required fields → same validation in both.
-- `/terms`, `/privacy-policy`, `/subscription/success`, `/subscription/fail` render.
-- Sign in → uaa → returns authenticated.
-- Arabic: switch locale, confirm the marketing page mirrors and pricing still loads.
-- All three themes (forest / midnight / daylight); 1440px, 900px, 420px.
+- **Auth**: open `/dashboard` signed out → redirected to uaa, not to getting-started. Sign in →
+  land back on `/dashboard`. This is new behaviour; confirm it does not trap the marketing routes.
+- **Store list**: the switcher shows the same stores as seller-ui's header select, same names, same
+  count. Switching stores changes `?store=&pod=` on the next request — check the network tab, and
+  that the pod id matches the store's real pod, not the invented `507f1f77…`.
+- **First run**: an org with no stores lands on `/getting-started` and cannot reach `/dashboard`.
+  Confirm without `?firstRun=1`, which no longer exists.
+- **Create**: create a store from console-ui, watch it provision, confirm it appears in seller-ui's
+  header select after a reload — the strongest single proof the two agree.
+- Duplicate name → the live uniqueness check blocks before submit; confirm seller-ui behaves the same.
+- Force `FAILED_PROVISIONING` if a pod can be drained, or stub it, and confirm the page says so.
+- Arabic and all three themes on the shell; 1440 / 900 / 420.
 
 ### Commits
 
-1. `plan(console-ui): marketing and auth module` — the module plan file.
-2. `feat(console-ui): marketing and auth on real APIs` — the port, the feature rewiring, the new
-   routes, `lessons.md`.
-3. `fix(console-ui): marketing and auth after QA` — whatever the two-tab comparison finds.
+1. `plan(console-ui): console shell and store context` — this document.
+2. `feat(console-ui): console shell and store context on real APIs`.
+3. `fix(console-ui): console shell after QA`.
 
 ---
 
 ## Critical files
 
-**seller-ui: not modified.** Read-only reference for the whole migration until Module 13.
+**seller-ui: not modified.** Read-only reference.
 
-**New in console-ui:**
-`src/app/api/billing/subscription.service.ts`, `src/app/api/signup/sign-up.service.ts`,
-`src/app/models/billing.ts`, `src/app/models/signup.ts`,
-`src/app/features/marketing/mappers/pricing.mapper.ts`, `lessons.md`, plus page components for
-terms / privacy-policy / subscription-success / subscription-fail / external-logout-link.
+**New in console-ui:** `src/app/api/tenancy/manager-store.service.ts`,
+`src/app/api/pod-registry/pod.service.ts`, `src/app/models/tenancy.ts`, `src/app/models/pod.ts`.
 
-**Changed in console-ui:**
-`tsconfig.json` (`@api/*` alias), `eslint.config.js` (dependency direction),
-`src/app/app.routes.ts`, `src/app/app.routes.server.ts`,
-`src/app/features/marketing/services/marketing.api.service.ts`,
-`src/app/features/marketing/facades/marketing.facade.ts`,
-`src/app/features/auth/services/auth.api.service.ts`,
-`src/app/features/auth/services/sign-up-form.service.ts`,
-`src/app/features/auth/facades/auth.facade.ts`, `src/app/mocks/marketing.fixture.ts`.
+**Changed in console-ui:** `src/app/core/store-context/selected-store.service.ts`,
+`src/app/app.routes.ts`, `src/app/layouts/console-shell/services/console.api.service.ts`,
+`.../facades/console-shell.facade.ts`, `.../guards/first-run.guard.ts`,
+`.../components/store-switcher/store-switcher.ts`, `.../components/console-toolbar/*`,
+`src/app/features/create-store/**`, `src/app/models/console.ts`,
+`src/app/mocks/console.fixture.ts`, `src/app/mocks/create-store.fixture.ts`, `lessons.md`.
 
-**Ported from (read-only):**
-`seller-ui/projects/seller-core/subscriptions/src/lib/{models/billing.model.ts,services/subscription.service.ts}`,
-`seller-ui/projects/seller-core/signup/src/lib/{domain/types.ts,service/sign-up.service.ts}`,
-`seller-ui/src/app/public/sections/pricing/{facades/pricing.facade.ts,mappers/pricing.mapper.ts}`,
-`seller-ui/src/app/public/components/sign-up-form/**`.
+**Deleted:** `src/app/core/store-context/first-run-mock.ts`.
 
-**Reused, already present:** `src/app/core/http/crud.service.ts`,
-`src/app/core/http/request-context.ts`, `src/app/core/errors/api-error.service.ts`,
-`src/app/core/errors/form-error.utils.ts`, `src/app/core/table/table.types.ts`,
-`src/app/shared/ui/toast/`.
-
-**Read, not changed:** `.agents/plans/seller-ui-feature-inventory.md` (the parity contract),
-`.agents/plans/seller-core-shared-lib.md` (why the library is shaped as it is),
-`store-core/console-ui/DESIGN.md`, `console-template/cvhome Marketing.dc.html`,
-`console-template/Sign In.dc.html`.
+**Reused, already present:** `src/app/core/auth/auth-guard.service.ts`,
+`src/app/core/auth/auth.service.ts`, `src/app/core/auth/user.service.ts`,
+`src/app/core/http/crud.service.ts`, `src/app/core/http/request-context.ts`.
 
 ## Verification
 
-1. `cd store-core/console-ui && npm run build && npm run lint && npm test`. No seller-ui build is
-   involved — `git status` in `store-core/seller-ui` must be clean.
-2. `grep -rn "@ngx-translate" store-core/console-ui/src store-core/console-ui/package.json` →
-   no hits.
-3. `grep -rn "from 'seller-core" store-core/console-ui/src` → no hits; the port is by copy, and a
-   stray import would mean an accidental cross-project dependency.
-4. `extra/scripts/run-lcl.sh`, then the two-tab comparison above via Chrome, driving both
-   `seller-ui.gateway.com:8000` and `console-ui.gateway.com:8000`.
-5. Network tab: every console-ui request is same-origin and relative; the public plans call
-   carries no tenant scoping.
-6. `lessons.md` exists and every `TODO(lessons.md):` marker in the diff has a matching entry
-   (`grep -rn 'TODO(lessons.md)' src | wc -l` against the heading count).
+1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
+   `git -C store-core/seller-ui status --porcelain` empty.
+2. `grep -rn "FirstRunMock\|firstRun=1" src` → no hits.
+3. `grep -rn "507f1f77bcf86cd799439011\|Acme Supply Co" src` → no hits outside specs.
+4. `grep -rn "from 'seller-core" src` → no hits.
+5. The two-tab comparison above, driven through Chrome.
+6. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
