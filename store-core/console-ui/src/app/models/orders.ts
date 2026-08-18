@@ -58,8 +58,10 @@ export interface OrderRow {
   readonly status: OrderStatus | null;
   /** The order's own `paymentStatus`, humanized. Null when the order carries none. */
   readonly payment: string | null;
-  readonly items: number;
-  /** Already formatted by the server, in the order's currency. */
+  /**
+   * Formatted from the order's `total` and `currency`. There is no item count: the list endpoint
+   * sends no `products` — see lessons.md, "Orders — the list omits line items".
+   */
   readonly total: string;
   readonly placedOn: string;
 }

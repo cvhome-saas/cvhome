@@ -99,8 +99,6 @@
                     <span class="payment-copy"><strong>{{ order.payment ?? '—' }}</strong></span>
                   </div>
 
-                  <span class="cell-items" role="cell" [attr.data-label]="t('orders.column.items')">{{ order.items }}</span>
-
                   <span class="cell-total" role="cell" [attr.data-label]="t('orders.column.total')">{{ order.total }}</span>
 
                   <div class="cell-placed" role="cell" [attr.data-label]="t('orders.column.placed')">

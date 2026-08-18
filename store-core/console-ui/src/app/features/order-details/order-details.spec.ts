@@ -22,10 +22,12 @@ const ORDER: ReadableOrder = {
     {id: 1, productName: 'Wireless Headphones', sku: 'ACME-HDPH-01', orderedQuantity: 2, price: '$62.00', subTotal: '$124.00'},
     {id: 2, productName: 'USB-C Dock', sku: 'ACME-DOCK-9', orderedQuantity: 1, price: '$88.00', subTotal: '$88.00'},
   ],
+  // Shaped like the running stack: `title` and `text` are null on every total, so both the label
+  // and the amount are derived by the console.
   totals: [
-    {code: 'order.subtotal', title: 'Subtotal', text: '$212.00'},
-    {code: 'order.shipping', title: 'Shipping', text: '$9.00'},
-    {code: 'order.total', title: 'Total', text: '$221.00'},
+    {id: 1, code: 'order.total.subtotal', module: 'subtotal', title: undefined, text: undefined, value: 212},
+    {id: 2, code: 'order.total.shipping', module: 'shipping', title: undefined, text: undefined, value: 9},
+    {id: 3, code: 'order.total.total', module: 'total', title: undefined, text: undefined, value: 221},
   ],
   billing: {firstName: 'Maya', lastName: 'Chen', address: '18 Harrison St', city: 'San Francisco', postalCode: '94103', country: 'US', email: 'maya@northline.example'},
   delivery: {firstName: 'Maya', lastName: 'Chen', address: '18 Harrison St', city: 'San Francisco', postalCode: '94103', country: 'US'},
@@ -108,7 +110,8 @@ describe('OrderDetails', () => {
       [...n.children].map((c) => c.textContent!.trim()).join(' '),
     );
 
-    // A store with a discount line gets it for free; the console does not have to know it exists.
+    // Labelled from `module` and formatted from `value` + `currency`, because the server sends
+    // neither a title nor formatted text. A discount line would appear here for free.
     expect(totals).toEqual(['Subtotal $212.00', 'Shipping $9.00', 'Total $221.00']);
   }));
 
@@ -143,6 +146,15 @@ describe('OrderDetails', () => {
     const element = load();
 
     expect(element.textContent).toContain('Something New');
+  }));
+
+  it('shows the status it will actually submit', fakeAsync(() => {
+    const element = load();
+    const select = element.querySelector('.status-form select') as HTMLSelectElement;
+
+    // Binding `[value]` on the select left it displaying the first option while submitting another.
+    expect(select.value).toBe('PROCESSING');
+    expect(select.selectedOptions[0].textContent!.trim()).toBe('Processing');
   }));
 
   it('records a status change and re-reads the order rather than assuming', fakeAsync(() => {

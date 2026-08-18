@@ -163,6 +163,55 @@ export interface PersistableOrderStatusHistory {
   readonly date?: string;
 }
 
+/**
+ * An amount, as a person reads it.
+ *
+ * `OrderTotal.text` is where the server *may* put a formatted string, and against the running stack
+ * it is **null on every total, on both the list and the detail endpoint** — only `products[].price`
+ * and `subTotal` arrive pre-formatted. So `text` is preferred when present and the raw `BigDecimal`
+ * `value` is formatted here otherwise. `value` is a decimal amount, not minor units.
+ */
+export function formatMoney(total: OrderTotal | undefined, currency: string | undefined): string {
+  if (total?.text) {
+    return total.text;
+  }
+  if (total?.value === undefined || total.value === null) {
+    return '—';
+  }
+  if (!currency) {
+    return String(total.value);
+  }
+  try {
+    return new Intl.NumberFormat(undefined, {style: 'currency', currency}).format(total.value);
+  } catch {
+    // An unknown ISO code would otherwise throw and take the page with it.
+    return `${currency} ${total.value}`;
+  }
+}
+
+/**
+ * A total's label.
+ *
+ * `title` is null on every total the server sends, so the line is named from `module` — `subtotal`,
+ * `total`, `tax`, `shipping` and whatever else a store's total modules add. Humanized rather than
+ * translated, for the same reason statuses are: the set is the server's, not the console's.
+ */
+export function totalLabel(total: OrderTotal): string {
+  const name = total.title ?? total.module ?? total.code?.split('.').pop() ?? '';
+  return name
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/^./, (c) => c.toUpperCase());
+}
+
+/** True when an address object is present but every field on it is empty. */
+export function isEmptyAddress(address: CustomerAddress | undefined): boolean {
+  if (!address) {
+    return true;
+  }
+  return !Object.values(address).some((value) => typeof value === 'string' && value.trim() !== '');
+}
+
 export interface ReadableCountry {
   readonly id?: number;
   readonly code?: string;

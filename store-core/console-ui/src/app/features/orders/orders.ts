@@ -27,7 +27,6 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
   {key: 'city', labelKey: 'orders.column.city', width: 'minmax(7rem, 1fr)'},
   {key: 'status', labelKey: 'orders.column.status', width: 'minmax(7rem, 1fr)'},
   {key: 'payment', labelKey: 'orders.column.payment', width: 'minmax(8rem, 1.05fr)'},
-  {key: 'items', labelKey: 'orders.column.items', width: '4.5rem', align: 'end'},
   {key: 'total', labelKey: 'orders.column.total', width: '6rem', align: 'end'},
   {key: 'placed', labelKey: 'orders.column.placed', width: 'minmax(6rem, 1fr)'},
   {key: 'actions', labelKey: '', width: '6rem'},

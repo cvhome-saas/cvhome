@@ -4,7 +4,7 @@ import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 import {OrdersService, type OrderQuery} from '@api/orders/orders.service';
 import {StatisticService} from '@api/analytics/statistic.service';
 import type {PageRequest, PageT} from '@core/table/table.types';
-import {AWAITING_FULFILMENT, type OrderStatus, type ReadableOrder} from '@models/checkout';
+import {AWAITING_FULFILMENT, formatMoney, type OrderStatus, type ReadableOrder} from '@models/checkout';
 import {orderStatusLabel, type OrderKpiSource, type OrderRow, type OrdersSnapshot, type OrderTab} from '@models/orders';
 import type {StatisticList} from '@models/statistics';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
@@ -88,23 +88,33 @@ function toOrderQuery(query: OrdersQuery): OrderQuery {
   };
 }
 
+/**
+ * One order, as a table row.
+ *
+ * Two things the list endpoint does **not** send, both verified against the running stack:
+ *
+ * - `customer` is null on every row. The buyer's name and email are on `billing`, which is where the
+ *   checkout wrote them, so that is what the row falls back to. The detail endpoint does populate
+ *   `customer`.
+ * - `products` is null too, so a line count is not available here at all — see lessons.md,
+ *   "Orders — the list omits line items". The items column came off the table.
+ */
 function toRow(order: ReadableOrder): OrderRow {
-  const customer = [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ').trim();
-  const address = order.delivery ?? order.billing;
+  const person = order.customer ?? order.billing;
+  const name = [person?.firstName, person?.lastName].filter(Boolean).join(' ').trim();
+  const email = order.customer?.emailAddress ?? order.billing?.email ?? '';
+  const address = order.delivery?.city ? order.delivery : order.billing;
 
   return {
     id: order.id ?? 0,
     reference: order.id === undefined ? '—' : `#${order.id}`,
-    customer: customer || order.customer?.emailAddress || '—',
-    email: order.customer?.emailAddress ?? '',
+    customer: name || email || '—',
+    email,
     city: address?.city ?? '—',
     status: order.orderStatus ?? null,
     // The order's own payment status, humanized the same way its order status is.
     payment: order.paymentStatus ? orderStatusLabel(order.paymentStatus) : null,
-    // The list returns whole orders, so the line count needs no extra request.
-    items: order.products?.length ?? 0,
-    // Already formatted by the server, in the order's currency — the console does not re-derive it.
-    total: order.total?.text ?? '—',
+    total: formatMoney(order.total, order.currency),
     placedOn: order.datePurchased ?? '',
   };
 }

@@ -69,10 +69,10 @@
                 needing to know that line exists.
               -->
               <dl class="totals">
-                @for (total of facade.totals(); track total.code) {
-                  <div [class.grand]="total.code === 'order.total'">
-                    <dt>{{ total.title ?? total.code ?? '' }}</dt>
-                    <dd>{{ total.text ?? total.value ?? '—' }}</dd>
+                @for (total of facade.totals(); track total.label) {
+                  <div [class.grand]="total.grand">
+                    <dt>{{ total.label }}</dt>
+                    <dd>{{ total.amount }}</dd>
                   </div>
                 }
               </dl>
@@ -106,13 +106,16 @@
               <div class="status-form">
                 <label>
                   {{ t('orderDetails.newStatus') }}
-                  <select
-                    class="control"
-                    [value]="nextStatus()"
-                    (change)="nextStatus.set($any($event.target).value)"
-                  >
+                  <!--
+                    `[selected]` on the option, not `[value]` on the select: Angular sets the
+                    select's value before its options exist, so the control displayed the first
+                    status while submitting a different one.
+                  -->
+                  <select class="control" (change)="nextStatus.set($any($event.target).value)">
                     @for (option of facade.statusOptions(); track option.value) {
-                      <option [value]="option.value">{{ option.label }}</option>
+                      <option [value]="option.value" [selected]="option.value === nextStatus()">
+                        {{ option.label }}
+                      </option>
                     }
                   </select>
                 </label>

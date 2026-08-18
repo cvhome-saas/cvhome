@@ -4,7 +4,15 @@ import {DestroyRef} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {ApiErrorService} from '@core/errors/api-error.service';
-import {ORDER_STATUSES, type CustomerAddress, type OrderStatus} from '@models/checkout';
+import {
+  ORDER_STATUSES,
+  formatMoney,
+  isEmptyAddress,
+  totalLabel,
+  type CustomerAddress,
+  type OrderStatus,
+  type OrderTotal,
+} from '@models/checkout';
 import {STATUS_TONE, orderStatusLabel} from '@models/orders';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsApi} from '../services/order-details.api.service';
@@ -86,12 +94,22 @@ export class OrderDetailsFacade {
   /**
    * The totals block, as the server computed it.
    *
-   * `totals[]` already holds every line — subtotal, shipping, tax, grand total — each with its own
-   * pre-formatted `text` in the order's currency. Rendering that list rather than picking fields off
-   * `total`/`tax`/`shipping` means a store with a discount or a surcharge shows it without the
-   * console needing to know the line exists.
+   * Rendering `totals[]` rather than picking `total`/`tax`/`shipping` off the order means a store
+   * with a discount or a surcharge shows it without the console needing to know the line exists.
+   *
+   * Both the label and the amount are derived here: against the running stack every total arrives
+   * with `title: null` and `text: null`, so the line is named from its `module` and the amount is
+   * formatted from `value` and the order's currency.
    */
-  readonly totals = computed(() => this.order()?.totals ?? []);
+  readonly totals = computed(() => {
+    const order = this.order();
+    return (order?.totals ?? []).map((total: OrderTotal) => ({
+      label: totalLabel(total),
+      amount: formatMoney(total, order?.currency),
+      // `order.total.total` is the grand total; the rest are lines above it.
+      grand: total.module === 'total',
+    }));
+  });
 
   readonly billing = computed(() => this.addressOf(this.order()?.billing, this.order()?.billing?.email));
   readonly delivery = computed(() => this.addressOf(this.order()?.delivery, null));
@@ -164,7 +182,9 @@ export class OrderDetailsFacade {
    * is present avoids the blank lines and stray commas a fixed template produces.
    */
   private addressOf(address: CustomerAddress | undefined, email: string | null | undefined): AddressView | null {
-    if (!address) {
+    // An order with no delivery address still carries a `delivery` object with every field null,
+    // so absence has to be tested field by field rather than by the object being missing.
+    if (!address || isEmptyAddress(address)) {
       return null;
     }
     const countries = this.detail.hasValue() ? this.detail.value()?.countries : undefined;

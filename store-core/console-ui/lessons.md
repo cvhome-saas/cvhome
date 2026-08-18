@@ -628,3 +628,37 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Expected contract:** `lastStatusChangeAt` on the order row, or a statistic grouped by
   `(status, age bucket)`.
 
+## Orders — the list omits line items and the customer
+
+**Found by QA against the running stack, and it contradicted this module's plan.**
+
+- **Screen:** `/orders`, the table's Items and Customer columns.
+- **What is missing:** `GET /private/orders` returns `ReadableOrder` objects with **`products: null`
+  and `customer: null`**. The detail endpoint populates both. So although the envelope is
+  `ReadableList<ReadableOrder>` and each row *looks* like a whole order, two of its most useful
+  fields are not filled in on the list.
+- **Consequence:** an item count per row is not obtainable without one detail call per row, so the
+  Items column was **removed from the table**. The customer column survives only because the buyer's
+  name and email are also on `billing`, which the list does send — that is what the row falls back to.
+- **Why it matters:** "how many things are in this order" is a column every order table has, and the
+  data is one join away on a query the server is already running.
+- **Expected contract:** populate `products` (or at least a `lineCount`) and `customer` on the list
+  projection.
+
+## Orders — totals arrive unformatted and unlabelled
+
+- **Screen:** `/orders` (the Total column) and `/orders/:id` (the totals block).
+- **What is missing:** `OrderTotal.text` and `OrderTotal.title` are **null on every total, on both the
+  list and the detail endpoint**. Only `products[].price` and `products[].subTotal` come
+  pre-formatted. `OrderApi.get` even declares `PriceNotFormattableException`, so formatting is clearly
+  intended somewhere — it just does not happen for totals.
+- **Consequence:** the console formats money itself from `value` (a `BigDecimal`, decimal units, not
+  minor units) and the order's `currency`, and labels each line from `module` — `subtotal`, `total`,
+  and whatever else a store's total modules add.
+- **Worth recording:** seller-ui does not do this. Its template renders `US${{ total.value }}`
+  literally, so a Saudi-riyal order displays as `US$9400` — wrong currency and unformatted. That is a
+  seller-ui defect, not a backend gap, but it is why the two consoles disagree on this screen and the
+  difference should not be read as a console-ui regression.
+- **Expected contract:** populate `title` and `text` on `OrderTotal` the way `ReadableOrderProduct`
+  already does for line prices.
+

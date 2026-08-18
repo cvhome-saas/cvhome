@@ -21,7 +21,6 @@ function row(id: number, status: OrderStatus, customer = 'Maya Chen'): OrderRow 
     city: 'Berlin',
     status,
     payment: 'Paid',
-    items: 3,
     total: '$124.00',
     placedOn: '2026-08-18T09:00:00Z',
   };
