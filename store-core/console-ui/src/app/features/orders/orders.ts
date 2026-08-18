@@ -1,8 +1,7 @@
-import {DatePipe} from '@angular/common';
 import {Component, ElementRef, computed, inject, viewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
-import {TranslocoLocaleService} from '@jsverse/transloco-locale';
+import {TranslocoDatePipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
@@ -18,6 +17,7 @@ import {Panel} from '@shared/ui/panel/panel';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import {STATUS_TONE, type OrderRow} from '@models/orders';
+import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
 import {OrdersFacade} from './facades/orders.facade';
 
@@ -48,7 +48,6 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     Badge,
     BusyOverlay,
     DataTable,
-    DatePipe,
     DateRangePicker,
     ExportButton,
     Icon,
@@ -58,6 +57,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     Panel,
     TabSwitcher,
     TableRow,
+    TranslocoDatePipe,
     TranslocoDirective,
   ],
   templateUrl: './orders.html',
@@ -66,6 +66,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
 export class Orders {
   private readonly toast = inject(ToastService);
   private readonly statusLabels = inject(StatusLabel);
+  private readonly money = inject(Money);
   private readonly transloco = inject(TranslocoService);
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly router = inject(Router);
@@ -121,6 +122,10 @@ export class Orders {
     return this.statusLabels.label(order.status);
   }
 
+  protected totalLabel(order: OrderRow): string {
+    return this.money.format(order.total.value, order.total.currency, order.total.text);
+  }
+
   protected paymentLabel(order: OrderRow): string {
     return this.statusLabels.label(order.payment);
   }
@@ -149,7 +154,8 @@ export class Orders {
 
   /*
    * TODO(lessons.md): creating an order, shipping one and bulk fulfilment have no endpoints — see
-   * lessons.md, "Orders — no fulfilment or shipping model" and "Orders — no cancel and no duplicate".
+   * lessons.md, "Orders — no seller-side order creation", "Orders — no fulfilment or shipping model"
+   * and "Orders — no cancel and no duplicate".
    * These say so rather than failing silently, so a click never looks like a bug.
    */
   protected createOrder(): void {

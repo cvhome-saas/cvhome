@@ -233,7 +233,7 @@
       "all": "All"
     },
     "subtitle": {
-      "range": "Showing {from}–{to} of {total, plural, one {# order} other {# orders}}",
+      "range": "{count, plural, one {Showing {from}–{to} of {total} order} other {Showing {from}–{to} of {total} orders}}",
       "rangeForStatus": "{status} · showing {from}–{to} of {total}",
       "none": "No orders in this period.",
       "noneForStatus": "No {status} orders in this period."
@@ -1140,7 +1140,8 @@
     "customerStatsUnavailable": "Lifetime figures are not available yet.",
     "emailInvoice": "Email",
     "emailNotAvailable": "Emailing invoices is not available yet.",
-    "commentVisible": "Visible to the customer"
+    "commentVisible": "Visible to the customer",
+    "badReference": "“{reference}” is not an order reference."
   },
   "status": {
     "CREATED": "Created",
@@ -1167,5 +1168,16 @@
     "COMMITTED": "Committed",
     "RELEASED": "Released",
     "RESERVATION_FAILED": "Reservation failed"
+  },
+  "orderTotal": {
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "tax": "Tax",
+    "shipping": "Shipping",
+    "handling": "Handling",
+    "discount": "Discount",
+    "credit": "Credit",
+    "refund": "Refund",
+    "product": "Products"
   }
 }

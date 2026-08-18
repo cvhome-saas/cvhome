@@ -20,8 +20,8 @@ function row(id: number, status: OrderStatus, customer = 'Maya Chen'): OrderRow 
     email: `${customer.split(' ')[0].toLowerCase()}@example.com`,
     city: 'Berlin',
     status,
-    payment: 'Paid',
-    total: '$124.00',
+    payment: 'PAID',
+    total: {value: 124, currency: 'USD', text: null},
     placedOn: '2026-08-18T09:00:00Z',
   };
 }

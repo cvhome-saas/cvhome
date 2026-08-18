@@ -4,7 +4,7 @@ import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 import {OrdersService, type OrderQuery} from '@api/orders/orders.service';
 import {StatisticService} from '@api/analytics/statistic.service';
 import type {PageRequest, PageT} from '@core/table/table.types';
-import {AWAITING_FULFILMENT, formatMoney, type OrderStatus, type ReadableOrder} from '@models/checkout';
+import {AWAITING_FULFILMENT, type OrderStatus, type ReadableOrder} from '@models/checkout';
 import type {OrderKpiSource, OrderRow, OrdersSnapshot, OrderTab} from '@models/orders';
 import type {StatisticList} from '@models/statistics';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
@@ -115,7 +115,9 @@ function toRow(order: ReadableOrder): OrderRow {
     // The raw enum, not a label: the row is built once per response and the page has to keep
     // reading in the language the operator switches to.
     payment: order.paymentStatus ?? null,
-    total: formatMoney(order.total, order.currency),
+    // The amount and its currency, not a rendered string: the row survives a language change,
+    // and the page formats it in the language the operator is actually reading.
+    total: {value: order.total?.value ?? null, currency: order.currency ?? null, text: order.total?.text ?? null},
     placedOn: order.datePurchased ?? '',
   };
 }

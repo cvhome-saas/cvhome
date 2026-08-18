@@ -98,11 +98,12 @@ describe('OrdersApi', () => {
     expect(load().page.content[0].city).toBe('Cairo');
   });
 
-  it('formats the total itself, because the server sends no formatted text', () => {
+  it('carries the amount and its currency rather than a rendered total', () => {
     const [row] = load().page.content;
 
-    expect(row.total).toContain('9,400');
-    expect(row.total).not.toBe('—');
+    // The server sends no formatted `text`, and a string built here would keep its old language
+    // after a switch — the page formats it, in the language being read.
+    expect(row.total).toEqual({value: 9400, currency: 'SAR', text: null});
   });
 
   it('routes a search term to the server field its shape implies', () => {

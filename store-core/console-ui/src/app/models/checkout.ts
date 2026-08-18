@@ -190,31 +190,57 @@ export interface PersistableOrderStatusHistory {
   readonly date?: string;
 }
 
+
 /**
- * An amount, as a person reads it.
+ * The number inside a server-formatted amount, or null when there is none to find.
  *
- * `OrderTotal.text` is where the server *may* put a formatted string, and against the running stack
- * it is **null on every total, on both the list and the detail endpoint** — only `products[].price`
- * and `subTotal` arrive pre-formatted. So `text` is preferred when present and the raw `BigDecimal`
- * `value` is formatted here otherwise. `value` is a decimal amount, not minor units.
+ * Line items are the one place the order carries **no** raw value: `ReadableOrderProduct.price` and
+ * `subTotal` are `String`, formatted by checkout, and nothing numeric sits behind them. Formatted in
+ * whose locale is not the console's decision — the result is `SAR550.00` next to a total the console
+ * renders as `٥٥٠٫٠٠ ر.س.`, two formats for the same currency on one screen.
+ *
+ * So the number is read back out and formatted with everything else. Grouping separators are
+ * dropped and the last `.` or `,` is taken as the decimal point, which covers both the English form
+ * the server emits today and a European one if it ever changes. Anything unparseable falls back to
+ * the server's own string — see lessons.md, "Orders — line prices arrive formatted".
  */
-export function formatMoney(total: OrderTotal | undefined, currency: string | undefined): string {
-  if (total?.text) {
-    return total.text;
+export function parseAmount(formatted: string | undefined): number | null {
+  if (!formatted) {
+    return null;
   }
-  if (total?.value === undefined || total.value === null) {
-    return '—';
+  const digits = formatted.replace(/[^\d.,-]/g, '').trim();
+  if (!digits) {
+    return null;
   }
-  if (!currency) {
-    return String(total.value);
-  }
-  try {
-    return new Intl.NumberFormat(undefined, {style: 'currency', currency}).format(total.value);
-  } catch {
-    // An unknown ISO code would otherwise throw and take the page with it.
-    return `${currency} ${total.value}`;
-  }
+  const lastDot = digits.lastIndexOf('.');
+  const lastComma = digits.lastIndexOf(',');
+  const decimalAt = Math.max(lastDot, lastComma);
+  // A separator with three digits behind it is grouping, not a decimal point: `1,234`.
+  const isDecimal = decimalAt > -1 && digits.length - decimalAt - 1 !== 3;
+  const normalized = isDecimal
+    ? digits.slice(0, decimalAt).replace(/[.,]/g, '') + '.' + digits.slice(decimalAt + 1)
+    : digits.replace(/[.,]/g, '');
+  const value = Number(normalized);
+  return Number.isFinite(value) ? value : null;
 }
+
+/**
+ * The total modules checkout itself defines, lowercased — its `OrderTotalType` enum.
+ *
+ * A store's total modules are not limited to these: the field is a free string, which is why
+ * anything outside the set is humanized rather than looked up. See `TotalLabel`.
+ */
+export const KNOWN_TOTAL_MODULES: ReadonlySet<string> = new Set([
+  'shipping',
+  'handling',
+  'tax',
+  'product',
+  'subtotal',
+  'total',
+  'credit',
+  'refund',
+  'discount',
+]);
 
 /**
  * A total's label.

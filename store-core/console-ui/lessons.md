@@ -675,3 +675,56 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Expected contract:** populate `title` and `text` on `OrderTotal` the way `ReadableOrderProduct`
   already does for line prices.
 
+
+## Orders — no seller-side order creation
+
+- **Screen:** `/orders`, the "Create order" button in the page header.
+- **What is missing:** checkout mints an order in exactly one way — `POST /cart/{code}/checkout`,
+  which needs a cart built by a shopper session. `OrderApi` exposes no private create, so a seller
+  cannot record a phone or counter order the way the design's button implies.
+- **Why it is required:** every order book in this category can take an order the seller took
+  themselves. Without it "Create order" is a button that can only apologise.
+- **Expected contract:** `POST …/private/orders` taking a customer (or a walk-in), lines by sku and
+  quantity, and an initial payment status, bypassing the cart.
+- **Placeholder:** `TODO(lessons.md)` on `createOrder()` in `orders.ts`; the control says it is not
+  available yet rather than failing.
+
+## Orders — the store's logo URL is not reachable from the browser
+
+- **Screen:** `/orders/:id`, the invoice letterhead.
+- **What happens:** `store-manager/private/store/{code}` answers with
+  `logo.path = http://localhost:9000/<bucket>/…/LOGO/logo.jpeg` — the object store's *internal*
+  address. From the operator's browser that host is either wrong or unreachable, so the image fails
+  and the letterhead printed a broken-image glyph.
+- **Consequence:** the console falls back to the store's lettermark when the image does not load,
+  which is right regardless, but every store logo in the console is affected, not just the invoice.
+- **Expected contract:** the merchant service should return a gateway-relative or publicly resolvable
+  URL for `ReadableImage.path`, the way it does for product images, rather than the storage host it
+  happens to use internally.
+
+## Orders — checkout's country list is the store's supported set
+
+- **Screen:** `/orders/:id`, the address panels and the invoice.
+- **What happens:** `GET /country` answers with the countries the *store* supports — four, on the
+  store this was written against — not the ISO list. An order or a store address may legitimately
+  name a country outside it: a store trading from Saudi Arabia had `SA` on its own invoice, because
+  `SA` is not in its own supported list.
+- **Consequence:** the console resolves anything the list does not know through `Intl.DisplayNames`,
+  which is formatting rather than data — the code is still the server's, the browser only spells it
+  out, in the reader's language.
+- **Expected contract:** either a full ISO country reference endpoint distinct from the store's
+  supported-shipping set, or names on the addresses themselves.
+
+## Orders — line prices arrive formatted, with no number behind them
+
+- **Screen:** `/orders/:id`, the items table and the invoice.
+- **What happens:** `ReadableOrderProduct.price` and `.subTotal` are `String`, formatted by checkout
+  in its own locale (`SAR550.00`), and `OrderProductEntity` carries no numeric amount at all — no
+  unit price, no line total. Order *totals* are the opposite: raw `value`, no formatting (see
+  "Orders — totals arrive unformatted and unlabelled").
+- **Consequence:** one screen showed two formats for the same currency — `SAR550.00` on the lines
+  above `٥٬٦٩٠٫٠٠ ر.س.` on the totals. The console now reads the number back out of the string and
+  formats it with everything else, falling back to the server's string when it cannot be parsed.
+  Parsing a server rendering is not something a client should have to do.
+- **Expected contract:** numeric `price` and `subTotal` on `ReadableOrderProduct` — the same fix as
+  the totals gap, from the other side: send numbers and let the client format.

@@ -7,15 +7,16 @@ import {ApiErrorService} from '@core/errors/api-error.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {
   ORDER_STATUSES,
-  formatMoney,
   isEmptyAddress,
-  totalLabel,
+  parseAmount,
   type CustomerAddress,
   type OrderStatus,
   type OrderTotal,
 } from '@models/checkout';
 import {STATUS_TONE} from '@models/orders';
+import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
+import {TotalLabel} from '@shared/i18n/total-label';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsApi} from '../services/order-details.api.service';
 
@@ -25,6 +26,16 @@ export interface AddressView {
   readonly lines: readonly string[];
   readonly phone: string | null;
   readonly email: string | null;
+}
+
+/** One line of the order, ready to print. */
+export interface OrderLine {
+  readonly id: number;
+  readonly name: string;
+  readonly sku: string;
+  readonly quantity: number;
+  readonly price: string;
+  readonly lineTotal: string;
 }
 
 /** The seller, as the invoice prints it in its letterhead. */
@@ -100,6 +111,8 @@ export class OrderDetailsFacade {
   private readonly apiErrors = inject(ApiErrorService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly statusLabels = inject(StatusLabel);
+  private readonly money = inject(Money);
+  private readonly totalLabels = inject(TotalLabel);
   private readonly destroyRef = inject(DestroyRef);
 
   /** Set by the component from the route. */
@@ -170,7 +183,7 @@ export class OrderDetailsFacade {
     return {
       placedAt: order?.datePurchased ?? null,
       itemCount: order?.products?.length ?? 0,
-      total: formatMoney(order?.total, order?.currency),
+      total: this.money.total(order?.total, order?.currency),
     };
   });
 
@@ -220,7 +233,29 @@ export class OrderDetailsFacade {
     };
   });
 
-  readonly items = computed(() => this.order()?.products ?? []);
+  /**
+   * The lines, with their money formatted the way every other amount on the page is.
+   *
+   * `price` and `subTotal` arrive as strings the server formatted — the only amounts on an order
+   * with no raw value behind them. They are read back to numbers so one screen does not show two
+   * formats for the same currency; a string that will not parse is printed as the server sent it.
+   */
+  readonly items = computed<readonly OrderLine[]>(() => {
+    const order = this.order();
+    return (order?.products ?? []).map((item, index) => ({
+      id: item.id ?? index,
+      name: item.productName ?? item.product?.name ?? '—',
+      sku: item.sku ?? item.product?.sku ?? '',
+      quantity: item.orderedQuantity ?? 0,
+      price: this.lineAmount(item.price, order?.currency),
+      lineTotal: this.lineAmount(item.subTotal, order?.currency),
+    }));
+  });
+
+  private lineAmount(formatted: string | undefined, currency: string | undefined): string {
+    const value = parseAmount(formatted);
+    return value === null ? (formatted ?? '—') : this.money.format(value, currency);
+  }
 
   /**
    * The totals block, as the server computed it.
@@ -235,8 +270,8 @@ export class OrderDetailsFacade {
   readonly totals = computed(() => {
     const order = this.order();
     return (order?.totals ?? []).map((total: OrderTotal) => ({
-      label: totalLabel(total),
-      amount: formatMoney(total, order?.currency),
+      label: this.totalLabels.label(total),
+      amount: this.money.total(total, order?.currency),
       // `order.total.total` is the grand total; the rest are lines above it.
       grand: total.module === 'total',
     }));

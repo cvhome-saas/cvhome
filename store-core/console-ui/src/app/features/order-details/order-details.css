@@ -343,6 +343,32 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * A numeric heading sits over its own column, not off to the left of it.
+ *
+ * `.items th` and `.invoice-items th` set `text-align: start` for the description column and
+ * outrank `.numeric` on specificity, so the three right-aligned columns had left-aligned headings —
+ * quantities and amounts flush right under labels flush left.
+ */
+.items th.numeric,
+.invoice-items th.numeric {
+  text-align: end;
+}
+
+/*
+ * Column widths, so the numbers occupy a predictable band instead of being sized by the longest
+ * amount in the response. The description takes what is left.
+ */
+.items th.numeric:first-of-type,
+.invoice-items th.numeric:first-of-type {
+  inline-size: 5rem;
+}
+
+.items th.numeric:not(:first-of-type),
+.invoice-items th.numeric:not(:first-of-type) {
+  inline-size: 8rem;
+}
+
 .mono {
   font-family: ui-monospace, monospace;
 }

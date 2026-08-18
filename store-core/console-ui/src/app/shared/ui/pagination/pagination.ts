@@ -1,5 +1,6 @@
 import {Component, computed, inject, input, output} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
+import {TranslocoDecimalPipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {Icon} from '@shared/ui/icon/icon';
 
@@ -18,7 +19,7 @@ const WINDOW = 5;
  */
 @Component({
   selector: 'app-pagination',
-  imports: [Icon],
+  imports: [Icon, TranslocoDecimalPipe],
   template: `
     <p class="page-info">{{ summary() }}</p>
 
@@ -46,7 +47,7 @@ const WINDOW = 5;
               [attr.aria-current]="slot === page() ? 'page' : null"
               (click)="go(slot)"
             >
-              {{ slot + 1 }}
+              {{ slot + 1 | translocoDecimal }}
             </button>
           }
         }
@@ -67,6 +68,7 @@ const WINDOW = 5;
 })
 export class Pagination {
   protected readonly transloco = inject(TranslocoService);
+  private readonly localeFormat = inject(TranslocoLocaleService);
 
   /** Zero-based, as `PageRequest` carries it. */
   readonly page = input.required<number>();
@@ -92,7 +94,14 @@ export class Pagination {
     }
     const first = this.page() * this.pageSize() + 1;
     const last = Math.min(total, first + this.pageSize() - 1);
-    return this.transloco.translate('shared.pagination.summary', {first, last, total, unit});
+    // Localised digits, so the line does not mix Latin numerals into an Arabic sentence.
+    const digits = (value: number) => this.localeFormat.localizeNumber(value, 'decimal');
+    return this.transloco.translate('shared.pagination.summary', {
+      first: digits(first),
+      last: digits(last),
+      total: digits(total),
+      unit,
+    });
   });
 
   /** Page indices to render; `null` is an elision. */

@@ -1,6 +1,7 @@
 import {computed, inject, Injectable, linkedSignal, signal} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
+import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
@@ -60,6 +61,7 @@ const TABS: readonly OrderTab[] = ['all', ...ORDER_STATUSES];
 export class OrdersFacade {
   private readonly api = inject(OrdersApi);
   private readonly transloco = inject(TranslocoService);
+  private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly statusLabels = inject(StatusLabel);
 
@@ -149,7 +151,7 @@ export class OrdersFacade {
       label: this.transloco.translate(kpi.labelKey),
       // An em dash, never a zero: average order value has no source, and two more tiles report
       // nothing while the statistic endpoint is down.
-      value: kpi.value ?? NO_FIGURE,
+      value: this.figure(kpi.value),
       icon: kpi.icon,
       tone: kpi.tone,
       delta: kpi.delta,
@@ -159,6 +161,23 @@ export class OrdersFacade {
   });
   readonly page = computed<PageT<OrderRow>>(() => this.loaded()?.page ?? EMPTY_ORDERS);
   readonly orders = computed<readonly OrderRow[]>(() => this.page().content);
+
+  /**
+   * A KPI's figure in the reader's digits, or an em dash where there is none.
+   *
+   * The mapping produces plain numeric strings — "12", "4" — and a percentage it has already
+   * formatted. Only the plain ones are re-read here; a value that is not a bare number is left
+   * exactly as the mapping wrote it.
+   */
+  private figure(value: string | null): string {
+    if (value === null) {
+      return NO_FIGURE;
+    }
+    const numeric = Number(value);
+    return Number.isFinite(numeric) && value.trim() !== ''
+      ? this.localeFormat.localizeNumber(numeric, 'decimal')
+      : value;
+  }
 
   /**
    * What the table is showing right now, under the panel title.
@@ -179,8 +198,19 @@ export class OrdersFacade {
         : this.transloco.translate('orders.subtitle.none');
     }
 
+    // Localised digits: the line reads "عرض ١–١٠ من ١٢" in Arabic, not Latin numerals inside an
+    // Arabic sentence.
+    const digits = (value: number) => this.localeFormat.localizeNumber(value, 'decimal');
     const from = page.pageNumber * page.size + 1;
-    const params = {from, to: from + page.content.length - 1, total: page.totalElements, status};
+    const params = {
+      from: digits(from),
+      to: digits(from + page.content.length - 1),
+      total: digits(page.totalElements),
+      // The raw number as well: the plural form is chosen from it, while the digits above are what
+      // gets printed.
+      count: page.totalElements,
+      status,
+    };
     return status
       ? this.transloco.translate('orders.subtitle.rangeForStatus', params)
       : this.transloco.translate('orders.subtitle.range', params);

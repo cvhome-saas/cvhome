@@ -233,7 +233,7 @@
       "all": "الكل"
     },
     "subtitle": {
-      "range": "عرض {from}–{to} من {total, plural, zero {# طلب} one {# طلب} two {# طلبين} few {# طلبات} many {# طلبًا} other {# طلب}}",
+      "range": "عرض {from}–{to} من {total}",
       "rangeForStatus": "{status} · عرض {from}–{to} من {total}",
       "none": "لا توجد طلبات في هذه الفترة.",
       "noneForStatus": "لا توجد طلبات {status} في هذه الفترة."
@@ -1140,7 +1140,8 @@
     "customerStatsUnavailable": "إجماليات العميل غير متاحة بعد.",
     "emailInvoice": "إرسال بالبريد",
     "emailNotAvailable": "إرسال الفواتير بالبريد غير متاح بعد.",
-    "commentVisible": "مرئي للعميل"
+    "commentVisible": "مرئي للعميل",
+    "badReference": "«{reference}» ليس رقم طلب صالحًا."
   },
   "status": {
     "CREATED": "أُنشئ",
@@ -1167,5 +1168,16 @@
     "COMMITTED": "مخصص",
     "RELEASED": "أُفرج عنه",
     "RESERVATION_FAILED": "فشل الحجز"
+  },
+  "orderTotal": {
+    "subtotal": "المجموع الفرعي",
+    "total": "الإجمالي",
+    "tax": "الضريبة",
+    "shipping": "الشحن",
+    "handling": "المناولة",
+    "discount": "الخصم",
+    "credit": "رصيد",
+    "refund": "مبلغ مسترد",
+    "product": "المنتجات"
   }
 }

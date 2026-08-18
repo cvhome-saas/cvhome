@@ -127,6 +127,29 @@ describe('OrderDetails', () => {
     expect(rows[0].textContent).toContain('$124.00');
   }));
 
+  it('reformats the line prices the server pre-formatted, and keeps what it cannot parse', fakeAsync(() => {
+    api.detail = {
+      ...DETAIL,
+      order: {
+        ...ORDER,
+        products: [
+          // As the running stack sends them: formatted by checkout, with no number behind them.
+          {id: 1, productName: 'Wireless Headphones', orderedQuantity: 2, price: 'SAR62.00', subTotal: 'SAR124.00'},
+          {id: 2, productName: 'Gift note', orderedQuantity: 1, price: 'on request', subTotal: 'on request'},
+        ],
+      },
+    };
+    const element = load();
+    const rows = [...element.querySelectorAll('.items tbody tr')];
+
+    // Read back to a number and written in the order's currency, so the lines and the totals below
+    // them are in one format rather than two.
+    expect(rows[0].textContent).toContain('$62.00');
+    expect(rows[0].textContent).toContain('$124.00');
+    // Nothing numeric to find: the server's own string stands rather than an em dash.
+    expect(rows[1].textContent).toContain('on request');
+  }));
+
   it('renders every total the server sent, not a fixed subtotal/tax/shipping trio', fakeAsync(() => {
     const element = load();
     const totals = [...element.querySelectorAll('.totals > div')].map((n) =>

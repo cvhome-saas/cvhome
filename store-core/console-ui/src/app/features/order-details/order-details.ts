@@ -1,8 +1,8 @@
-import {DatePipe} from '@angular/common';
 import {A11yModule} from '@angular/cdk/a11y';
 import {Component, ElementRef, computed, effect, inject, input, linkedSignal, signal, viewChild} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {TranslocoDatePipe, TranslocoDecimalPipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {OrderStatus} from '@models/checkout';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
@@ -28,7 +28,7 @@ import {OrderDetailsFacade} from './facades/order-details.facade';
  */
 @Component({
   selector: 'app-order-details',
-  imports: [A11yModule, Badge, BusyOverlay, DatePipe, Icon, Panel, RouterLink, TranslocoDirective],
+  imports: [A11yModule, Badge, BusyOverlay, Icon, Panel, RouterLink, TranslocoDatePipe, TranslocoDecimalPipe, TranslocoDirective],
   providers: [OrderDetailsFacade],
   templateUrl: './order-details.html',
   styleUrl: './order-details.css',
@@ -38,6 +38,7 @@ export class OrderDetails {
   readonly id = input.required<string>();
 
   private readonly transloco = inject(TranslocoService);
+  private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly pdf = inject(PdfExportService);
   private readonly toasts = inject(ToastService);
@@ -70,14 +71,44 @@ export class OrderDetails {
   /** The operator composing the status note, for the composer's avatar. */
   protected readonly operator = computed(() => this.shell.user()?.initials ?? '');
 
+  /**
+   * "Placed 18 Aug 2026, 23:20", localised.
+   *
+   * Built here rather than in the template: the date has to be formatted *before* it is
+   * interpolated into the sentence, and a pipe's options object inside a translation's parameter
+   * object is two levels of braces the template parser reads as a control block.
+   */
+  protected readonly placedLine = computed(() => {
+    const placedAt = this.facade.summary().placedAt;
+    if (!placedAt) {
+      return '';
+    }
+    this.transloco.activeLang();
+    return this.transloco.translate('orderDetails.placedOn', {
+      date: this.localeFormat.localizeDate(placedAt, undefined, {dateStyle: 'medium', timeStyle: 'short'}),
+    });
+  });
+
   protected readonly title = computed(() => {
     this.transloco.activeLang();
     return this.transloco.translate('orderDetails.title', {reference: this.facade.reference()});
   });
 
+  /**
+   * The route's `:id`, as an order id — or null when it is not one.
+   *
+   * `/orders/abc` used to reach the server as `orders/NaN`, which comes back a 500 and reads to the
+   * operator as "the order failed to load" rather than "there is no such order". A reference the
+   * console cannot even parse is answered here, without a request.
+   */
+  protected readonly orderId = computed(() => {
+    const id = Number(this.id());
+    return Number.isInteger(id) && id > 0 ? id : null;
+  });
+
   constructor() {
     // `id` is a signal, so navigating straight from one order to another re-reads without a reload.
-    effect(() => this.facade.orderId.set(Number(this.id())));
+    effect(() => this.facade.orderId.set(this.orderId()));
   }
 
   protected submitStatus(): void {
