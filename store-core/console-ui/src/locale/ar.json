@@ -88,7 +88,7 @@
     "signUp.email": "البريد الإلكتروني",
     "signUp.emailFallback": "أدخل بريدًا إلكترونيًا صالحًا.",
     "signUp.password": "كلمة المرور",
-    "signUp.passwordFallback": "أدخل كلمة مرور مكونة من ثمانية أحرف على الأقل.",
+    "signUp.passwordFallback": "استخدم 8 أحرف على الأقل.",
     "signUp.showPassword": "إظهار كلمة المرور",
     "signUp.hidePassword": "إخفاء كلمة المرور",
     "signUp.show": "إظهار",
@@ -103,7 +103,8 @@
     "signUp.passwordMismatch": "كلمتا المرور غير متطابقتين.",
     "signUp.creating": "جارٍ إنشاء الحساب…",
     "signUp.created": "تم إنشاء الحساب. سجّل الدخول للمتابعة.",
-    "signingOut": "جارٍ تسجيل خروجك…"
+    "signingOut": "جارٍ تسجيل خروجك…",
+    "signUp.emailTaken": "يوجد حساب مسجّل بهذا البريد الإلكتروني. سجّل الدخول بدلًا من ذلك، أو استخدم بريدًا آخر."
   },
   "dashboard": {
     "heading": {
@@ -969,7 +970,7 @@
       "heading": "سعر واحد. لكل متجر.",
       "billingCycle": "دورة الفوترة",
       "monthly": "شهري",
-      "yearly": "سنوي −20٪",
+      "yearly": "سنويًا",
       "perMonth": "/شهر",
       "billedYearly": "يُفوتر سنويًا",
       "billedMonthly": "يُفوتر شهريًا",
@@ -978,7 +979,8 @@
       "startFree": "ابدأ مجانًا",
       "startTrial": "ابدأ تجربة {days} يومًا",
       "choosePlan": "اختر هذه الخطة",
-      "unavailable": "الأسعار غير متاحة حاليًا. يرجى المحاولة بعد قليل."
+      "unavailable": "الأسعار غير متاحة حاليًا. يرجى المحاولة بعد قليل.",
+      "saving": "وفّر {percent}% مقارنة بالشهري"
     },
     "contact": {
       "heading": "تحدث إلى شخص <em>يدير متاجر</em>.",

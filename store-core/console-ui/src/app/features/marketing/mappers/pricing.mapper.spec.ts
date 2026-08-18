@@ -124,6 +124,26 @@ describe('toPricingPlans', () => {
     expect(toPricingPlans(CATALOG, 'YEAR').find((plan) => plan.featured)).toBeUndefined();
   });
 
+  it('computes the yearly saving from the prices actually charged', () => {
+    const yearly = toPricingPlans(CATALOG, 'YEAR');
+
+    // $100/yr against 12 × $10/mo = $120 is 17%, not the 20% the old toggle claimed.
+    expect(yearly.find((plan) => plan.code === 'BASIC')?.savingPercent).toBe(17);
+    expect(yearly.find((plan) => plan.code === 'PRO')?.savingPercent).toBe(17);
+    // Monthly cards have nothing to compare against.
+    expect(toPricingPlans(CATALOG, 'MONTH').every((plan) => plan.savingPercent === null)).toBeTrue();
+  });
+
+  it('reports no saving when the yearly price is not actually cheaper', () => {
+    const noDiscount = CATALOG.map((plan) =>
+      plan.code === 'BASIC'
+        ? {...plan, prices: plan.prices.map((p) => (p.interval === 'YEAR' ? {...p, amount: {currency: {code: 'USD'}, minorUnits: 12000}} : p))}
+        : plan,
+    );
+
+    expect(toPricingPlans(noDiscount, 'YEAR').find((plan) => plan.code === 'BASIC')?.savingPercent).toBeNull();
+  });
+
   it('carries the trial length through so the call to action can name it', () => {
     const plans = toPricingPlans(CATALOG, 'MONTH');
 

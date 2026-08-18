@@ -19,7 +19,11 @@ export interface PersistableUser {
   readonly lastName: string;
   readonly emailAddress: string;
   readonly password: string;
-  /** Checked server-side as well as in the form — uaa rejects a mismatch rather than trusting the client. */
+  /**
+   * Sent because `PersistableUser` declares it, but **nothing on the server reads it**. Verified against the
+   * running stack: a payload with `password: "a"` and `repeatPassword: "b"` is accepted with 200. The form is
+   * the only place the two are compared — see lessons.md, "Auth — public signup validates nothing".
+   */
   readonly repeatPassword: string;
 }
 

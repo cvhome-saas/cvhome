@@ -65,6 +65,16 @@ requirements document, with the entry here reduced to a link. There is already o
   more than one as none.
 - **Placeholder:** documented in `src/app/features/marketing/mappers/pricing.mapper.ts` (`middleCode`).
 
+## Marketing — FREE has no yearly price, so the yearly view has no free plan
+
+- **Screen:** `/` → `#pricing` with the toggle on Yearly.
+- **What happens:** `plan-catalog.yml` gives FREE a MONTH price only, so it is not purchasable yearly and the
+  console does not show it — leaving two cards where the design has three. This is correct behaviour, not a
+  bug: "Free — not available yearly" would be a worse answer. Recorded so the two-card yearly view is not
+  reported as a rendering fault.
+- **What would change it:** a `USD 0 / YEAR` price on FREE in the catalog. Whether that is wanted is a
+  commercial decision, not a frontend one.
+
 ## Marketing — the landing page's own content is hardcoded
 
 - **Screen:** `/` — the metrics strip, the `#story` pillars, the `#stores` merchant showcase, the `#reviews`
@@ -133,16 +143,74 @@ requirements document, with the entry here reduced to a link. There is already o
   component on `CreateOrgRequest` and a column behind `InternalOrgService.createOrgForUser`. Worth doing: an
   org currently has no display name anywhere in the console.
 
-## Auth — trial length is published but not selectable at signup
+## Auth — public signup validates nothing
 
-- **Screen:** `/` → `#pricing` ("Start 14-day trial"), `/sign-up`.
-- **What the UI needs:** signing up from a specific plan's trial should start that trial.
-- **What is missing:** the link between the two. `PlanPriceView.trialDays` is real and the console shows it, but
-  `CreateOrgRequest` has no plan and signup creates no subscription. seller-core's `SignUpForm` carried a
-  `subscriptionPlan` field that **no server field ever read** — it was dropped during the port rather than
-  carried across, since sending it suggested a connection that does not exist.
-- **Why it is required:** the pricing card's call to action names a trial length. Today every route into the
-  product lands on the same state regardless of which card was clicked.
-- **Expected contract:** either a `planPriceId` on `CreateOrgRequest` that billing turns into a `TRIALING`
-  subscription once the first store exists, or an explicit plan-selection step after the first store is created.
-  The second is probably right — a subscription belongs to a store, and signup has none yet.
+**Found by probing the running stack, not by reading the code.** This is the most serious entry in this file.
+
+- **Screen:** `/sign-up`.
+- **What is missing:** all server-side validation on `POST /tenancy/api/v1/signup/public/create`. Verified
+  against the local stack:
+  ```
+  POST .../signup/public/create
+  {"user":{"firstName":"","lastName":"","emailAddress":"not-an-email","password":"a","repeatPassword":"b"}}
+  → 200 OK, account and organization created
+  ```
+  Empty names, a string that is not an address, a one-character password, and a `repeatPassword` that does not
+  match the password — all accepted. `CreateOrgRequest` has no `@Valid` and `PersistableUser` carries no
+  constraints, so nothing downstream of the controller checks anything. uaa has no password policy either.
+- **Why it is required:** this is the one endpoint on the platform that anyone on the internet may call, and it
+  creates a tenant. Today it can be used to create unlimited organizations with junk data, and a client with a
+  bug — or no client at all — can create an account whose password is one character. `repeatPassword` is
+  particularly misleading: it exists on the DTO and is transmitted, which reads as if the server compares them.
+  It does not.
+- **What the console does meanwhile:** `SignUpFormService` is now the only validation there is, and says so.
+  An earlier revision of it deliberately dropped the password minimum "because uaa owns the policy" — that
+  assumption was wrong and the minimum is back.
+- **Expected contract:** `@Valid` on the request, `@NotBlank` on `firstName`/`lastName`, `@Email` on
+  `emailAddress`, a password policy (length and character classes) applied in uaa, and an `@AssertTrue` for
+  the password match. Failures should come back as RFC-7807 with `fieldErrors[]` paths like
+  `user.emailAddress`, which the console's form is already shaped to receive.
+- **Note:** the probe left a junk organization and user (`not-an-email`) in the local development database.
+
+## Auth — a taken email is indistinguishable from any other conflict
+
+- **Screen:** `/sign-up`.
+- **What the UI needs:** to tell the visitor that the address is already registered, on the email field.
+- **What is missing:** a specific error. Signing up with an existing address answers:
+  ```
+  409 {"code":"COMMON.DATA_INTEGRITY_VIOLATION","category":"CONFLICT",
+       "params":{"service":"uaa","path":"/api/v1/admin/users","remoteStatus":409}}
+  ```
+  No `fieldErrors[]`, and a code that says only "something violated a constraint somewhere". The message the
+  console's error chain resolves for it is "This changed somewhere else. Refresh and try again." — correct for
+  the generic code, wrong for this form. seller-ui has the same gap and does not handle it: its facade names
+  `CUA.REGISTRATION.EMAIL_TAKEN` in a comment, but nothing sends that code.
+- **Why it is required:** a duplicate address is the single most likely way a signup fails, and it is the one
+  the visitor can act on — by signing in instead.
+- **What the console does meanwhile:** `AuthFacade.bindTakenEmail` treats a 409 with no field errors on *this
+  call* as a taken address and puts a specific message on the email control. Deliberately narrow, and it should
+  be deleted the moment the server can say what it means.
+- **Expected contract:** a distinct code (`TENANCY.SIGNUP.EMAIL_TAKEN`) with
+  `fieldErrors: [{field: "user.emailAddress", code: "..."}]`. Note the conflict currently leaks the internal
+  uaa path (`/api/v1/admin/users`) in `params`, which a public endpoint should not do.
+
+## Auth — the trial a visitor is promised is not the trial the catalog publishes
+
+- **Screen:** `/sign-up` ("14 days free", "Free for 14 days. No card."), `/` → `#pricing` call to action.
+- **What is true:** there are **two** trials, and only one of them is real today.
+  - The **org trial** — `com.asrevo.cvhome.billing.trial-period: P14D` (`BillingProperties`, defaulted to 14
+    days in code as well). Granted once per organization, to the first store it creates
+    (`StoreQuotaServiceImpl`, `OrgTrialGrantRepository`). This is what the sign-up page's "14 days free"
+    refers to, and it is accurate.
+  - The **per-price trial** — `PlanPriceView.trialDays`, "free days this price grants on its own, on top of
+    the org-level trial". Every price in the seeded catalog has `trialDays: 0`.
+- **What the console does:** the pricing cards name a trial only when the price grants one, so against the
+  current catalog they read "Choose this plan" and never "Start 14-day trial". That is deliberate: the org
+  trial is once per organization, not per plan, so advertising it on a plan card would promise something a
+  returning visitor will not get.
+- **What is missing:** any way for the console to know whether *this* visitor's org still has its trial. The
+  grant is server state with no public read, so the sign-up page's "14 days free" is an unconditional claim —
+  correct for a genuinely new visitor, wrong for someone whose org has already used it.
+- **Expected contract:** either a `trialAvailable` boolean on the authenticated bootstrap (so the console can
+  stop promising a trial that is spent), or drop the per-price `trialDays` concept if the org trial is the
+  only one that will ever be granted — two trial mechanisms where one is always zero is a trap.

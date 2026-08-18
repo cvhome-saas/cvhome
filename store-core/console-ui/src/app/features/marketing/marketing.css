@@ -143,6 +143,8 @@ h2 em { color: var(--primary-emphasis); font-style: normal; font-weight: 600; }
 .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
 .plan { display: flex; flex-direction: column; padding: 2.25rem; border: 1px solid var(--border); border-radius: var(--radius-3xl); background: var(--muted); transition: transform .25s ease, border-color .25s ease, background .25s ease; }
 .plan.featured { border-color: var(--edge); background: var(--chart-1-wash); }
+/* Holds the section's height while the catalog loads, so the page below does not jump when it lands. */
+.plan-placeholder { min-block-size: 26rem; }
 .plan h3 { margin: 0; color: var(--muted-foreground); font-size: .8125rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
 .plan.featured h3 { color: var(--primary-emphasis); }
 .plan .price { display: flex; align-items: baseline; gap: .5rem; margin: 1.75rem 0 0; }
@@ -150,7 +152,13 @@ h2 em { color: var(--primary-emphasis); font-style: normal; font-weight: 600; }
 .plan .price span { color: var(--muted-foreground); font-size: .875rem; }
 .plan > small { margin-top: .5rem; color: var(--muted-foreground); font-size: .8125rem; }
 .plan > small.yearly { color: var(--primary-soft); }
-.plan .blurb { margin: 2rem 0 2.5rem; color: var(--foreground-quiet); font-size: .9375rem; font-weight: 300; line-height: 1.7; }
+.plan .plan-saving { margin-top: .35rem; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 500; }
+.plan .blurb { margin: 2rem 0 1.5rem; color: var(--foreground-quiet); font-size: .9375rem; font-weight: 300; line-height: 1.7; }
+.plan-features { display: grid; gap: .6rem; margin: 0 0 2.5rem; padding: 0; list-style: none; }
+.plan-features li { display: flex; align-items: flex-start; gap: .55rem; color: var(--foreground-subtle); font-size: .875rem; font-weight: 300; line-height: 1.5; }
+.plan-features app-icon { --icon-size: 14px; flex: none; margin-top: .18rem; color: var(--primary-emphasis); }
+/* The blurb is optional (billing allows a null description), so the list carries the top margin when it leads. */
+.plan .blurb + .plan-features { margin-top: 0; }
 .plan .button { margin-top: auto; padding: .85rem; font-size: .875rem; }
 .plan .button:hover { transform: none; }
 .pricing-note { margin: 2.5rem 0 0; color: var(--muted-foreground); font-size: .9375rem; font-weight: 300; text-align: center; }

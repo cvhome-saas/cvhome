@@ -133,6 +133,32 @@ describe('SignUp', () => {
     tick();
   }));
 
+  it('enforces a password minimum, because the server enforces none', () => {
+    fill({password: 'short', repeatPassword: 'short'});
+    submit();
+
+    expect(api.requests).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('at least 8 characters');
+  });
+
+  it('blames the email when tenancy answers a bare conflict', () => {
+    // What the running stack actually returns for an address that already exists: a generic
+    // COMMON.DATA_INTEGRITY_VIOLATION with no fieldErrors at all.
+    api.error = new ApiError({
+      code: 'COMMON.DATA_INTEGRITY_VIOLATION',
+      category: 'CONFLICT',
+      status: 409,
+    });
+    fill();
+    submit();
+
+    const email = fixture.nativeElement.querySelector('[formControlName="emailAddress"]')
+      .closest('label') as HTMLElement;
+    expect(email.textContent).toContain('already uses this email');
+    // Not the generic "This changed somewhere else. Refresh and try again." toast.
+    expect(toasts.messages).toEqual([]);
+  });
+
   it('lands a server field error on the control that caused it', () => {
     // What uaa answers when the email is already registered.
     api.error = new ApiError({

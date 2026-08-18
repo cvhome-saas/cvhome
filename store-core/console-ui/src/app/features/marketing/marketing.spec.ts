@@ -113,6 +113,22 @@ describe('Marketing', () => {
     expect(api.calls).toBe(1);
   });
 
+  it('states the saving the catalog actually gives, not a fixed claim', () => {
+    fixture.detectChanges();
+    // Nothing to compare against on the monthly view.
+    expect(fixture.nativeElement.querySelector('#pricing .plan-saving')).toBeNull();
+
+    fixture.nativeElement.querySelectorAll('#pricing .billing button')[1].click();
+    fixture.detectChanges();
+
+    const savings = Array.from(fixture.nativeElement.querySelectorAll('#pricing .plan-saving')).map(
+      (node) => (node as HTMLElement).textContent?.trim(),
+    );
+    // $100/yr vs 12 × $10/mo is 17%. The toggle no longer claims a flat 20%.
+    expect(savings).toEqual(['Save 17% against monthly', 'Save 17% against monthly']);
+    expect(fixture.nativeElement.querySelectorAll('#pricing .billing button')[1].textContent).not.toContain('20');
+  });
+
   it('says prices are unavailable rather than showing none when billing fails', () => {
     api.failure = true;
     fixture.detectChanges();

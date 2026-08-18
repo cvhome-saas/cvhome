@@ -62,7 +62,29 @@ export function toPricingPlans(plans: readonly PlanView[], interval: BillingInte
     features: featuresOf(plan),
     free: price.amount.minorUnits === 0,
     featured: plan.code === featuredCode,
+    savingPercent: savingAgainstMonthly(plan, price),
   }));
+}
+
+/**
+ * What a yearly price saves against twelve monthly ones.
+ *
+ * Computed per plan rather than stated once on the billing toggle. The toggle used to read "Yearly −20%",
+ * which was true of the old page because it multiplied an authored monthly price by 0.8. Against the real
+ * catalog it is false: BASIC is $100 a year against $10 a month, which is 17%, not 20%. A discount is a claim
+ * about money and has to come from the prices actually charged.
+ */
+function savingAgainstMonthly(plan: PlanView, price: PlanPriceView): number | null {
+  if (price.interval !== 'YEAR') {
+    return null;
+  }
+  const monthly = plan.prices.find((it) => it.interval === 'MONTH');
+  if (!monthly || monthly.amount.minorUnits === 0) {
+    return null;
+  }
+  const fullYear = monthly.amount.minorUnits * 12;
+  const saved = Math.round(((fullYear - price.amount.minorUnits) / fullYear) * 100);
+  return saved > 0 ? saved : null;
 }
 
 /**

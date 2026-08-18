@@ -107,6 +107,10 @@ export class MarketingFacade {
       ...plan,
       features: plan.features.map((feature) => this.featureLabel(feature)),
       action: this.actionLabel(plan.free, plan.trialDays),
+      saving:
+        plan.savingPercent === null
+          ? null
+          : this.transloco.translate('marketing.pricing.saving', {percent: plan.savingPercent}),
     }));
   });
 

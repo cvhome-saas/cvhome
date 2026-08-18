@@ -88,7 +88,7 @@
     "signUp.email": "Email",
     "signUp.emailFallback": "Enter a valid email address.",
     "signUp.password": "Password",
-    "signUp.passwordFallback": "Enter a password with at least eight characters.",
+    "signUp.passwordFallback": "Use at least 8 characters.",
     "signUp.showPassword": "Show password",
     "signUp.hidePassword": "Hide password",
     "signUp.show": "Show",
@@ -103,7 +103,8 @@
     "signUp.passwordMismatch": "The two passwords do not match.",
     "signUp.creating": "Creating account…",
     "signUp.created": "Account created. Sign in to continue.",
-    "signingOut": "Signing you out…"
+    "signingOut": "Signing you out…",
+    "signUp.emailTaken": "An account already uses this email address. Sign in instead, or use another address."
   },
   "dashboard": {
     "heading": {
@@ -969,7 +970,7 @@
       "heading": "One price. Per store.",
       "billingCycle": "Billing cycle",
       "monthly": "Monthly",
-      "yearly": "Yearly −20%",
+      "yearly": "Yearly",
       "perMonth": "/mo",
       "billedYearly": "billed yearly",
       "billedMonthly": "billed monthly",
@@ -978,7 +979,8 @@
       "startFree": "Start free",
       "startTrial": "Start {days}-day trial",
       "choosePlan": "Choose this plan",
-      "unavailable": "Prices are unavailable right now. Please try again shortly."
+      "unavailable": "Prices are unavailable right now. Please try again shortly.",
+      "saving": "Save {percent}% against monthly"
     },
     "contact": {
       "heading": "Talk to someone who <em>runs stores</em>.",

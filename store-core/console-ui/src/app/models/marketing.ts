@@ -77,6 +77,11 @@ export interface PricingPlan {
   readonly features: readonly PlanFeature[];
   readonly free: boolean;
   /**
+   * Whole percent saved against paying this plan monthly for a year, or null when that cannot be computed —
+   * the plan sells at only one interval, or the longer interval is not actually cheaper.
+   */
+  readonly savingPercent: number | null;
+  /**
    * Presentation only. The billing catalog has no "recommended plan" flag, so the console highlights the middle
    * paid tier — see lessons.md, "Marketing — no recommended-plan flag in the billing catalog".
    */

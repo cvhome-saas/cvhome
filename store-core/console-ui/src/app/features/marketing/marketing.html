@@ -154,6 +154,9 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
                 <h3>{{ plan.name }}</h3>
                 <p class="price"><strong>{{ plan.amount | currency: plan.currency : 'symbol' : '1.0-2' }}</strong><span>{{ plan.interval === 'YEAR' ? t('marketing.pricing.perYear') : t('marketing.pricing.perMonth') }}</span></p>
                 <small [class.yearly]="facade.yearlyBilling()">{{ facade.yearlyBilling() ? t('marketing.pricing.billedYearly') : t('marketing.pricing.billedMonthly') }}</small>
+                @if (plan.saving; as saving) {
+                  <small class="plan-saving">{{ saving }}</small>
+                }
                 @if (plan.description) {
                   <p class="blurb">{{ plan.description }}</p>
                 }
