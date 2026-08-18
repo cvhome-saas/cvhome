@@ -1,0 +1,194 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="title()" [context]="facade.customer().name">
+    <a class="secondary-action" routerLink="/orders">
+      <app-icon name="chevronLeft" [flip]="true" />
+      {{ t('orderDetails.backToOrders') }}
+    </a>
+    <app-export-button
+      [target]="report()"
+      [fileName]="'invoice' + facade.reference()"
+      [title]="t('orderDetails.invoice')"
+      [subtitle]="facade.reference()"
+      [disabled]="facade.isLoading() || facade.isEmpty()"
+    />
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button type="button" (click)="facade.retry()">{{ t('dashboard.tryAgain') }}</button>
+    </div>
+  }
+
+  <app-busy-overlay [busy]="facade.isLoading()" [label]="t('orderDetails.loading')">
+    @if (facade.isEmpty()) {
+      <div class="first-load" aria-hidden="true"></div>
+    } @else if (facade.order(); as order) {
+      <div class="order-grid">
+        <div class="column-main">
+          <!--
+            The invoice. Every figure on it is already on the order, so it renders and prints with no
+            backend — only *emailing* it needs a service. See lessons.md, "Orders — no invoice service".
+          -->
+          <app-panel [title]="t('orderDetails.items')" [subtitle]="t('orderDetails.itemsSubtitle', {count: facade.items().length})">
+            <app-badge panelAction [tone]="facade.statusTone()" shape="square">{{ facade.status() }}</app-badge>
+
+            <div class="panel-pad" #invoice>
+              <table class="items">
+                <caption class="sr-only">{{ t('orderDetails.items') }}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ t('orderDetails.column.product') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.quantity') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.unitPrice') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.lineTotal') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of facade.items(); track item.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ item.productName ?? item.product?.name ?? '—' }}</strong>
+                        <small class="mono">{{ item.sku ?? item.product?.sku ?? '' }}</small>
+                      </td>
+                      <td class="numeric">{{ item.orderedQuantity ?? 0 }}</td>
+                      <td class="numeric">{{ item.price ?? '—' }}</td>
+                      <td class="numeric">{{ item.subTotal ?? '—' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="4" class="empty">{{ t('orderDetails.noItems') }}</td></tr>
+                  }
+                </tbody>
+              </table>
+
+              <!--
+                Every total line the server computed, rendered as it sent them — each already
+                formatted in the order's currency. Listing them rather than picking out subtotal,
+                tax and shipping means a discount or a surcharge shows up without the console
+                needing to know that line exists.
+              -->
+              <dl class="totals">
+                @for (total of facade.totals(); track total.code) {
+                  <div [class.grand]="total.code === 'order.total'">
+                    <dt>{{ total.title ?? total.code ?? '' }}</dt>
+                    <dd>{{ total.text ?? total.value ?? '—' }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          </app-panel>
+
+          <app-panel [title]="t('orderDetails.history')" [subtitle]="t('orderDetails.historySubtitle')">
+            <div class="panel-pad panel-stack">
+              <ol class="timeline">
+                @for (entry of facade.timeline(); track $index) {
+                  <li>
+                    <app-badge [tone]="entry.tone" shape="square">{{ entry.status }}</app-badge>
+                    <span class="timeline-copy">
+                      @if (entry.comment) {
+                        <strong>{{ entry.comment }}</strong>
+                      }
+                      @if (entry.date) {
+                        <small>{{ entry.date | date: 'medium' }}</small>
+                      }
+                    </span>
+                  </li>
+                } @empty {
+                  <li class="empty">{{ t('orderDetails.noHistory') }}</li>
+                }
+              </ol>
+
+              <!--
+                The one write this screen has. Everything else the design asks for — refund,
+                capture, cancel, duplicate, create shipment — has no endpoint in checkout.
+              -->
+              <div class="status-form">
+                <label>
+                  {{ t('orderDetails.newStatus') }}
+                  <select
+                    class="control"
+                    [value]="nextStatus()"
+                    (change)="nextStatus.set($any($event.target).value)"
+                  >
+                    @for (option of facade.statusOptions(); track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="grow">
+                  {{ t('orderDetails.comment') }}
+                  <input
+                    class="control"
+                    type="text"
+                    [value]="comment()"
+                    (input)="comment.set($any($event.target).value)"
+                    [placeholder]="t('orderDetails.commentPlaceholder')"
+                  />
+                </label>
+                <button
+                  class="primary-action"
+                  type="button"
+                  [disabled]="facade.submitting()"
+                  (click)="submitStatus()"
+                >
+                  {{ facade.submitting() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
+                </button>
+              </div>
+            </div>
+          </app-panel>
+        </div>
+
+        <div class="column-side">
+          <app-panel [title]="t('orderDetails.customer')">
+            <div class="panel-pad panel-stack">
+              <p class="customer-name">{{ facade.customer().name }}</p>
+              @if (facade.customer().email; as email) {
+                <a class="customer-link" [href]="'mailto:' + email">{{ email }}</a>
+              }
+              <p class="placed">
+                {{ t('orderDetails.placed') }}
+                <strong>{{ order.datePurchased ? (order.datePurchased | date: 'medium') : '—' }}</strong>
+              </p>
+            </div>
+          </app-panel>
+
+          <!--
+            Read-only. `PATCH /orders/{id}/customer` does not exist, so seller-ui's editable panels
+            have never saved — see lessons.md, "Orders — order addresses cannot be edited".
+          -->
+          <app-panel [title]="t('orderDetails.addresses')">
+            <div class="panel-pad address-grid">
+              @for (pair of [{key: 'billing', view: facade.billing()}, {key: 'delivery', view: facade.delivery()}]; track pair.key) {
+                <section>
+                  <h3>{{ t('orderDetails.' + pair.key) }}</h3>
+                  @if (pair.view; as address) {
+                    <p class="address-name">{{ address.name }}</p>
+                    @for (line of address.lines; track line) {
+                      <p class="address-line">{{ line }}</p>
+                    }
+                    @if (address.phone) { <p class="address-line">{{ address.phone }}</p> }
+                    @if (address.email) { <p class="address-line">{{ address.email }}</p> }
+                  } @else {
+                    <p class="address-line muted">{{ t('orderDetails.noAddress') }}</p>
+                  }
+                </section>
+              }
+            </div>
+          </app-panel>
+
+          <app-panel [title]="t('orderDetails.status')">
+            <dl class="panel-pad flags">
+              @for (flag of facade.flags(); track flag.labelKey) {
+                <div>
+                  <dt>{{ t(flag.labelKey) }}</dt>
+                  <dd>{{ flag.value }}</dd>
+                </div>
+              }
+            </dl>
+          </app-panel>
+        </div>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

@@ -509,3 +509,122 @@ requirements document, with the entry here reduced to a link. There is already o
   whether the numbers match seller-ui's, because seller-ui cannot show any either. Re-run the two-tab
   comparison in the Module 3 plan once checkout is fixed.
 
+---
+
+## Orders — no refund and no capture
+
+- **Screen:** `/orders/:id`. `console-template/Order Details.dc.html` puts both in the payment panel,
+  and seller-ui puts them in the header.
+- **What is missing:** the endpoints. seller-core's `OrdersService` calls
+  `POST /spg/checkout/api/v1/private/orders/{id}/refund` and `…/capture`; **neither is mapped anywhere
+  in checkout**. Both buttons have always 404'd in seller-ui.
+- **Why it is required:** taking money and giving it back are the two most consequential things a
+  merchant does to an order, and the console currently cannot do either. The payment service has
+  `approve` and `reject` for its own transactions, but nothing ties those to an order.
+- **Decision:** both controls are absent from the page rather than present and broken.
+- **Expected contract:** `POST …/orders/{id}/refund {amount?, reason?}` and `…/capture {amount?}`,
+  each writing a status-history entry and delegating to the payment gateway. Partial refunds need an
+  amount; a full refund should be the default.
+
+## Orders — order addresses cannot be edited
+
+- **Screen:** `/orders/:id`, the billing and delivery panels.
+- **What is missing:** `PATCH /spg/checkout/api/v1/private/orders/{id}/customer`, which seller-core
+  calls and checkout does not map. seller-ui renders both panels as editable forms with a Save button
+  that has never saved.
+- **Why it is required:** a mistyped delivery address is caught after the order is placed more often
+  than before, and correcting it is the difference between a delivery and a return.
+- **Decision:** both panels are **read-only** in console-ui. `GET /country` and `GET /zones` are still
+  ported, because they turn the ISO codes on an order into names.
+- **Expected contract:** the PATCH seller-core already assumes, validating that the order has not
+  shipped.
+
+## Orders — no link from an order to its payment transactions
+
+- **Screen:** `/orders/:id`, the payment panel and the transactions list.
+- **What is missing:** any shared key. `ReadableOrder` carries a `paymentStatus` string and nothing
+  else; the payment service keys on its own `internalRef` and `requestRef`. seller-core records the
+  consequence in a comment on its own model: *"No backend endpoint populates transactionListData
+  anywhere."* — so seller-ui's transactions dialog has always been empty.
+- **Why it is required:** when a payment is disputed or a capture fails, the transaction is the
+  evidence, and the order is where an operator goes looking for it.
+- **Expected contract:** an order reference on the transaction, or
+  `GET …/orders/{id}/transactions` proxying the payment service.
+
+## Orders — no channel, and no payment method on the order
+
+- **Screen:** `/orders`, two columns the mockup draws.
+- **What is missing:** the order records neither how it was placed (web, phone, marketplace) nor how
+  it was paid beyond a status — the card brand and last four live in the payment service, unlinked
+  (see above).
+- **Decision:** both columns were removed, and the channel filter with them.
+- **Expected contract:** a `channel` enum on the order, set at checkout; and the payment method
+  summarised onto the order when the payment settles, since that is the only place it is read.
+
+## Orders — no fulfilment or shipping model
+
+- **Screen:** `/orders/:id` — the mockup's Create shipment, Tracking, Ships from, Promised by,
+  shipping method and carrier; and `/orders` — Print picking lists and bulk "Mark as processed".
+- **What is missing:** all of it. There is no shipment entity, no tracking number, no carrier, no
+  promised date. `ReadableOrder.shippingModule` names a module and nothing more.
+- **Why it is required:** fulfilment is most of what an operator does with an order all day, and
+  right now the console can only record that a status changed.
+- **Decision:** the detail screen omits every shipping block. The list keeps its bulk buttons wired to
+  an honest "not available yet" toast, since the design leads with them.
+- **Expected contract:** a shipment resource under the order — `POST …/orders/{id}/shipments`
+  `{carrier, tracking, items[]}` — with the order's status derived from its shipments rather than set
+  by hand.
+
+## Orders — no internal notes
+
+- **Screen:** `/orders/:id`, the "Internal notes — only visible to your team" panel, with attachments.
+- **What is missing:** the concept. Status-history comments exist, but those are the customer-facing
+  record; a note about a customer or a courier is a different thing and must not be mixed into it.
+- **Expected contract:** `GET`/`POST …/orders/{id}/notes` with an author and a timestamp, plus file
+  attachment once a media service exists.
+
+## Orders — no cancel and no duplicate
+
+- **Screen:** `/orders/:id`, header actions.
+- **What is missing:** both. `CANCELLED` is a status, so the console *can* record it through the
+  history endpoint — but that is a note, not a cancellation: nothing releases the stock reservation,
+  refunds the payment or notifies the customer.
+- **Decision:** neither control is offered. Recording `CANCELLED` through the status form remains
+  possible and is honest about being only a status change.
+- **Expected contract:** `POST …/orders/{id}/cancel {reason}` performing the whole transition, and
+  `POST …/orders/{id}/duplicate` returning a new draft order.
+
+## Orders — no customer analytics
+
+- **Screen:** `/orders/:id`, the customer panel's "Spent", "Returns" and "Business account" figures,
+  and its "View profile" link.
+- **What is missing:** any per-customer aggregate. `ReadableCustomer` carries identity and addresses
+  only, and there is no customer detail screen to link to — seller-ui's customer list is read-only
+  with no detail view, which the feature inventory already calls the thinnest feature in the app.
+- **Expected contract:** `GET …/customers/{id}/summary` → `{orderCount, lifetimeValue, returnRate,
+  firstOrderAt}`. The same aggregate would answer the dashboard's new-vs-returning gap.
+
+## Orders — no invoice service
+
+- **Screen:** `/orders/:id`, the invoice document.
+- **What is present:** rendering, download and print — every figure on an invoice is already on the
+  order, so console-ui builds it from `ReadableOrder` with `core/export/pdf-export.service.ts` and no
+  backend at all.
+- **What is missing:** everything about an invoice being a *record* rather than a rendering — a
+  stable invoice number, storage, a tax point, and emailing it to the customer. The mockup's "Email
+  to customer" and its `INV-10482.pdf` filename both imply a document that exists somewhere.
+- **Expected contract:** an invoice resource with a sequential per-store number issued when the order
+  is confirmed, retrievable as a PDF, plus a send endpoint.
+
+## Orders — no stale-order signal
+
+- **Screen:** `/orders`, the "unfulfilled for 6h" badge, the overdue notice above the table, and the
+  tab badge that counted them.
+- **What is missing:** the same gap the dashboard hit — nothing reports when an order's status last
+  changed, only when it was placed. The status history holds the transitions, but the list endpoint
+  does not join it and there is no statistic over it.
+- **Decision:** all three surfaces removed. The KPI row counts orders *awaiting fulfilment* by status
+  instead, which is a backlog rather than a staleness alarm.
+- **Expected contract:** `lastStatusChangeAt` on the order row, or a statistic grouped by
+  `(status, age bucket)`.
+

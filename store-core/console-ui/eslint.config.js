@@ -83,7 +83,7 @@ module.exports = tseslint.config(
             'data-date', 'data-theme-preview', 'panelId', 'rows', 'minlength', 'accept',
             // ARIA/SVG mechanics and component-internal enum inputs — never display text.
             'aria-labelledby', 'aria-controls', 'aria-haspopup', 'aria-current',
-            'aria-live', 'aria-relevant', 'stroke-linecap', 'stroke-linejoin',
+            'aria-live', 'aria-relevant', 'scope', 'stroke-linecap', 'stroke-linejoin',
             'animate.enter', 'animate.leave', 'method',
             'tone', 'icon', 'shape', 'fileName',
           ],

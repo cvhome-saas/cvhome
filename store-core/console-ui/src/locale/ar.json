@@ -41,6 +41,9 @@
     },
     "signOut": {
       "title": "جارٍ تسجيل الخروج | cvhome"
+    },
+    "orderDetails": {
+      "title": "الطلب | cvhome"
     }
   },
   "notFound": {
@@ -972,7 +975,8 @@
       "orders": "الطلبات",
       "storeManagement": "إدارة المتجر",
       "createStore": "إنشاء متجر",
-      "firstRun": "لنبدأ"
+      "firstRun": "لنبدأ",
+      "orderDetails": "الطلب"
     },
     "toolbar": {
       "breadcrumbNav": "مسار التنقل",
@@ -1062,6 +1066,45 @@
     "fail": {
       "title": "لم يكتمل الاشتراك",
       "copy": "لم يُخصم أي مبلغ. يمكنك المحاولة مجددًا من صفحة الأسعار أو استخدام بطاقة أخرى."
+    }
+  },
+  "orderDetails": {
+    "title": "الطلب {reference}",
+    "backToOrders": "كل الطلبات",
+    "loading": "جارٍ تحميل الطلب…",
+    "invoice": "الفاتورة",
+    "items": "العناصر",
+    "itemsSubtitle": "{count} بند في هذا الطلب",
+    "noItems": "لا توجد بنود في هذا الطلب.",
+    "column": {
+      "product": "المنتج",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "lineTotal": "الإجمالي"
+    },
+    "history": "السجل",
+    "historySubtitle": "كل الحالات التي مر بها هذا الطلب",
+    "noHistory": "لم تُسجَّل أي تغييرات حالة بعد.",
+    "newStatus": "الحالة الجديدة",
+    "comment": "تعليق",
+    "commentPlaceholder": "مرئي للعميل",
+    "recordStatus": "تسجيل الحالة",
+    "recording": "جارٍ التسجيل…",
+    "statusAdded": "تم تسجيل الحالة.",
+    "customer": "العميل",
+    "placed": "تاريخ الطلب",
+    "addresses": "العناوين",
+    "billing": "الفوترة",
+    "delivery": "التسليم",
+    "noAddress": "غير مُقدَّم في هذا الطلب.",
+    "status": "الحالة",
+    "yes": "نعم",
+    "no": "لا",
+    "flag": {
+      "paymentStatus": "الدفع",
+      "reservationStatus": "حجز المخزون",
+      "customerAgreed": "الموافقة على الشروط",
+      "confirmedAddress": "تأكيد العنوان"
     }
   }
 }

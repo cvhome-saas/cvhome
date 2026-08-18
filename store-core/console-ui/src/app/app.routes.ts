@@ -105,6 +105,14 @@ export const routes: Routes = [
         loadComponent: () => import('@features/orders/orders').then((page) => page.Orders),
         data: {titleKey: 'route.orders.title', breadcrumbKey: 'shell.breadcrumb.orders'},
       },
+      {
+        // `withComponentInputBinding()` binds `:id` straight onto the component's `id` input, so
+        // navigating from one order to another re-reads without recreating the page.
+        path: ':id',
+        loadComponent: () =>
+          import('@features/order-details/order-details').then((page) => page.OrderDetails),
+        data: {titleKey: 'route.orderDetails.title', breadcrumbKey: 'shell.breadcrumb.orderDetails'},
+      },
     ],
   },
   {

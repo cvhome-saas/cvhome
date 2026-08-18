@@ -41,6 +41,9 @@
     },
     "signOut": {
       "title": "Signing out | cvhome"
+    },
+    "orderDetails": {
+      "title": "Order | cvhome"
     }
   },
   "notFound": {
@@ -972,7 +975,8 @@
       "orders": "Orders",
       "storeManagement": "Store management",
       "createStore": "Create store",
-      "firstRun": "Getting started"
+      "firstRun": "Getting started",
+      "orderDetails": "Order"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1062,6 +1066,45 @@
     "fail": {
       "title": "Subscription not completed",
       "copy": "Nothing was charged. You can try again from the pricing page, or use another card."
+    }
+  },
+  "orderDetails": {
+    "title": "Order {reference}",
+    "backToOrders": "All orders",
+    "loading": "Loading order…",
+    "invoice": "Invoice",
+    "items": "Items",
+    "itemsSubtitle": "{count} lines on this order",
+    "noItems": "This order has no lines.",
+    "column": {
+      "product": "Product",
+      "quantity": "Qty",
+      "unitPrice": "Unit price",
+      "lineTotal": "Total"
+    },
+    "history": "History",
+    "historySubtitle": "Every status this order has been through",
+    "noHistory": "No status changes recorded yet.",
+    "newStatus": "New status",
+    "comment": "Comment",
+    "commentPlaceholder": "Visible to the customer",
+    "recordStatus": "Record status",
+    "recording": "Recording…",
+    "statusAdded": "Status recorded.",
+    "customer": "Customer",
+    "placed": "Placed",
+    "addresses": "Addresses",
+    "billing": "Billing",
+    "delivery": "Delivery",
+    "noAddress": "Not provided on this order.",
+    "status": "Status",
+    "yes": "Yes",
+    "no": "No",
+    "flag": {
+      "paymentStatus": "Payment",
+      "reservationStatus": "Stock reservation",
+      "customerAgreed": "Terms accepted",
+      "confirmedAddress": "Address confirmed"
     }
   }
 }

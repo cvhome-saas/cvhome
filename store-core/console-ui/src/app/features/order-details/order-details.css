@@ -1,0 +1,293 @@
+:host {
+  display: contents;
+}
+
+.load-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-lg);
+  background: --alpha(var(--destructive) / 8%);
+  color: var(--foreground-strong);
+}
+
+.load-error p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.load-error button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-full);
+  color: var(--destructive);
+  font-size: var(--text-xs);
+}
+
+.first-load {
+  min-block-size: 24rem;
+}
+
+/* The mockup's two columns; the side column drops under the main one when the shell narrows. */
+.order-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.9fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.column-main,
+.column-side {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+}
+
+.panel-pad {
+  padding: 1.25rem;
+}
+
+.panel-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+/* ---- Items ------------------------------------------------------------------------------ */
+
+.items {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.items th {
+  padding-block-end: 0.6rem;
+  border-block-end: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.items td {
+  padding-block: 0.7rem;
+  border-block-end: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.items strong {
+  display: block;
+  color: var(--foreground-strong);
+  font-weight: 500;
+}
+
+.items small {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.numeric {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.mono {
+  font-family: ui-monospace, monospace;
+}
+
+.empty {
+  padding-block: 1.5rem;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.totals {
+  display: grid;
+  gap: 0.4rem;
+  margin: 1.1rem 0 0;
+  margin-inline-start: auto;
+  max-inline-size: 20rem;
+  font-size: var(--text-sm);
+}
+
+.totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.totals dt {
+  color: var(--muted-foreground);
+}
+
+.totals dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.totals .grand {
+  padding-block-start: 0.5rem;
+  border-block-start: 1px solid var(--border);
+  color: var(--foreground-strong);
+  font-weight: 600;
+}
+
+/* ---- History ---------------------------------------------------------------------------- */
+
+.timeline {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.timeline-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.timeline-copy strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.timeline-copy small,
+.timeline .empty {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.status-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding-block-start: 1rem;
+  border-block-start: 1px solid var(--border);
+}
+
+.status-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.status-form .grow {
+  flex: 1;
+  min-inline-size: 12rem;
+}
+
+.control {
+  inline-size: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+}
+
+.control:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ---- Side panels ------------------------------------------------------------------------ */
+
+.customer-name {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+}
+
+.customer-link {
+  color: var(--primary);
+  font-size: var(--text-sm);
+}
+
+.placed {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+}
+
+.placed strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.address-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.address-grid h3 {
+  margin: 0 0 0.4rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.address-name {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+}
+
+.address-line {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-sm);
+}
+
+.address-line.muted {
+  color: var(--muted-foreground);
+}
+
+.flags {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.flags > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flags dt {
+  color: var(--muted-foreground);
+}
+
+.flags dd {
+  margin: 0;
+  color: var(--foreground-strong);
+}
+
+@media (max-width: 1100px) {
+  .order-grid {
+    grid-template-columns: 1fr;
+  }
+}
