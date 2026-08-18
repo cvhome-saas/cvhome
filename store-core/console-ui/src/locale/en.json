@@ -210,16 +210,11 @@
     "metricsLabel": "Order metrics",
     "allOrders": "All orders",
     "filterByStatus": "Filter orders by status",
-    "filterByChannel": "Filter orders by channel",
     "markAsProcessed": "Mark as processed",
     "printPickingLists": "Print picking lists",
     "noneMatch": "No orders match this filter.",
     "unit": "orders",
     "pagesLabel": "Order pages",
-    "createShipment": "Create shipment",
-    "createShipmentFor": "Create shipment for {id}",
-    "printInvoice": "Print invoice",
-    "printInvoiceFor": "Print invoice for {id}",
     "column": {
       "order": "Order",
       "customer": "Customer",
@@ -228,56 +223,34 @@
       "items": "Items",
       "total": "Total",
       "placed": "Placed",
-      "actions": "Actions"
-    },
-    "status": {
-      "ordered": "Ordered",
-      "processed": "Processed",
-      "delivered": "Delivered",
-      "refunded": "Refunded",
-      "canceled": "Canceled"
-    },
-    "payment": {
-      "paid": "Paid",
-      "pending": "Pending",
-      "refunded": "Refunded",
-      "failed": "Failed"
-    },
-    "channel": {
-      "all": "All channels",
-      "web": "Web",
-      "phone": "Phone"
+      "actions": "Actions",
+      "city": "City"
     },
     "tab": {
       "all": "All"
     },
     "subtitle": {
       "all": "Every order placed in the selected period",
-      "ordered": "Awaiting picking and packing",
-      "processed": "Packed and handed to a carrier",
-      "delivered": "Confirmed received by the customer",
-      "refunded": "Fully or partially refunded",
-      "canceled": "Canceled before fulfilment"
+      "status": "{status} orders in this period"
     },
-    "lateNotice": "{count, plural, one {# order has} other {# orders have}} been waiting more than 24 hours without a status update.",
-    "unfulfilledHours": "{count}h unfulfilled",
     "kpi": {
       "orders": "Orders",
-      "unfulfilled": "Unfulfilled",
-      "late": "Late",
       "allClear": "All clear",
       "averageOrderValue": "Average order value",
       "returnsRate": "Returns rate",
-      "refundedCount": "{count, plural, one {# refunded} other {# refunded}}"
+      "awaitingFulfilment": "Awaiting fulfilment",
+      "awaiting": "Needs picking",
+      "unavailable": "Not available yet"
     },
     "notAvailable": {
-      "details": "Order details for {id} are not available yet.",
       "create": "Creating orders from the console is not available yet.",
-      "ship": "Shipping {id} is not available yet.",
-      "invoice": "Invoice for {id} is not available yet.",
       "bulkFulfilment": "Bulk fulfilment is not available yet.",
       "pickingLists": "Picking lists are not available yet."
-    }
+    },
+    "searchLabel": "Search orders",
+    "searchPlaceholder": "Customer name, email or phone",
+    "viewOrder": "View order",
+    "viewOrderFor": "View order {id}"
   },
   "storeSettings": {
     "title": "Store management",

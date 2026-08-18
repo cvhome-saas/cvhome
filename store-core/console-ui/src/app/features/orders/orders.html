@@ -32,6 +32,11 @@
 
         <app-panel class="orders-panel" [title]="t('orders.allOrders')" [subtitle]="subtitle()">
           <div panelAction class="panel-controls">
+            <!--
+              Ten statuses plus "All", from the server's own enum — more tabs than the mockup
+              shows, because the endpoint filters on one status at a time and grouping them would
+              mean inventing groups it cannot express. The strip scrolls.
+            -->
             <app-tab-switcher
               [tabs]="tabs()"
               [(active)]="activeTab"
@@ -39,52 +44,28 @@
               panelId="orders-table"
             />
 
-            <!-- Dismissed by the shell's document click handler, as the toolbar menus are. -->
-            <div class="menu channel-filter">
-              <button
-                class="channel-trigger"
-                type="button"
-                [attr.aria-expanded]="channelOpen()"
-                aria-haspopup="listbox"
-                (click)="channelOpen.set(!channelOpen())"
-              >
-                <app-icon name="filter" />
-                {{ channelLabel() }}
-                <app-icon name="chevronDown" />
-              </button>
-
-              @if (channelOpen()) {
-                <div class="popover" role="listbox" [attr.aria-label]="t('orders.filterByChannel')">
-                  @for (option of channels(); track option.key) {
-                    <button
-                      type="button"
-                      role="option"
-                      [class.selected]="option.key === facade.channel()"
-                      [attr.aria-selected]="option.key === facade.channel()"
-                      (click)="pickChannel(option.key)"
-                    >
-                      {{ option.label }}
-                      @if (option.key === facade.channel()) {
-                        <app-icon name="check" />
-                      }
-                    </button>
-                  }
-                </div>
-              }
-            </div>
+            <!--
+              One box, three server fields. The list endpoint filters on name, email and phone
+              separately, so the term is routed to whichever its shape implies — see `toOrderQuery`.
+              A channel filter used to sit here; orders carry no channel.
+            -->
+            <label class="order-search">
+              <app-icon name="search" />
+              <span class="sr-only">{{ t('orders.searchLabel') }}</span>
+              <input
+                type="search"
+                [value]="search()"
+                [placeholder]="t('orders.searchPlaceholder')"
+                (change)="onSearch($any($event.target).value)"
+              />
+            </label>
           </div>
 
-          @if (showLateNotice()) {
-            <app-notice-bar tone="amber" icon="alertCircle" [message]="lateNotice()">
-              <button class="notice-primary" type="button" (click)="markProcessed()">
-                <app-icon name="send" />
-                {{ t('orders.markAsProcessed') }}
-              </button>
-              <button class="notice-secondary" type="button" (click)="printPickingLists()">
-                {{ t('orders.printPickingLists') }}
-              </button>
-            </app-notice-bar>
-          }
+          <!--
+            TODO(lessons.md): an overdue notice sat here, counting orders "past 24 hours without a
+            status update". Nothing records when a status last changed — see lessons.md,
+            "Orders — no stale-order signal".
+          -->
 
           @if (orders().length) {
             <app-data-table id="orders-table" [columns]="columns()" [label]="t('orders.allOrders')">
@@ -92,50 +73,30 @@
                 <app-table-row [interactive]="true" (click)="openOrder(order)">
                   <div class="cell-order" role="cell" [attr.data-label]="t('orders.column.order')">
                     <!--
-                      The whole row is a click target for pointers, but only this is focusable
-                      — a row of eight tab stops would be far worse to move through.
+                      The whole row is a click target for pointers, but only this is focusable —
+                      one tab stop per row rather than one per cell.
                     -->
-                    <button
-                      class="order-id"
-                      type="button"
-                      (click)="$event.stopPropagation(); openOrder(order)"
-                    >
-                      {{ order.id }}
+                    <button class="order-ref" type="button" (click)="$event.stopPropagation(); openOrder(order)">
+                      {{ order.reference }}
                     </button>
-                    <span class="order-channel">
-                      <app-icon [name]="channelIconOf(order)" />
-                      {{ t(channelLabelKeyOf(order)) }}
-                    </span>
                   </div>
 
                   <div class="cell-customer" role="cell" [attr.data-label]="t('orders.column.customer')">
                     <span class="customer-mark" aria-hidden="true">{{ initialsOf(order) }}</span>
                     <span class="customer-copy">
                       <strong>{{ order.customer }}</strong>
-                      <small>{{ order.city }}</small>
+                      <small>{{ order.email }}</small>
                     </span>
                   </div>
 
+                  <span class="cell-city" role="cell" [attr.data-label]="t('orders.column.city')">{{ order.city }}</span>
+
                   <div class="cell-status" role="cell" [attr.data-label]="t('orders.column.status')">
-                    <app-badge [tone]="toneOf(order)" shape="square">{{ t(statusLabelKey(order)) }}</app-badge>
-                    @if (order.unfulfilledFor; as overdue) {
-                      <span class="status-late">
-                        <app-icon name="clock" />
-                        {{ t('orders.unfulfilledHours', {count: overdue}) }}
-                      </span>
-                    }
+                    <app-badge [tone]="toneOf(order)" shape="square">{{ statusLabel(order) }}</app-badge>
                   </div>
 
                   <div class="cell-payment" role="cell" [attr.data-label]="t('orders.column.payment')">
-                    <app-icon
-                      class="payment-mark"
-                      [class]="paymentOf(order).tone"
-                      [name]="paymentOf(order).icon"
-                    />
-                    <span class="payment-copy">
-                      <strong>{{ t(paymentLabelKey(order)) }}</strong>
-                      <small>{{ order.paymentMeta }}</small>
-                    </span>
+                    <span class="payment-copy"><strong>{{ order.payment ?? '—' }}</strong></span>
                   </div>
 
                   <span class="cell-items" role="cell" [attr.data-label]="t('orders.column.items')">{{ order.items }}</span>
@@ -143,30 +104,22 @@
                   <span class="cell-total" role="cell" [attr.data-label]="t('orders.column.total')">{{ order.total }}</span>
 
                   <div class="cell-placed" role="cell" [attr.data-label]="t('orders.column.placed')">
-                    <strong>{{ order.placedOn }}</strong>
-                    <small>{{ order.placedAt }}</small>
+                    <strong>{{ order.placedOn ? (order.placedOn | date: 'mediumDate') : '—' }}</strong>
                   </div>
 
                   <div class="cell-actions" role="cell" [attr.data-label]="t('orders.column.actions')">
-                    @if (order.status === 'Ordered') {
-                      <button
-                        class="row-action ship"
-                        type="button"
-                        [title]="t('orders.createShipment')"
-                        [attr.aria-label]="t('orders.createShipmentFor', {id: order.id})"
-                        (click)="$event.stopPropagation(); shipOrder(order)"
-                      >
-                        <app-icon name="truck" />
-                      </button>
-                    }
+                    <!--
+                      One row action, not three. Create-shipment had no endpoint, and the invoice
+                      moved to the detail page where it is rendered from the order itself.
+                    -->
                     <button
                       class="row-action"
                       type="button"
-                      [title]="t('orders.printInvoice')"
-                      [attr.aria-label]="t('orders.printInvoiceFor', {id: order.id})"
-                      (click)="$event.stopPropagation(); printInvoice(order)"
+                      [title]="t('orders.viewOrder')"
+                      [attr.aria-label]="t('orders.viewOrderFor', {id: order.id})"
+                      (click)="$event.stopPropagation(); openOrder(order)"
                     >
-                      <app-icon name="printer" />
+                      <app-icon name="chevronRight" [flip]="true" />
                     </button>
                   </div>
                 </app-table-row>

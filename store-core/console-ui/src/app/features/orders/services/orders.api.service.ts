@@ -1,163 +1,189 @@
-import {Injectable} from '@angular/core';
-import {Observable, delay, of, throwError} from 'rxjs';
+import {Injectable, inject} from '@angular/core';
+import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 
+import {OrdersService, type OrderQuery} from '@api/orders/orders.service';
+import {StatisticService} from '@api/analytics/statistic.service';
 import type {PageRequest, PageT} from '@core/table/table.types';
-import {ORDERS} from '@mocks/orders.fixture';
-import type {
-  ChannelFilter,
-  OrderKpiSource,
-  OrderRow,
-  OrderTab,
-  OrdersSnapshot,
-} from '@models/orders';
+import {AWAITING_FULFILMENT, type OrderStatus, type ReadableOrder} from '@models/checkout';
+import {orderStatusLabel, type OrderKpiSource, type OrderRow, type OrdersSnapshot, type OrderTab} from '@models/orders';
+import type {StatisticList} from '@models/statistics';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
+
+/** What the page asks for: a filter, a search term and a page. */
+export interface OrdersQuery {
+  readonly tab: OrderTab;
+  readonly search: string;
+  readonly page: PageRequest;
+  readonly range: DateRangeValue;
+}
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Round-trip the mock pretends to take, so loading states are actually exercised. */
-const MIN_LATENCY_MS = 450;
-const MAX_LATENCY_MS = 900;
-
 /**
- * Fraction of requests that fail, for exercising the error path by hand. Kept at 0 so the
- * app is predictable; the error path is covered by a failing stub in the spec instead.
+ * The orders page's data.
+ *
+ * Two legs, and their failure modes are deliberately different. The **list** is the page: if it
+ * fails, the page failed. The **statistics** are the KPI row, and that leg is optional —
+ * `order-statistic` currently 500s for every caller on a checkout bug unrelated to orders
+ * (see lessons.md, "Dashboard — the three merchant statistics 500 for every caller"), and letting
+ * that take the table down would mean losing the whole screen to a defect in a different endpoint.
  */
-const FAILURE_RATE = 0;
-
-/** What the page is asking for: a slice of the book, under the current filters. */
-export interface OrdersQuery {
-  readonly range: DateRangeValue;
-  readonly tab: OrderTab;
-  readonly channel: ChannelFilter;
-  readonly page: PageRequest;
-}
-
-/** The order book. Console chrome is served by `ConsoleApi`. */
 @Injectable({providedIn: 'root'})
 export class OrdersApi {
-  /**
-   * Loads one page of orders, with the headline metrics for the same period.
-   *
-   * Stands in for a real endpoint: it takes time, and filtering and paging happen here
-   * rather than in the page, so the page is written against the same contract a server
-   * would satisfy.
-   */
-  loadOrders(query: OrdersQuery): Observable<OrdersSnapshot> {
-    const latency = MIN_LATENCY_MS + Math.random() * (MAX_LATENCY_MS - MIN_LATENCY_MS);
+  private readonly orders = inject(OrdersService);
+  private readonly statistics = inject(StatisticService);
 
-    if (Math.random() < FAILURE_RATE) {
-      return throwError(() => new Error('Unable to load orders.')).pipe(delay(latency));
-    }
-
-    return of(this.snapshotFor(query)).pipe(delay(latency));
-  }
-
-  /**
-   * Derives a snapshot from the query. Deterministic — the same query always returns the
-   * same orders, so the UI is stable across reloads.
-   */
-  private snapshotFor(query: OrdersQuery): OrdersSnapshot {
-    const days = this.spanInDays(query.range);
-    // A 30-day period shows the whole book; shorter periods show proportionally less of it.
-    const inRange = ORDERS.slice(0, Math.max(1, Math.round(ORDERS.length * (days / 30))));
-
-    const matching = inRange.filter(
-      (order) =>
-        (query.tab === 'all' || order.status === query.tab) &&
-        (query.channel === 'all' || order.channel === query.channel),
+  loadSnapshot(query: OrdersQuery): Observable<OrdersSnapshot> {
+    return forkJoin({
+      page: this.orders.list(toOrderQuery(query)),
+      counts: this.countsFor(query.range),
+    }).pipe(
+      map(({page, counts}) => ({
+        kpis: kpis(page.totalElements, counts),
+        page: {...page, content: page.content.map(toRow)},
+      })),
     );
-
-    return {
-      kpis: this.kpisFor(inRange, days),
-      page: this.pageOf(matching, query.page),
-      totalInRange: inRange.length,
-      lateCount: matching.filter((order) => order.unfulfilledFor).length,
-    };
-  }
-
-  /** Metrics describe the period, not the tab — they do not move when a filter narrows. */
-  private kpisFor(inRange: readonly OrderRow[], days: number): readonly OrderKpiSource[] {
-    const unfulfilled = inRange.filter((order) => order.unfulfilledFor).length;
-    const refunded = inRange.filter((order) => order.status === 'Refunded').length;
-
-    const revenue = inRange
-      .filter((order) => order.status !== 'Canceled')
-      .reduce((sum, order) => sum + this.amountOf(order.total), 0);
-    const average = revenue / Math.max(1, inRange.length);
-    const returnsRate = (refunded / Math.max(1, inRange.length)) * 100;
-
-    return [
-      {
-        labelKey: 'orders.kpi.orders',
-        value: inRange.length.toLocaleString(),
-        icon: 'shoppingCart',
-        tone: 'blue',
-        delta: this.delta(days, 5.8),
-      },
-      {
-        labelKey: 'orders.kpi.unfulfilled',
-        value: `${unfulfilled}`,
-        icon: 'clock',
-        tone: 'red',
-        flagKey: unfulfilled > 0 ? 'orders.kpi.late' : 'orders.kpi.allClear',
-      },
-      {
-        labelKey: 'orders.kpi.averageOrderValue',
-        value: `$${average.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`,
-        icon: 'chartLine',
-        tone: 'green',
-        delta: this.delta(days, 3.1),
-      },
-      {
-        labelKey: 'orders.kpi.returnsRate',
-        value: `${returnsRate.toFixed(1)}%`,
-        icon: 'undo',
-        tone: 'violet',
-        flagCount: refunded,
-      },
-    ];
   }
 
   /**
-   * Slices a page out of the matching orders.
+   * Counts per status over the period, for the KPI row.
    *
-   * Clamps the requested page rather than returning an empty one: narrowing a filter can
-   * leave the reader on a page that no longer exists, and showing them the last real page
-   * beats showing them nothing.
+   * One `order-statistic` call rather than one list call per status: the statistic groups by status
+   * server-side, and asking the list four times to read four `totalElements` would be four round
+   * trips for the same answer. Null when it fails — the tiles then say so.
    */
-  private pageOf(matching: readonly OrderRow[], request: PageRequest): PageT<OrderRow> {
-    const size = Math.max(1, request.count);
-    const totalPages = Math.max(1, Math.ceil(matching.length / size));
-    const pageNumber = Math.min(Math.max(0, request.page), totalPages - 1);
-    const start = pageNumber * size;
-
-    return {
-      size,
-      totalElements: matching.length,
-      totalPages,
-      pageNumber,
-      content: matching.slice(start, start + size),
-    };
-  }
-
-  /** `'$1,240.00'` → `1240`. */
-  private amountOf(total: string): number {
-    return Number(total.replace(/[^0-9.]/g, '')) || 0;
-  }
-
-  private spanInDays(range: DateRangeValue): number {
-    if (!range.from || !range.to) {
-      return 30;
+  private countsFor(range: DateRangeValue): Observable<Map<string, number> | null> {
+    const {from, to} = range;
+    if (!from || !to) {
+      return of(null);
     }
-    const span = Math.round((range.to.getTime() - range.from.getTime()) / DAY_MS) + 1;
-    return Math.max(1, span);
-  }
-
-  /** Movement scales gently with the period so the figure is not obviously static. */
-  private delta(days: number, base: number): string {
-    return `${(base * (30 / Math.max(days, 1)) ** 0.25).toFixed(1)}%`;
+    return this.statistics
+      .orderStatistic({fromDate: startOfDay(from).toISOString(), toDate: endOfDay(to).toISOString()})
+      .pipe(
+        map(sumByStatus),
+        catchError(() => of(null)),
+      );
   }
 }
+
+/* --------------------------------------------------------------------------- shaping ---- */
+
+/**
+ * The page's filter, as the endpoint's parameters.
+ *
+ * One search box against three server fields. `OrderApi.list` matches `name`, `email` and `phone`
+ * separately and ANDs whatever it is given, so the term is routed to exactly one of them by shape:
+ * an `@` means an address, digits and punctuation alone mean a phone, anything else is a name.
+ * Sending it as all three would return nothing at all.
+ */
+function toOrderQuery(query: OrdersQuery): OrderQuery {
+  const term = query.search.trim();
+  const field = !term ? null : term.includes('@') ? 'email' : /^[\d\s+()-]+$/.test(term) ? 'phone' : 'name';
+
+  return {
+    page: query.page.page,
+    count: query.page.count,
+    ...(query.tab === 'all' ? {} : {status: query.tab}),
+    ...(field ? {[field]: term} : {}),
+  };
+}
+
+function toRow(order: ReadableOrder): OrderRow {
+  const customer = [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ').trim();
+  const address = order.delivery ?? order.billing;
+
+  return {
+    id: order.id ?? 0,
+    reference: order.id === undefined ? '—' : `#${order.id}`,
+    customer: customer || order.customer?.emailAddress || '—',
+    email: order.customer?.emailAddress ?? '',
+    city: address?.city ?? '—',
+    status: order.orderStatus ?? null,
+    // The order's own payment status, humanized the same way its order status is.
+    payment: order.paymentStatus ? orderStatusLabel(order.paymentStatus) : null,
+    // The list returns whole orders, so the line count needs no extra request.
+    items: order.products?.length ?? 0,
+    // Already formatted by the server, in the order's currency — the console does not re-derive it.
+    total: order.total?.text ?? '—',
+    placedOn: order.datePurchased ?? '',
+  };
+}
+
+function sumByStatus(list: StatisticList): Map<string, number> {
+  const totals = new Map<string, number>();
+  for (const entry of list.entries) {
+    totals.set(entry.name, (totals.get(entry.name) ?? 0) + Number(entry.value));
+  }
+  return totals;
+}
+
+function kpis(matching: number, counts: Map<string, number> | null): OrderKpiSource[] {
+  const unavailable = counts === null;
+  const awaiting = counts === null ? null : sumOf(counts, AWAITING_FULFILMENT);
+  const returned = counts?.get('RETURNED') ?? null;
+  const inPeriod = counts === null ? null : [...counts.values()].reduce((sum, value) => sum + value, 0);
+
+  return [
+    {
+      // The one figure that comes from the list rather than the statistic, so it survives the outage.
+      labelKey: 'orders.kpi.orders',
+      value: String(matching),
+      icon: 'shoppingCart',
+      tone: 'blue',
+    },
+    {
+      labelKey: 'orders.kpi.awaitingFulfilment',
+      value: awaiting === null ? null : String(awaiting),
+      icon: 'clock',
+      tone: unavailable ? 'slate' : 'red',
+      flagKey: unavailable
+        ? 'orders.kpi.unavailable'
+        : awaiting === 0
+          ? 'orders.kpi.allClear'
+          : 'orders.kpi.awaiting',
+    },
+    {
+      // TODO(lessons.md): average order value needs a revenue sum, and nothing on the platform
+      // provides one — see lessons.md, "Dashboard — no revenue anywhere".
+      labelKey: 'orders.kpi.averageOrderValue',
+      value: null,
+      icon: 'chartLine',
+      tone: 'slate',
+      flagKey: 'orders.kpi.unavailable',
+    },
+    {
+      labelKey: 'orders.kpi.returnsRate',
+      value: rate(returned, inPeriod),
+      icon: 'undo',
+      tone: unavailable ? 'slate' : 'violet',
+      flagKey: unavailable ? 'orders.kpi.unavailable' : undefined,
+    },
+  ];
+}
+
+function sumOf(counts: Map<string, number>, statuses: readonly OrderStatus[]): number {
+  return statuses.reduce((sum, status) => sum + (counts.get(status) ?? 0), 0);
+}
+
+/** A percentage, or null when there is nothing to divide by — never `NaN%` and never a bare `0%`. */
+function rate(part: number | null, whole: number | null): string | null {
+  if (part === null || whole === null || whole === 0) {
+    return null;
+  }
+  return `${((part / whole) * 100).toFixed(1)}%`;
+}
+
+function startOfDay(date: Date): Date {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function endOfDay(date: Date): Date {
+  const copy = new Date(date);
+  copy.setHours(23, 59, 59, 999);
+  return copy;
+}
+
+export type {PageT};
+export {DAY_MS};

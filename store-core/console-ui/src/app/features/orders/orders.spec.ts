@@ -1,272 +1,267 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
+import {Router, provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
-import {ORDERS} from '@mocks/orders.fixture';
-import type {OrderRow, OrdersSnapshot} from '@models/orders';
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import type {OrderStatus} from '@models/checkout';
+import type {OrderRow, OrdersSnapshot} from '@models/orders';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {Orders} from './orders';
 import {OrdersApi, type OrdersQuery} from './services/orders.api.service';
 import {PAGE_SIZE} from './facades/orders.facade';
 
-/** Pages the fixture the way the real service does, so the spec exercises real paging. */
-function snapshot(query: OrdersQuery, book: readonly OrderRow[] = ORDERS): OrdersSnapshot {
-  const matching = book.filter(
-    (order) =>
-      (query.tab === 'all' || order.status === query.tab) &&
-      (query.channel === 'all' || order.channel === query.channel),
-  );
-  const size = query.page.count;
-  const totalPages = Math.max(1, Math.ceil(matching.length / size));
-  const pageNumber = Math.min(Math.max(0, query.page.page), totalPages - 1);
-
+function row(id: number, status: OrderStatus, customer = 'Maya Chen'): OrderRow {
   return {
-    kpis: [{labelKey: 'test.orders', value: `${matching.length}`, icon: 'shoppingCart', tone: 'blue'}],
-    page: {
-      size,
-      totalElements: matching.length,
-      totalPages,
-      pageNumber,
-      content: matching.slice(pageNumber * size, pageNumber * size + size),
-    },
-    totalInRange: book.length,
-    lateCount: matching.filter((order) => order.unfulfilledFor).length,
+    id,
+    reference: `#${id}`,
+    customer,
+    email: `${customer.split(' ')[0].toLowerCase()}@example.com`,
+    city: 'Berlin',
+    status,
+    payment: 'Paid',
+    items: 3,
+    total: '$124.00',
+    placedOn: '2026-08-18T09:00:00Z',
   };
 }
 
-/** Stands in for the real endpoint so the spec controls timing and failure. */
+const BOOK: readonly OrderRow[] = [
+  row(10, 'CREATED'),
+  row(11, 'PROCESSING', 'Tobias Lind'),
+  row(12, 'DELIVERED', 'Amina Haddad'),
+  row(13, 'DELIVERED', 'Daniel Okoye'),
+  row(14, 'CANCELLED', 'Camille Roux'),
+];
+
+/** Stands in for the endpoint so the spec controls filtering, paging, timing and failure. */
 class FakeOrdersApi {
   readonly requests: OrdersQuery[] = [];
   /** When set, requests hang until `resolve()` — used to observe the loading state. */
-  deferred = false;
   pending: Subject<OrdersSnapshot> | null = null;
-  failure: Error | null = null;
+  failure = false;
+  book: readonly OrderRow[] = BOOK;
 
-  loadOrders(query: OrdersQuery): Observable<OrdersSnapshot> {
+  loadSnapshot(query: OrdersQuery): Observable<OrdersSnapshot> {
     this.requests.push(query);
     if (this.failure) {
-      return throwError(() => this.failure);
+      return throwError(() => new Error('Unable to load orders.'));
     }
-    if (this.deferred) {
-      this.pending = new Subject<OrdersSnapshot>();
-      return this.pending;
-    }
-    return of(snapshot(query));
+    return this.pending ?? of(this.snapshot(query));
   }
 
-  resolve(value: OrdersSnapshot): void {
-    this.pending?.next(value);
-    this.pending?.complete();
+  resolve(query: OrdersQuery = this.requests[this.requests.length - 1]): void {
+    const subject = this.pending;
     this.pending = null;
+    subject?.next(this.snapshot(query));
+    subject?.complete();
   }
 
-  get lastRequest(): OrdersQuery {
-    return this.requests[this.requests.length - 1];
+  /** Filters and pages the book the way the server would, so the spec exercises real behaviour. */
+  private snapshot(query: OrdersQuery): OrdersSnapshot {
+    const term = query.search.trim().toLowerCase();
+    const matching = this.book.filter(
+      (order) =>
+        (query.tab === 'all' || order.status === query.tab) &&
+        (!term || order.customer.toLowerCase().includes(term) || order.email.includes(term)),
+    );
+    const size = query.page.count;
+    const totalPages = Math.max(1, Math.ceil(matching.length / size));
+    const pageNumber = Math.min(Math.max(0, query.page.page), totalPages - 1);
+
+    return {
+      kpis: [
+        {labelKey: 'orders.kpi.orders', value: `${matching.length}`, icon: 'shoppingCart', tone: 'blue'},
+        // The tile that has no source anywhere on the platform.
+        {labelKey: 'orders.kpi.averageOrderValue', value: null, icon: 'chartLine', tone: 'slate', flagKey: 'orders.kpi.unavailable'},
+      ],
+      page: {
+        size,
+        totalElements: matching.length,
+        totalPages,
+        pageNumber,
+        content: matching.slice(pageNumber * size, pageNumber * size + size),
+      },
+    };
   }
 }
 
-/**
- * The page owns only its own content — the banner, rail and toolbar are covered by
- * `console-shell.spec.ts`.
- */
 describe('Orders', () => {
   let api: FakeOrdersApi;
+  let fixture: ComponentFixture<Orders>;
 
   beforeEach(async () => {
+    localStorage.removeItem('cvhome.console.store');
     api = new FakeOrdersApi();
     await TestBed.configureTestingModule({
       imports: [Orders, ...translocoTesting().imports],
-      providers: [provideRouter([]),
-        // The page header names the open store, which comes from the shell.
-        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})}, {provide: OrdersApi, useValue: api}, ...translocoTesting().providers],
+      providers: [
+        provideRouter([]),
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
+        {provide: OrdersApi, useValue: api},
+        ...translocoTesting().providers,
+      ],
     }).compileComponents();
   });
 
-  /** Creates the page and settles the initial request. */
-  function load(): {fixture: ComponentFixture<Orders>; element: HTMLElement} {
-    const fixture = TestBed.createComponent(Orders);
+  function load(): HTMLElement {
+    fixture = TestBed.createComponent(Orders);
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
-    return {fixture, element: fixture.nativeElement as HTMLElement};
+    return fixture.nativeElement as HTMLElement;
   }
 
-  /** Settles whatever the last interaction kicked off. */
-  function settle(fixture: ComponentFixture<Orders>): void {
-    fixture.detectChanges();
-    tick();
-    fixture.detectChanges();
-  }
-
-  function rows(element: HTMLElement): HTMLElement[] {
-    return Array.from(element.querySelectorAll('app-table-row'));
+  function references(element: HTMLElement): string[] {
+    return [...element.querySelectorAll('.order-ref')].map((node) => node.textContent!.trim());
   }
 
   it('renders a page of orders and none of the console chrome', fakeAsync(() => {
-    const {element} = load();
+    const element = load();
 
-    expect(element.querySelector('app-kpi-grid')).not.toBeNull();
-    expect(element.querySelector('app-data-table')).not.toBeNull();
-    expect(rows(element).length).toBe(PAGE_SIZE);
-    expect(element.querySelector('.order-id')?.textContent?.trim()).toBe(ORDERS[0].id);
-
-    // Chrome belongs to the shell; a page must not grow its own.
+    expect(references(element)).toEqual(['#10', '#11', '#12', '#13', '#14']);
     expect(element.querySelector('.toolbar')).toBeNull();
     expect(element.querySelector('.sidebar')).toBeNull();
-    expect(element.querySelector('app-plan-banner')).toBeNull();
   }));
 
-  it('asks for the first page of every channel and status on load', fakeAsync(() => {
+  it('asks for the first page of every status on load', fakeAsync(() => {
     load();
 
     expect(api.requests.length).toBe(1);
-    expect(api.lastRequest.tab).toBe('all');
-    expect(api.lastRequest.channel).toBe('all');
-    expect(api.lastRequest.page).toEqual({page: 0, count: PAGE_SIZE});
-    expect(api.lastRequest.range.from).toBeTruthy();
+    expect(api.requests[0].tab).toBe('all');
+    expect(api.requests[0].search).toBe('');
+    expect(api.requests[0].page).toEqual({page: 0, count: PAGE_SIZE});
   }));
 
-  it('veils the table until the first response arrives', fakeAsync(() => {
-    api.deferred = true;
-    const fixture = TestBed.createComponent(Orders);
-    settle(fixture);
-    const element = fixture.nativeElement as HTMLElement;
+  it('offers a tab for every real status, not the five the mockup drew', fakeAsync(() => {
+    const element = load();
+    const tabs = [...element.querySelectorAll('app-tab-switcher button')].map((b) => b.textContent!.trim());
 
-    expect(element.querySelector('app-busy-overlay')?.getAttribute('aria-busy')).toBe('true');
-    expect(element.querySelector('.busy-veil')).not.toBeNull();
-    expect(element.querySelector('app-data-table')).toBeNull();
-    expect(element.querySelector('.busy-content')?.hasAttribute('inert')).toBeTrue();
-
-    api.resolve(snapshot({...api.lastRequest}));
-    tick();
-    fixture.detectChanges();
-
-    expect(element.querySelector('app-busy-overlay')?.getAttribute('aria-busy')).toBe('false');
-    expect(element.querySelector('app-data-table')).not.toBeNull();
+    // Ten statuses plus "All". Humanized from the enum, so an unexpected one cannot throw.
+    expect(tabs.length).toBe(11);
+    expect(tabs).toContain('Pending Payment');
+    expect(tabs).toContain('Delivering');
+    expect(tabs).not.toContain('Ordered');
   }));
 
   it('refetches for the selected status and renders only those orders', fakeAsync(() => {
-    const {fixture, element} = load();
+    const element = load();
+    const delivered = [...element.querySelectorAll('app-tab-switcher button')].find(
+      (b) => b.textContent!.trim() === 'Delivered',
+    ) as HTMLButtonElement;
 
-    fixture.componentInstance['facade'].activeTab.set('Canceled');
-    settle(fixture);
+    delivered.click();
+    tick();
+    fixture.detectChanges();
 
-    expect(api.lastRequest.tab).toBe('Canceled');
-    const canceled = ORDERS.filter((order) => order.status === 'Canceled');
-    expect(rows(element).length).toBe(canceled.length);
+    expect(api.requests[api.requests.length - 1].tab).toBe('DELIVERED');
+    expect(references(element)).toEqual(['#12', '#13']);
+  }));
+
+  it('sends the search term to the server rather than filtering on screen', fakeAsync(() => {
+    const element = load();
+    const search = element.querySelector('.order-search input') as HTMLInputElement;
+
+    search.value = 'Tobias';
+    search.dispatchEvent(new Event('change'));
+    tick();
+    fixture.detectChanges();
+
+    expect(api.requests[api.requests.length - 1].search).toBe('Tobias');
+    expect(references(element)).toEqual(['#11']);
   }));
 
   it('drops back to the first page when the filter changes', fakeAsync(() => {
-    const {fixture} = load();
+    api.book = Array.from({length: 25}, (_, index) => row(100 + index, 'CREATED'));
+    const element = load();
 
-    fixture.componentInstance['facade'].goToPage(2);
-    settle(fixture);
-    expect(api.lastRequest.page.page).toBe(2);
+    const steps = element.querySelectorAll('app-pagination .page-step');
+    (steps[steps.length - 1] as HTMLButtonElement).click();
+    tick();
+    fixture.detectChanges();
+    expect(api.requests[api.requests.length - 1].page.page).toBe(1);
 
-    // Page 3 of "all" is not page 3 of "Delivered"; asking for it would strand the reader.
-    fixture.componentInstance['facade'].activeTab.set('Delivered');
-    settle(fixture);
+    const cancelled = [...element.querySelectorAll('app-tab-switcher button')].find(
+      (b) => b.textContent!.trim() === 'Cancelled',
+    ) as HTMLButtonElement;
+    cancelled.click();
+    tick();
+    fixture.detectChanges();
 
-    expect(api.lastRequest.tab).toBe('Delivered');
-    expect(api.lastRequest.page.page).toBe(0);
+    // Holding page 2 would ask for a page the narrowed result does not have.
+    expect(api.requests[api.requests.length - 1].page.page).toBe(0);
   }));
 
-  it('pages through the book from the pager', fakeAsync(() => {
-    const {fixture, element} = load();
+  it('refetches when the open store changes', fakeAsync(() => {
+    load();
+    expect(api.requests.length).toBe(1);
 
-    const next = element.querySelector<HTMLButtonElement>('[aria-label="Next page"]');
-    expect(next).not.toBeNull();
-    next!.click();
-    settle(fixture);
+    TestBed.inject(ConsoleShellFacade).selectStore(CONSOLE_STORES_FAKE[1].id);
+    tick();
 
-    expect(api.lastRequest.page.page).toBe(1);
-    expect(element.querySelector('.order-id')?.textContent?.trim()).toBe(ORDERS[PAGE_SIZE].id);
+    // Orders belong to one store; the table must not outlive the store it was read for.
+    expect(api.requests.length).toBe(2);
   }));
 
-  it('filters by channel', fakeAsync(() => {
-    const {fixture, element} = load();
+  it('shows an em dash for a figure with no source, never a zero', fakeAsync(() => {
+    const element = load();
+    const cards = [...element.querySelectorAll('app-kpi-card')] as HTMLElement[];
+    const average = cards[cards.length - 1];
 
-    fixture.componentInstance['facade'].channel.set('Phone');
-    settle(fixture);
-
-    expect(api.lastRequest.channel).toBe('Phone');
-    const phone = ORDERS.filter((order) => order.channel === 'Phone');
-    expect(rows(element).length).toBe(Math.min(PAGE_SIZE, phone.length));
-  }));
-
-  it('raises the overdue notice only on the queue those orders are stuck in', fakeAsync(() => {
-    const {fixture, element} = load();
-
-    expect(element.querySelector('app-notice-bar')).toBeNull();
-
-    fixture.componentInstance['facade'].activeTab.set('Ordered');
-    settle(fixture);
-
-    const notice = element.querySelector('app-notice-bar');
-    expect(notice).not.toBeNull();
-    const late = ORDERS.filter(
-      (order) => order.status === 'Ordered' && order.unfulfilledFor,
-    ).length;
-    expect(notice?.textContent).toContain(`${late} orders have been waiting`);
-
-    fixture.componentInstance['facade'].activeTab.set('Delivered');
-    settle(fixture);
-
-    expect(element.querySelector('app-notice-bar')).toBeNull();
+    expect(average.querySelector('.kpi-value')?.textContent?.trim()).toBe('—');
+    expect(average.textContent).toContain('Not available yet');
   }));
 
   it('keeps the previous rows on screen while the next filter loads', fakeAsync(() => {
-    const {fixture, element} = load();
-    expect(element.querySelector('.order-id')?.textContent?.trim()).toBe(ORDERS[0].id);
+    const element = load();
+    api.pending = new Subject<OrdersSnapshot>();
 
-    api.deferred = true;
-    fixture.componentInstance['facade'].activeTab.set('Delivered');
-    settle(fixture);
-
-    // Veiled, but still readable — the layout must not collapse mid-request.
-    expect(element.querySelector('.busy-veil')).not.toBeNull();
-    expect(element.querySelector('.order-id')?.textContent?.trim()).toBe(ORDERS[0].id);
-
-    api.resolve(snapshot({...api.lastRequest}));
-    tick();
+    const cancelled = [...element.querySelectorAll('app-tab-switcher button')].find(
+      (b) => b.textContent!.trim() === 'Cancelled',
+    ) as HTMLButtonElement;
+    cancelled.click();
     fixture.detectChanges();
 
-    const delivered = ORDERS.find((order) => order.status === 'Delivered');
-    expect(element.querySelector('.order-id')?.textContent?.trim()).toBe(delivered!.id);
+    // Blanking the table on every tab change would make the page flicker.
+    expect(references(element).length).toBe(5);
+    expect(element.querySelector('app-busy-overlay .busy-veil')).not.toBeNull();
+
+    api.resolve();
+    tick();
+    fixture.detectChanges();
+    expect(references(element)).toEqual(['#14']);
   }));
 
   it('says so when a filter matches nothing', fakeAsync(() => {
-    const {fixture, element} = load();
-
-    api.deferred = true;
-    fixture.componentInstance['facade'].activeTab.set('Refunded');
-    settle(fixture);
-    api.resolve(snapshot({...api.lastRequest}, []));
-    tick();
-    fixture.detectChanges();
+    api.book = [];
+    const element = load();
 
     expect(element.querySelector('app-data-table')).toBeNull();
-    expect(element.querySelector('.table-empty')?.textContent).toContain('No orders match');
+    expect(element.querySelector('.table-empty')).not.toBeNull();
   }));
 
   it('surfaces a failed request with a retry that refetches', fakeAsync(() => {
-    api.failure = new Error('Unable to load orders.');
-    const fixture = TestBed.createComponent(Orders);
-    settle(fixture);
-    const element = fixture.nativeElement as HTMLElement;
+    api.failure = true;
+    const element = load();
 
-    const alert = element.querySelector('.load-error');
-    expect(alert).not.toBeNull();
-    expect(alert?.textContent).toContain('Unable to load orders.');
+    expect(element.querySelector('.load-error')).not.toBeNull();
 
-    api.failure = null;
-    element.querySelector<HTMLButtonElement>('.load-error button')!.click();
-    settle(fixture);
+    api.failure = false;
+    (element.querySelector('.load-error button') as HTMLButtonElement).click();
+    tick();
+    fixture.detectChanges();
 
-    expect(api.requests.length).toBe(2);
     expect(element.querySelector('.load-error')).toBeNull();
-    expect(rows(element).length).toBe(PAGE_SIZE);
+    expect(references(element).length).toBe(5);
+  }));
+
+  it('opens an order by navigating to it', fakeAsync(() => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate');
+    const element = load();
+
+    (element.querySelector('.order-ref') as HTMLButtonElement).click();
+
+    expect(navigate).toHaveBeenCalledWith(['/orders', 10]);
   }));
 });

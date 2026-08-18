@@ -1,4 +1,6 @@
-import {Component, ElementRef, computed, inject, signal, viewChild} from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {Component, ElementRef, computed, inject, viewChild} from '@angular/core';
+import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
@@ -10,28 +12,19 @@ import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
 import {ExportButton} from '@shared/ui/export-button/export-button';
 import {Icon} from '@shared/ui/icon/icon';
 import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Pagination} from '@shared/ui/pagination/pagination';
 import {Panel} from '@shared/ui/panel/panel';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
-import {
-  ORDER_CHANNEL_ICON,
-  ORDER_CHANNEL_LABEL_KEY,
-  ORDER_STATUS_LABEL_KEY,
-  PAYMENT_BADGE,
-  PAYMENT_STATE_LABEL_KEY,
-  STATUS_TONE,
-  type ChannelFilter,
-  type OrderRow,
-} from '@models/orders';
+import {STATUS_TONE, orderStatusLabel, type OrderRow} from '@models/orders';
 import {OrdersFacade} from './facades/orders.facade';
 
 /** The order book's columns. Widths are grid tracks, read straight into the row layout. */
 const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align?: 'start' | 'end'}[] = [
   {key: 'order', labelKey: 'orders.column.order', width: 'minmax(7.5rem, 0.9fr)'},
   {key: 'customer', labelKey: 'orders.column.customer', width: 'minmax(10rem, 1.5fr)'},
+  {key: 'city', labelKey: 'orders.column.city', width: 'minmax(7rem, 1fr)'},
   {key: 'status', labelKey: 'orders.column.status', width: 'minmax(7rem, 1fr)'},
   {key: 'payment', labelKey: 'orders.column.payment', width: 'minmax(8rem, 1.05fr)'},
   {key: 'items', labelKey: 'orders.column.items', width: '4.5rem', align: 'end'},
@@ -55,11 +48,11 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     Badge,
     BusyOverlay,
     DataTable,
+    DatePipe,
     DateRangePicker,
     ExportButton,
     Icon,
     KpiGrid,
-    NoticeBar,
     PageHeader,
     Pagination,
     Panel,
@@ -74,6 +67,7 @@ export class Orders {
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
   private readonly localeFormat = inject(TranslocoLocaleService);
+  private readonly router = inject(Router);
 
   protected readonly facade = inject(OrdersFacade);
 
@@ -91,14 +85,8 @@ export class Orders {
   protected readonly tabs = this.facade.tabs;
   protected readonly subtitle = this.facade.subtitle;
   protected readonly context = this.facade.context;
-  protected readonly showLateNotice = this.facade.showLateNotice;
-  protected readonly lateNotice = this.facade.lateNotice;
-
-  protected readonly channels = this.facade.channels;
-  protected readonly channelLabel = this.facade.channelLabel;
+  protected readonly search = this.facade.search;
   protected readonly pageSize = 10;
-
-  protected readonly channelOpen = signal(false);
 
   protected readonly columns = computed<readonly TableColumn[]>(() => {
     this.transloco.activeLang();
@@ -123,28 +111,13 @@ export class Orders {
     return `${format(from)} – ${format(to)}`;
   });
 
+  /** Slate for an order whose status the console has not seen — a colour, not a claim. */
   protected toneOf(order: OrderRow) {
-    return STATUS_TONE[order.status];
+    return order.status ? STATUS_TONE[order.status] : 'slate';
   }
 
-  protected paymentOf(order: OrderRow) {
-    return PAYMENT_BADGE[order.payment];
-  }
-
-  protected channelIconOf(order: OrderRow) {
-    return ORDER_CHANNEL_ICON[order.channel];
-  }
-
-  protected statusLabelKey(order: OrderRow): string {
-    return ORDER_STATUS_LABEL_KEY[order.status];
-  }
-
-  protected paymentLabelKey(order: OrderRow): string {
-    return PAYMENT_STATE_LABEL_KEY[order.payment];
-  }
-
-  protected channelLabelKeyOf(order: OrderRow): string {
-    return ORDER_CHANNEL_LABEL_KEY[order.channel];
+  protected statusLabel(order: OrderRow): string {
+    return order.status ? orderStatusLabel(order.status) : '—';
   }
 
   /** First letters of the first two words, as the avatar tile shows them. */
@@ -157,33 +130,25 @@ export class Orders {
       .toUpperCase();
   }
 
-  protected pickChannel(channel: ChannelFilter): void {
-    this.facade.channel.set(channel);
-    this.channelOpen.set(false);
+  protected onSearch(term: string): void {
+    this.facade.search.set(term);
   }
 
   protected onPage(page: number): void {
     this.facade.goToPage(page);
   }
 
-  /*
-   * Order details, fulfilment and order creation have no backend yet. These say so rather
-   * than failing silently, so a click never looks like a bug.
-   */
   protected openOrder(order: OrderRow): void {
-    this.toast.info(this.transloco.translate('orders.notAvailable.details', {id: order.id}));
+    this.router.navigate(['/orders', order.id]);
   }
 
+  /*
+   * TODO(lessons.md): creating an order, shipping one and bulk fulfilment have no endpoints — see
+   * lessons.md, "Orders — no fulfilment or shipping model" and "Orders — no cancel and no duplicate".
+   * These say so rather than failing silently, so a click never looks like a bug.
+   */
   protected createOrder(): void {
     this.toast.info(this.transloco.translate('orders.notAvailable.create'));
-  }
-
-  protected shipOrder(order: OrderRow): void {
-    this.toast.info(this.transloco.translate('orders.notAvailable.ship', {id: order.id}));
-  }
-
-  protected printInvoice(order: OrderRow): void {
-    this.toast.info(this.transloco.translate('orders.notAvailable.invoice', {id: order.id}));
   }
 
   protected markProcessed(): void {

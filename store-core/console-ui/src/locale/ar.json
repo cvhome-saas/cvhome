@@ -210,16 +210,11 @@
     "metricsLabel": "مقاييس الطلبات",
     "allOrders": "كل الطلبات",
     "filterByStatus": "تصفية الطلبات حسب الحالة",
-    "filterByChannel": "تصفية الطلبات حسب القناة",
     "markAsProcessed": "تحديد كمُعالَج",
     "printPickingLists": "طباعة قوائم الالتقاط",
     "noneMatch": "لا توجد طلبات مطابقة لهذا الفلتر.",
     "unit": "طلب",
     "pagesLabel": "صفحات الطلبات",
-    "createShipment": "إنشاء شحنة",
-    "createShipmentFor": "إنشاء شحنة لـ {id}",
-    "printInvoice": "طباعة الفاتورة",
-    "printInvoiceFor": "طباعة فاتورة {id}",
     "column": {
       "order": "الطلب",
       "customer": "العميل",
@@ -228,56 +223,34 @@
       "items": "العناصر",
       "total": "الإجمالي",
       "placed": "تاريخ الطلب",
-      "actions": "إجراءات"
-    },
-    "status": {
-      "ordered": "تم الطلب",
-      "processed": "قيد المعالجة",
-      "delivered": "تم التسليم",
-      "refunded": "مسترد",
-      "canceled": "ملغى"
-    },
-    "payment": {
-      "paid": "مدفوع",
-      "pending": "قيد الانتظار",
-      "refunded": "مسترد",
-      "failed": "فشل"
-    },
-    "channel": {
-      "all": "كل القنوات",
-      "web": "الموقع الإلكتروني",
-      "phone": "الهاتف"
+      "actions": "إجراءات",
+      "city": "المدينة"
     },
     "tab": {
       "all": "الكل"
     },
     "subtitle": {
       "all": "كل طلب تم تقديمه في الفترة المحددة",
-      "ordered": "بانتظار التجهيز والتعبئة",
-      "processed": "تم تعبئته وتسليمه لشركة الشحن",
-      "delivered": "تم تأكيد الاستلام من العميل",
-      "refunded": "مسترد كليًا أو جزئيًا",
-      "canceled": "ملغى قبل التنفيذ"
+      "status": "طلبات {status} في هذه الفترة"
     },
-    "lateNotice": "{count, plural, zero {لا طلبات} one {طلب واحد ينتظر} two {طلبان ينتظران} few {# طلبات تنتظر} many {# طلبًا ينتظر} other {# طلب ينتظر}} منذ أكثر من 24 ساعة دون تحديث للحالة.",
-    "unfulfilledHours": "{count} ساعة دون تنفيذ",
     "kpi": {
       "orders": "الطلبات",
-      "unfulfilled": "غير منفذة",
-      "late": "متأخر",
       "allClear": "لا مشاكل",
       "averageOrderValue": "متوسط قيمة الطلب",
       "returnsRate": "معدل الإرجاع",
-      "refundedCount": "{count, plural, zero {لا مسترد} one {مسترد واحد} two {مستردان} few {# مستردة} many {# مستردًا} other {# مسترد}}"
+      "awaitingFulfilment": "بانتظار التنفيذ",
+      "awaiting": "بحاجة إلى تجهيز",
+      "unavailable": "غير متاح بعد"
     },
     "notAvailable": {
-      "details": "تفاصيل الطلب {id} غير متاحة بعد.",
       "create": "إنشاء الطلبات من وحدة التحكم غير متاح بعد.",
-      "ship": "شحن {id} غير متاح بعد.",
-      "invoice": "فاتورة {id} غير متاحة بعد.",
       "bulkFulfilment": "التنفيذ الجماعي غير متاح بعد.",
       "pickingLists": "قوائم الالتقاط غير متاحة بعد."
-    }
+    },
+    "searchLabel": "البحث في الطلبات",
+    "searchPlaceholder": "اسم العميل أو بريده أو هاتفه",
+    "viewOrder": "عرض الطلب",
+    "viewOrderFor": "عرض الطلب {id}"
   },
   "storeSettings": {
     "title": "إدارة المتجر",

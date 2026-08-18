@@ -1,110 +1,86 @@
 import type {PageT} from '@core/table/table.types';
-import {IconName} from '@shared/ui/icon/icon-paths';
+import type {OrderStatus} from '@models/checkout';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {Tone} from '@shared/ui/tone';
 
-/** Where an order sits in fulfilment. The same vocabulary the dashboard charts. */
-export type OrderStatus = 'Ordered' | 'Processed' | 'Delivered' | 'Refunded' | 'Canceled';
-
-export type PaymentState = 'Paid' | 'Pending' | 'Refunded' | 'Failed';
-
-export type OrderChannel = 'Web' | 'Phone';
+/**
+ * The orders page's view models.
+ *
+ * The wire shapes live in `@models/checkout`. What changed when this page went from fixture to real
+ * orders: the five invented statuses (`Ordered | Processed | Delivered | Refunded | Canceled`) are
+ * gone, replaced by the server's ten-value enum, and with them the channel column, the card-brand
+ * line and the late badge — none of which any field on an order carries. See lessons.md.
+ */
 
 /**
  * Status to its categorical tone.
  *
- * Matches `DASHBOARD_ORDER_STATUSES`, so an order is the same colour in the dashboard's
- * breakdown chart and in this table.
+ * Grouped by meaning rather than spread across the palette, and **identical to the dashboard's map**
+ * so an order is the same colour in the breakdown chart and in this table.
  */
 export const STATUS_TONE: Readonly<Record<OrderStatus, Tone>> = {
-  Ordered: 'green',
-  Processed: 'blue',
-  Delivered: 'cyan',
-  Refunded: 'amber',
-  Canceled: 'red',
+  CREATED: 'slate',
+  PENDING_PAYMENT: 'amber',
+  CONFIRMED: 'blue',
+  PROCESSING: 'blue',
+  SHIPPED: 'cyan',
+  DELIVERING: 'cyan',
+  DELIVERED: 'green',
+  COMPLETED: 'green',
+  CANCELLED: 'red',
+  RETURNED: 'violet',
 };
 
-/** How a payment state is drawn: never colour alone — the state is always spelled out. */
-export const PAYMENT_BADGE: Readonly<Record<PaymentState, {icon: IconName; tone: Tone}>> = {
-  Paid: {icon: 'checkCircle', tone: 'green'},
-  Pending: {icon: 'clock', tone: 'amber'},
-  Refunded: {icon: 'undo', tone: 'slate'},
-  Failed: {icon: 'xCircle', tone: 'red'},
-};
-
-export const ORDER_CHANNEL_ICON: Readonly<Record<OrderChannel, IconName>> = {
-  Web: 'globe',
-  Phone: 'phone',
-};
-
-/** Display translation keys for the fixed vocabularies above — never the enum values themselves. */
-export const ORDER_STATUS_LABEL_KEY: Readonly<Record<OrderStatus, string>> = {
-  Ordered: 'orders.status.ordered',
-  Processed: 'orders.status.processed',
-  Delivered: 'orders.status.delivered',
-  Refunded: 'orders.status.refunded',
-  Canceled: 'orders.status.canceled',
-};
-
-export const PAYMENT_STATE_LABEL_KEY: Readonly<Record<PaymentState, string>> = {
-  Paid: 'orders.payment.paid',
-  Pending: 'orders.payment.pending',
-  Refunded: 'orders.payment.refunded',
-  Failed: 'orders.payment.failed',
-};
-
-export const ORDER_CHANNEL_LABEL_KEY: Readonly<Record<OrderChannel, string>> = {
-  Web: 'orders.channel.web',
-  Phone: 'orders.channel.phone',
-};
-
-export interface OrderRow {
-  /** Display reference, including the hash: `#10482`. */
-  readonly id: string;
-  readonly channel: OrderChannel;
-  readonly customer: string;
-  readonly city: string;
-  readonly status: OrderStatus;
-  readonly payment: PaymentState;
-  /** How it was paid: `Visa •••• 4242`, `Bank transfer`. */
-  readonly paymentMeta: string;
-  readonly items: number;
-  readonly total: string;
-  readonly placedOn: string;
-  readonly placedAt: string;
-  /**
-   * Hours the order has gone unfulfilled. Present only on late orders — its absence is
-   * what "on time" means. Formatted at render time (`orders.unfulfilledHours`) so the
-   * locale's plural rules apply.
-   */
-  readonly unfulfilledFor?: number;
+/**
+ * A status as a person reads it.
+ *
+ * Humanized, never translated. The server owns this enum and Transloco is configured to throw on a
+ * missing key, so a status added server-side would take the page down if it were looked up. Same
+ * rule as the dashboard's chart labels.
+ */
+export function orderStatusLabel(status: string): string {
+  return status
+    .toLowerCase()
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
-/** The tab strip's keys: every status, plus the unfiltered view. */
-export type OrderTab = 'all' | OrderStatus;
+/** One row of the orders table. Every field is read off the order the list already returned. */
+export interface OrderRow {
+  /** The numeric id, used for the row's link. */
+  readonly id: number;
+  /** Display reference, including the hash: `#10482`. */
+  readonly reference: string;
+  readonly customer: string;
+  readonly email: string;
+  readonly city: string;
+  readonly status: OrderStatus | null;
+  /** The order's own `paymentStatus`, humanized. Null when the order carries none. */
+  readonly payment: string | null;
+  readonly items: number;
+  /** Already formatted by the server, in the order's currency. */
+  readonly total: string;
+  readonly placedOn: string;
+}
 
-/** A filter selection, or every channel. */
-export type ChannelFilter = 'all' | OrderChannel;
+/** The filter strip's selection: one real status, or every order. */
+export type OrderTab = 'all' | OrderStatus;
 
 /** One order KPI's source data, resolved into a `KpiDatum` by the facade. */
 export interface OrderKpiSource {
   readonly labelKey: string;
-  readonly value: string;
+  /** Null when the figure has no source — rendered as an em dash under a flag, never as a zero. */
+  readonly value: string | null;
   readonly icon: KpiDatum['icon'];
   readonly tone: KpiDatum['tone'];
   readonly delta?: string;
-  /** A state flag, e.g. "Late" / "All clear". Mutually exclusive with `flagCount`. */
+  readonly trend?: 'up' | 'down';
   readonly flagKey?: string;
-  /** A state flag carrying a count, e.g. "3 refunded". Mutually exclusive with `flagKey`. */
-  readonly flagCount?: number;
 }
 
 /** Everything the orders page renders for one query. */
 export interface OrdersSnapshot {
   readonly kpis: readonly OrderKpiSource[];
   readonly page: PageT<OrderRow>;
-  /** Orders in the period before the tab and channel filters narrow it. */
-  readonly totalInRange: number;
-  /** Orders in the current filter that are past their fulfilment window. */
-  readonly lateCount: number;
 }

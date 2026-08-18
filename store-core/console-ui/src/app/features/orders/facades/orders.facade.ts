@@ -5,13 +5,26 @@ import {TranslocoService} from '@jsverse/transloco';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 
 import type {PageT} from '@core/table/table.types';
-import type {ChannelFilter, OrderRow, OrderTab, OrdersSnapshot} from '@models/orders';
+import {ORDER_STATUSES} from '@models/checkout';
+import {orderStatusLabel, type OrderRow, type OrderTab, type OrdersSnapshot} from '@models/orders';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
 import {OrdersApi} from '../services/orders.api.service';
 
-const DEFAULT_RANGE: DateRangeValue = {from: new Date(2026, 6, 5), to: new Date(2026, 7, 4)};
+/** How far back the page looks when it opens. */
+const DEFAULT_RANGE_DAYS = 30;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** The last 30 days, ending today — computed, not the fixed 2026 dates this used to carry. */
+function defaultRange(): DateRangeValue {
+  const to = new Date();
+  return {from: new Date(to.getTime() - (DEFAULT_RANGE_DAYS - 1) * DAY_MS), to};
+}
+
+/** What a KPI with no source shows in place of a figure. */
+const NO_FIGURE = '—';
 
 export const PAGE_SIZE = 10;
 
@@ -23,31 +36,17 @@ const EMPTY_ORDERS: PageT<OrderRow> = {
   content: [],
 };
 
-/** The tab strip, in fulfilment order. Badges are filled in from the loaded data. */
-const TABS: readonly {key: OrderTab; labelKey: string}[] = [
-  {key: 'all', labelKey: 'orders.tab.all'},
-  {key: 'Ordered', labelKey: 'orders.status.ordered'},
-  {key: 'Processed', labelKey: 'orders.status.processed'},
-  {key: 'Delivered', labelKey: 'orders.status.delivered'},
-  {key: 'Refunded', labelKey: 'orders.status.refunded'},
-  {key: 'Canceled', labelKey: 'orders.status.canceled'},
-];
-
-/** What each tab is showing, said plainly under the panel title. */
-const SUBTITLE_KEYS: Readonly<Record<OrderTab, string>> = {
-  all: 'orders.subtitle.all',
-  Ordered: 'orders.subtitle.ordered',
-  Processed: 'orders.subtitle.processed',
-  Delivered: 'orders.subtitle.delivered',
-  Refunded: 'orders.subtitle.refunded',
-  Canceled: 'orders.subtitle.canceled',
-};
-
-export const CHANNEL_FILTERS: readonly {key: ChannelFilter; labelKey: string}[] = [
-  {key: 'all', labelKey: 'orders.channel.all'},
-  {key: 'Web', labelKey: 'orders.channel.web'},
-  {key: 'Phone', labelKey: 'orders.channel.phone'},
-];
+/**
+ * The tab strip: every order status, in fulfilment order, plus the unfiltered view.
+ *
+ * Ten statuses rather than the mockup's five, because ten is what `OrderStatus` has and the endpoint
+ * filters on exactly one at a time — grouping them into five would mean inventing groups the API
+ * cannot express. The strip scrolls horizontally instead.
+ *
+ * Labels are humanized, not translated: the server owns this enum, and Transloco throws on a missing
+ * key, so an eleventh status would take the page down.
+ */
+const TABS: readonly OrderTab[] = ['all', ...ORDER_STATUSES];
 
 /**
  * The orders page's data, keyed on the period, the status tab, the channel and the page.
@@ -62,9 +61,10 @@ export class OrdersFacade {
   private readonly transloco = inject(TranslocoService);
   private readonly shell = inject(ConsoleShellFacade);
 
-  readonly dateRange = signal<DateRangeValue>(DEFAULT_RANGE);
+  readonly dateRange = signal<DateRangeValue>(defaultRange());
   readonly activeTab = signal<OrderTab>('all');
-  readonly channel = signal<ChannelFilter>('all');
+  /** Free-text search, routed to the server's name, email or phone filter by its shape. */
+  readonly search = signal('');
 
   /**
    * `computed()` rather than a static object — see `DashboardFacade.heading` for why:
@@ -87,18 +87,38 @@ export class OrdersFacade {
    * did not choose.
    */
   readonly pageIndex = linkedSignal<unknown, number>({
-    source: () => [this.dateRange(), this.activeTab(), this.channel()],
+    source: () => [this.dateRange(), this.activeTab(), this.search(), this.shell.currentStoreId()],
     computation: () => 0,
   });
 
-  private readonly snapshot = rxResource({
-    params: () => ({
+  /**
+   * What the table is a reading of: filters, a page, and a store.
+   *
+   * `undefined` until the store is known, which leaves the resource idle. The store directory
+   * resolves a moment after the page first renders, so without this the page fired **two** requests
+   * on every open — one unscoped, one correct.
+   *
+   * The store id is in the params though no argument is built from it: the request context stamps
+   * `?store=` itself, and without it here the table would keep one store's orders under another
+   * store's name.
+   */
+  private readonly query = computed(() => {
+    const storeId = this.shell.currentStoreId();
+    if (!storeId) {
+      return undefined;
+    }
+    return {
       range: this.dateRange(),
       tab: this.activeTab(),
-      channel: this.channel(),
+      search: this.search(),
       page: {page: this.pageIndex(), count: PAGE_SIZE},
-    }),
-    stream: ({params}) => this.api.loadOrders(params),
+      storeId,
+    };
+  });
+
+  private readonly snapshot = rxResource({
+    params: () => this.query(),
+    stream: ({params}) => this.api.loadSnapshot(params),
   });
 
   /**
@@ -125,30 +145,32 @@ export class OrdersFacade {
     this.transloco.activeLang();
     return (this.loaded()?.kpis ?? []).map((kpi) => ({
       label: this.transloco.translate(kpi.labelKey),
-      value: kpi.value,
+      // An em dash, never a zero: average order value has no source, and two more tiles report
+      // nothing while the statistic endpoint is down.
+      value: kpi.value ?? NO_FIGURE,
       icon: kpi.icon,
       tone: kpi.tone,
       delta: kpi.delta,
-      flag: kpi.flagKey
-        ? this.transloco.translate(kpi.flagKey)
-        : kpi.flagCount !== undefined
-          ? this.transloco.translate('orders.kpi.refundedCount', {count: kpi.flagCount})
-          : undefined,
+      trend: kpi.trend,
+      flag: kpi.flagKey ? this.transloco.translate(kpi.flagKey) : undefined,
     }));
   });
   readonly page = computed<PageT<OrderRow>>(() => this.loaded()?.page ?? EMPTY_ORDERS);
   readonly orders = computed<readonly OrderRow[]>(() => this.page().content);
-  readonly lateCount = computed(() => this.loaded()?.lateCount ?? 0);
 
+  /** What the strip is showing, said plainly under the panel title. */
   readonly subtitle = computed(() => {
     this.transloco.activeLang();
-    return this.transloco.translate(SUBTITLE_KEYS[this.activeTab()]);
+    const tab = this.activeTab();
+    return tab === 'all'
+      ? this.transloco.translate('orders.subtitle.all')
+      : this.transloco.translate('orders.subtitle.status', {status: orderStatusLabel(tab)});
   });
 
-  /** The period line under the page title, once a response says how much is in it. */
+  /** The period line under the page title, once a response says how many orders are in it. */
   readonly context = computed(() => {
     this.transloco.activeLang();
-    const total = this.loaded()?.totalInRange;
+    const total = this.loaded()?.page.totalElements;
     return total === undefined
       ? this.heading().context
       : this.transloco.translate('orders.heading.contextWithCount', {
@@ -158,42 +180,17 @@ export class OrdersFacade {
   });
 
   /**
-   * The tab strip. Only the tab needing action carries a badge — badging every tab with its
-   * count would make the one that matters no louder than the rest.
+   * The tab strip.
+   *
+   * No badges. The counts that used to sit here came from a "late orders" figure nothing reports —
+   * see lessons.md, "Orders — no stale-order signal is available to this page either".
    */
   readonly tabs = computed<readonly TabItem[]>(() => {
     this.transloco.activeLang();
-    const late = this.lateCount();
     return TABS.map((tab) => ({
-      key: tab.key,
-      label: this.transloco.translate(tab.labelKey),
-      badge: tab.key === 'Ordered' && late > 0 ? `${late}` : undefined,
-      badgeTone: 'red' as const,
+      key: tab,
+      label: tab === 'all' ? this.transloco.translate('orders.tab.all') : orderStatusLabel(tab),
     }));
-  });
-
-  /** The overdue notice belongs to the queue those orders are stuck in. */
-  readonly showLateNotice = computed(() => this.activeTab() === 'Ordered' && this.lateCount() > 0);
-
-  readonly lateNotice = computed(() => {
-    this.transloco.activeLang();
-    return this.transloco.translate('orders.lateNotice', {count: this.lateCount()});
-  });
-
-  readonly channels = computed(() => {
-    this.transloco.activeLang();
-    return CHANNEL_FILTERS.map((option) => ({
-      key: option.key,
-      label: this.transloco.translate(option.labelKey),
-    }));
-  });
-
-  readonly channelLabel = computed(() => {
-    this.transloco.activeLang();
-    const active = this.channel();
-    return this.transloco.translate(
-      CHANNEL_FILTERS.find((option) => option.key === active)?.labelKey ?? 'orders.channel.all',
-    );
   });
 
   goToPage(page: number): void {
