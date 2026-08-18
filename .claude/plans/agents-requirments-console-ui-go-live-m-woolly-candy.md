@@ -1,4 +1,4 @@
-# console-ui go-live — migration framework, and Module 4
+# console-ui go-live — migration framework, and Module 5
 
 ## Context
 
@@ -270,7 +270,24 @@ Shipped in three commits. What it established, which Module 4 reuses:
 
 ---
 
-## Module 4 — Orders
+## Module 4 — Orders — **done**
+
+Shipped across twelve commits (`feat(console-ui): order list on real orders` through
+`docs(console-ui): make every lessons.md reference resolve`). `orders.fixture.ts` is gone and
+`lessons.md` reached 45 entries. What it established, which Module 5 reuses:
+
+- **The known-set-then-fallback i18n pattern, as reusable services.** `shared/i18n/status-label.ts`,
+  `total-label.ts` and `money.ts` translate a server enum only when it is in a known set and humanize
+  it otherwise, so a value the console has not seen cannot take the page down under Transloco's
+  strict-missing handler. Module 5's provider and payment-type enums get the same treatment.
+- **Locale-correct data, not just locale-correct words.** `TranslocoLocaleService` for money, numbers
+  and dates — `Intl.NumberFormat(undefined, …)` resolves to the *browser's* locale and `DatePipe` is
+  pinned to `LOCALE_ID`, so both were wrong in Arabic. And `unicode-bidi: plaintext` for Latin data
+  (addresses, phone numbers, SKUs) inside an RTL page.
+- **Route params are validated before they reach a facade.** `/orders/abc` used to reach the server
+  as `orders/NaN` and come back a 500 that read as "load failed".
+- The full-page review after shipping found a genuinely app-wide bug — `crypto.randomUUID` does not
+  exist on insecure origins, so *every* toast in the app silently failed over plain HTTP.
 
 ### Scope
 
@@ -445,7 +462,7 @@ screen is large enough that folding it into one commit would make the diff unrea
 
 ---
 
-## Critical files
+### Critical files (Module 4)
 
 **seller-ui: not modified.** Read-only reference.
 
@@ -464,7 +481,7 @@ assembly point), `.../facades/orders.facade.ts`, `.../orders.html` (columns and 
 `src/app/core/export/pdf-export.service.ts` and `shared/ui/export-button` (the invoice),
 `shared/ui/{data-table,pagination,tab-switcher,page-header,panel,badge,busy-overlay,kpi-grid}`.
 
-## Verification
+### Verification (Module 4)
 
 1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
    `git -C store-core/seller-ui status --porcelain` empty, and `store-pod` untouched.
@@ -474,3 +491,217 @@ assembly point), `.../facades/orders.facade.ts`, `.../orders.html` (columns and 
    one order, which is this module's strongest evidence.
 5. Network tab: the list request carries `?store=`, `page`, `count` and the active filter.
 6. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
+
+---
+
+## Module 5 — Store management
+
+### Context
+
+console-ui's store-management feature is fully built and entirely fake. `mocks/store-settings.fixture.ts`
+feeds one `StoreSettings` document through `store-settings.api.service.ts`, which merges patches in
+memory and answers after a simulated delay. Eight sections — branding, home page, domain, social links,
+slider images, details, social login, payment configuration — render, validate and "save" without a
+single HTTP call. This module makes all eight real.
+
+Unlike Module 4, the shell does not need building: the page, the sub-nav, the eight section components,
+the form service and its validators all exist and stay. What changes is the layer beneath them.
+
+**The finding that shapes this module.** The design and the backend disagree far more than they did for
+Orders, and in both directions:
+
+- **Six of the twelve designed store-detail fields exist nowhere on the platform** — legal entity name,
+  store slug, category, timezone, tax/VAT number, short description — as do the Published and
+  Maintenance-mode toggles. Verified by grepping every `.java` file in `store-pod` and `store-core`:
+  `legalName`, `taxNumber`, `maintenanceMode`, `timezone` and `shortDescription` return zero hits, and
+  `slug` exists only for products, categories and content, never for a store.
+- **Nine fields the store record really carries are not on the screen** — theme, colour theme,
+  in-business-since, weight and dimension units, cache, require-login-for-checkout, supported languages
+  and country (`MerchantStoreDetails` + `ReadableMerchantStore`).
+- **The home page section has never worked, in either UI.** All three endpoints seller-core calls —
+  `GET /private/content/any/{code}`, `PUT /private/content/{code}`, `POST /private/content` — do not
+  exist. `ContentApi` maps `/private/content/pages`, `/private/content/boxes`, `/private/content/page`
+  and `/private/content/box`, and nothing else. seller-ui's landing-page screen has always 404'd, the
+  same class of finding as Orders' Refund and Capture buttons.
+- **The API hands the browser live secrets in cleartext.** `PaymentConfigurationMapper` and
+  `SocialLoginConfigMapper` both `decrypt()` before serialising, so `GET` on a payment configuration
+  returns the Stripe secret key and webhook secret in plaintext, and `GET` on a social-login
+  configuration returns the OAuth app secret. Encryption at rest buys nothing on these two endpoints.
+
+### seller-ui today
+
+`src/app/pages/store-management/`, one route per section, nav driven by `seller-core/stores`'
+`sideMenuLinks`. Store creation and the stores list are **out of scope** — Module 2 already ported
+`ManagerStoreService.list/create/nameExists`, and console-ui's `create-store` feature consumes them.
+
+| Section | seller-ui route | seller-core facade |
+|---|---|---|
+| Branding | `store-branding/:code` | `store-branding-logo.facade.ts`, `store-branding-banner.facade.ts` |
+| Details | `store/:code` (`StoreFormComponent`) | `store-form/facades/store-form.facade.ts` |
+| Home page | `store-landing/:code` | `store-landing-page.facade.ts` — **404s today** |
+| Domain | `store-domain/:code` | `store-domain.facade.ts`, `store-domain.validator.ts` |
+| Social links | `store-social-links/:code` | `store-social-links.facade.ts` |
+| Slider images | `store-slider-images/:code` | `store-slider-images.facade.ts` |
+| Social login | `store-social-login/:code` | `store-social-login.facade.ts` |
+| Payments | `store-payment-configuration/:code` | `store-payment-configuration.facade.ts` |
+
+Seven of the eight work. The console-ui fixture's `notSupported` toasts on branding upload, slider
+add/reorder/delete and delete-store are **not** backend gaps — they are places the fixture is more
+restrictive than reality, and they get wired to real endpoints here.
+
+### API surface to port
+
+All from `seller-core/stores/src/lib/services/store.service.ts` and `dns-check.service.ts`, split by
+concern into `src/app/api/stores/` — plus one new `api/content/` for the home page:
+
+| New file | Endpoints |
+|---|---|
+| `api/stores/store-detail.service.ts` | `PUT /spg/merchant/api/v1/private/store?store=`, `DELETE …/private/store?store=`, `GET /tenancy/api/v1/store-manager/public/themes`, `GET …/public/color-themes` |
+| `api/stores/store-branding.service.ts` | `POST`/`DELETE …/private/store/marketing/logo?store=`, `POST`/`DELETE …/private/store/marketing/banner?store=` (multipart) |
+| `api/stores/store-domain.service.ts` | `GET /tenancy/api/v1/saas/public/saas-properties`, `GET /spg/merchant/api/v1/router/private/allocates?store=`, `GET /tenancy/api/v1/router/store-pod-by-store-id?store=`, `POST`/`DELETE …/router/private/allocate|remove?domain=`, plus `DnsCheckService`'s client-side DoH CNAME lookup |
+| `api/stores/store-social-links.service.ts` | `GET /tenancy/api/v1/store-manager/public/social-links-providers`, `PUT /spg/merchant/api/v1/private/store/social-links?store=` |
+| `api/stores/store-slider.service.ts` | `POST …/private/store/marketing/add-slider-image?store=`, `PUT …/private/store/marketing/slider-images?store=` |
+| `api/stores/store-social-login.service.ts` | `GET /spg/cua/api/v1/private/social-login-config/supported-social-providers`, `GET`/`POST …/social-login-config?store=` |
+| `api/stores/store-payment-config.service.ts` | `GET /spg/payment/api/v1/private/payment-configuration/supported-payment-types`, `GET`/`POST …/payment-configuration?store=`, `PUT`/`DELETE …/payment-configuration/{paymentType}?store=` |
+| `api/content/content-box.service.ts` | `GET /spg/content/api/v1/private/content/boxes/{code}?store=`, `GET …/private/content/box/{code}/exists?store=`, `POST …/private/content/box?store=`, `PUT …/private/content/box/{id}?store=` |
+
+`GET …/store-manager/private/store/{store}` is **already ported** as `ManagerStoreService.getStoreDetail`
+(Module 2) — reuse it, do not re-port. `updateSocialNetworks` (`POST /v1/private/store/{store}/marketing`)
+has no caller anywhere in seller-ui; **not ported**, dead code.
+
+Wire DTOs go in `models/stores.ts` (new) and `models/content.ts` (new): `PersistableMerchantStore`,
+`Address`, `Logo`, `Banner`, `SocialLink`, `SliderImage`, `ManagerStoreDomain`, `SaasProperties`,
+`ReadableSocialLoginConfig`/`PersistableSocialLoginConfig`,
+`ReadablePaymentConfiguration`/`PersistablePaymentConfiguration`, `ReadableContentBox`/
+`PersistableContentBox`/`ContentDescription`. Drop seller-core's `LandingPageContent` entirely — it was
+typed from what the frontend happened to send, against endpoints that do not exist.
+
+**Two corrections to make while porting.** `PersistableMerchantStore` carries an
+`[key: string]: unknown` index signature that defeats `strict` — remove it and type the fields.
+`POST /social-login-config` takes a **`List<PersistableSocialLoginConfig>`**, an array, not a single
+object; seller-core's signature obscures this.
+
+### Decisions (settled with the user)
+
+| Question | Decision |
+|---|---|
+| The six unbacked detail fields | **Keep them, all of them, marked.** Add the nine real fields the store record carries *and* keep the six designed-but-unbacked ones, each disabled with an honest label, a `TODO(lessons.md):` marker and a `lessons.md` entry. The section ends up the fullest picture of a store the console can draw, and every dead control says why it is dead. |
+| Secrets returned in cleartext | **Reveal toggle.** The console shows the real `apiKey`, `secretKey`, `webhookSecret` and `appSecret` behind a click-to-reveal, masked by default, because that is genuinely what the API returns and an operator needs to verify a key. The `SecretHint` shape (`endsWith`/`lastRotated`) is dropped — `lastRotated` has no source anywhere. A `lessons.md` entry records that these endpoints should stop decrypting before serialising. |
+| The home page section | **Built, on content boxes.** `ContentBox` is a fragment with a `code` and per-language `descriptions[]`; `ContentPage` adds `linkToMenu`, which means nothing for home-page copy. `ContentDescription` carries `name`, `description`, `metaDescription` and `keyWords` — a 1:1 fit for the four fields the design shows — and `GET …/box/{code}/exists` gives a real create-vs-update pre-flight instead of seller-ui's guess. |
+| Storefront Builder | **Not built.** `console-template/Storefront Builder.dc.html` designs a drag-and-drop canvas of typed, reorderable page sections. A content box is a flat per-language document; nothing on the platform stores a section list. `lessons.md` entry, and the plain "Store home page" block from `Store Management.dc.html` is what gets built. |
+| Scope | **One module, five commits**, grouped by how the sections cluster rather than by pod. |
+
+### What stays unbacked → `lessons.md`
+
+1. **No legal entity name, slug, category, timezone, tax number or short description on a store.** Six
+   designed fields, zero backing. Disabled with a reason.
+2. **No store publish state and no maintenance mode.** `Store visibility` in the design is two toggles
+   with nothing behind them; provisioning state is not the same thing.
+3. **No page builder.** A content box is flat; `Storefront Builder.dc.html` needs typed, ordered,
+   reorderable sections.
+4. **No storefront preview.** Nothing renders a storefront from draft content before publish. The
+   design's "Preview storefront" button has no target.
+5. **Payment and social-login GETs return secrets in cleartext.** Both mappers decrypt before
+   serialising. Recorded as a backend issue with the mapper lines quoted, since the console cannot fix
+   it and the reveal toggle makes it visible rather than hidden.
+6. **A legacy plaintext credential row reads back as `null`.** Both mappers only set the field when the
+   stored value is in encrypted form, so a row written before encryption silently reads empty — which
+   the console cannot distinguish from "not configured".
+7. **DNS verification is a browser-side check, not a platform one.** `DnsCheckService` queries Google's
+   DoH endpoint directly; nothing server-side ever confirms the CNAME. Carried over as-is, because it is
+   what seller-ui does, but it is not a guarantee.
+8. **Slider images have no scheduling, no link target and no file metadata.** `ReadableSliderImage` is
+   `{priority, name, url}`; the design's `LIVE`/`SCHEDULED` tag, click-through link and
+   `1600×640 · 248 KB · JPG` line have no source.
+
+### Implementation
+
+- **Port** `api/stores/*` and `api/content/content-box.service.ts` per the table, following the standing
+  checklist: rewrite imports to `@core/*`, `TranslateService` → `TranslocoService`, harden to `strict`,
+  keep the doc comments, add the provenance line, bring specs across.
+- **`models/store-settings.ts`** is reshaped to what the DTOs actually hold: `StoreDetails` gains the
+  nine real fields and keeps the six unbacked ones behind an `unbacked` marker the section reads;
+  `address` expands from one string to the five `Address` fields; `SecretHint` is deleted; `SliderSlide`
+  loses `meta`, `link` and `state`; `StoreDomain` keeps its derived `status` and `record`, which come
+  from the DoH check and `saasProperties` respectively.
+- **`store-settings.api.service.ts`** becomes the assembly point: each section's read and save call the
+  matching ported service and map wire DTO ↔ view model. `loadSettings()` is a `forkJoin` across the
+  section GETs and the three supported-provider lists, each optional leg wrapped in `catchError` so one
+  dead pod cannot blank the whole page — the pattern Module 3 set for `order-statistic`.
+- **`store-settings.facade.ts`**: `saveSection(key, patch)` dispatches to the real service instead of
+  merging in memory; `verifyDomain` calls the real DoH check.
+- Delete the `notSupported` paths for branding upload/remove, slider add/reorder/delete and delete-store,
+  and wire them to their endpoints. **Delete-store gets a typed confirmation dialog** — it is the one
+  irreversible action on the page and currently a bare button.
+- Provider and payment-type enums route through the `StatusLabel`-style known-set guard from Module 4,
+  so a new `SocialProvider` or `PaymentType` from the server cannot throw under Transloco strict.
+- `mocks/store-settings.fixture.ts` is deleted.
+
+### New components
+
+- **`shared/ui/secret-field`** — masked value, reveal toggle, copy button. Used by both the social-login
+  and payment sections, four fields in total.
+- **`shared/ui/confirm-dialog`** — a typed confirmation for delete-store. Check first whether the toast
+  and busy-overlay work in `shared/ui/` already covers this; the template has no modal anywhere, so this
+  is console-ui's to design either way.
+
+### Testing
+
+Both UIs, same org admin, `ORG1-STORE1` open in each.
+
+- Each section reads the same values seller-ui shows, field for field.
+- Each section writes: change one field, save, reload, confirm it persisted — and confirm seller-ui shows
+  the change after a reload there too.
+- Branding: upload a logo and a banner, remove each. These were `notSupported` toasts; confirm they now
+  round-trip.
+- Slider: add an image, reorder, delete; confirm the 8-slot capacity still holds.
+- Domain: allocate a subdomain, run the DNS check on a custom domain, remove it.
+- Home page: save copy in English, switch to Arabic, save different copy, reload — confirm both
+  `descriptions[]` entries persist against the box's `code`, and that the first save created the box
+  (`POST`) while the second updated it (`PUT` by numeric id).
+- Secrets: confirm masked by default, revealed on click, and that a gateway with no credentials stored
+  reads as "not configured" rather than blank.
+- **Delete store: only against a throwaway store created for the test, never `ORG1-STORE1`.**
+- The six unbacked detail fields render disabled with their reason, and do not submit.
+- Arabic and all three themes; 1440 / 900 / 420.
+
+### Commits
+
+1. `plan(console-ui): store management` — this document.
+2. `feat(console-ui): store details and branding on real APIs`.
+3. `feat(console-ui): store domain, social links and slider images on real APIs`.
+4. `feat(console-ui): store home page on content boxes`.
+5. `feat(console-ui): social login and payment configuration on real APIs`.
+6. `fix(console-ui): store management after QA`.
+
+### Critical files
+
+**seller-ui: not modified.** Read-only reference. **store-pod: not modified** — the secret-in-cleartext
+finding is logged, not fixed, per the standing convention.
+
+**New:** `src/app/api/stores/{store-detail,store-branding,store-domain,store-social-links,store-slider,store-social-login,store-payment-config}.service.ts`,
+`src/app/api/content/content-box.service.ts`, `src/app/models/{stores,content}.ts`,
+`src/app/shared/ui/secret-field/`, possibly `src/app/shared/ui/confirm-dialog/`.
+
+**Changed:** `src/app/features/store-management/services/store-settings.api.service.ts` (the assembly
+point), `.../services/store-settings-form.service.ts`, `.../facades/store-settings.facade.ts`,
+`.../components/{details,branding,slider,social-login,payments}-section/`,
+`src/app/models/store-settings.ts`, `src/locale/{en,ar}.json`, `lessons.md`.
+
+**Deleted:** `src/app/mocks/store-settings.fixture.ts`.
+
+**Reused:** `api/tenancy/manager-store.service.ts`'s `getStoreDetail`, `shared/i18n/status-label.ts`'s
+known-set pattern, `core/http/crud.service.ts`, `core/errors/*`.
+
+### Verification
+
+1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
+   `git -C store-core/seller-ui status --porcelain` and `git -C store-pod status --porcelain` both empty.
+2. `grep -rn "store-settings.fixture" src` → no hits.
+3. `grep -rn "SecretHint\|lastRotated" src` → no hits.
+4. `grep -rn "notSupported" src/app/features/store-management` → only the genuinely unbacked actions
+   (storefront preview) remain.
+5. The two-tab comparison above, driven through Chrome — one field changed and reloaded per section.
+6. Network tab: every save carries `?store=`, and the home-page save is a `POST …/content/box` the first
+   time and a `PUT …/content/box/{id}` the second.
+7. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
