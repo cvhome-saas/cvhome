@@ -10,9 +10,26 @@ import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {DashboardSnapshot} from '@models/dashboard';
 import type {RankedItem} from '@shared/ui/ranked-list/ranked-list';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
-import {DashboardApi} from '../services/dashboard.api.service';
+import {DashboardApi, type CompleteRange} from '../services/dashboard.api.service';
 
-const DEFAULT_RANGE: DateRangeValue = {from: new Date(2026, 6, 5), to: new Date(2026, 7, 4)};
+/** How far back the dashboard looks when the page opens. */
+const DEFAULT_RANGE_DAYS = 30;
+
+/** What a KPI with no source shows in place of a figure. */
+const NO_FIGURE = '—';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The last 30 days, ending today.
+ *
+ * Computed rather than fixed. The previous revision hardcoded July–August 2026, which was harmless
+ * against a fixture and simply wrong against real orders.
+ */
+function defaultRange(): DateRangeValue {
+  const to = new Date();
+  return {from: new Date(to.getTime() - (DEFAULT_RANGE_DAYS - 1) * DAY_MS), to};
+}
 
 /**
  * The dashboard page's data, keyed on the selected reporting period.
@@ -28,9 +45,6 @@ export class DashboardFacade {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly localeFormat = inject(TranslocoLocaleService);
 
-  /** Fixture "now" for the heading's context line — see `heading` below. */
-  private static readonly HEADING_DATE = new Date(2026, 7, 4);
-
   /**
    * `computed()` rather than a static object: it renders once per page load but must still
    * follow a language switch, and a plain field would freeze at whatever language was
@@ -44,16 +58,30 @@ export class DashboardFacade {
       // follows the active locale like everything else.
       context: this.transloco.translate('dashboard.heading.context', {
         store: this.shell.currentStore()?.name ?? '',
-        date: this.localeFormat.localizeDate(DashboardFacade.HEADING_DATE, undefined, {dateStyle: 'medium'}),
+        date: this.localeFormat.localizeDate(this.completeRange()?.to ?? new Date(), undefined, {
+          dateStyle: 'medium',
+        }),
       }),
     };
   });
 
   /** The requested period. Writing to it triggers a fetch. */
-  readonly dateRange = signal<DateRangeValue>(DEFAULT_RANGE);
+  readonly dateRange = signal<DateRangeValue>(defaultRange());
+
+  /**
+   * The range, once both ends are chosen.
+   *
+   * `undefined` while a selection is half-made, which leaves the resource idle: the picker emits
+   * `{from, to: null}` between the two clicks, and a request built from that would either fail or
+   * silently report on the wrong window.
+   */
+  private readonly completeRange = computed<CompleteRange | undefined>(() => {
+    const {from, to} = this.dateRange();
+    return from && to ? {from, to} : undefined;
+  });
 
   private readonly snapshot = rxResource({
-    params: () => this.dateRange(),
+    params: () => this.completeRange(),
     stream: ({params}) => this.api.loadSnapshot(params),
   });
 
@@ -85,10 +113,13 @@ export class DashboardFacade {
     this.transloco.activeLang();
     return (this.loaded()?.kpis ?? []).map((kpi) => ({
       label: this.transloco.translate(kpi.labelKey),
-      value: kpi.value,
+      // An em dash, never a zero: two of these tiles have no source at all, and a third reports
+      // nothing when payments is unreachable.
+      value: kpi.value ?? NO_FIGURE,
       icon: kpi.icon,
       tone: kpi.tone,
       delta: kpi.delta,
+      trend: kpi.trend,
       flag: kpi.flagKey ? this.transloco.translate(kpi.flagKey) : undefined,
     }));
   });
@@ -98,35 +129,23 @@ export class DashboardFacade {
     return (this.loaded()?.attention ?? []).map((item) => ({
       label: this.transloco.translate(item.labelKey),
       detail: this.transloco.translate(item.detailKey),
-      count: item.count,
+      count: item.count ?? NO_FIGURE,
       icon: item.icon,
       tone: item.tone,
     }));
   });
 
-  readonly orderStatuses = computed(() => {
-    this.transloco.activeLang();
-    return (this.loaded()?.orderStatuses ?? []).map((status) => ({
-      label: this.transloco.translate(status.labelKey),
-      value: status.value,
-      tone: status.tone,
-    }));
-  });
+  /** Labels arrive resolved — the server's status names are not translation keys. */
+  readonly orderStatuses = computed(() => this.loaded()?.orderStatuses ?? []);
 
-  readonly customerSplit = computed<readonly DonutSlice[]>(() => {
-    this.transloco.activeLang();
-    return (this.loaded()?.customerSplit ?? []).map((segment) => ({
-      label: this.transloco.translate(segment.labelKey),
-      value: segment.value,
-      tone: segment.tone,
-    }));
-  });
+  /** Slices are countries as the orders recorded them, so there is nothing to translate. */
+  readonly customerSplit = computed<readonly DonutSlice[]>(() => this.loaded()?.customerSplit ?? []);
 
-  /** Product names are catalog data — a real API would already return them localized. */
+  /** SKU and order count — see `Product`. Neither is copy. */
   readonly topProducts = computed<readonly RankedItem[]>(() =>
     (this.loaded()?.products ?? []).map((product) => ({
-      label: product.name,
-      value: product.sales,
+      label: product.sku,
+      value: product.orders,
     })),
   );
 

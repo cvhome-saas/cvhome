@@ -380,3 +380,96 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Placeholder:** documented in `console.api.service.ts` (`loadUser`), which deliberately does not call
   it.
 
+---
+
+## Dashboard — no revenue anywhere
+
+- **Screen:** `/dashboard`, the first and largest KPI tile in `Admin Dashboard.dc.html`.
+- **What the UI needs:** money taken over the selected period, and its movement against the previous one.
+- **What is missing:** any sum of any amount. All three merchant statistics are `count(...)` queries —
+  `order-statistic` counts orders, `customer-statistic` counts orders, `product-statistic` counts order
+  lines. Nothing anywhere sums `order.total`. Billing knows about subscriptions, which is what the
+  *merchant* pays cvhome, not what the merchant's shoppers pay them.
+- **Why it is required:** it is the headline figure of the whole console, and the one number a merchant
+  opens the dashboard to see. Its absence is why the tile is rendered "Not available yet" rather than
+  quietly dropped — a dashboard with no revenue on it should look like an unfinished dashboard.
+- **Expected contract:** `POST /spg/checkout/api/v2/private/revenue-statistic` with the same
+  `StatisticRange` body, answering `(day, currencyCode, sum(total))`. **Per currency, not a single
+  total** — a store can take more than one, and adding them would be a wrong number rather than a
+  missing one. Refunds should be signed or reported separately, not silently netted.
+- **Placeholder:** `TODO(lessons.md)` in `dashboard.api.service.ts` (`kpis`).
+
+## Dashboard — no stock levels
+
+- **Screen:** `/dashboard`, the "Low stock items" KPI and the "Low stock products" attention row.
+- **What is missing:** a way to ask the catalog how much of anything is left. `ProductCriteria`
+  (`catalog-core/entity/product/ProductCriteria.java`) filters on name, SKU, category, manufacturer,
+  availability and status — there is no quantity field and no threshold, so "products below their
+  reorder point" is not expressible. Products do carry a quantity; nothing queries it.
+- **Why it is required:** running out of stock is the failure a merchant most wants warning of, and it
+  is the only item in the attention queue that is genuinely predictive rather than a backlog count.
+- **Decision:** the KPI renders "Not available yet"; the attention row was removed, since a queue of
+  two is fine but a queue row with no number is not.
+- **Expected contract:** a `quantityBelow` filter on the product query, so the console can both count
+  them and link through to the list. A reorder threshold per product would be better than a global one,
+  but a global one would do.
+- **Placeholder:** `TODO(lessons.md)` in `dashboard.api.service.ts` (`kpis`, `attention`).
+
+## Dashboard — customer-statistic counts orders, not customers
+
+- **Screen:** `/dashboard`, the donut. The design labels it "New vs. returning customers".
+- **What is missing:** both halves of that. The endpoint behind it runs
+  `select (null, billing.country, count(o.id)) from Order … group by billing.country` — it groups
+  **orders** by billing country and counts orders. It cannot distinguish a new customer from a
+  returning one, and it does not count customers at all: a store with one German buyer who ordered
+  forty times reads identically to one with forty German buyers.
+- **Decision:** the panel is retitled "Orders by customer country", which is what the query computes
+  and what seller-ui renders from the same endpoint. The new-vs-returning split is not attempted.
+- **Why the real thing is required:** repeat-purchase rate is the single most useful number a small
+  merchant can see, and it is the one the design asked for.
+- **Expected contract:** first, rename or add `orders-by-country`, since the current name will keep
+  causing this mistake. Then a genuine `customer-statistic` needs a first-order date per customer —
+  `(day, 'new'|'returning', count(distinct customer))`.
+
+## Dashboard — product-statistic has no name and no quantity
+
+- **Screen:** `/dashboard`, "Most ordered products".
+- **What is missing:** the product's name, and the number of units. The query is
+  `select (null, op.sku, count(o.id)) from OrderProduct … group by op.sku` — it returns the raw SKU,
+  and counts **orders containing the line**, so a single order for ten units counts once.
+- **Decision:** the list shows the SKU and is labelled "orders", not "sales". The console does not look
+  the names up: matching SKUs against a page of `tiny-products` would be one more call and would still
+  miss anything outside the page. The fixture's `{name, sales}` implied a lookup that never happened
+  and a unit that never existed.
+- **Expected contract:** `(sku, productId, localized name, sum(quantity), count(distinct order))`. The
+  name has to come from the server because it is per-locale, and the console has no other way to
+  resolve one from a SKU in a single call.
+
+## Dashboard — no stale-order signal
+
+- **Screen:** `/dashboard`, the attention row the design words as "Orders past 24 hours without a
+  status update".
+- **What is missing:** when a status last changed. `order-statistic` groups on `datePurchased`, so the
+  console can see how old an *order* is but not how long it has been sitting in its current state. The
+  order history holds the transitions, but no statistic exposes them.
+- **Decision:** retitled to "Orders awaiting fulfilment", counting the statuses before `SHIPPED`
+  (`CREATED, PENDING_PAYMENT, CONFIRMED, PROCESSING`) — a backlog rather than a staleness alarm. That
+  is a weaker signal: a store that ships same-day and one that has ignored its queue for a week look
+  the same.
+- **Expected contract:** the last status-change timestamp on the order row, or a statistic grouped by
+  `(status, age bucket)`.
+
+## Dashboard — counting requires fetching
+
+- **Screen:** `/dashboard`, the pending-payments tile and the payment-approvals row.
+- **What is missing:** a count endpoint. The only way to learn how many transactions are waiting is
+  `GET /spg/payment/api/v1/private/payment/transactions?status=WAITING_VERIFICATION&count=1` and to
+  read `totalElements` off the page envelope — fetching a row in order to be told how many rows there
+  are.
+- **Why it matters:** cheap at one row, but it is the same shape of problem as the sidebar badge counts
+  (see "Shell — no sidebar badge counts"), and both would be solved once by a small counts endpoint.
+  Painting a dashboard should not require paging through anything.
+- **Expected contract:** `GET …/transactions/count?status=` → `{count: n}`, and the same for orders, so
+  the attention queue is a handful of counts rather than a handful of page requests.
+- **Placeholder:** `TODO(lessons.md)` in `dashboard.api.service.ts` (`loadSnapshot`).
+

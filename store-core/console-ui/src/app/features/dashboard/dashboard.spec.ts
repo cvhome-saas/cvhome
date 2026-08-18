@@ -12,15 +12,19 @@ import {DashboardApi} from './services/dashboard.api.service';
 
 function snapshot(orders: number): DashboardSnapshot {
   return {
-    kpis: [{id: 'orders', labelKey: 'test.orders', value: `${orders}`, icon: 'shoppingCart', tone: 'blue', delta: '5.8%'}],
-    attention: [
-      {labelKey: 'test.unfulfilledOrders', detailKey: 'test.past24Hours', count: '5', icon: 'clock', tone: 'red'},
+    kpis: [
+      {id: 'orders', labelKey: 'test.orders', value: `${orders}`, icon: 'shoppingCart', tone: 'blue', delta: '5.8%', trend: 'up'},
+      // Two of the four tiles have no source at all; the page has to render that, not hide it.
+      {id: 'revenue', labelKey: 'test.revenue', value: null, icon: 'dollar', tone: 'slate', flagKey: 'dashboard.kpi.unavailable'},
     ],
-    orderStatuses: [{labelKey: 'test.ordered', value: orders, tone: 'green'}],
-    products: [{name: 'Wireless Headphones', sales: 482}],
+    attention: [
+      {labelKey: 'test.awaitingFulfilment', detailKey: 'test.notYetShipped', count: '5', icon: 'clock', tone: 'red'},
+    ],
+    orderStatuses: [{label: 'Delivered', value: orders, tone: 'green'}],
+    products: [{sku: 'ACME-HDPH-01', orders: 48}],
     customerSplit: [
-      {labelKey: 'test.newCustomers', value: 62, tone: 'green'},
-      {labelKey: 'test.returning', value: 38, tone: 'slate'},
+      {label: 'DE', value: 62, tone: 'green'},
+      {label: 'US', value: 38, tone: 'slate'},
     ],
   };
 }

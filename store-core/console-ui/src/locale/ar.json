@@ -116,42 +116,28 @@
     "storeMetrics": "مقاييس المتجر",
     "needsAttention": "يحتاج انتباهك",
     "viewAll": "عرض الكل",
-    "customerSplitTitle": "العملاء الجدد مقابل العائدين",
+    "customerSplitTitle": "الطلبات حسب بلد العميل",
     "orderStatusBreakdown": "تفصيل حالة الطلبات",
     "ordersUnit": "طلب",
-    "topSellingProducts": "أفضل المنتجات مبيعًا",
+    "topSellingProducts": "الأكثر طلبًا",
     "productReportOptions": "خيارات تقرير المنتج",
     "kpi": {
       "revenue": "الإيرادات",
       "orders": "الطلبات",
       "pendingPayments": "مدفوعات معلقة",
       "lowStock": "عناصر منخفضة المخزون",
-      "needsReview": "يحتاج مراجعة"
+      "needsReview": "يحتاج مراجعة",
+      "unavailable": "غير متاح بعد"
     },
     "attention": {
       "paymentApprovals": {
         "label": "موافقات دفع بالانتظار",
         "detail": "معاملات تحويل بنكي يدوية بحاجة إلى تأكيد"
       },
-      "unfulfilledOrders": {
-        "label": "طلبات غير منفذة",
-        "detail": "طلبات مضى عليها 24 ساعة دون تحديث للحالة"
-      },
-      "lowStockProducts": {
-        "label": "منتجات منخفضة المخزون",
-        "detail": "أقل من حد إعادة الطلب"
+      "awaitingFulfilment": {
+        "label": "طلبات بانتظار التنفيذ",
+        "detail": "تم إنشاؤها ولم تُشحن بعد"
       }
-    },
-    "orderStatus": {
-      "ordered": "تم الطلب",
-      "processed": "قيد المعالجة",
-      "delivered": "تم التسليم",
-      "refunded": "مسترد",
-      "canceled": "ملغى"
-    },
-    "customerSplit": {
-      "new": "عملاء جدد",
-      "returning": "عملاء عائدون"
     }
   },
   "shared": {

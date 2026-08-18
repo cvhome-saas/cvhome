@@ -116,42 +116,28 @@
     "storeMetrics": "Store metrics",
     "needsAttention": "Needs your attention",
     "viewAll": "View all",
-    "customerSplitTitle": "New vs. returning customers",
+    "customerSplitTitle": "Orders by customer country",
     "orderStatusBreakdown": "Order status breakdown",
     "ordersUnit": "orders",
-    "topSellingProducts": "Top selling products",
+    "topSellingProducts": "Most ordered products",
     "productReportOptions": "Product report options",
     "kpi": {
       "revenue": "Revenue",
       "orders": "Orders",
       "pendingPayments": "Pending payments",
       "lowStock": "Low stock items",
-      "needsReview": "Needs review"
+      "needsReview": "Needs review",
+      "unavailable": "Not available yet"
     },
     "attention": {
       "paymentApprovals": {
         "label": "Payment approvals waiting",
         "detail": "Manual bank-transfer transactions to confirm"
       },
-      "unfulfilledOrders": {
-        "label": "Unfulfilled orders",
-        "detail": "Orders past 24 hours without a status update"
-      },
-      "lowStockProducts": {
-        "label": "Low stock products",
-        "detail": "Below their reorder threshold"
+      "awaitingFulfilment": {
+        "label": "Orders awaiting fulfilment",
+        "detail": "Placed but not yet shipped"
       }
-    },
-    "orderStatus": {
-      "ordered": "Ordered",
-      "processed": "Processed",
-      "delivered": "Delivered",
-      "refunded": "Refunded",
-      "canceled": "Canceled"
-    },
-    "customerSplit": {
-      "new": "New customers",
-      "returning": "Returning"
     }
   },
   "shared": {
