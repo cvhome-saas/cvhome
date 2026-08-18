@@ -176,12 +176,55 @@ app-kpi-grid {
 
 /* ---- Rows ------------------------------------------------------------------------- */
 
+/*
+ * Two empty states in one block: nothing matched the filter, which the operator can undo, and
+ * nothing was placed in the period, which they cannot. Only the first offers a way out.
+ */
 .table-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
   margin: 0;
-  padding: 3rem 1.25rem;
+  padding: 3.5rem 1.25rem;
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   text-align: center;
+  --icon-size: 1.25rem;
+}
+
+.table-empty app-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  color: var(--foreground-subtle);
+}
+
+.table-empty p {
+  margin: 0;
+  max-inline-size: 26rem;
+}
+
+.table-empty button {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.table-empty button:hover {
+  border-color: var(--edge);
+  background: var(--accent);
+  color: var(--primary-emphasis);
 }
 
 .cell-order {
@@ -386,4 +429,15 @@ app-kpi-grid {
 
 .load-error button:hover {
   background: var(--chart-5-wash);
+}
+
+/*
+ * Customer names, emails and cities are the buyer's own text: laid out by its own direction, so a
+ * Latin address in an Arabic console is not reordered by the page around it. See the same note in
+ * `order-details.css`.
+ */
+.customer-copy strong,
+.customer-copy small,
+.cell-city {
+  unicode-bidi: plaintext;
 }

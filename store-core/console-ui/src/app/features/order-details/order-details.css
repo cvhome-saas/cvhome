@@ -1215,3 +1215,29 @@
     animation: none;
   }
 }
+
+/* ---- Bidi ---------------------------------------------------------------------------------- */
+
+/*
+ * Data the seller and the buyer typed, laid out by its own direction.
+ *
+ * In an Arabic console the page direction is RTL, and a Latin line that starts with digits gets
+ * reordered by it: "123 Olaya Street" printed as "Olaya Street 123", and "+966 50 123 4567" as
+ * "4567 123 50 966+". `plaintext` resolves each line from its own first strong character — the same
+ * rule `dir="auto"` applies — so Latin addresses stay Latin-ordered inside an Arabic page, and an
+ * Arabic address in an English page keeps its own order too.
+ */
+.seller p,
+.party-name,
+.invoice-parties p,
+.address-grid p,
+.contact a,
+.contact span,
+.customer-name strong,
+.customer-name small,
+.items strong,
+.items small,
+.invoice-items strong,
+.invoice-items small {
+  unicode-bidi: plaintext;
+}

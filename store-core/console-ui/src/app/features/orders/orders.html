@@ -124,7 +124,17 @@
               }
             </app-data-table>
           } @else {
-            <p class="table-empty">{{ t('orders.noneMatch') }}</p>
+            <!--
+              Empty because of a filter, or empty because the period holds no orders — the two are
+              different situations and only one of them has a way out.
+            -->
+            <div class="table-empty">
+              <app-icon name="shoppingCart" />
+              <p>{{ filtered() ? t('orders.noneMatch') : t('orders.noneInPeriod') }}</p>
+              @if (filtered()) {
+                <button type="button" (click)="clearFilters()">{{ t('orders.clearFilters') }}</button>
+              }
+            </div>
           }
 
           <app-pagination

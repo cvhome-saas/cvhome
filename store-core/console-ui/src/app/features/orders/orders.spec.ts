@@ -133,6 +133,30 @@ describe('Orders', () => {
     expect(api.requests[0].page).toEqual({page: 0, count: PAGE_SIZE});
   }));
 
+  it('offers a way back when a filter empties the table, and none when the period is simply empty', fakeAsync(() => {
+    api.book = [];
+    const element = load();
+
+    // Nothing placed in the period: there is nothing for the operator to undo.
+    expect(element.querySelector('.table-empty')?.textContent).toContain('No orders were placed');
+    expect(element.querySelector('.table-empty button')).toBeNull();
+
+    const search = element.querySelector('.order-search input') as HTMLInputElement;
+    search.value = 'nobody@example.com';
+    search.dispatchEvent(new Event('change'));
+    tick();
+    fixture.detectChanges();
+
+    const clear = element.querySelector('.table-empty button') as HTMLButtonElement;
+    expect(element.querySelector('.table-empty')?.textContent).toContain('No orders match');
+    expect(clear).not.toBeNull();
+
+    clear.click();
+    tick();
+    fixture.detectChanges();
+    expect(search.value).toBe('');
+  }));
+
   it('offers a tab for every real status, not the five the mockup drew', fakeAsync(() => {
     const element = load();
     const tabs = [...element.querySelectorAll('app-tab-switcher button')].map((b) => b.textContent!.trim());

@@ -255,7 +255,9 @@
     "searchLabel": "Search orders",
     "searchPlaceholder": "Customer name, email or phone",
     "viewOrder": "View order",
-    "viewOrderFor": "View order {id}"
+    "viewOrderFor": "View order {id}",
+    "noneInPeriod": "No orders were placed in this period.",
+    "clearFilters": "Clear filters"
   },
   "storeSettings": {
     "title": "Store management",

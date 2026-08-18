@@ -255,7 +255,9 @@
     "searchLabel": "البحث في الطلبات",
     "searchPlaceholder": "اسم العميل أو بريده أو هاتفه",
     "viewOrder": "عرض الطلب",
-    "viewOrderFor": "عرض الطلب {id}"
+    "viewOrderFor": "عرض الطلب {id}",
+    "noneInPeriod": "لا توجد طلبات في هذه الفترة.",
+    "clearFilters": "مسح عوامل التصفية"
   },
   "storeSettings": {
     "title": "إدارة المتجر",

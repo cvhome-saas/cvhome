@@ -122,6 +122,14 @@ export class Orders {
     return this.statusLabels.label(order.status);
   }
 
+  /** True when what is on screen is narrowed by something the operator can undo. */
+  protected readonly filtered = computed(() => this.activeTab() !== 'all' || this.search().trim() !== '');
+
+  protected clearFilters(): void {
+    this.activeTab.set('all');
+    this.facade.search.set('');
+  }
+
   protected totalLabel(order: OrderRow): string {
     return this.money.format(order.total.value, order.total.currency, order.total.text);
   }
