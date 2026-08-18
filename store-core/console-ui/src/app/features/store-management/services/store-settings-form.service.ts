@@ -1,5 +1,5 @@
 import {Injectable, inject} from '@angular/core';
-import {FormControl, FormGroup, NonNullableFormBuilder, Validators} from '@angular/forms';
+import {FormControl, FormGroup, NonNullableFormBuilder, Validators, type ValidatorFn} from '@angular/forms';
 
 import {CONSOLE_LOCALES} from '@core/i18n/locale.service';
 import {
@@ -7,6 +7,7 @@ import {
   HOME_TITLE_MAX,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
+  UNBACKED_DETAIL_FIELDS,
   type SettingsSectionKey,
   type StoreSettings,
 } from '@models/store-settings';
@@ -21,18 +22,38 @@ export type HomeCopyForm = FormGroup<{
 
 export type DomainForm = FormGroup<{customDomain: FormControl<string>}>;
 
+/**
+ * The store's identity.
+ *
+ * The first block saves. The second is `UNBACKED_DETAIL_FIELDS` — present so the designed layout
+ * survives, permanently `disabled` so it neither validates nor reaches a request body. Disabling is
+ * the enforcement rather than a convention: `sectionValueOf` reads `value`, which omits disabled
+ * controls, so there is no route by which these are submitted.
+ */
 export type DetailsForm = FormGroup<{
   name: FormControl<string>;
-  legalName: FormControl<string>;
-  slug: FormControl<string>;
-  category: FormControl<string>;
   supportEmail: FormControl<string>;
   supportPhone: FormControl<string>;
   currency: FormControl<string>;
   language: FormControl<string>;
+  country: FormControl<string>;
+  addressLine: FormControl<string>;
+  city: FormControl<string>;
+  postalCode: FormControl<string>;
+  stateProvince: FormControl<string>;
+  theme: FormControl<string>;
+  colorTheme: FormControl<string>;
+  inBusinessSince: FormControl<string>;
+  dimensionUnit: FormControl<string>;
+  weightUnit: FormControl<string>;
+  requireLoginForOrderPlacement: FormControl<boolean>;
+  useCache: FormControl<boolean>;
+
+  legalName: FormControl<string>;
+  slug: FormControl<string>;
+  category: FormControl<string>;
   timezone: FormControl<string>;
   taxNumber: FormControl<string>;
-  address: FormControl<string>;
   shortDescription: FormControl<string>;
   published: FormControl<boolean>;
   maintenanceMode: FormControl<boolean>;
@@ -163,7 +184,41 @@ export class StoreSettingsFormService {
       });
     }
 
-    form.controls.details.reset({...settings.details});
+    const details = settings.details;
+    form.controls.details.reset({
+      name: details.name,
+      supportEmail: details.supportEmail,
+      supportPhone: details.supportPhone,
+      currency: details.currency,
+      language: details.language,
+      country: details.country,
+      addressLine: details.address.address,
+      city: details.address.city,
+      postalCode: details.address.postalCode,
+      stateProvince: details.address.stateProvince,
+      theme: details.theme,
+      colorTheme: details.colorTheme,
+      inBusinessSince: details.inBusinessSince,
+      dimensionUnit: details.dimensionUnit,
+      weightUnit: details.weightUnit,
+      requireLoginForOrderPlacement: details.requireLoginForOrderPlacement,
+      useCache: details.useCache,
+      legalName: details.legalName,
+      slug: details.slug,
+      category: details.category,
+      timezone: details.timezone,
+      taxNumber: details.taxNumber,
+      shortDescription: details.shortDescription,
+      published: details.published,
+      maintenanceMode: details.maintenanceMode,
+    });
+    /*
+     * `reset` re-enables every control it is given a value for, so the unbacked ones are put back
+     * how they were declared. Without this a load would quietly make them editable.
+     */
+    for (const field of UNBACKED_DETAIL_FIELDS) {
+      form.controls.details.controls[field].disable({emitEvent: false});
+    }
   }
 
   private homeCopy(): HomeCopyForm {
@@ -183,20 +238,49 @@ export class StoreSettingsFormService {
   private details(): DetailsForm {
     return this.fb.group({
       name: this.fb.control('', [Validators.required]),
-      legalName: this.fb.control('', [Validators.required]),
-      slug: this.fb.control('', [Validators.required, Validators.pattern(SLUG_PATTERN)]),
-      category: this.fb.control(''),
       supportEmail: this.fb.control('', [Validators.required, Validators.email]),
       supportPhone: this.fb.control(''),
       currency: this.fb.control('', [Validators.required]),
       language: this.fb.control('', [Validators.required]),
-      timezone: this.fb.control(''),
-      taxNumber: this.fb.control(''),
-      address: this.fb.control(''),
-      shortDescription: this.fb.control('', [Validators.maxLength(SHORT_DESCRIPTION_MAX)]),
-      published: this.fb.control(false),
-      maintenanceMode: this.fb.control(false),
+      country: this.fb.control(''),
+      addressLine: this.fb.control(''),
+      city: this.fb.control(''),
+      postalCode: this.fb.control(''),
+      stateProvince: this.fb.control(''),
+      theme: this.fb.control(''),
+      colorTheme: this.fb.control(''),
+      /* `LocalDate`, so the control holds `YYYY-MM-DD` and binds to `<input type="date">`. */
+      inBusinessSince: this.fb.control(''),
+      dimensionUnit: this.fb.control(''),
+      weightUnit: this.fb.control(''),
+      requireLoginForOrderPlacement: this.fb.control(false),
+      useCache: this.fb.control(false),
+
+      /*
+       * Disabled at construction and never enabled. `SLUG_PATTERN` and `SHORT_DESCRIPTION_MAX`
+       * still hang off them so that if a backend ever grows these fields, enabling the control is
+       * the whole change — the rules the design implies are already written down.
+       */
+      legalName: this.unbacked<string>(''),
+      slug: this.unbacked<string>('', [Validators.pattern(SLUG_PATTERN)]),
+      category: this.unbacked<string>(''),
+      timezone: this.unbacked<string>(''),
+      taxNumber: this.unbacked<string>(''),
+      shortDescription: this.unbacked<string>('', [Validators.maxLength(SHORT_DESCRIPTION_MAX)]),
+      published: this.unbacked<boolean>(false),
+      maintenanceMode: this.unbacked<boolean>(false),
     });
+  }
+
+  /**
+   * A control for a field the platform does not store.
+   *
+   * TODO(lessons.md): store identity fields with no backend. See lessons.md, "Store management —
+   * six designed store fields do not exist" and "Store management — a store has no published or
+   * maintenance state".
+   */
+  private unbacked<T extends string | boolean>(value: T, validators: ValidatorFn[] = []): FormControl<T> {
+    return this.fb.control<T>({value, disabled: true}, validators);
   }
 
   /**
@@ -223,7 +307,17 @@ export class StoreSettingsFormService {
   }
 }
 
-/** The section a save posts, for the api service's patch. */
+/**
+ * The section a save posts, for the api service's patch.
+ *
+ * `value` rather than `getRawValue()`, and the difference is the whole point: `getRawValue()`
+ * includes disabled controls, so the fields the platform cannot store were reaching the patch —
+ * empty, but present, and one careless mapping away from being sent. Reading `value` makes
+ * "disabled" mean "cannot be submitted" at the seam rather than by convention downstream.
+ *
+ * The only disabled controls on this page are `UNBACKED_DETAIL_FIELDS`. If a section ever disables
+ * a control it does want submitted, it must re-enable it before saving rather than change this.
+ */
 export function sectionValueOf(form: SettingsForm, key: SettingsSectionKey): Record<string, unknown> {
-  return (form.controls[key] as FormGroup).getRawValue() as Record<string, unknown>;
+  return (form.controls[key] as FormGroup).value as Record<string, unknown>;
 }

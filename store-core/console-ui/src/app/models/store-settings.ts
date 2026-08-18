@@ -49,11 +49,15 @@ export interface StoredImage {
   readonly url: string | null;
 }
 
+/**
+ * The store's marketing images.
+ *
+ * The mockup's upload-progress bar is gone: an upload is a single POST that either completes or
+ * fails, and the section says which. A percentage that only ever read 0 or 100 was decoration.
+ */
 export interface BrandingSettings {
   readonly logo: StoredImage | null;
   readonly banner: StoredImage | null;
-  /** How far the banner's upload got, 0–100. `100` is the "Uploaded" row in the mockup. */
-  readonly bannerProgress: number;
 }
 
 /** One language's landing copy. Per-language because `supportedLanguages` drives the track. */
@@ -108,23 +112,83 @@ export interface SliderSlide {
   readonly url: string | null;
 }
 
-/** `MerchantStoreDetails` and the address off `ReadableMerchantStore`. */
+/**
+ * The store's own identity, as `ReadableMerchantStore` + `MerchantStoreDetails` hold it.
+ *
+ * Split in two on purpose. The first block is what the platform actually stores and what a save
+ * writes back. The second is what `Store Management.dc.html` designs and nothing anywhere records —
+ * kept on the model so the section can still render those fields, disabled and labelled, rather
+ * than silently dropping six controls the design asks for. `UNBACKED_DETAIL_FIELDS` below is the
+ * list the section reads to decide which ones to disable.
+ */
 export interface StoreDetails {
   readonly name: string;
-  readonly legalName: string;
-  readonly slug: string;
-  readonly category: string;
   readonly supportEmail: string;
   readonly supportPhone: string;
   readonly currency: string;
+  /** The store's own default; `supportedLanguages` is the set it may be chosen from. */
   readonly language: string;
+  readonly supportedLanguages: readonly string[];
+  /** ISO country code on the wire — the form resolves it to a name. */
+  readonly country: string;
+  readonly address: StoreAddressFields;
+  readonly theme: string;
+  readonly colorTheme: string;
+  /** `LocalDate` on the server: `YYYY-MM-DD`, never an instant. */
+  readonly inBusinessSince: string;
+  /** `MeasureUnit` — the enum also carries the weight values, which is the server's own muddle. */
+  readonly dimensionUnit: string;
+  /** `WeightUnit`. */
+  readonly weightUnit: string;
+  readonly requireLoginForOrderPlacement: boolean;
+  readonly useCache: boolean;
+
+  /*
+   * Designed, never stored. Every one of these returns zero hits across `store-pod` and
+   * `store-core`. See lessons.md, "Store management — six designed store fields do not exist"
+   * and "Store management — a store has no published or maintenance state".
+   */
+  readonly legalName: string;
+  readonly slug: string;
+  readonly category: string;
   readonly timezone: string;
   readonly taxNumber: string;
-  readonly address: string;
   readonly shortDescription: string;
   readonly published: boolean;
   readonly maintenanceMode: boolean;
 }
+
+/**
+ * `ReadableBaseAddress` → `BaseAddress`. Four fields plus the country on `StoreDetails`,
+ * rather than the mockup's single `1180 Harrison St, Suite 400, San Francisco, CA 94103` line —
+ * which cannot be saved, because the server stores the parts.
+ */
+export interface StoreAddressFields {
+  readonly address: string;
+  readonly city: string;
+  readonly postalCode: string;
+  /** Zone code, e.g. `CA`. Free text where a country has no zone list. */
+  readonly stateProvince: string;
+}
+
+/**
+ * The detail controls with nothing behind them, so the section can disable exactly these and the
+ * save can refuse to send them. Keeping it as data rather than a flag per field means the list is
+ * checkable against `PersistableMerchantStore` in one place.
+ */
+export const UNBACKED_DETAIL_FIELDS = [
+  'legalName',
+  'slug',
+  'category',
+  'timezone',
+  'taxNumber',
+  'shortDescription',
+  'published',
+  'maintenanceMode',
+] as const;
+
+export type UnbackedDetailField = (typeof UNBACKED_DETAIL_FIELDS)[number];
+
 
 /**
  * What is known about a secret that never comes back from the server.
@@ -196,6 +260,23 @@ export interface StoreSettings {
   readonly details: StoreDetails;
   readonly socialLogin: readonly SocialLoginConfig[];
   readonly payments: readonly PaymentGatewayConfig[];
+  /** The reference lists the selects are drawn from, fetched alongside the store itself. */
+  readonly choices: SettingsChoices;
+}
+
+/**
+ * What the server says the valid options are, rather than what the console guesses they are.
+ *
+ * Fetched with the store because the alternative is hardcoding four enums that the platform is
+ * free to extend — `ColorTheme` alone has thirty values. Each list is independently optional: a
+ * lookup that fails leaves its select showing the store's current value and nothing else, which is
+ * still usable, instead of blanking the whole page.
+ */
+export interface SettingsChoices {
+  readonly themes: readonly string[];
+  readonly colorThemes: readonly string[];
+  readonly languages: readonly string[];
+  readonly socialLinkProviders: readonly string[];
 }
 
 export interface SettingsSection {

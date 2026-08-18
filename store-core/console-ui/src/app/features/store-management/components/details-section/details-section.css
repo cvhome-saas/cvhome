@@ -65,3 +65,31 @@
     flex-wrap: wrap;
   }
 }
+
+.storefront-flags,
+.unbacked {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/*
+ * The designed-but-unrecorded block. Inset and tinted so it reads as a different kind of thing
+ * from the fields above it, rather than as a group that happens to be greyed out.
+ */
+.unbacked {
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+.unbacked-note {
+  margin: -0.4rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.unbacked .field-grid {
+  gap: 0.85rem 1rem;
+}

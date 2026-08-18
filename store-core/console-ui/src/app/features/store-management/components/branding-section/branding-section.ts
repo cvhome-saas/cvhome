@@ -1,23 +1,30 @@
-import {Component, inject, input} from '@angular/core';
-import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {Component, input, linkedSignal, output} from '@angular/core';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 import {FileDrop} from '@shared/ui/file-drop/file-drop';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
-import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
-import {ToastService} from '@shared/ui/toast/toast';
 import type {BrandingSettings} from '@models/store-settings';
 
 /**
  * Logo and banner.
  *
- * Both are uploads, and uploads have no endpoint yet, so every action here says so rather
- * than failing silently. The section carries no fields, which is why *Save changes* stays
- * disabled while it is open — there is nothing on this card to save.
+ * Uploading is a multipart POST of its own, so a picked file is sent immediately rather than held
+ * for *Save changes* — the section carries no form fields, and an image that appeared only after a
+ * separate save would be a confusing thing to offer. Replacing is the same call: the server keeps
+ * one logo and one banner, so a second upload overwrites the first.
+ *
+ * **Removing is not offered, because it cannot be done.** `MerchantStoreApi` maps `addLogo` and
+ * `addBanner` and no delete counterpart, and `PersistableMerchantStore` carries neither image, so
+ * an update cannot clear one either. seller-core has `removeStoreLogo`/`removeStoreBanner` methods
+ * pointing at unmapped paths — they have always 404'd. A Remove button that cannot remove is worse
+ * than none, so the card says what is possible instead.
+ * TODO(lessons.md): see lessons.md, "Store management — a logo or banner can be uploaded but
+ * never removed".
  */
 @Component({
   selector: 'app-branding-section',
-  imports: [FileDrop, Icon, Panel, ProgressTrack, TranslocoDirective],
+  imports: [FileDrop, Icon, Panel, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.branding.title')"
@@ -32,24 +39,29 @@ import type {BrandingSettings} from '@models/store-settings';
             [label]="t('storeSettings.branding.dropOrBrowse')"
             [hint]="t('storeSettings.branding.logoHint')"
             accept="image/png,image/svg+xml"
-            (filesSelected)="notSupported(t('storeSettings.branding.uploadingLogo'))"
+            (filesSelected)="pick('logo', $event)"
           >
-            @if (branding().logo?.url; as url) {
-              <img class="logo-preview" [src]="url" [alt]="t('storeSettings.branding.currentLogoAlt')" />
+            @if (!logoBroken() && branding().logo?.url; as url) {
+              <img
+                class="logo-preview"
+                [src]="url"
+                [alt]="t('storeSettings.branding.currentLogoAlt')"
+                (error)="logoBroken.set(true)"
+              />
             } @else {
-              <!-- No stored render yet, so the tile stands in with the store's initial. -->
+              <!-- No stored render, or a path this browser cannot reach: the store's initial stands in. -->
               <span class="logo-mark" aria-hidden="true">{{ initial() }}</span>
             }
           </app-file-drop>
 
-          <div class="slot-actions">
-            <button class="ghost-action" type="button" (click)="notSupported(t('storeSettings.branding.replacingLogo'))">
-              {{ t('storeSettings.branding.replace') }}
-            </button>
-            <button class="danger-action" type="button" (click)="notSupported(t('storeSettings.branding.removingLogo'))">
-              {{ t('storeSettings.branding.remove') }}
-            </button>
-          </div>
+          @if (branding().logo; as logo) {
+            <p class="slot-current" dir="auto">
+              {{ t('storeSettings.branding.currentFile', {name: logo.name}) }}
+            </p>
+          }
+          @if (uploading() === 'logo') {
+            <p class="slot-busy" role="status">{{ t('storeSettings.branding.uploadingLogo') }}</p>
+          }
         </div>
 
         <div class="slot">
@@ -60,52 +72,66 @@ import type {BrandingSettings} from '@models/store-settings';
             [label]="t('storeSettings.branding.dropBanner')"
             [hint]="t('storeSettings.branding.bannerHint')"
             accept="image/jpeg,image/png"
-            (filesSelected)="notSupported(t('storeSettings.branding.uploadingBanner'))"
+            (filesSelected)="pick('banner', $event)"
           >
-            <app-icon name="images" />
+            @if (!bannerBroken() && branding().banner?.url; as url) {
+              <img
+                class="banner-preview"
+                [src]="url"
+                [alt]="t('storeSettings.branding.currentBannerAlt')"
+                (error)="bannerBroken.set(true)"
+              />
+            } @else {
+              <app-icon name="images" />
+            }
           </app-file-drop>
 
           @if (branding().banner; as banner) {
-            <div class="upload-row">
-              <app-icon name="file" />
-              <div class="upload-copy">
-                <strong>{{ banner.name }}</strong>
-                <app-progress-track [value]="branding().bannerProgress" />
-              </div>
-              <span class="upload-state">{{ stateOf(t) }}</span>
-              <button
-                class="icon-action"
-                type="button"
-                [attr.aria-label]="t('storeSettings.branding.removeNamed', {name: banner.name})"
-                (click)="notSupported(t('storeSettings.branding.removingBanner'))"
-              >
-                <app-icon name="x" />
-              </button>
-            </div>
+            <p class="slot-current" dir="auto">
+              {{ t('storeSettings.branding.currentFile', {name: banner.name}) }}
+            </p>
+          }
+          @if (uploading() === 'banner') {
+            <p class="slot-busy" role="status">{{ t('storeSettings.branding.uploadingBanner') }}</p>
           }
         </div>
+
+        <p class="branding-note">{{ t('storeSettings.branding.replaceOnlyNote') }}</p>
       </div>
     </app-panel>
   `,
   styleUrls: ['../settings-card.css', './branding-section.css'],
 })
 export class BrandingSection {
-  private readonly toast = inject(ToastService);
-  private readonly transloco = inject(TranslocoService);
-
   readonly branding = input.required<BrandingSettings>();
   readonly storeName = input.required<string>();
+  /** Which upload is in flight, so the slot that is busy is the one that says so. */
+  readonly uploading = input<'logo' | 'banner' | null>(null);
+
+  readonly picked = output<{kind: 'logo' | 'banner'; file: File}>();
+
+  /*
+   * `ReadableImage.path` is where the pod put the file, which is not necessarily a URL this
+   * browser can reach — the same gap the invoice hit in Module 4. Keyed off the URL so that
+   * uploading a replacement clears the failure rather than inheriting it.
+   */
+  protected readonly logoBroken = linkedSignal<string | null, boolean>({
+    source: () => this.branding().logo?.url ?? null,
+    computation: () => false,
+  });
+  protected readonly bannerBroken = linkedSignal<string | null, boolean>({
+    source: () => this.branding().banner?.url ?? null,
+    computation: () => false,
+  });
 
   protected initial(): string {
     return this.storeName().charAt(0).toUpperCase();
   }
 
-  protected stateOf(t: (key: string) => string): string {
-    const progress = this.branding().bannerProgress;
-    return progress >= 100 ? t('storeSettings.branding.uploaded') : `${progress}%`;
-  }
-
-  protected notSupported(what: string): void {
-    this.toast.info(this.transloco.translate('storeSettings.notAvailable', {what}));
+  protected pick(kind: 'logo' | 'banner', files: readonly File[]): void {
+    const file = files[0];
+    if (file) {
+      this.picked.emit({kind, file});
+    }
   }
 }

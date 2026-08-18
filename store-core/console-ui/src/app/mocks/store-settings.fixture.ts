@@ -1,10 +1,18 @@
 import type {StoreSettings} from '@models/store-settings';
 
+/**
+ * The sections of the settings page still served from this file.
+ *
+ * Narrowed as each section moves to its real endpoint, so the type itself records how much of the
+ * page is still make-believe. When this reaches `never` the file goes.
+ */
+export type FixtureSections = Pick<
+  StoreSettings,
+  'home' | 'domains' | 'socialLinks' | 'slides' | 'socialLogin' | 'payments'
+>;
+
 /** The default subdomain every store is served from, before any custom domain. */
 export const STORE_SUBDOMAIN = 'acme-supply.myshop.io';
-
-/** Placeholder store name. Store settings are still fixture-backed until their own module. */
-const STORE_NAME = 'Acme Supply Co.';
 
 /** The custom domain the mockup is mid-way through verifying. */
 export const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
@@ -20,16 +28,7 @@ export const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
  * Home-page copy covers both console locales — the console's own locale list is the only
  * list of languages a storefront can be authored in, so there is no separate one here.
  */
-export const STORE_SETTINGS: StoreSettings = {
-  // Kept in step with the shell's switcher, so the page and the rail name the same store.
-  storeName: STORE_NAME,
-
-  branding: {
-    logo: {name: 'acme-logo.svg', url: null},
-    banner: {name: 'acme-banner-summer.jpg', url: null},
-    bannerProgress: 100,
-  },
-
+export const STORE_SETTINGS: FixtureSections = {
   home: {
     en: {
       title: 'Everything your workplace runs on',
@@ -99,22 +98,6 @@ export const STORE_SETTINGS: StoreSettings = {
     },
   ],
 
-  details: {
-    name: STORE_NAME,
-    legalName: 'Acme Supply Holdings LLC',
-    slug: 'acme-supply',
-    category: 'Business & industrial supplies',
-    supportEmail: 'help@acmesupply.co',
-    supportPhone: '+1 (415) 555-0142',
-    currency: 'USD — US Dollar',
-    language: 'English (EN)',
-    timezone: '(GMT−08:00) America/Los_Angeles',
-    taxNumber: 'US-93-4471209',
-    address: '1180 Harrison St, Suite 400, San Francisco, CA 94103',
-    shortDescription: 'Workplace supplies for growing teams.',
-    published: true,
-    maintenanceMode: false,
-  },
 
   socialLogin: [
     {

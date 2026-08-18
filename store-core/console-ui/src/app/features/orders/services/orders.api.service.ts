@@ -23,10 +23,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * The orders page's data.
  *
  * Two legs, and their failure modes are deliberately different. The **list** is the page: if it
- * fails, the page failed. The **statistics** are the KPI row, and that leg is optional —
- * `order-statistic` currently 500s for every caller on a checkout bug unrelated to orders
- * (see lessons.md, "Dashboard — the three merchant statistics 500 for every caller"), and letting
- * that take the table down would mean losing the whole screen to a defect in a different endpoint.
+ * fails, the page failed. The **statistics** are the KPI row, and that leg stays optional — losing
+ * the whole table to a defect in a different endpoint is a bad trade for a row of counts.
+ *
+ * That optionality was originally forced: `order-statistic` answered 500 for every caller when this
+ * was written. It answers now, verified against the running stack, so the KPI row is live rather
+ * than permanently unavailable. The `catchError` stays regardless, because "the counts are a
+ * secondary concern and the table is not" is a property of the page, not of that outage.
  */
 @Injectable({providedIn: 'root'})
 export class OrdersApi {
@@ -97,7 +100,8 @@ function toOrderQuery(query: OrdersQuery): OrderQuery {
  *   checkout wrote them, so that is what the row falls back to. The detail endpoint does populate
  *   `customer`.
  * - `products` is null too, so a line count is not available here at all — see lessons.md,
- *   "Orders — the list omits line items". The items column came off the table.
+ *   "Orders — the list omits line items and the
+ *   customer". The items column came off the table.
  */
 function toRow(order: ReadableOrder): OrderRow {
   const person = order.customer ?? order.billing;

@@ -98,3 +98,35 @@
     block-size: auto;
   }
 }
+
+/* The stored filename, which is a server-issued UUID for slides and the operator's own name here. */
+.slot-current {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+
+.slot-busy {
+  margin: 0;
+  color: var(--primary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.banner-preview {
+  display: block;
+  inline-size: 100%;
+  max-block-size: 8rem;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.branding-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}

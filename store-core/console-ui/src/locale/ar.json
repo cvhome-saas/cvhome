@@ -260,99 +260,72 @@
     "clearFilters": "مسح عوامل التصفية"
   },
   "storeSettings": {
-    "title": "إدارة المتجر",
-    "published": "منشور",
-    "unpublished": "غير منشور",
-    "previewStorefront": "معاينة واجهة المتجر",
-    "discard": "تجاهل",
-    "saving": "جارٍ الحفظ…",
-    "saveChanges": "حفظ التغييرات",
-    "loading": "جارٍ تحميل إعدادات المتجر…",
-    "sectionsLabel": "أقسام إعدادات المتجر",
-    "previewNotAvailable": "معاينة واجهة المتجر غير متاحة بعد.",
-    "sectionSaved": "تم حفظ {section}.",
-    "notAvailable": "{what} غير متاح بعد.",
-    "section": {
-      "branding": "هوية المتجر",
-      "home": "الصفحة الرئيسية للمتجر",
-      "domain": "نطاق المتجر",
-      "social": "روابط التواصل الاجتماعي",
-      "slider": "صور العرض المتحرك",
-      "details": "تفاصيل المتجر",
-      "socialLogin": "تسجيل الدخول الاجتماعي",
-      "payments": "إعدادات الدفع"
-    },
-    "sectionShort": {
-      "branding": "الهوية",
-      "home": "الصفحة الرئيسية",
-      "domain": "النطاق",
-      "social": "روابط التواصل",
-      "slider": "صور العرض",
-      "details": "التفاصيل",
-      "socialLogin": "تسجيل الدخول",
-      "payments": "إعدادات الدفع"
-    },
-    "nav": {
-      "heading": "الإعدادات",
-      "ariaLabel": "أقسام إعدادات المتجر",
-      "needsAttention": "يحتاج انتباهك",
-      "builderUnavailable": "منشئ الصفحة الرئيسية غير متاح بعد.",
-      "homePageBuilder": "منشئ الصفحة الرئيسية"
-    },
     "branding": {
-      "title": "هوية المتجر",
-      "subtitle": "الشعار والبانر المعروضان في متجرك وفواتيرك ورسائلك.",
-      "logo": "الشعار",
       "banner": "البانر",
-      "dropOrBrowse": "أفلت الصورة أو تصفح",
-      "dropBanner": "اسحب وأفلت البانر هنا",
-      "logoHint": "PNG أو SVG · مربع · حد أدنى 512×512 · حد أقصى 2 ميغابايت",
       "bannerHint": "JPG أو PNG · يُفضّل 1920×480 · حد أقصى 5 ميغابايت",
+      "currentBannerAlt": "لافتة المتجر الحالية",
+      "currentFile": "المخزَّن: {{name}}",
       "currentLogoAlt": "شعار المتجر الحالي",
-      "replace": "استبدال",
-      "remove": "إزالة",
-      "removeNamed": "إزالة {name}",
-      "uploaded": "تم الرفع",
-      "uploadingLogo": "رفع الشعار",
-      "replacingLogo": "استبدال الشعار",
-      "removingLogo": "إزالة الشعار",
+      "dropBanner": "اسحب وأفلت البانر هنا",
+      "dropOrBrowse": "أفلت الصورة أو تصفح",
+      "logo": "الشعار",
+      "logoHint": "PNG أو SVG · مربع · حد أدنى 512×512 · حد أقصى 2 ميغابايت",
+      "replaceOnlyNote": "رفع صورة جديدة يستبدل الصورة الحالية. لا توفّر المنصة طريقة لإزالة الصورة بعد تعيينها.",
+      "subtitle": "الشعار والبانر المعروضان في متجرك وفواتيرك ورسائلك.",
+      "title": "هوية المتجر",
       "uploadingBanner": "رفع البانر",
-      "removingBanner": "إزالة البانر"
+      "uploadingLogo": "رفع الشعار"
     },
     "details": {
-      "title": "تفاصيل المتجر",
-      "subtitle": "إعدادات الهوية والتواصل والمنطقة الزمنية لهذا المتجر.",
+      "address": "عنوان النشاط التجاري",
+      "category": "الفئة",
+      "city": "المدينة",
+      "colorTheme": "نسق الألوان",
+      "country": "الدولة",
+      "countryHint": "رمز الدولة حسب ISO، مثل SA أو US.",
+      "currency": "العملة الافتراضية",
+      "currencyFallback": "العملة الافتراضية مطلوبة.",
+      "currencyHint": "رمز العملة حسب ISO، مثل SAR أو USD.",
+      "deleteStore": "حذف هذا المتجر",
+      "deleteStoreAccept": "حذف هذا المتجر",
+      "deleteStoreConfirm": "سيؤدي هذا إلى حذف المتجر وإعداداته وواجهته. لا يمكن التراجع عن ذلك.",
+      "deleteStoreDone": "تم حذف المتجر.",
+      "deleteStoreType": "للتأكيد، اكتب اسم المتجر:",
+      "deleteStoreWarning": "يزيل المنتجات والطلبات والإعدادات. لا يمكن التراجع عن هذا الإجراء.",
+      "dimensionUnit": "وحدة القياس",
+      "inBusinessSince": "تعمل منذ",
+      "language": "اللغة الافتراضية",
+      "languageFallback": "اللغة الافتراضية مطلوبة.",
+      "legalName": "الاسم القانوني للكيان",
+      "maintenanceMode": "وضع الصيانة",
+      "maintenanceModeDescription": "عرض صفحة انتظار بدلًا من المتجر",
+      "notRecorded": "غير مخزَّن في المنصة",
+      "notRecordedNote": "تظهر هذه الحقول في تصميم لوحة التحكم، لكن لا يوجد ما يخزّنها بعد، لذلك لا يمكن تعديلها أو حفظها.",
+      "postalCode": "الرمز البريدي",
+      "published": "المتجر منشور",
+      "publishedDescription": "مرئي للعملاء وقابل للفهرسة من محركات البحث",
+      "requireLogin": "طلب تسجيل الدخول لإتمام الطلب",
+      "requireLoginDescription": "يجب أن يملك المتسوق حسابًا قبل إتمام الطلب.",
+      "shortDescription": "وصف مختصر",
+      "slug": "المعرّف المختصر للمتجر",
+      "stateProvince": "المنطقة أو المحافظة",
       "storeName": "اسم المتجر",
       "storeNameFallback": "اسم المتجر مطلوب.",
-      "legalName": "الاسم القانوني للكيان",
-      "legalNameFallback": "الاسم القانوني المسجل مطلوب.",
-      "slug": "المعرّف المختصر للمتجر",
-      "slugHint": "يُستخدم في رابط المتجر",
-      "slugFallback": "أحرف صغيرة وأرقام وشرطات مفردة فقط.",
-      "category": "الفئة",
+      "storefrontBehaviour": "سلوك المتجر",
+      "subtitle": "إعدادات الهوية والتواصل والمنطقة الزمنية لهذا المتجر.",
       "supportEmail": "بريد الدعم",
       "supportEmailFallback": "أدخل عنوانًا يمكن للعملاء التواصل معك عبره.",
       "supportPhone": "هاتف الدعم",
-      "currency": "العملة الافتراضية",
-      "currencyFallback": "العملة الافتراضية مطلوبة.",
-      "language": "اللغة الافتراضية",
-      "languageFallback": "اللغة الافتراضية مطلوبة.",
-      "timezone": "المنطقة الزمنية",
       "taxNumber": "الرقم الضريبي",
-      "taxHint": "يُطبع على الفواتير",
-      "address": "عنوان النشاط التجاري",
-      "shortDescription": "وصف مختصر",
+      "theme": "قالب المتجر",
+      "timezone": "المنطقة الزمنية",
+      "title": "تفاصيل المتجر",
       "upToCharacters": "حتى {max} حرفًا",
-      "shortDescriptionFallback": "يجب ألا يتجاوز {max} حرفًا.",
-      "visibility": "ظهور المتجر",
-      "published": "المتجر منشور",
-      "publishedDescription": "مرئي للعملاء وقابل للفهرسة من محركات البحث",
-      "maintenanceMode": "وضع الصيانة",
-      "maintenanceModeDescription": "عرض صفحة انتظار بدلًا من المتجر",
-      "deleteStore": "حذف هذا المتجر",
-      "deleteStoreWarning": "يزيل المنتجات والطلبات والإعدادات. لا يمكن التراجع عن هذا الإجراء.",
-      "deleteNotAvailable": "حذف متجر من وحدة التحكم غير متاح بعد."
+      "useCache": "تخزين صفحات المتجر مؤقتًا",
+      "useCacheDescription": "صفحات أسرع، مقابل ظهور التغييرات بعد وقت قصير.",
+      "weightUnit": "وحدة الوزن"
     },
+    "discard": "تجاهل",
     "domain": {
       "title": "نطاق المتجر",
       "subtitle": "قدّم متجرك من نطاقك الخاص.",
@@ -396,12 +369,95 @@
         "body": "يوجد سجل لـ {domain} لكنه يشير إلى مكان آخر. صححه إلى القيمة أدناه وتحقق مرة أخرى."
       }
     },
-    "social": {
-      "title": "روابط التواصل الاجتماعي",
-      "subtitle": "تظهر في تذييل واجهة المتجر. اتركها فارغة لإخفائها.",
-      "addProfileUrl": "أضف رابط الملف الشخصي…",
-      "fallback": "أدخل رابط ملف شخصي، مثل instagram.com/your-store."
+    "home": {
+      "title": "الصفحة الرئيسية للمتجر",
+      "subtitle": "نص الصفحة الرئيسية وبيانات تعريف البحث، مكتوبة لكل لغة.",
+      "writeIn": "اكتب نص الصفحة الرئيسية بـ",
+      "landingTitle": "عنوان الصفحة الرئيسية",
+      "landingTitleHint": "يظهر كعنوان H1 وعنوان تبويب المتصفح",
+      "landingTitleFallback": "عنوان الصفحة الرئيسية مطلوب.",
+      "landingText": "نص الصفحة الرئيسية",
+      "metaDescription": "الوصف التعريفي",
+      "metaRecommended": "يُنصح بـ {min}–{max} حرفًا",
+      "characters": "{count} حرفًا",
+      "tags": "الوسوم",
+      "tagsLabel": "وسوم الصفحة الرئيسية",
+      "fallbackNotice": "اللغات غير المترجمة تعود إلى الإنجليزية.",
+      "empty": "فارغ"
     },
+    "loading": "جارٍ تحميل إعدادات المتجر…",
+    "loginProvider": {
+      "google": "غوغل",
+      "facebook": "فيسبوك",
+      "github": "GitHub"
+    },
+    "nav": {
+      "heading": "الإعدادات",
+      "ariaLabel": "أقسام إعدادات المتجر",
+      "needsAttention": "يحتاج انتباهك",
+      "builderUnavailable": "منشئ الصفحة الرئيسية غير متاح بعد.",
+      "homePageBuilder": "منشئ الصفحة الرئيسية"
+    },
+    "notAvailable": "{what} غير متاح بعد.",
+    "paymentDescription": {
+      "cod": "يُحصَّل بواسطة المندوب — لا شيء لإعداده",
+      "manualTransfer": "تنتظر الطلبات حتى تؤكد التحويل",
+      "stripe": "بطاقات ومحافظ وطرق دفع محلية",
+      "paypal": "رصيد PayPal والبطاقات المرتبطة"
+    },
+    "paymentType": {
+      "cod": "الدفع عند الاستلام",
+      "manualTransfer": "تحويل بنكي يدوي",
+      "stripe": "Stripe",
+      "paypal": "PayPal"
+    },
+    "payments": {
+      "title": "إعدادات الدفع",
+      "subtitle": "بيانات اعتماد البوابة لهذا المتجر فقط.",
+      "secretsNotice": "مفاتيح الأسرار وأسرار الويبهوك مشفرة ولا تُعاد أبدًا إلى هذه الشاشة. يمكنك استبدال أو تدوير القيمة، لكن لا يمكن قراءتها.",
+      "accept": "قبول {gateway}",
+      "apiKey": "مفتاح API",
+      "publishable": "(قابل للنشر)",
+      "secretKey": "المفتاح السري",
+      "rotate": "تدوير",
+      "rotatingSecret": "تدوير المفتاح السري لـ {gateway}",
+      "webhookSecret": "سر الويبهوك",
+      "replacingWebhookSecret": "استبدال سر ويبهوك {gateway}",
+      "endpoint": "نقطة النهاية: {url}"
+    },
+    "previewNotAvailable": "معاينة واجهة المتجر غير متاحة بعد.",
+    "previewStorefront": "معاينة واجهة المتجر",
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جارٍ الحفظ…",
+    "secret": {
+      "endsWith": "•••••••••••••• ينتهي بـ {last4}",
+      "notSet": "•••••••••••••• غير معيّن",
+      "lastChanged": "آخر تغيير {date}",
+      "lastRotated": "آخر تدوير {date}",
+      "neverStored": "لا يوجد سر مخزن بعد"
+    },
+    "section": {
+      "branding": "هوية المتجر",
+      "home": "الصفحة الرئيسية للمتجر",
+      "domain": "نطاق المتجر",
+      "social": "روابط التواصل الاجتماعي",
+      "slider": "صور العرض المتحرك",
+      "details": "تفاصيل المتجر",
+      "socialLogin": "تسجيل الدخول الاجتماعي",
+      "payments": "إعدادات الدفع"
+    },
+    "sectionSaved": "تم حفظ {section}.",
+    "sectionShort": {
+      "branding": "الهوية",
+      "home": "الصفحة الرئيسية",
+      "domain": "النطاق",
+      "social": "روابط التواصل",
+      "slider": "صور العرض",
+      "details": "التفاصيل",
+      "socialLogin": "تسجيل الدخول",
+      "payments": "إعدادات الدفع"
+    },
+    "sectionsLabel": "أقسام إعدادات المتجر",
     "slider": {
       "title": "صور العرض المتحرك",
       "subtitle": "عرض متحرك للصفحة الرئيسية · اسحب لإعادة الترتيب · {count} من {capacity} فتحات مستخدمة",
@@ -420,6 +476,12 @@
       "uploadingImages": "رفع صور العرض",
       "slotsFull": "جميع الفتحات ({capacity}) مستخدمة. احذف شريحة قبل إضافة أخرى."
     },
+    "social": {
+      "title": "روابط التواصل الاجتماعي",
+      "subtitle": "تظهر في تذييل واجهة المتجر. اتركها فارغة لإخفائها.",
+      "addProfileUrl": "أضف رابط الملف الشخصي…",
+      "fallback": "أدخل رابط ملف شخصي، مثل instagram.com/your-store."
+    },
     "socialLogin": {
       "title": "تسجيل الدخول الاجتماعي",
       "subtitle": "اسمح للعملاء بتسجيل الدخول عبر مزود خارجي. الأسرار مخزنة مشفرة.",
@@ -431,49 +493,6 @@
       "callbackUrl": "رابط الاستدعاء",
       "callbackHint": "الصق هذا في قائمة السماح الخاصة بروابط إعادة التوجيه لدى المزود"
     },
-    "payments": {
-      "title": "إعدادات الدفع",
-      "subtitle": "بيانات اعتماد البوابة لهذا المتجر فقط.",
-      "secretsNotice": "مفاتيح الأسرار وأسرار الويبهوك مشفرة ولا تُعاد أبدًا إلى هذه الشاشة. يمكنك استبدال أو تدوير القيمة، لكن لا يمكن قراءتها.",
-      "accept": "قبول {gateway}",
-      "apiKey": "مفتاح API",
-      "publishable": "(قابل للنشر)",
-      "secretKey": "المفتاح السري",
-      "rotate": "تدوير",
-      "rotatingSecret": "تدوير المفتاح السري لـ {gateway}",
-      "webhookSecret": "سر الويبهوك",
-      "replacingWebhookSecret": "استبدال سر ويبهوك {gateway}",
-      "endpoint": "نقطة النهاية: {url}"
-    },
-    "home": {
-      "title": "الصفحة الرئيسية للمتجر",
-      "subtitle": "نص الصفحة الرئيسية وبيانات تعريف البحث، مكتوبة لكل لغة.",
-      "writeIn": "اكتب نص الصفحة الرئيسية بـ",
-      "landingTitle": "عنوان الصفحة الرئيسية",
-      "landingTitleHint": "يظهر كعنوان H1 وعنوان تبويب المتصفح",
-      "landingTitleFallback": "عنوان الصفحة الرئيسية مطلوب.",
-      "landingText": "نص الصفحة الرئيسية",
-      "metaDescription": "الوصف التعريفي",
-      "metaRecommended": "يُنصح بـ {min}–{max} حرفًا",
-      "characters": "{count} حرفًا",
-      "tags": "الوسوم",
-      "tagsLabel": "وسوم الصفحة الرئيسية",
-      "fallbackNotice": "اللغات غير المترجمة تعود إلى الإنجليزية.",
-      "empty": "فارغ"
-    },
-    "secret": {
-      "endsWith": "•••••••••••••• ينتهي بـ {last4}",
-      "notSet": "•••••••••••••• غير معيّن",
-      "lastChanged": "آخر تغيير {date}",
-      "lastRotated": "آخر تدوير {date}",
-      "neverStored": "لا يوجد سر مخزن بعد"
-    },
-    "state": {
-      "enabled": "مفعّل",
-      "disabled": "معطّل",
-      "live": "مباشر",
-      "off": "متوقف"
-    },
     "socialProvider": {
       "facebook": "فيسبوك",
       "x": "X",
@@ -481,22 +500,18 @@
       "instagram": "إنستغرام",
       "github": "GitHub"
     },
-    "loginProvider": {
-      "google": "غوغل",
-      "facebook": "فيسبوك",
-      "github": "GitHub"
+    "state": {
+      "enabled": "مفعّل",
+      "disabled": "معطّل",
+      "live": "مباشر",
+      "off": "متوقف"
     },
-    "paymentType": {
-      "cod": "الدفع عند الاستلام",
-      "manualTransfer": "تحويل بنكي يدوي",
-      "stripe": "Stripe",
-      "paypal": "PayPal"
-    },
-    "paymentDescription": {
-      "cod": "يُحصَّل بواسطة المندوب — لا شيء لإعداده",
-      "manualTransfer": "تنتظر الطلبات حتى تؤكد التحويل",
-      "stripe": "بطاقات ومحافظ وطرق دفع محلية",
-      "paypal": "رصيد PayPal والبطاقات المرتبطة"
+    "title": "إدارة المتجر",
+    "unit": {
+      "CM": "سنتيمتر (cm)",
+      "IN": "بوصة (in)",
+      "KG": "كيلوغرام (kg)",
+      "LB": "رطل (lb)"
     }
   },
   "createStore": {
@@ -1181,5 +1196,8 @@
     "credit": "رصيد",
     "refund": "مبلغ مسترد",
     "product": "المنتجات"
+  },
+  "actions": {
+    "cancel": "إلغاء"
   }
 }

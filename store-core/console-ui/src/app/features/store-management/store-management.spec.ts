@@ -6,6 +6,58 @@ import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ToastService} from '@shared/ui/toast/toast';
 import {STORE_SETTINGS} from '@mocks/store-settings.fixture';
 import type {DomainStatus, SettingsSectionKey, StoreSettings} from '@models/store-settings';
+
+/**
+ * A whole settings document.
+ *
+ * The fixture now covers only the sections still served from it, so the spec supplies the live
+ * ones itself — which is the point: these values are the shape `MerchantStoreService.store()` maps
+ * to, so a change to that mapping has to be reflected here to keep the spec passing.
+ */
+const SETTINGS: StoreSettings = {
+  ...STORE_SETTINGS,
+  storeName: 'Acme Supply Co.',
+  branding: {
+    logo: {name: 'acme-logo.svg', url: null},
+    banner: {name: 'acme-banner-summer.jpg', url: null},
+  },
+  details: {
+    name: 'Acme Supply Co.',
+    supportEmail: 'help@acmesupply.co',
+    supportPhone: '+1 (415) 555-0142',
+    currency: 'USD',
+    language: 'en',
+    supportedLanguages: ['en', 'ar'],
+    country: 'US',
+    address: {
+      address: '1180 Harrison St, Suite 400',
+      city: 'San Francisco',
+      postalCode: '94103',
+      stateProvince: 'CA',
+    },
+    theme: 'BASIS',
+    colorTheme: 'LIGHT',
+    inBusinessSince: '2019-04-01',
+    dimensionUnit: 'CM',
+    weightUnit: 'KG',
+    requireLoginForOrderPlacement: false,
+    useCache: true,
+    legalName: '',
+    slug: '',
+    category: '',
+    timezone: '',
+    taxNumber: '',
+    shortDescription: '',
+    published: false,
+    maintenanceMode: false,
+  },
+  choices: {
+    themes: ['BASIS', 'MODERN'],
+    colorThemes: ['LIGHT', 'DARK'],
+    languages: ['en', 'ar'],
+    socialLinkProviders: ['FACEBOOK', 'X', 'TIKTOK', 'INSTAGRAM', 'GITHUB'],
+  },
+};
 import {translocoTesting} from '@testing/transloco-testing';
 import {StoreManagement} from './store-management';
 import {
@@ -25,7 +77,7 @@ class FakeStoreSettingsApi {
   /** What the next save answers with. Defaults to the patch folded into the fixture. */
   saveFailure: Error | null = null;
 
-  private settings: StoreSettings = STORE_SETTINGS;
+  private settings: StoreSettings = SETTINGS;
   private verifyOutcome: DomainStatus = 'waiting';
 
   loadSettings(): Observable<StoreSettings> {
@@ -61,7 +113,7 @@ class FakeStoreSettingsApi {
     this.verifyOutcome = outcome;
   }
 
-  resolve(value: StoreSettings = STORE_SETTINGS): void {
+  resolve(value: StoreSettings = SETTINGS): void {
     this.pending?.next(value);
     this.pending?.complete();
     this.pending = null;
@@ -137,9 +189,14 @@ describe('StoreManagement', () => {
 
     expect(api.loads).toBe(1);
     expect(element.querySelector('app-page-header')?.textContent).toContain(
-      STORE_SETTINGS.storeName,
+      SETTINGS.storeName,
     );
-    expect(element.querySelector('app-badge')?.textContent).toContain('Published');
+    /*
+     * No publish badge: nothing on the platform records a store's publish state, so the mockup's
+     * green pill asserted something no service can answer. See lessons.md, "Store management — a
+     * store has no published or maintenance state".
+     */
+    expect(element.querySelector('app-badge')).toBeNull();
   }));
 
   it('veils the page until the first response arrives', fakeAsync(() => {
@@ -249,14 +306,46 @@ describe('StoreManagement', () => {
   it('flips a toggle and marks the section dirty', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    const published = element.querySelector<HTMLButtonElement>('.switch-row [role="switch"]')!;
-    expect(published.getAttribute('aria-checked')).toBe('true');
+    const requireLogin = element.querySelector<HTMLButtonElement>(
+      '.storefront-flags [role="switch"]',
+    )!;
+    expect(requireLogin.getAttribute('aria-checked')).toBe('false');
 
-    published.click();
+    requireLogin.click();
     settle(fixture);
 
-    expect(published.getAttribute('aria-checked')).toBe('false');
+    expect(requireLogin.getAttribute('aria-checked')).toBe('true');
     expect(saveButton(element).disabled).toBeFalse();
+  }));
+
+  it('renders the fields the platform cannot store as disabled, and never submits them', fakeAsync(() => {
+    const {fixture, element} = load('details');
+
+    for (const id of ['#legal-name', '#store-slug', '#store-category', '#store-timezone', '#store-tax']) {
+      expect(element.querySelector<HTMLInputElement>(id)!.disabled)
+        .withContext(`${id} must stay disabled`)
+        .toBeTrue();
+    }
+
+    type(element, '#store-name', 'Acme Supply Group');
+    settle(fixture);
+    saveButton(element).click();
+    settle(fixture);
+
+    const patch = api.saves[0].patch;
+    expect(patch['name']).toBe('Acme Supply Group');
+    for (const field of ['legalName', 'slug', 'category', 'timezone', 'taxNumber', 'published']) {
+      expect(patch[field]).withContext(`${field} must not be submitted`).toBeUndefined();
+    }
+  }));
+
+  it('offers no way to remove a logo, because the platform has none', fakeAsync(() => {
+    const {element} = load('branding');
+
+    const labels = Array.from(element.querySelectorAll('button')).map((button) =>
+      (button.textContent ?? '').toLowerCase(),
+    );
+    expect(labels.some((label) => label.includes('remove'))).toBeFalse();
   }));
 
   it('collapses a gateway\'s credentials when it is switched off', fakeAsync(() => {
@@ -303,7 +392,7 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('home');
     const title = () => element.querySelector<HTMLInputElement>('#home-title')!.value;
 
-    expect(title()).toBe(STORE_SETTINGS.home.en!.title);
+    expect(title()).toBe(SETTINGS.home.en!.title);
 
     const tabs = Array.from(
       element.querySelectorAll<HTMLButtonElement>('app-tab-switcher .tab'),
@@ -311,7 +400,7 @@ describe('StoreManagement', () => {
     tabs.find((tab) => tab.textContent?.includes('AR'))!.click();
     settle(fixture);
 
-    expect(title()).toBe(STORE_SETTINGS.home.ar!.title);
+    expect(title()).toBe(SETTINGS.home.ar!.title);
   }));
 
   it('surfaces a failed load with a retry that refetches', fakeAsync(() => {

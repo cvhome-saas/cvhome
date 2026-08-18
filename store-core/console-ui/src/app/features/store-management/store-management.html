@@ -1,17 +1,12 @@
 <ng-container *transloco="let t">
   <app-page-header [title]="t('storeSettings.title')" [context]="context()">
     <!--
-      Suppressed until something has loaded: on a failed first load "Unpublished" would be a
-      claim about the store rather than about the request.
+      No published/unpublished badge. Nothing on the platform records a store's publish state, so
+      the mockup's green pill was asserting something no service can answer — and a badge, unlike
+      a field, cannot be shown disabled with a reason. It is omitted instead.
+      TODO(lessons.md): see lessons.md, "Store management — a store has no published or
+      maintenance state".
     -->
-    @if (!isEmpty()) {
-      @if (isPublished()) {
-        <app-badge tone="green">{{ t('storeSettings.published') }}</app-badge>
-      } @else {
-        <app-badge tone="slate">{{ t('storeSettings.unpublished') }}</app-badge>
-      }
-    }
-
     <button class="secondary-action" type="button" (click)="previewStorefront()">
       <app-icon name="externalLink" />
       {{ t('storeSettings.previewStorefront') }}
@@ -60,7 +55,12 @@
           <div class="settings-section" id="settings-section">
             @switch (section()) {
               @case ('branding') {
-                <app-branding-section [branding]="store.branding" [storeName]="store.storeName" />
+                <app-branding-section
+                  [branding]="store.branding"
+                  [storeName]="store.storeName"
+                  [uploading]="facade.uploading()"
+                  (picked)="facade.upload($event.kind, $event.file)"
+                />
               }
               @case ('home') {
                 <app-home-section
@@ -85,7 +85,13 @@
                 <app-slider-section [slides]="store.slides" />
               }
               @case ('details') {
-                <app-details-section [form]="forms.details" />
+                <app-details-section
+                  [form]="forms.details"
+                  [choices]="store.choices"
+                  [storeName]="store.storeName"
+                  [isDeleting]="facade.isDeleting()"
+                  (deleteRequested)="facade.deleteStore()"
+                />
               }
               @case ('social-login') {
                 <app-social-login-section

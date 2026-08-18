@@ -2,7 +2,6 @@ import {Component, computed, effect, inject, input} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
 import {PageHeader} from '@shared/ui/page-header/page-header';
@@ -34,7 +33,6 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
 @Component({
   selector: 'app-store-management',
   imports: [
-    Badge,
     BrandingSection,
     BusyOverlay,
     DetailsSection,
@@ -70,7 +68,6 @@ export class StoreManagement {
   protected readonly settings = this.facade.settings;
   protected readonly sections = this.facade.sections;
   protected readonly context = this.facade.context;
-  protected readonly isPublished = this.facade.isPublished;
   protected readonly canSave = this.facade.canSave;
   protected readonly isDirty = this.facade.isDirty;
   protected readonly isSaving = this.facade.isSaving;

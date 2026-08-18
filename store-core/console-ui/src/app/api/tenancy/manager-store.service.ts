@@ -81,4 +81,26 @@ export class ManagerStoreService {
       .get<EntityExists>(`${STORE_MANAGER_API_BASE}/private/store/unique`, {name})
       .pipe(map((answer) => answer.exists));
   }
+
+  /**
+   * The themes a storefront may run, already filtered to the ones actually built —
+   * `Theme.getImplementedThemes()` drops the ten placeholders the enum also declares. Public
+   * because the create-store form needs it before a store exists to be scoped to.
+   */
+  themes(): Observable<string[]> {
+    return this.crudService.get(`${STORE_MANAGER_API_BASE}/public/themes`);
+  }
+
+  /** The palettes a storefront may run. Thirty values, so the settings form renders a select. */
+  colorThemes(): Observable<string[]> {
+    return this.crudService.get(`${STORE_MANAGER_API_BASE}/public/color-themes`);
+  }
+
+  /**
+   * The storefront footer's link providers — `commons` `SocialProvider`, which is a different and
+   * longer list than cua's identically named enum for shopper sign-in.
+   */
+  socialLinkProviders(): Observable<string[]> {
+    return this.crudService.get(`${STORE_MANAGER_API_BASE}/public/social-links-providers`);
+  }
 }

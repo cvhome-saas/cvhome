@@ -260,99 +260,72 @@
     "clearFilters": "Clear filters"
   },
   "storeSettings": {
-    "title": "Store management",
-    "published": "Published",
-    "unpublished": "Unpublished",
-    "previewStorefront": "Preview storefront",
-    "discard": "Discard",
-    "saving": "Saving…",
-    "saveChanges": "Save changes",
-    "loading": "Loading store settings…",
-    "sectionsLabel": "Store settings sections",
-    "previewNotAvailable": "Previewing the storefront is not available yet.",
-    "sectionSaved": "{section} saved.",
-    "notAvailable": "{what} is not available yet.",
-    "section": {
-      "branding": "Store branding",
-      "home": "Store home page",
-      "domain": "Store domain",
-      "social": "Store social links",
-      "slider": "Store slider images",
-      "details": "Store details",
-      "socialLogin": "Store social login",
-      "payments": "Store payment config"
-    },
-    "sectionShort": {
-      "branding": "Branding",
-      "home": "Home page",
-      "domain": "Domain",
-      "social": "Social links",
-      "slider": "Slider images",
-      "details": "Details",
-      "socialLogin": "Social login",
-      "payments": "Payment config"
-    },
-    "nav": {
-      "heading": "Settings",
-      "ariaLabel": "Store settings sections",
-      "needsAttention": "Needs your attention",
-      "builderUnavailable": "The home page builder is not available yet.",
-      "homePageBuilder": "Home page builder"
-    },
     "branding": {
-      "title": "Store branding",
-      "subtitle": "Logo and banner shown across your storefront, invoices and emails.",
-      "logo": "Logo",
       "banner": "Banner",
-      "dropOrBrowse": "Drop image or browse",
-      "dropBanner": "Drag & drop banner here",
-      "logoHint": "PNG or SVG · square · min 512×512 · max 2 MB",
       "bannerHint": "JPG or PNG · 1920×480 recommended · max 5 MB",
+      "currentBannerAlt": "Current store banner",
+      "currentFile": "Stored: {{name}}",
       "currentLogoAlt": "Current store logo",
-      "replace": "Replace",
-      "remove": "Remove",
-      "removeNamed": "Remove {name}",
-      "uploaded": "Uploaded",
-      "uploadingLogo": "Uploading a logo",
-      "replacingLogo": "Replacing the logo",
-      "removingLogo": "Removing the logo",
+      "dropBanner": "Drag & drop banner here",
+      "dropOrBrowse": "Drop image or browse",
+      "logo": "Logo",
+      "logoHint": "PNG or SVG · square · min 512×512 · max 2 MB",
+      "replaceOnlyNote": "Uploading again replaces the current image. The platform has no way to remove one once set.",
+      "subtitle": "Logo and banner shown across your storefront, invoices and emails.",
+      "title": "Store branding",
       "uploadingBanner": "Uploading a banner",
-      "removingBanner": "Removing the banner"
+      "uploadingLogo": "Uploading a logo"
     },
     "details": {
-      "title": "Store details",
-      "subtitle": "Identity, contact and locale settings for this store.",
+      "address": "Business address",
+      "category": "Category",
+      "city": "City",
+      "colorTheme": "Colour theme",
+      "country": "Country",
+      "countryHint": "ISO country code, e.g. SA or US.",
+      "currency": "Default currency",
+      "currencyFallback": "A default currency is required.",
+      "currencyHint": "ISO currency code, e.g. SAR or USD.",
+      "deleteStore": "Delete this store",
+      "deleteStoreAccept": "Delete this store",
+      "deleteStoreConfirm": "This removes the store, its settings and its storefront. It cannot be undone.",
+      "deleteStoreDone": "Store deleted.",
+      "deleteStoreType": "To confirm, type the store name:",
+      "deleteStoreWarning": "Removes products, orders and configuration. This cannot be undone.",
+      "dimensionUnit": "Dimension unit",
+      "inBusinessSince": "In business since",
+      "language": "Default language",
+      "languageFallback": "A default language is required.",
+      "legalName": "Legal entity name",
+      "maintenanceMode": "Maintenance mode",
+      "maintenanceModeDescription": "Show a holding page instead of the storefront",
+      "notRecorded": "Not recorded by the platform",
+      "notRecordedNote": "These fields appear in the console design but nothing stores them yet, so they cannot be edited or saved.",
+      "postalCode": "Postal code",
+      "published": "Store is published",
+      "publishedDescription": "Visible to customers and indexable by search engines",
+      "requireLogin": "Require sign-in to check out",
+      "requireLoginDescription": "Shoppers must have an account before placing an order.",
+      "shortDescription": "Short description",
+      "slug": "Store slug",
+      "stateProvince": "State or province",
       "storeName": "Store name",
       "storeNameFallback": "A store name is required.",
-      "legalName": "Legal entity name",
-      "legalNameFallback": "The registered entity name is required.",
-      "slug": "Store slug",
-      "slugHint": "Used in the storefront URL",
-      "slugFallback": "Lowercase letters, digits and single hyphens only.",
-      "category": "Category",
+      "storefrontBehaviour": "Storefront behaviour",
+      "subtitle": "Identity, contact and locale settings for this store.",
       "supportEmail": "Support email",
       "supportEmailFallback": "Enter an address customers can reach you at.",
       "supportPhone": "Support phone",
-      "currency": "Default currency",
-      "currencyFallback": "A default currency is required.",
-      "language": "Default language",
-      "languageFallback": "A default language is required.",
-      "timezone": "Timezone",
       "taxNumber": "Tax / VAT number",
-      "taxHint": "Printed on invoices",
-      "address": "Business address",
-      "shortDescription": "Short description",
+      "theme": "Storefront theme",
+      "timezone": "Timezone",
+      "title": "Store details",
       "upToCharacters": "Up to {max} characters",
-      "shortDescriptionFallback": "Keep this to {max} characters or fewer.",
-      "visibility": "Store visibility",
-      "published": "Store is published",
-      "publishedDescription": "Visible to customers and indexable by search engines",
-      "maintenanceMode": "Maintenance mode",
-      "maintenanceModeDescription": "Show a holding page instead of the storefront",
-      "deleteStore": "Delete this store",
-      "deleteStoreWarning": "Removes products, orders and configuration. This cannot be undone.",
-      "deleteNotAvailable": "Deleting a store from the console is not available yet."
+      "useCache": "Cache storefront responses",
+      "useCacheDescription": "Faster pages, at the cost of showing changes a little later.",
+      "weightUnit": "Weight unit"
     },
+    "discard": "Discard",
     "domain": {
       "title": "Store domain",
       "subtitle": "Serve your storefront from your own domain.",
@@ -396,12 +369,95 @@
         "body": "A record exists for {domain} but points somewhere else. Correct it to the value below and check again."
       }
     },
-    "social": {
-      "title": "Store social links",
-      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
-      "addProfileUrl": "Add profile URL…",
-      "fallback": "Enter a profile URL, like instagram.com/your-store."
+    "home": {
+      "title": "Store home page",
+      "subtitle": "Landing copy and search metadata, written per language.",
+      "writeIn": "Write home page copy in",
+      "landingTitle": "Landing page title",
+      "landingTitleHint": "Shown as the H1 and browser tab title",
+      "landingTitleFallback": "A landing page title is required.",
+      "landingText": "Landing text",
+      "metaDescription": "Meta description",
+      "metaRecommended": "Recommended {min}–{max} characters",
+      "characters": "{count} characters",
+      "tags": "Tags",
+      "tagsLabel": "Home page tags",
+      "fallbackNotice": "Untranslated languages fall back to English.",
+      "empty": "Empty"
     },
+    "loading": "Loading store settings…",
+    "loginProvider": {
+      "google": "Google",
+      "facebook": "Facebook",
+      "github": "GitHub"
+    },
+    "nav": {
+      "heading": "Settings",
+      "ariaLabel": "Store settings sections",
+      "needsAttention": "Needs your attention",
+      "builderUnavailable": "The home page builder is not available yet.",
+      "homePageBuilder": "Home page builder"
+    },
+    "notAvailable": "{what} is not available yet.",
+    "paymentDescription": {
+      "cod": "Collected by the courier — nothing to configure",
+      "manualTransfer": "Orders wait until you confirm the transfer",
+      "stripe": "Cards, wallets and local methods",
+      "paypal": "PayPal balance and linked cards"
+    },
+    "paymentType": {
+      "cod": "Cash on delivery",
+      "manualTransfer": "Manual bank transfer",
+      "stripe": "Stripe",
+      "paypal": "PayPal"
+    },
+    "payments": {
+      "title": "Store payment configuration",
+      "subtitle": "Gateway credentials for this store only.",
+      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest and never returned to this screen. You can replace or rotate a value, but not read it back.",
+      "accept": "Accept {gateway}",
+      "apiKey": "API key",
+      "publishable": "(publishable)",
+      "secretKey": "Secret key",
+      "rotate": "Rotate",
+      "rotatingSecret": "Rotating the {gateway} secret key",
+      "webhookSecret": "Webhook secret",
+      "replacingWebhookSecret": "Replacing the {gateway} webhook secret",
+      "endpoint": "Endpoint: {url}"
+    },
+    "previewNotAvailable": "Previewing the storefront is not available yet.",
+    "previewStorefront": "Preview storefront",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "secret": {
+      "endsWith": "•••••••••••••• ends {last4}",
+      "notSet": "•••••••••••••• not set",
+      "lastChanged": "Last changed {date}",
+      "lastRotated": "Last rotated {date}",
+      "neverStored": "No secret stored yet"
+    },
+    "section": {
+      "branding": "Store branding",
+      "home": "Store home page",
+      "domain": "Store domain",
+      "social": "Store social links",
+      "slider": "Store slider images",
+      "details": "Store details",
+      "socialLogin": "Store social login",
+      "payments": "Store payment config"
+    },
+    "sectionSaved": "{section} saved.",
+    "sectionShort": {
+      "branding": "Branding",
+      "home": "Home page",
+      "domain": "Domain",
+      "social": "Social links",
+      "slider": "Slider images",
+      "details": "Details",
+      "socialLogin": "Social login",
+      "payments": "Payment config"
+    },
+    "sectionsLabel": "Store settings sections",
     "slider": {
       "title": "Store slider images",
       "subtitle": "Homepage carousel · drag to reorder · {count} of {capacity} slots used",
@@ -420,6 +476,12 @@
       "uploadingImages": "Uploading slider images",
       "slotsFull": "All {capacity} slots are used. Delete a slide before adding another."
     },
+    "social": {
+      "title": "Store social links",
+      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
+      "addProfileUrl": "Add profile URL…",
+      "fallback": "Enter a profile URL, like instagram.com/your-store."
+    },
     "socialLogin": {
       "title": "Store social login",
       "subtitle": "Let customers sign in with an external provider. Secrets are stored encrypted.",
@@ -431,49 +493,6 @@
       "callbackUrl": "Callback URL",
       "callbackHint": "Paste this into the provider's redirect URI allow-list"
     },
-    "payments": {
-      "title": "Store payment configuration",
-      "subtitle": "Gateway credentials for this store only.",
-      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest and never returned to this screen. You can replace or rotate a value, but not read it back.",
-      "accept": "Accept {gateway}",
-      "apiKey": "API key",
-      "publishable": "(publishable)",
-      "secretKey": "Secret key",
-      "rotate": "Rotate",
-      "rotatingSecret": "Rotating the {gateway} secret key",
-      "webhookSecret": "Webhook secret",
-      "replacingWebhookSecret": "Replacing the {gateway} webhook secret",
-      "endpoint": "Endpoint: {url}"
-    },
-    "home": {
-      "title": "Store home page",
-      "subtitle": "Landing copy and search metadata, written per language.",
-      "writeIn": "Write home page copy in",
-      "landingTitle": "Landing page title",
-      "landingTitleHint": "Shown as the H1 and browser tab title",
-      "landingTitleFallback": "A landing page title is required.",
-      "landingText": "Landing text",
-      "metaDescription": "Meta description",
-      "metaRecommended": "Recommended {min}–{max} characters",
-      "characters": "{count} characters",
-      "tags": "Tags",
-      "tagsLabel": "Home page tags",
-      "fallbackNotice": "Untranslated languages fall back to English.",
-      "empty": "Empty"
-    },
-    "secret": {
-      "endsWith": "•••••••••••••• ends {last4}",
-      "notSet": "•••••••••••••• not set",
-      "lastChanged": "Last changed {date}",
-      "lastRotated": "Last rotated {date}",
-      "neverStored": "No secret stored yet"
-    },
-    "state": {
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "live": "Live",
-      "off": "Off"
-    },
     "socialProvider": {
       "facebook": "Facebook",
       "x": "X",
@@ -481,22 +500,18 @@
       "instagram": "Instagram",
       "github": "GitHub"
     },
-    "loginProvider": {
-      "google": "Google",
-      "facebook": "Facebook",
-      "github": "GitHub"
+    "state": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "live": "Live",
+      "off": "Off"
     },
-    "paymentType": {
-      "cod": "Cash on delivery",
-      "manualTransfer": "Manual bank transfer",
-      "stripe": "Stripe",
-      "paypal": "PayPal"
-    },
-    "paymentDescription": {
-      "cod": "Collected by the courier — nothing to configure",
-      "manualTransfer": "Orders wait until you confirm the transfer",
-      "stripe": "Cards, wallets and local methods",
-      "paypal": "PayPal balance and linked cards"
+    "title": "Store management",
+    "unit": {
+      "CM": "Centimetres (cm)",
+      "IN": "Inches (in)",
+      "KG": "Kilograms (kg)",
+      "LB": "Pounds (lb)"
     }
   },
   "createStore": {
@@ -1181,5 +1196,8 @@
     "credit": "Credit",
     "refund": "Refund",
     "product": "Products"
+  },
+  "actions": {
+    "cancel": "Cancel"
   }
 }

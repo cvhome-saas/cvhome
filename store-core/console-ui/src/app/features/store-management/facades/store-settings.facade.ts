@@ -3,6 +3,8 @@ import {rxResource, takeUntilDestroyed, toSignal} from '@angular/core/rxjs-inter
 import {FormGroup} from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
 
+import {DOCUMENT} from '@angular/common';
+
 import {ApiErrorService} from '@core/errors/api-error.service';
 import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
 import {CONSOLE_LOCALES, LocaleService} from '@core/i18n/locale.service';
@@ -42,6 +44,7 @@ export class StoreSettingsFacade {
   private readonly locale = inject(LocaleService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly transloco = inject(TranslocoService);
+  private readonly document = inject(DOCUMENT);
 
   /** Which card is open. Set from the route param, so a section is linkable. */
   readonly activeSection = signal<SettingsSectionKey>('branding');
@@ -74,6 +77,9 @@ export class StoreSettingsFacade {
 
   readonly settings = this.loaded;
   readonly isSaving = signal(false);
+  readonly isDeleting = signal(false);
+  /** An upload in flight, named so the section can show which tile is busy. */
+  readonly uploading = signal<'logo' | 'banner' | null>(null);
 
   /**
    * Bumped by every form event — value, status, touched and pristine changes alike.
@@ -116,8 +122,6 @@ export class StoreSettingsFacade {
     const settings = this.loaded();
     return settings ? `${settings.storeName} · ${this.subdomain()}` : null;
   });
-
-  readonly isPublished = computed(() => this.loaded()?.details.published ?? false);
 
   /**
    * The sub-nav. `attention` is real state — a custom domain that has been typed but not
@@ -191,6 +195,68 @@ export class StoreSettingsFacade {
         error: (failure: unknown) => {
           this.isSaving.set(false);
           this.apiErrors.applyToForm(failure, form);
+        },
+      });
+  }
+
+  /**
+   * Uploads a logo or a banner.
+   *
+   * Sent the moment a file is chosen rather than held for *Save changes*: the endpoint is a
+   * multipart POST of its own, so there is nothing for the section's (empty) form to submit, and
+   * an image that appears only after a separate save is a confusing thing to offer.
+   */
+  upload(kind: 'logo' | 'banner', file: File): void {
+    if (this.uploading()) {
+      return;
+    }
+    this.uploading.set(kind);
+
+    const request = kind === 'logo' ? this.api.uploadLogo(file) : this.api.uploadBanner(file);
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (settings) => {
+        this.uploading.set(null);
+        this.snapshot.set(settings);
+        this.toast.success(this.transloco.translate(`storeSettings.branding.${kind}Uploaded`));
+      },
+      error: (failure: unknown) => {
+        this.uploading.set(null);
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
+  }
+
+  /**
+   * Deletes the store, then sends the operator somewhere that still exists.
+   *
+   * The server refuses to remove an org's default store, so a failure here is usually a rule
+   * rather than a fault — the message it returns says which, and is shown rather than replaced
+   * with a generic one.
+   */
+  deleteStore(): void {
+    if (this.isDeleting()) {
+      return;
+    }
+    this.isDeleting.set(true);
+
+    this.api
+      .deleteStore()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isDeleting.set(false);
+          this.toast.success(this.transloco.translate('storeSettings.details.deleteStoreDone'));
+          /*
+           * The store this page is scoped to is gone, so staying here would keep querying it. A
+           * full reload is deliberate: the store list, the request context and the rail all read
+           * the deleted store, and re-resolving them is what the console-context guard does on a
+           * fresh navigation.
+           */
+          this.document.defaultView?.location.assign('/');
+        },
+        error: (failure: unknown) => {
+          this.isDeleting.set(false);
+          this.toast.danger(this.apiErrors.messageFor(failure));
         },
       });
   }

@@ -398,3 +398,21 @@ app-field-error {
     flex-wrap: wrap;
   }
 }
+
+/*
+ * A control the platform cannot store. Muted and struck out of the tab order by `disabled` on the
+ * control itself; this only makes the state visible. Kept legible rather than faded to illegibility
+ * — the operator still needs to read what the field would have been.
+ */
+.control:has(:disabled),
+.control:disabled {
+  border-color: var(--border-soft);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+}
+
+.control:has(:disabled):hover,
+.control:disabled:hover {
+  border-color: var(--border-soft);
+}

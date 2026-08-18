@@ -690,3 +690,118 @@ requirements document, with the entry here reduced to a link. There is already o
   Parsing a server rendering is not something a client should have to do.
 - **Expected contract:** numeric `price` and `subTotal` on `ReadableOrderProduct` — the same fix as
   the totals gap, from the other side: send numbers and let the client format.
+
+## Store management — six designed store fields do not exist
+
+- **Screen:** `/store-management/details`, from `console-template/Store Management.dc.html`'s
+  "Store details" block.
+- **What the UI needs:** the design's twelve-field identity grid — store name, legal entity name,
+  store slug, category, support email, support phone, default currency, default language, timezone,
+  tax/VAT number, business address, short description.
+- **What is missing:** six of the twelve have no counterpart anywhere. `legalName`, `taxNumber`,
+  `timezone` and `shortDescription` return zero hits across every `.java` file in `store-pod` and
+  `store-core`; `slug` exists only on products, categories and content (`ResourceUrlAccess`), never
+  on a store; and there is no store category concept at all. `PersistableMerchantStore` cannot carry
+  any of them.
+- **Why it is required:** the legal entity name and tax number are what an invoice needs to be a
+  valid document in most jurisdictions — the invoice built in Module 4 currently prints the trading
+  name because that is the only name there is. A slug is what makes a storefront URL readable, and a
+  timezone is what makes "placed at 14:32" mean anything to a seller in a different one.
+- **Expected contract:** additional columns on `MerchantStoreEntity`, surfaced through
+  `ReadableMerchantStore`/`PersistableMerchantStore`: `legalName`, `taxNumber`, `slug` (unique per
+  store, validated like a friendly URL), `category`, `timezone` (IANA zone id), `shortDescription`.
+- **Placeholder:** the fields render disabled in a "Not recorded by the platform" block, with the
+  reason beside them, and are `disabled` in `StoreSettingsFormService` so they cannot reach a
+  request body. `TODO(lessons.md)` markers in `store-settings-form.service.ts` and
+  `store-settings.api.service.ts`.
+
+## Store management — a store has no published or maintenance state
+
+- **Screen:** `/store-management/details` ("Store visibility"), and the page header's status pill.
+- **What the UI needs:** a switch to take a storefront offline, a second one to put it into
+  maintenance, and a badge in the header saying which it is.
+- **What is missing:** nothing records either. `MerchantStoreEntity` has no visibility column, and
+  `ProvisioningState` is a different thing — it says whether the store finished being *created*, not
+  whether its owner wants it reachable. There is no endpoint to change either.
+- **Why it is required:** a seller preparing a catalogue needs the storefront dark until it is
+  ready, and a seller mid-migration needs a maintenance page rather than a broken one. Today the
+  only way to take a store offline is to delete it.
+- **Expected contract:** `published` and `maintenanceMode` booleans on the store, with
+  `PUT /private/store` accepting both, and the storefront honouring them — a maintenance page rather
+  than a 404.
+- **Placeholder:** both switches render disabled in the "Not recorded by the platform" block. The
+  header's published/unpublished badge is **removed** rather than disabled — a badge cannot carry a
+  reason, and one that always reads "Published" is an assertion rather than a fact.
+
+## Store management — a logo or banner can be uploaded but never removed
+
+- **Screen:** `/store-management/branding`.
+- **What the UI needs:** the design's "Replace" and "Remove" buttons under the logo tile and the
+  banner row.
+- **What is missing:** `MerchantStoreApi` maps `POST /private/store/marketing/logo` and
+  `.../banner` and **no delete counterpart**, and `PersistableMerchantStore` carries neither image,
+  so `PUT /private/store` cannot clear one either. seller-core has `removeStoreLogo` and
+  `removeStoreBanner` posting to `/v1/private/store/{store}/marketing/logo|banner` — paths missing
+  the `/spg/merchant/api` prefix every sibling carries and mapped by no controller. Those buttons
+  have always 404'd in seller-ui.
+- **Why it is required:** a seller who uploads the wrong logo, or rebrands and has no replacement
+  ready, has no way back to the default. The image is permanent from first upload.
+- **Expected contract:** `DELETE /spg/merchant/api/v1/private/store/marketing/logo` and
+  `.../banner`, both store-scoped like their POST counterparts.
+- **Placeholder:** Remove is not rendered. Replace is folded into the drop zone, since re-uploading
+  is what replacing actually is, and the card says so: "Uploading again replaces the current image.
+  The platform has no way to remove one once set."
+
+## Store management — slider images carry no schedule, link or file metadata
+
+- **Screen:** `/store-management/slider`, from `Store Management.dc.html`'s "Store slider images".
+- **What the UI needs:** each slide row shows a `LIVE` or `SCHEDULED` tag, a click-through link, and
+  a `1600×640 · 248 KB · JPG` metadata line under the name.
+- **What is missing:** `ReadableSliderImage` is a record of exactly `(priority, name, url)` and
+  `PersistableMerchantStore.sliderImages` carries only `(priority, name)`. There is no schedule, no
+  target URL, no dimensions, no byte size and no format. `POST .../marketing/add-slider-image`
+  answers with the same three fields.
+- **Why it is required:** a carousel slide that links nowhere is decoration; the whole point of a
+  storefront hero is to send the shopper at a product or a collection. Scheduling is what lets a
+  seller prepare a sale banner in advance rather than uploading it at midnight.
+- **Expected contract:** `link`, `startsAt` and `endsAt` on `ReadableSliderImage` and its
+  persistable counterpart. Dimensions and byte size can be derived by the server at upload time —
+  they are already known to `InputContentFile` — and returned on the readable record.
+- **Placeholder:** the tag, link and metadata line are not rendered. Reordering and deleting *are*
+  supported, because `PUT .../marketing/slider-images` replaces the whole list.
+
+## Store management — the landing-page endpoints seller-ui calls do not exist
+
+- **Screen:** `/store-management/home`, from `Store Management.dc.html`'s "Store home page".
+- **What the UI needs:** per-language landing copy — title, body text, meta description and tags.
+- **What is missing:** the three paths seller-core's `StoreService` uses are mapped by no
+  controller. `GET /spg/content/api/v1/private/content/any/{pageCode}`, `PUT .../private/content/{code}`
+  and `POST .../private/content` do not exist; `ContentApi` maps `/private/content/pages`,
+  `/private/content/boxes`, `/private/content/page` and `/private/content/box`, and a bare
+  `PUT`/`POST` on `/private/content` is a 405. seller-ui's landing-page screen has therefore never
+  saved anything — the same class of finding as Orders' Refund and Capture buttons.
+- **Why it is required:** it is the only copy on the storefront's front page.
+- **What console-ui does instead:** builds against the endpoints that *do* exist, using **content
+  boxes**. A `ContentBox` is a `code` plus per-language `descriptions[]`, and `ContentDescription`
+  carries `name`, `description`, `metaDescription` and `keyWords` — a one-to-one fit for the four
+  fields the design shows. `ContentPage` was rejected because it adds `linkToMenu`, a storefront
+  navigation concern that means nothing for home-page copy. `GET .../box/{code}/exists` gives a real
+  create-versus-update pre-flight rather than seller-ui's guess.
+- **Expected contract:** none needed — this one is a client-side correction, not a backend gap. It
+  is recorded because the *old* client is still shipping the broken calls until seller-ui is retired.
+
+## Dashboard — the merchant statistics outage is over
+
+- **Screen:** `/dashboard` and `/orders`, the KPI rows on both.
+- **What was broken:** Module 3 recorded all three merchant statistics answering 500 for every
+  caller, on a date-type mismatch in checkout. Both pages were built with that leg optional as a
+  result, and both reported their counts unavailable.
+- **What is true now:** fixed on the backend. `StatisticRange` is a `ZonedDateTime` pair, the API
+  calls `.toInstant()`, and `Order.datePurchased` is an `Instant`, so the types line up. Verified
+  against the running stack during Module 5: `POST /private/order-statistic` answers 200 with
+  `StatisticList[entries=[StatisticEntry[date=2026-08-19, name=PENDING_PAYMENT, value=1]]]`.
+- **What stays:** the `catchError` on that leg in both `dashboard.api.service.ts` and
+  `orders.api.service.ts`. It is no longer working around an outage — it encodes that a row of
+  counts is secondary and must never be able to take its page down.
+- **Still open:** `customer-statistic` and `product-statistic` answer with `date=null`, which is the
+  separate gap recorded above.
