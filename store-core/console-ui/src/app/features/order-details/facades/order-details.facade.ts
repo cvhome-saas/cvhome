@@ -25,6 +25,22 @@ export interface AddressView {
   readonly email: string | null;
 }
 
+/**
+ * One stage of the fulfilment tracker.
+ *
+ * Five stages rather than the ten `OrderStatus` values: an operator watching an order wants to know
+ * how far it has got, not which of two synonyms for "in the warehouse" the server recorded. Each
+ * stage owns the statuses that satisfy it.
+ */
+export interface FulfilmentStage {
+  readonly labelKey: string;
+  readonly state: 'done' | 'current' | 'todo';
+  /** When the stage was reached, from the order's own history. Null while it is still ahead. */
+  readonly reachedAt: string | null;
+  /** How full the stage's bar is: 1 for reached, a half-step for the one in progress. */
+  readonly fill: number;
+}
+
 export interface TimelineEntry {
   readonly status: string;
   readonly tone: ReturnType<typeof toneOf>;
@@ -34,6 +50,27 @@ export interface TimelineEntry {
 
 function toneOf(status: OrderStatus | undefined) {
   return status ? STATUS_TONE[status] : 'slate';
+}
+
+/**
+ * The stages the tracker shows, and which statuses reach each one.
+ *
+ * `CANCELLED` and `RETURNED` appear in no stage on purpose: they are not points on the way to
+ * delivery, they are the order leaving the path. The tracker is replaced by a notice when either is
+ * the order's status, rather than showing a half-filled progress bar for an order that is not
+ * progressing.
+ */
+const STAGES: readonly {labelKey: string; statuses: readonly OrderStatus[]}[] = [
+  {labelKey: 'orderDetails.stage.placed', statuses: ['CREATED']},
+  {labelKey: 'orderDetails.stage.paid', statuses: ['PENDING_PAYMENT', 'CONFIRMED']},
+  {labelKey: 'orderDetails.stage.picked', statuses: ['PROCESSING']},
+  {labelKey: 'orderDetails.stage.shipped', statuses: ['SHIPPED', 'DELIVERING']},
+  {labelKey: 'orderDetails.stage.delivered', statuses: ['DELIVERED', 'COMPLETED']},
+];
+
+/** Where the order sits, as an index into `STAGES`. `-1` when its status is off the path. */
+function stageIndexOf(status: OrderStatus | undefined): number {
+  return status ? STAGES.findIndex((stage) => stage.statuses.includes(status)) : -1;
 }
 
 /**
@@ -79,13 +116,59 @@ export class OrderDetailsFacade {
 
   readonly statusTone = computed(() => toneOf(this.order()?.orderStatus));
 
+  /**
+   * The buyer.
+   *
+   * Falls back to the billing address the way the list does — the list's `customer` is null, and a
+   * detail page that disagreed with the row the operator clicked would be worse than either.
+   */
   readonly customer = computed(() => {
-    const customer = this.order()?.customer;
-    const name = [customer?.firstName, customer?.lastName].filter(Boolean).join(' ').trim();
+    const order = this.order();
+    const person = order?.customer ?? order?.billing;
+    const name = [person?.firstName, person?.lastName].filter(Boolean).join(' ').trim();
+    const email = order?.customer?.emailAddress ?? order?.billing?.email ?? null;
+
     return {
-      name: name || customer?.emailAddress || '—',
-      email: customer?.emailAddress ?? null,
-      username: customer?.username ?? null,
+      name: name || email || '—',
+      company: order?.billing?.company?.trim() || null,
+      email,
+      phone: order?.billing?.phone?.trim() || null,
+      initials: initialsOf(name || email || ''),
+    };
+  });
+
+  /**
+   * The line under the title: when it was placed, how many lines, what it came to.
+   *
+   * The mockup also puts the channel and the store here. There is no channel on an order, and the
+   * store is already named in the rail two inches to the left.
+   */
+  readonly summary = computed(() => {
+    const order = this.order();
+    return {
+      placedAt: order?.datePurchased ?? null,
+      itemCount: order?.products?.length ?? 0,
+      total: formatMoney(order?.total, order?.currency),
+    };
+  });
+
+  /**
+   * The invoice, as a document.
+   *
+   * Every figure is read off the order, which is why this can exist at all with no invoice service
+   * behind it. What a real one would add — a stable invoice number, an issue date distinct from the
+   * order date, the seller's registered address and tax id, payment terms — is absent rather than
+   * invented. See lessons.md, "Orders — no invoice service".
+   */
+  readonly invoice = computed(() => {
+    const order = this.order();
+    return {
+      orderReference: this.reference(),
+      issuedAt: order?.datePurchased ?? null,
+      paid: order?.paymentStatus === 'PAID',
+      paymentStatus: order?.paymentStatus ? orderStatusLabel(order.paymentStatus) : '—',
+      billing: this.billing(),
+      delivery: this.delivery(),
     };
   });
 
@@ -125,6 +208,40 @@ export class OrderDetailsFacade {
       {labelKey: 'orderDetails.flag.customerAgreed', value: this.yesNo(order.customerAgreed)},
       {labelKey: 'orderDetails.flag.confirmedAddress', value: this.yesNo(order.confirmedAddress)},
     ];
+  });
+
+  /** True when the order left the fulfilment path rather than stalling on it. */
+  readonly isCancelled = computed(() => {
+    const status = this.order()?.orderStatus;
+    return status === 'CANCELLED' || status === 'RETURNED';
+  });
+
+  /**
+   * The fulfilment tracker.
+   *
+   * Both the position and the timestamps are real: the position comes from the order's status, and
+   * each reached stage is dated from the **first** history entry that put it there. Nothing here is
+   * estimated — a stage still ahead simply carries no date, which is the honest answer to "when will
+   * this ship" on a platform with no shipping model at all.
+   */
+  readonly stages = computed<readonly FulfilmentStage[]>(() => {
+    const history = this.detail.hasValue() ? (this.detail.value()?.history ?? []) : [];
+    const current = stageIndexOf(this.order()?.orderStatus);
+
+    return STAGES.map((stage, index) => {
+      const state = index < current ? 'done' : index === current ? 'current' : 'todo';
+      const entry = history.find((it) => it.orderStatus && stage.statuses.includes(it.orderStatus));
+
+      return {
+        labelKey: stage.labelKey,
+        state,
+        // Only for a stage actually reached. An order can move *backwards* — one that went out for
+        // delivery and came back to picking still has a history entry for shipping, and dating a
+        // stage ahead of the order with it would say it had already happened.
+        reachedAt: state === 'todo' ? null : (entry?.date ?? null),
+        fill: state === 'done' ? 1 : state === 'current' ? 0.5 : 0,
+      } satisfies FulfilmentStage;
+    });
   });
 
   readonly timeline = computed<readonly TimelineEntry[]>(() => {
@@ -210,4 +327,17 @@ export class OrderDetailsFacade {
     this.transloco.activeLang();
     return this.transloco.translate(value ? 'orderDetails.yes' : 'orderDetails.no');
   }
+}
+
+/** First letters of the first two words, for the avatar tile. */
+function initialsOf(name: string): string {
+  return (
+    name
+      .split(/[\s@.]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word.charAt(0))
+      .join('')
+      .toUpperCase() || '?'
+  );
 }

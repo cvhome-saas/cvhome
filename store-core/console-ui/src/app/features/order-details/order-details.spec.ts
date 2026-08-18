@@ -4,6 +4,8 @@ import {Observable, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import type {OrderStatus, ReadableOrder} from '@models/checkout';
+import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {OrderDetails} from './order-details';
 import {OrderDetailsApi, type OrderDetail} from './services/order-details.api.service';
@@ -73,6 +75,8 @@ describe('OrderDetails', () => {
       providers: [
         provideRouter([]),
         {provide: OrderDetailsApi, useValue: api},
+        // The page names the store on the invoice and the operator on the composer.
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
         {provide: NOTIFICATION_PORT, useValue: toasts},
         ...translocoTesting().providers,
       ],
@@ -131,6 +135,69 @@ describe('OrderDetails', () => {
     expect(delivery.textContent).toContain('Not provided on this order.');
   }));
 
+  it('tracks fulfilment from the order status, dating each stage from its history entry', fakeAsync(() => {
+    const element = load();
+    const stages = [...element.querySelectorAll('.stages li')];
+
+    expect(stages.length).toBe(5);
+    // PROCESSING is the third stage, so the first two are behind it and the last two ahead.
+    expect(stages[0].className).toContain('done');
+    expect(stages[2].className).toContain('current');
+    expect(stages[4].className).toContain('todo');
+
+    // The dates are real: stage one is dated from the CREATED history entry, not estimated.
+    expect(stages[0].querySelector('.stage-meta')?.textContent?.trim()).toContain('Aug 4');
+    expect(stages[4].querySelector('.stage-meta')?.textContent?.trim()).toBe('Not yet');
+  }));
+
+  it('does not date a stage the order has not reached, even when history has been there', fakeAsync(() => {
+    // An order can move backwards: this one went out for delivery and came back to picking.
+    api.detail = {
+      ...DETAIL,
+      order: {...ORDER, orderStatus: 'PROCESSING'},
+      history: [
+        ...DETAIL.history,
+        {id: 3, orderStatus: 'DELIVERING', date: '2026-08-05T09:00:00Z'},
+        {id: 4, orderStatus: 'PROCESSING', date: '2026-08-05T11:00:00Z'},
+      ],
+    };
+    const element = load();
+    const shipped = element.querySelectorAll('.stages li')[3];
+
+    expect(shipped.className).toContain('todo');
+    expect(shipped.querySelector('.stage-meta')?.textContent?.trim()).toBe('Not yet');
+  }));
+
+  it('replaces the tracker with a notice for an order that left the path', fakeAsync(() => {
+    api.detail = {...DETAIL, order: {...ORDER, orderStatus: 'CANCELLED'}};
+    const element = load();
+
+    // A half-filled progress bar for a cancelled order would claim it is still moving.
+    expect(element.querySelector('.stages')).toBeNull();
+    expect(element.querySelector('.off-path')?.textContent).toContain('no longer moving');
+  }));
+
+  it('opens the invoice as a document and closes it again', fakeAsync(() => {
+    const element = load();
+    expect(element.querySelector('.invoice-sheet')).toBeNull();
+
+    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const sheet = element.querySelector('.invoice-sheet');
+    expect(sheet).not.toBeNull();
+    // The whole document, not a copy of the items panel: letterhead, both parties, lines, totals.
+    expect(sheet!.querySelector('.seller')?.textContent).toContain('Acme Supply Co.');
+    expect(sheet!.textContent).toContain('Billed to');
+    expect(sheet!.textContent).toContain('Shipped to');
+    expect(sheet!.querySelectorAll('.invoice-items tbody tr').length).toBe(2);
+    expect(sheet!.querySelector('.invoice-totals .grand')?.textContent).toContain('$221.00');
+
+    (element.querySelector('.invoice-close') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(element.querySelector('.invoice-sheet')).toBeNull();
+  }));
+
   it('renders the timeline oldest first', fakeAsync(() => {
     const element = load();
     const entries = [...element.querySelectorAll('.timeline li')].map((n) => n.textContent!.trim());
@@ -150,7 +217,7 @@ describe('OrderDetails', () => {
 
   it('shows the status it will actually submit', fakeAsync(() => {
     const element = load();
-    const select = element.querySelector('.status-form select') as HTMLSelectElement;
+    const select = element.querySelector('.composer select') as HTMLSelectElement;
 
     // Binding `[value]` on the select left it displaying the first option while submitting another.
     expect(select.value).toBe('PROCESSING');
@@ -159,12 +226,12 @@ describe('OrderDetails', () => {
 
   it('records a status change and re-reads the order rather than assuming', fakeAsync(() => {
     const element = load();
-    const comment = element.querySelector('.status-form input') as HTMLInputElement;
+    const comment = element.querySelector('.composer textarea') as HTMLTextAreaElement;
     comment.value = 'Handed to courier';
     comment.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    (element.querySelector('.status-form button') as HTMLButtonElement).click();
+    (element.querySelector('.composer .primary-action') as HTMLButtonElement).click();
     tick();
     fixture.detectChanges();
 
@@ -177,7 +244,7 @@ describe('OrderDetails', () => {
     api.postFails = true;
     const element = load();
 
-    (element.querySelector('.status-form button') as HTMLButtonElement).click();
+    (element.querySelector('.composer .primary-action') as HTMLButtonElement).click();
     tick();
     fixture.detectChanges();
 

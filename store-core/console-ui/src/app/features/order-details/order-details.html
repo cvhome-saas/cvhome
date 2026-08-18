@@ -1,18 +1,4 @@
 <ng-container *transloco="let t">
-  <app-page-header [title]="title()" [context]="facade.customer().name">
-    <a class="secondary-action" routerLink="/orders">
-      <app-icon name="chevronLeft" [flip]="true" />
-      {{ t('orderDetails.backToOrders') }}
-    </a>
-    <app-export-button
-      [target]="report()"
-      [fileName]="'invoice' + facade.reference()"
-      [title]="t('orderDetails.invoice')"
-      [subtitle]="facade.reference()"
-      [disabled]="facade.isLoading() || facade.isEmpty()"
-    />
-  </app-page-header>
-
   @if (facade.error(); as failure) {
     <div class="load-error" role="alert">
       <app-icon name="bolt" />
@@ -25,16 +11,78 @@
     @if (facade.isEmpty()) {
       <div class="first-load" aria-hidden="true"></div>
     } @else if (facade.order(); as order) {
+      <!--
+        The identity line. A square control returns to the list, the reference carries the title
+        weight, and the status sits beside it as a dotted pill — the order's state is the second
+        thing you need after knowing which order this is.
+      -->
+      <header class="order-head">
+        <a class="back" routerLink="/orders" [attr.aria-label]="t('orderDetails.backToOrders')">
+          <app-icon name="arrowLeft" [flip]="true" />
+        </a>
+
+        <div class="identity">
+          <div class="identity-line">
+            <h1>{{ title() }}</h1>
+            <app-badge [tone]="facade.statusTone()" shape="square">
+              <span class="status-dot" aria-hidden="true"></span>
+              {{ facade.status() }}
+            </app-badge>
+          </div>
+          <p class="order-meta">
+            @if (facade.summary().placedAt; as placed) {
+              <span>{{ t('orderDetails.placedOn', {date: placed | date: 'MMM d, y, HH:mm'}) }}</span>
+            }
+            <span>{{ t('orderDetails.itemsSubtitle', {count: facade.summary().itemCount}) }}</span>
+            <span class="meta-total">{{ facade.summary().total }}</span>
+          </p>
+        </div>
+
+        <button class="invoice-action" type="button" (click)="openInvoice()">
+          <app-icon name="file" />
+          {{ t('orderDetails.invoice') }}
+        </button>
+      </header>
+
+      <!--
+        Fulfilment progress. The position comes from the order's status and each reached stage is
+        dated from the history entry that put it there — nothing is estimated, so a stage still
+        ahead simply carries no date.
+      -->
+      @if (facade.isCancelled()) {
+        <div class="off-path" role="status">
+          <app-icon name="alertCircle" />
+          <span>{{ t('orderDetails.offPath', {status: facade.status()}) }}</span>
+        </div>
+      } @else {
+        <section class="fulfilment" [attr.aria-label]="t('orderDetails.fulfilment')">
+          <header>
+            <h2>{{ t('orderDetails.fulfilment') }}</h2>
+            <span class="fulfilment-state">{{ facade.status() }}</span>
+          </header>
+          <ol class="stages">
+            @for (stage of facade.stages(); track stage.labelKey) {
+              <li [class]="stage.state">
+                <span class="stage-head">
+                  <span class="stage-dot" aria-hidden="true">
+                    <app-icon [name]="stage.state === 'done' ? 'check' : stage.state === 'current' ? 'clock' : 'minus'" />
+                  </span>
+                  <span class="stage-label">{{ t(stage.labelKey) }}</span>
+                </span>
+                <span class="stage-bar" aria-hidden="true"><i [style.transform]="'scaleX(' + stage.fill + ')'"></i></span>
+                <span class="stage-meta">
+                  {{ stage.reachedAt ? (stage.reachedAt | date: 'MMM d, HH:mm') : t('orderDetails.stageAhead') }}
+                </span>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+
       <div class="order-grid">
         <div class="column-main">
-          <!--
-            The invoice. Every figure on it is already on the order, so it renders and prints with no
-            backend — only *emailing* it needs a service. See lessons.md, "Orders — no invoice service".
-          -->
           <app-panel [title]="t('orderDetails.items')" [subtitle]="t('orderDetails.itemsSubtitle', {count: facade.items().length})">
-            <app-badge panelAction [tone]="facade.statusTone()" shape="square">{{ facade.status() }}</app-badge>
-
-            <div class="panel-pad" #invoice>
+            <div class="panel-pad">
               <table class="items">
                 <caption class="sr-only">{{ t('orderDetails.items') }}</caption>
                 <thead>
@@ -49,12 +97,14 @@
                   @for (item of facade.items(); track item.id) {
                     <tr>
                       <td>
-                        <strong>{{ item.productName ?? item.product?.name ?? '—' }}</strong>
-                        <small class="mono">{{ item.sku ?? item.product?.sku ?? '' }}</small>
+                        <span class="item-copy">
+                          <strong>{{ item.productName ?? item.product?.name ?? '—' }}</strong>
+                          <small class="mono">{{ item.sku ?? item.product?.sku ?? '' }}</small>
+                        </span>
                       </td>
                       <td class="numeric">{{ item.orderedQuantity ?? 0 }}</td>
                       <td class="numeric">{{ item.price ?? '—' }}</td>
-                      <td class="numeric">{{ item.subTotal ?? '—' }}</td>
+                      <td class="numeric strong">{{ item.subTotal ?? '—' }}</td>
                     </tr>
                   } @empty {
                     <tr><td colspan="4" class="empty">{{ t('orderDetails.noItems') }}</td></tr>
@@ -63,9 +113,8 @@
               </table>
 
               <!--
-                Every total line the server computed, rendered as it sent them — each already
-                formatted in the order's currency. Listing them rather than picking out subtotal,
-                tax and shipping means a discount or a surcharge shows up without the console
+                Every total line the server computed, labelled from its module and formatted from
+                its value — a store with a discount or a surcharge shows it without the console
                 needing to know that line exists.
               -->
               <dl class="totals">
@@ -84,6 +133,7 @@
               <ol class="timeline">
                 @for (entry of facade.timeline(); track $index) {
                   <li>
+                    <span class="timeline-rail" aria-hidden="true"></span>
                     <app-badge [tone]="entry.tone" shape="square">{{ entry.status }}</app-badge>
                     <span class="timeline-copy">
                       @if (entry.comment) {
@@ -100,43 +150,44 @@
               </ol>
 
               <!--
-                The one write this screen has. Everything else the design asks for — refund,
-                capture, cancel, duplicate, create shipment — has no endpoint in checkout.
+                The composer, shaped like the note field in the mockup: who is writing, then the
+                message, then the action. It is the only write this screen has — refund, capture,
+                cancel and shipment all have no endpoint.
               -->
-              <div class="status-form">
-                <label>
-                  {{ t('orderDetails.newStatus') }}
-                  <!--
-                    `[selected]` on the option, not `[value]` on the select: Angular sets the
-                    select's value before its options exist, so the control displayed the first
-                    status while submitting a different one.
-                  -->
-                  <select class="control" (change)="nextStatus.set($any($event.target).value)">
-                    @for (option of facade.statusOptions(); track option.value) {
-                      <option [value]="option.value" [selected]="option.value === nextStatus()">
-                        {{ option.label }}
-                      </option>
-                    }
-                  </select>
-                </label>
-                <label class="grow">
-                  {{ t('orderDetails.comment') }}
-                  <input
-                    class="control"
-                    type="text"
+              <div class="composer">
+                <span class="composer-avatar" aria-hidden="true">{{ operator() }}</span>
+                <div class="composer-body">
+                  <label class="sr-only" for="status-comment">{{ t('orderDetails.comment') }}</label>
+                  <textarea
+                    id="status-comment"
+                    rows="2"
                     [value]="comment()"
                     (input)="comment.set($any($event.target).value)"
                     [placeholder]="t('orderDetails.commentPlaceholder')"
-                  />
-                </label>
-                <button
-                  class="primary-action"
-                  type="button"
-                  [disabled]="facade.submitting()"
-                  (click)="submitStatus()"
-                >
-                  {{ facade.submitting() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
-                </button>
+                  ></textarea>
+
+                  <div class="composer-actions">
+                    <label class="status-picker">
+                      <span>{{ t('orderDetails.newStatus') }}</span>
+                      <!--
+                        `[selected]` on the option, not `[value]` on the select: Angular sets the
+                        select's value before its options exist, so the control displayed the first
+                        status while submitting a different one.
+                      -->
+                      <select (change)="nextStatus.set($any($event.target).value)">
+                        @for (option of facade.statusOptions(); track option.value) {
+                          <option [value]="option.value" [selected]="option.value === nextStatus()">
+                            {{ option.label }}
+                          </option>
+                        }
+                      </select>
+                      <app-icon name="chevronDown" />
+                    </label>
+                    <button class="primary-action" type="button" [disabled]="facade.submitting()" (click)="submitStatus()">
+                      {{ facade.submitting() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </app-panel>
@@ -144,15 +195,40 @@
 
         <div class="column-side">
           <app-panel [title]="t('orderDetails.customer')">
+            <button panelAction class="panel-link" type="button" (click)="viewProfile()">
+              {{ t('orderDetails.viewProfile') }}
+              <app-icon name="chevronRight" [flip]="true" />
+            </button>
+
             <div class="panel-pad panel-stack">
-              <p class="customer-name">{{ facade.customer().name }}</p>
-              @if (facade.customer().email; as email) {
-                <a class="customer-link" [href]="'mailto:' + email">{{ email }}</a>
-              }
-              <p class="placed">
-                {{ t('orderDetails.placed') }}
-                <strong>{{ order.datePurchased ? (order.datePurchased | date: 'medium') : '—' }}</strong>
-              </p>
+              <div class="customer-head">
+                <span class="customer-avatar" aria-hidden="true">{{ facade.customer().initials }}</span>
+                <span class="customer-name">
+                  <strong>{{ facade.customer().name }}</strong>
+                  @if (facade.customer().company; as company) {
+                    <small>{{ company }}</small>
+                  }
+                </span>
+              </div>
+
+              <ul class="contact">
+                @if (facade.customer().email; as email) {
+                  <li>
+                    <app-icon name="envelope" />
+                    <a [href]="'mailto:' + email">{{ email }}</a>
+                  </li>
+                }
+                @if (facade.customer().phone; as phone) {
+                  <li>
+                    <app-icon name="phone" />
+                    <a [href]="'tel:' + phone">{{ phone }}</a>
+                  </li>
+                }
+                <li>
+                  <app-icon name="calendar" />
+                  <span>{{ order.datePurchased ? (order.datePurchased | date: 'medium') : '—' }}</span>
+                </li>
+              </ul>
             </div>
           </app-panel>
 
@@ -192,6 +268,121 @@
           </app-panel>
         </div>
       </div>
+
+      <!--
+        The invoice, as a document rather than a panel: page proportions, its own letterhead, and a
+        toolbar that acts on the sheet. Everything on it is read off the order, which is why it can
+        exist with no invoice service — see lessons.md, "Orders — no invoice service".
+      -->
+      @if (invoiceOpen()) {
+        <div class="invoice-scrim" (click)="closeInvoice()" aria-hidden="true"></div>
+        <div
+          class="invoice-layer"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-label]="t('orderDetails.invoice')"
+          cdkTrapFocus
+          [cdkTrapFocusAutoCapture]="true"
+          (keydown.escape)="closeInvoice()"
+        >
+          <div class="invoice-bar">
+            <strong>{{ t('orderDetails.invoice') }} · {{ facade.reference() }}</strong>
+            <button type="button" [disabled]="exporting()" (click)="downloadInvoice()">
+              <app-icon name="download" />
+              {{ exporting() ? t('orderDetails.preparing') : t('orderDetails.download') }}
+            </button>
+            <button type="button" (click)="printInvoice()">
+              <app-icon name="printer" />
+              {{ t('orderDetails.print') }}
+            </button>
+            <button class="invoice-close" type="button" [attr.aria-label]="t('orderDetails.close')" (click)="closeInvoice()">
+              <app-icon name="x" />
+            </button>
+          </div>
+
+          <div class="invoice-scroll">
+            <article class="invoice-sheet" #invoiceSheet>
+              <header class="invoice-head">
+                <div class="seller">
+                  <span class="seller-mark" aria-hidden="true">{{ storeName().charAt(0) }}</span>
+                  <strong>{{ storeName() }}</strong>
+                  <!--
+                    The seller's registered address and tax id would go here. The console has the
+                    store's name and nothing else about it — see lessons.md.
+                  -->
+                </div>
+                <div class="invoice-id">
+                  <p class="invoice-word">{{ t('orderDetails.invoiceWord') }}</p>
+                  <dl>
+                    <div>
+                      <dt>{{ t('orderDetails.order') }}</dt>
+                      <dd>{{ facade.invoice().orderReference }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ t('orderDetails.issued') }}</dt>
+                      <dd>{{ facade.invoice().issuedAt ? (facade.invoice().issuedAt | date: 'mediumDate') : '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ t('orderDetails.flag.paymentStatus') }}</dt>
+                      <dd>{{ facade.invoice().paymentStatus }}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </header>
+
+              <div class="invoice-parties">
+                @for (pair of [{key: 'billedTo', view: facade.invoice().billing}, {key: 'shippedTo', view: facade.invoice().delivery}]; track pair.key) {
+                  <section>
+                    <h3>{{ t('orderDetails.' + pair.key) }}</h3>
+                    @if (pair.view; as address) {
+                      <p class="party-name">{{ address.name }}</p>
+                      @for (line of address.lines; track line) {
+                        <p>{{ line }}</p>
+                      }
+                      @if (address.email) { <p>{{ address.email }}</p> }
+                    } @else {
+                      <p class="muted">{{ t('orderDetails.noAddress') }}</p>
+                    }
+                  </section>
+                }
+              </div>
+
+              <table class="invoice-items">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ t('orderDetails.column.description') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.quantity') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.unitPrice') }}</th>
+                    <th scope="col" class="numeric">{{ t('orderDetails.column.amount') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of facade.items(); track item.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ item.productName ?? item.product?.name ?? '—' }}</strong>
+                        <small class="mono">{{ item.sku ?? item.product?.sku ?? '' }}</small>
+                      </td>
+                      <td class="numeric">{{ item.orderedQuantity ?? 0 }}</td>
+                      <td class="numeric">{{ item.price ?? '—' }}</td>
+                      <td class="numeric strong">{{ item.subTotal ?? '—' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              <dl class="invoice-totals">
+                @for (total of facade.totals(); track total.label) {
+                  <div [class.grand]="total.grand">
+                    <dt>{{ total.label }}</dt>
+                    <dd>{{ total.amount }}</dd>
+                  </div>
+                }
+              </dl>
+            </article>
+          </div>
+        </div>
+      }
     }
   </app-busy-overlay>
 </ng-container>

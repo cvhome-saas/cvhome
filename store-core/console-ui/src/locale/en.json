@@ -1080,7 +1080,9 @@
       "product": "Product",
       "quantity": "Qty",
       "unitPrice": "Unit price",
-      "lineTotal": "Total"
+      "lineTotal": "Total",
+      "description": "Description",
+      "amount": "Amount"
     },
     "history": "History",
     "historySubtitle": "Every status this order has been through",
@@ -1092,7 +1094,6 @@
     "recording": "Recording…",
     "statusAdded": "Status recorded.",
     "customer": "Customer",
-    "placed": "Placed",
     "addresses": "Addresses",
     "billing": "Billing",
     "delivery": "Delivery",
@@ -1105,6 +1106,29 @@
       "reservationStatus": "Stock reservation",
       "customerAgreed": "Terms accepted",
       "confirmedAddress": "Address confirmed"
-    }
+    },
+    "placedOn": "Placed {date}",
+    "fulfilment": "Fulfilment progress",
+    "stageAhead": "Not yet",
+    "offPath": "This order is {status}. It is no longer moving through fulfilment.",
+    "stage": {
+      "placed": "Placed",
+      "paid": "Paid",
+      "picked": "Picked",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "viewProfile": "View profile",
+    "profileNotAvailable": "Customer profiles are not available yet.",
+    "invoiceWord": "INVOICE",
+    "order": "Order",
+    "issued": "Issued",
+    "billedTo": "Billed to",
+    "shippedTo": "Shipped to",
+    "download": "Download",
+    "preparing": "Preparing…",
+    "print": "Print",
+    "close": "Close",
+    "invoiceFailed": "The invoice could not be prepared."
   }
 }

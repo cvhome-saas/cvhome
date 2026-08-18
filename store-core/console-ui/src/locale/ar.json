@@ -1080,7 +1080,9 @@
       "product": "المنتج",
       "quantity": "الكمية",
       "unitPrice": "سعر الوحدة",
-      "lineTotal": "الإجمالي"
+      "lineTotal": "الإجمالي",
+      "description": "الوصف",
+      "amount": "المبلغ"
     },
     "history": "السجل",
     "historySubtitle": "كل الحالات التي مر بها هذا الطلب",
@@ -1092,7 +1094,6 @@
     "recording": "جارٍ التسجيل…",
     "statusAdded": "تم تسجيل الحالة.",
     "customer": "العميل",
-    "placed": "تاريخ الطلب",
     "addresses": "العناوين",
     "billing": "الفوترة",
     "delivery": "التسليم",
@@ -1105,6 +1106,29 @@
       "reservationStatus": "حجز المخزون",
       "customerAgreed": "الموافقة على الشروط",
       "confirmedAddress": "تأكيد العنوان"
-    }
+    },
+    "placedOn": "تم الطلب {date}",
+    "fulfilment": "مراحل التنفيذ",
+    "stageAhead": "لم تبدأ بعد",
+    "offPath": "هذا الطلب {status}. لم يعد يمر بمراحل التنفيذ.",
+    "stage": {
+      "placed": "تم الإنشاء",
+      "paid": "الدفع",
+      "picked": "التجهيز",
+      "shipped": "الشحن",
+      "delivered": "التسليم"
+    },
+    "viewProfile": "عرض الملف",
+    "profileNotAvailable": "ملفات العملاء غير متاحة بعد.",
+    "invoiceWord": "فاتورة",
+    "order": "الطلب",
+    "issued": "تاريخ الإصدار",
+    "billedTo": "الفوترة إلى",
+    "shippedTo": "الشحن إلى",
+    "download": "تنزيل",
+    "preparing": "جارٍ التحضير…",
+    "print": "طباعة",
+    "close": "إغلاق",
+    "invoiceFailed": "تعذّر تحضير الفاتورة."
   }
 }
