@@ -70,10 +70,17 @@ import type {DomainForm} from '../../services/store-settings-form.service';
                 <app-icon name="link" />
                 <span class="info-copy">
                   <strong>{{ entry.domain }}</strong>
-                  <small>{{ t(copyOf(entry).metaKey) }}</small>
                 </span>
 
-                <app-badge [tone]="toneOf(entry)" shape="square">{{ t(copyOf(entry).titleKey) }}</app-badge>
+                <!--
+                  A badge only once a lookup has actually run. An allocated domain is not in an
+                  unchecked state — the field refuses to add one that does not already point here —
+                  so a permanent "not checked" would have been the console doubting its own rule.
+                  What is worth saying is what a *re*-check found, because DNS can change afterwards.
+                -->
+                @if (statusOf(entry.domain); as status) {
+                  <app-badge [tone]="statusTone(status)" shape="square">{{ t(statusCopy(status).titleKey) }}</app-badge>
+                }
 
                 <button
                   class="ghost-action"
@@ -234,14 +241,6 @@ export class DomainSection {
   readonly verify = output<string>();
   readonly removed = output<string>();
 
-  protected toneOf(entry: StoreDomain) {
-    return DOMAIN_STATUS_TONE[this.statusOf(entry.domain)];
-  }
-
-  protected copyOf(entry: StoreDomain) {
-    return DOMAIN_STATUS_COPY[this.statusOf(entry.domain)];
-  }
-
   protected statusTone(status: DomainStatus) {
     return DOMAIN_STATUS_TONE[status];
   }
@@ -329,7 +328,8 @@ export class DomainSection {
     return control.invalid && (control.dirty || control.touched);
   }
 
-  private statusOf(domain: string): DomainStatus {
-    return this.status().get(domain) ?? 'unverified';
+  /** What the last lookup on this domain found, or nothing if none has run. */
+  protected statusOf(domain: string): DomainStatus | null {
+    return this.status().get(domain) ?? null;
   }
 }

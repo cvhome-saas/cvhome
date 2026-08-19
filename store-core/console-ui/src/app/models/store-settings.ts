@@ -26,10 +26,15 @@ export type SettingsSectionKey =
 export type DomainType = 'SUB_DOMAIN' | 'CUSTOM_DOMAIN';
 
 /**
- * Where a custom domain stands. `unverified` is a domain that has been typed but never
- * checked; `failed` is a check that came back wrong rather than empty.
+ * What a DNS lookup found.
+ *
+ * There is no `unverified` member, and its absence is the design: an allocated domain is not in an
+ * unchecked state, because the field refuses to add one whose CNAME does not already point here. A
+ * domain either has a verdict from a lookup that ran, or it has none at all — which is the absence
+ * of a `DomainStatus`, not a value of one. `waiting` is a record that is not there yet; `failed` is
+ * one that is there and points elsewhere.
  */
-export type DomainStatus = 'unverified' | 'checking' | 'waiting' | 'verified' | 'failed';
+export type DomainStatus = 'checking' | 'waiting' | 'verified' | 'failed';
 
 /** `SocialProvider` in `store-commons/commons`. The storefront footer's links. */
 export type SocialLinkProvider = 'FACEBOOK' | 'X' | 'TIKTOK' | 'INSTAGRAM' | 'GITHUB';
@@ -129,6 +134,37 @@ export const SOCIAL_LINK_ICON: Readonly<Record<SocialLinkProvider, IconName>> = 
 };
 
 export const SOCIAL_LINK_FALLBACK_ICON: IconName = 'link';
+
+/**
+ * The hosts a profile link for each provider may live on.
+ *
+ * A Facebook field holding a TikTok URL is not a typo the storefront can recover from — it renders
+ * the link under a Facebook mark and sends shoppers somewhere else entirely. Nothing server-side
+ * checks this: `SocialLink` is a provider and a free string, so the console is the only place the
+ * pairing can be enforced.
+ *
+ * The alternates are the ones these companies still serve rather than every domain they have ever
+ * owned: `twitter.com` because a decade of links point at it and X redirects them, `fb.com` because
+ * it is Facebook's own short domain. Subdomains are accepted against each entry (`m.facebook.com`,
+ * `www.instagram.com`), which is why the check is a suffix match rather than equality.
+ */
+export const SOCIAL_LINK_HOSTS: Readonly<Record<SocialLinkProvider, readonly string[]>> = {
+  FACEBOOK: ['facebook.com', 'fb.com'],
+  X: ['x.com', 'twitter.com'],
+  TIKTOK: ['tiktok.com'],
+  INSTAGRAM: ['instagram.com'],
+  GITHUB: ['github.com'],
+};
+
+/**
+ * The host a provider's link is expected on, for the field's own message.
+ *
+ * The first entry rather than all of them: the message is telling an operator what to type, and
+ * "use facebook.com" is advice where "use facebook.com or fb.com" is a quiz.
+ */
+export function expectedSocialHost(provider: string): string | null {
+  return isSocialLinkProvider(provider) ? SOCIAL_LINK_HOSTS[provider][0] : null;
+}
 
 export function isSocialLinkProvider(value: string): value is SocialLinkProvider {
   return value in SOCIAL_LINK_ICON;
@@ -367,7 +403,6 @@ export function isSectionKey(value: string): value is SettingsSectionKey {
  * the theme decides what that looks like.
  */
 export const DOMAIN_STATUS_TONE: Readonly<Record<DomainStatus, Tone>> = {
-  unverified: 'slate',
   checking: 'blue',
   waiting: 'amber',
   verified: 'green',
@@ -384,12 +419,6 @@ export interface DomainStatusCopy {
 
 /** What each state says. `{domain}` is filled in by the panel. */
 export const DOMAIN_STATUS_COPY: Readonly<Record<DomainStatus, DomainStatusCopy>> = {
-  unverified: {
-    titleKey: 'storeSettings.domain.unverified.title',
-    icon: 'questionCircle',
-    metaKey: 'storeSettings.domain.unverified.meta',
-    bodyKey: 'storeSettings.domain.unverified.body',
-  },
   checking: {
     titleKey: 'storeSettings.domain.checking.title',
     icon: 'clock',

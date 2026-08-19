@@ -65,6 +65,7 @@ const SETTINGS: StoreSettings = {
   socialLinks: [
     {provider: 'INSTAGRAM', icon: 'instagram', url: 'instagram.com/acmesupply'},
     {provider: 'FACEBOOK', icon: 'facebook', url: ''},
+    {provider: 'X', icon: 'xSocial', url: ''},
   ],
   slides: [
     {priority: 0, name: 'b8f0-first', url: null},
@@ -147,12 +148,13 @@ class FakeStoreSettingsApi {
 
   /**
    * One emission, not two. The real service answers a single verdict — `checking` is the facade's
-   * own state while the lookup is in flight, not something the DNS resolver reports.
+   * own state while the lookup is in flight, not something the DNS resolver reports — and `null`
+   * when there was nothing to compare against.
    */
-  verifyDomain(domain: string): Observable<DomainStatus> {
+  verifyDomain(domain: string): Observable<DomainStatus | null> {
     this.verified.push(domain);
     if (!domain) {
-      return of<DomainStatus>('unverified');
+      return of(null);
     }
     return this.verifyFailure ? throwError(() => this.verifyFailure) : of(this.verifyOutcome);
   }
@@ -233,6 +235,11 @@ describe('StoreManagement', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+  }
+
+  /** One social row's field, so an assertion reads that row's error rather than the first on screen. */
+  function socialField(element: HTMLElement, provider: string): HTMLElement {
+    return element.querySelector(`#social-${provider}`)!.closest('.link-field') as HTMLElement;
   }
 
   /** The add field's re-check button — the ghost action beside it. */
@@ -576,6 +583,37 @@ describe('StoreManagement', () => {
     expect(api.saves[0].patch['FACEBOOK']).toBe('https://facebook.com/acme-supply');
   }));
 
+  it('refuses a social link that points at the wrong site', fakeAsync(() => {
+    const {fixture, element} = load('social');
+
+    type(element, '#social-FACEBOOK', 'https://tiktok.com/@acme-supply');
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(socialField(element, 'FACEBOOK').querySelector('app-field-error')?.textContent).toContain(
+      'has to be a facebook.com link',
+    );
+
+    // twitter.com is still X: a decade of links point at it and X redirects them.
+    type(element, '#social-X', 'https://twitter.com/acme-supply');
+    type(element, '#social-FACEBOOK', 'https://m.facebook.com/acme-supply');
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeFalse();
+  }));
+
+  it('refuses a social link to the site rather than to a page on it', fakeAsync(() => {
+    const {fixture, element} = load('social');
+
+    type(element, '#social-FACEBOOK', 'facebook.com');
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(socialField(element, 'FACEBOOK').querySelector('app-field-error')?.textContent).toContain(
+      'not just facebook.com',
+    );
+  }));
+
   it('checks the typed domain on its own, without being asked', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
@@ -593,6 +631,39 @@ describe('StoreManagement', () => {
       'Points at this store',
     );
     expect(element.querySelector('.status')?.classList).toContain('green');
+  }));
+
+  it('says nothing about an allocated domain until a re-check finds something', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+    const row = () => element.querySelector('.domain-row.info-row')!;
+
+    /*
+     * No "not checked" badge. A domain is only allocated once its CNAME was confirmed, so a
+     * permanent unchecked state would have been the console doubting its own rule.
+     */
+    expect(row().querySelector('app-badge')).toBeNull();
+
+    // A re-check is different: DNS can change after the fact, and that is worth reporting.
+    api.nextVerify('failed');
+    row().querySelector<HTMLButtonElement>('.ghost-action')!.click();
+    settle(fixture);
+    tick(400);
+    settle(fixture);
+
+    expect(row().querySelector('app-badge')?.textContent?.trim()).toBe('Points somewhere else');
+  }));
+
+  it('leaves no verdict behind when the re-check could not be made', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+    const row = () => element.querySelector('.domain-row.info-row')!;
+
+    api.verifyFailure = new Error('offline');
+    row().querySelector<HTMLButtonElement>('.ghost-action')!.click();
+    settle(fixture);
+    tick(400);
+    settle(fixture);
+
+    expect(row().querySelector('app-badge')).toBeNull();
   }));
 
   it('lists every allocated domain and removes one', fakeAsync(() => {

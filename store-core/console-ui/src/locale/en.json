@@ -366,11 +366,6 @@
       "subtitle": "Serve your storefront from your own domain.",
       "system": "System",
       "title": "Store domain",
-      "unverified": {
-        "title": "Not checked",
-        "meta": "no lookup yet",
-        "body": "Add the CNAME record below at your DNS provider, then run a check from here."
-      },
       "verified": {
         "title": "Points at this store",
         "meta": "one resolver agrees",
@@ -489,10 +484,12 @@
       "uploading": "Uploading…"
     },
     "social": {
-      "title": "Store social links",
-      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
       "addProfileUrl": "Add profile URL…",
-      "fallback": "Enter a profile URL, like instagram.com/your-store."
+      "fallback": "Enter a profile URL, like instagram.com/your-store.",
+      "needsProfile": "Add the profile itself, not just {host} — for example {host}/your-store.",
+      "subtitle": "Shown in the storefront footer. Leave blank to hide.",
+      "title": "Store social links",
+      "wrongSite": "This has to be a {host} link."
     },
     "socialLogin": {
       "title": "Store social login",

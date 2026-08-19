@@ -20,8 +20,10 @@ import {
   PHONE_PATTERN,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
+  SOCIAL_LINK_HOSTS,
   UNBACKED_DETAIL_FIELDS,
   bareHostname,
+  isSocialLinkProvider,
   type SettingsSectionKey,
   type StoreSettings,
 } from '@models/store-settings';
@@ -202,7 +204,7 @@ export class StoreSettingsFormService {
     this.syncKeys(
       form.controls.social,
       settings.socialLinks.map((link) => link.provider),
-      () => this.fb.control('', [Validators.pattern(SOCIAL_URL_PATTERN)]),
+      (provider) => this.fb.control('', [Validators.pattern(SOCIAL_URL_PATTERN), socialProfileUrl(provider)]),
     );
     for (const link of settings.socialLinks) {
       form.controls.social.controls[link.provider].reset(link.url);
@@ -391,15 +393,18 @@ export class StoreSettingsFormService {
    * Brings a keyed group in line with the keys the server sent — adding what is new, removing
    * what is gone. Existing controls are left in place so a reset does not rebuild the tree
    * the template is already bound to.
+   *
+   * `make` is handed the key, because a social link's validator depends on which provider's row it
+   * is: the Facebook field and the TikTok field do not accept the same URLs.
    */
   private syncKeys<T extends FormGroup | FormControl>(
     group: FormGroup<Record<string, T>>,
     keys: readonly string[],
-    make: () => T,
+    make: (key: string) => T,
   ): void {
     for (const key of keys) {
       if (!group.contains(key)) {
-        group.addControl(key, make());
+        group.addControl(key, make(key));
       }
     }
     for (const key of Object.keys(group.controls)) {
@@ -421,6 +426,39 @@ export class StoreSettingsFormService {
  * character was typed. Whatever is entered is stored verbatim; the console does not rewrite it.
  */
 export const SOCIAL_URL_PATTERN = /^(https?:\/\/)?[^\s/]+\.[^\s]+$/;
+
+/**
+ * A profile link that belongs to the provider whose row it is in.
+ *
+ * `SocialLink` is a provider and a free string, and nothing on the platform checks that the two
+ * agree — so a TikTok URL sits happily in the Facebook row and the storefront renders it under a
+ * Facebook mark, sending shoppers somewhere they did not mean to go. The host has to match, and
+ * there has to be a profile after it: `facebook.com` on its own is the site, not a page on it.
+ *
+ * A provider the console does not know about — the enum is the server's and it may grow — is not
+ * guessed at. It keeps the generic URL check and nothing more, the same known-set discipline
+ * `shared/i18n/status-label.ts` applies to statuses.
+ */
+export function socialProfileUrl(provider: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = String(control.value ?? '').trim();
+    if (!value || !isSocialLinkProvider(provider)) {
+      return null;
+    }
+
+    const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '');
+    const [host, ...rest] = withoutScheme.split('/');
+    const hosts = SOCIAL_LINK_HOSTS[provider];
+    const bare = host.toLowerCase().replace(/:\d+$/, '');
+
+    // Suffix match, so `m.facebook.com` and `www.instagram.com` are the same site.
+    const onProvider = hosts.some((known) => bare === known || bare.endsWith(`.${known}`));
+    if (!onProvider) {
+      return {socialHost: {expected: hosts[0]}};
+    }
+    return rest.join('/').replace(/[?#].*$/, '').length > 0 ? null : {socialProfile: true};
+  };
+}
 
 /**
  * A phone number that could be dialled.

@@ -7,6 +7,7 @@ import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
 import {
   SOCIAL_LINK_LABEL_KEY,
+  expectedSocialHost,
   isSocialLinkProvider,
   type SocialLinkSetting,
 } from '@models/store-settings';
@@ -51,7 +52,7 @@ import type {SocialLinksForm} from '../../services/store-settings-form.service';
               </span>
               <app-field-error
                 [control]="controlOf(link.provider)"
-                [fallback]="t('storeSettings.social.fallback')"
+                [fallback]="errorFor(link, t)"
               />
             </div>
           </div>
@@ -80,5 +81,26 @@ export class SocialLinksSection {
   protected isSet(provider: string): boolean {
     const control = this.controlOf(provider);
     return control.value.trim().length > 0 && control.valid;
+  }
+
+  /**
+   * What is wrong with this row, named for the provider it belongs to.
+   *
+   * `FieldError` takes one message, so the row picks which one applies rather than listing them:
+   * the wrong site, a link to the site rather than to a page on it, or a value that is not a URL at
+   * all. Naming the expected host is the difference between an error an operator can act on and one
+   * that tells them to try again.
+   */
+  protected errorFor(link: SocialLinkSetting, t: (key: string, params?: Record<string, unknown>) => string): string {
+    const control = this.controlOf(link.provider);
+    const host = expectedSocialHost(link.provider);
+
+    if (control.hasError('socialHost') && host) {
+      return t('storeSettings.social.wrongSite', {host});
+    }
+    if (control.hasError('socialProfile') && host) {
+      return t('storeSettings.social.needsProfile', {host});
+    }
+    return t('storeSettings.social.fallback');
   }
 }

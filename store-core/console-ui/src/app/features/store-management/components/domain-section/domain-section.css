@@ -3,10 +3,20 @@
   gap: 0.5rem;
 }
 
+/*
+ * The scheme is part of the field, not a label beside it.
+ *
+ * It reads as the dimmed start of the value the operator is typing — same face and size as the
+ * input, muted, and hard against it, so `https://shop.example.com` looks like one string with its
+ * fixed half greyed out. `user-select: none` keeps it out of a copy of the field, which is the
+ * point of not putting it in the value: the record is about the host, not the URL.
+ */
 .scheme {
   flex: none;
-  color: var(--foreground-subtle);
-  font-size: var(--text-sm);
+  margin-inline-end: -0.25rem;
+  color: var(--muted-foreground);
+  font-size: inherit;
+  user-select: none;
 }
 
 /* Tone of the field's state mark, matching the status panel below it. */

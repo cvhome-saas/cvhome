@@ -214,15 +214,16 @@ export class StoreSettingsApi {
   /**
    * Looks a custom domain's CNAME up, in the operator's own browser.
    *
-   * Answers `unverified` when there is no target to check against — the pod lookup failed, so the
-   * console does not know what the record should say and will not claim the operator's DNS is wrong.
-   * A lookup that *fails* throws rather than resolving to `failed`: "we could not check" and "your
-   * record is wrong" are different answers and the facade shows different things for them.
+   * Answers `null` when there is nothing to compare against — the pod lookup is refused for a
+   * suspended or archived store, so the console does not know what the record should say and will
+   * not claim the operator's DNS is wrong. A lookup that *fails* throws rather than resolving to
+   * `failed`: "we could not check" and "your record is wrong" are different answers and the facade
+   * shows different things for them.
    */
-  verifyDomain(domain: string): Observable<DomainStatus> {
+  verifyDomain(domain: string): Observable<DomainStatus | null> {
     const target = this.podTarget;
     if (!domain || !target) {
-      return of<DomainStatus>('unverified');
+      return of(null);
     }
     return this.dns.checkCname(domain, target).pipe(map((outcome) => DOMAIN_OUTCOME[outcome]));
   }

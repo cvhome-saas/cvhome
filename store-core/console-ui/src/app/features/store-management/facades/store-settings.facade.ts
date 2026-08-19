@@ -371,11 +371,21 @@ export class StoreSettingsFacade {
       .subscribe({
         next: (status) => {
           this.checkingDomain.set(null);
-          this.setDomainStatus(hostname, status);
+          if (status) {
+            this.setDomainStatus(hostname, status);
+          } else {
+            // Nothing to compare against, so the domain keeps whatever it had — including nothing.
+            this.clearDomainStatus(hostname);
+            this.toast.warning(this.transloco.translate('storeSettings.domain.checkFailed'));
+          }
         },
         error: () => {
           this.checkingDomain.set(null);
-          this.setDomainStatus(hostname, 'unverified');
+          /*
+           * A lookup that could not be made leaves no verdict, rather than leaving a stale or
+           * invented one. The row goes back to saying nothing and the toast says why.
+           */
+          this.clearDomainStatus(hostname);
           this.toast.warning(this.transloco.translate('storeSettings.domain.checkFailed'));
         },
       });
@@ -465,6 +475,12 @@ export class StoreSettingsFacade {
   private setDomainStatus(domain: string, status: DomainStatus): void {
     const next = new Map(this.domainStatus());
     next.set(domain, status);
+    this.domainStatus.set(next);
+  }
+
+  private clearDomainStatus(domain: string): void {
+    const next = new Map(this.domainStatus());
+    next.delete(domain);
     this.domainStatus.set(next);
   }
 
