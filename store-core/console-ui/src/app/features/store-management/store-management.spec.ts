@@ -2,6 +2,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 import {Router, provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
+import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ToastService} from '@shared/ui/toast/toast';
 import {STORE_SETTINGS} from '@mocks/store-settings.fixture';
@@ -82,6 +83,24 @@ import {
   StoreSettingsApi,
   type SectionPatch,
 } from './services/store-settings.api.service';
+
+/**
+ * Stands in for the public DNS resolver the custom-domain field validates against.
+ *
+ * A fake rather than `provideHttpClientTesting`: the field's async validator is what the domain
+ * tests are about, and a testing backend that never answers would leave it pending forever — which
+ * looks exactly like the field refusing the domain.
+ */
+class FakeDnsCheckService {
+  readonly looked: {domain: string; target: string}[] = [];
+  outcome: CnameOutcome = 'points-here';
+  failure: Error | null = null;
+
+  checkCname(domain: string, target: string): Observable<CnameOutcome> {
+    this.looked.push({domain, target});
+    return this.failure ? throwError(() => this.failure) : of(this.outcome);
+  }
+}
 
 /** Stands in for the real endpoints so the spec controls timing, failure and outcome. */
 class FakeStoreSettingsApi {
@@ -178,16 +197,19 @@ class FakeStoreSettingsApi {
  */
 describe('StoreManagement', () => {
   let api: FakeStoreSettingsApi;
+  let dns: FakeDnsCheckService;
   let router: Router;
 
   beforeEach(async () => {
     api = new FakeStoreSettingsApi();
+    dns = new FakeDnsCheckService();
     await TestBed.configureTestingModule({
       imports: [StoreManagement, ...translocoTesting().imports],
       providers: [
         ...translocoTesting().providers,
         provideRouter([{path: 'store-management/:section', component: StoreManagement}]),
         {provide: StoreSettingsApi, useValue: api},
+        {provide: DnsCheckService, useValue: dns},
         // `ApiErrorService` needs somewhere to send what it cannot bind to a control.
         {provide: NOTIFICATION_PORT, useExisting: ToastService},
       ],
@@ -213,7 +235,7 @@ describe('StoreManagement', () => {
     fixture.detectChanges();
   }
 
-  /** The domain section's "Check DNS" button, which is the ghost action beside the add field. */
+  /** The add field's re-check button — the ghost action beside it. */
   function checkButton(element: HTMLElement): HTMLButtonElement {
     return element.querySelector('#custom-domain')!.closest('.domain-row')!
       .querySelector<HTMLButtonElement>('.ghost-action')!;
@@ -365,6 +387,9 @@ describe('StoreManagement', () => {
     expect(element.querySelectorAll('.dns-row > *')[1].textContent?.trim()).toBe(
       'shop.example.com',
     );
+
+    tick(600);
+    settle(fixture);
     expect(saveButton(element).disabled).toBeFalse();
   }));
 
@@ -551,40 +576,23 @@ describe('StoreManagement', () => {
     expect(api.saves[0].patch['FACEBOOK']).toBe('https://facebook.com/acme-supply');
   }));
 
-  it('says nothing about a domain until it has been looked up', fakeAsync(() => {
+  it('checks the typed domain on its own, without being asked', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
-    // No verdict before a check: the console has not looked, so it has nothing to report.
+    // Nothing to say before anything is typed.
     expect(element.querySelector('.status')).toBeNull();
+    expect(dns.looked.length).toBe(0);
 
-    api.nextVerify('verified');
     type(element, '#custom-domain', 'shop.acmesupply.co');
     settle(fixture);
-    checkButton(element).click();
-    // The busy state is held for a beat so it is legible; the verdict lands after it.
-    settle(fixture);
-    tick(400);
+    tick(600);
     settle(fixture);
 
-    expect(api.verified).toEqual(['shop.acmesupply.co']);
+    expect(dns.looked.map((lookup) => lookup.domain)).toEqual(['shop.acmesupply.co']);
     expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe(
       'Points at this store',
     );
     expect(element.querySelector('.status')?.classList).toContain('green');
-  }));
-
-  it('reports a failed lookup as a failure to check, not as a bad domain', fakeAsync(() => {
-    const {fixture, element} = load('domain');
-
-    api.verifyFailure = new Error('offline');
-    type(element, '#custom-domain', 'shop.acmesupply.co');
-    settle(fixture);
-    checkButton(element).click();
-    settle(fixture);
-    tick(400);
-    settle(fixture);
-
-    expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe('Not checked');
   }));
 
   it('lists every allocated domain and removes one', fakeAsync(() => {
@@ -602,17 +610,82 @@ describe('StoreManagement', () => {
     expect(element.querySelectorAll('.domain-row.info-row').length).toBe(0);
   }));
 
-  it('adds a domain through Save, since the router has no update', fakeAsync(() => {
+  it('adds a domain once its CNAME is confirmed to point here', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
     type(element, '#custom-domain', 'store.example.com');
     settle(fixture);
+
+    // The check is debounced, and Save stays out of reach while it is in flight.
+    expect(saveButton(element).disabled).toBeTrue();
+    tick(600);
+    settle(fixture);
+
+    expect(dns.looked).toEqual([
+      {domain: 'store.example.com', target: 'myshop-p1.example.io'},
+    ]);
+    expect(saveButton(element).disabled).toBeFalse();
+
     saveButton(element).click();
     settle(fixture);
 
     expect(api.saves.length).toBe(1);
     expect(api.saves[0].key).toBe('domain');
     expect(api.saves[0].patch['customDomain']).toBe('store.example.com');
+  }));
+
+  it('refuses a domain whose CNAME points somewhere else', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    dns.outcome = 'points-elsewhere';
+    type(element, '#custom-domain', 'store.example.com');
+    settle(fixture);
+    tick(600);
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe(
+      'Points somewhere else',
+    );
+
+    // And once the record is corrected, the same value goes through on a re-check.
+    dns.outcome = 'points-here';
+    checkButton(element).click();
+    settle(fixture);
+    tick(600);
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeFalse();
+  }));
+
+  it('refuses a domain with no CNAME at all', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    dns.outcome = 'no-record';
+    type(element, '#custom-domain', 'store.example.com');
+    settle(fixture);
+    tick(600);
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe('No record yet');
+  }));
+
+  it('lets a domain through when the resolver itself cannot be reached', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    /*
+     * A resolver we could not reach says nothing about the operator's DNS. Blocking here would make
+     * the field unusable on any network that filters dns.google, so it warns and allows.
+     */
+    dns.failure = new Error('offline');
+    type(element, '#custom-domain', 'store.example.com');
+    settle(fixture);
+    tick(600);
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeFalse();
+    expect(element.querySelector('.field-warning')?.textContent).toContain('could not reach');
   }));
 
   it('reorders and deletes slides by sending the list it wants', fakeAsync(() => {

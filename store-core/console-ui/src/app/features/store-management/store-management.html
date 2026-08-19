@@ -76,6 +76,7 @@
                   [customDomains]="customDomains()"
                   [status]="domainStatus()"
                   [checking]="facade.checkingDomain()"
+                  [checkUnavailable]="facade.dnsCheckUnavailable()"
                   [record]="customDomainRecord()"
                   [busy]="isSaving()"
                   (verify)="facade.verifyDomain($event)"

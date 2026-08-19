@@ -264,3 +264,12 @@
     transform: translateY(4px);
   }
 }
+
+
+/* Not an error: the check could not be made, which blocks nothing. Amber rather than red. */
+.field-warning {
+  margin: 0.35rem 0 0;
+  color: var(--chart-4-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}

@@ -1,14 +1,17 @@
-import {Injectable, inject} from '@angular/core';
+import {Injectable, inject, signal} from '@angular/core';
 import {
   FormControl,
   FormGroup,
   NonNullableFormBuilder,
   Validators,
   type AbstractControl,
+  type AsyncValidatorFn,
   type ValidationErrors,
   type ValidatorFn,
 } from '@angular/forms';
+import {Observable, catchError, map, of, switchMap, timer} from 'rxjs';
 
+import {DnsCheckService} from '@api/dns/dns-check.service';
 import {CONSOLE_LOCALES} from '@core/i18n/locale.service';
 import {
   CUSTOM_DOMAIN_PATTERN,
@@ -18,9 +21,13 @@ import {
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
   UNBACKED_DETAIL_FIELDS,
+  bareHostname,
   type SettingsSectionKey,
   type StoreSettings,
 } from '@models/store-settings';
+
+/** How long the field waits after the last keystroke before asking a resolver anything. */
+const DNS_DEBOUNCE_MS = 600;
 
 /** One language's landing copy. */
 export type HomeCopyForm = FormGroup<{
@@ -119,6 +126,26 @@ export type SettingsForm = FormGroup<SettingsForms>;
 @Injectable({providedIn: 'root'})
 export class StoreSettingsFormService {
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly dns = inject(DnsCheckService);
+
+  /**
+   * The hostname a custom domain has to CNAME to, from the last load.
+   *
+   * The async validator needs it and the form is built before any data has arrived, so it cannot be
+   * closed over at construction — `reset` fills it in. `null` means the pod lookup was refused, and
+   * the validator stands down rather than checking against nothing.
+   */
+  private readonly podTarget = signal<string | null>(null);
+
+  /**
+   * Whether the last lookup could not be made at all.
+   *
+   * Kept beside the control rather than as a validation error, because it is not one: a resolver we
+   * could not reach says nothing about the operator's DNS. Making it an error would block the field
+   * outright on any network that filters `dns.google` — the check would go from a safeguard to a
+   * lock with no way past it. The section shows it as a warning instead.
+   */
+  readonly dnsCheckUnavailable = signal(false);
 
   /*
    * The containers are constructed rather than built through `fb`: they hold groups, not raw
@@ -133,7 +160,10 @@ export class StoreSettingsFormService {
         Object.fromEntries(CONSOLE_LOCALES.map((locale) => [locale.code, this.homeCopy()])),
       ),
       domain: this.fb.group({
-        customDomain: this.fb.control('', [Validators.pattern(CUSTOM_DOMAIN_PATTERN)]),
+        customDomain: this.fb.control('', {
+          validators: [Validators.pattern(CUSTOM_DOMAIN_PATTERN)],
+          asyncValidators: [this.dnsPointsToPod()],
+        }),
       }),
       social: new FormGroup<SocialLinksForm['controls']>({}),
       slider: new FormGroup<Record<string, never>>({}),
@@ -165,6 +195,8 @@ export class StoreSettingsFormService {
      * remove — so seeding it with an existing one invited the operator to "edit" a hostname and get a
      * second allocation instead. The allocated domains are a list above it now.
      */
+    this.podTarget.set(settings.podTarget);
+    this.dnsCheckUnavailable.set(false);
     form.controls.domain.reset({customDomain: ''});
 
     this.syncKeys(
@@ -235,6 +267,50 @@ export class StoreSettingsFormService {
     for (const field of UNBACKED_DETAIL_FIELDS) {
       form.controls.details.controls[field].disable({emitEvent: false});
     }
+  }
+
+  /**
+   * Refuses a custom domain that does not already point at this store's pod.
+   *
+   * seller-ui had this and it is the reason the old screen was safe to use: a domain allocated
+   * before its CNAME exists resolves to nothing, the storefront is unreachable on it, and the seller
+   * has no way to tell whether they mistyped the record, mistyped the domain, or are simply waiting.
+   * The check moves that discovery to the moment of typing.
+   *
+   * How it differs from the original, which was subtly broken: seller-ui's version subscribed to
+   * `control.valueChanges` *inside* the validator and took `first()`, so the run for the current
+   * value never completed until the value changed again. Angular already gives an async validator
+   * the cancellation it needs — a new run unsubscribes the previous one — so debouncing is just a
+   * `timer` at the head of the stream, and the value under test is the control's own.
+   *
+   * Three cases deliberately do not block:
+   *
+   * - **No pod target.** The lookup that says where this store lives is refused for a suspended or
+   *   archived store. Nothing to compare against is not evidence of a wrong record.
+   * - **The resolver could not be reached.** Recorded on `dnsCheckUnavailable` and shown as a
+   *   warning; see the field's own note.
+   * - **An empty or malformed value.** `Validators.required` and the pattern own those, and Angular
+   *   does not run async validators while a sync one is failing anyway.
+   */
+  private dnsPointsToPod(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      const domain = bareHostname(String(control.value ?? ''));
+      const target = this.podTarget();
+
+      this.dnsCheckUnavailable.set(false);
+      if (!domain || !target) {
+        return of(null);
+      }
+
+      return timer(DNS_DEBOUNCE_MS).pipe(
+        switchMap(() => this.dns.checkCname(domain, target)),
+        map((outcome) => (outcome === 'points-here' ? null : {dnsNotPointing: {outcome, target}})),
+        catchError(() => {
+          this.dnsCheckUnavailable.set(true);
+          return of(null);
+        }),
+      );
+    };
   }
 
   private homeCopy(): HomeCopyForm {

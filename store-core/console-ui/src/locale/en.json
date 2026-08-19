@@ -332,10 +332,11 @@
     "discard": "Discard",
     "domain": {
       "addCustomDomain": "Add a custom domain",
-      "addHint": "Paste or type the domain — we keep just the host name. Point it at us with the record below, then save to add it.",
+      "addHint": "Paste or type the domain — we keep just the host name. It has to already point at us with the record below before it can be added.",
       "check": "Check DNS",
-      "checkDns": "Check DNS",
+      "checkAgain": "Check again",
       "checkFailed": "Could not reach the DNS resolver, so the record could not be checked.",
+      "checkUnavailable": "We could not reach a DNS resolver, so this domain has not been checked. You can still add it.",
       "checking": {
         "title": "Checking DNS…",
         "meta": "from your browser",

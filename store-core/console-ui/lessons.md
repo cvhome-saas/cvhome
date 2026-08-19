@@ -855,12 +855,17 @@ requirements document, with the entry here reduced to a link. There is already o
   the resolved CNAME, whether it matches the pod hostname, and the certificate's issue and expiry —
   run from the platform's own resolvers rather than the operator's, and ideally re-run periodically
   so the console can show a domain that has *stopped* pointing at us.
-- **Placeholder:** the DoH lookup is carried over as-is, in `api/dns/dns-check.service.ts`, but the
-  copy no longer claims anything it cannot know. The fixture's panel said "SSL issued", "retrying
-  every 5 minutes" and "we will email you when it resolves" — three assertions with nothing behind
-  any of them. It now says the check is a live lookup from your browser, a failed lookup reads as
-  "could not check" rather than as a bad domain, and allocation is deliberately not gated on it,
-  because adding a hostname before DNS propagates is normal and works the moment it does.
+- **Placeholder:** the DoH lookup is carried over as-is, in `api/dns/dns-check.service.ts`, and it
+  **gates the allocation** — the custom-domain field carries it as an async validator, so a domain
+  whose CNAME does not already point at the pod cannot be added. That is seller-ui's rule, kept
+  deliberately: the server accepts any hostname without looking, so if the client does not check,
+  nothing does, and the seller is left with a storefront that is unreachable on a domain the console
+  told them was fine. The copy no longer claims anything it cannot know — the fixture's panel said
+  "SSL issued", "retrying every 5 minutes" and "we will email you when it resolves", three
+  assertions with nothing behind any of them. Two outcomes deliberately do not block: a resolver the
+  browser could not reach (a warning, because that says nothing about the operator's DNS and
+  blocking would make the field unusable behind a filtering network), and a store whose pod lookup
+  was refused, where there is no target to compare against.
 
 ## Store management — nothing answers what address a store is served at
 

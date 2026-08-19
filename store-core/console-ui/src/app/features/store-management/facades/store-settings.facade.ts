@@ -63,6 +63,15 @@ export class StoreSettingsFacade {
 
   readonly form: SettingsForm = this.formService.create();
 
+  /**
+   * The custom-domain field could not reach a resolver, so its check neither passed nor failed.
+   *
+   * Surfaced from the form service because the field's own validator is what discovers it, and the
+   * section needs to say so — it is the one outcome that is not expressible as a validation error
+   * without locking the field.
+   */
+  readonly dnsCheckUnavailable = this.formService.dnsCheckUnavailable;
+
   private readonly snapshot = rxResource({stream: () => this.api.loadSettings()});
 
   /**

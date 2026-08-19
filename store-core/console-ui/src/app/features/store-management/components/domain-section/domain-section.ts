@@ -7,6 +7,7 @@ import {CopyField} from '@shared/ui/copy-field/copy-field';
 import {FieldError} from '@shared/ui/form-field/field-error';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
+import type {CnameOutcome} from '@api/dns/dns-check.service';
 import {
   DOMAIN_STATUS_COPY,
   DOMAIN_STATUS_TONE,
@@ -130,25 +131,44 @@ import type {DomainForm} from '../../services/store-settings-form.service';
                 (input)="onDomainInput($event)"
               />
             </span>
+            <!--
+              The field checks itself as it is typed; this re-runs it, for the operator who has just
+              fixed the record at their registrar and does not want to retype the domain to find out.
+            -->
             <button
               class="ghost-action"
               type="button"
-              [disabled]="!canCheckTyped()"
-              (click)="verify.emit(typed())"
+              [disabled]="!canRecheck()"
+              (click)="recheck()"
             >
-              @if (checking() === typed()) {
+              @if (pending()) {
                 <span class="spinner" aria-hidden="true"></span>
                 {{ t('storeSettings.domain.checkingNow') }}
               } @else {
-                {{ t('storeSettings.domain.checkDns') }}
+                {{ t('storeSettings.domain.checkAgain') }}
               }
             </button>
           </div>
           <p class="field-hint">{{ t('storeSettings.domain.addHint') }}</p>
-          <app-field-error
-            [control]="form().controls.customDomain"
-            [fallback]="t('storeSettings.domain.fallback')"
-          />
+          <!--
+            The inline error speaks for the shape of the value only. What the DNS check found is the
+            status panel's job, below — it has room to name the domain and say what to do about it,
+            and one message in two places would be two places to keep in step.
+          -->
+          @if (form().controls.customDomain.hasError('pattern')) {
+            <app-field-error
+              [control]="form().controls.customDomain"
+              [fallback]="t('storeSettings.domain.fallback')"
+            />
+          }
+          @if (checkUnavailable()) {
+            <!--
+              The resolver could not be reached, so the domain is neither approved nor refused. Said
+              plainly rather than blocking: a network that filters dns.google would otherwise make
+              the field impossible to use.
+            -->
+            <p class="field-warning" role="status">{{ t('storeSettings.domain.checkUnavailable') }}</p>
+          }
         </div>
 
         @if (typedStatus(); as status) {
@@ -203,9 +223,11 @@ export class DomainSection {
   readonly form = input.required<DomainForm>();
   readonly subdomain = input.required<string>();
   readonly customDomains = input.required<readonly StoreDomain[]>();
-  /** Every domain that has been looked up, and what the lookup found. Unlisted means unchecked. */
+  /** Every *allocated* domain that has been looked up, and what the lookup found. Unlisted means unchecked. */
   readonly status = input.required<ReadonlyMap<string, DomainStatus>>();
   readonly checking = input.required<string | null>();
+  /** The last lookup could not be made at all — neither approval nor refusal. */
+  readonly checkUnavailable = input(false);
   readonly record = input.required<DnsRecord | null>();
   readonly busy = input(false);
 
@@ -244,9 +266,24 @@ export class DomainSection {
     }
   }
 
-  /** A lookup is worth making only for something that could be a hostname. */
-  protected canCheckTyped(): boolean {
-    return this.checking() === null && this.typed().length > 0 && this.form().controls.customDomain.valid;
+  /** A re-check is worth offering only for something that could be a hostname and is not mid-flight. */
+  protected canRecheck(): boolean {
+    const control = this.form().controls.customDomain;
+    return this.typed().length > 0 && !control.pending && !control.hasError('pattern');
+  }
+
+  /**
+   * Runs the field's own check again.
+   *
+   * `updateValueAndValidity()` re-runs the async validator against the value already in the control,
+   * which is the point: the domain has not changed, the record at the registrar has.
+   */
+  protected recheck(): void {
+    this.form().controls.customDomain.updateValueAndValidity();
+  }
+
+  protected pending(): boolean {
+    return this.form().controls.customDomain.pending;
   }
 
   /**
@@ -259,10 +296,32 @@ export class DomainSection {
     return this.form().controls.customDomain.value.trim();
   }
 
-  /** The verdict on the domain being typed, if it has been looked up. Nothing to say before that. */
+  /**
+   * The verdict on the domain being typed, read off the control rather than kept beside it.
+   *
+   * The field validates itself, so its state *is* the verdict: pending is a lookup in flight, a
+   * `dnsNotPointing` error carries what the resolver actually found, and a valid, non-empty value
+   * that had something to be checked against is a domain that points here. Deriving the panel from
+   * the control is what keeps the two from disagreeing — a separate status could say "verified"
+   * under a field the form considers invalid.
+   */
   protected typedStatus(): DomainStatus | null {
-    const domain = this.typed();
-    return domain ? (this.status().get(domain) ?? null) : null;
+    const control = this.form().controls.customDomain;
+    if (!this.typed() || control.hasError('pattern')) {
+      return null;
+    }
+    if (control.pending) {
+      return 'checking';
+    }
+    const failure = control.getError('dnsNotPointing') as {outcome: CnameOutcome} | undefined;
+    if (failure) {
+      return failure.outcome === 'points-elsewhere' ? 'failed' : 'waiting';
+    }
+    // Valid, but nothing was compared: no pod target, or the resolver could not be reached.
+    if (!this.record() || this.checkUnavailable()) {
+      return null;
+    }
+    return 'verified';
   }
 
   protected domainInvalid(): boolean {
