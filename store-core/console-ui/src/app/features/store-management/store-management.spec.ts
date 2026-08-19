@@ -57,6 +57,11 @@ const SETTINGS: StoreSettings = {
     published: false,
     maintenanceMode: false,
   },
+  home: {
+    en: {title: 'Everything your workplace runs on', text: 'Bulk pricing applies.', metaDescription: '', tags: []},
+    ar: {title: 'كل ما يحتاجه مكان عملك', text: '', metaDescription: '', tags: []},
+  },
+  homeBoxId: 41,
   domains: [
     {domain: 'acme-supply', type: 'SUB_DOMAIN', hostname: 'acme-supply.myshop-p1.example.io'},
     {domain: 'shop.acmesupply.co', type: 'CUSTOM_DOMAIN', hostname: 'shop.acmesupply.co'},
@@ -784,19 +789,70 @@ describe('StoreManagement', () => {
     expect(api.savedSlides[1]).toEqual(['b8f0-first']);
   }));
 
-  it('swaps the home-page copy with the language track', fakeAsync(() => {
+  it('tracks the languages the store publishes in, not the console\'s own two', fakeAsync(() => {
     const {fixture, element} = load('home');
     const title = () => element.querySelector<HTMLInputElement>('#home-title')!.value;
+    // Scoped to the section: the page's own section rail is a tab switcher too.
+    const tabs = () =>
+      Array.from(element.querySelectorAll<HTMLButtonElement>('app-home-section .lang-track .tab'));
 
-    expect(title()).toBe(SETTINGS.home.en!.title);
+    /*
+     * `supportedLanguages` is ['en', 'ar'] here, and the track is named rather than coded — five
+     * storefront languages shown as "EN FR AR ES RU" is a puzzle rather than a label.
+     */
+    expect(tabs().map((tab) => tab.textContent?.trim().split('\n')[0])).toEqual([
+      'English',
+      'Arabic',
+    ]);
+    // Opens on the store's default language, which is what its storefront shows first.
+    expect(title()).toBe(SETTINGS.home['en'].title);
 
-    const tabs = Array.from(
-      element.querySelectorAll<HTMLButtonElement>('app-tab-switcher .tab'),
-    );
-    tabs.find((tab) => tab.textContent?.includes('AR'))!.click();
+    tabs().find((tab) => tab.textContent?.includes('Arabic'))!.click();
     settle(fixture);
 
-    expect(title()).toBe(SETTINGS.home.ar!.title);
+    expect(title()).toBe(SETTINGS.home['ar'].title);
+  }));
+
+  it('saves every language at once, because one box holds them all', fakeAsync(() => {
+    const {fixture, element} = load('home');
+
+    type(element, '#home-title', 'Workplace supplies, delivered');
+    settle(fixture);
+    saveButton(element).click();
+    settle(fixture);
+
+    expect(api.saves[0].key).toBe('home');
+    const patch = api.saves[0].patch as Record<string, {title: string}>;
+    expect(patch['en'].title).toBe('Workplace supplies, delivered');
+    // Untouched, and still sent: a language left out of the body is one the server forgets.
+    expect(patch['ar'].title).toBe(SETTINGS.home['ar'].title);
+  }));
+
+  it('refuses a language with copy but no title, which the platform cannot store', fakeAsync(() => {
+    const {fixture, element} = load('home');
+
+    // Arabic starts with a title in this fixture; clear it and leave the body behind.
+    type(element, '#home-text', 'Bulk pricing applies.');
+    type(element, '#home-title', '');
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(element.querySelector('.cross-field-error')?.textContent).toContain('no title');
+    expect(api.saves.length).toBe(0);
+  }));
+
+  it('renders the keyword field disabled, and never submits it', fakeAsync(() => {
+    const {fixture, element} = load('home');
+
+    expect(element.querySelector<HTMLInputElement>('app-tag-input input')!.disabled).toBeTrue();
+
+    type(element, '#home-title', 'Workplace supplies, delivered');
+    settle(fixture);
+    saveButton(element).click();
+    settle(fixture);
+
+    const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
+    expect(patch['en']['tags']).toBeUndefined();
   }));
 
   it('surfaces a failed load with a retry that refetches', fakeAsync(() => {

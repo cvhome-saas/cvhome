@@ -65,7 +65,7 @@
               @case ('home') {
                 <app-home-section
                   [forms]="forms.home.controls"
-                  [locales]="languages"
+                  [locales]="languages()"
                   [(language)]="activeLanguage"
                 />
               }

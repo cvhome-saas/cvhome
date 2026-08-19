@@ -21,17 +21,20 @@ import {Icon} from '@shared/ui/icon/icon';
       @for (tag of tags(); track tag) {
         <span class="tag">
           {{ tag }}
-          <button type="button" [attr.aria-label]="removeLabel(tag)" (click)="remove(tag)">
-            <app-icon name="x" />
-          </button>
+          @if (!disabled()) {
+            <button type="button" [attr.aria-label]="removeLabel(tag)" (click)="remove(tag)">
+              <app-icon name="x" />
+            </button>
+          }
         </span>
       }
 
       <input
         type="text"
         [attr.aria-label]="resolvedLabel()"
-        [placeholder]="resolvedPlaceholder()"
+        [placeholder]="disabled() ? '' : resolvedPlaceholder()"
         [value]="draft()"
+        [disabled]="disabled()"
         (input)="draft.set($any($event.target).value)"
         (keydown)="onKeydown($event)"
         (blur)="commit()"
@@ -47,6 +50,8 @@ export class TagInput {
   /** Names the field for assistive tech; the visible label is the consumer's. */
   readonly label = input<string>();
   readonly placeholder = input<string>();
+  /** Read-only: the chips stay legible, but nothing can be added or taken away. */
+  readonly disabled = input(false);
 
   protected readonly draft = signal('');
 

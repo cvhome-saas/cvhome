@@ -379,20 +379,22 @@
       "yourDomain": "your domain"
     },
     "home": {
-      "title": "Store home page",
-      "subtitle": "Landing copy and search metadata, written per language.",
-      "writeIn": "Write home page copy in",
-      "landingTitle": "Landing page title",
-      "landingTitleHint": "Shown as the H1 and browser tab title",
-      "landingTitleFallback": "A landing page title is required.",
+      "characters": "{count} characters",
+      "empty": "Empty",
+      "fallbackNotice": "Untranslated languages fall back to English.",
       "landingText": "Landing text",
+      "landingTitle": "Landing page title",
+      "landingTitleFallback": "Keep the title to 60 characters or fewer.",
+      "landingTitleHint": "Shown as the H1 and browser tab title",
       "metaDescription": "Meta description",
       "metaRecommended": "Recommended {min}–{max} characters",
-      "characters": "{count} characters",
+      "subtitle": "Landing copy and search metadata, written per language.",
       "tags": "Tags",
       "tagsLabel": "Home page tags",
-      "fallbackNotice": "Untranslated languages fall back to English.",
-      "empty": "Empty"
+      "tagsNotStored": "Keywords are not stored by the platform yet, so this cannot be edited.",
+      "title": "Store home page",
+      "titleForCopy": "This language has copy but no title. Add one — a landing page cannot be stored without it.",
+      "writeIn": "Write home page copy in"
     },
     "loading": "Loading store settings…",
     "loginProvider": {

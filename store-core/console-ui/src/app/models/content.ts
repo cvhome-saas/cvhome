@@ -1,49 +1,61 @@
 /**
- * Content as the content pod stores it, verified against
- * `content-commons/model/content/{common,box,page}` and `content-service/api/v1/ContentApi`.
+ * Ported from the shapes `content-service`'s `ContentApi` actually serves, rather than from
+ * seller-core: its `LandingPageContent` was typed from what the frontend happened to send, against
+ * three endpoints (`/private/content/any/{code}`, `PUT /private/content/{code}`,
+ * `POST /private/content`) that no controller maps. See lessons.md, "Store management — the
+ * landing-page endpoints seller-ui calls do not exist".
  *
- * Nothing was ported from seller-core here. Its `LandingPageContent` was typed from what
- * seller-ui happened to send rather than from a Java contract — its own doc comment said so —
- * and the three endpoints it sent it to are not mapped by any controller. See lessons.md,
- * "Store management — the landing-page endpoints seller-ui calls do not exist".
+ * A **content box** is a fragment of storefront copy: a `code` that identifies it, and one
+ * description per language. `ContentPage` is the other kind and is deliberately not modelled — it
+ * adds `linkToMenu`, a storefront navigation concern that means nothing for home-page copy.
  */
 
 /**
- * Mirrors `content/model/content/common/ContentDescription` → `NamedEntity`.
+ * One language's copy, as `content/model/content/common/ContentDescription` (→ `NamedEntity` →
+ * `ShopEntity` → `Entity`) declares it.
  *
- * One language's copy for a piece of content. `name` is the heading, `description` the body, and
- * `keyWords` a comma-separated string rather than a list — the console splits and joins it at the
- * edge so the form can hold real tags.
+ * Every field here exists on the wire. Not every field survives a round trip, and the difference is
+ * not guessable from the shape — see `keyWords`.
  */
 export interface ContentDescription {
   readonly id?: number;
-  /** ISO language code: the same `en` / `ar` the console runs in. */
-  readonly language?: string;
+  /** `LanguageCode`, flattened to its code by the serializer on `ShopEntity`. */
+  readonly language: string;
+  /** The headline. seller-ui used this as the landing page's title, and so does the console. */
   readonly name?: string;
+  /** The body copy. */
   readonly description?: string;
   readonly metaDescription?: string;
-  readonly keyWords?: string;
   readonly title?: string;
+  /** `SEF_URL` on the entity. Carried through untouched; the console does not edit it. */
   readonly friendlyUrl?: string;
-  readonly highlights?: string;
+  /**
+   * **Never stored and never returned.** `ContentFacadeImpl.buildDescriptions` does not set
+   * `metatagKeywords`, and `ReadableContentBoxPopulator.populateDescription` does not read it, so a
+   * value sent here is dropped in silence. Declared because it is on the DTO and its absence from
+   * both mappers is the finding, not the field. See lessons.md, "Store management — a content
+   * description's keywords are dropped by both mappers".
+   */
+  readonly keyWords?: string;
 }
 
-/**
- * Mirrors `content/model/content/box/ReadableContentBox` → `Content` → `Entity`.
- *
- * A box rather than a page, because a box is exactly a code plus per-language copy, while
- * `ContentPage` adds `linkToMenu` — a storefront navigation concern that means nothing for the
- * home page's own text.
- */
+/** `ReadableContentBox`. `description` is only populated when one language is asked for; the private endpoint asks for all. */
 export interface ReadableContentBox {
-  readonly id?: number;
-  readonly code?: string;
-  readonly visible?: boolean;
+  readonly id: number;
+  readonly code: string;
+  readonly visible: boolean;
   readonly contentType?: string;
   readonly descriptions?: readonly ContentDescription[];
 }
 
-/** Mirrors `content/model/content/box/PersistableContentBox`. */
+/**
+ * `PersistableContentBox`, as `POST /private/content/box` and `PUT /private/content/box/{id}` take it.
+ *
+ * `descriptions` is not optional in practice: `buildDescriptions` iterates it without a null check,
+ * so a body that omits it is a 500 rather than a validation error. And it must carry **every**
+ * language the box has — the entity's `@OneToMany` has no `orphanRemoval`, so a language left out of
+ * the list is not deleted, it is merely forgotten by this request and comes back on the next read.
+ */
 export interface PersistableContentBox {
   readonly id?: number;
   readonly code: string;
@@ -51,7 +63,7 @@ export interface PersistableContentBox {
   readonly descriptions: readonly ContentDescription[];
 }
 
-/** Mirrors `commons` `EntityExists` — what `…/box/{code}/exists` answers with. */
-export interface ContentExists {
-  readonly exists: boolean;
+/** What `POST /private/content/box` answers with: the new box's id and nothing else. */
+export interface ContentEntityId {
+  readonly id: number;
 }

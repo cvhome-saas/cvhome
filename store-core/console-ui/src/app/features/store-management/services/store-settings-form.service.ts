@@ -12,7 +12,6 @@ import {
 import {Observable, catchError, map, of, switchMap, timer} from 'rxjs';
 
 import {DnsCheckService} from '@api/dns/dns-check.service';
-import {CONSOLE_LOCALES} from '@core/i18n/locale.service';
 import {
   CUSTOM_DOMAIN_PATTERN,
   HOME_TITLE_MAX,
@@ -157,10 +156,13 @@ export class StoreSettingsFormService {
   create(): SettingsForm {
     return new FormGroup<SettingsForms>({
       branding: new FormGroup<Record<string, never>>({}),
-      home: new FormGroup<HomeForm['controls']>(
-        // The console's own locale list is the only list of languages; there is no second one.
-        Object.fromEntries(CONSOLE_LOCALES.map((locale) => [locale.code, this.homeCopy()])),
-      ),
+      /*
+       * Empty until a store loads. The languages a storefront is published in are the *store's*
+       * supported set, which is data, not a constant — this used to be seeded from the console's
+       * own en/ar locale list, which is a different list serving a different purpose. `reset` fills
+       * it in, the same way the provider-keyed groups are filled in.
+       */
+      home: new FormGroup<HomeForm['controls']>({}),
       domain: this.fb.group({
         customDomain: this.fb.control('', {
           validators: [Validators.pattern(CUSTOM_DOMAIN_PATTERN)],
@@ -182,14 +184,30 @@ export class StoreSettingsFormService {
    * providers there are is the server's answer, not a constant. Reset is where they arrive.
    */
   reset(form: SettingsForm, settings: StoreSettings): void {
-    for (const locale of CONSOLE_LOCALES) {
-      const copy = settings.home[locale.code];
-      form.controls.home.controls[locale.code].reset({
+    /*
+     * One group per language the store publishes in, plus any the box already holds copy for — a
+     * language dropped from `supportedLanguages` still has a description on the box, and hiding it
+     * would mean the next save quietly rewrote the box without it.
+     */
+    const homeLanguages = [
+      ...new Set([...settings.details.supportedLanguages, ...Object.keys(settings.home)]),
+    ];
+    this.syncKeys(form.controls.home, homeLanguages, () => this.homeCopy());
+    for (const language of homeLanguages) {
+      const copy = settings.home[language];
+      form.controls.home.controls[language].reset({
         title: copy?.title ?? '',
         text: copy?.text ?? '',
         metaDescription: copy?.metaDescription ?? '',
         tags: copy?.tags ?? [],
       });
+    }
+    /*
+     * `reset` re-enables what it is given a value for, so the keywords control goes back to how it
+     * was declared: the server drops it in both directions, so it must not be able to take input.
+     */
+    for (const language of homeLanguages) {
+      form.controls.home.controls[language].controls.tags.disable({emitEvent: false});
     }
 
     /*
@@ -317,16 +335,37 @@ export class StoreSettingsFormService {
 
   private homeCopy(): HomeCopyForm {
     return this.fb.group({
-      // The mockup's own hint. Over-length is an error, not a warning: it is the browser tab title.
-      title: this.fb.control('', [Validators.required, Validators.maxLength(HOME_TITLE_MAX)]),
+      /*
+       * Required only for a language that has copy in it. Unconditionally required would make the
+       * section unsavable until every translation was written; not required at all would let a
+       * language be filled in and then silently dropped, because a description with no name cannot
+       * be stored — `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so the
+       * server answers 500 rather than a validation error. Over-length stays an error either way:
+       * it is the browser tab title.
+       */
+      title: this.fb.control('', [Validators.maxLength(HOME_TITLE_MAX)]),
       text: this.fb.control(''),
       /*
        * 150–160 characters is a recommendation, not a constraint — a short meta description is
        * worse for search and perfectly valid. The section shows a counter instead of an error.
        */
       metaDescription: this.fb.control(''),
-      tags: this.fb.control<readonly string[]>([]),
-    });
+      /*
+       * Disabled at construction and never enabled: `ContentFacadeImpl.buildDescriptions` never
+       * writes `metatagKeywords` and `ReadableContentBoxPopulator` never reads it, so a value here
+       * is dropped in silence. `sectionValueOf` reads `value`, which omits disabled controls, so it
+       * cannot reach a request body either.
+       * TODO(lessons.md): see lessons.md, "Store management — a content description's keywords are
+       * dropped by both mappers".
+       */
+      tags: this.fb.control<readonly string[]>({value: [], disabled: true}),
+    },
+    /*
+     * On the group, not on `title`. The rule reads three controls, and a validator hanging off
+     * `title` alone would not re-run when the body text it depends on changes — Angular revalidates
+     * a control when *its* value changes, not when a sibling's does.
+     */
+    {validators: [titleForCopy]});
   }
 
   /*
@@ -414,6 +453,25 @@ export class StoreSettingsFormService {
       }
     }
   }
+}
+
+/**
+ * A language that has landing copy needs a headline to carry it.
+ *
+ * `BaseDescription.name` is `@NotEmpty` and `NAME` is `nullable = false`, so a description without
+ * one cannot be persisted — and because the console only sends the languages that have a title, a
+ * language with body text and no title would not be sent at all and would look like it saved and
+ * then vanished. The rule is enforced here so the operator is told before the round trip, and told
+ * about the field that is actually missing.
+ */
+export function titleForCopy(group: AbstractControl): ValidationErrors | null {
+  if (String(group.get('title')?.value ?? '').trim()) {
+    return null;
+  }
+  const hasCopy = ['text', 'metaDescription'].some((field) =>
+    String(group.get(field)?.value ?? '').trim(),
+  );
+  return hasCopy ? {titleForCopy: true} : null;
 }
 
 /**

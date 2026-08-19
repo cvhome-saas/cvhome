@@ -889,6 +889,55 @@ requirements document, with the entry here reduced to a link. There is already o
   legs optional. When either is refused the section shows "Address not available" and hides the DNS
   record block rather than printing a half-built hostname.
 
+## Store management — a content description's keywords are dropped by both mappers
+
+- **Screen:** `/store-management/home`, the "Search keywords" field.
+- **What the UI needs:** the keywords a storefront's landing page is indexed on, per language.
+- **What is missing:** the column exists and nothing uses it. `ContentDescription` has
+  `META_KEYWORDS` on the entity and `keyWords` on the DTO, but `ContentFacadeImpl.buildDescriptions`
+  sets `metatagDescription`, `title`, `name`, `seUrl`, `description` and `metatagTitle` and **never
+  `metatagKeywords`**, while `ReadableContentBoxPopulator.populateDescription` reads `name`,
+  `description`, `metaDescription`, `id`, `seUrl`, `title` and `language` and **never the keywords**
+  either. A value sent is dropped on the way in; a value already in the database is invisible on the
+  way out. seller-ui had the field in its form too, so it has never worked there.
+- **Why it is required:** it is one of the four fields the design's landing-copy block asks for, and
+  the only one of them that is about being found rather than about what the page says.
+- **Expected contract:** two lines — `contentDescription.setMetatagKeywords(source.getKeyWords())`
+  in `buildDescriptions`, and `d.setKeyWords(description.getMetatagKeywords())` in
+  `populateDescription`. No schema change; the column is already there.
+- **Placeholder:** the tag field renders disabled with the reason under it, and its control is
+  `disabled` in `StoreSettingsFormService` so it cannot reach a request body — `sectionValueOf`
+  reads `value`, which omits disabled controls. `TODO(lessons.md)` markers in
+  `store-settings-form.service.ts` and `home-section.ts`.
+
+## Store management — a content box save is all-or-nothing per language
+
+- **Screen:** `/store-management/home`, the language track.
+- **What happens:** `PUT /private/content/box/{id}` replaces the box's description list with exactly
+  what the body carries — `buildDescriptions` matches an existing row by language and overwrites it
+  field by field, then `contentModel.setDescriptions(descriptions)` swaps the list. Two consequences
+  that are not visible from the endpoint's shape. A **field** omitted from a description is not left
+  alone, it is written as null. And a **language** omitted from the list is not deleted either — the
+  entity's `@OneToMany` has no `orphanRemoval`, so the row survives in the database and reappears on
+  the next read, so an "edit" that dropped a language looks like it silently reverted.
+- **Consequence:** the console sends every language and every field on every save, carrying through
+  the ones it does not edit (`title`, `friendlyUrl`, the description's own id) from what the read
+  returned. That is why the home section's *Save changes* posts the whole box rather than the
+  language on screen.
+- **And a description must be named.** `BaseDescription.name` is `@NotEmpty` with
+  `@Column(nullable = false)`, so a language with body copy and no headline cannot be stored — and
+  it arrives as a **500**, not as a 400 naming the field, because the violation surfaces from the
+  persistence layer rather than from `@Valid` on the request. The first version of the console's
+  save sent a placeholder description for every untranslated language and every create failed on
+  it. The console now sends only the languages that have a title, and refuses in the form to let a
+  language hold copy without one, so nothing an operator typed is dropped by that filter.
+- **Also:** `buildDescriptions` iterates `content.getDescriptions()` with no null check, so a body
+  that omits `descriptions` entirely is a 500 rather than a 400.
+- **Expected contract:** either `orphanRemoval = true` so the list is genuinely the state, or a
+  per-language endpoint (`PUT …/box/{id}/description/{language}`) so a client can edit one
+  translation without having to hold all of them. And `@Valid` on the request body, so a missing
+  name is a 400 that names the field instead of a 500 that names nothing.
+
 ## Dashboard — the merchant statistics outage is over
 
 - **Screen:** `/dashboard` and `/orders`, the KPI rows on both.

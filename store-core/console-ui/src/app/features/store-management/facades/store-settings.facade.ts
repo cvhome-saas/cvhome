@@ -8,18 +8,18 @@ import {DOCUMENT} from '@angular/common';
 
 import {ApiErrorService} from '@core/errors/api-error.service';
 import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
-import {CONSOLE_LOCALES, LocaleService} from '@core/i18n/locale.service';
+import {LocaleService} from '@core/i18n/locale.service';
 import {
   SECTIONS,
   type DnsRecord,
   type DomainStatus,
-  type LocaleCode,
   type SettingsSection,
   type SettingsSectionKey,
   type SliderSlide,
   type StoreDomain,
   type StoreSettings,
 } from '@models/store-settings';
+import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ToastService} from '@shared/ui/toast/toast';
 import {StoreSettingsApi} from '../services/store-settings.api.service';
 import {
@@ -49,6 +49,7 @@ export class StoreSettingsFacade {
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly locale = inject(LocaleService);
+  private readonly reference = inject(ReferenceDataService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly transloco = inject(TranslocoService);
   private readonly document = inject(DOCUMENT);
@@ -56,10 +57,45 @@ export class StoreSettingsFacade {
   /** Which card is open. Set from the route param, so a section is linkable. */
   readonly activeSection = signal<SettingsSectionKey>('branding');
 
-  /** Which language the home-page copy is being written in. */
-  readonly activeLanguage = signal<LocaleCode>(this.locale.currentLocale().code);
+  /**
+   * The languages the storefront's landing copy can be written in.
+   *
+   * The *store's* supported set, plus any language the landing box already holds copy for. Not the
+   * console's own en/ar locales, which is what this used to be: those say which language the
+   * operator reads the console in, and have nothing to do with which languages their shoppers are
+   * served. `ReferenceDataService` names them, so the track reads "English", not "en".
+   */
+  readonly languages = computed<readonly ReferenceOption[]>(() => {
+    const settings = this.loaded();
+    if (!settings) {
+      return [];
+    }
+    const codes = [
+      ...new Set([...settings.details.supportedLanguages, ...Object.keys(settings.home)]),
+    ];
+    return codes.map((code) => ({code, label: this.reference.languageName(code)}));
+  });
 
-  readonly languages = CONSOLE_LOCALES;
+  /**
+   * Which language the home-page copy is being written in.
+   *
+   * Follows the store's default language once one has loaded, rather than the console's — the copy
+   * a seller writes first is the one their storefront shows by default. `linkedSignal` so an
+   * explicit choice survives a reload but a store swap starts from that store's default.
+   */
+  readonly activeLanguage = linkedSignal<readonly ReferenceOption[], string>({
+    source: this.languages,
+    computation: (languages, previous) => {
+      const chosen = previous?.value;
+      if (chosen && languages.some((language) => language.code === chosen)) {
+        return chosen;
+      }
+      const preferred = this.loaded()?.details.language ?? this.locale.currentLocale().code;
+      return languages.some((language) => language.code === preferred)
+        ? preferred
+        : (languages[0]?.code ?? preferred);
+    },
+  });
 
   readonly form: SettingsForm = this.formService.create();
 

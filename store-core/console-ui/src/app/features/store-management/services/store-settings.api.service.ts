@@ -1,12 +1,18 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
+import {ContentBoxService} from '@api/content/content-box.service';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {MerchantRouterService} from '@api/merchant/router.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {SaasService, podHostname} from '@api/tenancy/saas.service';
 import {STORE_SETTINGS, type FixtureSections} from '@mocks/store-settings.fixture';
+import type {
+  ContentDescription,
+  PersistableContentBox,
+  ReadableContentBox,
+} from '@models/content';
 import type {
   ManagerStoreDomain,
   PersistableMerchantStore,
@@ -20,7 +26,6 @@ import {
   type BrandingSettings,
   type DomainStatus,
   type HomePageCopy,
-  type LocaleCode,
   type SettingsChoices,
   type SettingsSectionKey,
   type SliderSlide,
@@ -40,6 +45,15 @@ export type SectionPatch = Readonly<Record<string, unknown>>;
  * added seconds ago looks exactly like one that never will be, and telling the operator their DNS is
  * broken while it propagates is the unhelpful reading.
  */
+/**
+ * The content box the storefront's landing copy lives in.
+ *
+ * seller-ui's code, kept deliberately: it is the only identifier for this copy that has ever been
+ * written down, and matching it means a store that was edited in the old console is editable in the
+ * new one rather than growing a second, orphaned box.
+ */
+const HOME_BOX_CODE = 'LANDING_PAGE';
+
 /** The order the five providers are shown in when the reference call is the leg that failed. */
 const SOCIAL_LINK_ORDER = ['INSTAGRAM', 'FACEBOOK', 'X', 'TIKTOK', 'GITHUB'] as const;
 
@@ -58,9 +72,8 @@ const DOMAIN_OUTCOME: Readonly<Record<CnameOutcome, DomainStatus>> = {
  * rather than the patch it was given, because the endpoints answer `void` and the page needs to
  * show what the server actually kept.
  *
- * **Migration state.** Details, branding, domain, social links and the slider are live. Home,
- * social login and payments still read from `@mocks/store-settings.fixture`, and are taken over in
- * the commits that follow. `fixtureSections()` is the seam, and it shrinks to nothing.
+ * **Migration state.** Everything but social login and payments is live; those two are taken over
+ * in the commit that follows. `fixtureSections()` is the seam, and it shrinks to nothing.
  */
 @Injectable({providedIn: 'root'})
 export class StoreSettingsApi {
@@ -69,6 +82,7 @@ export class StoreSettingsApi {
   private readonly router = inject(MerchantRouterService);
   private readonly saas = inject(SaasService);
   private readonly dns = inject(DnsCheckService);
+  private readonly content = inject(ContentBoxService);
 
   /**
    * The last store the server sent.
@@ -88,6 +102,15 @@ export class StoreSettingsApi {
    * `null` means the pod lookup failed, and the section says so rather than checking against nothing.
    */
   private podTarget: string | null = null;
+
+  /**
+   * The landing box the server last sent.
+   *
+   * A save has to send every language the box holds and every field on each description, not just
+   * the three the console edits — `buildDescriptions` replaces the description it matches by
+   * language, so a field left out is a field cleared. This is where the rest comes from.
+   */
+  private loadedHomeBox: ReadableContentBox | null = null;
 
   /**
    * Everything the page shows, in one pass.
@@ -114,9 +137,15 @@ export class StoreSettingsApi {
        */
       saas: this.optionalOne(this.saas.saasProperties()),
       pod: this.optionalOne(this.saas.storePod()),
+      /*
+       * A store that has never saved landing copy has no box, and the read is a 404 — which is the
+       * normal first state of this section, not a fault. `null` means "create on first save".
+       */
+      homeBox: this.optionalOne(this.content.box(HOME_BOX_CODE)),
     }).pipe(
-      map(({store, themes, colorThemes, socialLinkProviders, languages, allocations, saas, pod}) => {
+      map(({store, themes, colorThemes, socialLinkProviders, languages, allocations, saas, pod, homeBox}) => {
         this.loadedStore = store;
+        this.loadedHomeBox = homeBox;
         this.podTarget = podHostname(saas, pod);
         const choices: SettingsChoices = {
           themes,
@@ -135,6 +164,8 @@ export class StoreSettingsApi {
           details: this.details(store),
           domains: this.domains(allocations, store),
           podTarget: this.podTarget,
+          home: this.home(homeBox),
+          homeBoxId: homeBox?.id ?? null,
           socialLinks: this.socialLinks(store, socialLinkProviders),
           slides: this.slides(store),
           choices,
@@ -173,6 +204,25 @@ export class StoreSettingsApi {
         return this.stores
           .updateSocialLinks(this.socialLinksBody(patch))
           .pipe(switchMap(() => this.loadSettings()));
+
+      /*
+       * Create the first time, replace after that — and which one it is comes from whether the load
+       * found a box, not from a separate `exists` call. `POST` refuses a code the store already has,
+       * so getting this wrong is a 4xx rather than a duplicate.
+       */
+      case 'home': {
+        const box = this.homeBoxBody(patch);
+        const id = this.loadedHomeBox?.id;
+        /*
+         * Nothing written in any language and no box yet: there is nothing to create. A box with no
+         * descriptions is a storefront fragment that renders nothing, so it is not worth making.
+         */
+        if (!id && box.descriptions.length === 0) {
+          return this.loadSettings();
+        }
+        const write: Observable<unknown> = id ? this.content.update(id, box) : this.content.create(box);
+        return write.pipe(switchMap(() => this.loadSettings()));
+      }
 
       /*
        * Adding a domain, not editing one. The section's field is an input to an action: the router
@@ -327,6 +377,75 @@ export class StoreSettingsApi {
       icon: isSocialLinkProvider(provider) ? SOCIAL_LINK_ICON[provider] : SOCIAL_LINK_FALLBACK_ICON,
       url: saved.get(provider) ?? '',
     }));
+  }
+
+  /**
+   * The landing box's descriptions, keyed by language.
+   *
+   * `tags` is always empty and always will be: the server drops `metatagKeywords` on the way in and
+   * never reads it on the way out, so there is nothing to map. The section renders the control
+   * disabled rather than pretending the value it holds is stored.
+   */
+  private home(box: ReadableContentBox | null): Readonly<Record<string, HomePageCopy>> {
+    const copy: Record<string, HomePageCopy> = {};
+
+    for (const description of box?.descriptions ?? []) {
+      if (!description.language) {
+        continue;
+      }
+      copy[description.language] = {
+        title: description.name ?? '',
+        text: description.description ?? '',
+        metaDescription: description.metaDescription ?? '',
+        tags: [],
+      };
+    }
+    return copy;
+  }
+
+  /**
+   * The landing box as a save body.
+   *
+   * Every language in the patch is sent, whether or not it was touched: the server matches
+   * descriptions by language and replaces the matched one wholesale, so a language omitted here is
+   * not merely unchanged — the entity has no `orphanRemoval`, so the row survives in the database
+   * and reappears on the next read, which would make an "edit" look like it silently reverted.
+   * Fields the console does not own — `title`, `friendlyUrl`, the description's own id — are carried
+   * through from the loaded box for the same reason.
+   */
+  private homeBoxBody(patch: SectionPatch): PersistableContentBox {
+    const stored = new Map(
+      (this.loadedHomeBox?.descriptions ?? []).map((description) => [description.language, description]),
+    );
+
+    /*
+     * Only the languages that have a headline. `BaseDescription.name` is `@NotEmpty` and its column
+     * is `nullable = false`, so a description without one is a constraint violation the server
+     * answers as a 500 — sending an empty placeholder for every untranslated language, which is
+     * what a naive "send them all" does, made the very first save fail. The form's `titleForCopy`
+     * validator is the other half: it refuses to let a language hold copy with no headline, so
+     * nothing an operator typed can be dropped by this filter.
+     */
+    const descriptions: ContentDescription[] = Object.entries(patch)
+      .map(([language, raw]) => {
+        const slice = this.slice(raw);
+        return {
+          ...stored.get(language),
+          language,
+          name: this.text(slice['title'], '').trim(),
+          description: this.text(slice['text'], ''),
+          metaDescription: this.text(slice['metaDescription'], ''),
+        };
+      })
+      .filter((description) => description.name.length > 0);
+
+    return {
+      id: this.loadedHomeBox?.id,
+      code: HOME_BOX_CODE,
+      // A box the storefront can render. Nothing in the console hides one, so nothing sets it false.
+      visible: true,
+      descriptions,
+    };
   }
 
   /** The carousel, in priority order. `name` is the pod's UUID for the file, not a title. */
@@ -518,7 +637,6 @@ export class StoreSettingsApi {
 
   private fixtureSections(): FixtureSections {
     return {
-      home: this.fixture.home,
       socialLogin: this.fixture.socialLogin,
       payments: this.fixture.payments,
     };
@@ -533,9 +651,6 @@ export class StoreSettingsApi {
     const current = this.fixture;
 
     switch (key) {
-      case 'home':
-        return {...current, home: {...current.home, ...this.homePatch(patch)}};
-
       case 'social-login':
         return {
           ...current,
@@ -570,27 +685,9 @@ export class StoreSettingsApi {
       case 'details':
       case 'domain':
       case 'social':
+      case 'home':
         return current;
     }
-  }
-
-  private homePatch(patch: SectionPatch): Partial<Record<LocaleCode, HomePageCopy>> {
-    const home: Partial<Record<LocaleCode, HomePageCopy>> = {};
-
-    for (const [code, raw] of Object.entries(patch)) {
-      const slice = this.slice(raw);
-      const copy: HomePageCopy = {
-        title: this.text(slice['title'], ''),
-        text: this.text(slice['text'], ''),
-        metaDescription: this.text(slice['metaDescription'], ''),
-        tags: Array.isArray(slice['tags']) ? (slice['tags'] as readonly string[]) : [],
-      };
-      if (copy.title || copy.text || copy.metaDescription || copy.tags.length > 0) {
-        home[code as LocaleCode] = copy;
-      }
-    }
-
-    return home;
   }
 
   private slice(raw: unknown): Readonly<Record<string, unknown>> {

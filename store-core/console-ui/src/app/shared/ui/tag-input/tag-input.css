@@ -64,3 +64,19 @@ input:focus {
 input::placeholder {
   color: var(--foreground-subtle);
 }
+
+/*
+ * Read-only. The chips stay legible — the operator still needs to read what is there — and only
+ * the affordances go: no caret, no remove buttons, and the frame reads as a field that is not
+ * taking input rather than one that is broken.
+ */
+:host:has(input:disabled) .tag-field {
+  border-color: var(--border-soft);
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+input:disabled {
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+}

@@ -65,11 +65,23 @@ export interface BrandingSettings {
   readonly banner: StoredImage | null;
 }
 
-/** One language's landing copy. Per-language because `supportedLanguages` drives the track. */
+/**
+ * One language's landing copy, as one `ContentDescription` on the `LANDING_PAGE` content box.
+ *
+ * `title` is the description's `name` — seller-ui used it that way and the storefront reads it as
+ * the headline — and `text` is its `description`. `id` and the fields the console does not edit are
+ * not here; they are carried through on save from what the read returned.
+ */
 export interface HomePageCopy {
   readonly title: string;
   readonly text: string;
   readonly metaDescription: string;
+  /**
+   * Search keywords. Editable in the design, and **not stored**: neither mapper on the server
+   * touches `metatagKeywords`, so anything typed here is dropped in silence. Rendered disabled with
+   * the reason rather than accepting input that goes nowhere. See lessons.md, "Store management — a
+   * content description's keywords are dropped by both mappers".
+   */
   readonly tags: readonly string[];
 }
 
@@ -333,8 +345,17 @@ export const PAYMENT_TYPE_DESCRIPTION_KEY: Readonly<Record<PaymentType, string>>
 export interface StoreSettings {
   readonly storeName: string;
   readonly branding: BrandingSettings;
-  /** Keyed by console locale. A missing language is untranslated, and falls back to English. */
-  readonly home: Readonly<Partial<Record<LocaleCode, HomePageCopy>>>;
+  /**
+   * Keyed by *storefront* language, not by console locale.
+   *
+   * The two are different lists and conflating them was wrong in both directions: the console runs
+   * in English and Arabic, while a storefront may be published in any of the store's supported
+   * languages — so a store trading in French had nowhere to write its French landing copy, and a
+   * console reader could write Arabic copy for a store that does not publish Arabic.
+   */
+  readonly home: Readonly<Record<string, HomePageCopy>>;
+  /** The `LANDING_PAGE` box's id, or `null` when the store has never saved one — create versus update. */
+  readonly homeBoxId: number | null;
   readonly domains: readonly StoreDomain[];
   readonly socialLinks: readonly SocialLinkSetting[];
   readonly slides: readonly SliderSlide[];

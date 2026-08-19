@@ -8,7 +8,7 @@ import type {StoreSettings} from '@models/store-settings';
  */
 export type FixtureSections = Pick<
   StoreSettings,
-  'home' | 'socialLogin' | 'payments'
+  'socialLogin' | 'payments'
 >;
 
 /** The host the mockup's callback URLs are built on. Goes with the social-login section. */
@@ -26,22 +26,6 @@ const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
  * list of languages a storefront can be authored in, so there is no separate one here.
  */
 export const STORE_SETTINGS: FixtureSections = {
-  home: {
-    en: {
-      title: 'Everything your workplace runs on',
-      text: 'Acme Supply Co. stocks over 12,000 office, warehouse and janitorial products with next-day delivery across the region. Bulk pricing applies automatically at checkout.',
-      metaDescription:
-        'Office, warehouse and janitorial supplies with next-day regional delivery and automatic bulk pricing for business accounts.',
-      tags: ['office supplies', 'b2b', 'bulk pricing'],
-    },
-    ar: {
-      title: 'كل ما يحتاجه مكان عملك',
-      text: 'توفر شركة أكمي أكثر من ١٢٠٠٠ منتج للمكاتب والمستودعات والنظافة مع التوصيل في اليوم التالي.',
-      metaDescription: 'مستلزمات المكاتب والمستودعات والنظافة مع توصيل سريع وأسعار الجملة التلقائية.',
-      tags: ['مستلزمات مكتبية', 'أسعار الجملة'],
-    },
-  },
-
   socialLogin: [
     {
       providerId: 'GOOGLE',

@@ -12,3 +12,14 @@ textarea.meta {
   border-radius: var(--radius-lg);
   border-block-end: 0;
 }
+
+/*
+ * A message about the group rather than one control. `app-field-error` binds to a single control
+ * and this rule reads three, so it is written out — same voice, same colour.
+ */
+.cross-field-error {
+  margin: 0.35rem 0 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}
