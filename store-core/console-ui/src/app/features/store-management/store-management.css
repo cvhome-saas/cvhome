@@ -25,7 +25,6 @@
   grid-template-columns: 250px minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
-  animation: section-in 0.45s 0.2s ease both;
 }
 
 .settings-section {
@@ -33,6 +32,19 @@
   flex-direction: column;
   gap: 1.5rem;
   min-width: 0;
+}
+
+/*
+ * The card animates, not the layout around it.
+ *
+ * It used to sit on `.settings-layout`, which is created once and then persists — so the entrance
+ * played on the first load and never again, and switching sections swapped the card with no
+ * transition at all. `@switch` destroys and recreates the section component, so a rule on its
+ * element runs afresh every time the operator picks a section, while the rail and the tab track
+ * stay put. `prefers-reduced-motion` is handled globally in `styles.css`.
+ */
+.settings-section > * {
+  animation: section-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Reserves the page's height on a first load, so the veil has something to cover. */
@@ -43,7 +55,7 @@
 @keyframes section-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
 }
 

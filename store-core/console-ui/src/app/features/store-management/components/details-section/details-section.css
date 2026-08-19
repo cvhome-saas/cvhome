@@ -93,3 +93,65 @@
 .unbacked .field-grid {
   gap: 0.85rem 1rem;
 }
+
+/* ---- Supported languages ------------------------------------------------------------ */
+
+/*
+ * A checkbox per language rather than a multi-select: five options that are all visible at once
+ * read faster than a listbox, and ticking one does not require holding a modifier key.
+ */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.5rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+.check:hover {
+  border-color: var(--primary);
+}
+
+/* The ticked row is the state worth marking, so the box's own colour is not the only signal. */
+.check:has(:checked) {
+  border-color: var(--edge);
+  background: var(--accent-veil);
+}
+
+.check:has(:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.check input {
+  flex: none;
+  accent-color: var(--primary);
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  cursor: pointer;
+}
+
+/*
+ * A message about two fields at once. `app-field-error` binds to a single control and this one
+ * belongs to the group, so it is written out rather than borrowed — same voice, same colour.
+ */
+.cross-field-error {
+  margin: 0.35rem 0 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}

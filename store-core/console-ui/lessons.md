@@ -790,6 +790,49 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Expected contract:** none needed — this one is a client-side correction, not a backend gap. It
   is recorded because the *old* client is still shipping the broken calls until seller-ui is retired.
 
+## Store management — a supported language can be added but never removed
+
+- **Screen:** `/store-management/details`, the "Supported languages" checkboxes.
+- **What happens:** `PUT /private/store` carries the whole `supportedLanguages` list, but
+  `PersistableMerchantStorePopulator.applyLanguages` iterates it and calls
+  `target.getLanguages().add(lang)` — the entity's existing set is never cleared, and the update
+  path merges onto the loaded entity rather than a fresh one. Ticking a language on is applied;
+  ticking one off is accepted with a 200 and silently ignored.
+- **Consequence:** seller-ui had this too, and simply never said so — an operator who unticked
+  Russian saw it come back on the next load with no explanation. The console cannot fix it from the
+  client (there is no remove endpoint and no other body shape), so it states it: the note under the
+  field says additions apply and removals do not, before the operator spends a save finding out.
+- **Expected contract:** `applyLanguages` should replace the set rather than union with it —
+  `target.getLanguages().clear()` before the loop, or `setLanguages(languages)` — so the list the
+  client sends is the list the store ends up with. The same method also dereferences
+  `source.getSupportedLanguages()` without a null check, so a body that omits the field is a 500.
+
+## Store management — no reference lists for countries, currencies or storefront languages
+
+- **Screen:** `/store-management/details` — the country, currency and language selects; the same
+  three fields exist on `/create-store`.
+- **What the UI needs:** the countries a store may trade from, the currencies it may price in, and
+  the languages a storefront may be published in.
+- **What is missing:** all three. `GET /spg/checkout/api/v1/country` answers with the countries the
+  *store ships to* — four, on the store this was written against — which is a different question
+  (see "Orders — checkout's country list is the store's supported set"). Nothing serves currencies
+  at all. `GET /store/languages` answers with the languages this store has already turned **on**,
+  which cannot drive the control that turns them on. seller-ui shipped a 50 KB
+  `assets/data/countries.json`, a `currencies.json` and a hardcoded
+  `environment.client.language.array` instead, which is why its country select listed English names
+  only and its language checkboxes needed a translation key per language.
+- **What console-ui does instead:** treats the first two as what they are — ISO registries, not
+  platform data. `ReferenceDataService` holds the 249 ISO 3166-1 alpha-2 codes and reads
+  `Intl.supportedValuesOf('currency')`, and names both through `Intl.DisplayNames` in the reader's
+  own language, recomputing when the console's language changes. The stored code is always folded
+  into the options so a select cannot disagree with the value bound to it. The five storefront
+  languages remain a constant, `STOREFRONT_LANGUAGES`, because that set genuinely is the platform's
+  and only the platform can say what it is.
+- **Expected contract:** an endpoint listing the languages a storefront may be published in — the
+  one list of the three that is not an ISO registry and that a client cannot derive. Countries and
+  currencies need no endpoint; if one is ever added it should be the full ISO list, named per
+  `LanguageCode`, and kept distinct from the store's shipping set.
+
 ## Dashboard — the merchant statistics outage is over
 
 - **Screen:** `/dashboard` and `/orders`, the KPI rows on both.

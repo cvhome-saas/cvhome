@@ -1,5 +1,5 @@
 import {Injectable, inject} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, map} from 'rxjs';
 
 import {CrudService} from '@core/http/crud.service';
 import type {
@@ -47,9 +47,18 @@ export class MerchantStoreService {
     return this.crudService.get(`${MERCHANT_STORE_API_BASE}/private/store`);
   }
 
-  /** The language codes this store trades in, which drive the home page's per-language tabs. */
+  /**
+   * The language codes this store trades in.
+   *
+   * Answers with `List<LanguageCode>` and `LanguageCode` is a record, so the wire shape is
+   * `[{"code":"ar"}, {"code":"en"}]` — objects, not the bare strings the same codes arrive as on
+   * `ReadableMerchantStore.supportedLanguages`, where a serializer flattens them. Unwrapped here so
+   * one shape reaches the console: bound straight through, a `<select>` renders `[object Object]`.
+   */
   supportedLanguages(): Observable<string[]> {
-    return this.crudService.get(`${MERCHANT_STORE_API_BASE}/store/languages`);
+    return this.crudService
+      .get<{code: string}[]>(`${MERCHANT_STORE_API_BASE}/store/languages`)
+      .pipe(map((languages) => languages.map((language) => language?.code).filter(Boolean)));
   }
 
   update(store: PersistableMerchantStore): Observable<void> {

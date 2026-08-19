@@ -249,7 +249,6 @@ export class StoreSettingsApi {
       org: store.org,
       template: store.template,
       currencyFormatNational: store.currencyFormatNational,
-      supportedLanguages: store.supportedLanguages,
       storeDomains: store.storeDomains,
       socialLinks: store.socialLinks,
       sliderImages: store.sliderImages?.map((slide) => ({priority: slide.priority, name: slide.name})),
@@ -259,6 +258,14 @@ export class StoreSettingsApi {
       phone: this.text(patch['supportPhone'], store.phone ?? ''),
       currency: this.text(patch['currency'], store.currency ?? ''),
       defaultLanguage: this.text(patch['language'], store.defaultLanguage ?? ''),
+      /*
+       * Sent whole, and the server takes it as an addition rather than a replacement: the populator
+       * does `target.getLanguages().add(...)` per entry and never removes. Ticking a language on
+       * works; ticking one off is accepted and silently ignored — which is why the section says so
+       * next to the field rather than letting the operator find out from the next reload. See
+       * lessons.md, "Store management — a supported language can be added but never removed".
+       */
+      supportedLanguages: this.codes(patch['supportedLanguages'], store.supportedLanguages ?? []),
       countryIsoCode: address.country,
       theme: this.text(patch['theme'], store.theme ?? ''),
       colorTheme: this.text(patch['colorTheme'], store.colorTheme ?? ''),
@@ -397,5 +404,10 @@ export class StoreSettingsApi {
 
   private flag(raw: unknown, fallback: boolean): boolean {
     return typeof raw === 'boolean' ? raw : fallback;
+  }
+
+  /** A list of codes off a form control, narrowed to strings — `supportedLanguages` is the only one. */
+  private codes(raw: unknown, fallback: readonly string[]): string[] {
+    return Array.isArray(raw) ? raw.filter((entry): entry is string => typeof entry === 'string') : [...fallback];
   }
 }

@@ -165,6 +165,11 @@ describe('StoreManagement', () => {
     return element.querySelector<HTMLButtonElement>('.primary-action')!;
   }
 
+  /** The phone control's own `.field`, so an assertion cannot pick up the store name's error. */
+  function phoneField(element: HTMLElement): HTMLElement {
+    return element.querySelector('#support-phone')!.closest('.field') as HTMLElement;
+  }
+
   function type(element: HTMLElement, selector: string, value: string): void {
     const field = element.querySelector<HTMLInputElement>(selector)!;
     field.value = value;
@@ -315,6 +320,88 @@ describe('StoreManagement', () => {
     settle(fixture);
 
     expect(requireLogin.getAttribute('aria-checked')).toBe('true');
+    expect(saveButton(element).disabled).toBeFalse();
+  }));
+
+  it('offers every country and every currency, not just the ones the store trades in', fakeAsync(() => {
+    const {element} = load('details');
+
+    /*
+     * The platform serves neither list, so both are built from ISO codes plus `Intl`. The counts
+     * are the registries': 249 countries, and however many currencies this runtime knows. What
+     * matters is that neither is the store's own four-item supported set, which is what the
+     * country select used to be reduced to.
+     */
+    const countries = element.querySelectorAll('#store-country option');
+    expect(countries.length).toBe(249);
+    expect(Array.from(countries).map((option) => option.getAttribute('value'))).toContain('JP');
+
+    const currencies = element.querySelectorAll('#store-currency option');
+    expect(currencies.length).toBeGreaterThan(100);
+    expect(Array.from(currencies).map((option) => option.getAttribute('value'))).toContain('SAR');
+  }));
+
+  it('offers the default language as a name, and only from the supported set', fakeAsync(() => {
+    const {element} = load('details');
+
+    const options = Array.from(element.querySelectorAll('#store-language option'));
+    expect(options.map((option) => option.getAttribute('value'))).toEqual(['ar', 'en']);
+    // Named rather than coded, and ordered by that name: the select used to read "en".
+    expect(options[0].textContent).toContain('Arabic');
+    expect(options[1].textContent).toContain('English');
+  }));
+
+  it('ticks a supported language, marks the section dirty and sends the whole list', fakeAsync(() => {
+    const {fixture, element} = load('details');
+
+    const french = Array.from(element.querySelectorAll<HTMLInputElement>('.check input')).find(
+      (box) => box.closest('label')?.textContent?.includes('French'),
+    )!;
+    expect(french.checked).toBeFalse();
+
+    french.click();
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeFalse();
+    saveButton(element).click();
+    settle(fixture);
+
+    // Ordered as the list is offered — by name — so the saved value does not churn with clicks.
+    expect(api.saves[0].patch['supportedLanguages']).toEqual(['ar', 'en', 'fr']);
+  }));
+
+  it('refuses a default language the store no longer supports', fakeAsync(() => {
+    const {fixture, element} = load('details');
+
+    const english = Array.from(element.querySelectorAll<HTMLInputElement>('.check input')).find(
+      (box) => box.closest('label')?.textContent?.includes('English'),
+    )!;
+    english.click();
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(element.querySelector('.cross-field-error')?.textContent).toContain(
+      'must be one of the supported languages',
+    );
+    expect(api.saves.length).toBe(0);
+  }));
+
+  it('rejects a phone number that is not one, and requires it', fakeAsync(() => {
+    const {fixture, element} = load('details');
+
+    type(element, '#support-phone', 'call the shop');
+    settle(fixture);
+    expect(saveButton(element).disabled).toBeTrue();
+
+    type(element, '#support-phone', '');
+    settle(fixture);
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(phoneField(element).querySelector('app-field-error')?.textContent).toContain(
+      'phone number',
+    );
+
+    type(element, '#support-phone', '+44 20 7946 0958');
+    settle(fixture);
     expect(saveButton(element).disabled).toBeFalse();
   }));
 

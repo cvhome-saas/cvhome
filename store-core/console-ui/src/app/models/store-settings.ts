@@ -397,3 +397,17 @@ export const SHORT_DESCRIPTION_MAX = 160;
 export const CUSTOM_DOMAIN_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,}$/;
 
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/**
+ * A phone number the console will accept.
+ *
+ * Deliberately permissive: an optional leading `+`, then digits with spaces, hyphens, dots and
+ * parentheses between them. The server stores `phone` as a `String` with no format of its own, and
+ * the stores on this platform trade from anywhere — a stricter rule would reject valid numbers to
+ * enforce a convention nothing downstream relies on. What it does catch is the actual mistake:
+ * a name, an address or an email typed into the phone field.
+ */
+export const PHONE_PATTERN = /^\+?[0-9](?:[0-9 ()./-]*[0-9])?$/;
+
+/** Below this a "number" is a typo rather than a number, wherever it is dialled from. */
+export const PHONE_MIN_DIGITS = 6;
