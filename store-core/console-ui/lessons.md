@@ -833,6 +833,57 @@ requirements document, with the entry here reduced to a link. There is already o
   currencies need no endpoint; if one is ever added it should be the full ISO list, named per
   `LanguageCode`, and kept distinct from the store's shipping set.
 
+## Store management — DNS verification is a browser-side check, not a platform one
+
+- **Screen:** `/store-management/domain`, the "Check DNS" buttons and the status panel.
+- **What the UI needs:** to tell an operator whether the custom domain they just allocated actually
+  reaches their store, and whether a certificate has been issued for it.
+- **What is missing:** nothing server-side ever confirms a CNAME. `POST /router/private/allocate`
+  records the hostname in the routing map and answers `void`; it does not look the domain up, and
+  there is no status on `ManagerStoreDomain` — the record is `(domain, domainType)` and that is all.
+  The only DNS check that exists anywhere is `DnsCheckService`, which seller-ui runs **in the
+  operator's browser** against `https://dns.google/resolve`. Certificate state is likewise
+  unreadable: `GET /router/public/ask-for-tls` answers 200 or 400 for whether the edge *would* serve
+  TLS for a hostname, which is a restatement of whether it is allocated, not whether a certificate
+  was issued.
+- **Why it is required:** a domain that is allocated but not pointed at us is the single most common
+  way a storefront ends up unreachable, and it is invisible from the console. A verdict from one
+  public resolver, from one machine, on one network, is not the platform's answer — and if the
+  operator's browser cannot reach `dns.google` (a corporate network, an ad blocker, an offline
+  laptop) there is no check at all.
+- **Expected contract:** a server-side check — `GET /router/private/domain-status?domain=` answering
+  the resolved CNAME, whether it matches the pod hostname, and the certificate's issue and expiry —
+  run from the platform's own resolvers rather than the operator's, and ideally re-run periodically
+  so the console can show a domain that has *stopped* pointing at us.
+- **Placeholder:** the DoH lookup is carried over as-is, in `api/dns/dns-check.service.ts`, but the
+  copy no longer claims anything it cannot know. The fixture's panel said "SSL issued", "retrying
+  every 5 minutes" and "we will email you when it resolves" — three assertions with nothing behind
+  any of them. It now says the check is a live lookup from your browser, a failed lookup reads as
+  "could not check" rather than as a bad domain, and allocation is deliberately not gated on it,
+  because adding a hostname before DNS propagates is normal and works the moment it does.
+
+## Store management — nothing answers what address a store is served at
+
+- **Screen:** `/store-management/domain`, the default-subdomain row and the CNAME target.
+- **What the UI needs:** the URL of the storefront, and the hostname a custom domain has to point at.
+- **What is missing:** no endpoint answers either. A `SUB_DOMAIN` record stores only its label, and
+  the rest of the hostname has to be assembled from two calls on two different tiers —
+  `GET /tenancy/api/v1/saas/public/saas-properties` for `{alis, domain}` and
+  `GET /tenancy/api/v1/router/store-pod-by-store-id` for the pod's `shortenPodId` — into
+  `{label}.{alis}-{shortenPodId}.{apex}`. That formula exists in exactly one place on the platform:
+  seller-ui's `StoreDomainFacade.podServerDomain()`, a client-side string concatenation. Neither
+  service knows the other exists, and the pod lookup is refused outright for a suspended or archived
+  store, so a store can be in a state where the console cannot say where it lives.
+- **Why it is required:** it is the first thing a seller wants from this page, it is what the header's
+  "Preview storefront" button would need a target for, and getting the CNAME instructions wrong by one
+  segment sends the operator to their registrar to enter a hostname that will never resolve.
+- **Expected contract:** `storefrontUrl` and `cnameTarget` on the store's own record, or a
+  `GET /router/private/addresses` that answers both — assembled by the service that owns the routing
+  map rather than by every client that needs to display a URL.
+- **Placeholder:** `podHostname()` in `api/tenancy/saas.service.ts` reproduces the formula, with both
+  legs optional. When either is refused the section shows "Address not available" and hides the DNS
+  record block rather than printing a half-built hostname.
+
 ## Dashboard — the merchant statistics outage is over
 
 - **Screen:** `/dashboard` and `/orders`, the KPI rows on both.

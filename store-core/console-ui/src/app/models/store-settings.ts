@@ -68,27 +68,70 @@ export interface HomePageCopy {
   readonly tags: readonly string[];
 }
 
+/**
+ * The CNAME an operator has to add at their registrar.
+ *
+ * No TTL. The fixture printed `3600`, which was the console telling the operator what to set on a
+ * record in a zone the platform does not own and cannot read — a number with no source. Type, name and
+ * value are the three the platform actually determines.
+ */
 export interface DnsRecord {
   readonly type: string;
   readonly name: string;
   readonly value: string;
-  readonly ttl: number;
 }
 
-/** `ManagerStoreDomain`, plus the verification state the console has to show. */
+/**
+ * `ManagerStoreDomain`, plus the hostname it resolves to.
+ *
+ * `domain` is what is stored. `hostname` is what a browser types: for a `CUSTOM_DOMAIN` they are the
+ * same, but a `SUB_DOMAIN` stores only its label and is reached at `{label}.{alis}-{pod}.{apex}` —
+ * assembled on the client because no endpoint answers it. `null` when the pod lookup failed, which is
+ * the difference between "we do not know the address" and a half-built one.
+ *
+ * Verification state is deliberately **not** here: it is the outcome of a lookup the operator asks for,
+ * per domain, held by the facade — not a property of the record. The fixture stored it on the document
+ * and could therefore only ever describe one custom domain.
+ */
 export interface StoreDomain {
   readonly domain: string;
   readonly type: DomainType;
-  readonly status: DomainStatus;
-  /** The CNAME the operator has to add. Only custom domains need one. */
-  readonly record: DnsRecord | null;
+  readonly hostname: string | null;
 }
 
-/** `SocialLink(provider, url)`, with the mark the row is drawn with. Display name is a brand name — resolved from `SOCIAL_LINK_LABEL_KEY`, not carried on the record. */
+/**
+ * `SocialLink(provider, url)`, with the mark the row is drawn with.
+ *
+ * `provider` is the server's string rather than the narrowed union: the row list is built from
+ * `GET /public/social-links-providers`, so a member added to `SocialProvider` shows up here before the
+ * console knows about it. `icon` and the label fall back for those; the field still saves.
+ */
 export interface SocialLinkSetting {
-  readonly provider: SocialLinkProvider;
+  readonly provider: string;
   readonly icon: IconName;
   readonly url: string;
+}
+
+/**
+ * The mark each provider is drawn with.
+ *
+ * A lookup rather than a field on the record, because `SocialLink` carries only a provider and a URL —
+ * the icon is the console's decision. Keyed by the five `SocialProvider` members; a provider the server
+ * adds later falls back to a generic link mark rather than throwing, the same known-set discipline
+ * `shared/i18n/status-label.ts` applies to enums.
+ */
+export const SOCIAL_LINK_ICON: Readonly<Record<SocialLinkProvider, IconName>> = {
+  FACEBOOK: 'facebook',
+  X: 'xSocial',
+  TIKTOK: 'tiktok',
+  INSTAGRAM: 'instagram',
+  GITHUB: 'github',
+};
+
+export const SOCIAL_LINK_FALLBACK_ICON: IconName = 'link';
+
+export function isSocialLinkProvider(value: string): value is SocialLinkProvider {
+  return value in SOCIAL_LINK_ICON;
 }
 
 /** Brand names. Kept translated (rather than hardcoded) so a right-to-left reader still sees them presented consistently — the names themselves do not change across languages. */
@@ -100,15 +143,17 @@ export const SOCIAL_LINK_LABEL_KEY: Readonly<Record<SocialLinkProvider, string>>
   GITHUB: 'storeSettings.socialProvider.github',
 };
 
-/** `ReadableSliderImage(priority, name, url)`, plus what the carousel row displays. */
+/**
+ * `ReadableSliderImage(priority, name, url)` — and that is the whole record.
+ *
+ * The design's `LIVE`/`SCHEDULED` tag, click-through link and `1600×640 · 248 KB · JPG` line are gone:
+ * a slide is a position, a server-issued name and a path, and nothing stores a schedule, a target or
+ * any file metadata. See lessons.md, "Store management — slider images carry no schedule, link or file
+ * metadata". `name` is a UUID the pod assigns, not a filename, so it is not shown as a title.
+ */
 export interface SliderSlide {
-  readonly id: string;
   readonly priority: number;
   readonly name: string;
-  /** Dimensions, weight and format, as the row's second line: `1600×640 · 248 KB · JPG`. */
-  readonly meta: string;
-  readonly link: string;
-  readonly state: 'LIVE' | 'SCHEDULED';
   readonly url: string | null;
 }
 
@@ -260,6 +305,14 @@ export interface StoreSettings {
   readonly details: StoreDetails;
   readonly socialLogin: readonly SocialLoginConfig[];
   readonly payments: readonly PaymentGatewayConfig[];
+  /**
+   * The hostname a custom domain must CNAME to — `{alis}-{pod}.{apex}`.
+   *
+   * On the document rather than derived in a component because it takes two calls on two tiers to
+   * work out, and three separate things read it: the subdomain's full hostname, the CNAME
+   * instructions, and the DNS check's expected target. `null` when either call was refused.
+   */
+  readonly podTarget: string | null;
   /** The reference lists the selects are drawn from, fetched alongside the store itself. */
   readonly choices: SettingsChoices;
 }
@@ -377,11 +430,6 @@ export const LOGIN_STATE_TAG: Readonly<Record<'on' | 'off', StateTag>> = {
 export const GATEWAY_STATE_TAG: Readonly<Record<'on' | 'off', StateTag>> = {
   on: {labelKey: 'storeSettings.state.live', tone: 'green'},
   off: {labelKey: 'storeSettings.state.off', tone: 'slate'},
-};
-
-export const SLIDE_STATE_TONE: Readonly<Record<SliderSlide['state'], Tone>> = {
-  LIVE: 'green',
-  SCHEDULED: 'amber',
 };
 
 /** How many slides the carousel holds, for the "3 of 8 slots used" line. */

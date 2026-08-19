@@ -1,6 +1,7 @@
 import {Component, input, linkedSignal, output} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
+import {ImageBroken} from '@shared/directives/image-loaded';
 import {FileDrop} from '@shared/ui/file-drop/file-drop';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
@@ -24,7 +25,7 @@ import type {BrandingSettings} from '@models/store-settings';
  */
 @Component({
   selector: 'app-branding-section',
-  imports: [FileDrop, Icon, Panel, TranslocoDirective],
+  imports: [FileDrop, ImageBroken, Icon, Panel, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.branding.title')"
@@ -43,10 +44,11 @@ import type {BrandingSettings} from '@models/store-settings';
           >
             @if (!logoBroken() && branding().logo?.url; as url) {
               <img
+                appImageBroken
                 class="logo-preview"
                 [src]="url"
                 [alt]="t('storeSettings.branding.currentLogoAlt')"
-                (error)="logoBroken.set(true)"
+                (broken)="logoBroken.set(true)"
               />
             } @else {
               <!-- No stored render, or a path this browser cannot reach: the store's initial stands in. -->
@@ -76,10 +78,11 @@ import type {BrandingSettings} from '@models/store-settings';
           >
             @if (!bannerBroken() && branding().banner?.url; as url) {
               <img
+                appImageBroken
                 class="banner-preview"
                 [src]="url"
                 [alt]="t('storeSettings.branding.currentBannerAlt')"
-                (error)="bannerBroken.set(true)"
+                (broken)="bannerBroken.set(true)"
               />
             } @else {
               <app-icon name="images" />
@@ -106,7 +109,7 @@ export class BrandingSection {
   readonly branding = input.required<BrandingSettings>();
   readonly storeName = input.required<string>();
   /** Which upload is in flight, so the slot that is busy is the one that says so. */
-  readonly uploading = input<'logo' | 'banner' | null>(null);
+  readonly uploading = input<'logo' | 'banner' | 'slide' | null>(null);
 
   readonly picked = output<{kind: 'logo' | 'banner'; file: File}>();
 

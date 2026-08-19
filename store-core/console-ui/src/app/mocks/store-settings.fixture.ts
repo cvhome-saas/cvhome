@@ -8,14 +8,11 @@ import type {StoreSettings} from '@models/store-settings';
  */
 export type FixtureSections = Pick<
   StoreSettings,
-  'home' | 'domains' | 'socialLinks' | 'slides' | 'socialLogin' | 'payments'
+  'home' | 'socialLogin' | 'payments'
 >;
 
-/** The default subdomain every store is served from, before any custom domain. */
-export const STORE_SUBDOMAIN = 'acme-supply.myshop.io';
-
-/** The custom domain the mockup is mid-way through verifying. */
-export const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
+/** The host the mockup's callback URLs are built on. Goes with the social-login section. */
+const STORE_CUSTOM_DOMAIN = 'shop.acmesupply.co';
 
 /**
  * Acme Supply Co.'s settings, as the `Store Management` mockup shows them.
@@ -44,60 +41,6 @@ export const STORE_SETTINGS: FixtureSections = {
       tags: ['مستلزمات مكتبية', 'أسعار الجملة'],
     },
   },
-
-  domains: [
-    {
-      domain: STORE_SUBDOMAIN,
-      type: 'SUB_DOMAIN',
-      status: 'verified',
-      record: null,
-    },
-    {
-      domain: STORE_CUSTOM_DOMAIN,
-      type: 'CUSTOM_DOMAIN',
-      status: 'waiting',
-      record: {type: 'CNAME', name: 'shop', value: 'edge.myshop.io', ttl: 3600},
-    },
-  ],
-
-  socialLinks: [
-    {provider: 'INSTAGRAM', icon: 'instagram', url: 'instagram.com/acmesupply'},
-    {provider: 'FACEBOOK', icon: 'facebook', url: 'facebook.com/acmesupplyco'},
-    {provider: 'X', icon: 'xSocial', url: 'x.com/acmesupply'},
-    {provider: 'TIKTOK', icon: 'tiktok', url: ''},
-    {provider: 'GITHUB', icon: 'github', url: ''},
-  ],
-
-  slides: [
-    {
-      id: 'slide-1',
-      priority: 1,
-      name: 'Back to work sale — 20% off',
-      meta: '1600×640 · 248 KB · JPG',
-      link: '/collections/back-to-work',
-      state: 'LIVE',
-      url: null,
-    },
-    {
-      id: 'slide-2',
-      priority: 2,
-      name: 'New: ergonomic seating range',
-      meta: '1600×640 · 312 KB · JPG',
-      link: '/collections/seating',
-      state: 'LIVE',
-      url: null,
-    },
-    {
-      id: 'slide-3',
-      priority: 3,
-      name: 'Bulk paper — pallet pricing',
-      meta: '1600×640 · 190 KB · PNG',
-      link: '/products/copy-paper-pallet',
-      state: 'SCHEDULED',
-      url: null,
-    },
-  ],
-
 
   socialLogin: [
     {

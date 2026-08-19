@@ -160,13 +160,17 @@ export class StoreSettingsFormService {
       });
     }
 
-    const custom = settings.domains.find((entry) => entry.type === 'CUSTOM_DOMAIN');
-    form.controls.domain.reset({customDomain: custom?.domain ?? ''});
+    /*
+     * Emptied, not prefilled. The field adds a domain — the router has no update, only allocate and
+     * remove — so seeding it with an existing one invited the operator to "edit" a hostname and get a
+     * second allocation instead. The allocated domains are a list above it now.
+     */
+    form.controls.domain.reset({customDomain: ''});
 
     this.syncKeys(
       form.controls.social,
       settings.socialLinks.map((link) => link.provider),
-      () => this.fb.control('', [Validators.pattern(/^[^\s/]+\.[^\s]+$/)]),
+      () => this.fb.control('', [Validators.pattern(SOCIAL_URL_PATTERN)]),
     );
     for (const link of settings.socialLinks) {
       form.controls.social.controls[link.provider].reset(link.url);
@@ -330,6 +334,17 @@ export class StoreSettingsFormService {
     }
   }
 }
+
+/**
+ * A social profile link.
+ *
+ * The scheme is optional but allowed, because both shapes are real: the fixture this form was built
+ * against held `instagram.com/acme`, and every store on the platform holds
+ * `https://instagram.com/acme`. The stricter pattern rejected the stored values outright, which made
+ * *Save changes* impossible on a store that had ever set a link — the section was unusable before a
+ * character was typed. Whatever is entered is stored verbatim; the console does not rewrite it.
+ */
+export const SOCIAL_URL_PATTERN = /^(https?:\/\/)?[^\s/]+\.[^\s]+$/;
 
 /**
  * A phone number that could be dialled.

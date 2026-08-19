@@ -19,11 +19,23 @@
   box-shadow: var(--lift);
 }
 
-.handle {
+/*
+ * The slide's place in the carousel, which is the only thing that distinguishes one from another —
+ * `ReadableSliderImage` has no title. It replaces the grab handle: the arrows move a slide, and a
+ * handle that could not be dragged anywhere was a promise the endpoint does not keep.
+ */
+.position {
+  display: grid;
+  place-items: center;
   flex: none;
-  color: var(--foreground-subtle);
-  cursor: grab;
-  --icon-size: 0.9rem;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .thumb {
@@ -66,8 +78,25 @@
   font-size: var(--text-2xs);
 }
 
-.slide-copy .slide-link {
+/* A server-issued UUID. Monospaced and quiet — an identifier to match against, not a name to read. */
+.slide-copy .slide-ref {
+  overflow: hidden;
   color: var(--foreground-subtle);
+  font-family: ui-monospace, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slot-busy {
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.icon-action:disabled {
+  color: var(--foreground-subtle);
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .slide-actions {

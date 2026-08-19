@@ -1,11 +1,16 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Router, provideRouter} from '@angular/router';
-import {Observable, Subject, concat, of, throwError} from 'rxjs';
+import {Observable, Subject, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ToastService} from '@shared/ui/toast/toast';
 import {STORE_SETTINGS} from '@mocks/store-settings.fixture';
-import type {DomainStatus, SettingsSectionKey, StoreSettings} from '@models/store-settings';
+import type {
+  DomainStatus,
+  SettingsSectionKey,
+  SliderSlide,
+  StoreSettings,
+} from '@models/store-settings';
 
 /**
  * A whole settings document.
@@ -51,6 +56,19 @@ const SETTINGS: StoreSettings = {
     published: false,
     maintenanceMode: false,
   },
+  domains: [
+    {domain: 'acme-supply', type: 'SUB_DOMAIN', hostname: 'acme-supply.myshop-p1.example.io'},
+    {domain: 'shop.acmesupply.co', type: 'CUSTOM_DOMAIN', hostname: 'shop.acmesupply.co'},
+  ],
+  podTarget: 'myshop-p1.example.io',
+  socialLinks: [
+    {provider: 'INSTAGRAM', icon: 'instagram', url: 'instagram.com/acmesupply'},
+    {provider: 'FACEBOOK', icon: 'facebook', url: ''},
+  ],
+  slides: [
+    {priority: 0, name: 'b8f0-first', url: null},
+    {priority: 1, name: 'c210-second', url: null},
+  ],
   choices: {
     themes: ['BASIS', 'MODERN'],
     colorThemes: ['LIGHT', 'DARK'],
@@ -77,6 +95,12 @@ class FakeStoreSettingsApi {
   /** What the next save answers with. Defaults to the patch folded into the fixture. */
   saveFailure: Error | null = null;
 
+  readonly verified: string[] = [];
+  readonly removedDomains: string[] = [];
+  readonly addedSlides: string[] = [];
+  readonly savedSlides: string[][] = [];
+  verifyFailure: Error | null = null;
+
   private settings: StoreSettings = SETTINGS;
   private verifyOutcome: DomainStatus = 'waiting';
 
@@ -102,11 +126,39 @@ class FakeStoreSettingsApi {
     return of(this.settings);
   }
 
+  /**
+   * One emission, not two. The real service answers a single verdict — `checking` is the facade's
+   * own state while the lookup is in flight, not something the DNS resolver reports.
+   */
   verifyDomain(domain: string): Observable<DomainStatus> {
+    this.verified.push(domain);
     if (!domain) {
       return of<DomainStatus>('unverified');
     }
-    return concat(of<DomainStatus>('checking'), of(this.verifyOutcome));
+    return this.verifyFailure ? throwError(() => this.verifyFailure) : of(this.verifyOutcome);
+  }
+
+  removeDomain(domain: string): Observable<StoreSettings> {
+    this.removedDomains.push(domain);
+    this.settings = {
+      ...this.settings,
+      domains: this.settings.domains.filter((entry) => entry.domain !== domain),
+    };
+    return of(this.settings);
+  }
+
+  addSlide(file: File): Observable<StoreSettings> {
+    this.addedSlides.push(file.name);
+    return of(this.settings);
+  }
+
+  saveSlides(slides: readonly SliderSlide[]): Observable<StoreSettings> {
+    this.savedSlides.push(slides.map((slide) => slide.name));
+    this.settings = {
+      ...this.settings,
+      slides: slides.map((slide, index) => ({...slide, priority: index})),
+    };
+    return of(this.settings);
   }
 
   nextVerify(outcome: DomainStatus): void {
@@ -159,6 +211,12 @@ describe('StoreManagement', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+  }
+
+  /** The domain section's "Check DNS" button, which is the ghost action beside the add field. */
+  function checkButton(element: HTMLElement): HTMLButtonElement {
+    return element.querySelector('#custom-domain')!.closest('.domain-row')!
+      .querySelector<HTMLButtonElement>('.ghost-action')!;
   }
 
   function saveButton(element: HTMLElement): HTMLButtonElement {
@@ -460,19 +518,108 @@ describe('StoreManagement', () => {
     expect(element.querySelector('.secret input')).toBeNull();
   }));
 
-  it('walks the domain through checking and then the outcome', fakeAsync(() => {
-    const {fixture, element} = load('domain');
-    const statusText = () => element.querySelector('.status-head strong')?.textContent?.trim();
+  it('accepts a stored social link that carries its scheme', fakeAsync(() => {
+    const {fixture, element} = load('social');
 
-    expect(statusText()).toBe('Waiting for DNS');
+    /*
+     * Every link on a real store is a full URL. The pattern used to demand a bare host, which made
+     * the whole group invalid on load and Save unreachable before a character was typed.
+     */
+    expect(saveButton(element).disabled).toBeTrue();
 
-    api.nextVerify('verified');
-    element.querySelector<HTMLButtonElement>('.domain-row .primary-action')!.click();
+    type(element, '#social-FACEBOOK', 'https://facebook.com/acme-supply');
     settle(fixture);
 
-    // Both emissions land synchronously here; the last one is what the panel settles on.
-    expect(statusText()).toBe('Domain verified');
+    expect(saveButton(element).disabled).toBeFalse();
+    saveButton(element).click();
+    settle(fixture);
+
+    expect(api.saves[0].key).toBe('social');
+    expect(api.saves[0].patch['FACEBOOK']).toBe('https://facebook.com/acme-supply');
+  }));
+
+  it('says nothing about a domain until it has been looked up', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    // No verdict before a check: the console has not looked, so it has nothing to report.
+    expect(element.querySelector('.status')).toBeNull();
+
+    api.nextVerify('verified');
+    type(element, '#custom-domain', 'shop.acmesupply.co');
+    settle(fixture);
+    checkButton(element).click();
+    settle(fixture);
+
+    expect(api.verified).toEqual(['shop.acmesupply.co']);
+    expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe(
+      'Points at this store',
+    );
     expect(element.querySelector('.status')?.classList).toContain('green');
+  }));
+
+  it('reports a failed lookup as a failure to check, not as a bad domain', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    api.verifyFailure = new Error('offline');
+    type(element, '#custom-domain', 'shop.acmesupply.co');
+    settle(fixture);
+    checkButton(element).click();
+    settle(fixture);
+
+    expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe('Not checked');
+  }));
+
+  it('lists every allocated domain and removes one', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    // The subdomain is the store's address and is not removable; only the custom row offers it.
+    const rows = element.querySelectorAll('.domain-row.info-row');
+    expect(rows.length).toBe(1);
+    expect(rows[0].textContent).toContain('shop.acmesupply.co');
+
+    rows[0].querySelector<HTMLButtonElement>('.icon-action.danger')!.click();
+    settle(fixture);
+
+    expect(api.removedDomains).toEqual(['shop.acmesupply.co']);
+    expect(element.querySelectorAll('.domain-row.info-row').length).toBe(0);
+  }));
+
+  it('adds a domain through Save, since the router has no update', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    type(element, '#custom-domain', 'store.example.com');
+    settle(fixture);
+    saveButton(element).click();
+    settle(fixture);
+
+    expect(api.saves.length).toBe(1);
+    expect(api.saves[0].key).toBe('domain');
+    expect(api.saves[0].patch['customDomain']).toBe('store.example.com');
+  }));
+
+  it('reorders and deletes slides by sending the list it wants', fakeAsync(() => {
+    const {fixture, element} = load('slider');
+
+    const rows = () => Array.from(element.querySelectorAll('.slide .slide-ref')).map(
+      (ref) => ref.textContent?.trim(),
+    );
+    expect(rows()).toEqual(['b8f0-first', 'c210-second']);
+
+    // "Move later" on the first slide: there is no reorder endpoint, only the whole list.
+    element.querySelectorAll<HTMLButtonElement>('.slide')[0]
+      .querySelectorAll<HTMLButtonElement>('.icon-action')[1]
+      .click();
+    settle(fixture);
+
+    expect(api.savedSlides[0]).toEqual(['c210-second', 'b8f0-first']);
+    expect(rows()).toEqual(['c210-second', 'b8f0-first']);
+
+    element.querySelectorAll<HTMLButtonElement>('.slide')[0]
+      .querySelector<HTMLButtonElement>('.icon-action.danger')!
+      .click();
+    settle(fixture);
+
+    expect(api.savedSlides[1]).toEqual(['b8f0-first']);
   }));
 
   it('swaps the home-page copy with the language track', fakeAsync(() => {

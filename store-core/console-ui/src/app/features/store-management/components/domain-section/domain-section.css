@@ -90,7 +90,7 @@
 .dns-head,
 .dns-row {
   display: grid;
-  grid-template-columns: 5rem 1fr 1.4fr 4.5rem;
+  grid-template-columns: 5rem 1fr 1.4fr;
   gap: 1rem;
   align-items: center;
   padding: 0.6rem 1rem;
@@ -131,13 +131,45 @@
     flex-wrap: wrap;
   }
 
-  /* Four monospace columns stop fitting long before the card does. */
+  /* Three monospace columns stop fitting long before the card does. */
   .dns {
     overflow-x: auto;
   }
 
   .dns-head,
   .dns-row {
-    min-inline-size: 30rem;
+    min-inline-size: 26rem;
   }
+}
+
+
+/*
+ * A custom-domain row. Reuses `.info-row` for the frame and adds only what a row of actions needs —
+ * the subdomain above it is the same shape with fewer controls, and they have to line up.
+ */
+.domain-row.info-row {
+  flex-wrap: wrap;
+  margin-block-start: 0.5rem;
+}
+
+.domain-row.info-row .info-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-row a.icon-action {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+}
+
+.info-row .ghost-action {
+  flex: none;
+}
+
+.icon-action:disabled,
+.ghost-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

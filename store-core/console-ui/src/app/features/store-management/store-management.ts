@@ -77,6 +77,7 @@ export class StoreManagement {
   protected readonly activeLanguage = this.facade.activeLanguage;
 
   protected readonly domainStatus = this.facade.domainStatus;
+  protected readonly customDomains = this.facade.customDomains;
   protected readonly customDomainRecord = this.facade.customDomainRecord;
   protected readonly subdomain = this.facade.subdomain;
 

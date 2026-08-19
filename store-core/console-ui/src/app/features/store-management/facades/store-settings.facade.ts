@@ -10,10 +10,13 @@ import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
 import {CONSOLE_LOCALES, LocaleService} from '@core/i18n/locale.service';
 import {
   SECTIONS,
+  type DnsRecord,
   type DomainStatus,
   type LocaleCode,
   type SettingsSection,
   type SettingsSectionKey,
+  type SliderSlide,
+  type StoreDomain,
   type StoreSettings,
 } from '@models/store-settings';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -79,7 +82,7 @@ export class StoreSettingsFacade {
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
   /** An upload in flight, named so the section can show which tile is busy. */
-  readonly uploading = signal<'logo' | 'banner' | null>(null);
+  readonly uploading = signal<'logo' | 'banner' | 'slide' | null>(null);
 
   /**
    * Bumped by every form event — value, status, touched and pristine changes alike.
@@ -105,17 +108,47 @@ export class StoreSettingsFacade {
     return form.dirty && form.valid && !this.isSaving();
   });
 
-  /** How the custom domain's last check went. Not in the form — it is state, not input. */
-  readonly domainStatus = linkedSignal<StoreSettings | undefined, DomainStatus>({
+  /**
+   * How each domain's last DNS check went, keyed by hostname.
+   *
+   * A map rather than one value, because a store may have any number of custom domains and each is
+   * checked on its own. Cleared on every new document: a check describes DNS at the moment it ran, and
+   * carrying an old verdict across a reload would state something the console no longer knows.
+   */
+  readonly domainStatus = linkedSignal<StoreSettings | undefined, ReadonlyMap<string, DomainStatus>>({
     source: () => this.loaded(),
-    computation: (settings) => this.customDomain(settings)?.status ?? 'unverified',
+    computation: () => new Map<string, DomainStatus>(),
   });
 
-  readonly customDomainRecord = computed(() => this.customDomain(this.loaded())?.record ?? null);
+  /** The domain currently being looked up, so its row can show a spinner and refuse a second click. */
+  readonly checkingDomain = signal<string | null>(null);
 
-  readonly subdomain = computed(
-    () => this.loaded()?.domains.find((entry) => entry.type === 'SUB_DOMAIN')?.domain ?? '',
+  readonly domains = computed<readonly StoreDomain[]>(() => this.loaded()?.domains ?? []);
+
+  readonly customDomains = computed(() =>
+    this.domains().filter((entry) => entry.type === 'CUSTOM_DOMAIN'),
   );
+
+  readonly subdomain = computed(() => {
+    const entry = this.domains().find((candidate) => candidate.type === 'SUB_DOMAIN');
+    return entry?.hostname ?? entry?.domain ?? '';
+  });
+
+  /**
+   * The CNAME the operator has to add, for whatever is currently typed in the field.
+   *
+   * `null` when the platform could not tell us where to point — the pod lookup is refused for a
+   * suspended store — because instructions that name no target are worse than none.
+   */
+  readonly customDomainRecord = computed<DnsRecord | null>(() => {
+    this.formEvent();
+    const target = this.loaded()?.podTarget;
+    const typed = this.form.controls.domain.controls.customDomain.value.trim();
+    if (!target) {
+      return null;
+    }
+    return {type: 'CNAME', name: typed || this.transloco.translate('storeSettings.domain.yourDomain'), value: target};
+  });
 
   /** `Store · domain`, under the page title. */
   readonly context = computed(() => {
@@ -128,8 +161,16 @@ export class StoreSettingsFacade {
    * verified — rather than the mockup's hardcoded flag.
    */
   readonly sections = computed<readonly SettingsSection[]>(() => {
-    const pending = this.domainStatus();
-    const needsDomain = pending !== 'verified' && this.customDomain(this.loaded()) !== undefined;
+    const checked = this.domainStatus();
+    /*
+     * A domain the operator has looked up and found wrong or still propagating. An unchecked domain
+     * raises nothing: the console has not looked, so it has nothing to report — the fixture's version
+     * of this flagged every store that had a custom domain at all.
+     */
+    const needsDomain = this.customDomains().some((entry) => {
+      const status = checked.get(entry.domain);
+      return status === 'failed' || status === 'waiting';
+    });
     return SECTIONS.map((section) => ({
       ...section,
       attention: section.key === 'domain' && needsDomain,
@@ -270,20 +311,127 @@ export class StoreSettingsFacade {
   }
 
   /**
-   * Runs a DNS check. The stream emits `checking` first and the outcome second, so the panel
-   * shows the intermediate state without owning a timer.
+   * Looks one domain's CNAME up.
+   *
+   * Takes the hostname explicitly rather than reading the form, because the rows check an *allocated*
+   * domain while the field checks one that is about to be added — same lookup, two callers. A lookup
+   * that fails is reported as a failure to check, not as a failed domain: the console does not know
+   * that the operator's DNS is wrong, only that it could not find out.
    */
-  verifyDomain(): void {
-    const domain = this.form.controls.domain.controls.customDomain.value.trim();
-    if (!domain) {
+  verifyDomain(domain: string): void {
+    const hostname = domain.trim();
+    if (!hostname) {
       this.toast.warning(this.transloco.translate('storeSettings.domain.enterBeforeChecking'));
       return;
     }
+    if (this.checkingDomain()) {
+      return;
+    }
+
+    this.checkingDomain.set(hostname);
+    this.setDomainStatus(hostname, 'checking');
 
     this.api
-      .verifyDomain(domain)
+      .verifyDomain(hostname)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((status) => this.domainStatus.set(status));
+      .subscribe({
+        next: (status) => {
+          this.checkingDomain.set(null);
+          this.setDomainStatus(hostname, status);
+        },
+        error: () => {
+          this.checkingDomain.set(null);
+          this.setDomainStatus(hostname, 'unverified');
+          this.toast.warning(this.transloco.translate('storeSettings.domain.checkFailed'));
+        },
+      });
+  }
+
+  /** Takes a hostname off the store. Only custom domains are offered — the subdomain is the store's address. */
+  removeDomain(domain: string): void {
+    if (this.isSaving()) {
+      return;
+    }
+    this.isSaving.set(true);
+
+    this.api
+      .removeDomain(domain)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (settings) => {
+          this.isSaving.set(false);
+          this.snapshot.set(settings);
+          this.toast.success(this.transloco.translate('storeSettings.domain.removed', {domain}));
+        },
+        error: (failure: unknown) => {
+          this.isSaving.set(false);
+          this.toast.danger(this.apiErrors.messageFor(failure));
+        },
+      });
+  }
+
+  /**
+   * Adds a slide.
+   *
+   * Sent on selection rather than held for *Save changes*, for the same reason the logo is: it is a
+   * multipart POST of its own and the slider form has no controls to submit. The pod names the file,
+   * so the answer has to come from a reload rather than from the upload.
+   */
+  addSlide(file: File): void {
+    if (this.uploading()) {
+      return;
+    }
+    this.uploading.set('slide');
+
+    this.api
+      .addSlide(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (settings) => {
+          this.uploading.set(null);
+          this.snapshot.set(settings);
+          this.toast.success(this.transloco.translate('storeSettings.slider.uploaded'));
+        },
+        error: (failure: unknown) => {
+          this.uploading.set(null);
+          this.toast.danger(this.apiErrors.messageFor(failure));
+        },
+      });
+  }
+
+  /**
+   * Replaces the slider with the list the section built — a reorder or a delete.
+   *
+   * There is no reorder endpoint and no delete-slide endpoint; sending the list you want is the whole
+   * API. Applied immediately rather than through *Save changes* so the two act the same way as adding
+   * one, and so a half-applied reorder cannot be left sitting in a form.
+   */
+  saveSlides(slides: readonly SliderSlide[], messageKey: string): void {
+    if (this.isSaving()) {
+      return;
+    }
+    this.isSaving.set(true);
+
+    this.api
+      .saveSlides(slides)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (settings) => {
+          this.isSaving.set(false);
+          this.snapshot.set(settings);
+          this.toast.success(this.transloco.translate(messageKey));
+        },
+        error: (failure: unknown) => {
+          this.isSaving.set(false);
+          this.toast.danger(this.apiErrors.messageFor(failure));
+        },
+      });
+  }
+
+  private setDomainStatus(domain: string, status: DomainStatus): void {
+    const next = new Map(this.domainStatus());
+    next.set(domain, status);
+    this.domainStatus.set(next);
   }
 
   labelOf(key: SettingsSectionKey): string {
@@ -291,7 +439,4 @@ export class StoreSettingsFacade {
     return this.transloco.translate(labelKey ?? 'storeSettings.nav.heading');
   }
 
-  private customDomain(settings: StoreSettings | undefined) {
-    return settings?.domains.find((entry) => entry.type === 'CUSTOM_DOMAIN');
-  }
 }

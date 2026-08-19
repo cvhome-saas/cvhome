@@ -331,47 +331,56 @@
     },
     "discard": "Discard",
     "domain": {
-      "title": "Store domain",
-      "subtitle": "Serve your storefront from your own domain.",
-      "defaultSubdomain": "Default subdomain · always active",
-      "system": "System",
-      "customDomain": "Custom domain",
-      "verify": "Verify",
-      "pattern": "Lowercase letters, digits, hyphens and dots · no protocol or trailing slash",
-      "fallback": "Enter a bare host name, like shop.example.com — no https:// and no trailing slash.",
-      "recordToAdd": "DNS record to add",
-      "dnsType": "Type",
-      "dnsName": "Name",
-      "dnsValue": "Value",
-      "dnsTtl": "TTL",
-      "dnsHint": "Add this at your DNS provider, then hit Verify. Propagation can take up to 24 hours.",
-      "thisDomain": "this domain",
-      "enterBeforeChecking": "Enter a custom domain before checking DNS.",
-      "unverified": {
-        "title": "Not verified yet",
-        "meta": "never checked",
-        "body": "Add the CNAME record below at your DNS provider, then run a check."
-      },
+      "addCustomDomain": "Add a custom domain",
+      "addHint": "Point the domain at us with the record below, then save to add it. A domain can be added before DNS resolves.",
+      "check": "Check DNS",
+      "checkDns": "Check DNS",
+      "checkFailed": "Could not reach the DNS resolver, so the record could not be checked.",
       "checking": {
         "title": "Checking DNS…",
-        "meta": "started just now",
-        "body": "Querying authoritative name servers for {domain}. This usually resolves within a minute."
+        "meta": "from your browser",
+        "body": "Looking up the CNAME for {domain} through a public resolver."
       },
-      "waiting": {
-        "title": "Waiting for DNS",
-        "meta": "retrying every 5 minutes",
-        "body": "No CNAME record found yet for {domain}. Add the record below at your DNS provider — we keep checking in the background and will email you when it resolves."
+      "checkingNow": "Checking…",
+      "customDomains": "Custom domains",
+      "defaultSubdomain": "Default subdomain · always active",
+      "dnsHint": "Add this at your DNS provider, then run the check. DNS changes can take up to 24 hours to reach every resolver.",
+      "dnsName": "Name",
+      "dnsType": "Type",
+      "dnsValue": "Value",
+      "enterBeforeChecking": "Enter a custom domain before checking DNS.",
+      "failed": {
+        "title": "Points somewhere else",
+        "meta": "record found",
+        "body": "A CNAME exists for {domain} but points elsewhere. Correct it to the value below and check again."
+      },
+      "fallback": "Enter a bare host name, like shop.example.com — no https:// and no trailing slash.",
+      "noTarget": "The address to point your domain at is not available for this store, so the DNS record cannot be shown.",
+      "open": "Open",
+      "openNamed": "Open {domain} in a new tab",
+      "recordToAdd": "DNS record to add",
+      "removeNamed": "Remove {domain}",
+      "removed": "{domain} removed.",
+      "subdomainUnknown": "Address not available",
+      "subtitle": "Serve your storefront from your own domain.",
+      "system": "System",
+      "title": "Store domain",
+      "unverified": {
+        "title": "Not checked",
+        "meta": "no lookup yet",
+        "body": "Add the CNAME record below at your DNS provider, then run a check from here."
       },
       "verified": {
-        "title": "Domain verified",
-        "meta": "SSL issued",
-        "body": "{domain} resolves to our edge and a certificate has been issued. Traffic to the default subdomain now redirects here."
+        "title": "Points at this store",
+        "meta": "one resolver agrees",
+        "body": "{domain} currently resolves to this store. This is a live DNS lookup from your browser, not a platform verification."
       },
-      "failed": {
-        "title": "Verification failed",
-        "meta": "last check rejected",
-        "body": "A record exists for {domain} but points somewhere else. Correct it to the value below and check again."
-      }
+      "waiting": {
+        "title": "No record yet",
+        "meta": "nothing found",
+        "body": "No CNAME record for {domain} yet. Add the record below — DNS changes can take up to 24 hours to reach every resolver."
+      },
+      "yourDomain": "your domain"
     },
     "home": {
       "title": "Store home page",
@@ -463,22 +472,20 @@
     },
     "sectionsLabel": "Store settings sections",
     "slider": {
-      "title": "Store slider images",
-      "subtitle": "Homepage carousel · drag to reorder · {count} of {capacity} slots used",
-      "addSlide": "Add slide",
-      "addingSlide": "Adding a slide",
-      "reorderUnavailable": "Reordering slides is not available yet.",
-      "linksTo": "Links to {link}",
-      "live": "Live",
-      "scheduled": "Scheduled",
-      "editNamed": "Edit {name}",
-      "deleteNamed": "Delete {name}",
-      "editingSlide": "Editing a slide",
-      "deletingSlide": "Deleting a slide",
-      "dropImages": "Drag & drop slider images",
+      "deleteNumbered": "Delete slide {position}",
+      "deleted": "Slide deleted.",
+      "dropImages": "Drag & drop a slider image",
       "hint": "1600×640 recommended · up to {capacity} slides",
-      "uploadingImages": "Uploading slider images",
-      "slotsFull": "All {capacity} slots are used. Delete a slide before adding another."
+      "moveDown": "Move slide {position} later",
+      "moveUp": "Move slide {position} earlier",
+      "none": "No slides yet. Add one below.",
+      "reordered": "Slider order saved.",
+      "slideNumber": "Slide {position}",
+      "slotsFull": "All {capacity} slots are used. Delete a slide before adding another.",
+      "subtitle": "Homepage carousel · {count} of {capacity} slots used",
+      "title": "Store slider images",
+      "uploaded": "Slide added.",
+      "uploading": "Uploading…"
     },
     "social": {
       "title": "Store social links",

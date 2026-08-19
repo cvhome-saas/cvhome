@@ -73,16 +73,26 @@
                 <app-domain-section
                   [form]="forms.domain"
                   [subdomain]="subdomain()"
+                  [customDomains]="customDomains()"
                   [status]="domainStatus()"
+                  [checking]="facade.checkingDomain()"
                   [record]="customDomainRecord()"
-                  (verify)="facade.verifyDomain()"
+                  [busy]="isSaving()"
+                  (verify)="facade.verifyDomain($event)"
+                  (removed)="facade.removeDomain($event)"
                 />
               }
               @case ('social') {
                 <app-social-links-section [form]="forms.social" [links]="store.socialLinks" />
               }
               @case ('slider') {
-                <app-slider-section [slides]="store.slides" />
+                <app-slider-section
+                  [slides]="store.slides"
+                  [uploading]="facade.uploading() === 'slide'"
+                  [reordering]="isSaving()"
+                  (picked)="facade.addSlide($event)"
+                  (reordered)="facade.saveSlides($event.slides, $event.messageKey)"
+                />
               }
               @case ('details') {
                 <app-details-section

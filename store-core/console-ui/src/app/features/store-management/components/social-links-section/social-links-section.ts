@@ -5,14 +5,20 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {FieldError} from '@shared/ui/form-field/field-error';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
-import {SOCIAL_LINK_LABEL_KEY, type SocialLinkSetting} from '@models/store-settings';
+import {
+  SOCIAL_LINK_LABEL_KEY,
+  isSocialLinkProvider,
+  type SocialLinkSetting,
+} from '@models/store-settings';
 import type {SocialLinksForm} from '../../services/store-settings-form.service';
 
 /**
  * The storefront footer's profile links, one row per provider.
  *
- * The providers are `SocialProvider`'s five members and only those — the mockup's LinkedIn
- * and YouTube rows are gone, because there is nowhere to store them.
+ * The rows are whatever `GET /public/social-links-providers` answers with — `SocialProvider`'s five
+ * members today, and the mockup's LinkedIn and YouTube are not among them. A provider the enum grows
+ * later renders on its own name rather than throwing under Transloco's strict missing handler, the
+ * known-set discipline `shared/i18n/status-label.ts` sets.
  */
 @Component({
   selector: 'app-social-links-section',
@@ -28,7 +34,7 @@ import type {SocialLinksForm} from '../../services/store-settings-form.service';
           <div class="link-row">
             <label class="link-name" [attr.for]="'social-' + link.provider">
               <app-icon [name]="link.icon" />
-              <span>{{ t(labelKeyOf(link)) }}</span>
+              <span>{{ labelOf(link, t) }}</span>
             </label>
 
             <div class="link-field">
@@ -59,8 +65,11 @@ export class SocialLinksSection {
   readonly form = input.required<SocialLinksForm>();
   readonly links = input.required<readonly SocialLinkSetting[]>();
 
-  protected labelKeyOf(link: SocialLinkSetting): string {
-    return SOCIAL_LINK_LABEL_KEY[link.provider];
+  /** A brand name for a provider the console knows; the server's own token for one it does not. */
+  protected labelOf(link: SocialLinkSetting, t: (key: string) => string): string {
+    return isSocialLinkProvider(link.provider)
+      ? t(SOCIAL_LINK_LABEL_KEY[link.provider])
+      : link.provider;
   }
 
   protected controlOf(provider: string): FormControl<string> {
