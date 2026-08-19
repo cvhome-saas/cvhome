@@ -144,18 +144,22 @@
     }
   },
   "shared": {
-    "kpiCard": {
-      "vsLastPeriod": "vs last period"
+    "copyField": {
+      "defaultLabel": "value",
+      "copy": "Copy {what}",
+      "copied": "{what} copied to the clipboard.",
+      "failed": "{what} could not be copied. Select it and copy by hand."
     },
-    "toast": {
-      "regionLabel": "Notifications",
-      "dismiss": "Dismiss notification",
-      "tone": {
-        "success": "Success:",
-        "info": "Info:",
-        "warning": "Warning:",
-        "danger": "Error:"
-      }
+    "dateRangePicker": {
+      "selectRange": "Select date range",
+      "rangeLabel": "{from} to {to}",
+      "rangeLabelOpen": "{from} to ...",
+      "dialogLabel": "Select date range",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "pickEndDate": "pick an end date",
+      "pickStartDate": "Pick a start date",
+      "rangeApplied": "Range applied: {from} to {to}"
     },
     "export": {
       "generatedAt": "Generated {date}",
@@ -170,16 +174,8 @@
       "canvasUnavailable": "Unable to prepare the export canvas.",
       "failedAnnouncement": "Export failed. {message}"
     },
-    "dateRangePicker": {
-      "selectRange": "Select date range",
-      "rangeLabel": "{from} to {to}",
-      "rangeLabelOpen": "{from} to ...",
-      "dialogLabel": "Select date range",
-      "previousMonth": "Previous month",
-      "nextMonth": "Next month",
-      "pickEndDate": "pick an end date",
-      "pickStartDate": "Pick a start date",
-      "rangeApplied": "Range applied: {from} to {to}"
+    "kpiCard": {
+      "vsLastPeriod": "vs last period"
     },
     "pagination": {
       "previousPage": "Previous page",
@@ -190,16 +186,26 @@
       "noRecords": "No {unit}",
       "summary": "Showing {first}–{last} of {total} {unit}"
     },
-    "copyField": {
-      "defaultLabel": "value",
-      "copy": "Copy {what}",
-      "copied": "{what} copied to the clipboard.",
-      "failed": "{what} could not be copied. Select it and copy by hand."
+    "secretField": {
+      "copy": "Copy {field}",
+      "hide": "Hide {field}",
+      "notSet": "Not set",
+      "reveal": "Show {field}"
     },
     "tagInput": {
       "defaultLabel": "Tags",
       "defaultPlaceholder": "Add tag…",
       "removeTag": "Remove {tag}"
+    },
+    "toast": {
+      "regionLabel": "Notifications",
+      "dismiss": "Dismiss notification",
+      "tone": {
+        "success": "Success:",
+        "info": "Info:",
+        "warning": "Warning:",
+        "danger": "Error:"
+      }
     }
   },
   "orders": {
@@ -423,30 +429,21 @@
       "paypal": "PayPal"
     },
     "payments": {
-      "title": "Store payment configuration",
-      "subtitle": "Gateway credentials for this store only.",
-      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest and never returned to this screen. You can replace or rotate a value, but not read it back.",
       "accept": "Accept {gateway}",
       "apiKey": "API key",
       "publishable": "(publishable)",
       "secretKey": "Secret key",
-      "rotate": "Rotate",
-      "rotatingSecret": "Rotating the {gateway} secret key",
+      "secretsNotice": "Secret keys and webhook secrets are encrypted at rest, but this screen is handed them decrypted — treat this page as you would the keys themselves.",
+      "subtitle": "Gateway credentials for this store only.",
+      "title": "Store payment configuration",
+      "unknownGateway": "Configured on the platform.",
       "webhookSecret": "Webhook secret",
-      "replacingWebhookSecret": "Replacing the {gateway} webhook secret",
-      "endpoint": "Endpoint: {url}"
+      "webhookSecretHint": "The value the gateway signs its webhooks with."
     },
     "previewNotAvailable": "Previewing the storefront is not available yet.",
     "previewStorefront": "Preview storefront",
     "saveChanges": "Save changes",
     "saving": "Saving…",
-    "secret": {
-      "endsWith": "•••••••••••••• ends {last4}",
-      "notSet": "•••••••••••••• not set",
-      "lastChanged": "Last changed {date}",
-      "lastRotated": "Last rotated {date}",
-      "neverStored": "No secret stored yet"
-    },
     "section": {
       "branding": "Store branding",
       "home": "Store home page",
@@ -494,15 +491,16 @@
       "wrongSite": "This has to be a {host} link."
     },
     "socialLogin": {
-      "title": "Store social login",
-      "subtitle": "Let customers sign in with an external provider. Secrets are stored encrypted.",
-      "signInWith": "Sign in with {provider}",
       "appId": "App ID",
       "appSecret": "App secret",
-      "replace": "Replace",
-      "replacingSecret": "Replacing the {provider} app secret",
+      "appSecretHint": "Stored encrypted. It is shown here because the API returns it decrypted.",
+      "callbackHint": "Paste this into the provider's redirect URI allow-list",
       "callbackUrl": "Callback URL",
-      "callbackHint": "Paste this into the provider's redirect URI allow-list"
+      "credentialsRequired": "An enabled provider needs both an app ID and an app secret.",
+      "notConfigured": "Not set up yet",
+      "signInWith": "Sign in with {provider}",
+      "subtitle": "Let customers sign in with an external provider.",
+      "title": "Store social login"
     },
     "socialProvider": {
       "facebook": "Facebook",

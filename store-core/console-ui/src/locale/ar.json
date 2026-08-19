@@ -144,18 +144,22 @@
     }
   },
   "shared": {
-    "kpiCard": {
-      "vsLastPeriod": "مقارنة بالفترة السابقة"
+    "copyField": {
+      "defaultLabel": "القيمة",
+      "copy": "نسخ {what}",
+      "copied": "تم نسخ {what} إلى الحافظة.",
+      "failed": "تعذّر نسخ {what}. حدّده وانسخه يدويًا."
     },
-    "toast": {
-      "regionLabel": "الإشعارات",
-      "dismiss": "إغلاق الإشعار",
-      "tone": {
-        "success": "نجاح:",
-        "info": "معلومة:",
-        "warning": "تحذير:",
-        "danger": "خطأ:"
-      }
+    "dateRangePicker": {
+      "selectRange": "اختر نطاق التاريخ",
+      "rangeLabel": "{from} إلى {to}",
+      "rangeLabelOpen": "{from} إلى …",
+      "dialogLabel": "اختر نطاق التاريخ",
+      "previousMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي",
+      "pickEndDate": "اختر تاريخ الانتهاء",
+      "pickStartDate": "اختر تاريخ البدء",
+      "rangeApplied": "تم تطبيق النطاق: من {from} إلى {to}"
     },
     "export": {
       "generatedAt": "أُنشئ في {date}",
@@ -170,16 +174,8 @@
       "canvasUnavailable": "تعذّر تجهيز لوحة التصدير.",
       "failedAnnouncement": "فشل التصدير. {message}"
     },
-    "dateRangePicker": {
-      "selectRange": "اختر نطاق التاريخ",
-      "rangeLabel": "{from} إلى {to}",
-      "rangeLabelOpen": "{from} إلى …",
-      "dialogLabel": "اختر نطاق التاريخ",
-      "previousMonth": "الشهر السابق",
-      "nextMonth": "الشهر التالي",
-      "pickEndDate": "اختر تاريخ الانتهاء",
-      "pickStartDate": "اختر تاريخ البدء",
-      "rangeApplied": "تم تطبيق النطاق: من {from} إلى {to}"
+    "kpiCard": {
+      "vsLastPeriod": "مقارنة بالفترة السابقة"
     },
     "pagination": {
       "previousPage": "الصفحة السابقة",
@@ -190,16 +186,26 @@
       "noRecords": "لا يوجد {unit}",
       "summary": "عرض {first}–{last} من {total} {unit}"
     },
-    "copyField": {
-      "defaultLabel": "القيمة",
-      "copy": "نسخ {what}",
-      "copied": "تم نسخ {what} إلى الحافظة.",
-      "failed": "تعذّر نسخ {what}. حدّده وانسخه يدويًا."
+    "secretField": {
+      "copy": "نسخ {field}",
+      "hide": "إخفاء {field}",
+      "notSet": "غير محدد",
+      "reveal": "إظهار {field}"
     },
     "tagInput": {
       "defaultLabel": "الوسوم",
       "defaultPlaceholder": "إضافة وسم…",
       "removeTag": "إزالة {tag}"
+    },
+    "toast": {
+      "regionLabel": "الإشعارات",
+      "dismiss": "إغلاق الإشعار",
+      "tone": {
+        "success": "نجاح:",
+        "info": "معلومة:",
+        "warning": "تحذير:",
+        "danger": "خطأ:"
+      }
     }
   },
   "orders": {
@@ -423,30 +429,21 @@
       "paypal": "PayPal"
     },
     "payments": {
-      "title": "إعدادات الدفع",
-      "subtitle": "بيانات اعتماد البوابة لهذا المتجر فقط.",
-      "secretsNotice": "مفاتيح الأسرار وأسرار الويبهوك مشفرة ولا تُعاد أبدًا إلى هذه الشاشة. يمكنك استبدال أو تدوير القيمة، لكن لا يمكن قراءتها.",
       "accept": "قبول {gateway}",
       "apiKey": "مفتاح API",
       "publishable": "(قابل للنشر)",
       "secretKey": "المفتاح السري",
-      "rotate": "تدوير",
-      "rotatingSecret": "تدوير المفتاح السري لـ {gateway}",
+      "secretsNotice": "تُخزَّن المفاتيح السرية وأسرار الويبهوك مشفَّرة، لكن هذه الشاشة تستقبلها بعد فك التشفير — تعامل مع هذه الصفحة كما تتعامل مع المفاتيح نفسها.",
+      "subtitle": "بيانات اعتماد البوابة لهذا المتجر فقط.",
+      "title": "إعدادات الدفع",
+      "unknownGateway": "مُعدّة على المنصة.",
       "webhookSecret": "سر الويبهوك",
-      "replacingWebhookSecret": "استبدال سر ويبهوك {gateway}",
-      "endpoint": "نقطة النهاية: {url}"
+      "webhookSecretHint": "القيمة التي توقّع بها البوابة طلبات الويبهوك."
     },
     "previewNotAvailable": "معاينة واجهة المتجر غير متاحة بعد.",
     "previewStorefront": "معاينة واجهة المتجر",
     "saveChanges": "حفظ التغييرات",
     "saving": "جارٍ الحفظ…",
-    "secret": {
-      "endsWith": "•••••••••••••• ينتهي بـ {last4}",
-      "notSet": "•••••••••••••• غير معيّن",
-      "lastChanged": "آخر تغيير {date}",
-      "lastRotated": "آخر تدوير {date}",
-      "neverStored": "لا يوجد سر مخزن بعد"
-    },
     "section": {
       "branding": "هوية المتجر",
       "home": "الصفحة الرئيسية للمتجر",
@@ -494,15 +491,16 @@
       "wrongSite": "يجب أن يكون هذا رابطًا من {host}."
     },
     "socialLogin": {
-      "title": "تسجيل الدخول الاجتماعي",
-      "subtitle": "اسمح للعملاء بتسجيل الدخول عبر مزود خارجي. الأسرار مخزنة مشفرة.",
-      "signInWith": "تسجيل الدخول عبر {provider}",
       "appId": "معرّف التطبيق",
       "appSecret": "سر التطبيق",
-      "replace": "استبدال",
-      "replacingSecret": "استبدال سر تطبيق {provider}",
+      "appSecretHint": "يُخزَّن مشفَّرًا. يظهر هنا لأن واجهة البرمجة تعيده بعد فك التشفير.",
+      "callbackHint": "الصق هذا في قائمة روابط إعادة التوجيه المسموح بها لدى المزوّد",
       "callbackUrl": "رابط الاستدعاء",
-      "callbackHint": "الصق هذا في قائمة السماح الخاصة بروابط إعادة التوجيه لدى المزود"
+      "credentialsRequired": "المزوّد المفعَّل يحتاج إلى معرّف تطبيق وسر تطبيق معًا.",
+      "notConfigured": "لم يُعد بعد",
+      "signInWith": "تسجيل الدخول عبر {provider}",
+      "subtitle": "اسمح للعملاء بتسجيل الدخول عبر مزوّد خارجي.",
+      "title": "تسجيل الدخول الاجتماعي"
     },
     "socialProvider": {
       "facebook": "فيسبوك",

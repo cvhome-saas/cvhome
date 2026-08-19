@@ -938,6 +938,84 @@ requirements document, with the entry here reduced to a link. There is already o
   translation without having to hold all of them. And `@Valid` on the request body, so a missing
   name is a 400 that names the field instead of a 500 that names nothing.
 
+## Store management — payment and social-login reads return secrets in cleartext
+
+- **Screen:** `/store-management/payments` and `/store-management/social-login`.
+- **What happens:** both mappers decrypt before serialising.
+  `PaymentConfigurationMapper.toDTO` runs `decrypt()` over `apiKey`, `secretKey` and
+  `webhookSecret`; `SocialLoginConfigMapper.toDTO` does the same for `appId` and `appSecret`. So
+  `GET /private/payment-configuration` hands the browser the live Stripe secret key and webhook
+  secret, and `GET /private/social-login-config` hands it the OAuth app secret — as plain strings,
+  in a JSON body, over whatever the operator's network is.
+- **Why it matters:** encryption at rest buys nothing on these two endpoints. The value is in the
+  browser's memory, in the network tab, in any HAR the operator sends to support, and in any
+  browser extension with host permissions. A secret key is a bearer credential for the store's
+  Stripe account; a webhook secret is what makes a forged webhook detectable.
+- **Expected contract:** never return a stored secret. Answer with a hint — the last four
+  characters and the date it was last written — and take a new value on write only. That is what
+  the console's design assumed, and it is why the mockup had a "rotate" action rather than a field.
+- **What console-ui does meanwhile:** shows them, behind a click-to-reveal, in `shared/ui/secret-field`.
+  Masking a value the API has already handed over would be theatre, and would leave an operator
+  unable to check a key they can read in the network tab; the section says plainly that the screen
+  is handed them decrypted. When the contract changes, this component is the one thing that has to
+  change with it.
+
+## Store management — a credential written before encryption reads back as nothing
+
+- **Screen:** `/store-management/payments` and `/store-management/social-login`.
+- **What happens:** both mappers only populate a field when the stored value is *in encrypted form*
+  — `PaymentConfigurationMapper.decrypt()` returns `null` for anything else, and
+  `SocialLoginConfigMapper.toDTO` guards each `set` with `EncryptedValue.isEncrypted(...)`. A row
+  written before `secret-crypto` was introduced therefore reads back empty.
+- **Consequence:** the console cannot tell "no credential stored" from "a credential stored in a
+  form we no longer read", and neither can the operator. The screen shows an empty field for a
+  gateway that is, as far as the payment service is concerned, configured and live. Saving over it
+  is the only way out, and does not warn that something was there.
+- **Expected contract:** a migration that re-encrypts legacy rows, and until then a mapper that
+  treats an unencrypted stored value as the value rather than as nothing — or at minimum a flag
+  saying a value exists but could not be read.
+
+## Store management — a gateway has no webhook URL to show
+
+- **Screen:** `/store-management/payments`, the "Endpoint" line under each webhook secret.
+- **What the UI needs:** the URL to paste into Stripe or PayPal so their webhooks reach this store.
+- **What is missing:** nothing records or derives one. `PaymentConfiguration` is
+  `(store, type, apiKey, secretKey, webhookSecret, enabled)` and the payment service maps no
+  per-store webhook route. The fixture printed `https://{store}/webhooks/stripe`, which was an
+  invented address an operator might well have pasted into a live gateway.
+- **Why it is required:** a webhook secret with no endpoint to pair it with is unusable — it is the
+  half of the configuration the seller cannot work out on their own.
+- **Expected contract:** a `webhookUrl` on `ReadablePaymentConfiguration`, built by the service that
+  owns the route. **Placeholder:** the line is removed rather than guessed.
+
+## Store management — a payment type's required attributes are not served
+
+- **Screen:** `/store-management/payments`, which cards show a credential grid.
+- **What is missing:** `PaymentType` declares `attrs` — `STRIPE` and `PAYPAL` require `clientId` and
+  `secretKey`, `COD` and `MANUAL_TRANSFER` require nothing — and `GET /supported-payment-types`
+  serialises the enum by name, so the attrs never reach a client. The console hardcodes which two
+  types have no credentials, which means a new gateway added to the enum renders a credential grid
+  it may not want, or none when it needs one.
+- **Also worth noting:** the attrs name `clientId` and `secretKey`, while the DTO carries `apiKey`,
+  `secretKey` and `webhookSecret`. The two descriptions of the same thing do not line up.
+- **Expected contract:** serialise `PaymentType` as an object with its `attrs`, so a client can
+  render exactly the fields a gateway declares instead of guessing from a hardcoded list.
+
+## Store management — a social login callback URL has to be assembled by the client
+
+- **Screen:** `/store-management/social-login`, the "Callback URL" a seller pastes into Google or
+  Facebook.
+- **What is missing:** no endpoint answers it. The registration id is
+  `{store}.{provider}` (`SocialLoginConfigId.toRegistrationId()`), Spring Security's callback path
+  is `/login/oauth2/code/{registrationId}`, and the host is the store's own storefront — three
+  facts held in three different places, none of them served together.
+- **Why it matters:** it is the one value on the screen that must be exactly right, because the
+  provider rejects the sign-in if it does not match their allow-list character for character, and
+  the failure appears to the shopper rather than to the seller.
+- **Expected contract:** `callbackUrl` on `ReadableSocialLoginConfig`, built by cua, which is the
+  only component that knows all three parts. **Placeholder:** the console assembles it, and shows
+  nothing rather than a half-built URL when the pod lookup that supplies the host was refused.
+
 ## Dashboard — the merchant statistics outage is over
 
 - **Screen:** `/dashboard` and `/orders`, the KPI rows on both.

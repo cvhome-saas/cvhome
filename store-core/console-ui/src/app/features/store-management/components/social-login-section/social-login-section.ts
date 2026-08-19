@@ -1,14 +1,19 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Badge} from '@shared/ui/badge/badge';
 import {CopyField} from '@shared/ui/copy-field/copy-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
-import {ToastService} from '@shared/ui/toast/toast';
+import {SecretField} from '@shared/ui/secret-field/secret-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
-import {LOGIN_PROVIDER_LABEL_KEY, LOGIN_STATE_TAG, type SecretHint, type SocialLoginConfig} from '@models/store-settings';
+import {
+  LOGIN_PROVIDER_LABEL_KEY,
+  LOGIN_STATE_TAG,
+  isLoginProvider,
+  type SocialLoginConfig,
+} from '@models/store-settings';
 import type {
   LoginProviderForm,
   SocialLoginForm,
@@ -20,13 +25,18 @@ import type {
  * The providers are `cua`'s `SocialProvider` — Google, Facebook and GitHub. The mockup's Apple
  * row is gone; GitHub, which the enum does carry, is here instead.
  *
- * A disabled provider collapses its credentials. Its `appSecret` is never shown, because it is
- * encrypted at rest and never returned — the field says how the stored one ends and offers to
- * replace it.
+ * A disabled provider collapses its credentials.
+ *
+ * The secret **is** shown, behind a reveal toggle, and that is a deliberate answer to what the API
+ * does rather than a relaxation. `SocialLoginConfigMapper.toDTO` decrypts `appSecret` before
+ * serialising, so the browser has already been handed the live value by the time this renders —
+ * masking it as unknowable would be theatre, and would leave an operator unable to check a key they
+ * can read in the network tab. See lessons.md, "Store management — payment and social-login reads
+ * return secrets in cleartext".
  */
 @Component({
   selector: 'app-social-login-section',
-  imports: [Badge, CopyField, Icon, Panel, ReactiveFormsModule, Toggle, TranslocoDirective],
+  imports: [Badge, CopyField, Icon, Panel, ReactiveFormsModule, SecretField, Toggle, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.socialLogin.title')"
@@ -42,11 +52,14 @@ import type {
             <div class="provider-head">
               <app-icon [name]="provider.icon" />
               <span class="provider-name">
-                <strong>{{ t(labelKeyOf(provider)) }}</strong>
+                <strong>{{ labelOf(provider, t) }}</strong>
+                @if (!provider.configured) {
+                  <small>{{ t('storeSettings.socialLogin.notConfigured') }}</small>
+                }
               </span>
               <app-badge [tone]="tagOf(on).tone" shape="square">{{ t(tagOf(on).labelKey) }}</app-badge>
               <app-toggle
-                [name]="t('storeSettings.socialLogin.signInWith', {provider: t(labelKeyOf(provider))})"
+                [name]="t('storeSettings.socialLogin.signInWith', {provider: labelOf(provider, t)})"
                 [checked]="on"
                 (checkedChange)="setFlag(group.controls.enabled, $event)"
               />
@@ -65,20 +78,28 @@ import type {
                 </div>
 
                 <div class="field">
-                  <p class="field-label">{{ t('storeSettings.socialLogin.appSecret') }}</p>
-                  <span class="control secret">
-                    <app-icon name="lock" />
-                    <span class="mask">{{ maskOf(provider.appSecret, t) }}</span>
-                    <button
-                      class="text-action"
-                      type="button"
-                      (click)="notSupported(t('storeSettings.socialLogin.replacingSecret', {provider: t(labelKeyOf(provider))}))"
-                    >
-                      {{ t('storeSettings.socialLogin.replace') }}
-                    </button>
-                  </span>
-                  <p class="field-hint">{{ rotatedOf(provider.appSecret, t) }}</p>
+                  <label [attr.for]="'app-secret-' + provider.providerId">
+                    {{ t('storeSettings.socialLogin.appSecret') }}
+                  </label>
+                  <app-secret-field
+                    [label]="t('storeSettings.socialLogin.appSecret')"
+                    [value]="group.controls.appSecret.value"
+                  >
+                    <input
+                      [id]="'app-secret-' + provider.providerId"
+                      type="text"
+                      autocomplete="off"
+                      formControlName="appSecret"
+                    />
+                  </app-secret-field>
+                  <p class="field-hint">{{ t('storeSettings.socialLogin.appSecretHint') }}</p>
                 </div>
+
+                @if (missingCredentials(group)) {
+                  <p class="cross-field-error field-wide" role="alert">
+                    {{ t('storeSettings.socialLogin.credentialsRequired') }}
+                  </p>
+                }
 
                 <div class="field field-wide">
                   <p class="field-label">{{ t('storeSettings.socialLogin.callbackUrl') }}</p>
@@ -97,14 +118,14 @@ import type {
   styleUrls: ['../settings-card.css'],
 })
 export class SocialLoginSection {
-  private readonly toast = inject(ToastService);
-  private readonly transloco = inject(TranslocoService);
-
   readonly form = input.required<SocialLoginForm>();
   readonly providers = input.required<readonly SocialLoginConfig[]>();
 
-  protected labelKeyOf(provider: SocialLoginConfig): string {
-    return LOGIN_PROVIDER_LABEL_KEY[provider.providerId];
+  /** A brand name for a provider the console knows; cua's own token for one it does not. */
+  protected labelOf(provider: SocialLoginConfig, t: (key: string) => string): string {
+    return isLoginProvider(provider.providerId)
+      ? t(LOGIN_PROVIDER_LABEL_KEY[provider.providerId])
+      : provider.providerId;
   }
 
   protected groupOf(provider: string): LoginProviderForm {
@@ -115,25 +136,31 @@ export class SocialLoginSection {
     return enabled ? LOGIN_STATE_TAG.on : LOGIN_STATE_TAG.off;
   }
 
-  /** What is on record, never the value itself. */
-  protected maskOf(secret: SecretHint, t: (key: string, params?: Record<string, unknown>) => string): string {
-    return secret.endsWith
-      ? t('storeSettings.secret.endsWith', {last4: secret.endsWith})
-      : t('storeSettings.secret.notSet');
+  /**
+   * Whether an enabled provider is missing what it needs to broker a sign-in.
+   *
+   * Said whenever it is true, including for a row that arrived that way — a provider switched on
+   * with no app id is a sign-in button that fails for the shopper, and the seller should know even
+   * if they did not cause it. Whether it also *blocks* the save is the validator's business, and it
+   * only does so once the operator has touched the provider.
+   */
+  protected missingCredentials(group: LoginProviderForm): boolean {
+    if (!group.controls.enabled.value) {
+      return false;
+    }
+    return !group.controls.appId.value.trim() || !group.controls.appSecret.value.trim();
   }
 
-  protected rotatedOf(secret: SecretHint, t: (key: string, params?: Record<string, unknown>) => string): string {
-    return secret.lastRotated
-      ? t('storeSettings.secret.lastChanged', {date: secret.lastRotated})
-      : t('storeSettings.secret.neverStored');
-  }
-
+  /**
+   * Flips the switch, and says it was a change *first*.
+   *
+   * Order matters here in a way it does not elsewhere. `setValue` runs the group's validators
+   * synchronously, and the credential rule only bites on a group the operator has touched — so
+   * marking dirty afterwards means the first flip validates as untouched and the message does not
+   * appear until something else changes.
+   */
   protected setFlag(control: FormControl<boolean>, value: boolean): void {
-    control.setValue(value);
     control.markAsDirty();
-  }
-
-  protected notSupported(what: string): void {
-    this.toast.info(this.transloco.translate('storeSettings.notAvailable', {what}));
+    control.setValue(value);
   }
 }

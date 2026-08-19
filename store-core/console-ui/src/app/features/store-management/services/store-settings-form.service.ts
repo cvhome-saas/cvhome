@@ -79,14 +79,24 @@ export type DetailsForm = FormGroup<{
 }>;
 
 /** A provider's own credentials. The secret is not here — it never comes back to be edited. */
+/**
+ * A provider's own credentials.
+ *
+ * The secret is here, editable, because it comes back from the server — `SocialLoginConfigMapper`
+ * decrypts before serialising. The mockup's write-only "replace" flow described a different API.
+ */
 export type LoginProviderForm = FormGroup<{
   enabled: FormControl<boolean>;
   appId: FormControl<string>;
+  appSecret: FormControl<string>;
 }>;
 
+/** Same again for a gateway: all three fields round-trip, so all three are editable. */
 export type GatewayForm = FormGroup<{
   enabled: FormControl<boolean>;
   apiKey: FormControl<string>;
+  secretKey: FormControl<string>;
+  webhookSecret: FormControl<string>;
 }>;
 
 /** Sections with nothing editable still carry a group, so every key resolves to a form. */
@@ -232,22 +242,49 @@ export class StoreSettingsFormService {
     this.syncKeys(
       login,
       settings.socialLogin.map((config) => config.providerId),
-      () => this.fb.group({enabled: this.fb.control(false), appId: this.fb.control('')}),
+      () =>
+        this.fb.group(
+          {
+            enabled: this.fb.control(false),
+            appId: this.fb.control(''),
+            appSecret: this.fb.control(''),
+          },
+          /*
+           * Required only while the provider is on. `APP_ID` and `APP_SECRET` are `nullable = false`
+           * and `saveConfigs` builds a fresh entity, so an enabled provider missing either is a 500
+           * rather than a validation error — but a provider that is off has no credentials to
+           * demand, and demanding them would make the section unsavable for any store that has not
+           * set up all three.
+           */
+          {validators: [credentialsWhenEnabled(['appId', 'appSecret'])]},
+        ),
     );
     for (const config of settings.socialLogin) {
-      login.controls[config.providerId].reset({enabled: config.enabled, appId: config.appId});
+      login.controls[config.providerId].reset({
+        enabled: config.enabled,
+        appId: config.appId,
+        appSecret: config.appSecret,
+      });
     }
 
     const payments = form.controls.payments;
     this.syncKeys(
       payments,
       settings.payments.map((gateway) => gateway.paymentType),
-      () => this.fb.group({enabled: this.fb.control(false), apiKey: this.fb.control('')}),
+      () =>
+        this.fb.group({
+          enabled: this.fb.control(false),
+          apiKey: this.fb.control(''),
+          secretKey: this.fb.control(''),
+          webhookSecret: this.fb.control(''),
+        }),
     );
     for (const gateway of settings.payments) {
       payments.controls[gateway.paymentType].reset({
         enabled: gateway.enabled,
         apiKey: gateway.credentials?.apiKey ?? '',
+        secretKey: gateway.credentials?.secretKey ?? '',
+        webhookSecret: gateway.credentials?.webhookSecret ?? '',
       });
     }
 
@@ -453,6 +490,33 @@ export class StoreSettingsFormService {
       }
     }
   }
+}
+
+/**
+ * Credentials a provider needs once it is switched on — enforced only against changes.
+ *
+ * A group validator rather than `Validators.required` per field, because the rule is about the
+ * pair: turning the switch on is what makes the credentials matter, and a validator on `appId`
+ * would not re-run when `enabled` changed.
+ *
+ * The `dirty` check is the important half. Stores in the wild already have providers enabled with
+ * an empty app id — a credential written before encryption reads back as nothing (see lessons.md),
+ * and that state loads straight into this form. Blocking on it unconditionally would mean one
+ * unreadable row made the whole section unsavable, so an operator could not fix their Google secret
+ * because of a Facebook row they never touched. Untouched, it reports; touched, it refuses. The
+ * operator cannot create the problem and is not held hostage by it either.
+ */
+export function credentialsWhenEnabled(fields: readonly string[]): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    if (!group.get('enabled')?.value) {
+      return null;
+    }
+    const missing = fields.filter((field) => !String(group.get(field)?.value ?? '').trim());
+    if (missing.length === 0) {
+      return null;
+    }
+    return group.dirty ? {credentialsWhenEnabled: {fields: missing}} : null;
+  };
 }
 
 /**

@@ -2,12 +2,18 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {ContentBoxService} from '@api/content/content-box.service';
+import {SocialLoginConfigService} from '@api/cua/social-login-config.service';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {MerchantRouterService} from '@api/merchant/router.service';
 import {MerchantStoreService} from '@api/merchant/store.service';
+import {PaymentConfigurationService} from '@api/payment/payment-configuration.service';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {SaasService, podHostname} from '@api/tenancy/saas.service';
-import {STORE_SETTINGS, type FixtureSections} from '@mocks/store-settings.fixture';
+import type {PersistableSocialLoginConfig, ReadableSocialLoginConfig} from '@models/cua';
+import type {
+  PersistablePaymentConfiguration,
+  ReadablePaymentConfiguration,
+} from '@models/payment';
 import type {
   ContentDescription,
   PersistableContentBox,
@@ -20,16 +26,23 @@ import type {
   StoreAddress,
 } from '@models/merchant';
 import {
+  LOGIN_PROVIDER_ICON,
+  PAYMENT_TYPES_WITHOUT_CREDENTIALS,
+  PAYMENT_TYPE_ICON,
   SOCIAL_LINK_FALLBACK_ICON,
   SOCIAL_LINK_ICON,
+  isLoginProvider,
+  isPaymentType,
   isSocialLinkProvider,
   type BrandingSettings,
   type DomainStatus,
   type HomePageCopy,
   type SettingsChoices,
   type SettingsSectionKey,
+  type PaymentGatewayConfig,
   type SliderSlide,
   type SocialLinkSetting,
+  type SocialLoginConfig,
   type StoreDetails,
   type StoreDomain,
   type StoreSettings,
@@ -72,8 +85,8 @@ const DOMAIN_OUTCOME: Readonly<Record<CnameOutcome, DomainStatus>> = {
  * rather than the patch it was given, because the endpoints answer `void` and the page needs to
  * show what the server actually kept.
  *
- * **Migration state.** Everything but social login and payments is live; those two are taken over
- * in the commit that follows. `fixtureSections()` is the seam, and it shrinks to nothing.
+ * **Every section is live.** `@mocks/store-settings.fixture` is gone, and so is the seam that used
+ * to hold it — `saveSection` dispatches to a real endpoint for every key it accepts.
  */
 @Injectable({providedIn: 'root'})
 export class StoreSettingsApi {
@@ -83,6 +96,8 @@ export class StoreSettingsApi {
   private readonly saas = inject(SaasService);
   private readonly dns = inject(DnsCheckService);
   private readonly content = inject(ContentBoxService);
+  private readonly socialLogin = inject(SocialLoginConfigService);
+  private readonly payments = inject(PaymentConfigurationService);
 
   /**
    * The last store the server sent.
@@ -111,6 +126,14 @@ export class StoreSettingsApi {
    * language, so a field left out is a field cleared. This is where the rest comes from.
    */
   private loadedHomeBox: ReadableContentBox | null = null;
+
+  /**
+   * The payment configurations the server last sent.
+   *
+   * A save has to know which gateways already have a row, because `POST` and `PUT` are different
+   * endpoints with different semantics and there is no upsert. Held rather than re-fetched.
+   */
+  private loadedPayments: readonly ReadablePaymentConfiguration[] = [];
 
   /**
    * Everything the page shows, in one pass.
@@ -142,10 +165,23 @@ export class StoreSettingsApi {
        * normal first state of this section, not a fault. `null` means "create on first save".
        */
       homeBox: this.optionalOne(this.content.box(HOME_BOX_CODE)),
+      /*
+       * Four legs on two other pods. Each is optional for the same reason as the rest: cua being
+       * down is not a reason the store's own details cannot be edited. A failed provider list
+       * leaves that section showing only what the store has already configured.
+       */
+      loginProviders: this.optional(this.socialLogin.supportedProviders()),
+      loginConfigs: this.optionalList(this.socialLogin.configs()),
+      paymentTypes: this.optional(this.payments.supportedTypes()),
+      paymentConfigs: this.optionalList(this.payments.configs()),
     }).pipe(
-      map(({store, themes, colorThemes, socialLinkProviders, languages, allocations, saas, pod, homeBox}) => {
+      map((loaded) => {
+        const {store, themes, colorThemes, socialLinkProviders, languages} = loaded;
+        const {allocations, saas, pod, homeBox} = loaded;
+        const {loginProviders, loginConfigs, paymentTypes, paymentConfigs} = loaded;
         this.loadedStore = store;
         this.loadedHomeBox = homeBox;
+        this.loadedPayments = paymentConfigs;
         this.podTarget = podHostname(saas, pod);
         const choices: SettingsChoices = {
           themes,
@@ -158,7 +194,6 @@ export class StoreSettingsApi {
           languages: languages.length > 0 ? languages : this.presentLanguages(store),
         };
         return {
-          ...this.fixtureSections(),
           storeName: store.name,
           branding: this.branding(store),
           details: this.details(store),
@@ -166,6 +201,8 @@ export class StoreSettingsApi {
           podTarget: this.podTarget,
           home: this.home(homeBox),
           homeBoxId: homeBox?.id ?? null,
+          socialLogin: this.socialLoginConfigs(loginProviders, loginConfigs, store),
+          payments: this.paymentGateways(paymentTypes, paymentConfigs),
           socialLinks: this.socialLinks(store, socialLinkProviders),
           slides: this.slides(store),
           choices,
@@ -237,9 +274,26 @@ export class StoreSettingsApi {
         return this.router.allocate(domain).pipe(switchMap(() => this.loadSettings()));
       }
 
-      // TODO(lessons.md): still fixture-backed until their own commits in this module.
-      default:
-        return this.saveFixtureSection(key, patch);
+      /*
+       * One POST for the lot. cua takes a list and upserts each entry by `(store, provider)`, so
+       * there is no create-versus-update to work out — and no delete either, which is why turning a
+       * provider off is `enabled: false` rather than removing its row.
+       */
+      case 'social-login':
+        return this.socialLogin
+          .save(this.loginConfigsBody(patch))
+          .pipe(switchMap(() => this.loadSettings()));
+
+      /*
+       * One call per gateway, and which call depends on whether it already has a row: `POST` builds
+       * a fresh entity, `PUT` merges into the stored one and 404s when there is nothing to merge
+       * into. Sent together and waited on together, so a partial failure still reloads the truth.
+       */
+      case 'payments': {
+        const writes = this.paymentWrites(patch);
+        const applied: Observable<unknown> = writes.length > 0 ? forkJoin(writes) : of(null);
+        return applied.pipe(switchMap(() => this.loadSettings()));
+      }
     }
   }
 
@@ -630,64 +684,144 @@ export class StoreSettingsApi {
     };
   }
 
-  /* ---- the shrinking fixture half ---------------------------------------------------------- */
+  /**
+   * One row per provider cua can broker, whether or not this store has configured it.
+   *
+   * The provider list is the enum; the configs are only the ones with a row. A provider absent from
+   * the configs is `configured: false` — which the section shows, because "never set up" and
+   * "turned off" look identical once both render as an off switch.
+   *
+   * `appId` and `appSecret` arrive decrypted, which is why they are carried straight into the form
+   * rather than reduced to a hint. They also read empty when the stored value predates encryption —
+   * `SocialLoginConfigMapper` only sets a field it can decrypt — and the console cannot tell that
+   * apart from "not configured". See lessons.md, "Store management — a credential written before
+   * encryption reads back as nothing".
+   */
+  private socialLoginConfigs(
+    providers: readonly string[],
+    configs: readonly ReadableSocialLoginConfig[],
+    store: ReadableMerchantStore,
+  ): readonly SocialLoginConfig[] {
+    const stored = new Map(configs.map((config) => [config.providerId, config]));
+    const known = providers.length > 0 ? providers : [...stored.keys()];
 
-  /** The sections not yet migrated, held between saves so the page behaves as it did. */
-  private fixture: FixtureSections = STORE_SETTINGS;
-
-  private fixtureSections(): FixtureSections {
-    return {
-      socialLogin: this.fixture.socialLogin,
-      payments: this.fixture.payments,
-    };
+    return known.map((providerId) => {
+      const config = stored.get(providerId);
+      return {
+        providerId,
+        icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : SOCIAL_LINK_FALLBACK_ICON,
+        appId: config?.appId ?? '',
+        appSecret: config?.appSecret ?? '',
+        callbackUrl: this.callbackUrl(store, providerId),
+        enabled: config?.enabled ?? false,
+        configured: config !== undefined,
+      };
+    });
   }
 
-  private saveFixtureSection(key: SettingsSectionKey, patch: SectionPatch): Observable<StoreSettings> {
-    this.fixture = this.mergeFixture(key, patch);
-    return this.loadSettings();
+  /**
+   * Where a provider sends the shopper back to.
+   *
+   * Assembled here because no endpoint answers it. cua registers each provider under
+   * `{store}.{provider}` — `SocialLoginConfigId.toRegistrationId()` — and Spring Security's default
+   * callback path is `/login/oauth2/code/{registrationId}`. The host is the store's own storefront,
+   * which is the subdomain the domain section works out. See lessons.md, "Store management — a
+   * social login callback URL has to be assembled by the client".
+   */
+  private callbackUrl(store: ReadableMerchantStore, providerId: string): string {
+    const host = this.podTarget ? `https://${store.id}.${this.podTarget}` : '';
+    return `${host}/login/oauth2/code/${store.id}.${providerId.toLowerCase()}`;
   }
 
-  private mergeFixture(key: SettingsSectionKey, patch: SectionPatch): FixtureSections {
-    const current = this.fixture;
+  /**
+   * One card per payment type the platform declares, whether or not this store has configured it.
+   *
+   * `credentials` is `null` for the types whose `PaymentType.attrs` is empty — `COD` and
+   * `MANUAL_TRANSFER` are a switch and nothing else — and that list is the console's, because the
+   * attrs themselves are not on the wire. See lessons.md, "Store management — a payment type's
+   * required attributes are not served".
+   */
+  private paymentGateways(
+    types: readonly string[],
+    configs: readonly ReadablePaymentConfiguration[],
+  ): readonly PaymentGatewayConfig[] {
+    const stored = new Map(configs.map((config) => [config.paymentType, config]));
+    const known = types.length > 0 ? types : [...stored.keys()];
 
-    switch (key) {
-      case 'social-login':
-        return {
-          ...current,
-          socialLogin: current.socialLogin.map((config) => {
-            const slice = this.slice(patch[config.providerId]);
-            return {
-              ...config,
-              enabled: this.flag(slice['enabled'], config.enabled),
-              appId: this.text(slice['appId'], config.appId),
-            };
-          }),
-        };
+    return known.map((paymentType) => {
+      const config = stored.get(paymentType);
+      const carriesCredentials = !PAYMENT_TYPES_WITHOUT_CREDENTIALS.includes(paymentType);
+      return {
+        paymentType,
+        icon: isPaymentType(paymentType) ? PAYMENT_TYPE_ICON[paymentType] : 'creditCard',
+        enabled: config?.enabled ?? false,
+        credentials: carriesCredentials
+          ? {
+              apiKey: config?.apiKey ?? '',
+              secretKey: config?.secretKey ?? '',
+              webhookSecret: config?.webhookSecret ?? '',
+            }
+          : null,
+        configured: config !== undefined,
+      };
+    });
+  }
 
-      case 'payments':
-        return {
-          ...current,
-          payments: current.payments.map((gateway) => {
-            const slice = this.slice(patch[gateway.paymentType]);
-            return {
-              ...gateway,
-              enabled: this.flag(slice['enabled'], gateway.enabled),
-              credentials: gateway.credentials && {
-                ...gateway.credentials,
-                apiKey: this.text(slice['apiKey'], gateway.credentials.apiKey),
-              },
-            };
-          }),
-        };
+  /**
+   * The social-login save body.
+   *
+   * Every provider goes out, including the ones being turned off — the endpoint upserts what it is
+   * given and deletes nothing, so a provider left out of the list simply keeps whatever it had.
+   * `appId` and `appSecret` are never omitted: `APP_ID` and `APP_SECRET` are `nullable = false` and
+   * `saveConfigs` builds a fresh entity, so an absent field is a constraint violation the server
+   * answers as a 500.
+   */
+  private loginConfigsBody(patch: SectionPatch): PersistableSocialLoginConfig[] {
+    return Object.entries(patch).map(([providerId, raw]) => {
+      const slice = this.slice(raw);
+      return {
+        providerId,
+        appId: this.text(slice['appId'], ''),
+        appSecret: this.text(slice['appSecret'], ''),
+        enabled: this.flag(slice['enabled'], false),
+      };
+    });
+  }
 
-      case 'branding':
-      case 'slider':
-      case 'details':
-      case 'domain':
-      case 'social':
-      case 'home':
-        return current;
-    }
+  /**
+   * One write per gateway the operator changed, as create or update.
+   *
+   * Only the changed ones: sending all four would create empty rows for gateways the store has
+   * never configured, and an empty `COD` row is indistinguishable from a configured one afterwards.
+   * The comparison is against what the load returned, which is why the gateways are kept.
+   */
+  private paymentWrites(patch: SectionPatch): Observable<void>[] {
+    const stored = new Map(this.loadedPayments.map((config) => [config.paymentType, config]));
+
+    return Object.entries(patch).flatMap(([paymentType, raw]) => {
+      const slice = this.slice(raw);
+      const previous = stored.get(paymentType);
+      const body: PersistablePaymentConfiguration = {
+        paymentType,
+        enabled: this.flag(slice['enabled'], false),
+        apiKey: this.text(slice['apiKey'], ''),
+        secretKey: this.text(slice['secretKey'], ''),
+        webhookSecret: this.text(slice['webhookSecret'], ''),
+      };
+
+      if (!previous) {
+        // Never configured, and still nothing to say: creating an empty row would be noise.
+        const untouched =
+          !body.enabled && !body.apiKey && !body.secretKey && !body.webhookSecret;
+        return untouched ? [] : [this.payments.create(body)];
+      }
+      const unchanged =
+        previous.enabled === body.enabled &&
+        (previous.apiKey ?? '') === body.apiKey &&
+        (previous.secretKey ?? '') === body.secretKey &&
+        (previous.webhookSecret ?? '') === body.webhookSecret;
+      return unchanged ? [] : [this.payments.update(paymentType, body)];
+    });
   }
 
   private slice(raw: unknown): Readonly<Record<string, unknown>> {

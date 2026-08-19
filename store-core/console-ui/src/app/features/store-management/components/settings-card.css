@@ -416,3 +416,14 @@ app-field-error {
 .control:disabled:hover {
   border-color: var(--border-soft);
 }
+
+/*
+ * A message about a group rather than one control — `app-field-error` binds to a single control,
+ * and the credential rules read the switch as well as the fields. Same voice, same colour.
+ */
+.cross-field-error {
+  margin: 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}

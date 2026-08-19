@@ -5,7 +5,6 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ToastService} from '@shared/ui/toast/toast';
-import {STORE_SETTINGS} from '@mocks/store-settings.fixture';
 import type {
   DomainStatus,
   SettingsSectionKey,
@@ -21,7 +20,6 @@ import type {
  * to, so a change to that mapping has to be reflected here to keep the spec passing.
  */
 const SETTINGS: StoreSettings = {
-  ...STORE_SETTINGS,
   storeName: 'Acme Supply Co.',
   branding: {
     logo: {name: 'acme-logo.svg', url: null},
@@ -75,6 +73,36 @@ const SETTINGS: StoreSettings = {
   slides: [
     {priority: 0, name: 'b8f0-first', url: null},
     {priority: 1, name: 'c210-second', url: null},
+  ],
+  socialLogin: [
+    {
+      providerId: 'GOOGLE',
+      icon: 'google',
+      appId: '8841027-acme.apps.googleusercontent.com',
+      appSecret: 'gsec-4f2a',
+      callbackUrl: 'https://acme.example.io/login/oauth2/code/acme.google',
+      enabled: true,
+      configured: true,
+    },
+    {
+      providerId: 'GITHUB',
+      icon: 'github',
+      appId: '',
+      appSecret: '',
+      callbackUrl: 'https://acme.example.io/login/oauth2/code/acme.github',
+      enabled: false,
+      configured: false,
+    },
+  ],
+  payments: [
+    {
+      paymentType: 'STRIPE',
+      icon: 'creditCard',
+      enabled: true,
+      credentials: {apiKey: 'pk_live_51', secretKey: 'sk_live_7c31', webhookSecret: 'whsec_a0e5'},
+      configured: true,
+    },
+    {paymentType: 'COD', icon: 'dollar', enabled: false, credentials: null, configured: false},
   ],
   choices: {
     themes: ['BASIS', 'MODERN'],
@@ -189,6 +217,11 @@ class FakeStoreSettingsApi {
 
   nextVerify(outcome: DomainStatus): void {
     this.verifyOutcome = outcome;
+  }
+
+  /** Overrides part of the document before the page loads, for a state the default fixture lacks. */
+  settingsWith(overrides: Partial<StoreSettings>): void {
+    this.settings = {...this.settings, ...overrides};
   }
 
   resolve(value: StoreSettings = SETTINGS): void {
@@ -546,26 +579,98 @@ describe('StoreManagement', () => {
   it('collapses a gateway\'s credentials when it is switched off', fakeAsync(() => {
     const {fixture, element} = load('payments');
 
-    expect(element.querySelectorAll('.provider-body').length).toBe(2);
+    // Only Stripe is on, and only Stripe carries credentials — COD declares no attrs.
+    expect(element.querySelectorAll('.provider-body').length).toBe(1);
 
     const stripe = element.querySelector<HTMLButtonElement>('.provider-card [role="switch"]')!;
     stripe.click();
     settle(fixture);
 
-    expect(element.querySelectorAll('.provider-body').length).toBe(1);
+    expect(element.querySelectorAll('.provider-body').length).toBe(0);
   }));
 
-  it('never renders a stored secret, only what it ends with', fakeAsync(() => {
-    const {element} = load('payments');
+  it('masks a secret it has been given, and reveals it on request', fakeAsync(() => {
+    const {fixture, element} = load('payments');
 
-    const masks = Array.from(element.querySelectorAll('.secret .mask')).map(
-      (mask) => mask.textContent ?? '',
-    );
-    expect(masks.length).toBeGreaterThan(0);
-    for (const mask of masks) {
-      expect(mask).toContain('••••');
-    }
-    expect(element.querySelector('.secret input')).toBeNull();
+    /*
+     * The value is in the field because the API sends it decrypted; the mask is a courtesy against
+     * shoulder-surfing, not a claim that the console cannot see it. That is why this asserts on the
+     * host class rather than on the rendered characters — there is nothing to hide from the DOM.
+     */
+    const field = element.querySelector('app-secret-field')!;
+    expect(field.classList).toContain('masked');
+    expect(element.querySelector<HTMLInputElement>('#secret-key-STRIPE')!.value).toBe('sk_live_7c31');
+
+    field.querySelector<HTMLButtonElement>('.text-action')!.click();
+    settle(fixture);
+
+    expect(field.classList).not.toContain('masked');
+  }));
+
+  it('sends a gateway\'s credentials as an update when it already had a row', fakeAsync(() => {
+    const {fixture, element} = load('payments');
+
+    type(element, '#api-key-STRIPE', 'pk_live_rotated');
+    settle(fixture);
+    saveButton(element).click();
+    settle(fixture);
+
+    expect(api.saves[0].key).toBe('payments');
+    const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
+    expect(patch['STRIPE']['apiKey']).toBe('pk_live_rotated');
+    // Sent whole: the secret the operator did not touch still has to go, or PUT would blank it.
+    expect(patch['STRIPE']['secretKey']).toBe('sk_live_7c31');
+  }));
+
+  it('will not let an operator enable a login provider without its credentials', fakeAsync(() => {
+    const {fixture, element} = load('social-login');
+
+    // GitHub has never been configured, so turning it on leaves both fields empty.
+    const github = Array.from(
+      element.querySelectorAll<HTMLElement>('.provider-card'),
+    ).find((card) => card.textContent?.includes('GitHub'))!;
+    github.querySelector<HTMLButtonElement>('[role="switch"]')!.click();
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeTrue();
+    expect(github.querySelector('.cross-field-error')?.textContent).toContain('app ID');
+    expect(api.saves.length).toBe(0);
+
+    type(element, '#app-id-GITHUB', 'Iv1.acme');
+    type(element, '#app-secret-GITHUB', 'ghs_acme');
+    settle(fixture);
+
+    expect(saveButton(element).disabled).toBeFalse();
+    saveButton(element).click();
+    settle(fixture);
+
+    const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
+    expect(patch['GITHUB']['appId']).toBe('Iv1.acme');
+    // Every provider goes out, not only the one that changed — the endpoint upserts what it is given.
+    expect(patch['GOOGLE']['appSecret']).toBe('gsec-4f2a');
+  }));
+
+  it('reports a provider that arrived broken without blocking the rest of the section', fakeAsync(() => {
+    api.settingsWith({
+      socialLogin: SETTINGS.socialLogin.map((config) =>
+        config.providerId === 'GOOGLE' ? {...config, appId: ''} : config,
+      ),
+    });
+    const {fixture, element} = load('social-login');
+
+    /*
+     * A credential written before encryption reads back as nothing, so stores genuinely load in
+     * this state. Saying so is right; refusing every other edit on the page because of it is not.
+     */
+    const google = Array.from(
+      element.querySelectorAll<HTMLElement>('.provider-card'),
+    ).find((card) => card.textContent?.includes('Google'))!;
+    expect(google.querySelector('.cross-field-error')).not.toBeNull();
+
+    type(element, '#app-secret-GOOGLE', 'gsec-rotated');
+    settle(fixture);
+    // Touched now, so the rule bites — but only because the operator went near it.
+    expect(saveButton(element).disabled).toBeTrue();
   }));
 
   it('accepts a stored social link that carries its scheme', fakeAsync(() => {

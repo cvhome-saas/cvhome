@@ -1,19 +1,19 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Badge} from '@shared/ui/badge/badge';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
-import {ToastService} from '@shared/ui/toast/toast';
+import {SecretField} from '@shared/ui/secret-field/secret-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {
   GATEWAY_STATE_TAG,
   PAYMENT_TYPE_DESCRIPTION_KEY,
   PAYMENT_TYPE_LABEL_KEY,
+  isPaymentType,
   type PaymentGatewayConfig,
-  type SecretHint,
 } from '@models/store-settings';
 import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form.service';
 
@@ -24,12 +24,16 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
  * `attrs`, so `COD` and `MANUAL_TRANSFER` are a switch and nothing more. The mockup's Tap
  * Payments row is gone — the enum has no member for it.
  *
- * Neither secret is ever shown. Both are encrypted at rest and never returned, so each field
- * states what is on record and offers the one action that can change it.
+ * Both secrets **are** shown, behind a reveal toggle. They are encrypted at rest and
+ * `PaymentConfigurationMapper.toDTO` decrypts all three fields before serialising, so the browser
+ * already holds the live Stripe secret key by the time this renders — masking it as unknowable
+ * would be theatre, and would leave an operator unable to check a key they can read in the network
+ * tab. See lessons.md, "Store management — payment and social-login reads return secrets in
+ * cleartext".
  */
 @Component({
   selector: 'app-payments-section',
-  imports: [Badge, Icon, NoticeBar, Panel, ReactiveFormsModule, Toggle, TranslocoDirective],
+  imports: [Badge, Icon, NoticeBar, Panel, ReactiveFormsModule, SecretField, Toggle, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.payments.title')"
@@ -52,12 +56,12 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
             <div class="provider-head">
               <app-icon [name]="gateway.icon" />
               <span class="provider-name">
-                <strong>{{ t(labelKeyOf(gateway)) }}</strong>
-                <small>{{ t(descriptionKeyOf(gateway)) }}</small>
+                <strong>{{ labelOf(gateway, t) }}</strong>
+                <small>{{ descriptionOf(gateway, t) }}</small>
               </span>
               <app-badge [tone]="tagOf(on).tone" shape="square">{{ t(tagOf(on).labelKey) }}</app-badge>
               <app-toggle
-                [name]="t('storeSettings.payments.accept', {gateway: t(labelKeyOf(gateway))})"
+                [name]="t('storeSettings.payments.accept', {gateway: labelOf(gateway, t)})"
                 [checked]="on"
                 (checkedChange)="setFlag(group.controls.enabled, $event)"
               />
@@ -80,38 +84,45 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
                 </div>
 
                 <div class="field">
-                  <p class="field-label">{{ t('storeSettings.payments.secretKey') }}</p>
-                  <span class="control secret">
-                    <app-icon name="lock" />
-                    <span class="mask">{{ maskOf(credentials.secretKey, t) }}</span>
-                    <button
-                      class="text-action"
-                      type="button"
-                      (click)="notSupported(t('storeSettings.payments.rotatingSecret', {gateway: t(labelKeyOf(gateway))}))"
-                    >
-                      {{ t('storeSettings.payments.rotate') }}
-                    </button>
-                  </span>
-                  <p class="field-hint">{{ rotatedOf(credentials.secretKey, t) }}</p>
+                  <label [attr.for]="'secret-key-' + gateway.paymentType">
+                    {{ t('storeSettings.payments.secretKey') }}
+                  </label>
+                  <app-secret-field
+                    [label]="t('storeSettings.payments.secretKey')"
+                    [value]="group.controls.secretKey.value"
+                  >
+                    <input
+                      [id]="'secret-key-' + gateway.paymentType"
+                      type="text"
+                      autocomplete="off"
+                      formControlName="secretKey"
+                    />
+                  </app-secret-field>
                 </div>
 
                 <div class="field field-wide">
-                  <p class="field-label">{{ t('storeSettings.payments.webhookSecret') }}</p>
-                  <span class="control secret">
-                    <app-icon name="lock" />
-                    <span class="mask">{{ maskOf(credentials.webhookSecret, t) }}</span>
-                    <button
-                      class="text-action"
-                      type="button"
-                      (click)="notSupported(t('storeSettings.payments.replacingWebhookSecret', {gateway: t(labelKeyOf(gateway))}))"
-                    >
-                      {{ t('storeSettings.socialLogin.replace') }}
-                    </button>
-                  </span>
-                  <p class="field-hint endpoint">
-                    <app-icon name="link" />
-                    {{ t('storeSettings.payments.endpoint', {url: credentials.webhookUrl}) }}
-                  </p>
+                  <label [attr.for]="'webhook-secret-' + gateway.paymentType">
+                    {{ t('storeSettings.payments.webhookSecret') }}
+                  </label>
+                  <app-secret-field
+                    [label]="t('storeSettings.payments.webhookSecret')"
+                    [value]="group.controls.webhookSecret.value"
+                  >
+                    <input
+                      [id]="'webhook-secret-' + gateway.paymentType"
+                      type="text"
+                      autocomplete="off"
+                      formControlName="webhookSecret"
+                    />
+                  </app-secret-field>
+                  <!--
+                    No endpoint line. The mockup printed a webhook URL per gateway and nothing on
+                    the platform records or derives one, so it was a made-up address an operator
+                    might have pasted into Stripe.
+                    TODO(lessons.md): see lessons.md, "Store management — a gateway has no webhook
+                    URL to show".
+                  -->
+                  <p class="field-hint">{{ t('storeSettings.payments.webhookSecretHint') }}</p>
                 </div>
               </div>
               }
@@ -124,18 +135,20 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
   styleUrls: ['../settings-card.css', './payments-section.css'],
 })
 export class PaymentsSection {
-  private readonly toast = inject(ToastService);
-  private readonly transloco = inject(TranslocoService);
-
   readonly form = input.required<PaymentsForm>();
   readonly gateways = input.required<readonly PaymentGatewayConfig[]>();
 
-  protected labelKeyOf(gateway: PaymentGatewayConfig): string {
-    return PAYMENT_TYPE_LABEL_KEY[gateway.paymentType];
+  /** Real copy for a gateway the console knows; the server's own token for one it does not. */
+  protected labelOf(gateway: PaymentGatewayConfig, t: (key: string) => string): string {
+    return isPaymentType(gateway.paymentType)
+      ? t(PAYMENT_TYPE_LABEL_KEY[gateway.paymentType])
+      : gateway.paymentType;
   }
 
-  protected descriptionKeyOf(gateway: PaymentGatewayConfig): string {
-    return PAYMENT_TYPE_DESCRIPTION_KEY[gateway.paymentType];
+  protected descriptionOf(gateway: PaymentGatewayConfig, t: (key: string) => string): string {
+    return isPaymentType(gateway.paymentType)
+      ? t(PAYMENT_TYPE_DESCRIPTION_KEY[gateway.paymentType])
+      : t('storeSettings.payments.unknownGateway');
   }
 
   protected groupOf(paymentType: string): GatewayForm {
@@ -146,24 +159,8 @@ export class PaymentsSection {
     return enabled ? GATEWAY_STATE_TAG.on : GATEWAY_STATE_TAG.off;
   }
 
-  protected maskOf(secret: SecretHint, t: (key: string, params?: Record<string, unknown>) => string): string {
-    return secret.endsWith
-      ? t('storeSettings.secret.endsWith', {last4: secret.endsWith})
-      : t('storeSettings.secret.notSet');
-  }
-
-  protected rotatedOf(secret: SecretHint, t: (key: string, params?: Record<string, unknown>) => string): string {
-    return secret.lastRotated
-      ? t('storeSettings.secret.lastRotated', {date: secret.lastRotated})
-      : t('storeSettings.secret.neverStored');
-  }
-
   protected setFlag(control: FormControl<boolean>, value: boolean): void {
     control.setValue(value);
     control.markAsDirty();
-  }
-
-  protected notSupported(what: string): void {
-    this.toast.info(this.transloco.translate('storeSettings.notAvailable', {what}));
   }
 }
