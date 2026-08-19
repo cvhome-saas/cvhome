@@ -10,6 +10,7 @@ import {Panel} from '@shared/ui/panel/panel';
 import {
   DOMAIN_STATUS_COPY,
   DOMAIN_STATUS_TONE,
+  bareHostname,
   type DnsRecord,
   type DomainStatus,
   type StoreDomain,
@@ -43,7 +44,13 @@ import type {DomainForm} from '../../services/store-settings-form.service';
         <div class="info-row">
           <app-icon name="globe" />
           <span class="info-copy">
-            <strong dir="ltr">{{ subdomain() || t('storeSettings.domain.subdomainUnknown') }}</strong>
+            <!--
+              No dir="ltr" here, and that is the point. It orders the characters correctly but also
+              takes the element's alignment with it, so in an Arabic page the hostname jumped to the
+              left edge of the row while the caption under it stayed on the right. The CSS uses
+              unicode-bidi: plaintext instead: Latin-ordered text, page-aligned box.
+            -->
+            <strong>{{ subdomain() || t('storeSettings.domain.subdomainUnknown') }}</strong>
             <small>{{ t('storeSettings.domain.defaultSubdomain') }}</small>
           </span>
           @if (subdomain()) {
@@ -61,7 +68,7 @@ import type {DomainForm} from '../../services/store-settings-form.service';
               <div class="info-row domain-row">
                 <app-icon name="link" />
                 <span class="info-copy">
-                  <strong dir="ltr">{{ entry.domain }}</strong>
+                  <strong>{{ entry.domain }}</strong>
                   <small>{{ t(copyOf(entry).metaKey) }}</small>
                 </span>
 
@@ -73,7 +80,12 @@ import type {DomainForm} from '../../services/store-settings-form.service';
                   [disabled]="checking() !== null"
                   (click)="verify.emit(entry.domain)"
                 >
-                  {{ checking() === entry.domain ? t('storeSettings.domain.checkingNow') : t('storeSettings.domain.check') }}
+                  @if (checking() === entry.domain) {
+                    <span class="spinner" aria-hidden="true"></span>
+                    {{ t('storeSettings.domain.checkingNow') }}
+                  } @else {
+                    {{ t('storeSettings.domain.check') }}
+                  }
                 </button>
 
                 <a class="icon-action" [href]="'https://' + entry.domain" target="_blank" rel="noopener"
@@ -100,17 +112,36 @@ import type {DomainForm} from '../../services/store-settings-form.service';
         <div class="field">
           <label for="custom-domain">{{ t('storeSettings.domain.addCustomDomain') }}</label>
           <div class="domain-row">
-            <span class="control" [class.invalid]="domainInvalid()">
+            <!--
+              The direction is set on the wrapper, not just the input: the scheme and the host are
+              one Latin string read left to right, and in an Arabic page an RTL flex row put the
+              prefix after the field and reordered it into a mangled //:https.
+            -->
+            <span class="control host" dir="ltr" [class.invalid]="domainInvalid()">
               <span class="scheme">{{ scheme }}</span>
-              <input id="custom-domain" type="text" formControlName="customDomain" dir="ltr" />
+              <input
+                id="custom-domain"
+                type="text"
+                formControlName="customDomain"
+                [attr.inputmode]="'url'"
+                [attr.autocapitalize]="'none'"
+                [attr.spellcheck]="'false'"
+                [placeholder]="exampleDomain"
+                (input)="onDomainInput($event)"
+              />
             </span>
             <button
               class="ghost-action"
               type="button"
-              [disabled]="checking() !== null"
+              [disabled]="!canCheckTyped()"
               (click)="verify.emit(typed())"
             >
-              {{ t('storeSettings.domain.checkDns') }}
+              @if (checking() === typed()) {
+                <span class="spinner" aria-hidden="true"></span>
+                {{ t('storeSettings.domain.checkingNow') }}
+              } @else {
+                {{ t('storeSettings.domain.checkDns') }}
+              }
             </button>
           </div>
           <p class="field-hint">{{ t('storeSettings.domain.addHint') }}</p>
@@ -140,7 +171,12 @@ import type {DomainForm} from '../../services/store-settings-form.service';
               </div>
               <div class="dns-row">
                 <strong>{{ dns.type }}</strong>
-                <span dir="ltr">{{ dns.name }}</span>
+                <!--
+                  Monospace suits a hostname and does not suit Arabic — the fallback face breaks the
+                  joins and "نطاقك" comes out as loose letters. The placeholder is prose, so it opts
+                  out of the row's face; a real hostname keeps it.
+                -->
+                <span [class.awaiting]="!typed()">{{ dns.name }}</span>
                 <app-copy-field [value]="dns.value" [label]="t('storeSettings.domain.dnsValue')" />
               </div>
             </div>
@@ -159,8 +195,10 @@ import type {DomainForm} from '../../services/store-settings-form.service';
   styleUrls: ['../settings-card.css', './domain-section.css'],
 })
 export class DomainSection {
-  // A URL scheme, not language-dependent text.
+  // A URL scheme and an example host: neither is language-dependent text, so neither is translated.
   protected readonly scheme = 'https://';
+
+  protected readonly exampleDomain = 'shop.example.com';
 
   readonly form = input.required<DomainForm>();
   readonly subdomain = input.required<string>();
@@ -188,6 +226,27 @@ export class DomainSection {
 
   protected statusCopy(status: DomainStatus) {
     return DOMAIN_STATUS_COPY[status];
+  }
+
+  /**
+   * Keeps the field to a hostname.
+   *
+   * Operators paste out of the address bar, and `https://shop.example.com/` is not something a CNAME
+   * can be named after. Normalising as they type means the DNS record below always shows the host it
+   * will actually be for, rather than showing a URL and rejecting it a moment later.
+   */
+  protected onDomainInput(event: Event): void {
+    const control = this.form().controls.customDomain;
+    const cleaned = bareHostname((event.target as HTMLInputElement).value);
+    if (cleaned !== control.value) {
+      control.setValue(cleaned);
+      control.markAsDirty();
+    }
+  }
+
+  /** A lookup is worth making only for something that could be a hostname. */
+  protected canCheckTyped(): boolean {
+    return this.checking() === null && this.typed().length > 0 && this.form().controls.customDomain.valid;
   }
 
   /**

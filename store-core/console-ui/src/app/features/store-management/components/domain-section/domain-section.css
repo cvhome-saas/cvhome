@@ -173,3 +173,94 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+
+/* ---- Bidi and the host field --------------------------------------------------------------- */
+
+/*
+ * A hostname is one Latin string, whatever language the console is in.
+ *
+ * `dir="ltr"` on the wrapper puts the scheme before the field and stops the RTL algorithm
+ * reordering `https://` into `//:https`, and `text-align: left` keeps the caret where a reader of
+ * that string expects it — direction alone leaves the text hugging the right edge of the box.
+ */
+.control.host {
+  direction: ltr;
+  text-align: left;
+}
+
+/*
+ * A hostname inside an Arabic page: Latin-ordered, but still where the page puts everything else.
+ *
+ * `isolate` rather than `plaintext`, and the difference is the whole fix. Both order the characters
+ * correctly, but `plaintext` (like `dir="ltr"`) also re-resolves the *paragraph* direction from the
+ * content, which takes alignment with it — the hostname jumped to the left edge of the row while the
+ * Arabic caption directly under it stayed on the right, so one row read in two directions. `isolate`
+ * keeps the element's inherited RTL direction, so the box still starts on the right, and only seals
+ * the Latin run off from the text around it. The order screens use `plaintext` because addresses
+ * there are a whole column of mixed-language lines, each of which should own its alignment; a
+ * hostname is one field in a row, and the row owns it.
+ */
+.info-row .info-copy strong,
+.dns-row span {
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+/* The "your domain" stand-in, before one has been typed: prose, not a hostname. */
+.dns-row .awaiting {
+  color: var(--foreground-subtle);
+  font-family: var(--font-sans);
+}
+
+/* ---- The check in flight ------------------------------------------------------------------- */
+
+/*
+ * A DNS lookup goes out to a public resolver and back, which is long enough to look like nothing
+ * happened. The button says what it is doing and spins while it does it, and is the only control
+ * that changes — a whole-page veil for one field would be worse than no feedback.
+ */
+.spinner {
+  flex: none;
+  inline-size: 0.7rem;
+  block-size: 0.7rem;
+  border: 2px solid currentColor;
+  border-block-start-color: transparent;
+  border-radius: 50%;
+  animation: domain-spin 0.7s linear infinite;
+}
+
+@keyframes domain-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * The verdict arrives in place of nothing, so it moves in rather than appearing — the one moment on
+ * this page where something happened that the operator did not do themselves. Held to a short slide
+ * because it lands under the field they are still looking at. Global `prefers-reduced-motion` in
+ * `styles.css` turns it off.
+ */
+.status {
+  animation: domain-verdict 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes domain-verdict {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Each allocated domain settles in on load, in the order they are listed. */
+.domain-row.info-row {
+  animation: domain-row-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes domain-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}

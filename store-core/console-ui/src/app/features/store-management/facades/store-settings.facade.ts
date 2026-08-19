@@ -1,5 +1,6 @@
 import {DestroyRef, Injectable, computed, effect, inject, linkedSignal, signal, untracked} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {forkJoin, map, timer} from 'rxjs';
 import {FormGroup} from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
 
@@ -38,6 +39,9 @@ import {
  * component, because *Save changes* sits in the page header while the fields it saves are in
  * a section component several levels down — one owner, reachable from both.
  */
+/** How long the "Checking…" state stays up, however fast the resolver is. */
+const CHECK_MIN_VISIBLE_MS = 400;
+
 @Injectable({providedIn: 'root'})
 export class StoreSettingsFacade {
   private readonly api = inject(StoreSettingsApi);
@@ -142,12 +146,22 @@ export class StoreSettingsFacade {
    */
   readonly customDomainRecord = computed<DnsRecord | null>(() => {
     this.formEvent();
+    /*
+     * `activeLang()` is a dependency, not decoration: the placeholder name is translated, and a
+     * `computed` that calls `translate()` without tracking the language keeps whatever it resolved
+     * on first evaluation — the record read "your domain" in the middle of an Arabic page.
+     */
+    this.transloco.activeLang();
     const target = this.loaded()?.podTarget;
     const typed = this.form.controls.domain.controls.customDomain.value.trim();
     if (!target) {
       return null;
     }
-    return {type: 'CNAME', name: typed || this.transloco.translate('storeSettings.domain.yourDomain'), value: target};
+    return {
+      type: 'CNAME',
+      name: typed || this.transloco.translate('storeSettings.domain.yourDomain'),
+      value: target,
+    };
   });
 
   /** `Store · domain`, under the page title. */
@@ -331,9 +345,20 @@ export class StoreSettingsFacade {
     this.checkingDomain.set(hostname);
     this.setDomainStatus(hostname, 'checking');
 
-    this.api
-      .verifyDomain(hostname)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    /*
+     * Held for a beat. A DoH lookup usually answers in under 30ms, which is faster than the eye
+     * reads a label — the button flashed "Checking…" and was back before anyone saw it, so a check
+     * that ran and a click that missed looked identical. `forkJoin` with a timer makes the busy
+     * state legible without making the answer any later than it already is.
+     */
+    forkJoin({
+      status: this.api.verifyDomain(hostname),
+      _visible: timer(CHECK_MIN_VISIBLE_MS),
+    })
+      .pipe(
+        map((answer) => answer.status),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (status) => {
           this.checkingDomain.set(null);

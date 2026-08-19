@@ -447,6 +447,29 @@ export const CUSTOM_DOMAIN_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,}$/;
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
+ * A pasted address reduced to the host a DNS record is actually about.
+ *
+ * `https://Shop.Example.com/collections/new` is what an operator copies out of the address bar, and
+ * `shop.example.com` is the only part a CNAME can carry — a record named after a URL is not a record.
+ * Rather than rejecting the paste and making them edit it, the field takes what they gave and keeps
+ * the part that means something: scheme, credentials, port, path, query and fragment all go, and the
+ * host is lowercased because DNS is case-insensitive and a mixed-case host looks like a typo.
+ *
+ * Deliberately not a validator. `CUSTOM_DOMAIN_PATTERN` still has to pass afterwards — this only
+ * removes what is unambiguous, so `not a domain` stays wrong rather than being quietly mangled into
+ * something that looks right.
+ */
+export function bareHostname(value: string): string {
+  return value
+    .trim()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
+    .replace(/^[^/@]*@/, '')
+    .split(/[/?#]/)[0]
+    .replace(/:\d+$/, '')
+    .toLowerCase();
+}
+
+/**
  * A phone number the console will accept.
  *
  * Deliberately permissive: an optional leading `+`, then digits with spaces, hyphens, dots and

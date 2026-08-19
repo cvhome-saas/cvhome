@@ -332,7 +332,7 @@
     "discard": "Discard",
     "domain": {
       "addCustomDomain": "Add a custom domain",
-      "addHint": "Point the domain at us with the record below, then save to add it. A domain can be added before DNS resolves.",
+      "addHint": "Paste or type the domain — we keep just the host name. Point it at us with the record below, then save to add it.",
       "check": "Check DNS",
       "checkDns": "Check DNS",
       "checkFailed": "Could not reach the DNS resolver, so the record could not be checked.",
@@ -354,7 +354,7 @@
         "meta": "record found",
         "body": "A CNAME exists for {domain} but points elsewhere. Correct it to the value below and check again."
       },
-      "fallback": "Enter a bare host name, like shop.example.com — no https:// and no trailing slash.",
+      "fallback": "That does not look like a host name. Use something like shop.example.com.",
       "noTarget": "The address to point your domain at is not available for this store, so the DNS record cannot be shown.",
       "open": "Open",
       "openNamed": "Open {domain} in a new tab",

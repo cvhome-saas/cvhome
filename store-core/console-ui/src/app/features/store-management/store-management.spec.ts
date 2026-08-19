@@ -351,19 +351,32 @@ describe('StoreManagement', () => {
     expect(api.saves.length).toBe(0);
   }));
 
-  it('rejects a custom domain carrying a protocol or a path', fakeAsync(() => {
+  it('keeps the host name out of a pasted URL rather than rejecting it', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
-    type(element, '#custom-domain', 'https://foo/');
+    // What an operator actually pastes out of the address bar.
+    type(element, '#custom-domain', 'https://Shop.Example.com:8443/collections/new?a=1');
+    settle(fixture);
+
+    expect(element.querySelector<HTMLInputElement>('#custom-domain')!.value).toBe(
+      'shop.example.com',
+    );
+    // The DNS record follows the field, so it names the host the CNAME will be for.
+    expect(element.querySelectorAll('.dns-row > *')[1].textContent?.trim()).toBe(
+      'shop.example.com',
+    );
+    expect(saveButton(element).disabled).toBeFalse();
+  }));
+
+  it('still refuses something that is not a host name at all', fakeAsync(() => {
+    const {fixture, element} = load('domain');
+
+    type(element, '#custom-domain', 'not a domain');
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeTrue();
-    expect(element.querySelector('app-field-error')?.textContent).toContain('bare host name');
-
-    type(element, '#custom-domain', 'shop.example.com');
-    settle(fixture);
-
-    expect(saveButton(element).disabled).toBeFalse();
+    expect(checkButton(element).disabled).toBeTrue();
+    expect(element.querySelector('app-field-error')?.textContent).toContain('host name');
   }));
 
   it('flips a toggle and marks the section dirty', fakeAsync(() => {
@@ -548,6 +561,9 @@ describe('StoreManagement', () => {
     type(element, '#custom-domain', 'shop.acmesupply.co');
     settle(fixture);
     checkButton(element).click();
+    // The busy state is held for a beat so it is legible; the verdict lands after it.
+    settle(fixture);
+    tick(400);
     settle(fixture);
 
     expect(api.verified).toEqual(['shop.acmesupply.co']);
@@ -564,6 +580,8 @@ describe('StoreManagement', () => {
     type(element, '#custom-domain', 'shop.acmesupply.co');
     settle(fixture);
     checkButton(element).click();
+    settle(fixture);
+    tick(400);
     settle(fixture);
 
     expect(element.querySelector('.status-head strong')?.textContent?.trim()).toBe('Not checked');
