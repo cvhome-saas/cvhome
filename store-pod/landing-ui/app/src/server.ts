@@ -80,7 +80,3 @@ async function start(): Promise<void> {
 }
 
 void start();
-
-app.listen(port, () => {
-    console.log(`✅ Store Front running on http://localhost:${port} env: ${env}`);
-});
