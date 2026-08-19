@@ -9,7 +9,7 @@ const dir = process.cwd();
 const THEME_HEADER_NAME = 'theme';
 const DEFAULT_THEME_NAME = 'basis';
 const env: string = process.env.NODE_ENV || "development";
-
+import { syncStaticAssets } from "./static-assets-sync";
 // Express app setup
 const app = express();
 
@@ -59,6 +59,27 @@ app.get(/(.*)/, async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 });
+
+async function start(): Promise<void> {
+    try {
+        await syncStaticAssets();
+
+        app.listen(port, () => {
+            console.log(
+                `✅ Store Front running on http://localhost:${port} env: ${env}`,
+            );
+        });
+    } catch (error) {
+        console.error(
+            "❌ Store Front startup failed",
+            error,
+        );
+
+        process.exit(1);
+    }
+}
+
+void start();
 
 app.listen(port, () => {
     console.log(`✅ Store Front running on http://localhost:${port} env: ${env}`);

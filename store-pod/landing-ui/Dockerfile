@@ -12,6 +12,7 @@ RUN npm i --omit=dev \
   react@19.2.0 \
   react-dom@19.2.0 \
   next-intl@4.4.0 \
+  @aws-sdk/client-s3@3.1113.0 \
   @vercel/otel@2.1.0 \
   @opentelemetry/sdk-node@0.208.0 \
   @opentelemetry/api@1.9.0 \
