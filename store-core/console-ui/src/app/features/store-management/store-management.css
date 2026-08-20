@@ -20,11 +20,23 @@
   container: settings / inline-size;
 }
 
+/*
+ * The rail's column is the thing that animates.
+ *
+ * `grid-template-columns` is interpolable when both sides are lengths, so folding the rail is one
+ * transition on the container rather than a width on the rail and a reflow everything else has to
+ * follow. The card widens into the space in the same motion, which is the point of folding it.
+ */
 .settings-layout {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
+  transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.settings-layout.rail-collapsed {
+  grid-template-columns: 3.4rem minmax(0, 1fr);
 }
 
 .settings-section {

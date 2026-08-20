@@ -6,6 +6,8 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {DOCUMENT} from '@angular/common';
 
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
+
 import {ApiErrorService} from '@core/errors/api-error.service';
 import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
 import {LocaleService} from '@core/i18n/locale.service';
@@ -42,6 +44,9 @@ import {
 /** How long the "Checking…" state stays up, however fast the resolver is. */
 const CHECK_MIN_VISIBLE_MS = 400;
 
+/** The same, for an upload — long enough that the well's spinner and its tick both register. */
+const UPLOAD_MIN_VISIBLE_MS = 600;
+
 @Injectable({providedIn: 'root'})
 export class StoreSettingsFacade {
   private readonly api = inject(StoreSettingsApi);
@@ -49,6 +54,7 @@ export class StoreSettingsFacade {
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly locale = inject(LocaleService);
+  private readonly shell = inject(ConsoleShellFacade);
   private readonly reference = inject(ReferenceDataService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly transloco = inject(TranslocoService);
@@ -108,7 +114,20 @@ export class StoreSettingsFacade {
    */
   readonly dnsCheckUnavailable = this.formService.dnsCheckUnavailable;
 
-  private readonly snapshot = rxResource({stream: () => this.api.loadSettings()});
+  /**
+   * The settings document, keyed by the store it belongs to.
+   *
+   * `params` is not decoration. Without it the resource loads once and never again, so switching
+   * stores from the rail left the whole page showing the previous store's settings — its domains,
+   * its landing copy, its gateway secrets — under the new store's name in the request context. The
+   * next save would then have written those values onto the other store. The dashboard already
+   * keys its resource this way and says why: a page that keeps one store's data under another
+   * store's name is the worst kind of wrong, because it looks fine.
+   */
+  private readonly snapshot = rxResource({
+    params: () => this.shell.currentStoreId() ?? undefined,
+    stream: () => this.api.loadSettings(),
+  });
 
   /**
    * The last document that loaded successfully.
@@ -312,8 +331,18 @@ export class StoreSettingsFacade {
     }
     this.uploading.set(kind);
 
+    /*
+     * Held for a beat, the same way the DNS check is. A small image on a local pod round-trips
+     * faster than the eye registers a spinner, so without this the well flickered and an operator
+     * could not tell an upload that ran from a click that missed.
+     */
     const request = kind === 'logo' ? this.api.uploadLogo(file) : this.api.uploadBanner(file);
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    forkJoin({settings: request, _visible: timer(UPLOAD_MIN_VISIBLE_MS)})
+      .pipe(
+        map((answer) => answer.settings),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (settings) => {
         this.uploading.set(null);
         this.snapshot.set(settings);
@@ -463,9 +492,11 @@ export class StoreSettingsFacade {
     }
     this.uploading.set('slide');
 
-    this.api
-      .addSlide(file)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    forkJoin({settings: this.api.addSlide(file), _visible: timer(UPLOAD_MIN_VISIBLE_MS)})
+      .pipe(
+        map((answer) => answer.settings),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (settings) => {
           this.uploading.set(null);

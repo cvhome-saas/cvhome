@@ -2,7 +2,7 @@ import {Component, computed, input, output, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {ImageBroken} from '@shared/directives/image-loaded';
-import {FileDrop} from '@shared/ui/file-drop/file-drop';
+import {ImagePicker, type ImageRules} from '@shared/ui/image-picker/image-picker';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
 import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
@@ -27,7 +27,7 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
  */
 @Component({
   selector: 'app-slider-section',
-  imports: [FileDrop, Icon, ImageBroken, Panel, TranslocoDirective],
+  imports: [Icon, ImageBroken, ImagePicker, Panel, TranslocoDirective],
   template: `
     <app-panel [title]="t('storeSettings.slider.title')" [subtitle]="subtitle(t)" *transloco="let t">
       <div class="section-body slides">
@@ -88,14 +88,19 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
         }
 
         @if (hasRoom()) {
-          <app-file-drop
+          <!--
+            The same well the branding assets use, at the carousel's proportions. It carries the
+            checks with it: a slide that is the wrong shape or too small for a hero never becomes a
+            multipart POST, and the well itself reports the upload rather than a toast at the far
+            corner of the page.
+          -->
+          <app-image-picker
+            class="add-slide"
             [label]="t('storeSettings.slider.dropImages')"
-            [hint]="t('storeSettings.slider.hint', {capacity})"
-            (filesSelected)="add($event)"
+            [rules]="slideRules"
+            [busy]="uploading()"
+            (picked)="picked.emit($event)"
           />
-          @if (uploading()) {
-            <p class="slot-busy" role="status">{{ t('storeSettings.slider.uploading') }}</p>
-          }
         } @else {
           <p class="slots-full">
             {{ t('storeSettings.slider.slotsFull', {capacity}) }}
@@ -117,6 +122,22 @@ export class SliderSection {
   readonly reordered = output<{slides: readonly SliderSlide[]; messageKey: string}>();
 
   protected readonly capacity = SLIDER_CAPACITY;
+
+  /**
+   * What a slide has to be.
+   *
+   * 1600×640 is the carousel's own frame, and 2.5:1 is the shape a hero crop has to be to survive
+   * it. A portrait photograph dropped here would be cropped to a band across its middle, which is
+   * the kind of thing nobody notices until it is on the storefront.
+   */
+  protected readonly slideRules: ImageRules = {
+    accept: 'image/jpeg,image/png',
+    maxBytes: 5 * 1024 * 1024,
+    minWidth: 1200,
+    minHeight: 480,
+    aspect: 2.5,
+    aspectTolerance: 0.35,
+  };
 
   /** Slides whose image would not load. Keyed by name, so a reorder does not resurrect a broken one. */
   protected readonly broken = signal<ReadonlySet<string>>(new Set());
@@ -165,11 +186,4 @@ export class SliderSection {
     this.reordered.emit({slides: next, messageKey: 'storeSettings.slider.deleted'});
   }
 
-  /** One at a time: the endpoint takes a single file and the pod answers with the name it gave it. */
-  protected add(files: readonly File[]): void {
-    const file = files[0];
-    if (file) {
-      this.picked.emit(file);
-    }
-  }
 }

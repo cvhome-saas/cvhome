@@ -87,12 +87,6 @@
   white-space: nowrap;
 }
 
-.slot-busy {
-  margin: 0;
-  color: var(--foreground-subtle);
-  font-size: var(--text-2xs);
-}
-
 .icon-action:disabled {
   color: var(--foreground-subtle);
   cursor: not-allowed;
@@ -130,4 +124,13 @@
     flex-basis: 100%;
     order: 3;
   }
+}
+
+/*
+ * The add well is one more slot in the list, so it is held to a slide row's height rather than
+ * spanning the card at its full 2.5:1 — a hero-sized dashed rectangle under five compact rows read
+ * as a different page.
+ */
+.add-slide {
+  max-inline-size: 26rem;
 }

@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
@@ -57,6 +57,16 @@ export class StoreManagement {
   private readonly transloco = inject(TranslocoService);
 
   protected readonly facade = inject(StoreSettingsFacade);
+
+  /**
+   * Whether the settings rail is folded to icons.
+   *
+   * Held here rather than in the rail because the width it animates is a column of *this* grid —
+   * the rail decides, the page lays out. Not persisted: it is a working-posture choice for the
+   * session, and nothing on the platform stores operator preferences (see lessons.md, "Shell — no
+   * user-preferences endpoint").
+   */
+  protected readonly railCollapsed = signal(false);
 
   /** The `:section` route param. Bound by the router, not read from `ActivatedRoute`. */
   readonly section = input.required<SettingsSectionKey>();

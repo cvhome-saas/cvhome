@@ -45,44 +45,90 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
       />
 
       <div class="section-body" id="home-copy" [formGroup]="copy()">
-        <div class="field">
-          <!--
-            Not required. A storefront publishes in several languages and a seller fills them in
-            over time; demanding a headline in every one would make the section unsavable until the
-            last translation arrived. A language with no title is marked empty on the track instead.
-          -->
-          <label for="home-title">{{ t('storeSettings.home.landingTitle') }}</label>
-          <input id="home-title" class="control" type="text" formControlName="title" />
-          <p class="field-foot">
-            <span>{{ t('storeSettings.home.landingTitleHint') }}</span>
-            <span class="counter">{{ titleLength() }}/{{ titleMax }}</span>
-          </p>
-          <app-field-error [control]="title()" [fallback]="t('storeSettings.home.landingTitleFallback')" />
-          <!--
-            The rule reads three controls, so it lives on the group — but the field to fix is this
-            one, so the message sits under it. A description with no name cannot be stored at all.
-          -->
-          @if (needsTitle()) {
-            <p class="cross-field-error" role="alert">{{ t('storeSettings.home.titleForCopy') }}</p>
-          }
-        </div>
+        <!--
+          One authoring surface, not three form controls.
+          
+          The headline, the body and the search snippet are the parts of a single page, so they are
+          drawn as one bordered sheet with hairline rules between them rather than as a stack of
+          grey slabs. Each field is transparent and borderless — the sheet carries the frame — and
+          the headline is set at headline size, because it is the H1 the visitor will read. What an
+          operator is looking at is the page taking shape, which is what the section is for.
+        -->
+        <div class="composer">
+          <div class="row title-row">
+            <label for="home-title">{{ t('storeSettings.home.landingTitle') }}</label>
+            <!--
+              Not required. A storefront publishes in several languages and a seller fills them in
+              over time; demanding a headline in every one would make the section unsavable until
+              the last translation arrived. A language with no title is marked empty on the track.
 
-        <div class="field">
-          <label for="home-text">{{ t('storeSettings.home.landingText') }}</label>
-          <textarea id="home-text" class="control" formControlName="text"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="home-meta">{{ t('storeSettings.home.metaDescription') }}</label>
-          <textarea id="home-meta" class="control meta" formControlName="metaDescription"></textarea>
-          <p class="field-foot">
-            <span>{{ t('storeSettings.home.metaRecommended', {min: metaMin, max: metaMax}) }}</span>
-            <!-- A recommendation, so it is a counter that changes tone, never a blocking error. -->
-            <span class="counter" [class.over]="metaOutsideRange()">
-              {{ t('storeSettings.home.characters', {count: metaLength()}) }}
+              Automatic direction on every copy field, and it is not cosmetic: this section is
+              written in languages the console is not necessarily running in. Without it, Arabic
+              copy typed while the console is in English renders left-to-right and reads as
+              nonsense.
+            -->
+            <input
+              id="home-title"
+              type="text"
+              formControlName="title"
+              dir="auto"
+              [placeholder]="t('storeSettings.home.landingTitlePlaceholder')"
+            />
+            <span class="row-foot">
+              <span>{{ t('storeSettings.home.landingTitleHint') }}</span>
+              <span class="counter">{{ titleLength() }}/{{ titleMax }}</span>
             </span>
-          </p>
+          </div>
+
+          <div class="row">
+            <label for="home-text">{{ t('storeSettings.home.landingText') }}</label>
+            <textarea
+              id="home-text"
+              formControlName="text"
+              dir="auto"
+              rows="5"
+              [placeholder]="t('storeSettings.home.landingTextPlaceholder')"
+            ></textarea>
+            <span class="row-foot">
+              <span>{{ t('storeSettings.home.landingTextHint') }}</span>
+            </span>
+          </div>
+
+          <!-- Metadata rather than page copy, so it is set apart and set quieter. -->
+          <div class="row meta-row">
+            <label for="home-meta">{{ t('storeSettings.home.metaDescription') }}</label>
+            <textarea
+              id="home-meta"
+              formControlName="metaDescription"
+              dir="auto"
+              rows="2"
+              [placeholder]="t('storeSettings.home.metaPlaceholder')"
+            ></textarea>
+            <span class="row-foot">
+              <span>{{ t('storeSettings.home.metaRecommended', {min: metaMin, max: metaMax}) }}</span>
+              <!--
+                A recommendation, so it is a counter that changes tone, never a blocking error. The
+                track beside it fills toward the recommended window and goes amber outside it, which
+                answers "how close am I" before the number is read.
+              -->
+              <span class="meter" [class.over]="metaOutsideRange()" aria-hidden="true">
+                <span class="meter-fill" [style.inline-size.%]="metaProgress()"></span>
+              </span>
+              <span class="counter" [class.over]="metaOutsideRange()">
+                {{ t('storeSettings.home.characters', {count: metaLength()}) }}
+              </span>
+            </span>
+          </div>
         </div>
+
+        <app-field-error [control]="title()" [fallback]="t('storeSettings.home.landingTitleFallback')" />
+        <!--
+          The rule reads three controls, so it lives on the group — but the field to fix is the
+          headline, and a description with no name cannot be stored at all.
+        -->
+        @if (needsTitle()) {
+          <p class="cross-field-error" role="alert">{{ t('storeSettings.home.titleForCopy') }}</p>
+        }
 
         <!--
           Designed, and dropped by the platform in both directions: neither mapper on the server
@@ -176,6 +222,11 @@ export class HomeSection {
     const group = this.copy();
     return group.hasError('titleForCopy') && (group.dirty || group.touched);
   });
+
+  /** How full the meta description is, against the top of the recommended window. */
+  protected readonly metaProgress = computed(() =>
+    Math.min(100, Math.round((this.metaLength() / META_DESCRIPTION_MAX) * 100)),
+  );
 
   protected readonly metaOutsideRange = computed(() => {
     const length = this.metaLength();

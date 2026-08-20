@@ -174,6 +174,18 @@
       "canvasUnavailable": "Unable to prepare the export canvas.",
       "failedAnnouncement": "Export failed. {message}"
     },
+    "imagePicker": {
+      "constraints": "{formats} · at least {width}×{height} · up to {size}",
+      "replace": "Replace",
+      "saved": "Saved",
+      "stored": "Stored: {name}",
+      "tooHeavy": "That file is {actual}. The limit is {limit} — export it smaller and try again.",
+      "tooSmall": "That image is {actual}. It needs to be at least {width}×{height} to stay sharp.",
+      "unreadable": "That file could not be read as an image. Check it opens, then try again.",
+      "uploading": "Uploading…",
+      "wrongShape": "That image is {actual}, which is the wrong shape for this slot. Aim for {wanted} or the same proportions.",
+      "wrongType": "That is not a {formats} file."
+    },
     "kpiCard": {
       "vsLastPeriod": "vs last period"
     },
@@ -268,19 +280,13 @@
   "storeSettings": {
     "branding": {
       "banner": "Banner",
-      "bannerHint": "JPG or PNG · 1920×480 recommended · max 5 MB",
       "currentBannerAlt": "Current store banner",
-      "currentFile": "Stored: {{name}}",
       "currentLogoAlt": "Current store logo",
-      "dropBanner": "Drag & drop banner here",
-      "dropOrBrowse": "Drop image or browse",
+      "dropOrBrowse": "Drop an image, or browse",
       "logo": "Logo",
-      "logoHint": "PNG or SVG · square · min 512×512 · max 2 MB",
-      "replaceOnlyNote": "Uploading again replaces the current image. The platform has no way to remove one once set.",
+      "replaceOnly": "Uploading replaces the current image. The platform has no way to remove one once it is set.",
       "subtitle": "Logo and banner shown across your storefront, invoices and emails.",
-      "title": "Store branding",
-      "uploadingBanner": "Uploading a banner",
-      "uploadingLogo": "Uploading a logo"
+      "title": "Store branding"
     },
     "details": {
       "address": "Business address",
@@ -389,10 +395,14 @@
       "empty": "Empty",
       "fallbackNotice": "Untranslated languages fall back to English.",
       "landingText": "Landing text",
+      "landingTextHint": "Shown under the headline on your storefront's front page.",
+      "landingTextPlaceholder": "A paragraph or two about what you sell and who you sell it to. This is the first thing a visitor reads.",
       "landingTitle": "Landing page title",
       "landingTitleFallback": "Keep the title to 60 characters or fewer.",
       "landingTitleHint": "Shown as the H1 and browser tab title",
+      "landingTitlePlaceholder": "Everything your workplace runs on",
       "metaDescription": "Meta description",
+      "metaPlaceholder": "One sentence describing the shop, for search results and link previews.",
       "metaRecommended": "Recommended {min}–{max} characters",
       "subtitle": "Landing copy and search metadata, written per language.",
       "tags": "Tags",
@@ -409,11 +419,13 @@
       "github": "GitHub"
     },
     "nav": {
-      "heading": "Settings",
       "ariaLabel": "Store settings sections",
-      "needsAttention": "Needs your attention",
       "builderUnavailable": "The home page builder is not available yet.",
-      "homePageBuilder": "Home page builder"
+      "collapse": "Collapse the section list",
+      "expand": "Expand the section list",
+      "heading": "Settings",
+      "homePageBuilder": "Home page builder",
+      "needsAttention": "Needs your attention"
     },
     "notAvailable": "{what} is not available yet.",
     "paymentDescription": {
@@ -470,7 +482,6 @@
       "deleteNumbered": "Delete slide {position}",
       "deleted": "Slide deleted.",
       "dropImages": "Drag & drop a slider image",
-      "hint": "1600×640 recommended · up to {capacity} slides",
       "moveDown": "Move slide {position} later",
       "moveUp": "Move slide {position} earlier",
       "none": "No slides yet. Add one below.",
@@ -479,8 +490,7 @@
       "slotsFull": "All {capacity} slots are used. Delete a slide before adding another.",
       "subtitle": "Homepage carousel · {count} of {capacity} slots used",
       "title": "Store slider images",
-      "uploaded": "Slide added.",
-      "uploading": "Uploading…"
+      "uploaded": "Slide added."
     },
     "social": {
       "addProfileUrl": "Add profile URL…",

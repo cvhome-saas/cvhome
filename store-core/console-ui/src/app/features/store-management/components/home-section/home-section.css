@@ -3,10 +3,163 @@
   flex: none;
 }
 
-/* Shorter than the landing text: it is a sentence and a half, not a paragraph. */
-textarea.meta {
-  min-block-size: 4.5rem;
+/* ---- The composer --------------------------------------------------------------------------- */
+
+/*
+ * One sheet holding three parts of one page.
+ *
+ * The fields used to be three separately-bordered boxes of near-identical grey, which said the
+ * headline, the body and the search snippet were three unrelated inputs of the same importance.
+ * They are one document: the sheet carries the frame, hairlines separate the parts, and each field
+ * is set in the type it will actually be read in. Capped at a readable measure rather than the
+ * card's full width, because every row here is prose.
+ */
+.composer {
+  overflow: hidden;
+  max-inline-size: 46rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--input);
 }
+
+.row {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.9rem 1.05rem 0.85rem;
+  transition: background-color var(--default-transition-duration);
+}
+
+.row + .row {
+  border-block-start: 1px solid var(--border-soft);
+}
+
+/*
+ * The row being written in lifts, so the eye has somewhere to be on a sheet with no field borders
+ * to follow. It is the only state change here, which is what keeps it readable as one.
+ */
+.row:focus-within {
+  background: var(--accent-veil);
+}
+
+.row label {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/*
+ * Borderless and transparent: the sheet is the control's frame. `field-sizing: content` grows a
+ * textarea to its copy where the browser supports it, which is why there is no resize grabber to
+ * drag — `rows` and `min-block-size` keep a sensible floor everywhere else.
+ */
+.row input,
+.row textarea {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font: inherit;
+  resize: none;
+  field-sizing: content;
+}
+
+.row input:focus,
+.row textarea:focus {
+  outline: none;
+}
+
+.row ::placeholder {
+  color: var(--foreground-subtle);
+  opacity: 1;
+}
+
+/* The headline is set as a headline — this field is the storefront's H1, so it looks like one. */
+.title-row input {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.row textarea {
+  min-block-size: 5.5rem;
+  font-size: var(--text-sm);
+  line-height: 1.75;
+}
+
+/* Metadata, not page copy: quieter ground, smaller type, a shorter field. */
+.meta-row {
+  background: var(--muted);
+}
+
+.meta-row:focus-within {
+  background: var(--accent-veil);
+}
+
+.meta-row textarea {
+  min-block-size: 3.25rem;
+  font-size: var(--text-xs);
+  line-height: 1.65;
+}
+
+/* ---- The line under each row ---------------------------------------------------------------- */
+
+.row-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block-start: 0.15rem;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.row-foot > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.counter {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.counter.over {
+  color: var(--chart-4-foreground);
+}
+
+/*
+ * How full the search snippet is, against the top of the recommended window. A number alone means
+ * nothing without knowing the target; the track answers it before the number is read, and turns
+ * amber at the same moment the counter does — one state, said twice, in two registers.
+ */
+.meter {
+  flex: none;
+  overflow: hidden;
+  inline-size: 4rem;
+  block-size: 3px;
+  border-radius: var(--radius-full);
+  background: var(--track);
+}
+
+.meter-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition:
+    inline-size var(--default-transition-duration) ease-out,
+    background-color var(--default-transition-duration);
+}
+
+.meter.over .meter-fill {
+  background: var(--chart-4-foreground);
+}
+
+/* ---- The rest ------------------------------------------------------------------------------- */
 
 .fallback-notice {
   border-radius: var(--radius-lg);
@@ -18,7 +171,7 @@ textarea.meta {
  * and this rule reads three, so it is written out — same voice, same colour.
  */
 .cross-field-error {
-  margin: 0.35rem 0 0;
+  margin: 0;
   color: var(--chart-5-foreground);
   font-size: var(--text-2xs);
   font-weight: 500;

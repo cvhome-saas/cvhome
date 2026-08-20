@@ -111,6 +111,9 @@ const SETTINGS: StoreSettings = {
     socialLinkProviders: ['FACEBOOK', 'X', 'TIKTOK', 'INSTAGRAM', 'GITHUB'],
   },
 };
+import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
+import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {StoreManagement} from './store-management';
 import {
@@ -250,6 +253,11 @@ describe('StoreManagement', () => {
         provideRouter([{path: 'store-management/:section', component: StoreManagement}]),
         {provide: StoreSettingsApi, useValue: api},
         {provide: DnsCheckService, useValue: dns},
+        /*
+         * The settings resource is keyed on the open store, so the shell has to have one — without
+         * it `params` is undefined and the page never loads at all.
+         */
+        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
         // `ApiErrorService` needs somewhere to send what it cannot bind to a control.
         {provide: NOTIFICATION_PORT, useExisting: ToastService},
       ],
@@ -958,6 +966,28 @@ describe('StoreManagement', () => {
 
     const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
     expect(patch['en']['tags']).toBeUndefined();
+  }));
+
+  it('reloads the whole document when the open store changes', fakeAsync(() => {
+    const {fixture, element} = load('details');
+
+    expect(api.loads).toBe(1);
+    expect(element.querySelector<HTMLInputElement>('#store-name')!.value).toBe('Acme Supply Co.');
+
+    api.settingsWith({
+      storeName: 'Acme Outlet - West',
+      details: {...SETTINGS.details, name: 'Acme Outlet - West'},
+    });
+    TestBed.inject(ConsoleShellFacade).selectStore(CONSOLE_STORES_FAKE[1].id);
+    settle(fixture);
+
+    /*
+     * Without a `params` on the resource this stayed on the first store's settings while the
+     * request context had already moved to the second — so the next save would have written one
+     * store's values onto the other.
+     */
+    expect(api.loads).toBe(2);
+    expect(element.querySelector<HTMLInputElement>('#store-name')!.value).toBe('Acme Outlet - West');
   }));
 
   it('surfaces a failed load with a retry that refetches', fakeAsync(() => {

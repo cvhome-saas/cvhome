@@ -40,8 +40,13 @@
         They cannot be the same element — a container query never matches its own container.
       -->
       <div class="settings-region">
-        <div class="settings-layout">
-          <app-settings-nav class="settings-rail" [sections]="sections()" [active]="section()" />
+        <div class="settings-layout" [class.rail-collapsed]="railCollapsed()">
+          <app-settings-nav
+            class="settings-rail"
+            [sections]="sections()"
+            [active]="section()"
+            [(collapsed)]="railCollapsed"
+          />
 
           <app-tab-switcher
             class="settings-tabs"

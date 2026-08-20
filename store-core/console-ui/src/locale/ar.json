@@ -174,6 +174,18 @@
       "canvasUnavailable": "تعذّر تجهيز لوحة التصدير.",
       "failedAnnouncement": "فشل التصدير. {message}"
     },
+    "imagePicker": {
+      "constraints": "{formats} · ‎{width}×{height}‎ على الأقل · حتى {size}",
+      "replace": "استبدال",
+      "saved": "تم الحفظ",
+      "stored": "المخزَّن: {name}",
+      "tooHeavy": "حجم هذا الملف {actual}، والحد الأقصى {limit} — صدّره بحجم أصغر ثم أعد المحاولة.",
+      "tooSmall": "أبعاد هذه الصورة {actual}. يجب ألا تقل عن ‎{width}×{height}‎ لتبقى واضحة.",
+      "unreadable": "تعذّرت قراءة هذا الملف كصورة. تأكد من أنه يُفتح ثم أعد المحاولة.",
+      "uploading": "جارٍ الرفع…",
+      "wrongShape": "أبعاد هذه الصورة {actual}، وهي غير مناسبة لهذه المساحة. استهدف ‎{wanted}‎ أو النسب نفسها.",
+      "wrongType": "هذا ليس ملف {formats}."
+    },
     "kpiCard": {
       "vsLastPeriod": "مقارنة بالفترة السابقة"
     },
@@ -268,19 +280,13 @@
   "storeSettings": {
     "branding": {
       "banner": "البانر",
-      "bannerHint": "JPG أو PNG · يُفضّل 1920×480 · حد أقصى 5 ميغابايت",
-      "currentBannerAlt": "لافتة المتجر الحالية",
-      "currentFile": "المخزَّن: {{name}}",
+      "currentBannerAlt": "بانر المتجر الحالي",
       "currentLogoAlt": "شعار المتجر الحالي",
-      "dropBanner": "اسحب وأفلت البانر هنا",
-      "dropOrBrowse": "أفلت الصورة أو تصفح",
+      "dropOrBrowse": "أفلت صورة، أو تصفّح",
       "logo": "الشعار",
-      "logoHint": "PNG أو SVG · مربع · حد أدنى 512×512 · حد أقصى 2 ميغابايت",
-      "replaceOnlyNote": "رفع صورة جديدة يستبدل الصورة الحالية. لا توفّر المنصة طريقة لإزالة الصورة بعد تعيينها.",
+      "replaceOnly": "الرفع يستبدل الصورة الحالية. لا توفّر المنصة طريقة لإزالتها بعد تعيينها.",
       "subtitle": "الشعار والبانر المعروضان في متجرك وفواتيرك ورسائلك.",
-      "title": "هوية المتجر",
-      "uploadingBanner": "رفع البانر",
-      "uploadingLogo": "رفع الشعار"
+      "title": "هوية المتجر"
     },
     "details": {
       "address": "عنوان النشاط التجاري",
@@ -389,10 +395,14 @@
       "empty": "فارغ",
       "fallbackNotice": "اللغات غير المترجمة تعود إلى الإنجليزية.",
       "landingText": "نص الصفحة الرئيسية",
+      "landingTextHint": "يظهر أسفل العنوان في الصفحة الرئيسية لمتجرك.",
+      "landingTextPlaceholder": "فقرة أو فقرتان عمّا تبيعه ولمن تبيعه. هذا أول ما يقرأه الزائر.",
       "landingTitle": "عنوان الصفحة الرئيسية",
       "landingTitleFallback": "أبقِ العنوان في حدود ٦٠ حرفًا أو أقل.",
       "landingTitleHint": "يظهر كعنوان H1 وعنوان تبويب المتصفح",
+      "landingTitlePlaceholder": "كل ما يحتاجه مكان عملك",
       "metaDescription": "الوصف التعريفي",
+      "metaPlaceholder": "جملة واحدة تصف المتجر، لنتائج البحث ومعاينات الروابط.",
       "metaRecommended": "يُنصح بـ {min}–{max} حرفًا",
       "subtitle": "نص الصفحة الرئيسية وبيانات تعريف البحث، مكتوبة لكل لغة.",
       "tags": "الوسوم",
@@ -409,11 +419,13 @@
       "github": "GitHub"
     },
     "nav": {
-      "heading": "الإعدادات",
       "ariaLabel": "أقسام إعدادات المتجر",
-      "needsAttention": "يحتاج انتباهك",
       "builderUnavailable": "منشئ الصفحة الرئيسية غير متاح بعد.",
-      "homePageBuilder": "منشئ الصفحة الرئيسية"
+      "collapse": "طيّ قائمة الأقسام",
+      "expand": "توسيع قائمة الأقسام",
+      "heading": "الإعدادات",
+      "homePageBuilder": "منشئ الصفحة الرئيسية",
+      "needsAttention": "يحتاج انتباهك"
     },
     "notAvailable": "{what} غير متاح بعد.",
     "paymentDescription": {
@@ -470,7 +482,6 @@
       "deleteNumbered": "حذف الشريحة {position}",
       "deleted": "تم حذف الشريحة.",
       "dropImages": "اسحب وأفلت صورة للعرض المتحرك",
-      "hint": "يُفضَّل ١٦٠٠×٦٤٠ · حتى {capacity} شريحة",
       "moveDown": "تأخير الشريحة {position}",
       "moveUp": "تقديم الشريحة {position}",
       "none": "لا توجد شرائح بعد. أضف واحدة أدناه.",
@@ -479,8 +490,7 @@
       "slotsFull": "جميع الخانات الـ {capacity} مستخدمة. احذف شريحة قبل إضافة أخرى.",
       "subtitle": "عرض الصفحة الرئيسية · {count} من {capacity} خانة مستخدمة",
       "title": "صور العرض المتحرك",
-      "uploaded": "تمت إضافة الشريحة.",
-      "uploading": "جارٍ الرفع…"
+      "uploaded": "تمت إضافة الشريحة."
     },
     "social": {
       "addProfileUrl": "أضف رابط الملف الشخصي…",
