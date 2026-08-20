@@ -1,18 +1,8 @@
-import {
-  Component,
-  ElementRef,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-  untracked,
-  viewChild,
-} from '@angular/core';
+import {Component, computed, effect, inject, input, output, signal, untracked} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
+import {ImagePreview} from '@shared/ui/image-preview/image-preview';
 
 /** What an image has to be before it is worth sending. */
 export interface ImageRules {
@@ -44,7 +34,7 @@ export interface ImageRules {
  */
 @Component({
   selector: 'app-image-picker',
-  imports: [Icon],
+  imports: [Icon, ImagePreview],
   template: `
     <!--
       The frame holds two controls that overlap, which is why the eye is a sibling of the label
@@ -63,7 +53,7 @@ export interface ImageRules {
         class="sr-only"
         type="file"
         [attr.accept]="rules().accept"
-        [attr.aria-label]="label()"
+        [attr.aria-label]="pickLabel()"
         [disabled]="busy()"
         (change)="onPicked($event)"
       />
@@ -121,28 +111,6 @@ export interface ImageRules {
     </div>
 
     <!--
-      A native dialog, as shared/ui/confirm-dialog established: showModal() brings the top layer,
-      the focus trap, the backdrop and Escape with it. The asset is shown at its own size up to the
-      viewport, because the point of asking is to see the detail the small well loses.
-    -->
-    <dialog #preview class="preview" (close)="onClosed()">
-      @if (previewOpen()) {
-        <img class="preview-image" [src]="url()" [alt]="alt()" (load)="onMeasured($event)" />
-        <p class="preview-foot">
-          @if (fileName()) {
-            <span class="preview-name">{{ fileName() }}</span>
-          }
-          @if (naturalSize(); as size) {
-            <span class="preview-size">{{ size }}</span>
-          }
-          <button class="preview-close" type="button" (click)="closePreview()">
-            {{ t('shared.imagePicker.close') }}
-          </button>
-        </p>
-      }
-    </dialog>
-
-    <!--
       One line under the frame at most, and only when it adds something. An empty well already
       states the rules inside itself, so repeating them here was the same sentence twice.
     -->
@@ -154,20 +122,35 @@ export interface ImageRules {
     } @else if (hasImage() && fileName()) {
       <p class="foot stored">{{ t('shared.imagePicker.stored', {name: fileName()}) }}</p>
     }
+
+    <app-image-preview
+      [(open)]="previewOpen"
+      [url]="url()"
+      [alt]="alt()"
+      [heading]="assetName() || label()"
+      [caption]="fileName()"
+    />
   `,
   styleUrl: './image-picker.css',
   host: {
     '(dragover)': 'onDragOver($event)',
     '(dragleave)': 'isOver.set(false)',
     '(drop)': 'onDrop($event)',
-    '(click)': 'onDocumentClick($event)',
   },
 })
 export class ImagePicker {
   private readonly transloco = inject(TranslocoService);
 
-  /** Names the well and stands in as its empty-state prompt. */
+  /** The empty well's prompt — an invitation ("Drop an image, or browse"), not a name. */
   readonly label = input.required<string>();
+  /**
+   * What this asset is called: "Logo", "Banner", "Slide".
+   *
+   * Separate from `label` because the two are different sentences and only one of them belongs in
+   * a control's accessible name. Borrowing the prompt produced "View Drop an image, or browse full
+   * size", which is what a screen reader would have read out.
+   */
+  readonly assetName = input('');
   readonly rules = input.required<ImageRules>();
   /** What is stored, or `null` for an empty well. */
   readonly url = input<string | null>(null);
@@ -186,11 +169,8 @@ export class ImagePicker {
   /** True for a moment after an upload finishes, so the well confirms rather than just stopping. */
   protected readonly justSaved = signal(false);
 
-  private readonly preview = viewChild.required<ElementRef<HTMLDialogElement>>('preview');
-
+  /** Whether the enlarged view is open. The dialog itself is `shared/ui/image-preview`. */
   protected readonly previewOpen = signal(false);
-  /** The asset's real dimensions, read off the enlarged image once the browser has it. */
-  protected readonly naturalSize = signal<string | null>(null);
 
   private readonly wasBusy = signal(false);
 
@@ -238,43 +218,26 @@ export class ImagePicker {
     return this.transloco.translate(key, params);
   }
 
+  /** Falls back to the prompt when no name was given, so the control is never unlabelled. */
+  private naming(): string {
+    return this.assetName() || this.label();
+  }
+
+  protected pickLabel(): string {
+    return this.transloco.translate('shared.imagePicker.choose', {field: this.naming()});
+  }
+
   protected peekLabel(): string {
-    return this.transloco.translate('shared.imagePicker.peek', {field: this.label()});
+    return this.transloco.translate('shared.imagePicker.peek', {field: this.naming()});
   }
 
   protected openPreview(): void {
-    this.naturalSize.set(null);
     this.previewOpen.set(true);
-    this.preview().nativeElement.showModal();
   }
 
-  protected closePreview(): void {
-    this.preview().nativeElement.close();
-  }
 
-  /**
-   * Closes on a click that lands on the backdrop rather than on the picture.
-   *
-   * A modal dialog's backdrop is drawn by the element itself, so there is no node to bind to — the
-   * test is whether the click's target *is* the dialog, which only happens when it missed
-   * everything inside. Bound from the host rather than in the template on purpose: a template
-   * `(click)` here trips the a11y rule that wants a keyboard equivalent, and the keyboard
-   * equivalent is `Escape`, which the native dialog already handles.
-   */
-  protected onDocumentClick(event: MouseEvent): void {
-    if (this.previewOpen() && event.target === this.preview().nativeElement) {
-      this.closePreview();
-    }
-  }
 
-  protected onClosed(): void {
-    this.previewOpen.set(false);
-  }
 
-  protected onMeasured(event: Event): void {
-    const image = event.target as HTMLImageElement;
-    this.naturalSize.set(`${image.naturalWidth} × ${image.naturalHeight}`);
-  }
 
   protected onPicked(event: Event): void {
     const input = event.target as HTMLInputElement;

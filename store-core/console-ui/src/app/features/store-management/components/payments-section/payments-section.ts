@@ -3,6 +3,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Badge} from '@shared/ui/badge/badge';
+import {CopyField} from '@shared/ui/copy-field/copy-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
@@ -33,7 +34,17 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
  */
 @Component({
   selector: 'app-payments-section',
-  imports: [Badge, Icon, NoticeBar, Panel, ReactiveFormsModule, SecretField, Toggle, TranslocoDirective],
+  imports: [
+    Badge,
+    CopyField,
+    Icon,
+    NoticeBar,
+    Panel,
+    ReactiveFormsModule,
+    SecretField,
+    Toggle,
+    TranslocoDirective,
+  ],
   template: `
     <app-panel
       [title]="t('storeSettings.payments.title')"
@@ -115,14 +126,21 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
                       formControlName="webhookSecret"
                     />
                   </app-secret-field>
-                  <!--
-                    No endpoint line. The mockup printed a webhook URL per gateway and nothing on
-                    the platform records or derives one, so it was a made-up address an operator
-                    might have pasted into Stripe.
-                    TODO(lessons.md): see lessons.md, "Store management — a gateway has no webhook
-                    URL to show".
-                  -->
                   <p class="field-hint">{{ t('storeSettings.payments.webhookSecretHint') }}</p>
+                </div>
+
+                <!--
+                  The endpoint the gateway posts to. Not returned by anything — assembled from the
+                  route PublicPaymentWebhookApi actually maps — which is why it is read-only and
+                  copyable rather than a field: it is the platform's address, not the seller's.
+                -->
+                <div class="field field-wide">
+                  <p class="field-label">{{ t('storeSettings.payments.webhookUrl') }}</p>
+                  <app-copy-field
+                    [value]="credentials.webhookUrl"
+                    [label]="t('storeSettings.payments.webhookUrl')"
+                  />
+                  <p class="field-hint">{{ t('storeSettings.payments.webhookUrlHint', {gateway: labelOf(gateway, t)}) }}</p>
                 </div>
               </div>
               }

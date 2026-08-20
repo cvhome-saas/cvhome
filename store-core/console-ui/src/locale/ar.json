@@ -175,7 +175,7 @@
       "failedAnnouncement": "فشل التصدير. {message}"
     },
     "imagePicker": {
-      "close": "إغلاق",
+      "choose": "اختيار {field}",
       "constraints": "{formats} · ‎{width}×{height}‎ على الأقل · حتى {size}",
       "peek": "عرض {field} بالحجم الكامل",
       "replace": "استبدال",
@@ -187,6 +187,9 @@
       "uploading": "جارٍ الرفع…",
       "wrongShape": "أبعاد هذه الصورة {actual}، وهي غير مناسبة لهذه المساحة. استهدف ‎{wanted}‎ أو النسب نفسها.",
       "wrongType": "هذا ليس ملف {formats}."
+    },
+    "imagePreview": {
+      "close": "إغلاق"
     },
     "kpiCard": {
       "vsLastPeriod": "مقارنة بالفترة السابقة"
@@ -452,7 +455,9 @@
       "title": "إعدادات الدفع",
       "unknownGateway": "مُعدّة على المنصة.",
       "webhookSecret": "سر الويبهوك",
-      "webhookSecretHint": "القيمة التي توقّع بها البوابة طلبات الويبهوك."
+      "webhookSecretHint": "القيمة التي توقّع بها البوابة طلبات الويبهوك.",
+      "webhookUrl": "رابط الويبهوك",
+      "webhookUrlHint": "الصق هذا في {gateway} كنقطة استقبال الأحداث."
     },
     "previewNotAvailable": "معاينة واجهة المتجر غير متاحة بعد.",
     "previewStorefront": "معاينة واجهة المتجر",
@@ -488,11 +493,13 @@
       "moveUp": "تقديم الشريحة {position}",
       "none": "لا توجد شرائح بعد. أضف واحدة أدناه.",
       "reordered": "تم حفظ ترتيب الشرائح.",
+      "slide": "شريحة",
       "slideNumber": "الشريحة {position}",
       "slotsFull": "جميع الخانات الـ {capacity} مستخدمة. احذف شريحة قبل إضافة أخرى.",
       "subtitle": "عرض الصفحة الرئيسية · {count} من {capacity} خانة مستخدمة",
       "title": "صور العرض المتحرك",
-      "uploaded": "تمت إضافة الشريحة."
+      "uploaded": "تمت إضافة الشريحة.",
+      "viewNumbered": "عرض الشريحة {position} بالحجم الكامل"
     },
     "social": {
       "addProfileUrl": "أضف رابط الملف الشخصي…",

@@ -3,6 +3,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {ImageBroken} from '@shared/directives/image-loaded';
 import {ImagePicker, type ImageRules} from '@shared/ui/image-picker/image-picker';
+import {ImagePreview} from '@shared/ui/image-preview/image-preview';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
 import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
@@ -27,7 +28,7 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
  */
 @Component({
   selector: 'app-slider-section',
-  imports: [Icon, ImageBroken, ImagePicker, Panel, TranslocoDirective],
+  imports: [Icon, ImageBroken, ImagePicker, ImagePreview, Panel, TranslocoDirective],
   template: `
     <app-panel [title]="t('storeSettings.slider.title')" [subtitle]="subtitle(t)" *transloco="let t">
       <div class="section-body slides">
@@ -54,6 +55,20 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
             </div>
 
             <div class="slide-actions">
+              <!--
+                The row's thumbnail is 110px wide, which is enough to tell two slides apart and not
+                enough to judge one. The same enlarged view the branding wells offer, from here.
+              -->
+              @if (slide.url && !broken().has(slide.name)) {
+                <button
+                  class="icon-action"
+                  type="button"
+                  [attr.aria-label]="t('storeSettings.slider.viewNumbered', {position: index + 1})"
+                  (click)="viewing.set(slide)"
+                >
+                  <app-icon name="eye" />
+                </button>
+              }
               <button
                 class="icon-action"
                 type="button"
@@ -97,6 +112,7 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
           <app-image-picker
             class="add-slide"
             [label]="t('storeSettings.slider.dropImages')"
+            [assetName]="t('storeSettings.slider.slide')"
             [rules]="slideRules"
             [busy]="uploading()"
             (picked)="picked.emit($event)"
@@ -107,6 +123,18 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
           </p>
         }
       </div>
+
+      <!--
+        One dialog for the whole list rather than one per row: only ever a single slide is being
+        looked at, and eight mounted dialogs would be eight copies of the same chrome.
+      -->
+      <app-image-preview
+        [open]="viewing() !== null"
+        (openChange)="onViewerToggled($event)"
+        [url]="viewing()?.url ?? null"
+        [heading]="viewingLabel(t)"
+        [caption]="viewing()?.name ?? null"
+      />
     </app-panel>
   `,
   styleUrls: ['../settings-card.css', './slider-section.css'],
@@ -142,6 +170,9 @@ export class SliderSection {
   /** Slides whose image would not load. Keyed by name, so a reorder does not resurrect a broken one. */
   protected readonly broken = signal<ReadonlySet<string>>(new Set());
 
+  /** The slide being looked at full size, or `null`. One at a time, so one dialog serves them all. */
+  protected readonly viewing = signal<SliderSlide | null>(null);
+
   protected readonly busy = computed(() => this.uploading() || this.reordering());
 
   protected readonly ordered = computed(() =>
@@ -175,6 +206,22 @@ export class SliderSection {
     }
     [next[index], next[target]] = [next[target], next[index]];
     this.reordered.emit({slides: next, messageKey: 'storeSettings.slider.reordered'});
+  }
+
+  /** The dialog closes itself on Escape and on its backdrop, so the list has to hear about it. */
+  protected onViewerToggled(open: boolean): void {
+    if (!open) {
+      this.viewing.set(null);
+    }
+  }
+
+  /** Names the slide by its place in the carousel, which is the only name it has. */
+  protected viewingLabel(t: (key: string, params?: Record<string, unknown>) => string): string {
+    const slide = this.viewing();
+    if (!slide) {
+      return '';
+    }
+    return t('storeSettings.slider.slideNumber', {position: this.ordered().indexOf(slide) + 1});
   }
 
   protected markBroken(name: string): void {

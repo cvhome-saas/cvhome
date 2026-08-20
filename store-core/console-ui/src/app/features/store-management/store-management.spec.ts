@@ -99,7 +99,13 @@ const SETTINGS: StoreSettings = {
       paymentType: 'STRIPE',
       icon: 'creditCard',
       enabled: true,
-      credentials: {apiKey: 'pk_live_51', secretKey: 'sk_live_7c31', webhookSecret: 'whsec_a0e5'},
+      credentials: {
+        apiKey: 'pk_live_51',
+        secretKey: 'sk_live_7c31',
+        webhookSecret: 'whsec_a0e5',
+        webhookUrl:
+          'https://acme.example.io/payment/api/v1/public/webhook/65f023632bc46470c104b76f/STRIPE',
+      },
       configured: true,
     },
     {paymentType: 'COD', icon: 'dollar', enabled: false, credentials: null, configured: false},

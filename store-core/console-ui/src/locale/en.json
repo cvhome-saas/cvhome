@@ -175,7 +175,7 @@
       "failedAnnouncement": "Export failed. {message}"
     },
     "imagePicker": {
-      "close": "Close",
+      "choose": "Choose {field}",
       "constraints": "{formats} · at least {width}×{height} · up to {size}",
       "peek": "View {field} full size",
       "replace": "Replace",
@@ -187,6 +187,9 @@
       "uploading": "Uploading…",
       "wrongShape": "That image is {actual}, which is the wrong shape for this slot. Aim for {wanted} or the same proportions.",
       "wrongType": "That is not a {formats} file."
+    },
+    "imagePreview": {
+      "close": "Close"
     },
     "kpiCard": {
       "vsLastPeriod": "vs last period"
@@ -452,7 +455,9 @@
       "title": "Store payment configuration",
       "unknownGateway": "Configured on the platform.",
       "webhookSecret": "Webhook secret",
-      "webhookSecretHint": "The value the gateway signs its webhooks with."
+      "webhookSecretHint": "The value the gateway signs its webhooks with.",
+      "webhookUrl": "Webhook URL",
+      "webhookUrlHint": "Paste this into {gateway} as the endpoint for its events."
     },
     "previewNotAvailable": "Previewing the storefront is not available yet.",
     "previewStorefront": "Preview storefront",
@@ -488,11 +493,13 @@
       "moveUp": "Move slide {position} earlier",
       "none": "No slides yet. Add one below.",
       "reordered": "Slider order saved.",
+      "slide": "Slide",
       "slideNumber": "Slide {position}",
       "slotsFull": "All {capacity} slots are used. Delete a slide before adding another.",
       "subtitle": "Homepage carousel · {count} of {capacity} slots used",
       "title": "Store slider images",
-      "uploaded": "Slide added."
+      "uploaded": "Slide added.",
+      "viewNumbered": "View slide {position} full size"
     },
     "social": {
       "addProfileUrl": "Add profile URL…",

@@ -975,18 +975,34 @@ requirements document, with the entry here reduced to a link. There is already o
   treats an unencrypted stored value as the value rather than as nothing — or at minimum a flag
   saying a value exists but could not be read.
 
-## Store management — a gateway has no webhook URL to show
+## Store management — neither the webhook URL nor the OAuth callback is served
 
-- **Screen:** `/store-management/payments`, the "Endpoint" line under each webhook secret.
-- **What the UI needs:** the URL to paste into Stripe or PayPal so their webhooks reach this store.
-- **What is missing:** nothing records or derives one. `PaymentConfiguration` is
-  `(store, type, apiKey, secretKey, webhookSecret, enabled)` and the payment service maps no
-  per-store webhook route. The fixture printed `https://{store}/webhooks/stripe`, which was an
-  invented address an operator might well have pasted into a live gateway.
-- **Why it is required:** a webhook secret with no endpoint to pair it with is unusable — it is the
-  half of the configuration the seller cannot work out on their own.
-- **Expected contract:** a `webhookUrl` on `ReadablePaymentConfiguration`, built by the service that
-  owns the route. **Placeholder:** the line is removed rather than guessed.
+- **Screen:** `/store-management/payments`, the endpoint under each webhook secret; and
+  `/store-management/social-login`, the callback URL a seller pastes into Google or Facebook.
+- **What is missing:** both routes exist and no endpoint hands either of them out, so every client
+  has to reconstruct them from facts held in three different places.
+  - The webhook is `POST /api/v1/public/webhook/{storeId}/{paymentType}` on
+    `PublicPaymentWebhookApi`, reached through the pod's `handle_path /payment*` — which *strips*
+    the segment, so a client has to put `/payment` back on.
+  - The callback is `Constants.DEFAULT_REDIRECT_URI` (`{baseUrl}/login/oauth2/code/{registrationId}`)
+    with `registrationId` = `{store}.{provider}` from `SocialLoginConfigId.toRegistrationId()`,
+    reached through `handle /cua*` — `handle`, which *keeps* the segment and sets
+    `X-Forwarded-Prefix: /cua`, so `{baseUrl}` already carries it.
+  - Both need the store's storefront host, which is itself assembled from `saas-properties` and the
+    pod (see "Store management — nothing answers what address a store is served at").
+- **Why it matters:** these are the two values on the page that must be exactly right, because the
+  failure lands on the shopper rather than on the seller — a provider rejects a callback that does
+  not match its allow-list character for character, and a webhook posted to the wrong path is a
+  payment the store never hears about. Two prefixes behaving differently (`handle` keeps,
+  `handle_path` strips) is precisely the sort of detail a client should not be deriving.
+- **What went wrong here, as evidence:** the first version of this console shipped a callback URL of
+  `https://{storeId}.{podTarget}/login/oauth2/code/…` — an invented host and a missing `/cua`. It
+  looked plausible and would never have worked. seller-ui sidestepped the host by printing the path
+  fragment alone.
+- **Expected contract:** `callbackUrl` on `ReadableSocialLoginConfig` and `webhookUrl` on
+  `ReadablePaymentConfiguration`, each built by the service that owns the route.
+- **Placeholder:** the console assembles both, and falls back to the bare path — which an operator
+  can still recognise — when the pod lookup that supplies the host was refused.
 
 ## Store management — a payment type's required attributes are not served
 
@@ -1000,21 +1016,6 @@ requirements document, with the entry here reduced to a link. There is already o
   `secretKey` and `webhookSecret`. The two descriptions of the same thing do not line up.
 - **Expected contract:** serialise `PaymentType` as an object with its `attrs`, so a client can
   render exactly the fields a gateway declares instead of guessing from a hardcoded list.
-
-## Store management — a social login callback URL has to be assembled by the client
-
-- **Screen:** `/store-management/social-login`, the "Callback URL" a seller pastes into Google or
-  Facebook.
-- **What is missing:** no endpoint answers it. The registration id is
-  `{store}.{provider}` (`SocialLoginConfigId.toRegistrationId()`), Spring Security's callback path
-  is `/login/oauth2/code/{registrationId}`, and the host is the store's own storefront — three
-  facts held in three different places, none of them served together.
-- **Why it matters:** it is the one value on the screen that must be exactly right, because the
-  provider rejects the sign-in if it does not match their allow-list character for character, and
-  the failure appears to the shopper rather than to the seller.
-- **Expected contract:** `callbackUrl` on `ReadableSocialLoginConfig`, built by cua, which is the
-  only component that knows all three parts. **Placeholder:** the console assembles it, and shows
-  nothing rather than a half-built URL when the pod lookup that supplies the host was refused.
 
 ## Dashboard — the merchant statistics outage is over
 

@@ -37,6 +37,7 @@ import type {BrandingSettings} from '@models/store-settings';
           <app-image-picker
             icon="palette"
             [label]="t('storeSettings.branding.dropOrBrowse')"
+            [assetName]="t('storeSettings.branding.logo')"
             [rules]="logoRules"
             [url]="branding().logo?.url ?? null"
             [fileName]="branding().logo?.name ?? null"
@@ -50,6 +51,7 @@ import type {BrandingSettings} from '@models/store-settings';
           <p class="field-label">{{ t('storeSettings.branding.banner') }}</p>
           <app-image-picker
             [label]="t('storeSettings.branding.dropOrBrowse')"
+            [assetName]="t('storeSettings.branding.banner')"
             [rules]="bannerRules"
             [url]="branding().banner?.url ?? null"
             [fileName]="branding().banner?.name ?? null"

@@ -183,6 +183,14 @@ export class StoreSettingsApi {
         this.loadedHomeBox = homeBox;
         this.loadedPayments = paymentConfigs;
         this.podTarget = podHostname(saas, pod);
+
+        /*
+         * The store's own address, which several sections need and only this one can work out. The
+         * subdomain is the storefront; a custom domain is an alias to it, so the subdomain is what
+         * a provider's allow-list should hold.
+         */
+        const domains = this.domains(allocations, store);
+        const storefront = domains.find((entry) => entry.type === 'SUB_DOMAIN')?.hostname ?? null;
         const choices: SettingsChoices = {
           themes,
           colorThemes,
@@ -197,12 +205,12 @@ export class StoreSettingsApi {
           storeName: store.name,
           branding: this.branding(store),
           details: this.details(store),
-          domains: this.domains(allocations, store),
+          domains,
           podTarget: this.podTarget,
           home: this.home(homeBox),
           homeBoxId: homeBox?.id ?? null,
-          socialLogin: this.socialLoginConfigs(loginProviders, loginConfigs, store),
-          payments: this.paymentGateways(paymentTypes, paymentConfigs),
+          socialLogin: this.socialLoginConfigs(loginProviders, loginConfigs, store, storefront),
+          payments: this.paymentGateways(paymentTypes, paymentConfigs, store.id, storefront),
           socialLinks: this.socialLinks(store, socialLinkProviders),
           slides: this.slides(store),
           choices,
@@ -701,6 +709,7 @@ export class StoreSettingsApi {
     providers: readonly string[],
     configs: readonly ReadableSocialLoginConfig[],
     store: ReadableMerchantStore,
+    storefront: string | null,
   ): readonly SocialLoginConfig[] {
     const stored = new Map(configs.map((config) => [config.providerId, config]));
     const known = providers.length > 0 ? providers : [...stored.keys()];
@@ -712,7 +721,7 @@ export class StoreSettingsApi {
         icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : SOCIAL_LINK_FALLBACK_ICON,
         appId: config?.appId ?? '',
         appSecret: config?.appSecret ?? '',
-        callbackUrl: this.callbackUrl(store, providerId),
+        callbackUrl: this.callbackUrl(storefront, store.id, providerId),
         enabled: config?.enabled ?? false,
         configured: config !== undefined,
       };
@@ -722,15 +731,44 @@ export class StoreSettingsApi {
   /**
    * Where a provider sends the shopper back to.
    *
-   * Assembled here because no endpoint answers it. cua registers each provider under
-   * `{store}.{provider}` — `SocialLoginConfigId.toRegistrationId()` — and Spring Security's default
-   * callback path is `/login/oauth2/code/{registrationId}`. The host is the store's own storefront,
-   * which is the subdomain the domain section works out. See lessons.md, "Store management — a
-   * social login callback URL has to be assembled by the client".
+   * Assembled here because no endpoint answers it, and every part of it comes from somewhere else:
+   *
+   * - `/cua` is the gateway's own prefix. The pod's Caddyfile uses `handle /cua*` — not
+   *   `handle_path` — and sets `X-Forwarded-Prefix: /cua`, so Spring resolves its `{baseUrl}` with
+   *   that segment included. seller-ui showed exactly this path and it is why.
+   * - `/login/oauth2/code/{registrationId}` is `Constants.DEFAULT_REDIRECT_URI`, Spring Security's
+   *   own shape.
+   * - `{registrationId}` is `{store}.{provider}` in lower case —
+   *   `SocialLoginConfigId.toRegistrationId()`.
+   * - The host is the store's actual storefront, which is the subdomain the domain section works
+   *   out from `saas-properties` and the pod. It is *not* derivable from the store id: an earlier
+   *   version guessed `{storeId}.{podTarget}` and produced a URL no provider would ever call back
+   *   to.
+   *
+   * Answers the path alone when the host is unknown — the pod lookup is refused for a suspended
+   * store — because a path an operator can still recognise beats a URL built on a guess.
    */
-  private callbackUrl(store: ReadableMerchantStore, providerId: string): string {
-    const host = this.podTarget ? `https://${store.id}.${this.podTarget}` : '';
-    return `${host}/login/oauth2/code/${store.id}.${providerId.toLowerCase()}`;
+  private callbackUrl(storefront: string | null, storeId: string, providerId: string): string {
+    const path = `/cua/login/oauth2/code/${storeId}.${providerId.toLowerCase()}`;
+    return storefront ? `https://${storefront}${path}` : path;
+  }
+
+  /**
+   * Where a gateway should post its events.
+   *
+   * Assembled rather than served, like the social-login callback and for the same reason: the route
+   * exists, nothing hands it out. `PublicPaymentWebhookApi` maps
+   * `POST /api/v1/public/webhook/{storeId}/{paymentType}`, and the pod's Caddyfile reaches the
+   * payment service through `handle_path /payment*` — `handle_path`, which **strips** the segment,
+   * so the prefix goes back on here. The payment type is the enum's own name in upper case, because
+   * the controller binds it as a `PaymentType`.
+   *
+   * Answers the path alone when the storefront host is unknown: a fragment an operator can still
+   * recognise beats a URL built on a guess.
+   */
+  private webhookUrl(storefront: string | null, storeId: string, paymentType: string): string {
+    const path = `/payment/api/v1/public/webhook/${storeId}/${paymentType}`;
+    return storefront ? `https://${storefront}${path}` : path;
   }
 
   /**
@@ -744,6 +782,8 @@ export class StoreSettingsApi {
   private paymentGateways(
     types: readonly string[],
     configs: readonly ReadablePaymentConfiguration[],
+    storeId: string,
+    storefront: string | null,
   ): readonly PaymentGatewayConfig[] {
     const stored = new Map(configs.map((config) => [config.paymentType, config]));
     const known = types.length > 0 ? types : [...stored.keys()];
@@ -760,6 +800,7 @@ export class StoreSettingsApi {
               apiKey: config?.apiKey ?? '',
               secretKey: config?.secretKey ?? '',
               webhookSecret: config?.webhookSecret ?? '',
+              webhookUrl: this.webhookUrl(storefront, storeId, paymentType),
             }
           : null,
         configured: config !== undefined,

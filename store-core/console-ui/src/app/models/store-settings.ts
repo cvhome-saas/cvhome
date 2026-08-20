@@ -345,14 +345,15 @@ export const LOGIN_PROVIDER_LABEL_KEY: Readonly<Record<LoginProvider, string>> =
 /**
  * The credential half of a gateway, as the endpoint actually returns it: in cleartext.
  *
- * `webhookUrl` is gone. The mockup showed one per gateway and nothing on the platform records or
- * derives it — the payment service has no webhook route keyed to a store. See lessons.md, "Store
- * management — a gateway has no webhook URL to show".
+ * `webhookUrl` is not returned by anything — it is assembled by the console from the route
+ * `PublicPaymentWebhookApi` actually maps. See `paymentGateways` for the parts.
  */
 export interface PaymentCredentials {
   readonly apiKey: string;
   readonly secretKey: string;
   readonly webhookSecret: string;
+  /** Where the gateway should post its events, for pasting into Stripe or PayPal. */
+  readonly webhookUrl: string;
 }
 
 /** `ReadablePaymentConfiguration`. Display copy resolved from `PAYMENT_TYPE_LABEL_KEY` / `PAYMENT_TYPE_DESCRIPTION_KEY`. */

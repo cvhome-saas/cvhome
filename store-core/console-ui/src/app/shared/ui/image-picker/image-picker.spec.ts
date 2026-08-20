@@ -110,6 +110,8 @@ describe('ImagePicker', () => {
 
     peek(fixture)!.click();
     fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
 
     const dialog = fixture.nativeElement.querySelector('dialog') as HTMLDialogElement;
     expect(dialog.open).toBeTrue();
@@ -117,13 +119,17 @@ describe('ImagePicker', () => {
     expect(dialog.textContent).toContain('hero.png');
 
     dialog.querySelector<HTMLButtonElement>('.preview-close')!.click();
-    for (let attempt = 0; attempt < 20 && dialog.querySelector('.preview-image'); attempt += 1) {
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    /*
+     * The picture outlives the `close()` call on purpose — the dialog transitions out, and clearing
+     * it immediately would fade an empty panel — so this waits past the exit rather than one turn.
+     */
+    for (let attempt = 0; attempt < 60 && dialog.querySelector('.preview-image'); attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
       fixture.detectChanges();
     }
 
     expect(dialog.open).toBeFalse();
-    // The image is dropped with the dialog rather than left decoding behind a closed door.
+    // Only then is it dropped, rather than left decoding behind a closed door.
     expect(dialog.querySelector('.preview-image')).toBeNull();
   });
 });
