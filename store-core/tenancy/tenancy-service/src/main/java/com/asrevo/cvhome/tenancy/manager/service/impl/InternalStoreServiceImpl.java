@@ -77,8 +77,8 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Transactional
     @Override
-    public void failProvisioning(StoreMerchantId store) {
-        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning()));
+    public void failProvisioning(StoreMerchantId store, String reason) {
+        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning(reason)));
     }
 
     @Transactional

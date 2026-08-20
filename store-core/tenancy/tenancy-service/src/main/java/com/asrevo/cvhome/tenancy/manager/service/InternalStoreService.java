@@ -25,7 +25,11 @@ public interface InternalStoreService {
 
     void completeProvisioning(StoreMerchantId store);
 
-    void failProvisioning(StoreMerchantId store);
+    /**
+     * Records the store as failed, with the reason the pod gave. The reason is required rather than optional: a
+     * FAILED row that says nothing is what left the console able only to report "failed".
+     */
+    void failProvisioning(StoreMerchantId store, String reason);
 
     void startProvisioning(StoreMerchantId store);
 

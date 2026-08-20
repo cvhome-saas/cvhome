@@ -1,12 +1,16 @@
 package com.asrevo.cvhome.tenancy.manager.service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.ErrorPayload;
+import com.asrevo.cvhome.errors.FieldError;
 import com.asrevo.cvhome.errors.RemoteServiceTimeoutException;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
@@ -68,9 +72,47 @@ public class StoreProvisioningService {
             // The pod answered, and refused. Retrying an identical request will be refused identically, so this is
             // recorded as failed and swallowed — rethrowing would burn the outbox record's attempts and bury the
             // one line an operator needs to see.
-            internalStoreService.failProvisioning(store);
-            log.error("Pod {} refused to create store {}; marked FAILED_PROVISIONING", pod, store, err);
+            String reason = reasonFrom(err);
+            internalStoreService.failProvisioning(store, reason);
+            log.error("Pod {} refused to create store {}; marked FAILED_PROVISIONING: {}", pod, store, reason, err);
         }
+    }
+
+    /**
+     * The pod's refusal, reduced to one line worth storing.
+     *
+     * <p>
+     * The pod speaks the same problem-detail contract we do, so a rejected create arrives carrying a code, a detail
+     * and — for a validation failure, which is the common case — the exact fields it objected to. All of that used
+     * to end at {@code log.error} while the store row recorded nothing but {@code FAILED_PROVISIONING}, and a
+     * merchant looking at the console had no way to learn that the problem was a missing phone number.
+     * </p>
+     *
+     * <p>
+     * Field names are joined into the line rather than modelled: this is a diagnostic string for a human, not a
+     * second binding channel. The synchronous {@code @Valid} on the create endpoint is what gives a form its field
+     * errors; anything reaching here is a gap between our validation and the pod's, which someone has to read.
+     * </p>
+     */
+    private static String reasonFrom(UnmappedRemoteFailureException err) {
+        ErrorPayload payload = err.payload();
+        StringBuilder reason = new StringBuilder(err.remoteCode() == null ? payload.errorCode().code()
+                : err.remoteCode());
+        if (payload.detail() != null && !payload.detail().isBlank()) {
+            reason.append(": ").append(payload.detail());
+        }
+        List<FieldError> fields = payload.fieldErrors();
+        if (!fields.isEmpty()) {
+            reason.append(" (")
+                    .append(fields.stream().map(StoreProvisioningService::describe).collect(Collectors.joining(", ")))
+                    .append(')');
+        }
+        return reason.toString();
+    }
+
+    private static String describe(FieldError field) {
+        return field.message() == null || field.message().isBlank() ? field.field()
+                : field.field() + " " + field.message();
     }
 
     private boolean alreadyProvisioned(StoreMerchantId store) throws StoreNotFoundException {

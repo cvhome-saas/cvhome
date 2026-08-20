@@ -25,6 +25,10 @@ public interface ManagerStoreMappers {
     @Mapping(target = "provisioningState", ignore = true)
     // A list filter has no lifecycle status: the query excludes DELETED itself and matches the rest.
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "provisioningError", ignore = true)
+    // Not a property. MapStruct reads any single-argument method returning the entity as a setter, so the
+    // failProvisioning(reason) transition looks like one to it.
+    @Mapping(target = "failProvisioning", ignore = true)
     ManagerStoreEntity toEntity(ListManagerStoreQuery managerStoreDto);
 
     default PageImpl<Object> toPage(List<Object> it, Page<ManagerStoreDto> internalStores) {

@@ -58,7 +58,22 @@ public class SubscriptionApi {
 
     private static final String CANCEL_PATH = "/public/subscription/fail";
 
-    private static final String SELLER_UI = "seller-ui";
+    /**
+     * The console a paying customer is returned to.
+     *
+     * <p>
+     * {@code console-ui}, not {@code seller-ui}: the console is the seller-facing app now, and it already serves
+     * both outcome routes. While this named the old app, an operator who upgraded from the console was handed back
+     * to a different application after paying — the subscription was correct, the landing page was somebody else's.
+     * </p>
+     *
+     * <p>
+     * A constant rather than a property, deliberately. There is exactly one seller console per deployment, and a
+     * configurable return URL in a payment flow is a knob whose only wrong setting is an open redirect out of a
+     * checkout. When seller-ui is retired this line is already right.
+     * </p>
+     */
+    private static final String SELLER_CONSOLE = "console-ui";
 
     private final SubscriptionService subscriptionService;
 
@@ -164,7 +179,7 @@ public class SubscriptionApi {
         int port = Optional.ofNullable(request.getHeader(RedirectionUrlBuilder.PORT_HEADER_KEY))
                 .map(Integer::parseInt)
                 .orElse(request.getServerPort());
-        return new RedirectionUrlBuilder(scheme, port, serviceDomainProperties.getService(SELLER_UI));
+        return new RedirectionUrlBuilder(scheme, port, serviceDomainProperties.getService(SELLER_CONSOLE));
     }
 
     /**

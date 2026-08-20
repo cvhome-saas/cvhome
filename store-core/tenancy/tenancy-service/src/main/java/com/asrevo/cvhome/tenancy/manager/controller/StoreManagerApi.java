@@ -3,6 +3,8 @@ package com.asrevo.cvhome.tenancy.manager.controller;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,11 +80,18 @@ public class StoreManagerApi {
      *                                         something the merchant can resolve: someone has to drain, resize or
      *                                         add a pod
      * @throws PodRegistryUnavailableException the registry could not be reached, so the store is not created
+     *
+     * <p>
+     * {@code @Valid} is what keeps a create that cannot succeed from being accepted. Provisioning is asynchronous —
+     * this answers before the pod has seen the body — so a field the pod requires and this endpoint does not check
+     * surfaces as a {@code FAILED_PROVISIONING} row minutes later with no reason attached, rather than as a 400 the
+     * form can bind. See {@link CreateStoreRequest} for which of merchant's fields are checked here and why.
+     * </p>
      */
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestBody CreateStoreRequest request)
+                                  @Valid @RequestBody CreateStoreRequest request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
             PodRegistryUnavailableException, DuplicateStoreNameException {
         return this.managerService.createStore(identity.org(), request);

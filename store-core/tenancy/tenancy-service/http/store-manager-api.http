@@ -53,7 +53,8 @@ Cookie: SESSION={{SESSION_ID}}
 %}
 
 ### creating a store — a typed request now, not an untyped map
-# `name` and `pod` are what tenancy reads; everything else is forwarded to the pod untouched.
+# `name` and `pod` are what tenancy reads; the rest is merchant's, but the fields the pod *refuses without* are
+# validated here so the failure is this 400 rather than a FAILED_PROVISIONING row minutes later.
 # @name createStore
 POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
 Cookie: SESSION={{SESSION_ID}}
@@ -63,8 +64,17 @@ Content-Type: application/json
   "name": "HTTP-TEST-STORE",
   "email": "store@example.com",
   "phone": "+10000000000",
-  "theme": "DEFAULT",
-  "colorTheme": "BLUE"
+  "theme": "BASIS",
+  "colorTheme": "LIGHT",
+  "currency": "EUR",
+  "defaultLanguage": "en",
+  "supportedLanguages": ["en"],
+  "address": {
+    "country": "DE",
+    "city": "Berlin",
+    "address": "1 Test Street",
+    "postalCode": "10115"
+  }
 }
 
 > {%
@@ -75,6 +85,31 @@ Content-Type: application/json
     client.global.set("CREATED_STORE_ID", response.body.id.id);
 %}
 
+### a body missing what the pod requires is refused here, synchronously, with field errors
+# Before tenancy validated these, this exact body was accepted with a 200 and the store failed to provision later
+# with nothing recorded but the word FAILED.
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "HTTP-TEST-INCOMPLETE",
+  "country": "DE",
+  "currency": "EUR"
+}
+
+> {%
+    client.test("an incomplete store is a 400, not an accepted create", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.code === "COMMON.VALIDATION_FAILED", "code " + response.body.code);
+        const fields = (response.body.fieldErrors || []).map(function (e) { return e.field; });
+        ["email", "phone", "theme", "colorTheme", "defaultLanguage", "supportedLanguages", "address"]
+            .forEach(function (f) {
+                client.assert(fields.indexOf(f) !== -1, "missing field error for " + f + ": " + fields.join(","));
+            });
+    });
+%}
+
 ### the same name again — the unique constraint decides, not the pre-flight check
 POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
 Cookie: SESSION={{SESSION_ID}}
@@ -83,7 +118,13 @@ Content-Type: application/json
 {
   "name": "HTTP-TEST-STORE",
   "email": "store@example.com",
-  "phone": "+10000000000"
+  "phone": "+10000000000",
+  "theme": "BASIS",
+  "colorTheme": "LIGHT",
+  "currency": "EUR",
+  "defaultLanguage": "en",
+  "supportedLanguages": ["en"],
+  "address": {"country": "DE"}
 }
 
 > {%
