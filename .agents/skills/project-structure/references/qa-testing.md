@@ -13,46 +13,55 @@ routing change, a permission token, a new store/pod. "It compiles and the unit t
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh   # once per machine — /etc/hosts for gateway.com, pods, demo stores
-./extra/scripts/run-lcl.sh                 # infra + every Java service + both frontends
+./extra/scripts/run-lcl.sh start           # infra + every Java service + both frontends
 ```
 
-`run-lcl.sh` is *the* way to start it. It starts the compose infra (postgres, `spg`, monitoring), then each
-Java service under `--spring.profiles.active=lcl,test-stores` in dependency order (**uaa first — it issues the
-tokens**), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building landing-ui's workspace libs. Java
-services run **on the host**, not in Docker; `spg`'s `extra_hosts` map service hostnames back to the host.
+`run-lcl.sh` is *the* way to start it. It starts the compose infra (postgres, MinIO at `:9000`, `spg`,
+monitoring), then each Java service under `--spring.profiles.active=lcl,test-stores` in dependency order
+(**uaa first — it issues the tokens**), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building
+landing-ui's workspace libs. Java services run **on the host**, not in Docker; `spg`'s `extra_hosts` map
+service hostnames back to the host. A no-argument `./extra/scripts/run-lcl.sh` still means `start`.
 
-| flag | effect |
+| command / flag | effect |
 |---|---|
-| `--list` | print what would start, then exit — safe dry run |
-| `uaa catalog` | only those services, plus infra |
-| `--no-infra` | compose is already up; also leaves it up on exit |
-| `--keep-infra` | stop the services, leave the containers running |
-| `--build` | `./gradlew build -x test -x check` first |
+| `start --list` | print configured services with current `running <pid>` / `stopped` / `port-used <pid>` status |
+| `start uaa catalog` | only those services, plus infra |
+| `start --no-infra` | compose is already up; also leaves it up on exit |
+| `start --keep-infra` | stop the services, leave the containers running |
+| `start --build` | `./gradlew build -x test -x check` first |
+| `start -d` | start the stack in the background, wait for requested ports, then return |
+| `start -d catalog` | start only the selected stopped service in the recorded stack, then return |
+| `stop` | stop the recorded stack and delete compose volumes, logs, and pids |
+| `stop catalog` | stop only the selected recorded service |
+| `stop --volumes` | same cleanup as `stop`; kept for compatibility |
+| `restart` | stop the recorded stack with cleanup, then start it again |
+| `restart -d` | full stack restart in the background, wait for ports, then return |
+| `restart catalog` | restart only the selected recorded service |
+| `restart --volumes` | same cleanup as `restart`; rejected with selected service restart |
+| `logs [service...]` | tail all logs, or selected logs such as `logs gateway catalog` |
+| `pid [service...]` | print the recorded supervisor and service pids |
 
 Ports come from `common-config.yml` — change one there and change it in the script's
 `JAVA_SERVICES` / `NODE_SERVICES` tables too.
 
-**Check whether it is already running before starting it again.** The script skips any service whose port is
-already bound, so a second run against a live stack starts nothing useful — and when *it* exits it tears the
-containers down under the stack you were using. Cheap check: `run-lcl.sh --list` plus a port probe
-(`lsof -i :8000`, `:8010`, `:8110`).
+`start` removes old logs/runtime files and resets compose volumes before booting infra. It records its
+supervisor and service pids under `build/lcl-runtime/`. Starting again first stops any recorded live stack, so a
+stale run does not silently share ports with the new one. `stop <service...>` and `restart <service...>` use
+those pid files to stop or replace only selected services while the supervisor keeps the rest of the stack
+running. A selected stop leaves that service down until `restart <service>` or `start -d <service>`.
+Selected service restart requires the stack infra to still be up; if Postgres is not answering on `:5432`, it
+warns before starting the service. The supervisor blocks in the foreground tailing `build/lcl-logs/*.log`, and
+brings everything down if any non-stopped/non-restarting service dies. Run it in the background when a test
+needs to keep the stack available, inspect it with `pid`, and stop it with `stop`. Then verify: ports free and
+`docker compose -f docker-compose-lcl.yml ps` empty. Internally, shutdown still uses `SIGTERM`; use the command
+rather than manual `pkill`.
 
-It **blocks in the foreground** tailing `build/lcl-logs/*.log`, and brings everything down if any one service
-dies. So run it in the background (`run_in_background`) and watch `build/lcl-logs/`.
-
-**Stopping a backgrounded run: send `SIGTERM`, not `SIGINT`.**
-
-```bash
-pkill -TERM -f "bash ./extra/scripts/run-lcl.sh"
-```
-
-A shell that starts the script in the background inherits SIGINT as *ignored* and no trap can override that —
-Ctrl-C / `kill -INT` is silently a no-op there. Ctrl-C only works in the foreground. Then verify: ports free
-and `docker compose -f docker-compose-lcl.yml ps` empty.
+Use `start -d` or full `restart -d` when the terminal should return after startup; the background supervisor
+continues writing startup output to `build/lcl-stack.log`.
 
 Iterating on one frontend against an already-running backend? Don't restart everything — leave the stack up
-and run `npm start` in that `-ui` module, or start a narrowed set (`run-lcl.sh --no-infra seller-ui`). One
-service by hand:
+and run `npm start` in that `-ui` module, or start a narrowed set
+(`run-lcl.sh start --no-infra seller-ui`). One service by hand:
 `./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl,test-stores'`.
 
 ---

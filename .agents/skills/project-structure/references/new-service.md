@@ -349,5 +349,5 @@ that service's own data). Anything a user navigates to as a product surface belo
 [ ] FE: app.sub entry if it is browser-facing behind uaa login
 [ ] Versions via libs.versions.toml only
 [ ] ./gradlew checkstyleMain checkstyleTest && ./gradlew build -x test -x check clean
-[ ] ./extra/scripts/run-lcl.sh --list shows it; a real run starts it
+[ ] ./extra/scripts/run-lcl.sh start --list shows it; a real run starts it
 ```
