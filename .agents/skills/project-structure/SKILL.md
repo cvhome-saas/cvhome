@@ -272,8 +272,14 @@ it in the browser or through the endpoint's `.http` blocks. Two things QA must s
 **tenant isolation** (repeat as a second store — it must not see the first store's data) and the
 **permission gate** (no token → 403, not an empty 200).
 
-The script blocks and tears everything down on exit, so background it, check it isn't already running, and
-stop it with `SIGTERM` — `SIGINT` is a no-op on a backgrounded run.
+Use `./extra/scripts/run-lcl.sh start` to bring the stack up, `stop` to tear down the recorded run,
+`stop <service...>` to stop only selected services, `restart` to replace the stack, `restart <service...>` to
+restart only selected services, `logs [service...]` to tail service logs, and `pid [service...]` to inspect the
+recorded processes. A no-argument run still means `start`.
+Full `start`, `stop`, and `restart` reset compose volumes, logs, and runtime pid files. Selected service
+start/stop/restart is scoped to the named service and keeps infra/data in place. Use `start -d` or full
+`restart -d` to return the terminal after the requested service ports open; selected `start -d <service>` asks
+the recorded supervisor to start that service without stopping the rest of the stack.
 
 **Procedure, flags, logins, browser tooling, log/trace locations, known local gaps and the checklist:
 `references/qa-testing.md`.**
@@ -299,7 +305,7 @@ See `references/frontends.md`.
 | Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
 | Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
 | QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `./extra/scripts/run-lcl.sh` |
-| Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`run-lcl.sh`, its flags, `SIGTERM` not `SIGINT`) |
+| Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`run-lcl.sh start/stop/restart/logs/pid`) |
 | Log in locally (seller or storefront) | `references/qa-testing.md` §2 — the `test-stores` demo accounts |
 | Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
 | Store an API key / secret | encrypt in the mapper via `SecretCryptoProvider` — never a plaintext column |
