@@ -52,7 +52,7 @@ import {Icon} from '@shared/ui/icon/icon';
         [disabled]="empty()"
         (click)="revealed.set(!revealed())"
       >
-        <app-icon [name]="revealed() ? 'xCircle' : 'search'" />
+        <app-icon [name]="revealed() ? 'eyeOff' : 'eye'" />
       </button>
 
       <button

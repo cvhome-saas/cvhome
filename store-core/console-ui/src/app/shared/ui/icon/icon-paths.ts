@@ -33,6 +33,10 @@ export const ICON_PATHS = {
   pin: 'M12 17v5M7 3h10l-2 7 3 4H6l3-4-2-7Z',
   plus: 'M12 5v14M5 12h14',
   search: 'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm6-2 4 4',
+  /* An eye, for revealing something that is deliberately hidden — a masked secret, a thumbnail
+     worth seeing at full size. Paired with `eyeOff`, which is the same lid struck through. */
+  eye: 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  eyeOff: 'M10.7 6.2A9.6 9.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 3.9M6.4 6.4A17.6 17.6 0 0 0 2 12s3.6 7 10 7c1.4 0 2.7-.3 3.8-.8M3 3l18 18m-11.1-11.1a3 3 0 0 0 4.2 4.2',
   signOut: 'M10 17l5-5-5-5M15 12H3M21 3v18',
   shoppingCart: 'M4 4h2l2 11h10l2-7H7m2 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm9 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z',
   sort: 'M8 7h11M8 12h8M8 17h5M4 7h.01M4 12h.01M4 17h.01',

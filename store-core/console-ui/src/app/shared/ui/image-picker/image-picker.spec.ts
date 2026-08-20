@@ -13,13 +13,27 @@ const BANNER: ImageRules = {
   aspectTolerance: 0.35,
 };
 
+/** A 1×1 transparent GIF: a real, decodable asset for the well to hold. */
+const STORED =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 @Component({
   imports: [ImagePicker],
-  template: `<app-image-picker [label]="label" [rules]="rules" (picked)="picked.set($event)" />`,
+  template: `
+    <app-image-picker
+      [label]="label"
+      [rules]="rules"
+      [url]="url()"
+      [fileName]="fileName()"
+      (picked)="picked.set($event)"
+    />
+  `,
 })
 class Host {
   readonly label = 'Banner';
   readonly rules = BANNER;
+  readonly url = signal<string | null>(null);
+  readonly fileName = signal<string | null>(null);
   readonly picked = signal<File | null>(null);
 }
 
@@ -75,7 +89,48 @@ describe('ImagePicker', () => {
     expect(fixture.componentInstance.picked()).toBeNull();
     expect(error(fixture)).toContain('wrong shape');
   });
+
+  it('offers a closer look only when there is something to look at', async () => {
+    expect(peek(fixture)).toBeNull();
+
+    fixture.componentInstance.url.set(STORED);
+    fixture.componentInstance.fileName.set('hero.png');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(peek(fixture)).not.toBeNull();
+    expect(peek(fixture)!.getAttribute('aria-label')).toContain('Banner');
+  });
+
+  it('opens the asset in a dialog and closes again', async () => {
+    fixture.componentInstance.url.set(STORED);
+    fixture.componentInstance.fileName.set('hero.png');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    peek(fixture)!.click();
+    fixture.detectChanges();
+
+    const dialog = fixture.nativeElement.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog.open).toBeTrue();
+    expect(dialog.querySelector('.preview-image')?.getAttribute('src')).toBe(STORED);
+    expect(dialog.textContent).toContain('hero.png');
+
+    dialog.querySelector<HTMLButtonElement>('.preview-close')!.click();
+    for (let attempt = 0; attempt < 20 && dialog.querySelector('.preview-image'); attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      fixture.detectChanges();
+    }
+
+    expect(dialog.open).toBeFalse();
+    // The image is dropped with the dialog rather than left decoding behind a closed door.
+    expect(dialog.querySelector('.preview-image')).toBeNull();
+  });
 });
+
+function peek(fixture: ComponentFixture<Host>): HTMLButtonElement | null {
+  return fixture.nativeElement.querySelector('.peek');
+}
 
 /**
  * Puts a file through the hidden input the way the browser would, and waits for the verdict.

@@ -175,7 +175,9 @@
       "failedAnnouncement": "Export failed. {message}"
     },
     "imagePicker": {
+      "close": "Close",
       "constraints": "{formats} · at least {width}×{height} · up to {size}",
+      "peek": "View {field} full size",
       "replace": "Replace",
       "saved": "Saved",
       "stored": "Stored: {name}",

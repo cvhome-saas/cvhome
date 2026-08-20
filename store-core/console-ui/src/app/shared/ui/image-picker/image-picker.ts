@@ -1,4 +1,15 @@
-import {Component, computed, effect, inject, input, output, signal, untracked} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
@@ -36,10 +47,11 @@ export interface ImageRules {
   imports: [Icon],
   template: `
     <!--
-      The label *is* the frame, so clicking anywhere on the asset opens the picker and the whole
-      well is one keyboard stop. The input stays visually hidden inside it rather than being
-      referenced by id, which keeps the pair impossible to separate.
+      The frame holds two controls that overlap, which is why the eye is a sibling of the label
+      rather than a child of it: any button inside a label activates that label's input, so an eye
+      nested in the well would have opened the file picker instead of the preview.
     -->
+    <div class="frame">
     <label
       class="well"
       [class.filled]="hasImage()"
@@ -90,6 +102,46 @@ export interface ImageRules {
       }
     </label>
 
+      @if (hasImage()) {
+        <!--
+          Kept in the DOM rather than revealed on hover alone: a control that only exists for a
+          pointer is a control a keyboard cannot reach. It fades in with the veil and is fully
+          opaque whenever it holds focus.
+        -->
+        <button
+          class="peek"
+          type="button"
+          [attr.aria-label]="peekLabel()"
+          [title]="peekLabel()"
+          (click)="openPreview()"
+        >
+          <app-icon name="eye" />
+        </button>
+      }
+    </div>
+
+    <!--
+      A native dialog, as shared/ui/confirm-dialog established: showModal() brings the top layer,
+      the focus trap, the backdrop and Escape with it. The asset is shown at its own size up to the
+      viewport, because the point of asking is to see the detail the small well loses.
+    -->
+    <dialog #preview class="preview" (close)="onClosed()">
+      @if (previewOpen()) {
+        <img class="preview-image" [src]="url()" [alt]="alt()" (load)="onMeasured($event)" />
+        <p class="preview-foot">
+          @if (fileName()) {
+            <span class="preview-name">{{ fileName() }}</span>
+          }
+          @if (naturalSize(); as size) {
+            <span class="preview-size">{{ size }}</span>
+          }
+          <button class="preview-close" type="button" (click)="closePreview()">
+            {{ t('shared.imagePicker.close') }}
+          </button>
+        </p>
+      }
+    </dialog>
+
     <!--
       One line under the frame at most, and only when it adds something. An empty well already
       states the rules inside itself, so repeating them here was the same sentence twice.
@@ -108,6 +160,7 @@ export interface ImageRules {
     '(dragover)': 'onDragOver($event)',
     '(dragleave)': 'isOver.set(false)',
     '(drop)': 'onDrop($event)',
+    '(click)': 'onDocumentClick($event)',
   },
 })
 export class ImagePicker {
@@ -132,6 +185,12 @@ export class ImagePicker {
 
   /** True for a moment after an upload finishes, so the well confirms rather than just stopping. */
   protected readonly justSaved = signal(false);
+
+  private readonly preview = viewChild.required<ElementRef<HTMLDialogElement>>('preview');
+
+  protected readonly previewOpen = signal(false);
+  /** The asset's real dimensions, read off the enlarged image once the browser has it. */
+  protected readonly naturalSize = signal<string | null>(null);
 
   private readonly wasBusy = signal(false);
 
@@ -177,6 +236,44 @@ export class ImagePicker {
 
   protected t(key: string, params?: Record<string, unknown>): string {
     return this.transloco.translate(key, params);
+  }
+
+  protected peekLabel(): string {
+    return this.transloco.translate('shared.imagePicker.peek', {field: this.label()});
+  }
+
+  protected openPreview(): void {
+    this.naturalSize.set(null);
+    this.previewOpen.set(true);
+    this.preview().nativeElement.showModal();
+  }
+
+  protected closePreview(): void {
+    this.preview().nativeElement.close();
+  }
+
+  /**
+   * Closes on a click that lands on the backdrop rather than on the picture.
+   *
+   * A modal dialog's backdrop is drawn by the element itself, so there is no node to bind to — the
+   * test is whether the click's target *is* the dialog, which only happens when it missed
+   * everything inside. Bound from the host rather than in the template on purpose: a template
+   * `(click)` here trips the a11y rule that wants a keyboard equivalent, and the keyboard
+   * equivalent is `Escape`, which the native dialog already handles.
+   */
+  protected onDocumentClick(event: MouseEvent): void {
+    if (this.previewOpen() && event.target === this.preview().nativeElement) {
+      this.closePreview();
+    }
+  }
+
+  protected onClosed(): void {
+    this.previewOpen.set(false);
+  }
+
+  protected onMeasured(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    this.naturalSize.set(`${image.naturalWidth} × ${image.naturalHeight}`);
   }
 
   protected onPicked(event: Event): void {

@@ -175,7 +175,9 @@
       "failedAnnouncement": "فشل التصدير. {message}"
     },
     "imagePicker": {
+      "close": "إغلاق",
       "constraints": "{formats} · ‎{width}×{height}‎ على الأقل · حتى {size}",
+      "peek": "عرض {field} بالحجم الكامل",
       "replace": "استبدال",
       "saved": "تم الحفظ",
       "stored": "المخزَّن: {name}",
