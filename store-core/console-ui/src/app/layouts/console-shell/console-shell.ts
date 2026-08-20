@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
@@ -6,6 +6,7 @@ import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleSidebar} from './components/console-sidebar/console-sidebar';
 import {ConsoleToolbar} from './components/console-toolbar/console-toolbar';
 import {PlanBanner} from './components/plan-banner/plan-banner';
+import {BillingFacade} from '@shared/billing/billing.facade';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
 
 /**
@@ -20,8 +21,8 @@ import {ConsoleShellFacade} from './facades/console-shell.facade';
   selector: 'app-console-shell',
   imports: [ConsoleSidebar, ConsoleToolbar, Icon, PlanBanner, RouterOutlet, TranslocoDirective],
   template: `
-    <div class="console" [class.banner-on]="shell.bannerShown()" *transloco="let t">
-      @if (shell.bannerShown()) {
+    <div class="console" [class.banner-on]="bannerShown()" *transloco="let t">
+      @if (bannerShown()) {
         <app-plan-banner />
       }
 
@@ -62,6 +63,20 @@ import {ConsoleShellFacade} from './facades/console-shell.facade';
 })
 export class ConsoleShell {
   protected readonly shell = inject(ConsoleShellFacade);
+  private readonly billing = inject(BillingFacade);
+
+  /**
+   * Whether the banner occupies a row.
+   *
+   * Asked here rather than on `ConsoleShellFacade` because the answer now depends on billing, and
+   * `BillingFacade` already injects the shell facade — putting it there would close a dependency
+   * cycle. The layout needs the same answer the banner does: `.banner-on` reserves the row's height,
+   * so gating only the component would leave a 49px gap above every page whenever there is nothing
+   * to say, which is the normal case for a paying customer.
+   */
+  protected readonly bannerShown = computed(
+    () => this.shell.bannerShown() && this.billing.banner() !== null,
+  );
 
   /** Escape backs out of whatever is open — a menu, or the mobile drawer. */
   protected dismiss(): void {

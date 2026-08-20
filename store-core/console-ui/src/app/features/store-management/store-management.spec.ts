@@ -319,7 +319,8 @@ describe('StoreManagement', () => {
     const {element} = load();
 
     expect(element.querySelector('app-branding-section')).not.toBeNull();
-    expect(element.querySelector('app-settings-nav')).not.toBeNull();
+    // The rail is `app-section-nav` now — promoted to shared when billing grew the same shape.
+    expect(element.querySelector('app-section-nav')).not.toBeNull();
     expect(element.querySelector('app-details-section')).toBeNull();
 
     // Chrome belongs to the shell; a page must not grow its own.

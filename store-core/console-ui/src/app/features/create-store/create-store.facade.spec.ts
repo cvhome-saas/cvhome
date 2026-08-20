@@ -14,7 +14,7 @@ import {FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {CreateStoreFacade} from './facades/create-store.facade';
 
-function store(state: ProvisioningState): ManagerStore {
+function store(state: ProvisioningState, provisioningError: string | null = null): ManagerStore {
   return {
     id: 'store-1',
     name: 'Acme Supply Co.',
@@ -23,6 +23,7 @@ function store(state: ProvisioningState): ManagerStore {
     provisioningState: state,
     status: 'ACTIVE',
     billingStatus: null,
+    provisioningError,
   };
 }
 
@@ -31,6 +32,8 @@ class FakeManagerStoreService {
   infoCalls = 0;
   /** The state each successive poll reports. The last entry repeats. */
   states: ProvisioningState[] = ['SUCCESSFULLY_PROVISIONING'];
+  /** What a FAILED row carries as its reason, as tenancy now records it. */
+  failureReason: string | null = null;
 
   nameExists(): Observable<boolean> {
     return of(this.taken);
@@ -39,7 +42,15 @@ class FakeManagerStoreService {
   storeInfo(): Observable<ManagerStore> {
     const state = this.states[Math.min(this.infoCalls, this.states.length - 1)];
     this.infoCalls++;
-    return of(store(state));
+    return of(store(state, state === 'FAILED_PROVISIONING' ? this.failureReason : null));
+  }
+
+  themes(): Observable<string[]> {
+    return of(['BASIS', 'MODERN']);
+  }
+
+  colorThemes(): Observable<string[]> {
+    return of(['LIGHT', 'DARK']);
   }
 }
 
@@ -85,25 +96,98 @@ describe('CreateStoreFacade', () => {
     facade = TestBed.inject(CreateStoreFacade);
   });
 
+  /**
+   * A complete, valid store — every field the pod refuses without.
+   *
+   * Filling all of them is the point of the test rather than boilerplate: the form used to hold four
+   * controls, was valid without an email or a phone, and posted a body the pod could only reject once
+   * the store row already existed.
+   */
   function fill(name = 'Acme Supply Co.'): void {
-    facade.form.controls.name.setValue(name);
+    facade.form.patchValue({
+      name,
+      email: 'support@acme.test',
+      phone: '+491234567',
+      currency: 'EUR',
+      language: 'en',
+      supportedLanguages: ['en'],
+      country: 'DE',
+      city: 'Berlin',
+      postalCode: '10115',
+      theme: 'BASIS',
+      colorTheme: 'LIGHT',
+    });
     facade.form.controls.name.updateValueAndValidity();
   }
 
-  it('posts the name and the merchant fields tenancy forwards, and no pod when none was chosen', fakeAsync(() => {
+  it('posts every field the pod requires, and no pod when none was chosen', fakeAsync(() => {
     fill();
     tick(500);
     facade.start();
     tick();
 
     expect(console_.requests.length).toBe(1);
-    expect(console_.requests[0]['name']).toBe('Acme Supply Co.');
-    expect(console_.requests[0]['country']).toBe('DE');
-    expect(console_.requests[0]['currency']).toBe('EUR');
+    const request = console_.requests[0];
+    expect(request.name).toBe('Acme Supply Co.');
+    // The five that made the pod refuse the create while the form did not collect them.
+    expect(request.email).toBe('support@acme.test');
+    expect(request.phone).toBe('+491234567');
+    expect(request.theme).toBe('BASIS');
+    expect(request.colorTheme).toBe('LIGHT');
+    expect(request.defaultLanguage).toBe('en');
+    expect(request.supportedLanguages).toEqual(['en']);
+    expect(request.currency).toBe('EUR');
+    // An object, not a flat `country` key: merchant reads the country off `PersistableBaseAddress`,
+    // and a top-level `country` is a field it does not know and silently drops.
+    expect(request.address.country).toBe('DE');
+    // `@NotEmpty` on the MerchantStore *entity* — nullable columns, but Hibernate refuses the insert
+    // without them, as a 500 rather than a 400. Omitting these produced a real FAILED store in QA.
+    expect(request.address.city).toBe('Berlin');
+    expect(request.address.postalCode).toBe('10115');
+    // A LocalDate that would not parse is omitted rather than sent empty.
+    expect(request.inBusinessSince).toBeUndefined();
     // The registry places the store when the operator has no pod to ask for.
-    expect(console_.requests[0]['pod']).toBeUndefined();
+    expect(request.pod).toBeUndefined();
 
     discardPeriodicTasks();
+  }));
+
+  it('refuses to post a store the pod would reject', fakeAsync(() => {
+    fill();
+    facade.form.controls.email.setValue('');
+    facade.form.controls.phone.setValue('');
+    tick(500);
+
+    facade.start();
+    tick();
+
+    // Provisioning is asynchronous, so a body accepted here fails minutes later with no field to blame.
+    expect(console_.requests).toEqual([]);
+    expect(facade.form.controls.email.touched).toBeTrue();
+  }));
+
+  it('refuses a store with no city or postal code, which the pod rejects at persist time', fakeAsync(() => {
+    fill();
+    facade.form.controls.city.setValue('');
+    facade.form.controls.postalCode.setValue('');
+    tick(500);
+
+    facade.start();
+    tick();
+
+    expect(console_.requests).toEqual([]);
+  }));
+
+  it('refuses a default language that is not one of the supported ones', fakeAsync(() => {
+    fill();
+    facade.form.controls.supportedLanguages.setValue(['fr']);
+    tick(500);
+
+    expect(facade.form.hasError('defaultLanguageNotSupported')).toBeTrue();
+
+    facade.start();
+    tick();
+    expect(console_.requests).toEqual([]);
   }));
 
   it('sends a chosen pod as a preference', fakeAsync(() => {
@@ -157,6 +241,7 @@ describe('CreateStoreFacade', () => {
 
   it('reports a provisioning failure, which the old timer could never reach', fakeAsync(() => {
     stores.states = ['FAILED_PROVISIONING'];
+    stores.failureReason = 'COMMON.VALIDATION_FAILED: Request validation failed. (email must not be null)';
     fill();
     tick(500);
     facade.start();
@@ -165,6 +250,8 @@ describe('CreateStoreFacade', () => {
 
     expect(facade.hasFailed()).toBeTrue();
     expect(facade.isDone()).toBeFalse();
+    // The pod's own words. Before tenancy recorded these, "failed" was the entire answer available.
+    expect(facade.failureReason()).toContain('email must not be null');
 
     tick(10000);
     // A failure is terminal too — no point re-reading a row that will not change.
@@ -218,5 +305,20 @@ describe('CreateStoreFacade', () => {
     expect(facade.phase()).toBe('form');
     expect(facade.submitting()).toBeFalse();
     expect(facade.store()).toBeNull();
+  }));
+
+  it('does not put the word "undefined" in the headline when the pod has no name', fakeAsync(() => {
+    fill();
+    tick(500);
+    facade.start();
+    tick();
+    tick(2000);
+
+    // `pod/list` returns only an org's own private pods, so most placements resolve to nothing but a
+    // hex id. The subtitle used to interpolate a {region} nobody passed and read "… live in undefined".
+    expect(facade.liveSubtitle()).not.toContain('undefined');
+    expect(facade.liveSubtitle()).toContain('Acme Supply Co.');
+
+    discardPeriodicTasks();
   }));
 });

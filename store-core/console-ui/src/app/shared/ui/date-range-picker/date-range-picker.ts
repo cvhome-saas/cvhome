@@ -14,6 +14,20 @@ import {
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
+import {
+  addDays,
+  addMonths,
+  buildFormatters,
+  dateKey,
+  dateOnly,
+  isBefore,
+  isWithin,
+  monthGrid,
+  outsideBounds,
+  sameDay,
+  startOfMonth,
+  type DateFormatters,
+} from '@core/i18n/calendar';
 import {Icon} from '@shared/ui/icon/icon';
 
 export interface DateRangeValue {
@@ -45,81 +59,6 @@ interface CalendarMonth {
 
 /** How long the completed range stays visible before the panel closes itself. */
 const COMMIT_DWELL_MS = 160;
-
-function dateOnly(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function addDays(date: Date, days: number): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-}
-
-function addMonths(date: Date, months: number): Date {
-  return new Date(date.getFullYear(), date.getMonth() + months, 1);
-}
-
-function startOfMonth(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-
-function sameDay(left: Date | null, right: Date | null): boolean {
-  return !!left && !!right && dateKey(left) === dateKey(right);
-}
-
-function dateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-function isBefore(left: Date, right: Date): boolean {
-  return dateOnly(left).getTime() < dateOnly(right).getTime();
-}
-
-function isAfter(left: Date, right: Date): boolean {
-  return dateOnly(left).getTime() > dateOnly(right).getTime();
-}
-
-function isWithin(date: Date, start: Date | null, end: Date | null): boolean {
-  if (!start || !end) {
-    return false;
-  }
-  const time = dateOnly(date).getTime();
-  return time >= dateOnly(start).getTime() && time <= dateOnly(end).getTime();
-}
-
-/**
- * Every `Intl.DateTimeFormat` this component needs, built for one locale.
- *
- * A fresh set per active language rather than module-level constants: the originals were
- * hardcoded to `'en-US'`, which is exactly the kind of "translated everything except the
- * dates" gap that is easy to miss. `WEEKDAYS` is derived rather than listed, so it never
- * has to be transcribed by hand for a new language.
- */
-interface DateFormatters {
-  readonly month: Intl.DateTimeFormat;
-  readonly day: Intl.DateTimeFormat;
-  readonly fullDay: Intl.DateTimeFormat;
-  readonly range: Intl.DateTimeFormat;
-  readonly weekdays: readonly string[];
-}
-
-function buildFormatters(locale: string): DateFormatters {
-  // A known Monday, walked forward six times — locale-correct short weekday names without
-  // hardcoding a single one.
-  const monday = new Date(2026, 0, 5);
-  const weekdayFormatter = new Intl.DateTimeFormat(locale, {weekday: 'short'});
-  return {
-    month: new Intl.DateTimeFormat(locale, {month: 'long', year: 'numeric'}),
-    day: new Intl.DateTimeFormat(locale, {day: 'numeric', month: 'short'}),
-    fullDay: new Intl.DateTimeFormat(locale, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }),
-    range: new Intl.DateTimeFormat(locale, {day: '2-digit', month: '2-digit', year: 'numeric'}),
-    weekdays: Array.from({length: 7}, (_, index) => weekdayFormatter.format(addDays(monday, index))),
-  };
-}
 
 @Component({
   selector: 'app-date-range-picker',
@@ -353,18 +292,9 @@ export class DateRangePicker {
 
   private buildMonth(month: Date): CalendarMonth {
     const first = startOfMonth(month);
-    const leading = (first.getDay() + 6) % 7;
-    const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
-    const days: CalendarDay[] = [];
-    for (let index = 0; index < leading; index++) {
-      days.push(this.emptyDay(`${dateKey(first)}-empty-${index}`));
-    }
-    for (let dateNumber = 1; dateNumber <= daysInMonth; dateNumber++) {
-      days.push(this.calendarDay(new Date(first.getFullYear(), first.getMonth(), dateNumber)));
-    }
-    while (days.length % 7 !== 0) {
-      days.push(this.emptyDay(`${dateKey(first)}-tail-${days.length}`));
-    }
+    const days = monthGrid(first).map((date, index) =>
+      date ? this.calendarDay(date) : this.emptyDay(`${dateKey(first)}-empty-${index}`),
+    );
     return {key: dateKey(first), label: this.formatters().month.format(first), days};
   }
 
@@ -402,7 +332,7 @@ export class DateRangePicker {
       key: dateKey(date),
       label: String(date.getDate()),
       fullLabel: this.formatters().fullDay.format(date),
-      disabled: (!!min && isBefore(date, min)) || (!!max && isAfter(date, max)),
+      disabled: outsideBounds(date, min, max),
       today: sameDay(date, new Date()),
       selected: sameDay(date, from) || sameDay(date, to),
       inBar: !!barEndDate && isWithin(date, barStartDate, barEndDate),

@@ -2,14 +2,6 @@ import type {IconName} from '@shared/ui/icon/icon-paths';
 
 export type CreateStorePhase = 'form' | 'running';
 
-/** A country the operator can pick as the store's country of operation. */
-export interface CountryOption {
-  readonly id: string;
-  readonly labelKey: string;
-  readonly currencyCode: string;
-  readonly currencyLabelKey: string;
-}
-
 /**
  * A server region the store can be provisioned in. `code` and `latencyMs` are the physical
  * facts; everything else describes it to the operator.

@@ -44,6 +44,9 @@
     },
     "orderDetails": {
       "title": "Order | cvhome"
+    },
+    "billing": {
+      "title": "Billing"
     }
   },
   "notFound": {
@@ -223,6 +226,23 @@
         "warning": "Warning:",
         "danger": "Error:"
       }
+    },
+    "datePicker": {
+      "selectDate": "Select a date",
+      "dialogLabel": "Choose a date",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "clear": "Clear",
+      "applied": "Date set to {date}",
+      "cleared": "Date cleared."
+    },
+    "sectionNav": {
+      "ariaLabel": "Sections",
+      "heading": "Sections",
+      "collapse": "Collapse sections",
+      "expand": "Expand sections",
+      "needsAttention": "Needs attention"
     }
   },
   "orders": {
@@ -344,7 +364,8 @@
       "upToCharacters": "Up to {max} characters",
       "useCache": "Cache storefront responses",
       "useCacheDescription": "Faster pages, at the cost of showing changes a little later.",
-      "weightUnit": "Weight unit"
+      "weightUnit": "Weight unit",
+      "inBusinessSincePlaceholder": "No date set"
     },
     "discard": "Discard",
     "domain": {
@@ -547,33 +568,48 @@
     "cancel": "Cancel",
     "subtitle": {
       "form": "Provision a new store on a server in the region you sell from",
-      "running": "Provisioning {name} in {region} — this takes about a minute",
-      "live": "{name} · live in {region}"
+      "running": "Provisioning {name} — this takes about a minute",
+      "live": "{name} · live",
+      "runningInRegion": "Provisioning {name} in {region} — this takes about a minute",
+      "liveInRegion": "{name} · live in {region}"
     },
     "identity": {
       "title": "Store identity",
       "subtitle": "Branding, domains and content are configured after provisioning",
       "storeName": "Store name",
-      "storeNamePlaceholder": "Acme Supply EU",
+      "storeNamePlaceholder": "Acme Supply Co.",
       "country": "Country of operation",
-      "countryHint": "Sets default currency, tax rules and data residency",
+      "countryHint": "Where the store trades from, on its invoices and storefront",
       "currency": "Base currency",
       "nameAvailable": "That name is available.",
-      "nameTaken": "That name is already in use. Store names are unique across the platform."
-    },
-    "country": {
-      "de": "Germany",
-      "us": "United States",
-      "ae": "United Arab Emirates",
-      "eg": "Egypt",
-      "sg": "Singapore"
-    },
-    "currency": {
-      "eur": "EUR — Euro",
-      "usd": "USD — US Dollar",
-      "aed": "AED — UAE Dirham",
-      "egp": "EGP — Egyptian Pound",
-      "sgd": "SGD — Singapore Dollar"
+      "nameTaken": "That name is already in use. Store names are unique across the platform.",
+      "email": "Support email",
+      "emailFallback": "Enter an address customers can reach you at.",
+      "phone": "Support phone",
+      "phoneFallback": "Enter a phone number customers can reach you on.",
+      "choose": "Choose…",
+      "countryFallback": "Choose the country this store trades from.",
+      "currencyFallback": "A base currency is required.",
+      "supportedLanguages": "Storefront languages",
+      "supportedLanguagesFallback": "Choose at least one language for the storefront.",
+      "language": "Default language",
+      "languageNotSupported": "The default language has to be one of the storefront languages ticked above.",
+      "theme": "Storefront theme",
+      "themeFallback": "A theme is required.",
+      "colorTheme": "Colour palette",
+      "colorThemeFallback": "A colour palette is required.",
+      "address": "Street address",
+      "city": "City",
+      "stateProvince": "State or province",
+      "postalCode": "Postal code",
+      "inBusinessSince": "In business since",
+      "weightUnit": "Weight unit",
+      "dimensionUnit": "Dimension unit",
+      "requireLogin": "Shoppers must sign in before placing an order",
+      "requireLoginDescription": "Guests can browse either way. With this off, they can check out without an account.",
+      "inBusinessSincePlaceholder": "No date set",
+      "cityFallback": "A city is required.",
+      "postalCodeFallback": "A postal code is required."
     },
     "region": {
       "title": "Hosting region",
@@ -617,7 +653,8 @@
       "pendingName": "—",
       "region": "Region",
       "countryCurrency": "Country · currency",
-      "regionAutomatic": "Assigned automatically"
+      "regionAutomatic": "Assigned automatically",
+      "languages": "Storefront languages"
     },
     "artifactsPanel": {
       "title": "What gets created"
@@ -660,7 +697,8 @@
       "timedOutNote": "Still building. We stopped checking, but the server has not.",
       "timedOutBanner": "This is taking longer than expected. Provisioning has not failed — reopen the store from store management to see where it got to.",
       "openConsole": "Open the console",
-      "viewStores": "View stores"
+      "viewStores": "View stores",
+      "failureReason": "The pod reported:"
     },
     "infraPanel": {
       "title": "Assigned infrastructure"
@@ -711,7 +749,7 @@
       },
       "ready": {
         "title": "Create your first store",
-        "copy": "Nothing else in cvhome works until a store exists — products, orders and payments all belong to one. Pick a region and a name; provisioning takes about a minute.",
+        "copy": "Nothing else in cvhome works until a store exists — products, orders and payments all belong to one. Give it a name, a contact address and where it trades from; provisioning takes about a minute.",
         "meta": "~1 minute · you can create more later"
       }
     },
@@ -722,7 +760,7 @@
     "step": {
       "createStore": {
         "label": "Create your first store",
-        "meta": "Region, name and plan · ~1 min"
+        "meta": "Name, contact and locale · ~1 min"
       },
       "addProducts": {
         "label": "Add your first products",
@@ -805,6 +843,12 @@
       "title": "Want us to set the first store up with you?",
       "copy": "A 15-minute call covering regions, currency and catalogue import. Free on every plan.",
       "bookCall": "Book a call"
+    },
+    "planAfterStore": "Pick a plan once your first store exists — a subscription belongs to a store, not to the account.",
+    "video": {
+      "close": "Close video",
+      "unavailable": "This walkthrough has not been published yet.",
+      "unsupported": "Your browser cannot play this video."
     }
   },
   "marketing": {
@@ -1023,7 +1067,8 @@
       "storeManagement": "Store management",
       "createStore": "Create store",
       "firstRun": "Getting started",
-      "orderDetails": "Order"
+      "orderDetails": "Order",
+      "billing": "Billing"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1073,14 +1118,16 @@
         "contentManagement": "Content management",
         "inventory": "Inventory",
         "orders": "Orders",
-        "payments": "Payments"
+        "payments": "Payments",
+        "billing": "Billing"
       }
     },
     "planBanner": {
       "ariaLabel": "Plan notice",
       "notice": "You're on the Free plan — upgrade to add more stores, users and premium features.",
       "upgrade": "Upgrade plan",
-      "dismiss": "Dismiss plan notice"
+      "dismiss": "Dismiss plan notice",
+      "manage": "Manage plan"
     },
     "store": {
       "ariaLabel": "Stores",
@@ -1105,7 +1152,6 @@
   },
   "subscription": {
     "toConsole": "Go to the console",
-    "backToPricing": "Back to pricing",
     "success": {
       "title": "Subscription confirmed",
       "copy": "Your plan is active. It may take a moment to appear in the console while the payment settles."
@@ -1113,7 +1159,8 @@
     "fail": {
       "title": "Subscription not completed",
       "copy": "Nothing was charged. You can try again from the pricing page, or use another card."
-    }
+    },
+    "toBilling": "Go to billing"
   },
   "orderDetails": {
     "title": "Order {reference}",
@@ -1227,5 +1274,116 @@
   },
   "actions": {
     "cancel": "Cancel"
+  },
+  "plans": {
+    "title": "Plans",
+    "subtitle": "Every plan is the whole platform. You pay per store, not per account.",
+    "close": "Close plans",
+    "billingCycle": "Billing cycle",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "/mo",
+    "perYear": "/yr",
+    "popular": "Popular",
+    "saving": "Save {percent}% against monthly",
+    "startFree": "Start free",
+    "startTrial": "Start {days}-day trial",
+    "choose": "Choose this plan",
+    "note": "Prices come straight from the billing catalogue — the same one you are charged from.",
+    "unavailable": "Plans could not be loaded.",
+    "retry": "Try again",
+    "noneAtInterval": "No plans are sold at this billing cycle."
+  },
+  "billing": {
+    "title": "Billing",
+    "loading": "Loading billing…",
+    "subtitle": {
+      "on": "This store is on {plan}",
+      "none": "No subscription on record for this store yet"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment failed",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Cancelled"
+    },
+    "plan": {
+      "title": "Current plan",
+      "subtitle": "What this store is on, and when it next renews",
+      "change": "Change plan",
+      "renewsOn": "Renews on",
+      "endsOn": "Ends on",
+      "trialEnds": "Trial ends",
+      "graceUntil": "Works until",
+      "pendingChange": "Moving to {plan} on {date}. Until then this store keeps what it is paying for.",
+      "resume": "Resume renewal",
+      "cancel": "Cancel renewal",
+      "noSubscription": "Billing has not caught up with this store yet. It is created moments after the store and usually appears within a minute.",
+      "noPlanYet": "No plan yet",
+      "choose": "Choose a plan",
+      "perPeriod": "per month"
+    },
+    "allowances": {
+      "title": "What this plan grants",
+      "subtitle": "The ceilings on this store",
+      "none": "No plan on this store yet, so there are no allowances to show.",
+      "note": "These are the plan's limits, not what the store has used — the platform does not publish usage counters yet."
+    },
+    "allowance": {
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Issued by the payment provider",
+      "none": "No invoices yet.",
+      "unnumbered": "Draft",
+      "view": "View",
+      "pdf": "PDF"
+    },
+    "invoiceStatus": {
+      "DRAFT": "Draft",
+      "OPEN": "Due",
+      "PAID": "Paid",
+      "UNCOLLECTIBLE": "Uncollectible",
+      "VOID": "Void"
+    },
+    "banner": {
+      "trial": "{days} days left on your {plan} trial.",
+      "pastDue": "Your last payment failed. Update your payment details to keep this store running.",
+      "pastDueGrace": "Your last payment failed — this store keeps working for {days} more days.",
+      "suspended": "This store is suspended for non-payment.",
+      "canceled": "This store's subscription has ended.",
+      "cancelling": "Renewal is off. This store stops on {date}.",
+      "noSubscription": "Billing has not caught up with this store yet."
+    },
+    "cancelDialog": {
+      "title": "Turn off renewal?",
+      "message": "This store keeps everything it is paying for until {date}, then stops. You can turn renewal back on before then.",
+      "confirm": "Turn off renewal",
+      "dismiss": "Keep it running"
+    },
+    "toast": {
+      "planChanged": "Now on {plan}.",
+      "downgradeScheduled": "Scheduled. This store moves to {plan} at the end of the period.",
+      "resumed": "Renewal is back on.",
+      "cancelled": "Renewal is off."
+    },
+    "planName": {
+      "FREE": "Free",
+      "BASIC": "Basic",
+      "PRO": "Pro"
+    },
+    "section": {
+      "plan": "Plan",
+      "invoices": "Invoices"
+    },
+    "nav": {
+      "heading": "Billing",
+      "ariaLabel": "Billing sections"
+    }
   }
 }

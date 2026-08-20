@@ -1,0 +1,98 @@
+<div class="dp1" *transloco="let t">
+  <button
+    #trigger
+    class="dp1-trigger group"
+    type="button"
+    aria-haspopup="dialog"
+    [attr.id]="id()"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="ariaLabel()"
+    [class.empty]="!hasValue()"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+  >
+    <app-icon class="dp1-trigger-icon" name="calendar" />
+    <span class="dp1-trigger-label">{{ label() }}</span>
+    <app-icon class="dp1-trigger-chevron transition group-aria-expanded:rotate-180" name="chevronDown" />
+  </button>
+
+  @if (open()) {
+    <section
+      class="dp1-panel"
+      [class.drop-up]="dropUp()"
+      [class.align-end]="alignEnd()"
+      [animate.enter]="dropUp() ? 'dp1-panel-up-in' : 'dp1-panel-in'"
+      [animate.leave]="dropUp() ? 'dp1-panel-up-out' : 'dp1-panel-out'"
+      role="dialog"
+      [attr.aria-label]="ariaLabel() ?? t('shared.datePicker.dialogLabel')"
+    >
+      <header class="dp1-head">
+        <button
+          class="dp1-nav"
+          type="button"
+          [attr.aria-label]="t('shared.datePicker.previousMonth')"
+          (click)="previousMonth()"
+        >
+          <app-icon name="chevronLeft" />
+        </button>
+
+        <p class="dp1-month" aria-live="polite">{{ monthLabel() }}</p>
+
+        <button
+          class="dp1-nav"
+          type="button"
+          [attr.aria-label]="t('shared.datePicker.nextMonth')"
+          (click)="nextMonth()"
+        >
+          <app-icon name="chevronRight" />
+        </button>
+      </header>
+
+      <div class="dp1-weekdays" aria-hidden="true">
+        @for (weekday of weekdays(); track weekday) {
+          <span>{{ weekday }}</span>
+        }
+      </div>
+
+      <div class="dp1-grid" role="grid">
+        @for (day of days(); track day.key) {
+          @if (day.date) {
+            <button
+              class="dp1-day"
+              type="button"
+              [class.selected]="day.selected"
+              [class.today]="day.today"
+              [attr.data-date]="day.key"
+              [attr.aria-current]="day.today ? 'date' : null"
+              [attr.aria-pressed]="day.selected"
+              [attr.aria-label]="day.fullLabel"
+              [attr.tabindex]="day.focused ? 0 : -1"
+              [disabled]="day.disabled"
+              (click)="selectDate(day)"
+              (keydown)="onDayKeydown($event, day)"
+            >
+              <span class="dp1-day-inner">{{ day.label }}</span>
+            </button>
+          } @else {
+            <span class="dp1-day dp1-day-empty" aria-hidden="true"></span>
+          }
+        }
+      </div>
+
+      <footer class="dp1-foot">
+        <button class="dp1-action" type="button" [disabled]="!todaySelectable()" (click)="selectToday()">
+          {{ t('shared.datePicker.today') }}
+        </button>
+        @if (clearable()) {
+          <!-- Both fields this picker serves are optional, so there has to be a way back to unset. -->
+          <button class="dp1-action quiet" type="button" [disabled]="!hasValue()" (click)="clear()">
+            {{ t('shared.datePicker.clear') }}
+          </button>
+        }
+      </footer>
+    </section>
+  }
+
+  <!-- Choosing a day applies and closes without a confirmation step, so the change is announced. -->
+  <p class="sr-only" role="status" aria-live="polite">{{ announcement() }}</p>
+</div>

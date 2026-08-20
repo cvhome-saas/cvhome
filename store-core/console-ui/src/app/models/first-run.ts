@@ -20,6 +20,14 @@ export interface GuideVideo {
   readonly titleKey: string;
   readonly durationKey: string;
   readonly sectionKey: string;
+  /**
+   * Where this guide lives in the docs site, relative to `DOCS_BASE_URL`.
+   *
+   * These rows were buttons that raised a "not available yet" toast. The written guides exist —
+   * they are on the documentation site — so each row is a link out to its page rather than a
+   * placeholder for a video nobody has recorded.
+   */
+  readonly docPath: string;
 }
 
 /** A capability that unlocks once the store is provisioned. */
@@ -47,6 +55,15 @@ export interface FeatureVideo {
   readonly titleKey: string;
   readonly copyKey: string;
   readonly durationKey: string;
+  /**
+   * The clip itself. Any URL a `<video>` element can load.
+   *
+   * Null means no walkthrough has been published yet, and the player says so rather than opening
+   * on a black rectangle — which is what a missing source looks like otherwise.
+   */
+  readonly src: string | null;
+  /** A still shown before playback starts. Optional; the player falls back to the first frame. */
+  readonly poster: string | null;
 }
 
 export interface FirstRunSnapshot {

@@ -4,7 +4,11 @@ import type {PlanFeature, PricingPlan} from '@models/marketing';
 /**
  * Ported and rebuilt from seller-ui/src/app/public/sections/pricing/mappers/pricing.mapper.ts.
  *
- * Turns billing's public catalog into the cards the pricing section draws. The catalog is the same list the console
+ * Turns billing's public catalog into the cards a pricing surface draws.
+ *
+ * Shared rather than owned by the marketing page, because it is no longer the only reader: the console's
+ * plan dialog compares the same catalog for a signed-in operator. Two copies of "how the catalog becomes
+ * cards" would be two places for the unlimited rule and the saving calculation to drift. The catalog is the same list the console
  * and Stripe are driven from, so a marketing page can no longer quietly disagree with what a customer is charged.
  *
  * What changed from the seller-ui original: it listed entitlements by printing the raw enum name (`MAX_PRODUCTS`) and

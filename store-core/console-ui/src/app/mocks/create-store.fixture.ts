@@ -1,14 +1,12 @@
-import type {ArtifactItem, CountryOption, NextStepLink} from '@models/create-store';
+import type {ArtifactItem, NextStepLink} from '@models/create-store';
 
-export const COUNTRIES: readonly CountryOption[] = [
-  {id: 'DE', labelKey: 'createStore.country.de', currencyCode: 'EUR', currencyLabelKey: 'createStore.currency.eur'},
-  {id: 'US', labelKey: 'createStore.country.us', currencyCode: 'USD', currencyLabelKey: 'createStore.currency.usd'},
-  {id: 'AE', labelKey: 'createStore.country.ae', currencyCode: 'AED', currencyLabelKey: 'createStore.currency.aed'},
-  {id: 'EG', labelKey: 'createStore.country.eg', currencyCode: 'EGP', currencyLabelKey: 'createStore.currency.egp'},
-  {id: 'SG', labelKey: 'createStore.country.sg', currencyCode: 'SGD', currencyLabelKey: 'createStore.currency.sgd'},
-];
-
-export const DEFAULT_COUNTRY_ID = 'DE';
+/*
+ * The five-country, five-currency list that used to live here is gone. It was a fixture standing in
+ * for reference data the platform does not serve, and the create form now reads
+ * `ReferenceDataService` — every ISO country and currency, named by `Intl` in the reader's language —
+ * exactly as store management's details section does. A merchant trading from anywhere else could
+ * not create a store at all while this list was the whole set.
+ */
 
 export const PROVISIONING_ARTIFACTS: readonly ArtifactItem[] = [
   {

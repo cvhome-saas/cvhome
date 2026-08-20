@@ -24,15 +24,26 @@ export const routes: Routes = [
         data: {titleKey: 'route.privacyPolicy.title', document: 'privacy'},
       },
       {
-        // Where the hosted checkout returns to. Client-rendered: nothing here is worth prerendering, and both
-        // outcomes are reachable by URL alone.
-        path: 'subscription/success',
+        /*
+         * Where the hosted checkout returns to, and the path is not negotiable: `SubscriptionApi`
+         * builds it from `SUCCESS_PATH = "/public/subscription/success"`, so `public` is a real URL
+         * segment here even though nothing else in this app uses one.
+         *
+         * It had been mounted at `subscription/success` — no `public` — which matched nothing, so a
+         * customer who had just paid landed on the not-found page. seller-ui has the same gap: its
+         * routes are under `src/app/public/`, a *source folder*, mounted at `''`. The prefix in the
+         * server constant was reading a directory name as a path.
+         *
+         * Client-rendered: nothing here is worth prerendering, and both outcomes are reachable by
+         * URL alone by anyone, which is why the page states no fact it did not re-read.
+         */
+        path: 'public/subscription/success',
         loadComponent: () =>
           import('@features/subscription/subscription-outcome').then((page) => page.SubscriptionOutcome),
         data: {titleKey: 'route.subscriptionSuccess.title', succeeded: true},
       },
       {
-        path: 'subscription/fail',
+        path: 'public/subscription/fail',
         loadComponent: () =>
           import('@features/subscription/subscription-outcome').then((page) => page.SubscriptionOutcome),
         data: {titleKey: 'route.subscriptionFail.title', succeeded: false},
@@ -112,6 +123,33 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@features/order-details/order-details').then((page) => page.OrderDetails),
         data: {titleKey: 'route.orderDetails.title', breadcrumbKey: 'shell.breadcrumb.orderDetails'},
+      },
+    ],
+  },
+  {
+    /*
+     * Its own branch rather than a store-management section: a subscription is store-scoped but it is
+     * not a *setting*, and the banner links here from every page in the console.
+     *
+     * **Not `/billing`.** The gateway claims `/billing/**` for the billing service and matches it
+     * before the console's catch-all, so that path never reaches this application at all — the route
+     * would have been silently unreachable rather than merely oddly named. `GatewayRouteLocatorImpl`
+     * reserves `tenancy`, `billing`, `pod-registry`, `uaa` and `spg`; a console route must avoid all
+     * five.
+     */
+    path: 'subscription',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext],
+    children: [
+      // The section is part of the URL, so a rail tab is linkable and survives a reload — the same
+      // shape store management uses.
+      {path: '', redirectTo: 'plan', pathMatch: 'full'},
+      {
+        path: ':section',
+        loadComponent: () => import('@features/billing/billing').then((page) => page.Billing),
+        // Billing reads a store's subscription, so there has to be a store.
+        canActivate: [requiresStore],
+        data: {titleKey: 'route.billing.title', breadcrumbKey: 'shell.breadcrumb.billing'},
       },
     ],
   },

@@ -13,7 +13,7 @@ import {DetailsSection} from './components/details-section/details-section';
 import {DomainSection} from './components/domain-section/domain-section';
 import {HomeSection} from './components/home-section/home-section';
 import {PaymentsSection} from './components/payments-section/payments-section';
-import {SettingsNav} from './components/settings-nav/settings-nav';
+import {SectionNav} from '@shared/ui/section-nav/section-nav';
 import {SliderSection} from './components/slider-section/slider-section';
 import {SocialLinksSection} from './components/social-links-section/social-links-section';
 import {SocialLoginSection} from './components/social-login-section/social-login-section';
@@ -41,7 +41,7 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
     Icon,
     PageHeader,
     PaymentsSection,
-    SettingsNav,
+    SectionNav,
     SliderSection,
     SocialLinksSection,
     SocialLoginSection,

@@ -6,7 +6,7 @@
         <app-icon name="arrowRight" [flip]="true" />
       </button>
     }
-    <button type="button" class="trial-plans" (click)="notAvailable(t('firstRun.notice.viewPlans'))">
+    <button type="button" class="trial-plans" (click)="plansOpen.set(true)">
       {{ t('firstRun.notice.viewPlans') }}
     </button>
   </app-notice-bar>
@@ -89,7 +89,7 @@
         <!-- Watch it done once, then the shorter guides. -->
         <div class="split">
           @if (feature(); as video) {
-            <button type="button" class="feature-video" (click)="notAvailable(video.title)">
+            <button type="button" class="feature-video" (click)="videoOpen.set(true)">
               <span class="feature-play"><app-icon name="play" [filled]="true" /></span>
               <span class="feature-title">{{ video.title }}</span>
               <span class="feature-copy">{{ video.copy }}</span>
@@ -100,14 +100,23 @@
           <app-panel [title]="t('firstRun.guides.title')">
             <div class="guide-list">
               @for (guide of guides(); track guide.id) {
-                <button type="button" class="guide-row" (click)="notAvailable(guide.title)">
-                  <span class="guide-icon"><app-icon name="play" [filled]="true" /></span>
+                <!--
+                  A link to the written guide on the docs site, not a button that apologises. Opens in
+                  a new tab, and `noopener noreferrer` because the console holds a session.
+                -->
+                <a
+                  class="guide-row"
+                  [href]="guide.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="guide-icon"><app-icon name="file" /></span>
                   <span class="guide-copy">
                     <strong>{{ guide.title }}</strong>
                     <small>{{ guide.meta }}</small>
                   </span>
-                  <app-icon name="chevronRight" [flip]="true" class="guide-chevron" />
-                </button>
+                  <app-icon name="externalLink" class="guide-chevron" />
+                </a>
               }
             </div>
           </app-panel>
@@ -135,7 +144,7 @@
 
         <app-panel [title]="t('firstRun.plan.title')" [meta]="t('firstRun.plan.meta')">
           <app-badge panelAction tone="green">{{ t('firstRun.plan.freeTrial') }}</app-badge>
-          <button panelAction type="button" class="secondary-action" (click)="notAvailable(t('firstRun.plan.comparePlans'))">
+          <button panelAction type="button" class="secondary-action" (click)="plansOpen.set(true)">
             {{ t('firstRun.plan.comparePlans') }}
             <app-icon name="arrowUpRight" [flip]="true" />
           </button>
@@ -173,4 +182,24 @@
       </div>
     }
   </app-busy-overlay>
+
+  <!-- The walkthrough, in the console's own player. -->
+  <app-video-dialog
+    [open]="videoOpen()"
+    [title]="videoTitle()"
+    [src]="videoSrc()"
+    [poster]="videoPoster()"
+    [description]="videoCopy()"
+    [closeLabel]="t('firstRun.video.close')"
+    [unavailableLabel]="t('firstRun.video.unavailable')"
+    [unsupportedLabel]="t('firstRun.video.unsupported')"
+    (closed)="videoOpen.set(false)"
+  />
+
+  <!-- The real billing catalog, which this page has been able to read all along. -->
+  <app-plan-dialog
+    [open]="plansOpen()"
+    (chosen)="planChosen()"
+    (closed)="plansOpen.set(false)"
+  />
 </ng-container>

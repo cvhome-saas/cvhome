@@ -99,3 +99,38 @@
     opacity: 0;
   }
 }
+
+/*
+ * Tone follows the reason. The default is the informational accent the banner has always used; a
+ * failing payment and a dead subscription are not that, and colouring them the same as a trial
+ * countdown was part of why the old banner was ignorable.
+ */
+.plan-banner.warn {
+  background: var(--warning-veil, var(--muted));
+  border-bottom-color: var(--chart-4-foreground);
+}
+
+.plan-banner.warn > app-icon {
+  color: var(--chart-4-foreground);
+}
+
+.plan-banner.danger {
+  background: var(--muted);
+  border-bottom-color: var(--chart-5-foreground);
+}
+
+.plan-banner.danger > app-icon {
+  color: var(--chart-5-foreground);
+}
+
+/* The way out of a state money cannot fix — "manage", not "upgrade". */
+.upgrade.quiet {
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--foreground-strong);
+}
+
+/* An anchor now rather than a dead button. */
+.upgrade {
+  text-decoration: none;
+}

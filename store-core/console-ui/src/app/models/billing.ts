@@ -70,3 +70,78 @@ export interface PlanView {
   readonly prices: readonly PlanPriceView[];
   readonly entitlements: Entitlements;
 }
+
+/* ------------------------------------------------------------------------------------------------
+ * A store's own subscription. Everything above describes the *catalogue*; everything below describes
+ * what one store is actually on, and is store-scoped on the wire (`?store=`).
+ * ---------------------------------------------------------------------------------------------- */
+
+/**
+ * A plan change that has been agreed but has not taken effect.
+ *
+ * Only downgrades land here. An upgrade is applied immediately and comes back as the new plan; a
+ * downgrade waits for the period to end, so the store keeps what it paid for. Mirrors
+ * `PendingPlanChangeView`.
+ */
+export interface PendingPlanChange {
+  readonly planPriceId: string;
+  readonly planCode: string;
+  /** ISO-8601 instant. */
+  readonly effectiveAt: string;
+}
+
+/**
+ * Mirrors `billing.commons.dto.SubscriptionView` — what `GET subscription/current?store=` answers.
+ *
+ * Instants are ISO-8601 strings, not `Date`: they arrive as strings and are formatted for display,
+ * and parsing them into `Date` at the edge only invites a timezone bug in the middle.
+ *
+ * `entitlements` is the same map the catalogue uses, so the *granted* ceilings can be compared
+ * against the *plan's* without a second shape.
+ */
+export interface Subscription {
+  readonly store: {readonly id: string} | string;
+  readonly status: SubscriptionStatus;
+  readonly planCode: string | null;
+  readonly planDisplayName: string | null;
+  readonly planPriceId: string | null;
+  readonly amount: Money | null;
+  /** When the current period ends — the renewal date, or the cut-off if cancelling. */
+  readonly currentPeriodEnd: string | null;
+  readonly trialEnd: string | null;
+  /** Renewal is off: the store keeps its plan until `currentPeriodEnd` and then stops. */
+  readonly cancelAtPeriodEnd: boolean;
+  /** How long a past-due store stays operable before enforcement bites. Null when not past due. */
+  readonly graceUntil: string | null;
+  readonly pendingPlanChange: PendingPlanChange | null;
+  /** Whether a payment provider customer exists. False for a store that has never checked out. */
+  readonly providerLinked: boolean;
+  readonly entitlements: Entitlements;
+}
+
+/** What `POST subscription/checkout` answers: where to send the browser. */
+export interface CheckoutSession {
+  readonly url: string;
+}
+
+export type InvoiceStatus = 'DRAFT' | 'OPEN' | 'PAID' | 'UNCOLLECTIBLE' | 'VOID';
+
+/**
+ * Mirrors `InvoiceView`.
+ *
+ * `hostedInvoiceUrl` and `invoicePdfUrl` are Stripe's own pages. The console links to them rather
+ * than rendering an invoice itself — the provider's copy is the one that is legally the invoice.
+ */
+export interface Invoice {
+  readonly id: string;
+  readonly number: string | null;
+  readonly status: InvoiceStatus;
+  readonly amountDue: Money;
+  readonly amountPaid: Money;
+  readonly periodStart: string | null;
+  readonly periodEnd: string | null;
+  readonly issuedAt: string | null;
+  readonly paidAt: string | null;
+  readonly hostedInvoiceUrl: string | null;
+  readonly invoicePdfUrl: string | null;
+}

@@ -279,8 +279,12 @@ requirements document, with the entry here reduced to a link. There is already o
 - **What is missing:** anything beyond `ProvisioningState` — `NOT_STARTED`, `IN_PROGRESS`, `SUCCESSFULLY`,
   `FAILED` — read by re-fetching the store's row from
   `GET /tenancy/api/v1/store-manager/store-info?store=`. There is no per-step progress, no percentage, no
-  estimate, no failure reason, and **no retry**: `FAILED_PROVISIONING` leaves a store row the merchant can
-  see and cannot act on.
+  estimate and **no retry**: `FAILED_PROVISIONING` leaves a store row the merchant can see and cannot act on.
+- **Resolved since:** the *failure reason* is no longer missing. `ManagerStoreDto.provisioningError` now
+  carries the pod's own refusal — for a validation failure, the fields it objected to — and the progress
+  screen renders it verbatim under the translated failure line. Before that, `StoreProvisioningService`
+  caught the pod's problem body, called `failProvisioning(store)` and put the whole thing in `log.error`,
+  so the console could only ever say "failed".
 - **Why it is required:** provisioning is the first thing a new merchant watches the product do, and a
   failure there is unrecoverable from the console.
 - **Decision:** the seven-row checklist that animated on a client-side timer is **gone**. It reported
@@ -288,9 +292,8 @@ requirements document, with the entry here reduced to a link. There is already o
   names (`fra-07`, `pg-14`), and could never reach a failure state at all. The page now polls the real
   state, shows the four outcomes honestly, and stops after two minutes saying it lost track rather than
   claiming a failure it cannot see.
-- **Expected contract:** a failure reason on the store row, and an idempotent
-  `POST /store-manager/private/store/{id}/reprovision` — the row already exists, so the console must not
-  offer "create it again".
+- **Expected contract:** an idempotent `POST /store-manager/private/store/{id}/reprovision` — the row
+  already exists, so the console must not offer "create it again".
 - **Placeholder:** `TODO(lessons.md)` in `create-store.html` and `create-store.facade.ts`.
 
 ## Shell — no notifications service
@@ -1032,3 +1035,155 @@ requirements document, with the entry here reduced to a link. There is already o
   counts is secondary and must never be able to take its page down.
 - **Still open:** `customer-statistic` and `product-statistic` answer with `date=null`, which is the
   separate gap recorded above.
+
+## Store creation — tenancy validates merchant's required fields, and has to
+
+- **Screen:** create store.
+- **What happened:** the create form posted four fields — name, country, currency, pod. Tenancy's
+  `CreateStoreRequest` typed only `name` and `pod` and collected the rest into a `@JsonAnySetter` map to
+  forward, so the body was accepted, the store row was created, and `POST /private/store` answered `200`
+  with `IN_PROGRESS_PROVISIONING`. The pod then refused the create off the outbox: `MerchantStoreDetails`
+  is `@NotNull` on `email` and `phone`, `PersistableMerchantStorePopulator.applyLanguages` dereferences
+  `defaultLanguage` and `supportedLanguages` unguarded, and `merchant.merchant_store` is NOT NULL on
+  `theme`, `color_theme`, `store_email`, `country_id`, `currency_id` and `language_code`. The merchant sees
+  "provisioning", then "failed", and never learns which field was wrong. seller-ui's form collected all of
+  them, which is why the same flow worked there.
+- **Decision:** the fields the pod refuses without are **typed and validated on tenancy's
+  `CreateStoreRequest`**, so an incomplete body is a synchronous `400` with field errors the form binds
+  rather than a broken store row minutes later. This duplicates part of merchant's model inside tenancy —
+  deliberately, and against that class's original argument for staying untyped. The reason the argument
+  loses here is that creation is asynchronous: there is no later moment at which the caller can be told.
+  Fields the pod merely tolerates (`inBusinessSince`, `dimension`, `weight`, `useCache`, `template`) stay
+  in the forwarded map.
+- **Cost, stated plainly:** a change to `MerchantStoreDetails`'s `@NotNull`s, to `merchant_store`'s NOT
+  NULL columns, or to the `MerchantStore` **entity**'s `@NotEmpty`s has to be applied to
+  `CreateStoreRequest` too. The javadoc on both sides says so.
+- **Read the entity, not just the schema.** The first cut of this took the required set from the DDL and
+  left `city` and `postalCode` optional, because both columns are nullable. They carry `@NotEmpty` on the
+  `MerchantStore` entity, so Hibernate refuses them at *persist* time — below the layer that renders
+  validation failures, so it surfaces as a `ConstraintViolationException` → **500**, not a 400 with field
+  errors. QA caught it as a real FAILED store row reading `COMMON.INTERNAL_ERROR`. The full required set
+  is: name, email, phone, theme, colorTheme, currency, defaultLanguage, supportedLanguages, and
+  address.{country, city, postalCode}. The street line and stateProvince are genuinely optional.
+- **Still open:** `PersistableMerchantStorePopulator.applyLanguages` remains an unguarded dereference, so a
+  caller that reaches merchant directly with no `defaultLanguage` still gets a 500 rather than a 400. Not
+  reachable through the console any more, but not fixed either.
+
+## Getting started — three dead controls that already had somewhere to go
+
+- **Screen:** getting started (`/getting-started`).
+- **What happened:** "View plans", "Compare plans", the walkthrough tile and every short-guide row all
+  called `notAvailable()`, which raises a "not built yet" toast. Two of the three were not gaps at all:
+  - `GET /billing/api/v1/plan/public/plans` has been serving the real catalogue to the **marketing
+    page** the whole time. The console simply never called it.
+  - The written guides exist on the documentation site.
+- **Decision:** the plan buttons open `PlanDialog`, which reads that same catalogue through
+  `SubscriptionService` and renders it with the *same mapper* the marketing pricing section uses —
+  moved to `@shared/billing/pricing.mapper` so there is one definition of how a catalogue becomes
+  cards, and the two surfaces cannot disagree about a price. The guide rows are now `<a>` links to
+  `DOCS_BASE_URL` (`https://cvhome-saas.github.io/`), opening in a new tab with
+  `rel="noopener noreferrer"` — the console holds a session. The walkthrough opens `VideoDialog`, the
+  console's own `<video>` player rather than a third-party embed, so no external player script runs on
+  a page behind that session.
+- **Still open:** *choosing* a plan from this page has nowhere to go, and for a structural reason — a
+  subscription belongs to a store, and this is the one console page where no store exists. The dialog
+  emits `chosen` and the page explains the ordering. "Book a call" stays a toast: unlike the other
+  three it has no service and no page behind it.
+- **Placeholder:** `FIRST_RUN_FEATURE.src` is a sample clip until an onboarding walkthrough is recorded.
+  `VideoDialog` takes any URL, so replacing that one line is the whole change; setting it to `null`
+  puts the player back to saying no walkthrough has been published.
+
+## Billing — the plan banner was a constant, and every billing endpoint was unused
+
+- **Screen:** the console chrome's plan strip, and the new billing page (`/subscription`).
+- **What happened:** the banner rendered a hardcoded line — "You're on the Free plan — upgrade to add
+  more stores" — on every page for every operator, whatever they were paying, with a dead Upgrade
+  button. A paying customer was told to upgrade; a store whose card had just failed was told nothing.
+  Meanwhile `billing-service` publishes the whole surface: `subscription/current`, `checkout`, `plan`,
+  `cancel`, `resume` and `invoice/list`, none of which the console called.
+- **Decision:** one `BillingFacade` reads `subscription/current` for the store the console has open,
+  and both the banner and the page render from it, so they cannot disagree. The banner is now `null`
+  for a healthy paid store — **no banner at all is the common case** — and appears only for a trial
+  running down, a failed payment (with its grace countdown), a scheduled cancellation, or a store
+  billing has not caught up with.
+- **`/subscription`, not `/billing`.** The gateway claims `/billing/**` for the billing service and
+  matches it *before* the console's catch-all, so a `/billing` route in this app is not merely oddly
+  named — it never reaches Angular at all. `GatewayRouteLocatorImpl` reserves `tenancy`, `billing`,
+  `pod-registry`, `uaa` and `spg`.
+- **Checkout returns to the console now.** `SubscriptionApi` built its Stripe return URLs against the
+  `seller-ui` service domain, so an operator who upgraded from the console was handed back to a
+  different application after paying. The constant is `console-ui`, which already serves both outcome
+  routes.
+- **A 404 from `current` is a state, not a failure.** Billing learns about a store from
+  `StoreCreatedEvent` through the outbox, so a store created seconds ago reaches the console before its
+  subscription row exists. Both surfaces render that as "not caught up yet" rather than an error.
+- **Absent-means-unlimited is a rule about a *plan*, not a subscription.** A row with no `planCode`
+  carries an empty entitlement map, and reading it through the catalogue's rule rendered every
+  allowance as "Unlimited" — telling a merchant mid-provisioning that they had unlimited everything.
+  Caught in QA on a real store. No plan now means no allowances to report.
+- **Still open:** entitlements are *ceilings* with no usage behind them — billing publishes no counters,
+  so "3 of 500 products" cannot be drawn and the panel says so. Immediate cancellation is a super-admin
+  operation and is never sent from the console.
+
+## Console — the action vocabulary was copied into five stylesheets
+
+- **What happened:** `.primary-action` and `.secondary-action` were redeclared in order-details,
+  create-store, store-management, first-run, orders and settings-card. They had already drifted: one
+  pinned a `block-size` where the others used padding, one dropped `white-space: nowrap`, one omitted
+  `:not(:disabled)` so a disabled button still lit up on hover. The billing page declared *neither*,
+  so its buttons rendered as unstyled text and red text — which is what "the design is so bad" was.
+- **Decision:** one definition in `styles.css`, beside `.popover`, which is global for exactly the
+  same reason: these classes are used by components that cannot see each other's encapsulated styles.
+  The five copies are deleted. The set gained `.ghost-action` (tertiary, no chrome until touched) and
+  `.danger-action` (danger hue in the *text*, not a red slab that competes with the primary action),
+  plus one disabled treatment covering `:disabled`, `.disabled` and `[aria-busy]`.
+- **Why not a component:** these are applied to `<button>`, `<a>` and — in first-run's trial gate — a
+  `<span>`. A directive or component would have to reproduce all three.
+
+## Console — money and dates were formatted against the wrong locale
+
+- **What happened:** the billing page used Angular's `CurrencyPipe` and bare
+  `Intl.DateTimeFormat(activeLang)`. `CurrencyPipe` reads `LOCALE_ID`, fixed at bootstrap and always
+  `en-US`, so switching the console to Arabic left the money in English. `activeLang` is `ar`, but the
+  console's locale for it is `ar-EG` — formatting on the language alone produced Latin digits and
+  `2026/09/03` on an otherwise Arabic page.
+- **Decision:** `TranslocoLocaleService` for dates and counts, and the existing `Money` service for
+  amounts. `Money` was written for exactly this and already knew the answer.
+- **Currency is an ISO code on account surfaces.** `symbol` renders USD as `US$` and GBP as `UK£` in
+  Arabic — Latin script stranded in a right-to-left line — and `narrowSymbol` is identical. Only
+  `code` and `name` localize; `name` is too long for a metric. `code` is also already this product's
+  currency vocabulary: the merchant picks it from a select reading `SAR · Saudi Riyal`. Storefront
+  money keeps `symbol`; `Money.account()` is the account-level form.
+- **Plan names are translated on `code`, not `displayName`.** Billing authors one English
+  `displayName` for every locale, so an Arabic console read "This store is on Free". `PlanLabel`
+  translates the stable code and falls back to the server's name for a plan the console has no word
+  for — so a plan added at runtime renders in English rather than throwing against the strict
+  missing-key handler.
+
+## Billing — the checkout return URL pointed at a path neither console served
+
+- **What happened:** `SubscriptionApi` builds Stripe's return URLs from
+  `SUCCESS_PATH = "/public/subscription/success"`. console-ui mounted those routes at
+  `subscription/success` — no `public` — so a customer who had just paid landed on the not-found page.
+- **seller-ui has the same gap.** Its outcome routes live in `src/app/public/subscription/`, a *source
+  folder*, mounted at `''` — so they serve `/subscription/success` too. The `/public/` prefix in the
+  server constant was reading a directory name as a URL segment, and has never matched either app.
+- **Decision:** the console now serves `public/subscription/success` and `.../fail`, which makes the
+  existing server constants correct without a backend change. The bare `subscription/*` mounts are
+  gone, which also clears the collision with the billing page at `/subscription`.
+- **On return, the console invalidates rather than trusts.** The outcome page still reads nothing from
+  the URL — anyone can type it — but it does call `BillingFacade.refresh()`, because after a checkout
+  the cached subscription is stale by definition. The URL says "go and look again"; the server still
+  decides what is true. Both CTAs now lead to billing rather than the dashboard.
+
+## Console — the section rail is shared, not store management's
+
+- **What happened:** `SettingsNav` was written page-local, with a comment arguing that "nothing else in
+  the console has that shape". Billing then grew exactly that shape.
+- **Decision:** promoted to `@shared/ui/section-nav` as `SectionNav`, parameterised by `basePath` and
+  `heading`, with the footer projected — store management's storefront-builder entry was the only
+  genuinely page-specific part. Both pages now bind their sections to the router the same way, so a
+  tab is linkable and survives a reload on either.
+- **Billing's sections are `plan` and `invoices`**, at `/subscription/:section` with `''` redirecting
+  to `plan`. Splitting them fixed a layout problem as much as a navigation one: the two panels had
+  been sharing a row, and whichever one remained was stranded at half width.

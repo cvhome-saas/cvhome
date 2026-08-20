@@ -1,6 +1,8 @@
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
 
+import {SubscriptionService} from '@api/billing/subscription.service';
+import {FakeSubscriptionService} from '@testing/billing.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {FakeConsoleApi, consoleStore} from '@testing/console-api.fake';
 import {ConsoleShell} from './console-shell';
@@ -22,6 +24,8 @@ describe('ConsoleShell (first run)', () => {
     await TestBed.configureTestingModule({
       imports: [ConsoleShell, ...translocoTesting().imports],
       providers: [
+        // The shell mounts the plan banner, which reads billing.
+        {provide: SubscriptionService, useClass: FakeSubscriptionService},
         provideRouter([]),
         {provide: ConsoleApi, useValue: api},
         ...translocoTesting().providers,
@@ -106,7 +110,13 @@ describe('ConsoleShell (first run)', () => {
     facade.refreshStores();
     tick();
     fixture.detectChanges();
+    // A second flush: the store list resolving is what gives billing a store to read, so its own
+    // request only starts on this turn.
+    tick();
+    fixture.detectChanges();
 
+    // Once a store exists the strip is billing's to decide. This fake reports no subscription — the
+    // state a store created seconds ago is genuinely in — so the strip appears saying exactly that.
     expect(element.querySelector('app-plan-banner')).not.toBeNull();
   }));
 

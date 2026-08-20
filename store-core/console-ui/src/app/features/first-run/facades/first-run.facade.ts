@@ -2,6 +2,7 @@ import {Injectable, computed, inject, linkedSignal, signal} from '@angular/core'
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 
+import {docsUrl} from '@core/config/docs';
 import {BrowserStorage} from '@core/platform/browser-storage';
 import type {FirstRunSnapshot} from '@models/first-run';
 import type {IconName} from '@shared/ui/icon/icon-paths';
@@ -24,6 +25,8 @@ export interface GuideView {
   readonly id: string;
   readonly title: string;
   readonly meta: string;
+  /** Absolute URL on the documentation site. These rows are links out, not unbuilt buttons. */
+  readonly href: string;
 }
 
 export interface NextUpView {
@@ -155,6 +158,8 @@ export class FirstRunFacade {
       title: this.transloco.translate(feature.titleKey),
       copy: this.transloco.translate(feature.copyKey),
       duration: this.transloco.translate(feature.durationKey),
+      src: feature.src,
+      poster: feature.poster,
     };
   });
 
@@ -167,6 +172,7 @@ export class FirstRunFacade {
         duration: this.transloco.translate(guide.durationKey),
         section: this.transloco.translate(guide.sectionKey),
       }),
+      href: docsUrl(guide.docPath),
     }));
   });
 

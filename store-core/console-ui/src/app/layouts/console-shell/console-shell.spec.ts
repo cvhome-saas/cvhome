@@ -1,8 +1,14 @@
 import {Component} from '@angular/core';
-import {TestBed} from '@angular/core/testing';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
 import {RouterTestingHarness} from '@angular/router/testing';
 
+import {SubscriptionService} from '@api/billing/subscription.service';
+import {
+  FakeSubscriptionService,
+  activeSubscription,
+  trialingSubscription,
+} from '@testing/billing.fake';
 import {translocoTesting} from '@testing/transloco-testing';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {ConsoleShell} from './console-shell';
@@ -13,10 +19,15 @@ import {ConsoleShellFacade} from './facades/console-shell.facade';
 class TestPage {}
 
 describe('ConsoleShell', () => {
+  let billing: FakeSubscriptionService;
+
   beforeEach(async () => {
+    billing = new FakeSubscriptionService();
     await TestBed.configureTestingModule({
       imports: [ConsoleShell, ...translocoTesting().imports],
       providers: [
+        // The shell mounts the plan banner, which reads billing.
+        {provide: SubscriptionService, useValue: billing},
         provideRouter([]),
         ...translocoTesting().providers,
         {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
@@ -33,7 +44,8 @@ describe('ConsoleShell', () => {
   it('renders the chrome and an outlet for pages', () => {
     const {element} = shell();
 
-    expect(element.querySelector('app-plan-banner')).not.toBeNull();
+    // The plan banner is deliberately absent here: it is conditional on billing having something to
+    // say, and this store's subscription is healthy. See `dismisses the plan banner` below.
     expect(element.querySelector('app-console-sidebar')).not.toBeNull();
     expect(element.querySelector('app-console-toolbar')).not.toBeNull();
     expect(element.querySelector('router-outlet')).not.toBeNull();
@@ -72,21 +84,38 @@ describe('ConsoleShell', () => {
     expect(element.querySelector('.language-menu')).not.toBeNull();
   });
 
-  it('dismisses the plan banner', () => {
+  it('shows no plan banner for a store in good standing', fakeAsync(() => {
+    billing.subscription = activeSubscription();
     const {fixture, element} = shell();
+    tick();
+    fixture.detectChanges();
+
+    // The banner used to tell a paying customer to upgrade, on every page. Nothing to say is now the
+    // common case and renders nothing at all — including the row it used to reserve.
+    expect(element.querySelector('app-plan-banner')).toBeNull();
+    expect(element.querySelector('.console')?.classList).not.toContain('banner-on');
+  }));
+
+  it('dismisses the plan banner', fakeAsync(() => {
+    billing.subscription = trialingSubscription();
+    const {fixture, element} = shell();
+    tick();
+    fixture.detectChanges();
 
     expect(element.querySelector('app-plan-banner')).not.toBeNull();
     (element.querySelector('.dismiss') as HTMLButtonElement).click();
     fixture.detectChanges();
 
     expect(element.querySelector('app-plan-banner')).toBeNull();
-  });
+  }));
 
   it('hosts any child route inside its workspace, with the chrome supplied', async () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [...translocoTesting().imports],
       providers: [
+        // The shell mounts the plan banner, which reads billing.
+        {provide: SubscriptionService, useClass: FakeSubscriptionService},
         provideRouter([
           {
             path: 'inventory',

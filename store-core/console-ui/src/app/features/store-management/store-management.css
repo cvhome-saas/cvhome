@@ -96,60 +96,10 @@
 }
 
 /* ---- Page header actions ---------------------------------------------------------- */
-
-.primary-action,
-.secondary-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.95rem;
-  border-radius: var(--radius-md);
-  font-size: var(--text-xs);
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--default-transition-duration),
-    border-color var(--default-transition-duration),
-    box-shadow var(--default-transition-duration);
-  --icon-size: 0.75rem;
-}
-
-.primary-action {
-  border: 1px solid var(--primary);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-weight: 600;
-}
-
-.primary-action:hover:not(:disabled) {
-  background: var(--primary-emphasis);
-  border-color: var(--primary-emphasis);
-  box-shadow: var(--lift-primary);
-}
-
 /*
  * Nothing to save is the resting state of this page, so the disabled button has to read as
  * quiet rather than as broken.
  */
-.primary-action:disabled {
-  border-color: var(--border);
-  background: var(--input);
-  color: var(--muted-foreground);
-  cursor: not-allowed;
-}
-
-.secondary-action {
-  border: 1px solid var(--border);
-  background: var(--muted);
-  color: var(--foreground);
-  font-weight: 500;
-}
-
-.secondary-action:hover {
-  border-color: var(--primary);
-  background: var(--accent);
-}
-
 /* ---- Error ------------------------------------------------------------------------ */
 
 .load-error {

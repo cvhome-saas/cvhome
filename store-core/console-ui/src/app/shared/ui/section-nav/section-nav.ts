@@ -3,34 +3,47 @@ import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
-import type {SettingsSection, SettingsSectionKey} from '@models/store-settings';
+import type {IconName} from '@shared/ui/icon/icon-paths';
+
+/** One entry in a section rail. `key` is both the route segment and the active-state handle. */
+export interface NavSection {
+  readonly key: string;
+  readonly labelKey: string;
+  readonly icon: IconName;
+  /** Draws the amber dot: this section has something waiting on the operator. */
+  readonly attention?: boolean;
+}
 
 /**
- * The settings rail: one link per section, then a way out to the storefront builder.
+ * A vertical, router-bound section rail: one link per section, collapsible to an icon strip.
  *
- * Page-local rather than a shared primitive — it is a vertical tab list bound to the router,
- * not a generic list of links, and nothing else in the console has that shape.
+ * Promoted out of store management, where it was written as a page-local component on the argument
+ * that "nothing else in the console has that shape". Billing has that shape. The only thing that was
+ * page-specific was the base path and the footer, so both are now inputs — the rail itself was
+ * always general.
  *
- * Each section is a real `routerLink` to `/store-management/:section`, so a tab is
- * linkable, survives a reload and answers the back button.
+ * Each section is a real `routerLink` to `[basePath, key]`, so a tab is linkable, survives a reload
+ * and answers the back button.
  *
- * It collapses to an icon strip. Eight sections is a tall rail beside a card that is often taller
- * still, and on a laptop the section being edited can end up scrolled away from the list it came
- * from; folding the rail hands that width back to the work. Collapsed, the icons keep their tooltips
- * and their accessible names, so nothing is lost but the words.
+ * It collapses to an icon strip because a tall rail beside a taller card wastes width on a laptop,
+ * and the section being edited can end up scrolled away from the list it came from. Collapsed, the
+ * icons keep their tooltips and their accessible names, so nothing is lost but the words.
+ *
+ * Anything projected is placed under a rule at the foot of the rail — store management uses it for
+ * the storefront builder.
  */
 @Component({
-  selector: 'app-settings-nav',
+  selector: 'app-section-nav',
   imports: [Icon, RouterLink, TranslocoDirective],
   template: `
     <nav
       class="settings-nav"
       [class.collapsed]="collapsed()"
-      [attr.aria-label]="label() ?? t('storeSettings.nav.ariaLabel')"
+      [attr.aria-label]="label() ?? t('shared.sectionNav.ariaLabel')"
       *transloco="let t"
     >
       <div class="nav-head">
-        <p class="nav-heading">{{ t('storeSettings.nav.heading') }}</p>
+        <p class="nav-heading">{{ heading() ?? t('shared.sectionNav.heading') }}</p>
         <button
           class="nav-toggle"
           type="button"
@@ -47,7 +60,7 @@ import type {SettingsSection, SettingsSectionKey} from '@models/store-settings';
         <a
           class="nav-item"
           [class.active]="section.key === active()"
-          [routerLink]="['/store-management', section.key]"
+          [routerLink]="[basePath(), section.key]"
           [attr.aria-current]="section.key === active() ? 'page' : null"
           [title]="collapsed() ? t(section.labelKey) : null"
         >
@@ -61,34 +74,27 @@ import type {SettingsSection, SettingsSectionKey} from '@models/store-settings';
             <!-- Colour is not the signal: the dot is titled, and the section it marks says why. -->
             <span
               class="nav-dot"
-              [title]="t('storeSettings.nav.needsAttention')"
-              [attr.aria-label]="t('storeSettings.nav.needsAttention')"
+              [title]="t('shared.sectionNav.needsAttention')"
+              [attr.aria-label]="t('shared.sectionNav.needsAttention')"
             ></span>
           }
         </a>
       }
 
-      <hr />
-
-      <!--
-        The storefront builder is a route of its own and not built yet. A disabled item with a
-        reason beats a link that goes nowhere.
-      -->
-      <span class="nav-item builder" [title]="t('storeSettings.nav.builderUnavailable')">
-        <app-icon name="layoutGrid" />
-        <span class="nav-copy">{{ t('storeSettings.nav.homePageBuilder') }}</span>
-        <app-icon name="arrowUpRight" [flip]="true" />
-      </span>
+      <ng-content />
     </nav>
   `,
-  styleUrl: './settings-nav.css',
+  styleUrl: './section-nav.css',
 })
-export class SettingsNav {
+export class SectionNav {
   private readonly transloco = inject(TranslocoService);
 
-  readonly sections = input.required<readonly SettingsSection[]>();
-  readonly active = input.required<SettingsSectionKey>();
+  readonly sections = input.required<readonly NavSection[]>();
+  readonly active = input.required<string>();
+  /** The route the section key is appended to, e.g. `/store-management`. */
+  readonly basePath = input.required<string>();
   readonly label = input<string>();
+  readonly heading = input<string>();
 
   /**
    * Whether the rail is folded to icons.
@@ -101,7 +107,7 @@ export class SettingsNav {
 
   protected toggleLabel(): string {
     return this.transloco.translate(
-      this.collapsed() ? 'storeSettings.nav.expand' : 'storeSettings.nav.collapse',
+      this.collapsed() ? 'shared.sectionNav.expand' : 'shared.sectionNav.collapse',
     );
   }
 }

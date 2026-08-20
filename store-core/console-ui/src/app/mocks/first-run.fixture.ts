@@ -18,29 +18,41 @@ export const FIRST_RUN_FEATURE: FeatureVideo = {
   titleKey: 'firstRun.feature.title',
   copyKey: 'firstRun.feature.copy',
   durationKey: 'firstRun.feature.duration',
+  /*
+   * TODO(lessons.md): a placeholder clip until the onboarding walkthrough is recorded and hosted.
+   * The player takes any URL, so replacing this line is the whole change — nothing downstream
+   * knows or cares where the file lives. Setting it to `null` puts the player back to saying the
+   * video is not available, which is the honest state while none exists.
+   */
+  src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+  poster: null,
 };
 
 export const FIRST_RUN_GUIDES: readonly GuideVideo[] = [
   {
     id: 'csv-import',
+    docPath: 'products/import-csv/',
     titleKey: 'firstRun.guide.csvImport.title',
     durationKey: 'firstRun.guide.csvImport.duration',
     sectionKey: 'firstRun.guide.section.products',
   },
   {
     id: 'home-page',
+    docPath: 'storefront/home-page/',
     titleKey: 'firstRun.guide.homePage.title',
     durationKey: 'firstRun.guide.homePage.duration',
     sectionKey: 'firstRun.guide.section.storefront',
   },
   {
     id: 'go-live',
+    docPath: 'payments/go-live/',
     titleKey: 'firstRun.guide.goLive.title',
     durationKey: 'firstRun.guide.goLive.duration',
     sectionKey: 'firstRun.guide.section.payments',
   },
   {
     id: 'second-language',
+    docPath: 'content/languages/',
     titleKey: 'firstRun.guide.secondLanguage.title',
     durationKey: 'firstRun.guide.secondLanguage.duration',
     sectionKey: 'firstRun.guide.section.content',

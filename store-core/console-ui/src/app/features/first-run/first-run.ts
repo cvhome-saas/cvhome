@@ -1,7 +1,8 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
+import {PlanDialog} from '@shared/billing/plan-dialog/plan-dialog';
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
@@ -10,6 +11,7 @@ import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
 import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
 import {ToastService} from '@shared/ui/toast/toast';
+import {VideoDialog} from '@shared/ui/video-dialog/video-dialog';
 import {FirstRunFacade} from './facades/first-run.facade';
 
 /**
@@ -31,9 +33,11 @@ import {FirstRunFacade} from './facades/first-run.facade';
     NoticeBar,
     PageHeader,
     Panel,
+    PlanDialog,
     ProgressTrack,
     RouterLink,
     TranslocoDirective,
+    VideoDialog,
   ],
   templateUrl: './first-run.html',
   styleUrl: './first-run.css',
@@ -62,11 +66,33 @@ export class FirstRun {
   protected readonly error = this.facade.error;
 
   /**
-   * The walkthroughs and the plan links have nowhere to go yet. A toast naming what was
-   * asked for beats a dead control, and matches how the rest of the console handles a
-   * section that is not built — see `createStore.notAvailable`.
+   * Booking a call is still unbuilt — there is no scheduling service behind it, and unlike the
+   * plans and the guides there is no existing endpoint or page to point it at. A toast naming what
+   * was asked for beats a dead control; see `createStore.notAvailable` for the same treatment.
    */
   protected notAvailable(what: string): void {
     this.toast.info(this.transloco.translate('firstRun.notAvailable', {what}));
+  }
+
+  /** Whether the plan comparison is showing. The catalog is not fetched until this first flips. */
+  protected readonly plansOpen = signal(false);
+
+  /** Whether the walkthrough player is showing. */
+  protected readonly videoOpen = signal(false);
+
+  protected readonly videoTitle = computed(() => this.feature()?.title ?? '');
+  protected readonly videoSrc = computed(() => this.feature()?.src ?? null);
+  protected readonly videoPoster = computed(() => this.feature()?.poster ?? null);
+  protected readonly videoCopy = computed(() => this.feature()?.copy ?? null);
+
+  /**
+   * Choosing a plan from here has nowhere to go *yet*, and for a reason worth stating: a
+   * subscription belongs to a store, and this page is the one place in the console where no store
+   * exists. The catalog is real and readable; the checkout it would open is not addressable until
+   * the first store is provisioned. See lessons.md, "Shell — no plan selection at store creation".
+   */
+  protected planChosen(): void {
+    this.plansOpen.set(false);
+    this.toast.info(this.transloco.translate('firstRun.planAfterStore'));
   }
 }

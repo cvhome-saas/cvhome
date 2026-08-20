@@ -4,8 +4,10 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {switchMap} from 'rxjs';
 import {TranslocoDirective} from '@jsverse/transloco';
 
+import {dateKey} from '@core/i18n/calendar';
 import {ReferenceDataService, STOREFRONT_LANGUAGES} from '@core/reference/reference-data.service';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
+import {DatePicker} from '@shared/ui/date-picker/date-picker';
 import {FieldError} from '@shared/ui/form-field/field-error';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
@@ -26,7 +28,16 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
  */
 @Component({
   selector: 'app-details-section',
-  imports: [ConfirmDialog, FieldError, Icon, Panel, ReactiveFormsModule, Toggle, TranslocoDirective],
+  imports: [
+    ConfirmDialog,
+    DatePicker,
+    FieldError,
+    Icon,
+    Panel,
+    ReactiveFormsModule,
+    Toggle,
+    TranslocoDirective,
+  ],
   template: `
     <app-panel
       [title]="t('storeSettings.details.title')"
@@ -180,7 +191,12 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
 
           <div class="field">
             <label for="store-since">{{ t('storeSettings.details.inBusinessSince') }}</label>
-            <input id="store-since" class="control" type="date" formControlName="inBusinessSince" />
+            <app-date-picker
+              id="store-since"
+              formControlName="inBusinessSince"
+              [max]="today"
+              [placeholder]="t('storeSettings.details.inBusinessSincePlaceholder')"
+            />
           </div>
 
           <div class="field">
@@ -380,6 +396,9 @@ export class DetailsSection {
   /** `WeightUnit` and `MeasureUnit`. The server's `MeasureUnit` also lists the weight values,
    * which is its own muddle; only the two that measure a distance are offered here. */
   protected readonly weightUnits = ['KG', 'LB'] as const;
+
+  /** Today, as the date picker's upper bound — a store cannot have traded since tomorrow. */
+  protected readonly today = dateKey(new Date());
   protected readonly dimensionUnits = ['CM', 'IN'] as const;
 
   /**

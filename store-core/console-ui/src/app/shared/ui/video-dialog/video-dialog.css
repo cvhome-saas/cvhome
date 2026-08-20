@@ -1,0 +1,168 @@
+/*
+ * Video modal. Sized to the clip rather than to the page: a 16:9 player capped at the viewport,
+ * so a short guide does not open as a full-screen takeover.
+ */
+
+.vd {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+  inline-size: min(56rem, calc(100vw - 2rem));
+  max-block-size: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+.vd::backdrop {
+  background: rgb(0 0 0 / 55%);
+  backdrop-filter: blur(2px);
+}
+
+.vd-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.vd-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.vd-title {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.vd-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.vd-close:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.vd-close:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.vd-close svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+/*
+ * A fixed aspect box rather than an intrinsically sized video: the element has no dimensions until
+ * metadata loads, and without this the dialog jumped from a thin strip to full height mid-open.
+ */
+.vd-player {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  max-block-size: calc(100vh - 12rem);
+  border-radius: var(--radius-lg);
+  background: #000;
+  object-fit: contain;
+}
+
+.vd-missing {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 3rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.vd-copy {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+@media (max-width: 37.5rem) {
+  .vd-body {
+    padding: 0.75rem;
+  }
+
+  .vd-title {
+    font-size: var(--text-sm);
+  }
+}
+
+/*
+ * Dialogs animate in the top layer, which `display` transitions cannot reach without
+ * `allow-discrete` — without it the box pops in and vanishes on close instead of easing out.
+ * `@starting-style` supplies the from-state for the open direction; the plain `[open]` rule is what
+ * the close direction transitions back from. Same idiom as `ConfirmDialog`. Off for reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @starting-style {
+    .vd[open] {
+      opacity: 0;
+      transform: translateY(0.75rem) scale(0.98);
+    }
+  }
+
+  .vd[open] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .vd {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      overlay 0.18s ease allow-discrete,
+      display 0.18s ease allow-discrete;
+  }
+
+  .vd::backdrop {
+    opacity: 0;
+    transition:
+      opacity 0.18s ease,
+      overlay 0.18s ease allow-discrete,
+      display 0.18s ease allow-discrete;
+  }
+
+  .vd[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .vd[open]::backdrop {
+      opacity: 0;
+    }
+  }
+}

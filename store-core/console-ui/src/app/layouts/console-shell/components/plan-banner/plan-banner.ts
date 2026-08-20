@@ -1,32 +1,63 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
+import {BillingFacade} from '@shared/billing/billing.facade';
 import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 
-/** Dismissible plan notice pinned above the console. */
+/**
+ * The plan notice pinned above the console — when there is one.
+ *
+ * **It used to be a constant.** The banner said "You're on the Free plan — upgrade to add more stores"
+ * to every operator on every page, whatever they were paying, and its Upgrade button did nothing. A
+ * paying customer was told to upgrade; a store whose card had just failed was told nothing.
+ *
+ * It now renders `BillingFacade.banner()`, which is `null` for a healthy paid store — so the common
+ * case is **no banner at all**. What remains is a trial running down, a payment that failed, a
+ * cancellation already scheduled, or a store billing has not caught up with yet. `Upgrade` goes to the
+ * billing page (`/subscription` — the gateway owns `/billing`) rather than opening a checkout from the chrome: choosing what to pay for is a decision
+ * with a price attached, and it belongs on a page that shows the plans.
+ */
 @Component({
   selector: 'app-plan-banner',
-  imports: [Icon, TranslocoDirective],
+  imports: [Icon, RouterLink, TranslocoDirective],
   template: `
-    <aside class="plan-banner" [attr.aria-label]="t('shell.planBanner.ariaLabel')" *transloco="let t">
-      <app-icon name="sparkles" />
-      <p>{{ t('shell.planBanner.notice') }}</p>
-      <button class="upgrade" type="button">
-        {{ t('shell.planBanner.upgrade') }} <app-icon name="arrowUpRight" />
-      </button>
-      <button
-        class="dismiss"
-        type="button"
-        [attr.aria-label]="t('shell.planBanner.dismiss')"
-        (click)="shell.bannerVisible.set(false)"
+    @if (billing.banner(); as banner) {
+      <aside
+        class="plan-banner"
+        [class.warn]="banner.tone === 'warn'"
+        [class.danger]="banner.tone === 'danger'"
+        [attr.aria-label]="t('shell.planBanner.ariaLabel')"
+        *transloco="let t"
       >
-        <app-icon name="x" />
-      </button>
-    </aside>
+        <app-icon [name]="banner.tone === 'info' ? 'sparkles' : 'alertCircle'" />
+        <p>{{ banner.message }}</p>
+
+        @if (banner.canUpgrade) {
+          <a class="upgrade" routerLink="/subscription">
+            {{ t('shell.planBanner.upgrade') }} <app-icon name="arrowUpRight" [flip]="true" />
+          </a>
+        } @else {
+          <a class="upgrade quiet" routerLink="/subscription">
+            {{ t('shell.planBanner.manage') }} <app-icon name="arrowUpRight" [flip]="true" />
+          </a>
+        }
+
+        <button
+          class="dismiss"
+          type="button"
+          [attr.aria-label]="t('shell.planBanner.dismiss')"
+          (click)="shell.bannerVisible.set(false)"
+        >
+          <app-icon name="x" />
+        </button>
+      </aside>
+    }
   `,
   styleUrl: './plan-banner.css',
 })
 export class PlanBanner {
   protected readonly shell = inject(ConsoleShellFacade);
+  protected readonly billing = inject(BillingFacade);
 }

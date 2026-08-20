@@ -41,12 +41,26 @@
       -->
       <div class="settings-region">
         <div class="settings-layout" [class.rail-collapsed]="railCollapsed()">
-          <app-settings-nav
+          <app-section-nav
             class="settings-rail"
+            basePath="/store-management"
             [sections]="sections()"
             [active]="section()"
+            [heading]="t('storeSettings.nav.heading')"
+            [label]="t('storeSettings.nav.ariaLabel')"
             [(collapsed)]="railCollapsed"
-          />
+          >
+            <hr />
+            <!--
+              The storefront builder is a route of its own and not built yet. A disabled item with a
+              reason beats a link that goes nowhere.
+            -->
+            <span class="nav-item builder" [title]="t('storeSettings.nav.builderUnavailable')">
+              <app-icon name="layoutGrid" />
+              <span class="nav-copy">{{ t('storeSettings.nav.homePageBuilder') }}</span>
+              <app-icon name="arrowUpRight" [flip]="true" />
+            </span>
+          </app-section-nav>
 
           <app-tab-switcher
             class="settings-tabs"

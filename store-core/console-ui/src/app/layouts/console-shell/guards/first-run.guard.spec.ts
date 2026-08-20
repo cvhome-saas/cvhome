@@ -35,6 +35,7 @@ function store(id: string, name: string): ManagerStore {
     provisioningState: 'SUCCESSFULLY_PROVISIONING',
     status: 'ACTIVE',
     billingStatus: 'ACTIVE',
+    provisioningError: null,
   };
 }
 

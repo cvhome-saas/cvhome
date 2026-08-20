@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
+
 import {provideRouter} from '@angular/router';
 import {Observable, Subject, of, throwError} from 'rxjs';
 
@@ -6,6 +7,7 @@ import type {FirstRunSnapshot} from '@models/first-run';
 import {translocoTesting} from '@testing/transloco-testing';
 import {FirstRun} from './first-run';
 import {FirstRunFacade} from './facades/first-run.facade';
+import {SubscriptionService} from '@api/billing/subscription.service';
 import {FirstRunApi} from './services/first-run.api.service';
 
 function snapshot(): FirstRunSnapshot {
@@ -21,6 +23,7 @@ function snapshot(): FirstRunSnapshot {
         titleKey: 'firstRun.guide.csvImport.title',
         durationKey: 'firstRun.guide.csvImport.duration',
         sectionKey: 'firstRun.guide.section.products',
+        docPath: 'products/import-csv/',
       },
     ],
     nextUp: [
@@ -33,6 +36,8 @@ function snapshot(): FirstRunSnapshot {
       titleKey: 'firstRun.feature.title',
       copyKey: 'firstRun.feature.copy',
       durationKey: 'firstRun.feature.duration',
+      src: 'https://example.test/walkthrough.mp4',
+      poster: null,
     },
     trialDays: 14,
   };
@@ -77,7 +82,18 @@ describe('FirstRun', () => {
     api = new FakeFirstRunApi();
     await TestBed.configureTestingModule({
       imports: [FirstRun, ...translocoTesting().imports],
-      providers: [provideRouter([]), {provide: FirstRunApi, useValue: api}, ...translocoTesting().providers],
+      providers: [
+        provideRouter([]),
+        /*
+         * The page now mounts `PlanDialog`, which injects the billing catalogue. A stub rather
+         * than the HTTP testing stack: `CrudService` pulls in the request context and the whole
+         * interceptor chain, none of which this page's behaviour depends on. The dialog's own
+         * spec covers the catalogue.
+         */
+        {provide: SubscriptionService, useValue: {plans: () => of([])}},
+        {provide: FirstRunApi, useValue: api},
+        ...translocoTesting().providers,
+      ],
     }).compileComponents();
   });
 
@@ -165,7 +181,18 @@ describe('FirstRun', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         imports: [...translocoTesting().imports],
-        providers: [provideRouter([]), {provide: FirstRunApi, useValue: api}, ...translocoTesting().providers],
+        providers: [
+        provideRouter([]),
+        /*
+         * The page now mounts `PlanDialog`, which injects the billing catalogue. A stub rather
+         * than the HTTP testing stack: `CrudService` pulls in the request context and the whole
+         * interceptor chain, none of which this page's behaviour depends on. The dialog's own
+         * spec covers the catalogue.
+         */
+        {provide: SubscriptionService, useValue: {plans: () => of([])}},
+        {provide: FirstRunApi, useValue: api},
+        ...translocoTesting().providers,
+      ],
       });
 
       expect(TestBed.inject(FirstRunFacade).trialPending()).toBeFalse();
@@ -210,5 +237,41 @@ describe('FirstRun', () => {
 
     expect(element.querySelector('[role="alert"]')).toBeNull();
     expect(element.querySelector('.hero')).not.toBeNull();
+  }));
+
+  it('sends each short guide to the documentation site rather than a dead button', fakeAsync(() => {
+    const {element} = load();
+
+    const guide = element.querySelector<HTMLAnchorElement>('.guide-row');
+    // A link, not a button: these rows used to raise a "not available yet" toast while the written
+    // guides already existed on the docs site.
+    expect(guide?.tagName).toBe('A');
+    expect(guide?.href).toBe('https://cvhome-saas.github.io/products/import-csv/');
+    expect(guide?.target).toBe('_blank');
+    // The console holds a session, so a docs tab must not be able to reach back into this window.
+    expect(guide?.rel).toContain('noopener');
+  }));
+
+  it('opens a real player on the walkthrough instead of apologising', fakeAsync(() => {
+    const {fixture, element} = load();
+
+    expect(element.querySelector('app-video-dialog')).not.toBeNull();
+
+    element.querySelector<HTMLButtonElement>('.feature-video')?.click();
+    fixture.detectChanges();
+
+    const dialog = element.querySelector<HTMLDialogElement>('dialog.vd');
+    expect(dialog?.open).toBeTrue();
+    expect(dialog?.querySelector('source')?.getAttribute('src')).toBe('https://example.test/walkthrough.mp4');
+  }));
+
+  it('opens the plan catalogue from the trial notice and from the plan panel', fakeAsync(() => {
+    const {fixture, element} = load();
+
+    // Both entry points raised a "not available yet" toast while billing had been serving the
+    // catalogue to the marketing page all along.
+    element.querySelector<HTMLButtonElement>('.trial-plans')?.click();
+    fixture.detectChanges();
+    expect(element.querySelector<HTMLDialogElement>('dialog.pd')?.open).toBeTrue();
   }));
 });

@@ -202,6 +202,14 @@
   text-transform: uppercase;
 }
 
+/* A heading that does not fit is clipped rather than allowed to overlap the next column. */
+.dp-weekdays > span {
+  overflow: hidden;
+  min-inline-size: 0;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
 .dp-grid {
   row-gap: 0.15rem;
 }

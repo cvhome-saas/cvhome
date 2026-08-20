@@ -16,6 +16,8 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
     groupKey: 'shell.nav.group.organization',
     items: [
       {labelKey: 'shell.nav.item.storeManagement', icon: 'building', route: '/store-management'},
+      // `/subscription`, not `/billing` — the gateway owns that prefix. See app.routes.ts.
+      {labelKey: 'shell.nav.item.billing', icon: 'creditCard', route: '/subscription'},
       {labelKey: 'shell.nav.item.userManagement', icon: 'users'},
     ],
   },

@@ -14,7 +14,7 @@ import {
   MARKETING_REVIEW_STATS,
   MARKETING_STORES,
 } from '@mocks/marketing.fixture';
-import {toPricingPlans} from '../mappers/pricing.mapper';
+import {toPricingPlans} from '@shared/billing/pricing.mapper';
 import {MarketingApi} from '../services/marketing.api.service';
 
 /** The five slots of a review card's rating row, so the template can draw filled and empty stars. */
