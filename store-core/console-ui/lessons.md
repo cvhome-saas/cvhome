@@ -1187,3 +1187,586 @@ requirements document, with the entry here reduced to a link. There is already o
 - **Billing's sections are `plan` and `invoices`**, at `/subscription/:section` with `''` redirecting
   to `plan`. Splitting them fixed a layout problem as much as a navigation one: the two panels had
   been sharing a row, and whichever one remained was stranded at half width.
+
+## Catalogue — no multi-location inventory
+
+- **Screen:** `/products`, from `console-template/Inventory.dc.html` — the "All locations" switcher,
+  the per-location cards, and the on-hand / reserved / available split on every row.
+- **What the UI needs:** stock held per warehouse or per region, so a seller with two locations can
+  see where their stock is and move it.
+- **What is missing:** there is no location entity anywhere in the catalog pod. `InventoryEntity`
+  carries `region` and `regionVariant` as **free text**, with no repository, no endpoint and no
+  constraint — nothing joins them to a place. Zero hits pod-wide for warehouse, location or
+  fulfilment centre.
+- **Why it is required:** the whole left-hand column of the inventory design rests on it, and a
+  merchant trading from two warehouses cannot answer "where is this stock" at all.
+- **Expected contract:** a `Location` entity per store, `GET/POST /private/locations`, and inventory
+  keyed on `(product, location)` rather than on product alone.
+- **Placeholder:** none in code. The blocks are removed rather than disabled — see the note under
+  "Catalogue — the inventory KPI row" below.
+
+## Catalogue — no reorder point and no low-stock threshold
+
+- **Screen:** `/products` — the "12 SKUs are at or below their reorder point" banner, the "reorder at
+  N" caption under each stock bar, and the Low stock KPI tile.
+- **What the UI needs:** a per-product replenishment level, and a list of what has fallen below it.
+- **What is missing:** no such field. `InventoryEntity.productQuantityOrderMin` and
+  `productQuantityOrderMax` look like candidates and are not: they are **per-order purchase limits**
+  — the smallest and largest quantity a shopper may put in one basket — read by the cart, not by
+  replenishment. Reusing them would be a fixture standing in for a real answer.
+- **Why it is required:** without it there is no low-stock signal at all, so a seller learns they
+  are out of something when a shopper cannot buy it.
+- **Expected contract:** `reorderPoint` on the inventory record, and a `lowStock=true` filter on
+  `ProductCriteria`.
+- **Placeholder:** `TODO(lessons.md)` in `features/products/products.ts`.
+
+## Catalogue — no purchase orders and no supplier
+
+- **Screen:** `/products` — the "Incoming purchase orders" panel and its Create purchase orders
+  action; `/products/:id` — the Supplier field in Merchandising.
+- **What the UI needs:** inbound stock the seller has ordered but not received, and who they order
+  it from.
+- **What is missing:** zero hits across the catalog pod for purchase order, supplier or vendor.
+  Neither concept is modelled anywhere on the platform.
+- **Why it is required:** it is half of what an inventory screen is for. Without it the page can
+  only describe the present.
+- **Expected contract:** a `PurchaseOrder` aggregate with a supplier, expected date, lines and a
+  received-quantity per line, plus `GET /private/purchase-orders`.
+- **Placeholder:** none — the panel and the field are removed.
+
+## Catalogue — no stock-movement ledger
+
+- **Screen:** `/products` — the "Recent stock movements · last 48 hours" panel.
+- **What the UI needs:** an append-only record of every quantity change, with its reason and who
+  made it.
+- **What is missing:** quantity is a **mutable column** on the inventory row. `PATCH
+  /private/product/{id}` overwrites it and keeps no history. The only movement-shaped surface on the
+  platform is checkout's reserve / commit / release trio, which is service-to-service and not
+  exposed to the console.
+- **Why it is required:** without it "why is this figure wrong" is unanswerable, which is the
+  question an inventory discrepancy always raises.
+- **Expected contract:** a `StockMovement` record — product, delta, reason, actor, timestamp —
+  written by every quantity change, with `GET /private/products/{id}/movements`.
+- **Placeholder:** none — the panel is removed.
+
+## Catalogue — no product cost, so no inventory valuation and no margin
+
+- **Screen:** `/products` — the Value column and the Inventory value KPI tile; `/products/:id` —
+  Unit cost and the "Margin 39.5% · $51.00 per unit" line derived from it.
+- **What the UI needs:** what the seller paid for a unit.
+- **What is missing:** a product carries exactly one money field, `price`, and it is the **sale**
+  price. There is no cost column on the product, the inventory row or the price record.
+- **Why it is required:** three separate blocks of the design compute from it, and margin is the
+  number a merchant actually manages.
+- **Expected contract:** `cost` on the inventory record, in the store's currency.
+- **Placeholder:** none — all three blocks are removed.
+
+## Catalogue — the inventory KPI row is removed rather than reported unavailable
+
+- **Screen:** `/products` — the four tiles across the top of `Inventory.dc.html`.
+- **What happened:** Module 3 established a pattern for an unbacked metric — an em dash under a
+  "Not available yet" flag. It is the right answer for a row where *some* tiles are real. Here all
+  four are unbacked at once: Stock on hand and Inventory value need sums the platform never
+  computes, Low stock needs a reorder point that does not exist, and Out of stock needs a
+  `quantity = 0` filter `ProductCriteria` does not offer.
+- **Decision:** the row goes. Four em dashes in a row is not an honest page, it is a decoration —
+  it occupies the most prominent band of the screen to say nothing four times. The one real figure
+  the row carried, the total SKU count, is in the page header's context line and in the pagination
+  footer, where it is next to the thing it counts.
+
+## Catalogue — no CSV import or export, and no bulk operations
+
+- **Screen:** `/products` — Import CSV, Stock count, Export list, the row checkboxes and the bulk
+  action bar they reveal.
+- **What the UI needs:** to change many products at once — a price rise across a brand, a visibility
+  change across a category — and to move a catalogue in and out of a spreadsheet.
+- **What is missing:** no import endpoint, no export endpoint, and no bulk write of any kind. Every
+  catalog mutation is one record per request.
+- **Why it is required:** a store with 1,482 SKUs cannot be operated one `PATCH` at a time, which is
+  the size the design itself assumes.
+- **Expected contract:** `POST /private/products/import` taking a CSV and answering a job id, a
+  matching export, and `PATCH /private/products` taking a list of ids and one change.
+- **Placeholder:** none — the controls are removed.
+
+## Catalogue — no product tags and no collections
+
+- **Screen:** `/products/:id`, the Merchandising block — the Collections list and the tag input.
+- **What the UI needs:** free-form labels on a product, and curated sets that are not categories.
+- **What is missing:** no tag table, no collection entity, no field on the product. **Product groups
+  are a different concept and not a substitute**: a group is a named, code-addressed membership set
+  with its own per-language name, edited on `/catalogue`, whereas a tag is a label anyone can type.
+- **Why it is required:** collections drive storefront merchandising strips that categories cannot
+  express, because a collection cuts across the tree.
+- **Expected contract:** `tags: List<String>` on the product, and a `Collection` entity with an
+  ordered membership.
+- **Placeholder:** none — both blocks are removed.
+
+## Catalogue — no barcode or GTIN on a product
+
+- **Screen:** `/products/:id`, step 1 — the "Barcode (GTIN)" field beside the SKU.
+- **What the UI needs:** the manufacturer's global identifier, so a warehouse scanner and a
+  marketplace feed can both find the product.
+- **What is missing:** no such field on `Product`, `ProductEntity`, `ProductDefinition` or
+  `InventoryEntity`. `identifier` on the definition is unused and unpopulated, and `refSku` is an
+  internal cross-reference, not a GTIN.
+- **Why it is required:** every marketplace feed and every scanner integration is keyed on it.
+- **Expected contract:** `gtin` on the product, validated as GTIN-8/12/13/14.
+- **Placeholder:** none — the field is removed.
+
+## Catalogue — no compare-at price and no quantity-break tiers
+
+- **Screen:** `/products/:id`, step 3 — "Compare at" and the whole Bulk pricing tiers table.
+- **What the UI needs:** a struck-through was-price, and automatic discounts at quantity
+  breakpoints.
+- **What is missing:** `ProductPriceApi` allows several price records per inventory row, but the
+  price record carries **neither semantic** — no "this is the original price" flag and no minimum
+  quantity. `ReadableProduct.originalPrice` and `discounted` exist on the read DTO and are populated
+  from a promotion, which nothing in the console can create.
+- **Why it is required:** both are ordinary retail mechanics, and the B2B wholesale case the design
+  assumes is unserviceable without tiers.
+- **Expected contract:** `type` on the price record (`REGULAR` / `COMPARE_AT`) and `minQuantity` for
+  a tier, plus a private CRUD for prices.
+- **Placeholder:** none — both blocks are removed.
+
+## Catalogue — no tax class and no per-product currency
+
+- **Screen:** `/products/:id`, step 3 — the "Tax class" and "Currency" selects.
+- **What the UI needs:** which tax rate applies to this product, and which currency its price is in.
+- **What is missing:** no tax-class field or table in the catalog pod, and price is a bare
+  `BigDecimal` with the **store's** currency implied. A product cannot be priced in a currency other
+  than its store's, and no rate can be varied per product.
+- **Why it is required:** a store selling both books and electronics in a VAT jurisdiction needs two
+  rates, and cannot express them.
+- **Expected contract:** a `TaxClass` per store and a `taxClass` reference on the product.
+- **Placeholder:** none — both selects are removed. The store's currency is shown beside the price
+  as a read-only prefix, so the figure is not ambiguous.
+
+## Catalogue — a product type carries no attribute definitions
+
+- **Screen:** `/catalogue`, the Product types tab — the whole right-hand panel of
+  `Catalog (standalone).html`: attribute name, kind, Required / Optional, Variant / Shared, and the
+  "Used by categories" chip row.
+- **What the UI needs:** a type that says which attributes a product of that type must carry, and
+  which of them generate variants.
+- **What is missing:** `ProductAttributeOptionApi` and `ProductPropertySetApi` are both mapped, and
+  neither is reachable from a type. `ProductTypeEntity` is `{id, code, allowAddToCart, visible,
+  descriptions}` — there is no join from a type to an attribute set, and no relation from a type to
+  a category either.
+- **Why it is required:** it is the entire purpose of a product type. Without it a type is a label,
+  which is what the console now honestly presents it as.
+- **Expected contract:** `attributes: List<ProductAttributeDefinition>` on the type, each with a
+  name, a kind, a required flag and a variant-defining flag; and `GET /private/product/type/{id}` to
+  return them.
+- **Placeholder:** the tab shows a notice saying so, backed by
+  `catalogue.types.noAttributes`.
+
+## Catalogue — a category has no banner image and a brand has no logo or publish flag
+
+- **Screen:** `/catalogue` — the category editor's "Banner image · 1600 × 400 recommended" well, and
+  the brand editor's logo well and "Publish brand page" toggle.
+- **What the UI needs:** artwork for a category landing page and a brand page, and control over
+  whether the brand page exists.
+- **What is missing:** `ReadableCategory` has no image field and no upload endpoint.
+  `ReadableManufacturer` is `{id, code, order, descriptions}` — no image, no publish flag, and no
+  product count either.
+- **Why it is required:** a storefront category page with no banner and a brand page with no logo
+  are visibly unfinished, and the seller has no way to fix it.
+- **Expected contract:** the same shape the merchant pod already has for a store logo —
+  `POST …/private/category/{id}/image` multipart, and the equivalent for a manufacturer — plus a
+  `published` boolean on the manufacturer.
+- **Placeholder:** both wells are removed. The brand card shows the brand's initials, which is
+  visibly a stand-in rather than a broken image.
+
+## Catalogue — no SKU generation
+
+- **Screen:** `/products/:id`, step 1 — the "Available — generated from category" hint under the SKU
+  field, and the "SKU prefix ACM-ELC · inherits Standard tax rate" line in the category picker.
+- **What the UI needs:** a SKU proposed from the product's category, so a catalogue's codes stay
+  consistent without the seller inventing a scheme.
+- **What is missing:** nothing derives a SKU. `GET /private/product/unique?code=` answers only
+  whether a given code is taken — it cannot suggest a free one, and there is no SKU-prefix field on
+  a category.
+- **Why it is required:** the design presents the SKU as assisted, and it is entirely manual.
+- **Expected contract:** `skuPrefix` on a category, and `GET /private/product/next-sku?categoryId=`
+  answering the next free code under that prefix.
+- **Placeholder:** the field states that the code is the seller's own, and the uniqueness check
+  reports rather than proposes.
+
+## Catalogue — a product's default image cannot be changed after upload
+
+- **Screen:** `/products/:id`, step 2 — "First image is the storefront thumbnail", and the MAIN badge
+  the design puts on a hoverable image.
+- **What the UI needs:** to pick which of a product's images is the storefront thumbnail, at any
+  time.
+- **What is missing:** the flag can only be set **at upload**. `POST …/product/{id}/image` takes
+  `?defaultImage=`, and `PATCH …/product/{id}/image/{imageId}` sets `sortOrder` and nothing else —
+  no endpoint re-designates an existing image. Worse, `ProductImageApi.buildContentImages` sets the
+  flag on the new image without clearing it on the old one, so uploading with `defaultImage=true`
+  onto a product that already has a default leaves **two** images flagged.
+- **Why it is required:** the first photograph a seller happens to upload is not usually the one
+  they want on the category grid, and today they must delete and re-upload the whole gallery to
+  change it.
+- **Expected contract:** `PATCH …/product/{id}/image/{imageId}?defaultImage=true`, clearing the flag
+  on every sibling in the same transaction.
+- **Placeholder:** the Media step marks which image is the thumbnail and does not offer to change
+  it. `product-image.service.ts` carries the note at the call site.
+
+## Catalogue — two seller-core calls have never worked
+
+- **Screen:** `/products/:id`, step 4 (Organize) and step 2 (Media) — and, in seller-ui, the
+  Category and Images sub-tabs of its product form.
+- **What happened:** two paths in `seller-core/catalog` do not match any mapping, and both were
+  found by porting them.
+  - `ProductService.addProductToCategory()` builds
+    `/api/v1/private/product/${productId}/category/${categoryId}}` — with a **literal trailing
+    brace**. Every attempt to put a product in a category from the old console has 404'd.
+  - `ProductImageService.createImage()` posts to `/api/v1/private/product/{id}/images`, **plural**.
+    `ProductImageApi` maps only the singular `/image`. Every image upload from the old console has
+    404'd.
+- **Decision:** both are fixed in the port rather than in seller-ui, per the standing convention
+  that a module does not modify the old console. `addToCategory` is what makes the Organize step's
+  category diffing possible at all, which makes the category round-trip the sharpest test in this
+  module. `createImage` is dropped and replaced by an upload that targets the mapping that exists.
+- **Same class of finding as** Orders' Refund and Capture (Module 4) and `ManagerStoreService.create()`
+  (Module 2): a client method whose endpoint has never existed, kept alive by a UI nobody exercised.
+
+## Catalogue — `PATCH /api/v1/private/product/{id}` is mapped twice
+
+- **Screen:** `/products` — the inline edit of price, quantity and availability.
+- **What is wrong:** `ProductApi` declares two `@PatchMapping` handlers on the same path. One takes a
+  `@Valid @RequestBody LightPersistableProduct`; the other takes `?order=` and changes the product's
+  sort order. They differ only by `produces`, so which one answers depends on the caller's `Accept`
+  header.
+- **Why it matters:** it is a latent ambiguity rather than a live fault — the console sends a JSON
+  body and gets the first — but a client that sets `Accept: */*` and passes `?order=` would get
+  whichever Spring resolves first, and the two do entirely different things.
+- **Expected fix:** give product ordering its own path, e.g. `PATCH …/product/{id}/order`.
+- **Placeholder:** the console calls only the body form; the `?order=` form is not ported. Noted in
+  `api/catalog/product.service.ts`.
+
+## Catalogue — a console gap, not a backend one: variants, options and attributes
+
+Recorded here for completeness because it is the reverse of every entry above, and belongs in the
+module's plan rather than in this file's remit. `ProductVariantApi`, `ProductVariationApi`,
+`ProductVariantGroupApi`, `ProductAttributeOptionApi`, `ProductPropertySetApi`,
+`ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi` and `ExternalProductReservationApi`
+are all **fully mapped on the backend** and have no seller-core client and no UI — seller-ui's menu
+has its Options group commented out. Module 6 ships one product with no variants, matching what
+seller-ui writes. Nothing is missing from the platform here; what is missing is a console for it.
+
+## Catalogue — the category tree's "move to top level" is an undocumented `-1`
+
+- **Screen:** `/catalogue`, the Categories tab — the row's "move out" button, and a drag that
+  promotes a child to the root.
+- **What is wrong:** `PUT …/category/{child}/move/{parent}` is the only way to re-parent, and there
+  is no way to clear a parent through `PUT …/category/{id}` — the update maps a parent it is given
+  and ignores its absence. Promoting a category to the top level works **only** by passing `-1` as
+  the parent, which `CategoryFacadeImpl.move` special-cases into `addChild(null, category)`.
+- **Why it matters:** it is real, working behaviour with nothing naming it. seller-ui never found
+  it: its tree only nests, so a category dragged into another could never be got back out.
+- **Expected fix:** `DELETE …/category/{id}/parent`, or at minimum an OpenAPI note on the `-1`.
+- **Placeholder:** named as `ROOT_PARENT` in `api/catalog/category.service.ts` rather than left as a
+  magic number at the call site.
+
+## Catalogue — the private product list is stripped of everything a list needs
+
+- **Screen:** `/products`, and both product pickers (`/catalogue` Groups, and the product form's
+  related products).
+- **What the UI needs:** a page of products carrying, per row, a name, its categories, its brand and
+  a thumbnail — the columns `Inventory.dc.html` draws and seller-ui's own list shows.
+- **What is missing:** the *authorised* list endpoints answer none of it.
+  `GET /api/v2/private/base-products` returns `description: null`, `categories: []`,
+  `manufacturer: null` and `image: null` on every row — verified on the running stack, in both
+  languages. `GET /api/v2/private/tiny-products` is thinner still. A row from either has an id, a
+  SKU, a price, a quantity and a flag, and **no name**.
+- **Why it is required:** a product list that can only show SKUs is not a product list, and a picker
+  whose results have no names cannot be used to pick anything.
+- **What the console does instead:** reads `GET /api/v2/products`, which is **public** — no
+  `@PreAuthorize`. It runs the identical query: `ProductFacadeV2Impl.getProductListsByCriteria` and
+  `getBaseProductListsByCriteria` both delegate to the same `listProducts(...)` over the same
+  `productService.findAll(criteria, store)`, and differ only in which mapper they pass. Checked
+  before making the swap: it does **not** hide unpublished products, so a seller still sees their
+  own drafts.
+- **Expected contract:** `/private/base-products` populated by `readableProductMapper` — or, better,
+  a `?fields=` on it, since the thin mapper is presumably there for the storefront's sake.
+- **The gap that remains:** the console reads its own catalogue through an unauthenticated endpoint.
+  It is still store-scoped by the `store` parameter and the data is the storefront's own public
+  catalogue, but the asymmetry is real and should close when the private list is populated.
+
+## Catalogue — the product-name filter is accepted and ignored
+
+- **Screen:** `/products` — the search box the design puts at the top of the stock table; and both
+  product pickers.
+- **What the UI needs:** to narrow a list of 1,482 SKUs by typing part of a product's name.
+- **What is missing:** `ProductCriteria.productName` exists, Spring binds it, and
+  **`getProductName()` is never called anywhere in the pod.** `ProductRepository`'s predicate builder
+  reads `sku` (as `LIKE %sku%`), `manufacturerId`, `categoryIds` and `available`, and nothing else.
+  Verified twice: by reading the predicate builder, and against the running stack, where
+  `?productName=scarf` returns all 45 products in the store.
+- **Why it is required:** SKU is an internal code. A seller looking for "the blue scarf" knows its
+  name, not its code, and this is the single most-used control on the screen.
+- **Why it is worse than a missing filter:** a dead filter *looks* like it worked. The list re-renders,
+  the spinner runs, and the operator concludes their catalogue contains every product they searched
+  for.
+- **Expected contract:** join `ProductDescription` and add a `LIKE %productName%` on `name`, in the
+  request's language.
+- **Placeholder:** the console does not offer a name search at all — only SKU, category and brand,
+  which are the three that work. The box is labelled "Search by SKU" so it cannot be mistaken for one.
+
+## Catalogue — two DTOs answer `null` where every sibling answers `[]`
+
+- **What happened:** the catalogue page went down on first load against the live stack with
+  "Cannot read properties of null (reading '0')".
+- **Cause:** `ReadableManufacturer.descriptions` and `ReadableProductType.descriptions` are declared
+  in Java with **no initialiser**, while `ReadableCategory`, `ReadableProductGroup` and
+  `ReadableProductDefinition` all declare theirs `= new ArrayList<>()`. So a manufacturer answers
+  `"descriptions": null` while a category in the same response answers `"descriptions": []`. The
+  port had typed all five as required, reasoning from the DTOs that happened to be read first.
+- **Decision:** the two are typed `readonly descriptions?: readonly …[] | null` and their mappers
+  narrow with `?? []`. The other three stay required, because they genuinely are.
+- **The lesson, which is about porting and not about the catalogue:** "the Java field is a `List`"
+  does not mean "the wire value is an array". The initialiser is the test, it has to be checked per
+  DTO, and one observed payload is not evidence — `ReadableProductType.descriptions` arrives as `[]`
+  on the seeded store and is nullable by declaration all the same.
+
+## Catalogue — a brand persists only its name and its description
+
+- **Screen:** `/catalogue`, the Brands tab — the Slug field with its `/b/` prefix, and Sort order.
+- **What the UI needs:** a storefront URL for a brand page, and control over where a brand sits in
+  the storefront's brand list.
+- **What is missing:** both, and neither fails loudly.
+  - **No slug.** `manufacturer_description` has **no `sef_url` column** — the table is `description`,
+    `name`, `title`, `manufacturers_url`, `url_clicked`, `language_code`. Every sibling description
+    table has one; this one does not. `ManufacturerDescription` maps `MANUFACTURERS_URL` to a `url`
+    field that is a *click-tracked outbound link*, not a storefront path.
+  - **No sort order.** `PersistableManufacturerPopulator.populate` sets `storeMerchantId`, `code`,
+    and per description `description`, `name` and `languageCode`. It never calls `setOrder`, so the
+    `order` on `PersistableManufacturer` is bound by Jackson and then dropped on the floor.
+  - The same populator also ignores `title`, `highlights`, `metaDescription` and `keyWords`, all of
+    which `NamedEntity` carries. A brand is a name and a description, in each language.
+- **Why it matters:** these are not absent controls, they are controls that accept input and throw it
+  away. An operator sets a brand's order, saves, sees a success toast, reloads, and finds it back at
+  zero — which reads as a bug in the console rather than a gap in the platform.
+- **Expected contract:** `sef_url` on `manufacturer_description` and a populator that reads `order`
+  and the remaining `NamedEntity` fields — the category populator's `buildDescription` is the model,
+  and it maps six of them.
+- **Placeholder:** both fields are removed. The Brands editor states that a brand is a name and a
+  description here, so the absence is explained rather than merely absent.
+
+## Catalogue — a category's meta keywords are dropped by its populator
+
+- **Screen:** `/catalogue`, the Categories tab — not rendered, and this entry is why.
+- **What is missing:** `category_description.meta_keywords varchar(255)` exists in the schema, and
+  `PersistableCategoryPopulator.buildDescription` sets `categoryHighlight`, `description`, `name`,
+  `metatagDescription`, `metatagTitle`, `seUrl` and `languageCode` — **not** `metatagKeywords`. A
+  value sent for it is accepted and never stored.
+- **The same defect, a third time.** Module 5 recorded it for `ContentDescription.keyWords`, where
+  `ContentFacadeImpl.buildDescriptions` has the identical omission. Product descriptions *do* persist
+  keywords (`PersistableProductDefinitionMapper` calls `setMetatagKeywords`), and so do product
+  groups. So the field works on two of the four entities that declare it, which is the worst of both
+  worlds — there is no rule to remember.
+- **Expected contract:** one shared description populator, or at minimum `setMetatagKeywords` in
+  `buildDescription`.
+- **Placeholder:** the Categories editor does not offer a keywords field. The product form does,
+  because there it is real.
+
+## Catalogue — `PUT /private/category/{id}` fails for every caller
+
+- **Screen:** `/catalogue`, the Categories tab — *Save category*, and anything built on it.
+- **What happens:** every update returns 500. Verified against the running stack with four different
+  request bodies (with and without `parent`, with and without description ids); the body makes no
+  difference.
+- **Root cause, from `catalog.log`:**
+  ```
+  java.lang.UnsupportedOperationException
+    at java.util.ImmutableCollections.uoe
+    at java.util.ImmutableCollections$AbstractImmutableCollection.clear
+    at org.hibernate.type.CollectionType.replaceElements
+    at org.hibernate.event.internal.DefaultMergeEventListener.entityIsPersistent
+  ```
+  `CategoryFacadeImpl.saveCategory` builds the children list with `Stream.toList()`, which is
+  **immutable**, and assigns it to the managed entity:
+  ```java
+  List<Category> saveNow = children.stream()
+          .filter(c -> c.getId() != null && c.getId() > 0)
+          .toList();          // immutable
+  category.setCategories(saveNow);
+  categoryService.saveOrUpdate(category);   // Hibernate merge -> replaceElements -> clear() -> boom
+  ```
+  It fails on a leaf as readily as on a branch: the list is immutable whether or not it is empty.
+- **Who it affects:** everyone. seller-ui calls the same endpoint from its category form, so category
+  editing has been broken there too — this is not something the port introduced.
+- **Expected fix:** one line — `new ArrayList<>(children.stream()...toList())`, or collect to a
+  mutable list. `Collectors.toList()` or `.collect(Collectors.toCollection(ArrayList::new))`.
+- **What the console does:** nothing special. The call is correct and the failure is surfaced through
+  the normal error toast, because the console cannot make a broken endpoint work and pretending
+  otherwise would be worse. `PATCH …/category/{id}/visible`, `PUT …/category/{child}/move/{parent}`,
+  `POST /private/category` and `DELETE` are all unaffected and all verified working — so the tab is
+  fully usable apart from saving edits to an existing category.
+
+## Catalogue — sibling order is not expressible, twice over
+
+- **Screen:** `/catalogue`, the Categories tab — "move up" / "move down" on a row, and dragging onto
+  a row's top or bottom edge.
+- **What the UI needs:** to put one category before another among its siblings.
+- **What is missing — two independent blockers**, either of which alone would be enough:
+  1. **Ordering is a field, and the only endpoint that writes it is broken.** `sortOrder` lives on
+     the category, so "move up" is a save of a new number on two records — and
+     `PUT /private/category/{id}` 500s for every caller (see the entry above). There is no
+     reorder endpoint.
+  2. **The hierarchy does not come back in `sortOrder` order anyway.**
+     `GET /private/category-hierarchy` answers `MEN`'s children as
+     `[MEN_TOPS:0, MEN_SHOES:2, MEN_BOTTOMS:1]` — the numbers are right there in the payload and the
+     list is not sorted by them. `CategoryFacadeImpl.hierarchyList` builds each parent's `children`
+     in repository order and never sorts. So even with a working write, the tree would redraw in the
+     same order it had before and the operator would see nothing happen.
+- **Expected contract:** sort `children` by `sortOrder` in the hierarchy populator, and either fix
+  the update or add `PUT …/category/{id}/order`.
+- **Placeholder:** sibling reordering is **removed** — the row's up/down buttons, their `Alt+Arrow`
+  shortcuts and their menu items, and the tree's before/after drop zones. Dropping onto a row now
+  always nests, which is the one rearrangement the platform can actually perform. Nesting, promoting
+  out of a parent, visibility, add and delete are all real and all verified.
+
+## Catalogue — the console-side lessons from the hardening pass
+
+Not backend gaps. Recorded because each was a defect the module shipped with and each has a rule
+behind it worth keeping.
+
+- **A `<select>` bound with `[value]` loses its value when its options arrive later.** The Organize
+  step's Brand and Type selects read "No brand" for a product that had one: the value binding is
+  applied before the `@for` has produced any `<option>`, so the browser discards it. `formControlName`
+  is the fix — `SelectControlValueAccessor` registers each option as it appears and re-applies. Any
+  select whose options come from a request has this bug unless it is bound through the form.
+- **A form nobody fills renders empty next to data.** The catalogue's editors were loaded from
+  `select()`, `cancelEdit()` and after a write — but not on the first response, where there is no
+  user action to hang a call on. An `effect` keyed on the selected record covers all of them, and
+  the first load is just another case rather than a special one.
+- **Focus and selection are different things in a tree.** `focusRow` emitted `selectedIdChange`, so
+  arrowing down the category tree loaded each category into the editor in turn and discarded
+  whatever was half-typed there. The WAI-ARIA tree pattern separates them for exactly this reason:
+  you must be able to move a node without opening it.
+- **`queueMicrotask` is not "after render" in a zone app.** `app.config.ts` uses
+  `provideZoneChangeDetection({eventCoalescing: true})`, so change detection can run *after* a
+  microtask — post-render focus has to use `afterNextRender(fn, {injector})`. `DatePicker` documents
+  the same trap; the tree had to relearn it.
+- **A "settled" check cannot key on a `busy()` input.** The tree's focus-restoration effect ran in
+  the same tick as its own emit, before the page had started the request, and announced the node's
+  *old* position — the one thing the move had changed. Keying on the identity of the node list is
+  deterministic; a flag that has to propagate through an input is not. Caught by a spec, not by the
+  browser, because the real round trip is fast enough to hide it.
+- **Tailwind's Preflight removes list markers.** Right for app chrome built out of `<ul>`, wrong for
+  a rich text editor holding a seller's prose — the bullet button appeared to do nothing. Content
+  that is *the user's document* needs its list styles restored explicitly.
+- **`.popover` already animates.** Adding `animate.enter` to an element that carries it runs two
+  animations over the same travel. The global class owns the entry; a component adds only the leave,
+  which `.popover` does not provide.
+- **Bound `contenteditable` and a `role="toolbar"` container both trip
+  `interactive-supports-focus`.** Both are correct — a contenteditable is focusable by definition,
+  and a toolbar must not be focusable because its buttons are — so both carry an inline disable with
+  the reason, rather than the rule being switched off.
+- **A `computed` cannot see a plain field.** `RichText.editableDir` derived from `wrapperDir`, which
+  was an ordinary property set by `render()` — so the editable stayed on `dir="auto"` after loading
+  an Arabic document. `auto` guesses from the first strong character, which is right often enough to
+  hide the bug and wrong for a description that opens with a Latin brand name or a digit. Anything a
+  `computed` reads has to be a signal; the compiler will not say so.
+- **Compare like with like when checking whether a document is untouched.** The editor's pristine
+  short-circuit compared the sanitised whole document against the sanitised whole document, but
+  sanitising drops whitespace-only nodes *between top-level blocks* and leaves them alone one level
+  down. Inside a `<div dir="rtl">` wrapper the two sides could never agree, so every Arabic
+  description came back re-serialised and showed as a diff nobody made. The comparison now happens
+  inside the wrapper, where both sides have had the same rules applied.
+- **`disable()` cannot null an error that has not arrived yet.** Every existing category, brand,
+  product type, group and product carried a red "already taken" marker against its own code — the
+  one field the form does not allow editing. The form is filled while the control is still enabled,
+  so the async check starts; the facade disables the control a tick later, and Angular's `disable()`
+  nulls the errors *present at that moment*; the server then truthfully answers "yes, a record has
+  that code" and the result lands on a disabled control, where nothing will ever clear it. An async
+  validator that can outlive its control's enabled state has to check `control.enabled` at the point
+  it decides to report, not only at the point it starts.
+
+## Catalogue — the second QA pass, and why the first one missed it
+
+- **A spec that asserts presence proves nothing about behaviour.** `expect(querySelector(
+  'app-export-button')).not.toBeNull()` passes whether or not the button is the same height as the
+  one beside it, wired to anything, or visible. Nine of the thirteen defects found in review were
+  under assertions that were green. Where a person would look at something, the test has to measure
+  it; where a person would use something, the test has to drive it.
+- **A list endpoint can answer with a hollow object.**
+  `GET /private/products/groups` returns `products: []` for every group whatever they contain; only
+  `GET /private/products/groups/{code}` populates it. The Groups tab built its member lists from the
+  list response and showed every group as empty — which looked plausible, because empty is a
+  perfectly ordinary answer. This is the second instance of the same trap after `base-products`
+  answering `description: null`. **When a list and a by-id read return the same DTO, verify the list
+  actually fills it** rather than assuming the shape is the contract.
+- **The product-name filter is accepted and ignored, everywhere.** `ProductRepository.findAll` builds
+  its `Specification` from store, language, `available`, `sku`, `manufacturerId` and `categoryIds`.
+  `ProductCriteria.productName` and `Criteria.name` are bound by Spring and read by no one. So
+  seller-ui's product autocomplete, which passes `name=` to `/api/v2/private/tiny-products`, **has
+  never searched** — it shows the first twenty products in the store whatever you type, and looks
+  like a working control until you want the twenty-first. The console filters on the client instead
+  and says in the field hint that it is doing so.
+- **An `rxResource` keyed on signals that settle late runs once per signal.**
+  `params: () => ({id: this.productId(), store: this.shell.currentStoreId()})` ran three times on
+  one page load — no id and no store, then the route effect, then the store directory — each a
+  `forkJoin` of six requests, two rounds cancelled mid-flight. Eighteen requests to answer six
+  questions. `params` returning `undefined` is the "not ready" signal; a resource that depends on
+  more than one asynchronous input needs a gate, not a key.
+- **A root-provided facade with a resource starts fetching when something injects it.** The product
+  form held `ProductsFacade` purely to call `invalidate()` after a save, and paid for a page of the
+  products list on every visit. What the form actually needed was a stamp to bump. **Inject the
+  smallest thing that does the job**, because injection is construction and construction is a
+  request.
+- **Deleting a margin because a host rule replaces it — check the rule reaches.**
+  `:host { display: contents }` hands the shell's `.workspace` gap to a page's children, but it stops
+  at `app-busy-overlay`, which is a real box with its own formatting context. The previous pass
+  deleted `.stacked`, `.box-panel` and `.copy-panel` on the strength of the host rule and left the
+  four wizard steps with no gap between any two panels. The classes stayed in the templates, so
+  nothing failed — the CSS simply matched nothing.
+- **`appearance: none` cannot theme a dropdown.** It restyles the closed control; the open list is
+  drawn by the operating system and no CSS reaches it. In a console with two dark themes that meant
+  every brand, type and unit picker opened a white sheet. A listbox behind a button is more code and
+  is the only thing that actually works.
+- **A native checkbox reads as checked when it is not.** `accent-color` tints the checked state and
+  leaves the unchecked one to the platform, which against a dark theme is a solid dark square —
+  indistinguishable from selected. Controls in a themed surface have to be drawn, not tinted.
+- **Never `kill` a process the stack manager is supervising.** `run-lcl.sh` records a pid per
+  service; killing `console-ui` and starting an unsupervised `ng serve` in its place left the gateway
+  routing to an instance it no longer knew, which then read as "the app does not compile". The stack
+  has `restart console-ui` for exactly this, and it only works while the supervisor is alive.
+- **The weight and dimension units were an invented uppercase subset.** The server enums are
+  `WeightUnitOfMeasure {g, kg, l, lb, T}` and `DimensionUnitOfMeasure {cm, cu, ft, in, m}` — lowercase
+  bar the ton. This console declared `['KG','LB']` and `['CM','IN']`, so the value never matched what
+  the server sent, a save would have posted a constant the enum does not have, and three of five
+  units in each set were unreachable. The native `<select>` hid all of it by falling back to its
+  first option; the themed one rendered blank, which is how it was finally seen. **A `<select>` that
+  cannot match its value shows something plausible instead of nothing** — that is the third defect in
+  this module that a native select concealed.
+
+## The design pass — encapsulation, and three more things a native control hid
+
+- **A page cannot style anything inside a child component's template.** Angular scopes styles by the
+  *defining* component's attribute, so `.step-body > *` reached each step's host and stopped there —
+  the `[formGroup]` wrapper inside the step carries the step's attribute, not the page's. The rule
+  computed `gap: 16px` on a container holding one child while the panels inside sat flush, which is
+  why the spacing looked unfixed after it had been "fixed". The same trap then hit
+  `.filter-select .select-trigger`. **Two ways out, and only two**: put the rule in a stylesheet the
+  child itself includes (`editor-card.css`), or have the child expose a custom property
+  (`--select-height`). A selector written from outside is not one of them.
+- **`position: absolute` does not mean "free".** The autocomplete's results panel displaced nothing,
+  yet the page still grew 84px whenever results appeared: an absolutely positioned element that
+  overflows the bottom of the document still extends the scrollable area. It needed the same
+  open-upward rule as the select.
+- **The unit enums were an invented uppercase subset.** The server's are
+  `WeightUnitOfMeasure {g, kg, l, lb, T}` and `DimensionUnitOfMeasure {cm, cu, ft, in, m}` —
+  lowercase bar the ton. The console declared `['KG','LB']` and `['CM','IN']`, so the value never
+  matched, a save would have posted a constant the enum does not have, and three of five units in
+  each set were unreachable. **A native `<select>` hid it by falling back to its first option**;
+  the themed one rendered blank, which is how it was finally seen. Third defect in this module that
+  a native select concealed.
+- **`shareReplay` caches a failure as faithfully as a value.** A reference read that 404s while a
+  service is warming up would be replayed to every reader for the rest of the session. The cache
+  drops its entry on error so the next reader tries again.
+- **A product can have two default images.** `defaultImage: true` on more than one row of
+  `product_image` for the same product — the upload endpoint sets the flag without clearing the
+  previous one, and nothing enforces uniqueness. Which image the storefront picks is then arbitrary.
+  Not fixed here; `store-pod` is not modified by a module.

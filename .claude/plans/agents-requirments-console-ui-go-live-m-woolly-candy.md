@@ -494,7 +494,25 @@ assembly point), `.../facades/orders.facade.ts`, `.../orders.html` (columns and 
 
 ---
 
-## Module 5 — Store management
+## Module 5 — Store management — **done**
+
+Shipped across five commits (`feat(console-ui): store details and branding on real APIs` through
+`feat(console-ui): social login and payment configuration on real APIs`).
+`store-settings.fixture.ts` is gone and `lessons.md` reached 61 entries. What it established, which
+Module 6 reuses:
+
+- **The `optional*` `catchError` helpers as a named pattern.** `store-settings.api.service.ts`'s
+  `optional`, `optionalList` and `optionalOne` wrap every leg of a wide `forkJoin` except the one
+  that *is* the page — "a select that falls back to showing only the current value is still a
+  working page, whereas a failed `forkJoin` is a blank one." Module 6's `loadCatalogue()` is built
+  the same way, with the category hierarchy as the unwrapped leg.
+- **Writes reload rather than echo.** The endpoints answer `void`, so `saveSection` re-reads; the
+  page shows what the server normalised, not the operator's own input.
+- **Three shared components Module 6 depends on:** `shared/ui/image-picker` (product images),
+  `shared/ui/confirm-dialog` (every destructive action in the catalogue) and
+  `shared/ui/secret-field`.
+- The Module 3 dashboard-statistics outage was confirmed resolved against the live stack during
+  this module's QA, and logged as the one *resolved* entry in `lessons.md`.
 
 ### Context
 
@@ -705,3 +723,427 @@ known-set pattern, `core/http/crud.service.ts`, `core/errors/*`.
 6. Network tab: every save carries `?store=`, and the home-page save is a `POST …/content/box` the first
    time and a `PUT …/content/box/{id}` the second.
 7. Every `TODO(lessons.md):` marker in the diff has a matching heading in `lessons.md`.
+
+---
+
+## Module 6 — Product catalogue
+
+### Context
+
+Module 6 is the catalogue — **products, categories, brands (manufacturers), product types and
+product groups**. It is the largest merchant-facing area in seller-ui and the one console-ui has
+never had at all: there is no `features/catalogue`, no `@api/catalog`, no `@models/catalog`. The
+Commerce group in the nav rail (`src/app/mocks/console.fixture.ts`) carries an `inventory` item
+with **no `route`**, which is this app's marker for "not built"; this module is what gives it one.
+
+Unlike Modules 3–5 there is no fixture-backed shell to swap underneath. The feature and its API
+tier are built together, which makes this the largest module of the migration so far — hence six
+commits rather than three.
+
+**Prerequisite:** Module 5 must land first. `shared/ui/image-picker/` arrives with it, and the
+product Media step depends on it.
+
+**The finding that shapes this module.** The catalog pod is the *richest* backend on the platform
+and the design asks it for things it has never modelled. Verified by reading every controller under
+`store-pod/catalog/catalog-service/src/main/java/com/asrevo/cvhome/catalog/api/`:
+
+- **Everything `Inventory.dc.html` is actually about does not exist.** Zero hits across the pod for
+  reorder, stockCount, warehouse, location, purchase order, stock movement, valuation or cost.
+  `InventoryEntity` carries `region`/`regionVariant` as free text — not a location model, with no
+  endpoint of its own. There is no cost field anywhere, only a sale `price`.
+- **The reverse is also true, at scale.** `ProductVariantApi`, `ProductVariationApi`,
+  `ProductVariantGroupApi`, `ProductAttributeOptionApi`, `ProductPropertySetApi`,
+  `ProductInventoryApi` and `ProductPriceApi` are all fully mapped and have **no seller-core client
+  and no UI**. seller-ui's menu has the Options group commented out.
+- **Two seller-core calls have never worked.** `ProductService.addProductToCategory()` builds
+  `.../category/${categoryId}}` — a literal trailing brace, so the URL never matches its mapping.
+  `ProductImageService.createImage()` posts to `/private/product/{id}/images`; the pod only maps
+  `/private/product/{id}/image`, singular. Same class of finding as Orders' Refund and Capture.
+- **`ProductApi` maps `PATCH /api/v1/private/product/{id}` twice**, the two differing only by
+  `produces` — a latent ambiguity, noted under Deviations.
+
+### seller-ui today
+
+`src/app/pages/catalogue`, mounted at `/pages/catalogue`, guarded by `CanAccessCatalogue`. Five
+child areas. **There is no inventory page, no stock screen and no warehouse screen anywhere in
+seller-ui** — `.agents/plans/seller-ui-feature-inventory.md` §10 uses "inventory" as a synonym for
+"catalogue".
+
+| Section | seller-ui route | seller-core service |
+|---|---|---|
+| Products | `products/products-list`, `products/create-product`, `products/product/:code` | `products/services/product.service.ts` |
+| Product images | `product/:code/images` | `products/services/product-image.service.ts` |
+| Related products | `product/:code/related` | `products/product-related/services/product-relationship.service.ts` |
+| Categories | `categories/categories-list`, `create-category`, `category/:id` | `categories/services/category.service.ts` |
+| Category hierarchy | `categories/categories-hierarchy` | same — `PUT …/category/{child}/move/{parent}` |
+| Brands | `brands/brands-list`, `create-brand`, `brand/:id` | `brands/services/brand.service.ts`, `manufacture.service.ts` |
+| Product groups | `products-groups/*` | `products-groups/services/product-groups.service.ts` |
+| Product types | `types/types-list`, `create-type`, `type/:id` | `types/services/types.service.ts` |
+
+The products list filters on `sku` and `available` (`categoryIds`/`manufacturerId` are wired in the
+facade but never exposed in the template), pages server-side, and inline-edits quantity and price by
+**double-click** plus an availability checkbox, all three via `PATCH /private/product/{id}`. The
+product form is two columns (Definition + per-language SEO descriptions) with real router sub-tabs
+for Images, Category and Related; `PRODUCT_FORM_TABS` also declares a `discount` tab with no route
+and no component. The category hierarchy is a drag-and-drop `ngcx-tree` — the feature inventory
+calls it "one of the few genuinely interactive screens; keep it, upgrade it."
+
+### API surface to port
+
+All from `seller-ui/projects/seller-core/catalog/src/lib`, into a new `src/app/api/catalog/`. Every
+path is prefixed `/spg/catalog`. `?store=` is stamped by `CrudService` via `REQUEST_CONTEXT` —
+**callers never pass it**.
+
+| New file | Endpoints |
+|---|---|
+| `api/catalog/product.service.ts` | `GET /api/v2/private/base-products`, `GET /api/v2/private/tiny-products`, `GET`/`PUT /api/v2/private/product/{id}`, `POST /api/v2/private/product`, `PATCH /api/v1/private/product/{id}`, `DELETE /api/v1/private/product/{id}`, `GET /api/v1/private/product/unique?code=`, `POST`/`DELETE /api/v1/private/product/{productId}/category/{categoryId}` |
+| `api/catalog/product-image.service.ts` | `POST /api/v1/private/product/{id}/image` (multipart, `?order=&defaultImage=`), `DELETE …/image/{imageId}`, `PATCH …/image/{imageId}?order=`, `GET /api/v1/product/{id}/images` |
+| `api/catalog/product-relationship.service.ts` | `GET /api/v1/products/{id}/relationship`, `POST`/`DELETE /api/v1/private/products/{id}/relationship/{relatedId}` |
+| `api/catalog/category.service.ts` | `GET`/`POST /api/v1/private/category`, `GET`/`PUT`/`DELETE …/category/{id}`, `PATCH …/category/{id}/visible`, `PUT …/category/{child}/move/{parent}`, `GET …/category/unique?code=`, `GET /api/v1/private/category-hierarchy`, `GET …/category/product/{productId}` |
+| `api/catalog/manufacturer.service.ts` | `GET /api/v1/private/manufacturers`, `GET`/`PUT`/`DELETE …/manufacturer/{id}`, `POST …/manufacturer`, `GET …/manufacturer/unique?code=` |
+| `api/catalog/product-type.service.ts` | `GET /api/v1/private/product/types`, `GET`/`PUT`/`DELETE …/product/type/{id}`, `POST …/product/type`, `GET …/product/type/unique?code=` |
+| `api/catalog/product-group.service.ts` | `GET`/`POST /api/v1/private/products/groups`, `GET`/`DELETE …/groups/{code}`, `GET …/groups/unique?code=`, `POST`/`DELETE …/groups/{code}/product/{productId}` |
+
+Wire DTOs → **`models/catalog.ts`** (new): `ReadableProduct`, `ReadableProductDefinition`,
+`PersistableProductDefinition`, `LightPersistableProduct`, `ProductDescription`,
+`ProductSpecification`, `ReadableImage`, `ReadableCategory`, `PersistableCategory`, `CategoryRef`,
+`CategoryDescription`, `ReadableManufacturer`, `PersistableManufacturer`, `ReadableProductType`,
+`PersistableProductType`, `ReadableProductGroup`, `PersistableProductGroup`, `ProductGroupItem`,
+`EntityExists`, and `ProductQuery extends PageRequest` (`sku`, `productName`, `available`,
+`categoryIds`, `manufacturerId`).
+
+View models → **`models/products.ts`** (list rows, the form's view model, the step definitions, the
+readiness checklist) and **`models/taxonomy.ts`** (`CategoryNode`, `BrandCard`, `TypeCard`,
+`GroupRow`, the `/catalogue` tab set) — the `checkout.ts` / `orders.ts` split Module 4 established.
+
+**Not ported, deliberately.** `ProductVariantApi`, `ProductVariationApi`, `ProductVariantGroupApi`,
+`ProductAttributeOptionApi`, `ProductPropertySetApi`, `ProductInventoryApi`, `ProductPriceApi`,
+`ExternalProductApi`, `ExternalProductReservationApi`. All mapped on the backend; none has a
+seller-core client or a UI today, and the decision below is one product with no variants. This is a
+**console gap, not a backend gap** — it belongs here, not in `lessons.md`. Also not ported:
+`PATCH …/product/{id}?order=` (product ordering, commented out of seller-ui's own menu) and
+`ProductImageService.createImage()` (no such mapping).
+
+**Deviations.** Each is a real bug found by porting under `strict: true`, per the standing rule.
+
+1. **`addProductToCategory` has never worked** — literal trailing brace. Fixed in the port; it is
+   what makes the Organize step's category diffing possible.
+2. **`createImage` targets a mapping that does not exist.** The port uses `POST …/{id}/image`,
+   multipart, with `?order=` and `?defaultImage=`, and drops the dead method.
+3. **`ProductApi` maps `PATCH …/product/{id}` twice.** The console calls the
+   `LightPersistableProduct` form and does not port the `?order=` form.
+4. **`ReadableProductDefinition.inventory` is a single flat object**, `{sku, price: string,
+   quantity}` — not a list, and `price` reads back as a **string** while
+   `PersistableProductDefinition.price` writes a **number**. Both typed honestly; the api service
+   converts in one place.
+5. **seller-core's catalog models are optional on every field.** Hardened: `id`, `sku`, `code` and
+   `descriptions` are required where the server always sends them, and the mappers narrow rather
+   than assert.
+6. **`PersistableProductDefinition.categories` and `.properties` are `unknown[]`** — typed as
+   `CategoryRef[]`, and dropped, respectively.
+
+**Two further deviations, found during implementation** and not anticipated when this section was
+written. Both are in `lessons.md`.
+
+7. **"Move a category to the top level" is an undocumented `-1`.** `PUT …/category/{child}/move/{parent}`
+   is the only re-parenting endpoint, and `PUT …/category/{id}` cannot clear a parent it is not
+   given. `CategoryFacadeImpl.move` special-cases `parent == -1` into `addChild(null, category)` —
+   the only way to detach a child. seller-ui never found it, because its tree only nests. Named as
+   `ROOT_PARENT` in the port rather than left as a magic number.
+8. **The private product list is stripped, so the list reads the public one.**
+   `GET /api/v2/private/base-products` answers `description: null`, `categories: []`,
+   `manufacturer: null` and `image: null` on every row — this section's claim that it "carries the
+   description, the categories and the brand" is wrong, verified against the running stack. The
+   console reads `GET /api/v2/products`, which runs the identical query through the full mapper and
+   does not hide unpublished products. It is public, which is the cost.
+9. **`ProductCriteria.productName` is bound and never read.** `ProductRepository`'s predicate builder
+   covers `sku`, `manufacturerId`, `categoryIds` and `available` only. The name filter this section
+   lists as "real" narrows nothing while appearing to, so the console offers three filters, not four,
+   and its text box searches SKUs.
+10. **Two DTOs answer `null` where their siblings answer `[]`.** `ReadableManufacturer.descriptions`
+    and `ReadableProductType.descriptions` carry no Java initialiser. Typed nullable; their mappers
+    narrow.
+11. **A product's default image cannot be changed after upload.** `?defaultImage=` on the upload is
+   the only place the flag can be set; `PATCH …/image/{imageId}` sets `sortOrder` and nothing else.
+   `buildContentImages` also sets the flag without clearing it on the existing default, so passing
+   `true` on a product that already has one leaves two. This invalidates one line of the Testing
+   section below — "set the second as default" is not a thing the platform can do. The Media step
+   marks which image is the thumbnail and does not offer to move it; reordering is real.
+
+### Decisions (settled with the user)
+
+| Question | Decision |
+|---|---|
+| Page shape | **Two pages, as the templates draw them.** A new `Catalogue` nav item → `/catalogue` (tabs: Categories, Product types, Brands, Groups), and the existing disabled `Inventory` item gets `route: '/products'` (list + form). |
+| Inventory behaviour | **Not built.** No locations, reorder points, purchase orders, stock movements, valuation, CSV or bulk actions. Only the stock-levels *table* survives, as the product list. |
+| Product shape | **One product, no variants.** `PersistableProductDefinition` with a flat `price` and `quantity`, exactly as seller-ui writes it — multi-variant does not work from the backend. |
+| Product groups | **Built**, as a fourth tab on `/catalogue`. In seller-ui and in the backend, in no template. |
+| Product form | **The wizard layout, backed steps only.** Four steps plus the readiness and translations panels. Unbacked fields are removed with a `lessons.md` entry each, *not* disabled — Module 5's "keep them, marked" call does not scale to a form with this many dead controls. |
+| The products KPI row | **Removed entirely**, not reported unavailable — see below. |
+
+### What gets built, block by block
+
+**`/catalogue`** — from `console-template/Catalog (standalone).html`. `page-header` + a four-tab
+`tab-switcher`; each tab is a list or tree on the left and a detail editor on the right.
+
+| Block | Backing |
+|---|---|
+| Category tree, expand/collapse, depth | **real** — `GET /private/category-hierarchy` |
+| Per-row product count | **real** — `ReadableCategory.productCount` |
+| Drag to re-parent; drag to reorder as sibling | **real** — `PUT …/category/{child}/move/{parent}`; `sortOrder` on `PUT …/category/{id}` |
+| "In nav" eye toggle | **real** — `PATCH …/category/{id}/visible` |
+| Add child, add top-level, delete | **real** |
+| Detail: locale chips, name, slug, description, SEO title, meta description, visible | **real** — `descriptions[]` carries `name`, `friendlyUrl`, `title`, `description`, `metaDescription`, `keyWords`, `highlights` |
+| Category **banner image** | no field on `ReadableCategory` → **removed** |
+| Product type list, name, code, description | **real** |
+| Product type **attribute list** (name, kind, required, variant-defining) | nothing links a type to an attribute set → **removed**. The largest deviation on this page. |
+| "Used by categories" chips on a type | no such relation → **removed** |
+| Brand cards, name, slug, description, order | **real** |
+| Brand **logo upload**, **"publish brand page"** toggle | `ReadableManufacturer` is `{id, code, order, descriptions}` → **removed** |
+| "View storefront" | no preview target → **removed**, cross-referencing Module 5's entry |
+| Groups tab (no template) | **real** — list, code, active toggle, per-language name, member picker |
+
+**`/products`** — from `console-template/Inventory.dc.html`.
+
+| Block | Backing |
+|---|---|
+| Header, store context, Add product | **real** |
+| Table: name + SKU, category, price, quantity, available, actions | **real** — `GET /api/v2/private/base-products` |
+| Tabs All / Available / Unavailable | **real** — `available` on `ProductCriteria`. Replaces In stock / Low / Out of stock / Overstock, none of which the platform can compute. |
+| Filters: SKU, name, category, brand | **real** — `sku`, `productName`, `categoryIds`, `manufacturerId`. Backed and unused in seller-ui; the console exposes them. |
+| Paging | **real** — `count`, not `size` |
+| Inline edit of price, quantity, availability | **real** — `PATCH /api/v1/private/product/{id}` |
+| Delete a product | **real**, behind `confirm-dialog` |
+| KPI row, location cards, on-hand/reserved split, stock bars, "reorder at N", Value column, row checkboxes and bulk bar, "All locations", Import CSV, Stock count, Incoming purchase orders, Recent stock movements | **all removed** — nothing on the platform answers any of them |
+
+**Why the KPI row goes rather than reporting unavailable.** Module 3's pattern — an em dash under a
+"Not available yet" flag — was for a row where *some* tiles were real. Here all four are unbacked:
+Stock on hand and Inventory value need a sum the platform never computes, Low stock needs a reorder
+point that does not exist, and Out of stock needs a `quantity = 0` filter `ProductCriteria` does not
+offer. A row of four em dashes is not an honest page, it is a decoration. The one real figure — the
+total SKU count — already appears in the page header's context line and in the pagination footer.
+
+**`/products/new` and `/products/:id`** — from `console-template/Add Product.dc.html`: the stepper
+layout and both right-hand panels, over four backed steps.
+
+| Step | Fields |
+|---|---|
+| **1 Essentials** | SKU (required, alphanumeric, uniqueness-checked live via `GET …/product/unique?code=`), visible, `dateAvailable`, `sortOrder`; per-language `name`, `friendlyUrl`, `title`, `highlights`, `description`, `metaDescription`, `keyWords` |
+| **2 Media** | Images: upload, remove, reorder, set default |
+| **3 Pricing & stock** | `price`, `quantity`, `canBePurchased`, `shipeable`, `virtual`; `productSpecifications` — weight, height, width, length + `weightUnitOfMeasure`, `dimensionUnitOfMeasure` |
+| **4 Organize** | Categories (multi-select over the tree), brand (required), product type, related products (edit only) |
+
+Removed, each with a `lessons.md` entry: barcode/GTIN, compare-at price, unit cost and its derived
+margin, bulk pricing tiers, tax class, per-product currency, per-location opening quantity and
+reorder point, collections, tags, supplier, and the SKU-generated-from-category hint. Backorder goes
+too — `productQuantityOrderMin/Max` are per-order purchase limits, not a backorder flag, and reusing
+them would be a fixture standing in for a real answer.
+
+**The right column is real and worth keeping.** The readiness checklist is computed from the form's
+own required fields, and the translations panel from `descriptions[]` — the console can see exactly
+which locales a product is missing, which the feature inventory flags as invisible in seller-ui
+(§16). Both are client-side and cost no endpoint.
+
+**Media and Related need a saved product.** Images post to `/private/product/{id}/image` and
+relationships to `/products/{id}/relationship/{relatedId}`, both needing an id. So on
+`/products/new` step 2 and the related-products block are disabled with an honest label, and **Save
+draft** (a `POST` with `visible: false`) creates the product and routes to `/products/:id` where
+every step is live. Stated in the step rail, not discovered by clicking a dead control.
+
+**Categories are applied by diffing.** Organize compares the selected set against what
+`GET /api/v2/private/product/{id}` returned and issues `POST`/`DELETE
+…/product/{productId}/category/{categoryId}` for the difference — possible only because the
+stray-brace bug is fixed.
+
+### Mapping table — old capability → new location
+
+| seller-ui | console-ui |
+|---|---|
+| `catalogue/products/products-list` | `/products` |
+| SKU + availability filters | same, plus category and brand filters (backed, previously unexposed) |
+| Double-click inline edit of quantity/price | An explicit inline-edit affordance on the row — the feature inventory calls double-click "undiscoverable — only a `title` tooltip" |
+| Availability checkbox in the row | same, via `toggle` |
+| `products/create-product`, `products/product/:code` | `/products/new`, `/products/:id` — one wizard, not a form plus router sub-tabs |
+| Product sub-tab: Images | Step 2, Media |
+| Product sub-tab: Category | Step 4, Organize |
+| Product sub-tab: Related | Step 4, Organize (edit only) |
+| Product sub-tab: `discount` | **Deliberate removal** — declared in `PRODUCT_FORM_TABS` with no route and no component |
+| `categories/categories-list` + `create-category` + `category/:id` | `/catalogue`, Categories tab — the list and the editor are one screen |
+| `categories/categories-hierarchy` | Same screen. The tree *is* the list |
+| `brands/*` | `/catalogue`, Brands tab |
+| `types/*` | `/catalogue`, Product types tab |
+| `products-groups/*` | `/catalogue`, Groups tab |
+| Commented-out Options group, `product-ordering` | **Deliberate removal** — no routes exist in seller-ui either |
+
+### New components
+
+- **`shared/ui/tree`** — the category tree: expand/collapse, depth indent, drag to nest, drag to
+  reorder as a sibling. Nothing in `shared/ui/` does hierarchy. Drag-and-drop alone is
+  inaccessible, so every move is also reachable from the row's `menu` ("Move into…", "Move up",
+  "Move down"), and the whole tree is keyboard-navigable.
+- **`shared/ui/stepper`** — the wizard rail. `tab-switcher` is a `tablist` and cannot express
+  completion, linear progress or a disabled-until-saved step; the ARIA contract differs.
+- **`shared/ui/autocomplete`** — remote-search picker over `GET …/tiny-products`, for group members
+  and related products. `tag-input` is chips-you-type, not a search.
+
+**Reused, already present:** `data-table` + `table-row`, `pagination` (zero-based on the wire,
+one-based on screen), `tab-switcher`, `page-header`, `panel`, `badge`, `busy-overlay`,
+`confirm-dialog`, **`image-picker`** (product images — the Module 5 component, hence the
+prerequisite), `form-field`, `toggle`, `progress-track` (the readiness percentage), `notice-bar`,
+`toast`, `shared/i18n/money`, `shared/i18n/status-label` (`InventoryStatus` is **already named
+there** — the availability badge reuses it).
+
+### What stays unbacked → `lessons.md`
+
+Appended after the existing 61, newest last, in the file's established heading and bullet format.
+Each pairs with a `TODO(lessons.md):` marker at its call site.
+
+1. **No multi-location inventory.** `InventoryEntity.region`/`regionVariant` are free text with no
+   location entity, repository or endpoint.
+2. **No reorder point and no low-stock threshold.** `productQuantityOrderMin`/`Max` are per-order
+   purchase limits, not replenishment.
+3. **No purchase orders and no supplier.** Zero hits pod-wide.
+4. **No stock-movement ledger.** Quantity is a mutable column; the only movement surface is the
+   checkout reservation trio, which is service-to-service.
+5. **No product cost, and so no inventory valuation.** Only a sale `price` exists — which also
+   removes the unit cost and its derived margin.
+6. **No CSV import or export** anywhere, front or back.
+7. **No bulk operations** — bulk price change, bulk visibility, bulk category assignment.
+8. **No product tags and no collections.** Product groups are a different concept: a named,
+   code-addressed membership set, not free-form labels.
+9. **No barcode / GTIN on a product.**
+10. **No compare-at price and no quantity-break tiers.** `ProductPriceApi` allows several prices per
+    inventory record but carries neither semantic.
+11. **No tax class and no per-product currency.**
+12. **A product type carries no attribute definitions.** `ProductAttributeOptionApi` and
+    `ProductPropertySetApi` exist, but nothing links a *type* to the attributes a product of that
+    type must carry. The whole right-hand panel of the template's Product types tab rests on this.
+13. **A category has no banner image**, and **a brand has no logo and no publish flag.**
+14. **No SKU generation.** The design says "generated from category"; nothing derives one, and
+    `GET …/product/unique?code=` only answers whether one is taken.
+15. **`PATCH /api/v1/private/product/{id}` is mapped twice**, differing only by `produces`.
+
+Cross-referenced rather than duplicated: the storefront-preview gap (Module 5), and
+`product-statistic` answering with `date=null` (Dashboard).
+
+### Implementation
+
+Two features, each following `features/store-management`'s four layers — page → facade → feature api
+service → `@api/*`.
+
+- **`features/catalogue/`** — `catalogue.ts`/`.html`/`.css`,
+  `components/{category-tab,type-tab,brand-tab,group-tab}/`, `facades/catalogue.facade.ts`,
+  `services/catalogue.api.service.ts`. The facade uses `rxResource` keyed on
+  `shell.currentStoreId()` with a `linkedSignal` last-good snapshot, forms held in the facade
+  because Save lives in the header — the `StoreSettingsFacade` contract exactly.
+  `loadCatalogue()` is a `forkJoin` in which **the category hierarchy is the unwrapped leg** (it is
+  the page); every other leg goes through the existing `optionalList`/`optionalOne` `catchError`
+  helpers, each with an inline comment naming why *that* leg may fail. Writes reload rather than
+  echo the operator's input, since the endpoints answer `void`.
+- **`features/products/`** — the list: `products.ts`, `facades/products.facade.ts`,
+  `services/products.api.service.ts` mapping `ReadableProduct` → `ProductRow` and translating
+  filters to `ProductCriteria`.
+- **`features/product-form/`** — the wizard: `product-form.ts`, `facades/product-form.facade.ts`,
+  `services/product-form.api.service.ts`, `services/product-form.service.ts` (the reactive form,
+  following `store-settings-form.service.ts`), `components/{essentials,media,pricing,organize}-step/`.
+- **Routing** — `app.routes.ts`, under `ConsoleShell` with `canAccessSecuredPages, consoleContext,
+  requiresStore` and `data: {titleKey, breadcrumbKey}`: `catalogue`, `products`, `products/new`,
+  `products/:id`. Both trees are `RenderMode.Client` in `app.routes.server.ts` —
+  `SelectedStoreRequestContext.params()` throws during SSR, the same reason `store-management/**`
+  is client-rendered. Route params are validated before reaching a facade, per Module 4's
+  `/orders/abc` finding.
+- **Nav** — `console.fixture.ts`: add `{labelKey: 'shell.nav.item.catalogue', icon: 'sitemap',
+  route: '/catalogue'}` to the Commerce group, and give the existing `inventory` item
+  `route: '/products'`.
+- **i18n** — names come from the server's `descriptions[]`, matched against
+  `transloco.activeLang()` with a first-entry fallback, so there is no known-set problem for them.
+  The two enum-ish values that do need the Module 4 guard are `weightUnitOfMeasure` and
+  `dimensionUnitOfMeasure`. Locale chips render `LocaleService`'s available languages — en and ar,
+  not seller-ui's five. Prices go through `shared/i18n/money`, never bare `Intl`; SKUs and slugs get
+  `unicode-bidi: plaintext` inside the RTL page.
+- **No fixture.** `src/app/mocks/` gains nothing and no seam for one, per the Module 5 precedent.
+
+### Testing
+
+Both UIs, same org admin, `ORG1-STORE1` open in each.
+
+- The product list shows the same products as seller-ui's `products-list` — same ids, SKUs,
+  quantities, prices, availability, same total count.
+- Filter by SKU and by availability: both narrow identically. Then exercise the two filters
+  seller-ui never exposed — category and brand. **There is no name filter** — see Deviation 9.
+- Paging: `count` is the page-size parameter; page 2 differs and the total is stable.
+- Inline-edit a price, a quantity and availability; reload seller-ui and confirm all three moved.
+- Create a product end to end: SKU uniqueness reports a taken code live, Save draft creates it and
+  routes to `/products/:id`, then upload two images and reorder them, and confirm the order in
+  seller-ui's Images tab. **Not** "set the second as default" — see Deviation 8: no endpoint
+  re-designates a default image, so the console marks the thumbnail and does not offer to move it.
+- Assign and unassign categories in Organize; confirm in seller-ui's Category tab. **This is the
+  module's sharpest test** — the endpoint has never worked from seller-ui.
+- Attach and remove a related product; confirm in seller-ui's Related tab.
+- Category tree: nest a category by drag, reorder a sibling, do the same two moves by keyboard
+  through the row menu, toggle visibility, and confirm the hierarchy in seller-ui's tree screen.
+- Create and delete a brand, a product type and a product group; add and remove a group member.
+- A product with no images, one with no Arabic description, and a category with no children all
+  render — and the translations panel names the missing locale rather than showing blank.
+- Delete a product, a category and a brand, each behind the confirm dialog, **against throwaway
+  records only**.
+- Arabic and all three themes; 1440 / 900 / 420.
+
+### Commits
+
+1. `plan(console-ui): product catalogue` — this section.
+2. `feat(console-ui): the category tree on real categories`.
+3. `feat(console-ui): brands, product types and product groups`.
+4. `feat(console-ui): product list on real products`.
+5. `feat(console-ui): the product form`.
+6. `fix(console-ui): catalogue after QA`.
+
+Six rather than three: the API tier and both features are net-new, and folding the tree, the three
+taxonomy tabs, the list and the wizard into one diff would make it unreadable. `lessons.md` entries
+ride with the commit that creates their `TODO` marker.
+
+### Critical files
+
+**seller-ui: not modified. store-pod: not modified** — every backend finding above is logged, not
+fixed, per the standing convention.
+
+**New:**
+`src/app/api/catalog/{product,product-image,product-relationship,category,manufacturer,product-type,product-group}.service.ts`,
+`src/app/models/{catalog,products,taxonomy}.ts`,
+`src/app/features/catalogue/{catalogue.ts,.html,.css,components/,facades/,services/}`,
+`src/app/features/products/{products.ts,.html,.css,facades/,services/}`,
+`src/app/features/product-form/{product-form.ts,.html,.css,components/,facades/,services/}`,
+`src/app/shared/ui/{tree,stepper,autocomplete}/`.
+
+**Changed:** `src/app/app.routes.ts`, `src/app/app.routes.server.ts`,
+`src/app/mocks/console.fixture.ts` (the two nav routes), `src/locale/{en,ar}.json`,
+`eslint.config.js` (`ignoreAttributes` for any new component-internal enum input), `lessons.md`.
+
+**Reused, already present:** `core/http/crud.service.ts` (`?store=` stamping),
+`core/table/table.types.ts` (`PageT`, `PageRequest`, `count` not `size`), `core/errors/*`
+(`applyToForm`, `clearServerErrorsOnChange`), `shared/i18n/{money,status-label}.ts`,
+`shared/ui/image-picker/`, `shared/ui/confirm-dialog/`,
+`testing/{transloco-testing,console-api.fake}.ts`.
+
+### Verification
+
+1. `cd store-core/console-ui && npm run build && npm run lint && npm test`;
+   `git -C store-core/seller-ui status --porcelain` and `git -C store-pod status --porcelain` both
+   empty.
+2. `grep -rn "categoryId}}" src` → no hits. The stray-brace bug does not survive the port.
+3. `grep -rn "/private/product/.*/images" src` → no hits. The dead plural mapping is not ported.
+4. `grep -rn "reorder\|purchaseOrder\|stockMovement\|onHand\|inventoryValue" src` → no hits. No
+   inventory concept leaked in from the template.
+5. `grep -rn "variant\|optionValue\|propertySet" src/app/api` → no hits. The no-variants decision
+   holds at the API tier.
+6. `grep -rn "TODO(lessons.md)" src` — every marker in the diff has a matching heading in
+   `lessons.md`, and every new heading has a marker.
+7. The two-tab comparison above, driven through Chrome — in particular the category-assignment
+   round-trip, this module's strongest evidence, because the endpoint has never worked from the old
+   console.
+8. Network tab: the list request carries `?store=`, `page`, `count` and the active filter; the
+   product `POST` is v2 and the inline edit is a v1 `PATCH`; the image upload is multipart with
+   `?order=` and `?defaultImage=`.
+9. Specs: `products.api.service.spec.ts` and `catalogue.api.service.spec.ts` following
+   `orders.api.service.spec.ts` (a fake that filters and pages the way the server would), plus page
+   specs for both features asserting against rendered English copy.
