@@ -1,0 +1,114 @@
+<ng-container *transloco="let t">
+  <app-panel [title]="t('productForm.media.title')" [subtitle]="t('productForm.media.subtitle')">
+    <div class="editor-body">
+      @if (!saved()) {
+        <!--
+          Stated, not discovered. The rail already disables this step; this is what an operator who
+          got here by another route reads.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('productForm.media.saveFirst')" />
+      } @else {
+        <!--
+          One grid, images and the drop target together — the layout `Add Product.dc.html` draws,
+          where the dashed cell is the **last tile** rather than a separate well underneath.
+
+          The well used to sit below a vertical list, at the asset's own square aspect, which in this
+          column made a 774px box: the thing you drop onto filled the screen and the photographs you
+          came to manage were pushed off it.
+        -->
+        <ul class="shot-grid">
+          @for (image of facade.images(); track image.id; let index = $index, count = $count) {
+            <li class="shot">
+              <span class="shot-frame">
+                @if (image.url && !broken().has(image.id)) {
+                  <img appImageBroken [src]="image.url" alt="" (broken)="markBroken(image.id)" />
+                } @else {
+                  <app-icon name="images" [size]="20" />
+                }
+
+                @if (image.isDefault) {
+                  <!--
+                    A statement, not a control. There is no endpoint that moves the default to
+                    another image — see the component's own note and lessons.md. It is the first
+                    image, so reordering is what changes it.
+                  -->
+                  <span class="shot-main">{{ t('productForm.media.storefrontThumbnail') }}</span>
+                }
+
+                <span class="shot-overlay">
+                  @if (image.url && !broken().has(image.id)) {
+                    <button
+                      type="button"
+                      [attr.aria-label]="t('productForm.media.view', {position: index + 1})"
+                      (click)="viewing.set(image)"
+                    >
+                      <app-icon name="eye" [size]="13" />
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="danger"
+                    [disabled]="facade.uploading()"
+                    [attr.aria-label]="t('productForm.media.remove', {position: index + 1})"
+                    (click)="facade.removeImage(image.id)"
+                  >
+                    <app-icon name="trash" [size]="13" />
+                  </button>
+                </span>
+              </span>
+
+              <span class="shot-foot">
+                <!--
+                  Move rather than drag. The platform reorders by rewriting every image's order in
+                  one request; a drag gesture would be a second way to express the same write, and
+                  the only one that cannot be reached from a keyboard.
+                -->
+                <button
+                  type="button"
+                  [disabled]="index === 0 || facade.uploading()"
+                  [attr.aria-label]="t('productForm.media.moveUp', {position: index + 1})"
+                  (click)="facade.moveImage(index, -1)"
+                >
+                  <app-icon name="arrowUp" [size]="13" />
+                </button>
+                <span class="shot-name" dir="ltr">{{ image.name }}</span>
+                <button
+                  type="button"
+                  [disabled]="index === count - 1 || facade.uploading()"
+                  [attr.aria-label]="t('productForm.media.moveDown', {position: index + 1})"
+                  (click)="facade.moveImage(index, 1)"
+                >
+                  <app-icon name="arrowDown" [size]="13" />
+                </button>
+              </span>
+            </li>
+          }
+
+          <!--
+            The last cell, sized like the tiles beside it. It carries the upload checks with it, so
+            an image that is the wrong shape or too small never becomes a multipart POST.
+          -->
+          <li class="shot-drop">
+            <app-image-picker
+              [label]="t('productForm.media.drop')"
+              [assetName]="t('productForm.media.image')"
+              [rules]="imageRules"
+              [busy]="facade.uploading()"
+              (picked)="onPicked($event)"
+            />
+          </li>
+        </ul>
+
+        <p class="field-hint">{{ t('productForm.media.hint') }}</p>
+      }
+    </div>
+
+    <app-image-preview
+      [open]="viewing() !== null"
+      (openChange)="onViewerToggled($event)"
+      [url]="viewing()?.url ?? null"
+      [heading]="t('productForm.media.image')"
+      [caption]="viewing()?.name ?? null"
+    />
+  </app-panel>
+</ng-container>

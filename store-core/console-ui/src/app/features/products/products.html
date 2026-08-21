@@ -1,0 +1,319 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="facade.context()">
+    <!--
+      The same export the order book offers, over the same PDF path. It captures what is on screen —
+      the current filter and page — because that is the list the operator is looking at and asked to
+      keep. There is no server-side export on this platform; see lessons.md.
+    -->
+    <app-export-button
+      [target]="report()"
+      fileName="products"
+      [title]="heading().title"
+      [subtitle]="facade.subtitle()"
+      [disabled]="facade.isLoading() || facade.isEmpty()"
+    />
+    <button class="primary-action" type="button" (click)="createProduct()">
+      <app-icon name="plus" />
+      {{ t('products.addProduct') }}
+    </button>
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button class="secondary-action" type="button" (click)="facade.retry()">
+        {{ t('dashboard.tryAgain') }}
+      </button>
+    </div>
+  }
+
+  <app-busy-overlay
+    [busy]="facade.isLoading() || facade.saving()"
+    [label]="t('products.loading')"
+  >
+    @if (facade.isEmpty()) {
+      <div class="first-load" aria-hidden="true"></div>
+    } @else {
+      <app-panel
+        class="products-panel"
+        #report
+        [title]="t('products.allProducts')"
+        [subtitle]="facade.subtitle()"
+      >
+        <!--
+          Three filters, all three backed. `categoryIds` and `manufacturerId` were wired into
+          seller-ui's facade and never reached its template; this is the first console to offer them.
+
+          There is no search-by-name box, and its absence is deliberate: `ProductCriteria.productName`
+          is bound by Spring and read by nothing, so it would have looked like a working filter while
+          returning the whole catalogue. See lessons.md. The SKU filter is a substring match, which
+          is why it is presented as a search rather than a lookup.
+        -->
+        <!--
+          Every control that narrows the table, on one rail, aligned to the table's own gutter.
+
+          The availability tabs used to sit up in the panel header, visually divorced from the three
+          filters doing the same job, and the rail was inset 20px from the table it filters. Both
+          were the same mistake: the filters are part of the table, not part of the panel's title.
+
+          Three filters, all three backed. `categoryIds` and `manufacturerId` were wired into
+          seller-ui's facade and never reached its template; this is the first console to offer them.
+
+          There is no search-by-name box, and its absence is not an oversight:
+          `ProductRepository.findAll` builds its query from store, language, availability, SKU,
+          manufacturer and categories, and reads no name field at all. See lessons.md.
+        -->
+        <!--
+          Every control that narrows the table, on the panel's own header row — where
+          `Inventory.dc.html` puts them, beside the tabs, rather than on a rail of their own below.
+
+          They are also **compact**, which they were not: the search box is a fixed 230px and the two
+          selects are sized to their content, matching the template's `.45rem .7rem` chip. Built as
+          `flex: 1 1 11rem` they grew to 372px each and dominated the panel they were meant to serve.
+
+          Three filters, all three backed. `categoryIds` and `manufacturerId` were wired into
+          seller-ui's facade and never reached its template; this is the first console to offer them.
+
+          There is no search-by-name box, and its absence is not an oversight:
+          `ProductRepository.findAll` builds its query from store, language, availability, SKU,
+          manufacturer and categories, and reads no name field at all. See lessons.md.
+        -->
+        <div panelAction class="panel-controls" role="search">
+          <label class="filter">
+            <span class="sr-only">{{ t('products.filter.sku') }}</span>
+            <app-icon name="search" [size]="15" />
+            <!-- A SKU is an identifier: left-to-right even inside the Arabic console. -->
+            <input
+              type="search"
+              dir="ltr"
+              [value]="facade.filters().sku"
+              [placeholder]="t('products.filter.skuPlaceholder')"
+              (change)="facade.setFilter('sku', $any($event.target).value)"
+            />
+          </label>
+
+          <app-select
+            class="filter-select"
+            [options]="categoryOptions()"
+            [value]="facade.filters().categoryId?.toString() ?? ''"
+            (valueChange)="onCategoryFilter($event)"
+            [ariaLabel]="t('products.filter.category')"
+          />
+
+          <app-select
+            class="filter-select"
+            [options]="brandOptions()"
+            [value]="facade.filters().brandId?.toString() ?? ''"
+            (valueChange)="onBrandFilter($event)"
+            [ariaLabel]="t('products.filter.brand')"
+          />
+
+          <!--
+            Availability, not stock level. The design's In stock / Low / Out of stock / Overstock
+            need a reorder point and a stock sum this platform does not have; `available` is a real
+            field on the product and is what the endpoint filters on. See lessons.md.
+          -->
+          <app-tab-switcher
+            [tabs]="facade.tabs()"
+            [active]="facade.activeTab()"
+            (activeChange)="onTabChange($event)"
+            [label]="t('products.filterByAvailability')"
+            panelId="products-table"
+          />
+
+          @if (facade.filtered()) {
+            <button class="ghost-action rail-clear" type="button" (click)="facade.clearFilters()">
+              <app-icon name="x" [size]="13" />
+              {{ t('products.clearFilters') }}
+            </button>
+          }
+        </div>
+
+        @if (facade.products().length) {
+          <app-data-table id="products-table" [columns]="columns()" [label]="t('products.allProducts')">
+            @for (row of facade.products(); track row.id) {
+              <app-table-row [interactive]="facade.editingId() !== row.id">
+                <div class="cell-product" role="cell" [attr.data-label]="t('products.column.product')">
+                  <!--
+                    The pod's own asset path, which is not necessarily a URL this browser can reach —
+                    the same gap the store logo and the invoice hit in Modules 4 and 5. A thumbnail
+                    that will not load falls back to the glyph rather than a broken-image icon; the
+                    `(error)` binding alone misses the case where the failure beats the listener,
+                    which is why the directive is here.
+                  -->
+                  <span class="thumb" aria-hidden="true">
+                    @if (row.imageUrl && !brokenThumbs().has(row.id)) {
+                      <img appImageBroken [src]="row.imageUrl" alt="" (broken)="markBroken(row.id)" />
+                    } @else {
+                      <app-icon name="images" [size]="15" />
+                    }
+                  </span>
+                  <span class="product-copy">
+                    <button class="product-name" type="button" (click)="openProduct(row)" dir="auto">
+                      {{ row.name }}
+                    </button>
+                    <small dir="ltr">{{ row.sku || '—' }}</small>
+                  </span>
+                </div>
+
+                <div class="cell-category" role="cell" [attr.data-label]="t('products.column.category')">
+                  @if (row.categories.length) {
+                    <span dir="auto">{{ row.categories.join(', ') }}</span>
+                  } @else {
+                    <span class="muted">{{ t('products.uncategorised') }}</span>
+                  }
+                </div>
+
+                <span class="cell-brand" role="cell" [attr.data-label]="t('products.column.brand')" dir="auto">
+                  {{ row.brand ?? '—' }}
+                </span>
+
+                <div class="cell-price" role="cell" [attr.data-label]="t('products.column.price')">
+                  @if (facade.editingId() === row.id) {
+                    <app-number-field
+                      class="inline-input"
+                      [(value)]="draftPrice"
+                      [decimals]="2"
+                      [min]="0"
+                      [ariaLabel]="t('products.editPriceFor', {name: row.name})"
+                    />
+                  } @else {
+                    <span>{{ priceLabel(row) }}</span>
+                  }
+                </div>
+
+                <div class="cell-quantity" role="cell" [attr.data-label]="t('products.column.quantity')">
+                  @if (facade.editingId() === row.id) {
+                    <app-number-field
+                      class="inline-input"
+                      [(value)]="draftQuantity"
+                      [decimals]="0"
+                      [min]="0"
+                      [ariaLabel]="t('products.editQuantityFor', {name: row.name})"
+                    />
+                  } @else {
+                    <!-- Localised like the price beside it: Arabic reads ٢٥, not 25. -->
+                    <span class="numeric">{{ quantityLabel(row) }}</span>
+                  }
+                </div>
+
+                <div class="cell-available" role="cell" [attr.data-label]="t('products.column.available')">
+                  <!--
+                    A button rather than a switch inside an editable row: the availability change is
+                    its own decision and commits on the spot, while price and quantity are held
+                    until Save. Two controls that look alike and commit differently is a trap.
+                  -->
+                  <button
+                    class="availability"
+                    type="button"
+                    [disabled]="facade.saving()"
+                    [attr.aria-pressed]="row.available"
+                    [attr.aria-label]="t('products.toggleAvailableFor', {name: row.name})"
+                    (click)="facade.toggleAvailable(row)"
+                  >
+                    <app-badge [tone]="row.available ? 'green' : 'slate'" shape="square">
+                      {{ row.available ? t('products.available') : t('products.unavailable') }}
+                    </app-badge>
+                  </button>
+                </div>
+
+                <div class="cell-actions" role="cell" [attr.data-label]="t('products.column.actions')">
+                  @if (facade.editingId() === row.id) {
+                    <button
+                      class="row-action confirm"
+                      type="button"
+                      [disabled]="facade.saving()"
+                      [attr.aria-label]="t('products.saveRowFor', {name: row.name})"
+                      (click)="commitEdit(row)"
+                    >
+                      <app-icon name="check" [size]="15" />
+                    </button>
+                    <button
+                      class="row-action"
+                      type="button"
+                      [attr.aria-label]="t('products.cancelEditFor', {name: row.name})"
+                      (click)="facade.cancelEdit()"
+                    >
+                      <app-icon name="x" [size]="15" />
+                    </button>
+                  } @else {
+                    <!--
+                      seller-ui edited these cells on double-click, discoverable only from a `title`
+                      tooltip. An explicit control is the whole point of the row action here.
+                    -->
+                    <button
+                      class="row-action"
+                      type="button"
+                      [attr.aria-label]="t('products.editRowFor', {name: row.name})"
+                      [title]="t('products.editRow')"
+                      (click)="startEdit(row)"
+                    >
+                      <app-icon name="pencil" [size]="15" />
+                    </button>
+                    <button
+                      class="row-action"
+                      type="button"
+                      [attr.aria-label]="t('products.openProductFor', {name: row.name})"
+                      [title]="t('products.openProduct')"
+                      (click)="openProduct(row)"
+                    >
+                      <app-icon name="chevronRight" [size]="15" [flip]="true" />
+                    </button>
+                    <button
+                      class="row-action danger"
+                      type="button"
+                      [attr.aria-label]="t('products.deleteProductFor', {name: row.name})"
+                      [title]="t('products.deleteProduct')"
+                      (click)="facade.askDelete(row)"
+                    >
+                      <app-icon name="trash" [size]="15" />
+                    </button>
+                  }
+                </div>
+              </app-table-row>
+            }
+          </app-data-table>
+        } @else {
+          <!--
+            Empty because of a filter, or empty because the store has no products — two different
+            situations, and only one of them has a way out.
+          -->
+          <div class="table-empty">
+            <app-icon name="box" />
+            <p>{{ facade.filtered() ? t('products.noneMatch') : t('products.none') }}</p>
+            @if (facade.filtered()) {
+              <button class="secondary-action" type="button" (click)="facade.clearFilters()">
+                {{ t('products.clearFilters') }}
+              </button>
+            } @else {
+              <button class="primary-action" type="button" (click)="createProduct()">
+                {{ t('products.addProduct') }}
+              </button>
+            }
+          </div>
+        }
+
+        <app-pagination
+          [page]="facade.page().pageNumber"
+          [totalPages]="facade.page().totalPages"
+          [totalElements]="facade.page().totalElements"
+          [pageSize]="pageSize"
+          [unit]="t('products.unit')"
+          [label]="t('products.pagesLabel')"
+          (pageChange)="facade.goToPage($event)"
+        />
+      </app-panel>
+    }
+  </app-busy-overlay>
+
+  <app-confirm-dialog
+    [open]="facade.pendingDelete() !== null"
+    [title]="deleteTitle()"
+    [message]="t('products.delete.message')"
+    [confirmLabel]="t('products.delete.confirm')"
+    [cancelLabel]="t('actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDelete()"
+  />
+</ng-container>
