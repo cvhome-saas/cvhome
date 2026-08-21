@@ -71,6 +71,25 @@ export const ICON_PATHS = {
   percent: 'M19 5 5 19M7 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
   images: 'M8 3h13v13H8V3Zm-5 5v13h13m-3.5-16a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm8.5 12-4.5-5-4 4',
   layoutGrid: 'M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z',
+  // A root box with two branches dropping to two leaves — the catalogue's hierarchy, as the
+  // nav rail's one-glyph statement of what the page is.
+  // A price tag with its hole — what a product type is, and what the design's own `pi pi-tags` drew.
+  tag: 'M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Zm4.5-5.5h.01',
+  // A ribbon bookmark. Brands are marks you recognise, not favourites you starred.
+  bookmark: 'M6 3h12v18l-6-4.5L6 21V3Z',
+  sitemap: 'M9 3h6v4H9V3ZM2 17h6v4H2v-4Zm14 0h6v4h-6v-4ZM12 7v4M5 17v-3h14v3',
+
+  // ---- Rich text toolbar -------------------------------------------------------------------
+  // Drawn as letterforms rather than glyphs, because that is what every editor's toolbar uses and
+  // what an operator recognises without a tooltip.
+  bold: 'M7 5h6.5a3.5 3.5 0 0 1 0 7H7V5Zm0 7h7.5a3.5 3.5 0 0 1 0 7H7v-7Z',
+  italic: 'M15 5H9m6 0-4 14m4-14h-4M9 19h6',
+  heading2: 'M4 6v12M4 12h7m0-6v12m4-6.5a2.5 2.5 0 1 1 5 0c0 1.7-5 3.2-5 5.5h5',
+  heading3: 'M4 6v12M4 12h7m0-6v12m4-5.5h2a2 2 0 1 0-2-2m0 4h2a2 2 0 1 1-2 2',
+  listBullet: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
+  listOrdered: 'M10 6h10M10 12h10M10 18h10M4 6h2m-1 0v4m-1 0h2M4 15.5a1.5 1.5 0 1 1 2.6 1L4 20h3',
+  eraser: 'M8 20h12M4.5 15.5 9 20l10.5-10.5a2.1 2.1 0 0 0 0-3L16 3l-11.5 11.5a.7.7 0 0 0 0 1Z',
+  code: 'M9 17 4 12l5-5m6 10 5-5-5-5',
   link: 'M9.5 14.5 14.5 9.5M10 6l1-1a4 4 0 0 1 6 6l-1 1m-2 4-1 1a4 4 0 0 1-6-6l1-1',
   lock: 'M6 11h12v10H6V11Zm3 0V7a3 3 0 0 1 6 0v4',
   palette:

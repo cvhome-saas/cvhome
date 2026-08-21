@@ -1,0 +1,84 @@
+/*
+ * Metrics copied from `.control`, the class every text input in this console wears, because a
+ * number and a name sit side by side in every form here and any difference in height, radius or
+ * border reads as a mistake.
+ */
+
+:host {
+  display: block;
+}
+
+.number-shell {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  inline-size: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  transition: border-color var(--default-transition-duration);
+}
+
+.number-shell:hover,
+.number-shell:focus-within {
+  border-color: var(--primary);
+}
+
+:host(.number-invalid) .number-shell {
+  border-color: var(--chart-5-foreground);
+}
+
+:host(.number-disabled) .number-shell {
+  background: var(--muted);
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.number-input {
+  flex: 1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.number-input::placeholder {
+  color: var(--foreground-quiet);
+}
+
+.number-input:disabled {
+  cursor: not-allowed;
+}
+
+/*
+ * Belt and braces. The input is `type="text"`, so no engine should draw a spinner — but a future
+ * edit that changes the type would otherwise reintroduce them silently, and this is the one visual
+ * detail the whole component exists to remove.
+ */
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+/* The currency, or the unit. Quiet, because it is a label on the figure rather than part of it. */
+.number-affix {
+  flex: none;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .number-shell {
+    transition: none;
+  }
+}

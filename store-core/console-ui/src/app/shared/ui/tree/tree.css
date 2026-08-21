@@ -1,0 +1,261 @@
+:host {
+  display: block;
+}
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/*
+ * The row is a grid rather than a flex line so the label truncates and the trailing controls keep
+ * their place: a long category name must not push the move buttons off the panel.
+ */
+.tree-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: .5rem;
+  /* The indent is the hierarchy. `--depth` is set per row; everything else is constant. */
+  padding-block: .45rem;
+  padding-inline: calc(.5rem + var(--depth, 0) * 1.15rem) .5rem;
+  border-radius: var(--radius-md);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    box-shadow var(--default-transition-duration),
+    opacity var(--default-transition-duration);
+}
+
+.tree-row:hover {
+  background: var(--input);
+}
+
+.tree-row.selected {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.tree-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.tree-row.dragging {
+  opacity: .4;
+}
+
+/*
+ * One drop state, because there is one drop: into the row. Sibling ordering is not expressible on
+ * this platform, so there are no edge zones to mark. See `DropPosition`.
+ */
+.tree-row.drop-inside {
+  background: var(--accent-strong);
+  box-shadow: inset 0 0 0 2px var(--edge-strong);
+}
+
+.grip {
+  display: flex;
+  color: var(--foreground-quiet);
+  cursor: grab;
+}
+
+.chevron,
+.chevron-gap {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+}
+
+.chevron:hover {
+  background: var(--input);
+  color: var(--foreground);
+}
+
+.node-label {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Depth 0 reads as a heading; deeper rows recede. */
+.tree-row[aria-level='1'] .node-label {
+  font-weight: 600;
+}
+
+.node-meta {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.row-moves {
+  display: flex;
+  gap: .1rem;
+  /* Quiet until the row is touched: five glyphs on every row of a large tree is noise. */
+  opacity: 0;
+  transition: opacity var(--default-transition-duration);
+}
+
+.tree-row:hover .row-moves,
+.tree-row:focus-visible .row-moves,
+.tree-row.selected .row-moves,
+.row-moves:focus-within {
+  opacity: 1;
+}
+
+.row-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.row-action:hover:not(:disabled) {
+  background: var(--input);
+  color: var(--primary-emphasis);
+}
+
+.row-action:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.tree-empty {
+  padding: 1.5rem .5rem;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+/*
+ * A row that has just arrived. No leave animation: the tree is replaced wholesale by the server's
+ * answer, so animating a row "out" would be a claim about something that did not happen here.
+ */
+@keyframes tree-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.tree-row-in {
+  animation: tree-row-enter .18s var(--ease-emphasis) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-row-in {
+    animation-duration: .01ms;
+  }
+}
+
+/* Touch has no hover, so the controls that hover reveals have to be permanently visible there. */
+@media (hover: none) {
+  .row-moves {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-row,
+  .row-moves,
+  .row-action {
+    transition: none;
+  }
+}
+
+/* ---- Row actions menu -------------------------------------------------------------------- */
+
+/* The menu anchors to its row, so `.tree-row` has to establish the containing block. */
+.tree-row {
+  position: relative;
+}
+
+.tree-row-menu {
+  inline-size: 15rem;
+  inset-block-start: calc(100% - .25rem);
+  inset-inline-end: .5rem;
+  cursor: default;
+}
+
+.tree-row-menu button {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.tree-row-menu button span {
+  flex: 1;
+  text-align: start;
+}
+
+/*
+ * `aria-disabled` rather than `disabled`, so the item stays focusable and countable — see the
+ * template. It still has to *look* unavailable.
+ */
+.tree-row-menu button[aria-disabled='true'] {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.tree-row-menu kbd {
+  flex: none;
+  padding: .05rem .3rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--foreground-quiet);
+  font-family: inherit;
+  font-size: var(--text-3xs);
+  white-space: nowrap;
+}
+
+.tree-row-menu hr {
+  block-size: 1px;
+  margin: .35rem;
+  border: 0;
+  background: var(--border-soft);
+}
+
+/* Without this the more-button fades out from under the menu it just opened. */
+.tree-row:has(.tree-row-menu) .row-moves {
+  opacity: 1;
+}
+
+/*
+ * Only the leave. The global `.popover` this menu carries already animates its own entry, so
+ * declaring a second one here would run two animations over one element for the same 8px of travel.
+ */
+.tree-menu-out {
+  animation: popover-in .12s ease-in reverse both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-menu-out {
+    animation-duration: .01ms;
+  }
+}

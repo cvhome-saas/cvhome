@@ -1,0 +1,228 @@
+<ng-container *transloco="let t">
+  <!--
+    One `tree` role for the whole list, with rows flattened and `aria-level` carrying the depth.
+    A nested `<ul>` per branch would express the same hierarchy, but it cannot express a *drop
+    target between two branches*, and it makes the single-tab-stop contract much harder to hold.
+  -->
+  <!--
+    One sentence, read once on entry rather than repeated per row: the shortcuts are otherwise
+    invisible, and the row menu that advertises them is itself behind a shortcut.
+  -->
+  <p class="sr-only" [id]="hintId">{{ t('shared.tree.keyboardHint') }}</p>
+
+  <div
+    class="tree"
+    role="tree"
+    [attr.aria-label]="label()"
+    [attr.aria-describedby]="hintId"
+    [attr.aria-busy]="busy() ? 'true' : null"
+    (dragend)="endDrag()"
+  >
+    @for (row of flat(); track row.node.id; let index = $index) {
+      <div
+        #row
+        class="tree-row"
+        role="treeitem"
+        [class.selected]="row.node.id === selectedId()"
+        [class.dragging]="dragging() === row.node.id"
+        [class]="dropMode(row.node) ? 'drop-' + dropMode(row.node) : ''"
+        [style.--depth]="row.depth"
+        [attr.aria-level]="row.depth + 1"
+        [attr.aria-posinset]="row.index"
+        [attr.aria-setsize]="row.size"
+        [attr.aria-selected]="row.node.id === selectedId()"
+        [attr.aria-expanded]="row.hasChildren ? row.expanded : null"
+        [tabindex]="index === focusedIndex() ? 0 : -1"
+        [attr.draggable]="busy() ? null : 'true'"
+        (click)="select(row.node)"
+        (keydown)="onKeydown($event, index)"
+        animate.enter="tree-row-in"
+        (dragstart)="onDragStart(row.node, $event)"
+        (dragover)="onDragOver(row.node, $event)"
+        (drop)="onDrop($event)"
+      >
+        <span class="grip" aria-hidden="true"><app-icon name="grip" [size]="14" /></span>
+
+        <!--
+          The chevron is a real button so a pointer can expand without selecting, but it is
+          `tabindex="-1"`: the row already reaches it with Left and Right, and one tab stop per
+          chevron would put a hundred stops in a large tree.
+        -->
+        @if (row.hasChildren) {
+          <button
+            class="chevron"
+            type="button"
+            tabindex="-1"
+            [attr.aria-label]="row.expanded ? t('shared.tree.collapse', {name: row.node.label}) : t('shared.tree.expand', {name: row.node.label})"
+            (click)="$event.stopPropagation(); toggleCollapsed.emit(row.node.id)"
+          >
+            <app-icon [name]="row.expanded ? 'chevronDown' : 'chevronRight'" [size]="12" [flip]="!row.expanded" />
+          </button>
+        } @else {
+          <span class="chevron-gap" aria-hidden="true"></span>
+        }
+
+        <span class="node-label">{{ row.node.label }}</span>
+
+        @if (row.node.meta) {
+          <span class="node-meta">{{ row.node.meta }}</span>
+        }
+
+        @if (showVisibility() && row.node.visible !== undefined) {
+          <button
+            class="row-action"
+            type="button"
+            tabindex="-1"
+            [disabled]="busy()"
+            [attr.aria-pressed]="row.node.visible"
+            [attr.aria-label]="t('shared.tree.toggleVisibility', {name: row.node.label})"
+            [title]="row.node.visible ? t('shared.tree.visible') : t('shared.tree.hidden')"
+            (click)="$event.stopPropagation(); toggleVisibility(row)"
+          >
+            <app-icon [name]="row.node.visible ? 'eye' : 'eyeOff'" [size]="15" />
+          </button>
+        }
+
+        <!--
+          The moves, as buttons. Drag-and-drop is a pointer affordance and nothing else, so every
+          rearrangement it can perform is here too — this is the path a keyboard, a screen reader
+          and a touch screen all take.
+        -->
+        <span class="row-moves">
+          <button
+            class="row-action"
+            type="button"
+            tabindex="-1"
+            [disabled]="busy() || !canNest(row)"
+            [attr.aria-label]="t('shared.tree.nest', {name: row.node.label})"
+            [title]="t('shared.tree.nestShort')"
+            (click)="$event.stopPropagation(); nest(row)"
+          >
+            <app-icon name="arrowRight" [size]="14" [flip]="true" />
+          </button>
+          <button
+            class="row-action"
+            type="button"
+            tabindex="-1"
+            [disabled]="busy() || !canUnnest(row)"
+            [attr.aria-label]="t('shared.tree.unnest', {name: row.node.label})"
+            [title]="t('shared.tree.unnestShort')"
+            (click)="$event.stopPropagation(); unnest(row)"
+          >
+            <app-icon name="arrowLeft" [size]="14" [flip]="true" />
+          </button>
+          <button
+            class="row-action"
+            type="button"
+            tabindex="-1"
+            [disabled]="busy()"
+            [attr.aria-label]="t('shared.tree.addChild', {name: row.node.label})"
+            [title]="t('shared.tree.addChildShort')"
+            (click)="$event.stopPropagation(); requestChild(row)"
+          >
+            <app-icon name="plus" [size]="14" />
+          </button>
+
+          <!--
+            The discoverable path. Every action above is here too, each with its shortcut printed
+            beside it — which is the only place an operator can find out the shortcuts exist.
+          -->
+          <button
+            class="row-action row-more"
+            type="button"
+            tabindex="-1"
+            [disabled]="busy()"
+            aria-haspopup="menu"
+            [attr.aria-expanded]="openMenuFor() === row.node.id"
+            [attr.aria-controls]="openMenuFor() === row.node.id ? menuId(row) : null"
+            [attr.aria-label]="t('shared.tree.actions', {name: row.node.label})"
+            (click)="$event.stopPropagation(); toggleMenu(row)"
+          >
+            <app-icon name="ellipsisV" [size]="14" />
+          </button>
+        </span>
+
+        @if (openMenuFor() === row.node.id) {
+          <!-- eslint-disable-next-line @angular-eslint/template/interactive-supports-focus -- a
+               `role="menu"` container is not focusable and must not be; its items are, and these
+               handlers catch what bubbles from them. -->
+          <div
+            class="popover tree-row-menu"
+            role="menu"
+            [id]="menuId(row)"
+            [attr.aria-label]="t('shared.tree.actions', {name: row.node.label})"
+            animate.leave="tree-menu-out"
+            (click)="$event.stopPropagation()"
+            (keydown)="onMenuKeydown($event)"
+          >
+            <!--
+              `aria-disabled`, not `disabled`. A disabled button is skipped by screen-reader item
+              counts, so "Move out" would silently vanish on a top-level row and the operator could
+              not tell whether the action was unavailable or the app was broken.
+            -->
+            <button
+              #menuItem
+              type="button"
+              role="menuitem"
+              [attr.aria-disabled]="busy() || !canNest(row)"
+              (click)="nest(row)"
+            >
+              <app-icon name="arrowRight" [flip]="true" />
+              <span>{{ t('shared.tree.nestShort') }}</span>
+              <kbd>{{ t('shared.tree.keys.nest') }}</kbd>
+            </button>
+            <button
+              #menuItem
+              type="button"
+              role="menuitem"
+              [attr.aria-disabled]="busy() || !canUnnest(row)"
+              (click)="unnest(row)"
+            >
+              <app-icon name="arrowLeft" [flip]="true" />
+              <span>{{ t('shared.tree.unnestShort') }}</span>
+              <kbd>{{ t('shared.tree.keys.unnest') }}</kbd>
+            </button>
+
+            @if (showVisibility() && row.node.visible !== undefined) {
+              <hr />
+              <!-- A checkbox item, mirroring the row button's `aria-pressed`. -->
+              <button
+                #menuItem
+                type="button"
+                role="menuitemcheckbox"
+                [attr.aria-checked]="row.node.visible"
+                [attr.aria-disabled]="busy()"
+                (click)="toggleVisibility(row)"
+              >
+                <app-icon [name]="row.node.visible ? 'eye' : 'eyeOff'" />
+                <span>{{ t('shared.tree.visibilityShort') }}</span>
+                <kbd>{{ t('shared.tree.keys.visibility') }}</kbd>
+              </button>
+            }
+
+            <hr />
+            <button
+              #menuItem
+              type="button"
+              role="menuitem"
+              [attr.aria-disabled]="busy()"
+              (click)="requestChild(row)"
+            >
+              <app-icon name="plus" />
+              <span>{{ t('shared.tree.addChildShort') }}</span>
+              <kbd>{{ t('shared.tree.keys.addChild') }}</kbd>
+            </button>
+          </div>
+        }
+      </div>
+    } @empty {
+      <p class="tree-empty">{{ t('shared.tree.empty') }}</p>
+    }
+  </div>
+
+  <!--
+    What just happened. The tree redraws from the server after every move, and focus staying on the
+    same row means nothing is re-announced on its own.
+  -->
+  <p class="sr-only" role="status" aria-live="polite">{{ announcement() }}</p>
+</ng-container>

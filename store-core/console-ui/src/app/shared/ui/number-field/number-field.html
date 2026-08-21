@@ -1,0 +1,38 @@
+<!--
+  `type="text"`, deliberately — see the class note. `inputmode="decimal"` is what brings up the
+  numeric keypad on a phone, which is the only part of `type="number"` worth keeping.
+
+  `dir="ltr"` unconditionally: a figure runs left to right in every locale, and a price inside the
+  Arabic console that flips is a price nobody can read.
+-->
+<span class="number-shell">
+  @if (prefix()) {
+    <span class="number-affix" aria-hidden="true">{{ prefix() }}</span>
+  }
+
+  <input
+    #input
+    class="number-input"
+    type="text"
+    dir="ltr"
+    inputmode="decimal"
+    autocomplete="off"
+    [id]="id()"
+    [value]="text()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [attr.inputmode]="decimals() === 0 ? 'numeric' : 'decimal'"
+    [attr.aria-valuemin]="min()"
+    [attr.aria-valuemax]="max()"
+    (input)="onInput(input)"
+    (blur)="onBlur()"
+    (wheel)="onWheel(input)"
+  />
+
+  @if (suffix()) {
+    <span class="number-affix trailing" aria-hidden="true">{{ suffix() }}</span>
+  }
+</span>

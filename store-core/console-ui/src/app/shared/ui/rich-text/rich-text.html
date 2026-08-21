@@ -1,0 +1,140 @@
+<ng-container *transloco="let t">
+  <!--
+    One tab stop for the whole strip. Arrows move between buttons without activating — a toolbar is
+    not a tablist, where arrows select as they go.
+  -->
+  <!-- eslint-disable-next-line @angular-eslint/template/interactive-supports-focus -- the toolbar
+       is not focusable and must not be: its buttons are, and this handler catches their bubbled
+       keydown. That is the ARIA toolbar pattern, and giving the container a tabindex would add a
+       second tab stop to the field. -->
+  <div
+    class="rt-toolbar"
+    role="toolbar"
+    [attr.aria-label]="t('shared.richText.toolbarLabel')"
+    [attr.aria-controls]="editorId"
+    (keydown)="onToolbarKeydown($event)"
+  >
+    @for (tool of tools; track tool.key; let index = $index) {
+      <button
+        #tool
+        class="rt-tool"
+        type="button"
+        [class.pressed]="pressed(tool.key)"
+        [tabindex]="index === toolbarIndex() ? 0 : -1"
+        [disabled]="isDisabled() || sourceMode() || !available(tool.key)"
+        [attr.aria-pressed]="pressed(tool.key)"
+        [attr.aria-label]="t(tool.labelKey)"
+        [title]="t(tool.labelKey) + ' · ' + t(tool.shortcutKey)"
+        (mousedown)="$event.preventDefault()"
+        (click)="activate(tool.key)"
+        (focus)="toolbarIndex.set(index)"
+      >
+        <app-icon [name]="tool.icon" [size]="15" />
+      </button>
+    }
+
+    @if (allowSource()) {
+      <span class="rt-toolbar-gap"></span>
+      <!--
+        A switch, not a pressed button: this changes the field's mode rather than the format of a
+        selection, and the two announce differently.
+      -->
+      <button
+        class="rt-tool rt-source-toggle"
+        type="button"
+        role="switch"
+        tabindex="-1"
+        [class.pressed]="sourceMode()"
+        [attr.aria-checked]="sourceMode()"
+        [disabled]="isDisabled()"
+        [attr.aria-label]="t('shared.richText.sourceLabel')"
+        [title]="t('shared.richText.sourceLabel')"
+        (mousedown)="$event.preventDefault()"
+        (click)="toggleSource()"
+      >
+        <app-icon name="code" [size]="15" />
+      </button>
+    }
+  </div>
+
+  @if (!sourceMode()) {
+    <!--
+      The content is written imperatively by `render()`, never bound — which is also what makes the
+      server render an empty region rather than reaching for `document`.
+
+      `dir` comes from the document's own wrapper where it has one, so the text runs the way it was
+      written regardless of which language the console itself is in.
+    -->
+    <!-- eslint-disable-next-line @angular-eslint/template/interactive-supports-focus -- a
+         contenteditable region is focusable by definition; the rule cannot see it because the
+         attribute is bound rather than literal. -->
+    <div
+      #editable
+      class="rt-editable"
+      [id]="editorId"
+      role="textbox"
+      aria-multiline="true"
+      [attr.contenteditable]="isDisabled() ? null : 'true'"
+      [attr.aria-readonly]="isDisabled() ? 'true' : null"
+      [attr.aria-label]="resolvedLabel()"
+      [attr.aria-invalid]="invalid() ? 'true' : null"
+      [attr.dir]="editableDir()"
+      [class.is-empty]="isEmpty()"
+      [attr.data-placeholder]="placeholder()"
+      (input)="onInput()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onEditorKeydown($event)"
+      (paste)="onPaste($event)"
+      (drop)="onDrop($event)"
+    ></div>
+  } @else {
+    <!--
+      Source is left-to-right whatever the content is: it is markup, not prose, and reading a tag
+      right-to-left helps nobody.
+    -->
+    <textarea
+      class="rt-source"
+      dir="ltr"
+      spellcheck="false"
+      rows="12"
+      [id]="editorId"
+      [attr.aria-label]="t('shared.richText.sourceFieldLabel', {field: resolvedLabel()})"
+      [disabled]="isDisabled()"
+      [value]="value()"
+      (input)="onSourceInput($any($event.target).value)"
+    ></textarea>
+  }
+
+  @if (linkOpen()) {
+    <!--
+      Inside an `@if` so `animate.leave` has something to run on — Angular only plays it when Angular
+      is the one removing the node.
+    -->
+    <div class="popover rt-link" animate.leave="rt-link-out">
+      <label class="rt-link-field">
+        <span class="sr-only">{{ t('shared.richText.linkUrl') }}</span>
+        <app-icon name="link" [size]="14" />
+        <input
+          #linkInput
+          type="url"
+          dir="ltr"
+          inputmode="url"
+          [placeholder]="t('shared.richText.linkPlaceholder')"
+          [value]="linkHref()"
+          (input)="linkHref.set($any($event.target).value)"
+          (keydown)="onLinkKeydown($event)"
+        />
+      </label>
+      <button class="rt-link-action" type="button" (click)="applyLink()">
+        {{ t('shared.richText.linkApply') }}
+      </button>
+      <button class="rt-link-action ghost" type="button" (click)="cancelLink()">
+        {{ t('actions.cancel') }}
+      </button>
+    </div>
+  }
+
+  <!-- Mode changes and refused links, for a reader who cannot see the toolbar light up. -->
+  <p class="sr-only" role="status" aria-live="polite">{{ announcement() }}</p>
+</ng-container>
