@@ -50,3 +50,4 @@ http-client.private.env.json
 /.codex/config.toml
 /.codex/hooks.json
 **/.angular/
+/store-pod/landing-ui/.impeccable/*
