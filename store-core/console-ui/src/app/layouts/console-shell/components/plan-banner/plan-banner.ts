@@ -1,8 +1,8 @@
-import {Component, computed, inject} from '@angular/core';
-import {Router, RouterLink} from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {BillingFacade} from '@shared/billing/billing.facade';
+import {BillingFacade} from '@layouts/billing/billing.facade';
 import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 

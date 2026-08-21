@@ -6,7 +6,7 @@ import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleSidebar} from './components/console-sidebar/console-sidebar';
 import {ConsoleToolbar} from './components/console-toolbar/console-toolbar';
 import {PlanBanner} from './components/plan-banner/plan-banner';
-import {BillingFacade} from '@shared/billing/billing.facade';
+import {BillingFacade} from '@layouts/billing/billing.facade';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
 
 /**

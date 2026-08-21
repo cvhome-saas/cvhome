@@ -16,6 +16,13 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      // `_name` is how this codebase spells "this parameter exists to match a signature, not to be
+      // read" — the test fakes mirror the real services so a drift in their parameters is a compile
+      // error rather than a silently weaker spec.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_'},
+      ],
       '@angular-eslint/directive-selector': [
         'error',
         {type: 'attribute', prefix: 'app', style: 'camelCase'},
@@ -85,7 +92,8 @@ module.exports = tseslint.config(
             'aria-labelledby', 'aria-controls', 'aria-haspopup', 'aria-current',
             'aria-live', 'aria-relevant', 'scope', 'stroke-linecap', 'stroke-linejoin',
             'animate.enter', 'animate.leave', 'method',
-            'tone', 'icon', 'shape', 'fileName',
+            'tone', 'icon', 'shape', 'fileName', 'slugPrefix', 'basePath',
+            'd', 'preload', 'kind',
           ],
         },
       ],

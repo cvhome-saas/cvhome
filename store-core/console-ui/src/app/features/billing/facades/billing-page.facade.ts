@@ -5,7 +5,7 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {SubscriptionService} from '@api/billing/subscription.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
-import {BillingFacade} from '@shared/billing/billing.facade';
+import {BillingFacade} from '@layouts/billing/billing.facade';
 import {ToastService} from '@shared/ui/toast/toast';
 import type {EntitlementKey, EntitlementValue} from '@models/billing';
 

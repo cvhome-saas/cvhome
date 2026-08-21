@@ -4,7 +4,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 import {map} from 'rxjs';
 
-import {BillingFacade} from '@shared/billing/billing.facade';
+import {BillingFacade} from '@layouts/billing/billing.facade';
 import {Icon} from '@shared/ui/icon/icon';
 
 /**

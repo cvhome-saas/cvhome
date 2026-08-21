@@ -194,7 +194,11 @@ export class DatePicker implements ControlValueAccessor {
   }
 
   protected toggle(): void {
-    this.open() ? this.cancel() : this.openPicker();
+    if (this.open()) {
+      this.cancel();
+    } else {
+      this.openPicker();
+    }
   }
 
   protected openPicker(): void {
