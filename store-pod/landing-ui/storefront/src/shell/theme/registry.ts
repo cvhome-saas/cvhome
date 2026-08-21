@@ -9,6 +9,7 @@ export const themeLoaders = {
     // @themes:start
     starter: () => import('@store-front/theme-starter'),
     'beauty': () => import('@store-front/theme-beauty'),
+    'fashion': () => import('@store-front/theme-fashion'),
     // @themes:end
 } satisfies Record<string, () => Promise<{ default: ThemeDefinition }>>;
 

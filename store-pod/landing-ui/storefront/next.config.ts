@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
         // @themes:start
         '@store-front/theme-starter',
         '@store-front/theme-beauty',
+        '@store-front/theme-fashion',
         // @themes:end
     ],
 };

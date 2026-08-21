@@ -181,7 +181,8 @@
       "FAILED_TO_REMOVED_PRODUCT": "No se pudo eliminar el producto.",
       "FAILED_TO_UPDATE_QUANTITY": "No se pudo actualizar la cantidad.",
       "SALE": "Oferta",
-      "LOW_STOCK": "Pocas unidades"
+      "LOW_STOCK": "Pocas unidades",
+      "ADDED": "Añadido"
     },
     "HEADER": {
       "HOME_TITLE": "Inicio",

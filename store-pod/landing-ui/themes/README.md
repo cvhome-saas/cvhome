@@ -10,6 +10,7 @@ colours it. How to build one: `.agents/skills/project-structure/references/new-l
 |---|---|---|
 | `starter` | reference | deliberately undesigned; the copy source for `npm run new-theme <id>`; current fallback for every legacy enum value |
 | `beauty` | built (v1.0.0) | Industrial Quote Grammar for a beauty + fashion boutique — ink plates on a 1px grid, 45° hazard stripes, straight-quoted labels, condensed caps display (Oswald) + mono facts (JetBrains Mono), the merchant primary as the single zip-tie-tag accent; `themes/beauty/DESIGN.md` |
+| `fashion` | built (v1.0.0) | The Wheatpaste Wall for streetwear / drops — a rendered wall under pasted paper posters (≤1.2° tilts, offset shadows, a peeling corner on the big ones), the merchant primary as day-glo paper on every primary action, state as rubber stamps (SALE / SOLD OUT / ONLY N LEFT / ADDED), Anton + Changa poster caps, Rubik body; typographic posters when the merchant gave no picture; `themes/fashion/DESIGN.md` |
 
 ## How to read the catalog
 

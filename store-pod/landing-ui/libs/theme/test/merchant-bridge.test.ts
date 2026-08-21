@@ -26,6 +26,27 @@ describe('merchant colour bridge', () => {
         });
     }
 
+    for (const preset of Object.values(ColorTheme)) {
+        it(`${preset}: the bridge renders the preset's brand and semantic colours unmodified`, () => {
+            const schema = getThemeColors(preset);
+            const {tokens} = deriveColorTokens(schema);
+            // The presets are authored so every role already reads with white or #111; if the guard had
+            // to nudge one of these, the merchant would not be seeing the colour they picked.
+            assert.equal(tokens.background, schema.background);
+            assert.equal(tokens.foreground, schema.foreground);
+            assert.equal(tokens.primary, schema.primary);
+            assert.equal(tokens.secondary, schema.secondary);
+            assert.equal(tokens.accent, schema.accent);
+            assert.equal(tokens.destructive, schema.error);
+            assert.equal(tokens.warning, schema.warning);
+            assert.equal(tokens.success, schema.success);
+            assert.equal(tokens.info, schema.info);
+            assert.ok(contrastRatio(tokens.primaryHover, tokens.primaryForeground) >= 4.5, `${preset} primary-foreground on primary-hover`);
+            assert.ok(contrastRatio(tokens.ring, tokens.background) >= 3, `${preset} ring on background`);
+            assert.ok(contrastRatio(tokens.foreground, tokens.background) >= 7, `${preset} AAA canvas/ink`);
+        });
+    }
+
     it('detects dark presets', () => {
         assert.equal(deriveColorTokens(getThemeColors(ColorTheme.DARK)).scheme, 'dark');
         assert.equal(deriveColorTokens(getThemeColors(ColorTheme.MIDNIGHT)).scheme, 'dark');

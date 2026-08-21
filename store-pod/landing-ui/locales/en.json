@@ -181,7 +181,8 @@
       "FAILED_TO_REMOVED_PRODUCT": "Failed to remove product.",
       "FAILED_TO_UPDATE_QUANTITY": "Failed to update quantity.",
       "SALE": "Sale",
-      "LOW_STOCK": "Low stock"
+      "LOW_STOCK": "Low stock",
+      "ADDED": "Added"
     },
     "HEADER": {
       "HOME_TITLE": "Home",

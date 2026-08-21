@@ -181,7 +181,8 @@
       "FAILED_TO_REMOVED_PRODUCT": "Не удалось удалить товар.",
       "FAILED_TO_UPDATE_QUANTITY": "Не удалось обновить количество.",
       "SALE": "Скидка",
-      "LOW_STOCK": "Мало на складе"
+      "LOW_STOCK": "Мало на складе",
+      "ADDED": "Добавлено"
     },
     "HEADER": {
       "HOME_TITLE": "Главная",

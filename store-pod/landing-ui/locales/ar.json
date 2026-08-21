@@ -181,7 +181,8 @@
       "FAILED_TO_REMOVED_PRODUCT": "فشل حذف المنتج.",
       "FAILED_TO_UPDATE_QUANTITY": "فشل تحديث الكمية.",
       "SALE": "تخفيض",
-      "LOW_STOCK": "كمية محدودة"
+      "LOW_STOCK": "كمية محدودة",
+      "ADDED": "أُضيف"
     },
     "HEADER": {
       "HOME_TITLE": "الرئيسية",

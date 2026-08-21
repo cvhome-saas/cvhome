@@ -15,7 +15,7 @@ export const LEGACY_THEME_MAP: Readonly<Record<string, RegisteredThemeId>> = {
     jewelery: 'starter',
     beauty: 'beauty',
     default: 'starter',
-    fashion: 'starter',
+    fashion: 'fashion',
     furniture: 'starter',
     sports: 'starter',
     electronics: 'starter',

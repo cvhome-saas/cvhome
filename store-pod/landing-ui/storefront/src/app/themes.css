@@ -5,4 +5,6 @@
 @import "@store-front/theme-starter/tokens.css";
 @source "../../../themes/beauty/src";
 @import "@store-front/theme-beauty/tokens.css";
+@source "../../../themes/fashion/src";
+@import "@store-front/theme-fashion/tokens.css";
 /* @themes:end */

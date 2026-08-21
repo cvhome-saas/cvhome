@@ -181,7 +181,8 @@
       "FAILED_TO_REMOVED_PRODUCT": "Échec de la suppression du produit.",
       "FAILED_TO_UPDATE_QUANTITY": "Échec de la mise à jour de la quantité.",
       "SALE": "Promo",
-      "LOW_STOCK": "Stock limité"
+      "LOW_STOCK": "Stock limité",
+      "ADDED": "Ajouté"
     },
     "HEADER": {
       "HOME_TITLE": "Accueil",
