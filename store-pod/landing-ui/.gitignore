@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+storefront/next-env.d.ts

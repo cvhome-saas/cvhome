@@ -1,142 +1,92 @@
-# `store-pod/landing-ui` — storefront and template system
+# `store-pod/landing-ui` — storefront and theme system
 
-The customer-facing storefront (port **8110**). Next.js 16 / React 19, TypeScript, Tailwind + shadcn/ui,
-`next-intl` for i18n. It is itself an **npm workspaces monorepo**, wrapped by a `build.gradle` so the root
-Gradle build can build and containerize it.
+The customer-facing storefront (port **8110**). Next.js 16 / React 19, TypeScript, Tailwind v4 + shadcn/ui,
+`next-intl`. An npm-workspaces monorepo wrapped by `build.gradle` (`ui-conventions`) so the root Gradle build
+can build and containerize it.
 
 ## Workspace layout
 
 ```
 store-pod/landing-ui/
-├── package.json           name "store-front", workspaces: ["app", "libs/*", "templates/*"]
-├── app/                   the Express server that selects and serves a template
-│   └── src/
-│       ├── server.ts            Express entry
-│       ├── template-manager.ts  picks the template folder per request
-│       └── instrumentation.ts   OpenTelemetry
-├── libs/                  shared business logic — imported by EVERY template
-│   ├── types/             @store-front/types      — Store, Product, Category, Cart, User, StoreContext, Theme enum
-│   ├── services/          @store-front/services   — server-side API clients + utils
-│   └── hooks/             @store-front/hooks      — client-side React hooks
-├── templates/             one full Next.js app per visual theme
-│   └── basis/  modern/  beauty/  jewelery/
-├── locales/               SHARED across all templates: en, ar, es, fr, ru
-├── Dockerfile, docker.sh, scripts.sh
-└── build.gradle           ui-conventions + node plugin
+├── package.json           name "store-front", workspaces: ["storefront", "libs/*", "themes/*"]
+├── PRODUCT.md             impeccable product truth for every theme
+├── storefront/            THE single Next.js app ("shell"): routes, proxy, loaders, theme resolution, token bridge
+├── libs/
+│   ├── types/             @store-front/types      — Store, Product (options/variants typed), listing, search, Theme enum
+│   ├── services/          @store-front/services   — API clients, product-presenter, cart-manager
+│   ├── hooks/             @store-front/hooks      — useCart, useUser, useCustomer, useCheckoutForm, useOrderStatus,
+│   │                                                useProductListing, useProductPurchase, useSearch
+│   ├── ui/                @store-front/ui         — shadcn primitives shared once (+ Skeleton, EmptyState, ErrorState, Price, …)
+│   ├── i18n/              @store-front/i18n       — routing, Link/useRouter, direction, useDir()
+│   └── theme/             @store-front/theme      — ThemeDefinition contract, token schema, colour bridge, defineTheme()
+├── themes/
+│   ├── README.md          theme-direction catalog (briefs for future themes)
+│   └── starter/           @store-front/theme-starter — plain reference theme, copy source
+├── templates-deprecated/  the old one-Next-app-per-theme generation + Express server (not built)
+├── locales/               SHARED across all themes: en, ar, es, fr, ru
+├── scripts/new-theme.mjs  scaffold + register a theme
+└── Dockerfile, docker.sh, build.gradle
 ```
 
-`app` is **not** a Next.js app — it's a thin Express server. Each `templates/<name>` is the actual Next.js app.
+`types`, `services`, `hooks` are tsc-built (`dist/`); `ui`, `i18n`, `theme` and every theme are **source
+packages** compiled by Next (`transpilePackages` + tsconfig paths in `storefront/tsconfig.json`).
 
 ## How theming works end to end
 
-1. A store admin assigns a `Theme` enum value (e.g. `BEAUTY`) to their store.
-2. The Express server reads the `theme` HTTP header on each request.
-3. `getTheme()` lowercases it → `"beauty"`.
-4. `TemplateManager` looks for `templates/beauty/` and serves that app.
+1. spg/Caddy `domain_lookup` injects `Store-Id`, `Theme`, `Color-Theme`, `Default-Language`,
+   `Supported-Languages` request headers.
+2. `storefront/src/proxy.ts`: no `Store-Id` → `/store-not-found` (404); `/` → `/{lang}`; next-intl routing;
+   dev-only `?theme=<id>` override cookie.
+3. `getTheme()` (`src/shell/theme/get-theme.ts`): override cookie → `theme` header → `STOREFRONT_THEME` →
+   registry hit, else `legacy-theme-map.ts` (every `Theme` enum value, lowercased), else fallback (`starter`).
+4. `registry.ts` is a static map of dynamic imports — each theme is its own server chunk; only the rendered
+   theme's client components reach the browser.
+5. The root layout (`app/(storefront)/[locale]/layout.tsx`) fetches store + categories + pages + announcement
+   in parallel, derives the merchant colour-role tokens from the `Color-Theme` preset
+   (`libs/theme/src/merchant-bridge.ts`, contrast-guarded) and renders
+   `<html data-theme=<id> data-color-scheme style="--primary:…" class="<next/font vars>">` →
+   `theme.layout.Root` → page → `theme.pages.X`.
+6. CSS: one Tailwind build. `globals.css` maps tokens → utilities once (`@theme inline`); `themes.css`
+   (generated) holds a `@source` + `tokens.css` import per theme; theme tokens are scoped to
+   `[data-theme="<id>"]`. The stock Tailwind palette is removed — colour is role-based only.
 
-**The template folder name must be the lowercase of the `Theme` enum value.** `BEAUTY` → `templates/beauty/`.
+Pages in the shell do loading + metadata only (`Suspense` with the theme's skeleton, `notFound()` on 404,
+`error.tsx` → the theme's `ErrorState`). Composition is owned by the theme.
 
-Registration is almost entirely convention-driven: the `templates/*` workspace glob auto-discovers new folders,
-`TemplateManager` discovers by folder existence, and the Dockerfile copies the whole `templates/` directory. The
-**only** explicit registration is adding the value to the `Theme` enum in `libs/types/src/store.ts`.
-
-On top of the template choice, each store injects its own **color palette at runtime**: `layout.tsx` renders a
-`<style>` tag built by `toRootStyle()` from `@store-front/services`, overriding the CSS variables the template
-declared in `globals.css`.
-
-## Build order
-
-The root `package.json` build script is strictly ordered — libs first, because templates and app consume their
-compiled `dist`:
+## Build / run
 
 ```
-npm run build
-  = build:libs-types → build:libs-services → build:libs-hooks → build:templates → build:app
+npm run build      # build:libs (types → services → hooks) then next build (standalone output)
+npm run dev        # build:libs then next dev -p 8110 --turbopack
+npm run lint | typecheck
+npm test --workspace=libs/theme     # colour bridge tests
+npm run new-theme <id>
 ```
+`./extra/scripts/run-lcl.sh` starts it as before (prep builds the libs, then `npm run dev`). Docker: the
+image copies `storefront/.next/standalone` (build on host/CI first — see `docker.sh`).
 
-Dev options:
-- Single template: `cd templates/<name> && npm run dev` (Next dev on 8110, turbopack)
-- Full stack via Express (theme-header routing): `npm install && npm run build && npm run dev` at
-  `landing-ui/` root
+**Local dev URLs.** The storefront needs the store headers spg injects, so the supported dev URL is through spg:
+`http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `run-lcl.sh`). Hitting `http://localhost:8110/en`
+directly works for SSR only because the proxy falls back to `FALLBACK_STORE_ID` (env, then the demo-store constant) —
+but browser-side calls (cart, listing, auth) go to `/catalog`, `/checkout`, … on the same origin, which only spg routes;
+set `EXTERNAL_SPG=http://spg-507f1f77.gateway.com` if you must use localhost. `?theme=<id>` sets a dev-only override
+cookie (`?theme=` clears it); unknown ids resolve through the legacy map to the fallback theme.
 
-## Adding a new template
+## Adding a theme
 
-**➡️ Follow `new-landing-ui-template.md` (in this same `references/` folder).** It is the authoritative
-step-by-step procedure with a complete file-by-file checklist — work through it rather than improvising.
+**➡️ `new-landing-ui-template.md`** — scaffold, impeccable design flow, contract checklist, verification.
+Direction briefs live in `themes/README.md`.
 
-Summary of what it prescribes, so you know what you're in for:
+## Non-negotiable conventions in theme code
 
-**Copy as-is (do not modify):** `next.config.ts`, `tsconfig.json` (aliases must point at `../../libs/*`),
-`postcss.config.mjs`, `eslint.config.mjs`, `components.json`, `src/proxy.ts`, all four `src/i18n/*` files,
-`src/lib/utils.ts`, all shadcn primitives in `src/components/ui/` (~22 files), and **every page** under
-`src/app/[locale]/` — pages are server components that fetch data and pass it down as props, so they carry no
-visual logic.
-
-**Customize:** `public/css/login.css` (brand styles for auth pages) and `src/app/[locale]/globals.css` (the
-palette/font/radius CSS variables — noting the store's runtime colors will override them).
-
-**Design from scratch — the actual work (19 files under `src/shared/`):** `Layout/{Header,Footer}`,
-`SlideShow/{CoverFlow,swiper-custom.css}`, `ProductGrid/{ProductGrid,ProductSwiperGrid}`,
-`ProductItem/ProductItem`, `ProductDetails/{ProductDetails,ProductDetailedActionBox,ProductDetailsImageGallery}`,
-`Category/ProductCategoryFilter`, `Cart/CartProductList`, `Checkout/{CheckoutForm,CheckoutResult}`,
-`Customer/{CustomerDashboard,OrderDetails}`, `Common/{Breadcrumb,SectionTitle,Secured}`.
-
-These receive the same props as `basis`/`modern` — only JSX and Tailwind classes may differ. The props/hooks
-contract must not break:
-
-| Component | Hook |
-|---|---|
-| `Header` | `useCart`, `useUser` |
-| `CartProductList` | `useCart` |
-| `ProductCategoryFilter` | `useProductCategoryFilter` |
-| `CheckoutForm` | `useCheckoutForm` |
-| `CheckoutCartBox` | `useCart` |
-| `CheckoutResult` | `useOrderStatus` |
-| `ProductDetailedActionBox` | `useProductDetailedAddToCart` |
-| `CustomerDashboard`, `OrderDetails` | `useUser`, `useCustomer` |
-| `ProductGrid`, `ProductItem`, `ProductSwiperGrid`, `CoverFlow` | props only |
-
-## Shared library imports
-
-```typescript
-import type { Store, Product, Category, Cart, User, StoreContext } from '@store-front/types'
-
-// services — server components / pages
-import { ProductService }  from '@store-front/services/product-service'
-import { CategoryService } from '@store-front/services/category-service'
-import { StoreService }    from '@store-front/services/store-service'
-import { ContentService }  from '@store-front/services/content-service'
-import { OrderService }    from '@store-front/services/order-service'
-import { AuthService }     from '@store-front/services/auth-service'
-import { toRootStyle }     from '@store-front/services/color-utils'
-import { getDirection }    from '@store-front/services/direction-utils'
-
-// hooks — client components only ('use client')
-import { useCart, useUser, useCustomer } from '@store-front/hooks/...'
-import { useCheckoutForm, useOrderStatus } from '@store-front/hooks/...'
-import { useProductCategoryFilter, useProductDetailedAddToCart } from '@store-front/hooks/...'
-```
-
-## Non-negotiable conventions when writing template code
-
-- **No hardcoded text.** Add keys to **all 5** files in `landing-ui/locales/` and use `t()` —
-  `useTranslations('NS')` in client components, `getTranslations('NS')` in server components.
-- **No hardcoded colors.** Use variable-backed Tailwind classes (`bg-primary`, `text-foreground`,
-  `border-border`, `hover:bg-primary-hover`), never `bg-blue-500` — runtime injection would override them.
-- **RTL-safe.** Logical properties only: `ps-*`/`pe-*`, `ms-*`/`me-*`, `text-start`/`text-end`,
-  `rounded-s-*`/`rounded-e-*`. Test against `/ar/`.
-- **Secure `/customer/**`** with `useUser` and redirect unauthenticated visitors to login.
-- **Mobile-first**, Tailwind breakpoints; header needs a mobile drawer; grids 1 → 2–3 → 3–4 columns.
-- **Approved libraries only:** `lucide-react` (icons), `swiper` (carousels), `nextjs-toast-notify` (toasts),
-  `react-hook-form` + `yup` (forms), shadcn/Radix (primitives).
-- **Product data edge cases:** `object-cover` in fixed-ratio containers, `line-clamp-2` for long names,
-  `placeholder.png` fallback, "Out of Stock" badge + disabled add-to-cart at zero stock, and prices arrive
-  pre-formatted from the API — display as-is.
+- No literal UI text — `t()` and keys in **all 5** locale files.
+- No hard-coded colours (they don't compile); role tokens only. Fonts/radius/spacing through `tokens.css`.
+- RTL-safe: logical utilities, `DrawerContent side="start|end"`, Swiper `dir={useDir()}`.
+- No `@/` imports in themes/libs (ESLint). Primitives from `@store-front/ui`, never forked.
+- Behaviour from `@store-front/hooks`; every state (loading/empty/error/not-found) rendered.
 
 ## Checkout redirect flow
 
-After payment the gateway returns the shopper to
-`{domain}/{locale}/checkout/success?code={cartCode}&orderId={id}` (or `.../cancel?...`); those query params are
-set server-side by the checkout API's `successUrl`/`cancelUrl`. Both routes render the *same* `CheckoutResult`
-component, which reads `code`/`orderId` via `useSearchParams()` and fetches the real order status from the API
-rather than trusting which URL the browser landed on.
+After payment the gateway returns to `{domain}/{locale}/checkout/success?code=&orderId=` (or `/cancel`).
+Both routes render `theme.pages.CheckoutResult` with `outcome`, which re-fetches the real order status
+(`useOrderStatus`) rather than trusting the URL.

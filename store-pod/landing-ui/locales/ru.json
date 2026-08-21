@@ -5,7 +5,9 @@
       "FEATURED_ITEMS": "Рекомендуемые товары",
       "NEWLY_ADDED": "Новинки",
       "HOME_PRODUCT": "Товар на главной",
-      "RECOMMENDED": "Рекомендуем"
+      "RECOMMENDED": "Рекомендуем",
+      "SHOP_NOW": "Купить",
+      "HERO_SLIDE": "Слайд {index} из {total}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Детали продукта",
@@ -18,7 +20,22 @@
       "AVAILABLE": "disponible",
       "PRODUCT_ALREADY_EXIST_IN_CART": "Ya está en tu carrito.",
       "ADD_TO_SECURE_CHECKOUT": "Añadir al carrito para un pago seguro.",
-      "OUT_OF_STOCK": "Agotado"
+      "OUT_OF_STOCK": "Agotado",
+      "SELECT_OPTION": "Выберите {option}",
+      "OPTION_REQUIRED": "Пожалуйста, выберите {option}",
+      "SALE": "Скидка",
+      "SAVE_PERCENT": "Экономия {percent}%",
+      "LOW_STOCK": "Осталось {count}",
+      "IN_STOCK": "В наличии",
+      "SKU": "Артикул",
+      "IN_CART": "{count, plural, =1 {1 в корзине} other {# в корзине}}",
+      "DECREASE_QUANTITY": "Уменьшить количество",
+      "INCREASE_QUANTITY": "Увеличить количество",
+      "ADDING": "Добавляем…",
+      "GALLERY_IMAGE": "Изображение {index} из {total}",
+      "UNAVAILABLE_COMBINATION": "Недоступно",
+      "DETAILS": "Описание",
+      "SPECIFICATIONS": "Характеристики"
     },
     "CHECKOUT": {
       "TITLE": "Оформление заказа",
@@ -91,7 +108,23 @@
       "HOME_TITLE": "Категория",
       "FILTER_BY_MANUFACTURER": "Фильтр по производителю",
       "ALL": "Все",
-      "NO_PRODUCTS_FOUND": "Товаров не найдено."
+      "NO_PRODUCTS_FOUND": "Товаров не найдено.",
+      "SORT_LABEL": "Сортировать",
+      "SORT": {
+        "RELEVANCE": "По релевантности",
+        "NEWEST": "Сначала новые",
+        "OLDEST": "Сначала старые"
+      },
+      "RESULTS_COUNT": "{count, plural, =0 {Нет товаров} =1 {1 товар} other {# товаров}}",
+      "PAGE_OF": "Страница {page} из {total}",
+      "PREVIOUS": "Назад",
+      "NEXT": "Вперёд",
+      "FILTERS": "Фильтры",
+      "CLEAR_FILTERS": "Сбросить фильтры",
+      "FILTER_BY_OPTION": "Фильтр: {option}",
+      "LISTING_ERROR": "Не удалось загрузить товары.",
+      "SHOW_FILTERS": "Показать фильтры",
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Нет товаров} =1 {1 товар} other {# товаров}}"
     },
     "CUSTOMER": {
       "TITLE": "Мой аккаунт",
@@ -129,7 +162,10 @@
       "CANCELED": "Отменён",
       "CREATED": "Создан",
       "CONFIRMED": "Подтверждён",
-      "PENDING_PAYMENT": "Ожидает оплаты"
+      "PENDING_PAYMENT": "Ожидает оплаты",
+      "ORDER_NOT_FOUND": "Заказ не найден.",
+      "ERROR_LOADING": "Не удалось загрузить ваш аккаунт.",
+      "SIGNED_IN_AS": "Вы вошли как {name}"
     }
   },
   "COMPONENTS": {
@@ -141,7 +177,11 @@
       "OUT_OF_STOCK": "Нет в наличии",
       "ADD_TO_CART": "Добавить в корзину",
       "QUICK_VIEW": "Быстрый просмотр",
-      "VIEW_DETAILS": "Просмотреть детали"
+      "VIEW_DETAILS": "Просмотреть детали",
+      "FAILED_TO_REMOVED_PRODUCT": "Не удалось удалить товар.",
+      "FAILED_TO_UPDATE_QUANTITY": "Не удалось обновить количество.",
+      "SALE": "Скидка",
+      "LOW_STOCK": "Мало на складе"
     },
     "HEADER": {
       "HOME_TITLE": "Главная",
@@ -159,7 +199,13 @@
       },
       "LOGIN": "Войти",
       "LOGOUT": "Выйти",
-      "PROFILE": "Профиль"
+      "PROFILE": "Профиль",
+      "ANNOUNCEMENT_DISMISS": "Скрыть объявление",
+      "ACCOUNT": "Аккаунт",
+      "MAIN_NAVIGATION": "Основная навигация",
+      "SEARCH": "Поиск",
+      "CART_WITH_COUNT": "Корзина, {count, plural, =0 {пусто} =1 {1 товар} other {# товаров}}",
+      "VIEW_ALL_IN": "Все в {name}"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -168,7 +214,11 @@
       "SOCIAL_INSTAGRAM": "Instagram",
       "SOCIAL_TIKTOK": "TikTok",
       "LEGAL": "Правовая информация",
-      "RIGHT_RESERVED": "Все права защищены."
+      "RIGHT_RESERVED": "Все права защищены.",
+      "SHOP": "Магазин",
+      "INFORMATION": "Информация",
+      "CONTACT": "Контакты",
+      "FOLLOW_US": "Мы в соцсетях"
     },
     "CART": {
       "QTY": "Кол-во",
@@ -179,17 +229,29 @@
       "CHECKOUT": "Оформить заказ",
       "CONTINUE_SHOPPING": "Продолжить покупки",
       "OR": "или",
-      "CART_IS_EMPTY": "Ваша корзина пуста."
+      "CART_IS_EMPTY": "Ваша корзина пуста.",
+      "EMPTY_TITLE": "Ваша корзина пуста",
+      "EMPTY_BODY": "Добавьте что-нибудь — и это появится здесь.",
+      "QUANTITY": "Количество",
+      "VIEW_CART": "Открыть корзину",
+      "ITEMS_COUNT": "{count, plural, =0 {Нет товаров} =1 {1 товар} other {# товаров}}",
+      "DECREASE_QUANTITY": "Уменьшить количество",
+      "INCREASE_QUANTITY": "Увеличить количество"
     },
     "CHECKOUT": {},
     "CONTENT": {},
-    "CATEGORY": {}
+    "CATEGORY": {},
+    "SEARCH": {
+      "LABEL": "Поиск",
+      "PLACEHOLDER": "Искать категории и страницы…",
+      "NOT_AVAILABLE": "Поиск пока недоступен в этом магазине.",
+      "NO_RESULTS": "Совпадений нет.",
+      "CATEGORIES": "Категории",
+      "PAGES": "Страницы",
+      "PRODUCTS": "Товары",
+      "SUGGESTIONS_ONLY": "Показаны категории и страницы"
+    }
   },
-  "HOME": {},
-  "PRODUCT": {},
-  "CHECKOUT": {},
-  "CONTENT": {},
-  "CATEGORY": {},
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "Этот товар больше не доступен.",
@@ -241,5 +303,40 @@
       "NOT_FOUND_TITLE": "Страница не найдена",
       "NOT_FOUND_MESSAGE": "Страница, которую вы ищете, не существует или была перемещена."
     }
+  },
+  "COMMON": {
+    "LOADING": "Загрузка…",
+    "RETRY": "Повторить",
+    "BACK_TO_HOME": "На главную",
+    "CONTINUE_SHOPPING": "Продолжить покупки",
+    "CLOSE": "Закрыть",
+    "MENU": "Меню",
+    "SKIP_TO_CONTENT": "Перейти к содержимому",
+    "VIEW_ALL": "Смотреть все",
+    "SEARCH": "Поиск",
+    "HOME": "Главная"
+  },
+  "STATES": {
+    "REDIRECTING_LOGIN": "Перенаправление на вход…",
+    "AUTHENTICATING": "Выполняется вход…",
+    "ERROR_TITLE": "Что-то пошло не так",
+    "ERROR_BODY": "Не удалось загрузить страницу. Попробуйте ещё раз.",
+    "ERROR_REFERENCE": "Код: {digest}",
+    "NOT_FOUND_TITLE": "Страница не найдена",
+    "NOT_FOUND_BODY": "Страница, которую вы ищете, не существует или была перемещена.",
+    "PRODUCT_NOT_FOUND_TITLE": "Товар не найден",
+    "PRODUCT_NOT_FOUND_BODY": "Этот товар больше недоступен.",
+    "CATEGORY_NOT_FOUND_TITLE": "Категория не найдена",
+    "CATEGORY_NOT_FOUND_BODY": "Эта категория не существует или была перемещена.",
+    "CONTENT_NOT_FOUND_TITLE": "Страница не найдена",
+    "CONTENT_NOT_FOUND_BODY": "Эта страница не существует или была перемещена.",
+    "EMPTY_CART_TITLE": "Ваша корзина пуста",
+    "EMPTY_CART_BODY": "Добавьте что-нибудь — и это появится здесь.",
+    "EMPTY_LISTING_TITLE": "Товары не найдены",
+    "EMPTY_LISTING_BODY": "Попробуйте другую категорию или сбросьте фильтры.",
+    "EMPTY_ORDERS_TITLE": "Заказов пока нет",
+    "EMPTY_ORDERS_BODY": "Ваши заказы появятся здесь после первой покупки.",
+    "EMPTY_SEARCH_TITLE": "Ничего не найдено",
+    "EMPTY_SEARCH_BODY": "Попробуйте другое слово."
   }
 }

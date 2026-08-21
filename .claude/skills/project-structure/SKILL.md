@@ -54,7 +54,7 @@ catalog). See `references/build-system.md`.
 | `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
 | `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
 | `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
-| `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. Next.js 16 / React 19 inside an npm-workspaces monorepo, with a **multi-template theming system** — one Next.js app per visual theme (`basis`, `modern`, `beauty`, `jewelery`), all sharing business logic from `libs/`. An Express server picks the template per request from the store's `theme` header. See `references/landing-ui.md`. |
+| `store-pod/landing-ui` | **FE** | 8110 | The customer-facing **storefront**. ONE Next.js 16 / React 19 app (`storefront/`) plus **theme packages** (`themes/<id>/`) inside an npm-workspaces monorepo; business logic in `libs/` (`types`, `services`, `hooks`), shared primitives in `libs/ui`, the theme contract in `libs/theme`. The theme is resolved per request from the `Theme` header spg injects; merchant colours come from the `Color-Theme` preset through a contrast-guarded bridge. Old one-app-per-theme templates are parked in `templates-deprecated/`. See `references/landing-ui.md`. |
 
 ## Every service sits behind a gateway
 
@@ -320,7 +320,7 @@ See `references/frontends.md`.
 | Fix "host not found" running locally | `sudo ./extra/scripts/configure-domain.sh` (`/etc/hosts` entries) |
 | Change how a request is routed to a service | `store-pod/spg/Caddyfile` (pod) or `GatewayRouteLocatorImpl`/`PodClient` (platform) |
 | Bump a dependency version | `gradle/libs.versions.toml` — never hardcode versions in a `build.gradle` |
-| Add a storefront theme | `store-pod/landing-ui/templates/` — follow `references/new-landing-ui-template.md` |
+| Add a storefront theme | `store-pod/landing-ui/themes/` — `npm run new-theme <id>`, then follow `references/new-landing-ui-template.md` |
 | Create a whole new service (backend, UI, or both) | `references/new-service.md` — pick the shape first, then register it in all four config files |
 | Know if a folder is a build unit | `settings.gradle` |
 

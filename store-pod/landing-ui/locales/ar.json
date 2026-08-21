@@ -5,7 +5,9 @@
       "FEATURED_ITEMS": "منتجات مميزة",
       "NEWLY_ADDED": "أضيف حديثاً",
       "HOME_PRODUCT": "منتجات الصفحة الرئيسية",
-      "RECOMMENDED": "نوصي بها"
+      "RECOMMENDED": "نوصي بها",
+      "SHOP_NOW": "تسوّق الآن",
+      "HERO_SLIDE": "الشريحة {index} من {total}"
     },
     "PRODUCT": {
       "HOME_TITLE": "تفاصيل المنتج",
@@ -18,7 +20,22 @@
       "AVAILABLE": "متوفر",
       "PRODUCT_ALREADY_EXIST_IN_CART": "المنتج موجود بالفعل في سلتك",
       "ADD_TO_SECURE_CHECKOUT": "أضف إلى السلة للدفع الآمن",
-      "OUT_OF_STOCK": "نفدت الكمية"
+      "OUT_OF_STOCK": "نفدت الكمية",
+      "SELECT_OPTION": "اختر {option}",
+      "OPTION_REQUIRED": "يرجى اختيار {option}",
+      "SALE": "تخفيض",
+      "SAVE_PERCENT": "وفّر {percent}%",
+      "LOW_STOCK": "بقي {count} فقط",
+      "IN_STOCK": "متوفر",
+      "SKU": "رمز المنتج",
+      "IN_CART": "{count, plural, =1 {1 في سلتك} other {# في سلتك}}",
+      "DECREASE_QUANTITY": "تقليل الكمية",
+      "INCREASE_QUANTITY": "زيادة الكمية",
+      "ADDING": "جارٍ الإضافة…",
+      "GALLERY_IMAGE": "الصورة {index} من {total}",
+      "UNAVAILABLE_COMBINATION": "غير متاح",
+      "DETAILS": "التفاصيل",
+      "SPECIFICATIONS": "المواصفات"
     },
     "CHECKOUT": {
       "TITLE": "الدفع",
@@ -91,7 +108,23 @@
       "HOME_TITLE": "الفئة",
       "FILTER_BY_MANUFACTURER": "تصفية حسب الشركة المصنعة",
       "ALL": "الكل",
-      "NO_PRODUCTS_FOUND": "لم يتم العثور على منتجات."
+      "NO_PRODUCTS_FOUND": "لم يتم العثور على منتجات.",
+      "SORT_LABEL": "ترتيب حسب",
+      "SORT": {
+        "RELEVANCE": "الصلة",
+        "NEWEST": "الأحدث",
+        "OLDEST": "الأقدم"
+      },
+      "RESULTS_COUNT": "{count, plural, =0 {لا توجد منتجات} =1 {منتج واحد} other {# منتجات}}",
+      "PAGE_OF": "الصفحة {page} من {total}",
+      "PREVIOUS": "السابق",
+      "NEXT": "التالي",
+      "FILTERS": "عوامل التصفية",
+      "CLEAR_FILTERS": "مسح عوامل التصفية",
+      "FILTER_BY_OPTION": "تصفية حسب {option}",
+      "LISTING_ERROR": "تعذّر تحميل المنتجات.",
+      "SHOW_FILTERS": "إظهار عوامل التصفية",
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {لا توجد منتجات} =1 {منتج واحد} other {# منتجات}}"
     },
     "CUSTOMER": {
       "TITLE": "حسابي",
@@ -129,7 +162,10 @@
       "CANCELED": "ملغى",
       "CREATED": "تم الإنشاء",
       "CONFIRMED": "تم التأكيد",
-      "PENDING_PAYMENT": "في انتظار الدفع"
+      "PENDING_PAYMENT": "في انتظار الدفع",
+      "ORDER_NOT_FOUND": "تعذّر العثور على هذا الطلب.",
+      "ERROR_LOADING": "تعذّر تحميل حسابك الآن.",
+      "SIGNED_IN_AS": "مسجّل الدخول باسم {name}"
     }
   },
   "COMPONENTS": {
@@ -141,7 +177,11 @@
       "OUT_OF_STOCK": "غير متوفر",
       "ADD_TO_CART": "أضف إلى السلة",
       "QUICK_VIEW": "عرض سريع",
-      "VIEW_DETAILS": "عرض التفاصيل"
+      "VIEW_DETAILS": "عرض التفاصيل",
+      "FAILED_TO_REMOVED_PRODUCT": "فشل حذف المنتج.",
+      "FAILED_TO_UPDATE_QUANTITY": "فشل تحديث الكمية.",
+      "SALE": "تخفيض",
+      "LOW_STOCK": "كمية محدودة"
     },
     "HEADER": {
       "HOME_TITLE": "الرئيسية",
@@ -159,7 +199,13 @@
       },
       "LOGIN": "تسجيل الدخول",
       "LOGOUT": "تسجيل الخروج",
-      "PROFILE": "الملف الشخصي"
+      "PROFILE": "الملف الشخصي",
+      "ANNOUNCEMENT_DISMISS": "إخفاء الإعلان",
+      "ACCOUNT": "الحساب",
+      "MAIN_NAVIGATION": "التنقل الرئيسي",
+      "SEARCH": "بحث",
+      "CART_WITH_COUNT": "السلة، {count, plural, =0 {فارغة} =1 {عنصر واحد} other {# عناصر}}",
+      "VIEW_ALL_IN": "كل {name}"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "فيسبوك",
@@ -168,7 +214,11 @@
       "SOCIAL_INSTAGRAM": "انستجرام",
       "SOCIAL_TIKTOK": "تيك توك",
       "LEGAL": "قانوني",
-      "RIGHT_RESERVED": "جميع الحقوق محفوظة."
+      "RIGHT_RESERVED": "جميع الحقوق محفوظة.",
+      "SHOP": "تسوّق",
+      "INFORMATION": "معلومات",
+      "CONTACT": "اتصل بنا",
+      "FOLLOW_US": "تابعنا"
     },
     "CART": {
       "QTY": "الكمية",
@@ -179,17 +229,29 @@
       "CHECKOUT": "الدفع",
       "CONTINUE_SHOPPING": "متابعة التسوق",
       "OR": "أو",
-      "CART_IS_EMPTY": "سلة التسوق الخاصة بك فارغة."
+      "CART_IS_EMPTY": "سلة التسوق الخاصة بك فارغة.",
+      "EMPTY_TITLE": "سلة التسوق فارغة",
+      "EMPTY_BODY": "أضف ما يعجبك وسيظهر هنا.",
+      "QUANTITY": "الكمية",
+      "VIEW_CART": "عرض السلة",
+      "ITEMS_COUNT": "{count, plural, =0 {لا عناصر} =1 {عنصر واحد} other {# عناصر}}",
+      "DECREASE_QUANTITY": "تقليل الكمية",
+      "INCREASE_QUANTITY": "زيادة الكمية"
     },
     "CHECKOUT": {},
     "CONTENT": {},
-    "CATEGORY": {}
+    "CATEGORY": {},
+    "SEARCH": {
+      "LABEL": "بحث",
+      "PLACEHOLDER": "ابحث في الفئات والصفحات…",
+      "NOT_AVAILABLE": "البحث غير متاح في هذا المتجر بعد.",
+      "NO_RESULTS": "لا توجد نتائج مطابقة.",
+      "CATEGORIES": "الفئات",
+      "PAGES": "الصفحات",
+      "PRODUCTS": "المنتجات",
+      "SUGGESTIONS_ONLY": "عرض الفئات والصفحات"
+    }
   },
-  "HOME": {},
-  "PRODUCT": {},
-  "CHECKOUT": {},
-  "CONTENT": {},
-  "CATEGORY": {},
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "هذا المنتج لم يعد متاحًا.",
@@ -241,5 +303,40 @@
       "NOT_FOUND_TITLE": "الصفحة غير موجودة",
       "NOT_FOUND_MESSAGE": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها."
     }
+  },
+  "COMMON": {
+    "LOADING": "جارٍ التحميل…",
+    "RETRY": "حاول مرة أخرى",
+    "BACK_TO_HOME": "العودة إلى الرئيسية",
+    "CONTINUE_SHOPPING": "متابعة التسوق",
+    "CLOSE": "إغلاق",
+    "MENU": "القائمة",
+    "SKIP_TO_CONTENT": "الانتقال إلى المحتوى",
+    "VIEW_ALL": "عرض الكل",
+    "SEARCH": "بحث",
+    "HOME": "الرئيسية"
+  },
+  "STATES": {
+    "REDIRECTING_LOGIN": "جارٍ التحويل إلى تسجيل الدخول…",
+    "AUTHENTICATING": "جارٍ تسجيل دخولك…",
+    "ERROR_TITLE": "حدث خطأ ما",
+    "ERROR_BODY": "تعذّر تحميل هذه الصفحة. يرجى المحاولة مرة أخرى.",
+    "ERROR_REFERENCE": "المرجع: {digest}",
+    "NOT_FOUND_TITLE": "الصفحة غير موجودة",
+    "NOT_FOUND_BODY": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "PRODUCT_NOT_FOUND_TITLE": "المنتج غير موجود",
+    "PRODUCT_NOT_FOUND_BODY": "هذا المنتج لم يعد متاحًا.",
+    "CATEGORY_NOT_FOUND_TITLE": "الفئة غير موجودة",
+    "CATEGORY_NOT_FOUND_BODY": "هذه الفئة غير موجودة أو تم نقلها.",
+    "CONTENT_NOT_FOUND_TITLE": "الصفحة غير موجودة",
+    "CONTENT_NOT_FOUND_BODY": "هذه الصفحة غير موجودة أو تم نقلها.",
+    "EMPTY_CART_TITLE": "سلة التسوق فارغة",
+    "EMPTY_CART_BODY": "أضف ما يعجبك وسيظهر هنا.",
+    "EMPTY_LISTING_TITLE": "لا توجد منتجات",
+    "EMPTY_LISTING_BODY": "جرّب فئة أخرى أو امسح عوامل التصفية.",
+    "EMPTY_ORDERS_TITLE": "لا توجد طلبات بعد",
+    "EMPTY_ORDERS_BODY": "ستظهر طلباتك هنا بعد إتمام أول طلب.",
+    "EMPTY_SEARCH_TITLE": "لا توجد نتائج",
+    "EMPTY_SEARCH_BODY": "جرّب كلمة أخرى."
   }
 }

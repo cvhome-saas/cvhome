@@ -5,7 +5,9 @@
       "FEATURED_ITEMS": "Artículos Destacados",
       "NEWLY_ADDED": "Recién Añadidos",
       "HOME_PRODUCT": "Producto de Inicio",
-      "RECOMMENDED": "Recomendados"
+      "RECOMMENDED": "Recomendados",
+      "SHOP_NOW": "Comprar ahora",
+      "HERO_SLIDE": "Diapositiva {index} de {total}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Detalles del Producto",
@@ -18,7 +20,22 @@
       "AVAILABLE": "disponible",
       "PRODUCT_ALREADY_EXIST_IN_CART": "Ya está en tu carrito.",
       "ADD_TO_SECURE_CHECKOUT": "Añadir al carrito para un pago seguro.",
-      "OUT_OF_STOCK": "Agotado"
+      "OUT_OF_STOCK": "Agotado",
+      "SELECT_OPTION": "Selecciona {option}",
+      "OPTION_REQUIRED": "Elige {option}",
+      "SALE": "Oferta",
+      "SAVE_PERCENT": "Ahorra {percent}%",
+      "LOW_STOCK": "Solo quedan {count}",
+      "IN_STOCK": "En stock",
+      "SKU": "SKU",
+      "IN_CART": "{count, plural, =1 {1 en tu carrito} other {# en tu carrito}}",
+      "DECREASE_QUANTITY": "Reducir cantidad",
+      "INCREASE_QUANTITY": "Aumentar cantidad",
+      "ADDING": "Añadiendo…",
+      "GALLERY_IMAGE": "Imagen {index} de {total}",
+      "UNAVAILABLE_COMBINATION": "No disponible",
+      "DETAILS": "Detalles",
+      "SPECIFICATIONS": "Especificaciones"
     },
     "CHECKOUT": {
       "TITLE": "Pago",
@@ -91,7 +108,23 @@
       "HOME_TITLE": "Categoría",
       "FILTER_BY_MANUFACTURER": "Filtrar por Fabricante",
       "ALL": "Todos",
-      "NO_PRODUCTS_FOUND": "No se encontraron productos."
+      "NO_PRODUCTS_FOUND": "No se encontraron productos.",
+      "SORT_LABEL": "Ordenar por",
+      "SORT": {
+        "RELEVANCE": "Relevancia",
+        "NEWEST": "Más recientes",
+        "OLDEST": "Más antiguos"
+      },
+      "RESULTS_COUNT": "{count, plural, =0 {Sin productos} =1 {1 producto} other {# productos}}",
+      "PAGE_OF": "Página {page} de {total}",
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente",
+      "FILTERS": "Filtros",
+      "CLEAR_FILTERS": "Borrar filtros",
+      "FILTER_BY_OPTION": "Filtrar por {option}",
+      "LISTING_ERROR": "No pudimos cargar los productos.",
+      "SHOW_FILTERS": "Mostrar filtros",
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Sin productos} =1 {1 producto} other {# productos}}"
     },
     "CUSTOMER": {
       "TITLE": "Mi cuenta",
@@ -129,7 +162,10 @@
       "CANCELED": "Cancelado",
       "CREATED": "Creado",
       "CONFIRMED": "Confirmado",
-      "PENDING_PAYMENT": "Pago Pendiente"
+      "PENDING_PAYMENT": "Pago Pendiente",
+      "ORDER_NOT_FOUND": "No encontramos este pedido.",
+      "ERROR_LOADING": "No pudimos cargar tu cuenta ahora mismo.",
+      "SIGNED_IN_AS": "Sesión iniciada como {name}"
     }
   },
   "COMPONENTS": {
@@ -141,7 +177,11 @@
       "OUT_OF_STOCK": "Agotado",
       "ADD_TO_CART": "Añadir al Carrito",
       "QUICK_VIEW": "Vista rápida",
-      "VIEW_DETAILS": "Ver detalles"
+      "VIEW_DETAILS": "Ver detalles",
+      "FAILED_TO_REMOVED_PRODUCT": "No se pudo eliminar el producto.",
+      "FAILED_TO_UPDATE_QUANTITY": "No se pudo actualizar la cantidad.",
+      "SALE": "Oferta",
+      "LOW_STOCK": "Pocas unidades"
     },
     "HEADER": {
       "HOME_TITLE": "Inicio",
@@ -159,7 +199,13 @@
       },
       "LOGIN": "Iniciar sesión",
       "LOGOUT": "Cerrar sesión",
-      "PROFILE": "Perfil"
+      "PROFILE": "Perfil",
+      "ANNOUNCEMENT_DISMISS": "Cerrar aviso",
+      "ACCOUNT": "Cuenta",
+      "MAIN_NAVIGATION": "Navegación principal",
+      "SEARCH": "Buscar",
+      "CART_WITH_COUNT": "Carrito, {count, plural, =0 {vacío} =1 {1 artículo} other {# artículos}}",
+      "VIEW_ALL_IN": "Todo en {name}"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -168,7 +214,11 @@
       "SOCIAL_INSTAGRAM": "Instagram",
       "SOCIAL_TIKTOK": "TikTok",
       "LEGAL": "Legal",
-      "RIGHT_RESERVED": "Todos los Derechos Reservados."
+      "RIGHT_RESERVED": "Todos los Derechos Reservados.",
+      "SHOP": "Tienda",
+      "INFORMATION": "Información",
+      "CONTACT": "Contacto",
+      "FOLLOW_US": "Síguenos"
     },
     "CART": {
       "QTY": "Cant.",
@@ -179,17 +229,29 @@
       "CHECKOUT": "Pagar",
       "CONTINUE_SHOPPING": "Continuar Comprando",
       "OR": "o",
-      "CART_IS_EMPTY": "Tu carrito está vacío."
+      "CART_IS_EMPTY": "Tu carrito está vacío.",
+      "EMPTY_TITLE": "Tu carrito está vacío",
+      "EMPTY_BODY": "Añade algo que te guste y aparecerá aquí.",
+      "QUANTITY": "Cantidad",
+      "VIEW_CART": "Ver carrito",
+      "ITEMS_COUNT": "{count, plural, =0 {Sin artículos} =1 {1 artículo} other {# artículos}}",
+      "DECREASE_QUANTITY": "Reducir cantidad",
+      "INCREASE_QUANTITY": "Aumentar cantidad"
     },
     "CHECKOUT": {},
     "CONTENT": {},
-    "CATEGORY": {}
+    "CATEGORY": {},
+    "SEARCH": {
+      "LABEL": "Buscar",
+      "PLACEHOLDER": "Buscar categorías y páginas…",
+      "NOT_AVAILABLE": "La búsqueda aún no está disponible en esta tienda.",
+      "NO_RESULTS": "Sin coincidencias.",
+      "CATEGORIES": "Categorías",
+      "PAGES": "Páginas",
+      "PRODUCTS": "Productos",
+      "SUGGESTIONS_ONLY": "Mostrando categorías y páginas"
+    }
   },
-  "HOME": {},
-  "PRODUCT": {},
-  "CHECKOUT": {},
-  "CONTENT": {},
-  "CATEGORY": {},
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "Este producto ya no está disponible.",
@@ -241,5 +303,40 @@
       "NOT_FOUND_TITLE": "Página no encontrada",
       "NOT_FOUND_MESSAGE": "La página que buscas no existe o se ha movido."
     }
+  },
+  "COMMON": {
+    "LOADING": "Cargando…",
+    "RETRY": "Inténtalo de nuevo",
+    "BACK_TO_HOME": "Volver al inicio",
+    "CONTINUE_SHOPPING": "Seguir comprando",
+    "CLOSE": "Cerrar",
+    "MENU": "Menú",
+    "SKIP_TO_CONTENT": "Saltar al contenido",
+    "VIEW_ALL": "Ver todo",
+    "SEARCH": "Buscar",
+    "HOME": "Inicio"
+  },
+  "STATES": {
+    "REDIRECTING_LOGIN": "Redirigiendo al inicio de sesión…",
+    "AUTHENTICATING": "Iniciando sesión…",
+    "ERROR_TITLE": "Algo salió mal",
+    "ERROR_BODY": "No pudimos cargar esta página. Inténtalo de nuevo.",
+    "ERROR_REFERENCE": "Referencia: {digest}",
+    "NOT_FOUND_TITLE": "Página no encontrada",
+    "NOT_FOUND_BODY": "La página que buscas no existe o se ha movido.",
+    "PRODUCT_NOT_FOUND_TITLE": "Producto no encontrado",
+    "PRODUCT_NOT_FOUND_BODY": "Este producto ya no está disponible.",
+    "CATEGORY_NOT_FOUND_TITLE": "Categoría no encontrada",
+    "CATEGORY_NOT_FOUND_BODY": "Esta categoría no existe o se ha movido.",
+    "CONTENT_NOT_FOUND_TITLE": "Página no encontrada",
+    "CONTENT_NOT_FOUND_BODY": "Esta página no existe o se ha movido.",
+    "EMPTY_CART_TITLE": "Tu carrito está vacío",
+    "EMPTY_CART_BODY": "Añade algo que te guste y aparecerá aquí.",
+    "EMPTY_LISTING_TITLE": "No se encontraron productos",
+    "EMPTY_LISTING_BODY": "Prueba otra categoría o borra los filtros.",
+    "EMPTY_ORDERS_TITLE": "Aún no hay pedidos",
+    "EMPTY_ORDERS_BODY": "Tus pedidos aparecerán aquí cuando hagas uno.",
+    "EMPTY_SEARCH_TITLE": "Sin resultados",
+    "EMPTY_SEARCH_BODY": "Prueba con otra palabra."
   }
 }

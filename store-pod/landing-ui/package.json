@@ -4,42 +4,26 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "app",
+    "storefront",
     "libs/*",
-    "templates/*"
+    "themes/*"
   ],
   "scripts": {
-    "start": "npm run start --workspace=app",
-    "dev": "npm run dev --workspace=app",
-    "build": " npm run build:libs-types && npm run build:libs-services && npm run build:libs-hooks && npm run build:templates && npm run build:app",
+    "dev": "npm run build:libs && npm run dev --workspace=storefront",
+    "start": "npm run start --workspace=storefront",
+    "build": "npm run build:libs && npm run build --workspace=storefront",
+    "build:libs": "npm run build:libs-types && npm run build:libs-services && npm run build:libs-hooks",
     "build:libs-types": "npm run build --workspace=libs/types",
     "build:libs-services": "npm run build --workspace=libs/services",
     "build:libs-hooks": "npm run build --workspace=libs/hooks",
-    "build:templates": "npm run build --workspace=templates",
-    "build:app": "npm run build --workspace=app",
-    "build:prod": "npm run build && npm prune --production",
-    "test": "npm run test --workspaces"
-  },
-  "dependencies": {
-    "express": "5.1.0",
-    "next": "16.0.0",
-    "next-intl": "^4.4.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "@vercel/otel": "2.1.0",
-    "radix-ui": "^1.2.12"
+    "lint": "npm run lint --workspace=storefront",
+    "typecheck": "npm run typecheck --workspace=storefront",
+    "test": "npm run test --workspaces --if-present",
+    "new-theme": "node scripts/new-theme.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@types/express": "5.0.5",
     "@types/node": "^24.6.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9.36.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.22",
-    "globals": "^16.4.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.45.0"
+    "tsx": "^4.19.0"
   }
 }
