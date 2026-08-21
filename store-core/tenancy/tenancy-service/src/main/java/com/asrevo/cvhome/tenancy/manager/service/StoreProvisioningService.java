@@ -112,7 +112,7 @@ public class StoreProvisioningService {
 
     private static String describe(FieldError field) {
         return field.message() == null || field.message().isBlank() ? field.field()
-                : field.field() + " " + field.message();
+                : String.format("%s %s", field.field(), field.message());
     }
 
     private boolean alreadyProvisioned(StoreMerchantId store) throws StoreNotFoundException {
