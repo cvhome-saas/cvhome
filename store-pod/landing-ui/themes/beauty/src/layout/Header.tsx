@@ -7,25 +7,21 @@ import {MobileNav} from './MobileNav';
 import {HeaderActions} from './HeaderActions';
 import {SearchBox} from '../sections/SearchBox';
 
-/** Logo · primary nav (desktop) · search · actions. Mobile: menu button · logo · actions. */
+/** The awning rail: logo plate · quoted nav row · search plate · action plates · cart tag. One ink rule below. */
 export function Header({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const {store} = data;
     return (
-        <header className={cn('z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80', ctx.layout.header.sticky && 'sticky top-0')}>
-            <div className="mx-auto flex h-header max-w-content items-center gap-3 px-gutter lg:h-header-lg">
+        <header className={cn('z-40 border-b border-foreground bg-background', ctx.layout.header.sticky && 'sticky top-0')}>
+            <div className="mx-auto flex h-header max-w-wide items-stretch px-gutter lg:h-header-lg">
                 <MobileNav ctx={ctx} data={data}/>
-                <Link prefetch={false} href="/" className="flex shrink-0 items-center gap-2" aria-label={store.name}>
-                    {store.logo?.path ? (
-                        <Image src={store.logo.path} alt={store.logo.name || store.name} width={120} height={32} className="h-8 w-auto object-contain" priority/>
-                    ) : (
-                        <span className="text-lg font-semibold tracking-tight">{store.name}</span>
-                    )}
+                <Link prefetch={false} href="/" aria-label={store.name} className="flex shrink-0 items-center gap-2 border-e border-foreground pe-4 ps-1 lg:pe-5">
+                    {store.logo?.path
+                        ? <Image src={store.logo.path} alt={store.logo.name || store.name} width={120} height={32} className="h-7 w-auto object-contain lg:h-8" priority/>
+                        : <span className="q font-display text-xl font-bold uppercase leading-none tracking-tight">{store.name}</span>}
                 </Link>
-                <Nav ctx={ctx} data={data} className="hidden flex-1 lg:flex"/>
-                <div className="ms-auto flex items-center gap-1">
-                    {ctx.layout.search === 'header' && (
-                        <SearchBox storeContext={ctx.storeContext} capabilities={data.search} className="hidden md:block"/>
-                    )}
+                <Nav ctx={ctx} data={data} className="hidden min-w-0 flex-1 lg:flex"/>
+                <div className="ms-auto flex items-stretch">
+                    {ctx.layout.search === 'header' && <SearchBox storeContext={ctx.storeContext} capabilities={data.search} className="hidden items-center border-s border-foreground px-3 md:flex"/>}
                     <HeaderActions ctx={ctx}/>
                 </div>
             </div>

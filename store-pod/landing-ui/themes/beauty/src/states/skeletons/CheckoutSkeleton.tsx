@@ -6,7 +6,7 @@ export const CheckoutSkeleton = () => (
         <Skeleton className="h-9 w-48"/>
         <div className="grid gap-8 lg:grid-cols-3">
             <div className="flex flex-col gap-4 lg:col-span-2">{Array.from({length: 6}).map((_, i) => <Skeleton key={i} className="h-10 w-full"/>)}</div>
-            <Skeleton className="h-64 w-full rounded-card"/>
+            <Skeleton className="h-64 w-full rounded-none"/>
         </div>
     </Page>
 );

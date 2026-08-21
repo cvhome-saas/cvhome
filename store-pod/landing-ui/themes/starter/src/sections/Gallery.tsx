@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import Image from 'next/image';
 import {useTranslations} from 'next-intl';
 import type {Image as ProductImage} from '@store-front/types';
@@ -11,7 +11,8 @@ import {cn} from '@store-front/ui/lib/utils';
 export function Gallery({images, alt}: { images: ProductImage[]; alt: string }) {
     const t = useTranslations('PAGE.PRODUCT');
     const [index, setIndex] = useState(0);
-    useEffect(() => setIndex(0), [images]);
+    const [prevImages, setPrevImages] = useState(images);
+    if (images !== prevImages) { setPrevImages(images); setIndex(0); }  // variant changed the image set
     const current = images[index] ?? images[0];
     return (
         <div className="flex flex-col gap-3">

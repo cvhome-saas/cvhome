@@ -21,9 +21,11 @@
 @custom-variant dark (&:is([data-color-scheme="dark"] *));
 
 /* ---------------------------------------------------------------------------------------------- */
-/* Fallback values — a theme that forgets a token still renders; merchant colours always override   */
+/* Fallback values — a theme that forgets a token still renders; merchant colours always override.  */
+/* `:where(:root)` has ZERO specificity on purpose: theme tokens live on `[data-theme="<id>"]`       */
+/* (imported above, so earlier in source) and must win over these defaults.                        */
 /* ---------------------------------------------------------------------------------------------- */
-:root {
+:where(:root) {
     /* colour roles (LIGHT-preset-like defaults; replaced per request by the merchant bridge) */
     --background: #ffffff;
     --foreground: #1a1a1a;
@@ -202,6 +204,35 @@
 
     --aspect-product: var(--product-aspect);
 }
+
+/* ---------------------------------------------------------------------------------------------- */
+/* Toasts (nextjs-toast-notify) — the library injects its own :root variables at runtime; binding them  */
+/* on html[data-theme] (higher specificity) makes every toast follow the active theme's tokens.         */
+/* ---------------------------------------------------------------------------------------------- */
+html[data-theme] {
+    --toast-bg-color: var(--popover);
+    --toast-text-color: var(--popover-foreground);
+    --toast-border-radius: var(--r-overlay);
+    --toast-box-shadow: var(--elev-overlay);
+    --toast-success-color: var(--success);
+    --toast-error-color: var(--destructive);
+    --toast-warning-color: var(--warning);
+    --toast-info-color: var(--info);
+    --toast-close-color: var(--popover-foreground);
+    --toast-font-size: var(--type-sm);
+}
+html[data-theme] .toast-nextjs {
+    font-family: var(--font-body);
+    border: var(--border-width) solid var(--border);
+}
+html[data-theme] .toast-nextjs .message .text { text-align: start; line-height: var(--line-snug); }
+html[data-theme] .toast-nextjs .close-toast { right: auto; inset-inline-end: var(--toast-close-position-right, 0.5rem); }
+/* the icon tile's colour is inlined by the library — role tokens win */
+html[data-theme] .toast-nextjs .check { border-radius: var(--r-badge); }
+html[data-theme] .toast-nextjs.success .check { background-color: var(--success) !important; color: var(--success-foreground) !important; }
+html[data-theme] .toast-nextjs.error .check { background-color: var(--destructive) !important; color: var(--destructive-foreground) !important; }
+html[data-theme] .toast-nextjs.warning .check { background-color: var(--warning) !important; color: var(--warning-foreground) !important; }
+html[data-theme] .toast-nextjs.info .check { background-color: var(--info) !important; color: var(--info-foreground) !important; }
 
 @layer base {
     * {

@@ -9,6 +9,7 @@ colours it. How to build one: `.agents/skills/project-structure/references/new-l
 | id | status | notes |
 |---|---|---|
 | `starter` | reference | deliberately undesigned; the copy source for `npm run new-theme <id>`; current fallback for every legacy enum value |
+| `beauty` | built (v1.0.0) | Industrial Quote Grammar for a beauty + fashion boutique — ink plates on a 1px grid, 45° hazard stripes, straight-quoted labels, condensed caps display (Oswald) + mono facts (JetBrains Mono), the merchant primary as the single zip-tie-tag accent; `themes/beauty/DESIGN.md` |
 
 ## How to read the catalog
 

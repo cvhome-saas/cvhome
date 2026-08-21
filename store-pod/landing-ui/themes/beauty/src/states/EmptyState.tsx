@@ -1,15 +1,18 @@
 'use client'
 import type {ReactNode} from 'react';
 import {useTranslations} from 'next-intl';
-import {PackageOpenIcon, ReceiptTextIcon, SearchIcon, ShoppingBagIcon} from 'lucide-react';
 import type {EmptyKind} from '@store-front/theme';
-import {EmptyState as EmptyBlock} from '@store-front/ui/empty-state';
 
-const ICONS = {cart: ShoppingBagIcon, listing: PackageOpenIcon, orders: ReceiptTextIcon, search: SearchIcon};
-
+/** An empty plate: the stripe where goods would be, the quoted reason, an action tag. */
 export function EmptyState({kind, action}: { kind: EmptyKind; action?: ReactNode }) {
     const t = useTranslations('STATES');
-    const Icon = ICONS[kind];
     const K = kind.toUpperCase();
-    return <EmptyBlock icon={<Icon/>} title={t(`EMPTY_${K}_TITLE`)} action={action}>{t(`EMPTY_${K}_BODY`)}</EmptyBlock>;
+    return (
+        <section role="status" className="flex flex-col items-center gap-3 py-10 text-center">
+            <div className="hazard-soft h-10 w-28 border border-foreground" aria-hidden/>
+            <h2 className="q font-display text-xl font-semibold uppercase tracking-tight">{t(`EMPTY_${K}_TITLE`)}</h2>
+            <p className="max-w-prose font-mono text-xs uppercase tracking-wide text-muted-foreground">{t(`EMPTY_${K}_BODY`)}</p>
+            {action && <div className="mt-2 flex flex-wrap justify-center gap-2">{action}</div>}
+        </section>
+    );
 }

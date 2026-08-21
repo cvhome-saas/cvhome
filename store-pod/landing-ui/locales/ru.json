@@ -205,7 +205,8 @@
       "MAIN_NAVIGATION": "Основная навигация",
       "SEARCH": "Поиск",
       "CART_WITH_COUNT": "Корзина, {count, plural, =0 {пусто} =1 {1 товар} other {# товаров}}",
-      "VIEW_ALL_IN": "Все в {name}"
+      "VIEW_ALL_IN": "Все в {name}",
+      "ANNOUNCEMENT": "Заметка"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -314,7 +315,10 @@
     "SKIP_TO_CONTENT": "Перейти к содержимому",
     "VIEW_ALL": "Смотреть все",
     "SEARCH": "Поиск",
-    "HOME": "Главная"
+    "HOME": "Главная",
+    "LANGUAGE_LABEL": "Язык",
+    "CURRENCY": "Валюта",
+    "ITEMS": "Товары"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Перенаправление на вход…",

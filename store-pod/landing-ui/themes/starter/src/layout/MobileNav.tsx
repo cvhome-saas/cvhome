@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {MenuIcon} from 'lucide-react';
 import {Link, usePathname} from '@store-front/i18n/navigation';
@@ -13,9 +13,11 @@ import {SearchBox} from '../sections/SearchBox';
 export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const t = useTranslations('COMPONENTS.HEADER');
     const tc = useTranslations('COMMON');
-    const [open, setOpen] = useState(false);
     const pathname = usePathname();
-    useEffect(() => setOpen(false), [pathname]);
+    // Open state is keyed to the path it was opened on, so a navigation closes it without an effect.
+    const [openPath, setOpenPath] = useState<string | null>(null);
+    const open = openPath === pathname;
+    const setOpen = (o: boolean) => setOpenPath(o ? pathname : null);
     const categories = data.categories.filter(c => c.description);
     const pages = data.pages.filter(p => p.linkToMenu && p.description);
     const linkCls = 'block rounded-control px-3 py-2 text-base font-medium hover:bg-muted';

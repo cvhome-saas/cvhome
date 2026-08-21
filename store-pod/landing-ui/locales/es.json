@@ -205,7 +205,8 @@
       "MAIN_NAVIGATION": "Navegación principal",
       "SEARCH": "Buscar",
       "CART_WITH_COUNT": "Carrito, {count, plural, =0 {vacío} =1 {1 artículo} other {# artículos}}",
-      "VIEW_ALL_IN": "Todo en {name}"
+      "VIEW_ALL_IN": "Todo en {name}",
+      "ANNOUNCEMENT": "Aviso"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -314,7 +315,10 @@
     "SKIP_TO_CONTENT": "Saltar al contenido",
     "VIEW_ALL": "Ver todo",
     "SEARCH": "Buscar",
-    "HOME": "Inicio"
+    "HOME": "Inicio",
+    "LANGUAGE_LABEL": "Idioma",
+    "CURRENCY": "Moneda",
+    "ITEMS": "Artículos"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirigiendo al inicio de sesión…",

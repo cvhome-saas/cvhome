@@ -1,30 +1,30 @@
 'use client'
-import {useEffect, useState} from 'react';
+import {useSyncExternalStore} from 'react';
 import {useTranslations} from 'next-intl';
 import {XIcon} from 'lucide-react';
 import type {Box} from '@store-front/types';
 import {parseDescription} from '@store-front/services/description-view-util';
-import {Button} from '@store-front/ui/button';
 
 const KEY = 'beauty-announcement-dismissed';
+const listeners = new Set<() => void>();
+const read = () => { try { return sessionStorage.getItem(KEY); } catch { return null; } };
+const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
+const dismiss = (code: string) => { try { sessionStorage.setItem(KEY, code); } catch {} listeners.forEach(l => l()); };
 
-/** The merchant's `header-message` box. Dismissal is per session so it does not nag. */
+/** The stockroom notice: an ink strip, a primary "NOTE" tag at the start, the text in mono, a plate × at the end. */
 export function Announcement({box}: { box: Box }) {
     const t = useTranslations('COMPONENTS.HEADER');
-    const [hidden, setHidden] = useState(true);
-    useEffect(() => {
-        try { setHidden(sessionStorage.getItem(KEY) === box.code); } catch { setHidden(false); }
-    }, [box.code]);
+    const hidden = useSyncExternalStore(subscribe, () => read() === box.code, () => false);
     if (hidden) return null;
     return (
-        <div className="bg-primary text-primary-foreground">
-            <div className="mx-auto flex max-w-content items-center gap-3 px-gutter py-2 text-sm">
-                <div className="min-w-0 flex-1 text-center [&_a]:underline" dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/>
-                <Button variant="ghost" size="icon-sm" className="shrink-0 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
-                        aria-label={t('ANNOUNCEMENT_DISMISS')}
-                        onClick={() => { try { sessionStorage.setItem(KEY, box.code); } catch {} setHidden(true); }}>
-                    <XIcon/>
-                </Button>
+        <div className="bg-foreground text-background">
+            <div className="mx-auto flex max-w-wide items-stretch gap-3 px-gutter">
+                <span aria-hidden className="tag my-1 hidden h-6 items-center self-center rounded-control ps-2 font-display text-[0.65rem] font-semibold uppercase tracking-wide sm:inline-flex">{t('ANNOUNCEMENT')}</span>
+                <div className="min-w-0 flex-1 py-2 font-mono text-xs uppercase leading-snug tracking-wide [&_a]:underline" dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/>
+                <button type="button" aria-label={t('ANNOUNCEMENT_DISMISS')} onClick={() => dismiss(box.code)}
+                        className="my-1 flex size-6 shrink-0 items-center justify-center self-center border border-background/60 hover:bg-background hover:text-foreground">
+                    <XIcon className="size-3.5"/>
+                </button>
             </div>
         </div>
     );

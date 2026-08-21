@@ -205,7 +205,8 @@
       "MAIN_NAVIGATION": "Main navigation",
       "SEARCH": "Search",
       "CART_WITH_COUNT": "Cart, {count, plural, =0 {empty} =1 {1 item} other {# items}}",
-      "VIEW_ALL_IN": "All {name}"
+      "VIEW_ALL_IN": "All {name}",
+      "ANNOUNCEMENT": "Note"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -314,7 +315,10 @@
     "SKIP_TO_CONTENT": "Skip to content",
     "VIEW_ALL": "View all",
     "SEARCH": "Search",
-    "HOME": "Home"
+    "HOME": "Home",
+    "LANGUAGE_LABEL": "Language",
+    "CURRENCY": "Currency",
+    "ITEMS": "Items"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirecting to sign in…",

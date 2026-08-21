@@ -8,14 +8,12 @@ const SM: Record<number, string> = {1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3:
 const LG: Record<number, string> = {2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4', 5: 'lg:grid-cols-5'};
 const XL: Record<number, string> = {2: 'xl:grid-cols-2', 3: 'xl:grid-cols-3', 4: 'xl:grid-cols-4', 5: 'xl:grid-cols-5', 6: 'xl:grid-cols-6'};
 
-/** Grid columns follow the theme's layout config so every listing in the theme agrees. */
-export function ProductGrid({products, storeContext, grid, className}: {
-    products: Product[]; storeContext: StoreContext; grid: ThemeLayoutConfig['productGrid']; className?: string
-}) {
+/** Plates butt against each other on 1px ink seams (borders, so a half-filled last row stays clean). */
+export function ProductGrid({products, storeContext, grid, className}: { products: Product[]; storeContext: StoreContext; grid: ThemeLayoutConfig['productGrid']; className?: string }) {
     return (
-        <ul className={cn('grid gap-x-4 gap-y-8', COLS[grid.base], SM[grid.sm], LG[grid.lg], XL[grid.xl], className)}>
+        <ul className={cn('grid ps-px pt-px', COLS[grid.base], SM[grid.sm], LG[grid.lg], XL[grid.xl], className)}>
             {products.map((p, i) => (
-                <li key={p.id}><ProductCard product={p} storeContext={storeContext} priority={i < 4}/></li>
+                <li key={p.id} className="-ms-px -mt-px border border-foreground bg-background"><ProductCard product={p} storeContext={storeContext} priority={i < 4} className="border-0"/></li>
             ))}
         </ul>
     );

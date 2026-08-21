@@ -205,7 +205,8 @@
       "MAIN_NAVIGATION": "Navigation principale",
       "SEARCH": "Rechercher",
       "CART_WITH_COUNT": "Panier, {count, plural, =0 {vide} =1 {1 article} other {# articles}}",
-      "VIEW_ALL_IN": "Tout {name}"
+      "VIEW_ALL_IN": "Tout {name}",
+      "ANNOUNCEMENT": "Note"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -314,7 +315,10 @@
     "SKIP_TO_CONTENT": "Aller au contenu",
     "VIEW_ALL": "Tout voir",
     "SEARCH": "Rechercher",
-    "HOME": "Accueil"
+    "HOME": "Accueil",
+    "LANGUAGE_LABEL": "Langue",
+    "CURRENCY": "Devise",
+    "ITEMS": "Articles"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirection vers la connexion…",

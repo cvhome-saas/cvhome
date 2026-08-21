@@ -205,7 +205,8 @@
       "MAIN_NAVIGATION": "التنقل الرئيسي",
       "SEARCH": "بحث",
       "CART_WITH_COUNT": "السلة، {count, plural, =0 {فارغة} =1 {عنصر واحد} other {# عناصر}}",
-      "VIEW_ALL_IN": "كل {name}"
+      "VIEW_ALL_IN": "كل {name}",
+      "ANNOUNCEMENT": "تنبيه"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "فيسبوك",
@@ -314,7 +315,10 @@
     "SKIP_TO_CONTENT": "الانتقال إلى المحتوى",
     "VIEW_ALL": "عرض الكل",
     "SEARCH": "بحث",
-    "HOME": "الرئيسية"
+    "HOME": "الرئيسية",
+    "LANGUAGE_LABEL": "اللغة",
+    "CURRENCY": "العملة",
+    "ITEMS": "المنتجات"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "جارٍ التحويل إلى تسجيل الدخول…",

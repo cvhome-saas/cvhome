@@ -3,55 +3,54 @@ import {FacebookIcon, GithubIcon, InstagramIcon, LinkedinIcon, TwitterIcon, Yout
 import {Link} from '@store-front/i18n/navigation';
 import type {LayoutData, PageContext} from '@store-front/theme';
 
-const SOCIAL_ICONS: Record<string, LucideIcon> = {
-    facebook: FacebookIcon, twitter: TwitterIcon, x: TwitterIcon, instagram: InstagramIcon, github: GithubIcon,
-    youtube: YoutubeIcon, linkedin: LinkedinIcon,
-};
+const SOCIAL_ICONS: Record<string, LucideIcon> = {facebook: FacebookIcon, twitter: TwitterIcon, x: TwitterIcon, instagram: InstagramIcon, github: GithubIcon, youtube: YoutubeIcon, linkedin: LinkedinIcon};
 
+/** The loading dock: a hazard band, four plates of quoted headings with mono rows, the store's own facts. */
 export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
     const t = await getTranslations('COMPONENTS.FOOTER');
     const {store} = data;
     const shop = data.categories.filter(c => c.description).slice(0, 8);
     const info = data.pages.filter(p => p.description);
     const socials = (store.socialLinks ?? []).filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
+    const col = 'flex flex-col border-foreground p-4 md:border-s first:md:border-s-0';
+    const h = 'q mb-3 font-display text-sm font-semibold uppercase tracking-wide';
+    const row = 'q py-1 font-mono text-xs uppercase tracking-wide hover:underline hover:underline-offset-4';
     return (
-        <footer className="mt-section border-t bg-muted/40">
-            <div className="mx-auto grid max-w-content gap-10 px-gutter py-12 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="flex flex-col gap-3">
-                    <p className="text-lg font-semibold">{store.name}</p>
+        <footer className="mt-section border-t border-foreground">
+            <div className="hazard h-3 border-b border-foreground" aria-hidden/>
+            <div className="mx-auto grid max-w-wide px-gutter md:grid-cols-4">
+                <div className={col}>
+                    <p className="q font-display text-2xl font-bold uppercase leading-none tracking-tight">{store.name}</p>
                     {(store.address?.address || store.address?.city) && (
-                        <address className="text-sm not-italic text-muted-foreground">
-                            {[store.address.address, store.address.city, store.address.postalCode, store.address.country].filter(Boolean).join(', ')}
+                        <address dir="auto" className="mt-3 font-mono text-xs uppercase not-italic leading-relaxed tracking-wide text-muted-foreground">
+                            {[store.address.address, store.address.city, store.address.postalCode, store.address.country].filter(Boolean).join(' · ')}
                         </address>
                     )}
                 </div>
                 {shop.length > 0 && (
-                    <nav aria-label={t('SHOP')} className="flex flex-col gap-2">
-                        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('SHOP')}</h2>
-                        {shop.map(c => <Link key={c.code} prefetch={false} href={`/category/${c.description.friendlyUrl}`} className="text-sm hover:underline">{c.description.name}</Link>)}
+                    <nav aria-label={t('SHOP')} className={col}>
+                        <h2 className={h}>{t('SHOP')}</h2>
+                        {shop.map(c => <Link key={c.code} prefetch={false} href={`/category/${c.description.friendlyUrl}`} className={row}>{c.description.name}</Link>)}
                     </nav>
                 )}
                 {info.length > 0 && (
-                    <nav aria-label={t('INFORMATION')} className="flex flex-col gap-2">
-                        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('INFORMATION')}</h2>
-                        {info.map(p => <Link key={p.code} prefetch={false} href={`/content/${p.description.friendlyUrl}`} className="text-sm hover:underline">{p.description.name}</Link>)}
+                    <nav aria-label={t('INFORMATION')} className={col}>
+                        <h2 className={h}>{t('INFORMATION')}</h2>
+                        {info.map(p => <Link key={p.code} prefetch={false} href={`/content/${p.description.friendlyUrl}`} className={row}>{p.description.name}</Link>)}
                     </nav>
                 )}
-                <div className="flex flex-col gap-2">
-                    <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('CONTACT')}</h2>
-                    {store.email && <a href={`mailto:${store.email}`} className="text-sm hover:underline">{store.email}</a>}
-                    {store.phone && <a href={`tel:${store.phone}`} className="text-sm hover:underline" dir="ltr">{store.phone}</a>}
+                <div className={col}>
+                    <h2 className={h}>{t('CONTACT')}</h2>
+                    {store.email && <a href={`mailto:${store.email}`} className="py-1 font-mono text-xs tracking-wide hover:underline hover:underline-offset-4">{store.email}</a>}
+                    {store.phone && <a href={`tel:${store.phone}`} className="py-1 font-mono text-xs tracking-wide hover:underline hover:underline-offset-4" dir="ltr">{store.phone}</a>}
                     {socials.length > 0 && (
-                        <ul className="mt-2 flex gap-2" aria-label={t('FOLLOW_US')}>
+                        <ul className="mt-3 flex" aria-label={t('FOLLOW_US')}>
                             {socials.map(s => {
                                 const Icon = SOCIAL_ICONS[s.provider.toLowerCase()];
                                 const url = s.url.startsWith('http') ? s.url : `https://${s.url}`;
                                 return (
-                                    <li key={s.provider}>
-                                        <a href={url} target="_blank" rel="noopener noreferrer" aria-label={s.provider}
-                                           className="flex size-9 items-center justify-center rounded-control border hover:bg-muted">
-                                            <Icon className="size-4"/>
-                                        </a>
+                                    <li key={s.provider} className="-ms-px first:ms-0">
+                                        <a href={url} target="_blank" rel="noopener noreferrer" aria-label={s.provider} className="plate flex size-9 items-center justify-center hover:bg-foreground hover:text-background"><Icon className="size-4"/></a>
                                     </li>
                                 );
                             })}
@@ -59,9 +58,9 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
                     )}
                 </div>
             </div>
-            <div className="border-t">
-                <p className="mx-auto max-w-content px-gutter py-4 text-xs text-muted-foreground">
-                    © {new Date().getFullYear()} {store.name}. {t('RIGHT_RESERVED')}
+            <div className="border-t border-foreground">
+                <p className="mx-auto max-w-wide px-gutter py-3 font-mono text-[0.7rem] uppercase tracking-wide text-muted-foreground">
+                    © {new Date().getFullYear()} <span className="q">{store.name}</span> · {t('RIGHT_RESERVED')}
                 </p>
             </div>
         </footer>

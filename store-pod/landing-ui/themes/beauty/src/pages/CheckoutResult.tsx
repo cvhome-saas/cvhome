@@ -7,7 +7,7 @@ import type {CheckoutResultData, PageProps} from '@store-front/theme';
 import {Link} from '@store-front/i18n/navigation';
 import {useOrderStatus} from '@store-front/hooks/use-order-status';
 import {useUser} from '@store-front/hooks/use-user';
-import {Button} from '@store-front/ui/button';
+import {TagButton} from '../components/TagButton';
 import {Skeleton} from '@store-front/ui/skeleton';
 import {PageShell} from '../components/PageShell';
 
@@ -28,18 +28,19 @@ export function CheckoutResult({ctx, data}: PageProps<CheckoutResultData>) {
 
     return (
         <PageShell width="narrow" className="py-section">
-            <div className="flex flex-col items-center gap-6 rounded-card border p-8 text-center" aria-live="polite">
-                {isLoading && <><Skeleton className="size-14 rounded-full"/><p className="text-muted-foreground">{t('RESULT_LOADING')}</p></>}
-                {!isLoading && !orderStatus && <><XCircleIcon className="size-14 text-muted-foreground"/><p className="text-lg font-medium">{t('RESULT_NOT_FOUND')}</p></>}
-                {isPaid && <><CheckCircle2Icon className="size-14 text-success"/><div><h1 className="text-2xl font-semibold">{t('RESULT_SUCCESS_TITLE')}</h1><p className="mt-1 text-muted-foreground">{t('RESULT_SUCCESS_MESSAGE')}</p></div></>}
-                {isPending && <><ClockIcon className="size-14 text-warning"/><div><h1 className="text-2xl font-semibold">{t('RESULT_PENDING_TITLE')}</h1><p className="mt-1 text-muted-foreground">{t('RESULT_PENDING_MESSAGE')}</p></div></>}
-                {isCancelled && <><XCircleIcon className="size-14 text-destructive"/><div><h1 className="text-2xl font-semibold">{t('RESULT_FAILED_TITLE')}</h1><p className="mt-1 text-muted-foreground">{t('RESULT_FAILED_MESSAGE')}</p></div></>}
-                {orderStatus && <p className="text-sm text-muted-foreground">{t('ORDER_NUMBER')}: <span className="font-semibold text-foreground">#{orderStatus.orderId}</span></p>}
+            <div className="plate relative flex flex-col items-center gap-6 p-8 text-center" aria-live="polite">
+                <div className="hazard absolute inset-x-0 top-0 h-2" aria-hidden/>
+                {isLoading && <><Skeleton className="size-14 rounded-none"/><p className="font-mono text-sm uppercase tracking-wide text-muted-foreground">{t('RESULT_LOADING')}</p></>}
+                {!isLoading && !orderStatus && <><XCircleIcon className="size-14 text-muted-foreground"/><p className="q font-display text-xl font-semibold uppercase">{t('RESULT_NOT_FOUND')}</p></>}
+                {isPaid && <><CheckCircle2Icon className="size-14 text-success"/><div><h1 className="q font-display text-3xl font-bold uppercase tracking-tight">{t('RESULT_SUCCESS_TITLE')}</h1><p className="mt-2 font-mono text-sm text-muted-foreground">{t('RESULT_SUCCESS_MESSAGE')}</p></div></>}
+                {isPending && <><ClockIcon className="size-14 text-warning"/><div><h1 className="q font-display text-3xl font-bold uppercase tracking-tight">{t('RESULT_PENDING_TITLE')}</h1><p className="mt-2 font-mono text-sm text-muted-foreground">{t('RESULT_PENDING_MESSAGE')}</p></div></>}
+                {isCancelled && <><XCircleIcon className="size-14 text-destructive"/><div><h1 className="q font-display text-3xl font-bold uppercase tracking-tight">{t('RESULT_FAILED_TITLE')}</h1><p className="mt-2 font-mono text-sm text-muted-foreground">{t('RESULT_FAILED_MESSAGE')}</p></div></>}
+                {orderStatus && <p className="plate px-3 py-1 font-mono text-xs uppercase tracking-wide">{t('ORDER_NUMBER')}: <span className="font-bold">#{orderStatus.orderId}</span></p>}
                 <div className="flex w-full flex-col gap-3 sm:flex-row">
-                    {isPending && orderStatus?.redirectUrl && <Button asChild size="lg" className="flex-1"><a href={orderStatus.redirectUrl}>{t('COMPLETE_PAYMENT')}</a></Button>}
-                    <Button asChild size="lg" variant={isPending && orderStatus?.redirectUrl ? 'outline' : 'default'} className="flex-1">
-                        <Link prefetch={false} href="/">{t('BACK_TO_HOME')}</Link>
-                    </Button>
+                    {isPending && orderStatus?.redirectUrl && <TagButton asChild size="lg" className="flex-1"><a href={orderStatus.redirectUrl}>{t('COMPLETE_PAYMENT')}</a></TagButton>}
+                    {isPending && orderStatus?.redirectUrl
+                        ? <Link prefetch={false} href="/" className="plate inline-flex h-12 flex-1 items-center justify-center font-display text-base font-semibold uppercase tracking-wide hover:bg-foreground hover:text-background"><span className="q">{t('BACK_TO_HOME')}</span></Link>
+                        : <TagButton asChild size="lg" className="flex-1"><Link prefetch={false} href="/">{t('BACK_TO_HOME')}</Link></TagButton>}
                 </div>
             </div>
         </PageShell>

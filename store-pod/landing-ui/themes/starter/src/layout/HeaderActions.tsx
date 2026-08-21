@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {GlobeIcon, ShoppingBagIcon, UserIcon} from 'lucide-react';
 import {Link, usePathname, useRouter} from '@store-front/i18n/navigation';
@@ -67,10 +67,11 @@ function AccountButton({ctx}: { ctx: PageContext }) {
 
 function CartControl({ctx}: { ctx: PageContext }) {
     const t = useTranslations('COMPONENTS.HEADER');
-    const [open, setOpen] = useState(false);
     const pathname = usePathname();
     const {count} = useCart(ctx.storeContext);
-    useEffect(() => setOpen(false), [pathname]);
+    const [openPath, setOpenPath] = useState<string | null>(null);
+    const open = openPath === pathname;
+    const setOpen = (o: boolean) => setOpenPath(o ? pathname : null);
     return (
         <>
             <Button variant="ghost" size="icon" className="relative" aria-label={t('CART_WITH_COUNT', {count})} onClick={() => setOpen(true)}>

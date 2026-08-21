@@ -22,19 +22,24 @@ import {CheckoutSkeleton} from './states/skeletons/CheckoutSkeleton';
 import {CustomerSkeleton} from './states/skeletons/CustomerSkeleton';
 import {OrderSkeleton} from './states/skeletons/OrderSkeleton';
 
-/**
- * starter — the reference implementation of the theme contract.
- * Intentionally undesigned: neutral type, neutral radius, no decoration. Everything a theme must do
- * (every page, every state, RTL, mobile nav, cart drawer, variants, sort/pagination, search capability
- * branch, sale/out-of-stock badges, skeletons, error/empty/not-found) is here to copy and then redesign.
- */
+/** beauty — Industrial Quote Grammar. Behaviour from @store-front/hooks; look and structure are this theme's. */
 export default defineTheme({
     id: 'beauty',
     name: 'Beauty',
-    version: '0.1.0',
-    description: 'Plain reference theme — copy source for new themes.',
+    version: '1.0.0',
+    description: 'Industrial quote grammar for a beauty + fashion boutique: ink plates, hazard stripes, the merchant primary as the zip-tie tag; labels stay on.',
     fonts,
-    tokens: {},
+    tokens: {
+        // Monochrome world: the preset's background/foreground stay; the preset's PRIMARY is the only accent
+        // (the zip-tie tag). Secondary/accent are demoted to ink so nothing competes with the tag.
+        mapMerchantColors: (schema) => ({
+            secondary: schema.foreground,
+            accent: schema.foreground,
+            ring: schema.primary,
+            border: schema.foreground,
+            input: schema.foreground,
+        }),
+    },
     layout: {config: layoutConfig, Root},
     pages: {Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order},
     states: {

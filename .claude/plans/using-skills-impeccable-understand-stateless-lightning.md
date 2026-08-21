@@ -298,3 +298,13 @@ checkout (login-required dialog), `/ar` RTL, mobile viewport, real 404 for unkno
 
 Found along the way (backend, not changed): `GET /api/v2/product/name/{unknown}` returns 500 instead of 404; local images 404
 (no MinIO) — known gap. Left for later: generating the first designed theme via `npm run new-theme` + the impeccable flow.
+
+## First designed theme — `beauty` (2026-08-21)
+
+Built with the impeccable flow: init answers (beauty + fashion boutique, "trusted expert counter"), direction roll
+(`concept-seed` key 85f13d63, user chose the dealt challenger **Industrial Quote Grammar**), contract in
+`themes/beauty/src/layout/Root.tsx`, full rebuild of tokens/fonts/layout/pages/sections/states, detector run, fresh
+finish-reviewer (two fix batches within budget), documenter → `themes/beauty/DESIGN.md`.
+Architecture fix found on the way: the shell's `:root` token fallbacks now use `:where(:root)` (zero specificity) —
+before, they silently overrode every theme token (fonts included). ESLint config moved to the landing-ui root so
+`themes/**` and `libs/**` are actually linted; hook-rule fixes applied to `starter` too.

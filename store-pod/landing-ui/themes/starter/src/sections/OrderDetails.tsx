@@ -13,7 +13,7 @@ import {ErrorState as ErrorBlock} from '@store-front/ui/error-state';
 export function OrderDetails({storeContext, orderId}: { storeContext: StoreContext; orderId: number }) {
     const t = useTranslations('PAGE.CUSTOMER');
     const {user} = useUser(storeContext);
-    const {getOrderDetails, loading, error} = useCustomer(storeContext);
+    const {getOrderDetails, error} = useCustomer(storeContext);
     const [data, setData] = useState<{ order: Order; history: OrderHistoryList } | null>(null);
 
     useEffect(() => {
