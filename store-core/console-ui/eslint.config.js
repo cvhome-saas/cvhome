@@ -92,11 +92,23 @@ module.exports = tseslint.config(
             'aria-labelledby', 'aria-controls', 'aria-haspopup', 'aria-current',
             'aria-live', 'aria-relevant', 'scope', 'stroke-linecap', 'stroke-linejoin',
             'animate.enter', 'animate.leave', 'method',
-            'tone', 'icon', 'shape', 'fileName', 'slugPrefix', 'basePath',
+            'tone', 'icon', 'shape', 'fileName', 'slugPrefix', 'inputmode', 'contentDir', 'basePath',
             'd', 'preload', 'kind',
           ],
         },
       ],
+    },
+  },
+  {
+    /*
+     * A spec's host template is a fixture, not an interface. The i18n rule exists to catch copy
+     * that would reach an operator untranslated, and nothing here ever does — the literals are the
+     * inputs under test, and binding them through Transloco would only hide what the case is
+     * asserting. Matches the virtual filenames `processInlineTemplates` derives from a `.spec.ts`.
+     */
+    files: ['**/*.spec.ts', '**/*.spec.ts/**'],
+    rules: {
+      '@angular-eslint/template/i18n': 'off',
     },
   },
 );

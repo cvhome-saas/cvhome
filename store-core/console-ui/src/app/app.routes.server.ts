@@ -45,6 +45,19 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    // Same reason: every catalog call is scoped by the request context's `store`.
+    path: 'catalogue/**',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'products',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'products/**',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: '**',
     renderMode: RenderMode.Client,
   },

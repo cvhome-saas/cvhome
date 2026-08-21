@@ -31,7 +31,9 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
   {
     groupKey: 'shell.nav.group.commerce',
     items: [
-      {labelKey: 'shell.nav.item.inventory', icon: 'box'},
+      {labelKey: 'shell.nav.item.catalogue', icon: 'sitemap', route: '/catalogue'},
+      // Was routeless — this app's marker for "not built". Module 6 built it.
+      {labelKey: 'shell.nav.item.inventory', icon: 'box', route: '/products'},
       {labelKey: 'shell.nav.item.orders', icon: 'shoppingCart', route: '/orders'},
       {labelKey: 'shell.nav.item.payments', icon: 'creditCard'},
     ],

@@ -47,6 +47,18 @@
     },
     "billing": {
       "title": "Billing"
+    },
+    "catalogue": {
+      "title": "Catalogue | cvhome"
+    },
+    "products": {
+      "title": "Products | cvhome"
+    },
+    "newProduct": {
+      "title": "New product | cvhome"
+    },
+    "productForm": {
+      "title": "Product | cvhome"
     }
   },
   "notFound": {
@@ -243,6 +255,73 @@
       "collapse": "Collapse sections",
       "expand": "Expand sections",
       "needsAttention": "Needs attention"
+    },
+    "tree": {
+      "expand": "Expand {name}",
+      "collapse": "Collapse {name}",
+      "toggleVisibility": "Show or hide {name} in the storefront navigation",
+      "visible": "Shown in the storefront navigation",
+      "hidden": "Hidden from the storefront navigation",
+      "nest": "Move {name} into the row above it",
+      "nestShort": "Move into the row above",
+      "unnest": "Move {name} out of its parent",
+      "unnestShort": "Move out",
+      "addChild": "Add a category inside {name}",
+      "addChildShort": "Add inside",
+      "empty": "Nothing here yet.",
+      "actions": "Actions for {name}",
+      "keyboardHint": "Use Alt with the left and right arrows to move a category in or out. Press Shift F10 for more actions.",
+      "visibilityShort": "Show in navigation",
+      "keys": {
+        "nest": "Alt+→",
+        "unnest": "Alt+←",
+        "visibility": "Alt+V",
+        "addChild": "Alt+N"
+      },
+      "announce": {
+        "nesting": "Moving {name} in",
+        "unnesting": "Moving {name} out",
+        "hiding": "Hiding {name} from the storefront navigation",
+        "showing": "Showing {name} in the storefront navigation",
+        "settled": "{name}, level {level}, {position} of {size}"
+      }
+    },
+    "autocomplete": {
+      "searching": "Searching…",
+      "noMatches": "No matches."
+    },
+    "stepper": {
+      "complete": "Complete"
+    },
+    "richText": {
+      "defaultLabel": "Formatted text",
+      "toolbarLabel": "Text formatting",
+      "heading2": "Heading",
+      "heading3": "Subheading",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bulletList": "Bulleted list",
+      "numberList": "Numbered list",
+      "link": "Link",
+      "clear": "Clear formatting",
+      "sourceLabel": "Edit HTML source",
+      "sourceFieldLabel": "HTML source of {field}",
+      "sourceOn": "HTML source shown. Undo history starts again from here.",
+      "sourceOff": "Formatted view shown. Undo history starts again from here.",
+      "linkUrl": "Link address",
+      "linkPlaceholder": "https://example.com",
+      "linkApply": "Add link",
+      "linkRefused": "That address cannot be used in a link.",
+      "keys": {
+        "heading2": "Ctrl+Alt+2",
+        "heading3": "Ctrl+Alt+3",
+        "bold": "Ctrl+B",
+        "italic": "Ctrl+I",
+        "bulletList": "Ctrl+Shift+8",
+        "numberList": "Ctrl+Shift+7",
+        "link": "Ctrl+K",
+        "clear": "Ctrl+\\"
+      }
     }
   },
   "orders": {
@@ -1068,7 +1147,11 @@
       "createStore": "Create store",
       "firstRun": "Getting started",
       "orderDetails": "Order",
-      "billing": "Billing"
+      "billing": "Billing",
+      "catalogue": "Catalogue",
+      "products": "Products",
+      "newProduct": "New product",
+      "productForm": "Product"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1119,7 +1202,8 @@
         "inventory": "Inventory",
         "orders": "Orders",
         "payments": "Payments",
-        "billing": "Billing"
+        "billing": "Billing",
+        "catalogue": "Catalogue"
       }
     },
     "planBanner": {
@@ -1385,5 +1469,386 @@
       "heading": "Billing",
       "ariaLabel": "Billing sections"
     }
+  },
+  "catalogue": {
+    "loading": "Loading the catalogue…",
+    "tabsLabel": "Catalogue sections",
+    "code": "Code",
+    "codeHintNew": "Used in the API, in imports and in storefront URLs. Suggested from the name; edit it before saving if you want a different one.",
+    "codeHintExisting": "Fixed once the record exists — a different code is a different record, not a rename.",
+    "codeInvalid": "Use letters, digits, hyphens and underscores only.",
+    "deleteConfirm": "Delete",
+    "heading": {
+      "title": "Catalogue",
+      "context": "{store} — the category tree is what your storefront navigation shows",
+      "contextWithCounts": "{store} · {categories, plural, one {# category} other {# categories}}, {brands, plural, one {# brand} other {# brands}}"
+    },
+    "tab": {
+      "categories": "Categories",
+      "types": "Product types",
+      "brands": "Brands",
+      "groups": "Groups"
+    },
+    "add": {
+      "categories": "New category",
+      "types": "New product type",
+      "brands": "New brand",
+      "groups": "New group"
+    },
+    "delete": {
+      "categories": "Delete {name}?",
+      "types": "Delete {name}?",
+      "brands": "Delete {name}?",
+      "groups": "Delete {name}?"
+    },
+    "deleteMessage": {
+      "categories": "This deletes the category and every category inside it. Products stay, but they lose this category.",
+      "types": "Products already using this type keep working, but you will not be able to set it on a new one.",
+      "brands": "Products already using this brand keep working, but they will no longer name it.",
+      "groups": "The products stay. Only the group and its membership go."
+    },
+    "saved": {
+      "category": "Category saved.",
+      "brand": "Brand saved.",
+      "type": "Product type saved.",
+      "group": "Group saved.",
+      "visibility": "Storefront navigation updated.",
+      "moved": "Category moved.",
+      "memberAdded": "Product added to the group.",
+      "memberRemoved": "Product removed from the group.",
+      "deleted": "Deleted."
+    },
+    "copy": {
+      "languageLabel": "Language being written",
+      "name": "Name",
+      "nameRequired": "A name is required in at least one language.",
+      "slug": "Slug",
+      "slugHint": "The storefront URL. Leave it empty and the storefront falls back to the code.",
+      "description": "Description",
+      "seoTitle": "SEO title",
+      "seoTitleHint": "What a search engine shows as the page title.",
+      "metaDescription": "Meta description",
+      "metaHint": "The snippet under the title in search results.",
+      "counter": "{count} / {limit}",
+      "translated": "Written in {language}.",
+      "notTranslated": "Not written in {language} yet — the storefront falls back to another language.",
+      "translatedIn": "Written in {language}",
+      "notTranslatedIn": "Not written in {language}",
+      "descriptionPlaceholder": "Describe this for a shopper."
+    },
+    "categories": {
+      "title": "Category tree",
+      "subtitle": "{total, plural, one {# category} other {# categories}} · {roots} top level · {visible} in the storefront navigation",
+      "treeLabel": "Category tree",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "addTopLevel": "Add a top-level category",
+      "dragHint": "Drag a row onto another to nest it inside. Every move is also on the row’s own buttons, which work from the keyboard.",
+      "newTitle": "New category",
+      "newSubtitle": "Give it a name and a code. Everything else can wait.",
+      "noneTitle": "No category selected",
+      "empty": "This store has no categories yet.",
+      "sortOrder": "Sort order",
+      "sortOrderHint": "Lower numbers come first among siblings.",
+      "visible": "Show in storefront navigation",
+      "visibleOn": "Appears in the storefront navigation, in tree order.",
+      "visibleOff": "Reachable by URL and by search, hidden from the navigation.",
+      "hasChildren": "This category has {count, plural, one {# category} other {# categories}} inside it. Deleting it deletes them too.",
+      "create": "Create category",
+      "save": "Save category",
+      "delete": "Delete"
+    },
+    "brands": {
+      "title": "Brands",
+      "subtitle": "{count, plural, one {# brand} other {# brands}}",
+      "unavailable": "The brand list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no brands yet.",
+      "newTitle": "New brand",
+      "newSubtitle": "A name and a code is all it takes.",
+      "noneTitle": "No brand selected",
+      "empty": "This store has no brands yet.",
+      "create": "Create brand",
+      "save": "Save brand",
+      "delete": "Delete",
+      "nameAndDescriptionOnly": "A brand on this platform is a name and a description. It has no storefront slug and no sort order — the server records neither."
+    },
+    "types": {
+      "title": "Product types",
+      "subtitle": "{count, plural, one {# type} other {# types}}",
+      "unavailable": "The product type list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no product types yet.",
+      "newTitle": "New product type",
+      "newSubtitle": "A name and a code is all it takes.",
+      "noneTitle": "No product type selected",
+      "empty": "This store has no product types yet.",
+      "codeHint": "Used in imports and in the API. Changing it breaks existing feeds.",
+      "noAttributes": "A product type on this platform is a name, a code and the two settings below. It does not define which attributes a product must carry — nothing links a type to an attribute set.",
+      "visible": "Show on the storefront",
+      "visibleHint": "Whether shoppers can browse by this type.",
+      "allowAddToCart": "Can be added to a basket",
+      "allowAddToCartHint": "Turn this off for types that are shown but not sold directly.",
+      "create": "Create product type",
+      "save": "Save product type",
+      "delete": "Delete"
+    },
+    "groups": {
+      "title": "Product groups",
+      "subtitle": "{count, plural, one {# group} other {# groups}}",
+      "unavailable": "The product group list could not be loaded. Everything else on this page is up to date.",
+      "none": "This store has no product groups yet.",
+      "newTitle": "New product group",
+      "newSubtitle": "Name the group and give it a code. Add products once it exists.",
+      "noneTitle": "No group selected",
+      "empty": "This store has no product groups yet.",
+      "memberCount": "{count, plural, one {# product} other {# products}}",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activeLabel": "Active",
+      "activeHint": "An inactive group stays here but the storefront ignores it.",
+      "codeHint": "A group is addressed by its code everywhere. Changing it after the fact creates a second group rather than renaming this one.",
+      "members": "Products in this group",
+      "membersHint": "Adding and removing take effect immediately — they are not part of Save.",
+      "addMember": "Add a product to this group",
+      "searchProducts": "Search by name or SKU…",
+      "removeMember": "Remove {name} from this group",
+      "noMembers": "No products in this group yet.",
+      "saveFirst": "Save the group first. Products can be added once it exists.",
+      "create": "Create group",
+      "save": "Save group",
+      "delete": "Delete",
+      "searchPool": "Searches the products already loaded — the platform has no server-side search by name."
+    },
+    "codeChecking": "Checking…",
+    "codeTaken": "That code is already used by another record in this store.",
+    "missingLanguages": "Cannot save yet — no name written in {languages}."
+  },
+  "products": {
+    "loading": "Loading products…",
+    "allProducts": "Products",
+    "addProduct": "Add product",
+    "unit": "products",
+    "pagesLabel": "Product pages",
+    "filterByAvailability": "Filter products by availability",
+    "clearFilters": "Clear filters",
+    "uncategorised": "Uncategorised",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "none": "This store has no products yet.",
+    "noneMatch": "No products match these filters.",
+    "editRow": "Edit price and quantity",
+    "editRowFor": "Edit the price and quantity of {name}",
+    "saveRowFor": "Save the changes to {name}",
+    "cancelEditFor": "Cancel editing {name}",
+    "editPriceFor": "Price of {name}",
+    "editQuantityFor": "Quantity of {name}",
+    "toggleAvailableFor": "Show or hide {name} on the storefront",
+    "openProduct": "Open the product",
+    "openProductFor": "Open {name}",
+    "deleteProduct": "Delete the product",
+    "deleteProductFor": "Delete {name}",
+    "heading": {
+      "title": "Products",
+      "context": "{store}",
+      "contextWithCount": "{store} · {count, plural, one {# product} other {# products}}"
+    },
+    "tab": {
+      "all": "All",
+      "available": "Available",
+      "unavailable": "Unavailable"
+    },
+    "column": {
+      "product": "Product",
+      "category": "Category",
+      "brand": "Brand",
+      "price": "Price",
+      "quantity": "Quantity",
+      "available": "Storefront",
+      "actions": "Actions"
+    },
+    "filter": {
+      "sku": "Search by SKU",
+      "skuPlaceholder": "Search by SKU…",
+      "category": "Filter by category",
+      "allCategories": "All categories",
+      "brand": "Filter by brand",
+      "allBrands": "All brands"
+    },
+    "subtitle": {
+      "none": "Nothing to show.",
+      "range": "Showing {from}–{to} of {total} {count, plural, one {product} other {products}}"
+    },
+    "saved": {
+      "row": "Product updated.",
+      "deleted": "{name} deleted."
+    },
+    "delete": {
+      "title": "Delete {name}?",
+      "message": "This removes the product, its images and its category assignments. Orders that already include it are not affected.",
+      "confirm": "Delete product"
+    }
+  },
+  "productForm": {
+    "loading": "Loading the product…",
+    "title": "Product",
+    "newTitle": "New product",
+    "contextDraft": "Draft · SKU {sku} · {percent}% ready",
+    "contextLive": "On the storefront · SKU {sku} · {percent}% ready",
+    "stepsLabel": "Product setup steps",
+    "saveDraft": "Save draft",
+    "publish": "Publish product",
+    "cannotPublish": "Some required details are still missing. The checklist on the right says which.",
+    "step": {
+      "essentials": "Essentials",
+      "essentialsMeta": "SKU, name and description",
+      "media": "Media",
+      "mediaMeta": "Photographs and their order",
+      "mediaLocked": "Save the product first",
+      "pricing": "Pricing & stock",
+      "pricingMeta": "Price, quantity and the shipping box",
+      "organize": "Organize",
+      "organizeMeta": "Categories, brand and related products"
+    },
+    "saved": {
+      "created": "Product created. Images and related products are available now.",
+      "updated": "Product saved.",
+      "published": "Product published to the storefront.",
+      "createdWithoutCategories": "Product created, but its categories could not be applied. Check the Organize step.",
+      "categoriesFailed": "Product saved, but its categories could not be applied. The list below is what the server has."
+    },
+    "essentials": {
+      "identifiers": "Identifiers",
+      "identifiersSubtitle": "Shared across every language.",
+      "sku": "SKU",
+      "skuHint": "Your own code for this product. Fixed once the product exists.",
+      "skuTaken": "Another product in this store already uses this SKU.",
+      "skuInvalid": "Use letters, digits, dots, hyphens and underscores only.",
+      "dateAvailable": "Available from",
+      "dateAvailableHint": "Leave it empty to make it available immediately.",
+      "sortOrder": "Sort order",
+      "sortOrderHint": "Lower numbers come first in a category listing.",
+      "visible": "Show on the storefront",
+      "visibleOn": "Shoppers can find and buy this product.",
+      "visibleOff": "Hidden from the storefront. Publishing turns this on.",
+      "copy": "Names and descriptions",
+      "copySubtitle": "One version per language your store trades in.",
+      "languageLabel": "Language being written",
+      "perLanguage": "You are editing the {language} version. Only the fields below are per-language — the SKU, price, stock, categories and images are shared.",
+      "name": "Product name",
+      "nameHint": "What shoppers see in listings and search results.",
+      "slug": "URL slug",
+      "slugHint": "Leave it empty and the storefront falls back to the SKU.",
+      "highlights": "Short description",
+      "highlightsHint": "One or two lines, shown beside the product image.",
+      "description": "Full description",
+      "seoTitle": "SEO title",
+      "metaDescription": "Meta description",
+      "keywords": "Keywords",
+      "keywordsHint": "Comma-separated. Used by the storefront’s own search.",
+      "slugPrefix": "/p/",
+      "descriptionPlaceholder": "Describe the product for a shopper. Headings and lists are fine.",
+      "skuChecking": "Checking the SKU…",
+      "dateAvailablePlaceholder": "Available immediately",
+      "keywordsPlaceholder": "Add a keyword…"
+    },
+    "media": {
+      "title": "Images",
+      "subtitle": "The first image is the storefront thumbnail.",
+      "saveFirst": "Save the product first. Images are attached to a product, so there has to be one to attach them to.",
+      "none": "No images yet.",
+      "drop": "Drop an image, or browse",
+      "image": "Product image",
+      "position": "Image {position}",
+      "storefrontThumbnail": "Storefront thumbnail",
+      "view": "View image {position} full size",
+      "moveUp": "Move image {position} earlier",
+      "moveDown": "Move image {position} later",
+      "remove": "Remove image {position}",
+      "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free."
+    },
+    "pricing": {
+      "title": "Price and stock",
+      "subtitle": "One price and one quantity — this platform does not model more than that.",
+      "price": "Price",
+      "priceInvalid": "Enter a price of zero or more.",
+      "quantity": "Quantity in stock",
+      "quantityHint": "A single figure. There are no per-location stock levels on this platform.",
+      "notModelled": "Compare-at price, unit cost and margin, quantity-break tiers, tax class, per-product currency, reorder points and backorders are not recorded anywhere on this platform, so they are not shown here.",
+      "canBePurchased": "Can be bought",
+      "canBePurchasedHint": "Turn this off to show the product without a buy button.",
+      "shipeable": "Needs shipping",
+      "shipeableHint": "Turn this off for a product that is collected or delivered digitally.",
+      "virtual": "Digital product",
+      "virtualHint": "No physical item ships.",
+      "shippingBox": "Shipping box",
+      "shippingBoxSubtitle": "What the courier is quoted on.",
+      "weight": "Weight",
+      "weightUnit": "Weight unit",
+      "length": "Length",
+      "width": "Width",
+      "height": "Height",
+      "dimensionUnit": "Dimension unit",
+      "unit": {
+        "g": "Grams",
+        "kg": "Kilograms",
+        "l": "Litres",
+        "lb": "Pounds",
+        "T": "Tonnes",
+        "cm": "Centimetres",
+        "cu": "Cubic",
+        "ft": "Feet",
+        "in": "Inches",
+        "m": "Metres"
+      },
+      "weightValue": "Weight",
+      "dimensions": "Dimensions"
+    },
+    "organize": {
+      "categories": "Categories",
+      "categoriesSubtitle": "Where shoppers find this product. A product can be in several.",
+      "selectedCount": "{count, plural, one {# category selected} other {# categories selected}}",
+      "noneSelected": "No categories selected. Shoppers will only find this product by search.",
+      "noCategories": "This store has no categories yet. Create some on the Catalogue page first.",
+      "classification": "Brand and type",
+      "classificationSubtitle": "How the product is classified.",
+      "brand": "Brand",
+      "noBrand": "No brand",
+      "brandHint": "Shown on the product page and filterable in listings.",
+      "type": "Product type",
+      "noType": "No product type",
+      "typeHint": "Manage the list on the Catalogue page.",
+      "related": "Related products",
+      "relatedSubtitle": "Shown as “you may also like” on the product page.",
+      "relatedSaveFirst": "Save the product first. Relationships are between two saved products.",
+      "addRelated": "Add a related product",
+      "searchProducts": "Search by name or SKU…",
+      "removeRelated": "Remove {name} from the related products",
+      "noRelated": "No related products yet.",
+      "searchPool": "Searches the products already loaded — the platform has no server-side search by name."
+    },
+    "readiness": {
+      "title": "Ready to publish",
+      "subtitle": "{percent}% complete",
+      "required": "REQ",
+      "done": "Done",
+      "todo": "Still to do",
+      "blocked": "Publishing needs every required item above.",
+      "item": {
+        "sku": "A SKU",
+        "name": "A name in every language",
+        "price": "A price",
+        "category": "At least one category",
+        "brand": "A brand",
+        "image": "At least one image",
+        "description": "A description"
+      },
+      "name": "A name in every language"
+    },
+    "translations": {
+      "title": "Translations",
+      "subtitle": "Which languages this product is written in.",
+      "missing": "Not written",
+      "filled": "{filled} of {total}"
+    },
+    "missingLanguages": "Cannot save yet — no name written in {languages}."
   }
 }

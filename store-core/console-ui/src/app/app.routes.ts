@@ -154,6 +154,55 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * The taxonomy: categories, product types, brands and product groups. The tab is a URL segment
+     * so it is linkable and survives a reload — the shape store management and billing already use.
+     */
+    path: 'catalogue',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    children: [
+      {path: '', redirectTo: 'categories', pathMatch: 'full'},
+      {
+        // An unknown tab is caught in the page and replaced with `categories`, rather than
+        // matched here — a fixed `:tab` list would make adding a tab a two-file change.
+        path: ':tab',
+        loadComponent: () => import('@features/catalogue/catalogue').then((page) => page.Catalogue),
+        data: {titleKey: 'route.catalogue.title', breadcrumbKey: 'shell.breadcrumb.catalogue'},
+      },
+    ],
+  },
+  {
+    /*
+     * Products. Its own branch rather than a fifth catalogue tab: this is a paged, filtered table
+     * with a wizard behind it, and the four taxonomy tabs are small records edited in place. One
+     * route with two behaviours that different would be a worse page than two routes.
+     */
+    path: 'products',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/products/products').then((page) => page.Products),
+        data: {titleKey: 'route.products.title', breadcrumbKey: 'shell.breadcrumb.products'},
+      },
+      // Static before the id param, so this is not read as a product called "new".
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('@features/product-form/product-form').then((page) => page.ProductForm),
+        data: {titleKey: 'route.newProduct.title', breadcrumbKey: 'shell.breadcrumb.newProduct'},
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('@features/product-form/product-form').then((page) => page.ProductForm),
+        data: {titleKey: 'route.productForm.title', breadcrumbKey: 'shell.breadcrumb.productForm'},
+      },
+    ],
+  },
+  {
     path: 'store-management',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     // Authentication and the store list for the whole branch; a *store* is not required, because
