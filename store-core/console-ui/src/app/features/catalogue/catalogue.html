@@ -1,0 +1,77 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="context()">
+    <button class="primary-action" type="button" [disabled]="isEmpty()" (click)="onAdd()">
+      <app-icon name="plus" />
+      {{ facade.addLabel() }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <div class="load-error" role="alert">
+      <app-icon name="bolt" />
+      <p>{{ failure.message }}</p>
+      <button class="secondary-action" type="button" (click)="facade.retry()">
+        {{ t('dashboard.tryAgain') }}
+      </button>
+    </div>
+  }
+
+  <app-busy-overlay [busy]="isLoading() || facade.saving()" [label]="t('catalogue.loading')">
+    @if (isEmpty()) {
+      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
+      <div class="first-load" aria-hidden="true"></div>
+    } @else {
+      <div class="catalogue-body">
+        <app-tab-switcher
+          [tabs]="tabs()"
+          [active]="activeTab()"
+          (activeChange)="onTabChange($event)"
+          [label]="t('catalogue.tabsLabel')"
+          panelId="catalogue-panel"
+        />
+
+        <!--
+          Keyed on the tab so Angular tears the old panel down and builds the new one — without the
+          key it reuses the container and `animate.enter` never fires. The four tabs are different
+          screens, not four states of one.
+        -->
+        @switch (activeTab()) {
+          @case ('categories') {
+            <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
+              <app-category-tab />
+            </div>
+          }
+          @case ('types') {
+            <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
+              <app-type-tab />
+            </div>
+          }
+          @case ('brands') {
+            <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
+              <app-brand-tab />
+            </div>
+          }
+          @case ('groups') {
+            <div id="catalogue-panel" class="tab-panel" animate.enter="tab-panel-in">
+              <app-group-tab />
+            </div>
+          }
+        }
+      </div>
+    }
+  </app-busy-overlay>
+
+  <!--
+    One dialog for all four tabs. Deletion here is not reversible and, for a category, takes the
+    whole branch with it — so the title names the record rather than asking "Are you sure?".
+  -->
+  <app-confirm-dialog
+    [open]="facade.pendingDelete() !== null"
+    [title]="deleteTitle()"
+    [message]="deleteMessage()"
+    [confirmLabel]="t('catalogue.deleteConfirm')"
+    [cancelLabel]="t('actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDelete()"
+  />
+</ng-container>

@@ -1,0 +1,161 @@
+<ng-container *transloco="let t">
+  @if (unavailable()) {
+    <app-notice-bar icon="alertCircle" tone="red" [message]="t('catalogue.types.unavailable')" />
+  }
+
+  <div class="split">
+    <app-panel
+      class="list-panel"
+      [title]="t('catalogue.types.title')"
+      [subtitle]="t('catalogue.types.subtitle', {count: types().length})"
+    >
+      <ul class="type-list">
+        @for (type of types(); track type.id) {
+          <li>
+            <button
+              class="type-row"
+              type="button"
+              [class.current]="type.id === facade.selectedTypeId()"
+              [attr.aria-pressed]="type.id === facade.selectedTypeId()"
+              (click)="facade.select('types', type.id)"
+            >
+              <span class="type-icon" aria-hidden="true"><app-icon name="tag" [size]="15" /></span>
+              <span class="type-copy">
+                <strong dir="auto">{{ type.name }}</strong>
+                <small dir="ltr">{{ type.code }}</small>
+                @if (type.description) {
+                  <span class="type-blurb" dir="auto">{{ type.description }}</span>
+                }
+              </span>
+            </button>
+          </li>
+        } @empty {
+          <li class="list-empty">{{ t('catalogue.types.none') }}</li>
+        }
+      </ul>
+
+      <div class="list-foot">
+        <button class="secondary-action" type="button" (click)="facade.startCreate()">
+          <app-icon name="plus" />
+          {{ t('catalogue.add.types') }}
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel
+      class="editor-panel"
+      [title]="creating() ? t('catalogue.types.newTitle') : (selected()?.name ?? t('catalogue.types.noneTitle'))"
+      [subtitle]="creating() ? t('catalogue.types.newSubtitle') : (selected()?.code ?? null)"
+    >
+      @if (!creating() && !selected()) {
+        <div class="editor-empty">
+          <app-icon name="tag" />
+          <p>{{ t('catalogue.types.empty') }}</p>
+          <button class="secondary-action" type="button" (click)="facade.startCreate()">
+            {{ t('catalogue.add.types') }}
+          </button>
+        </div>
+      } @else {
+        <form class="editor-body" [formGroup]="form" (ngSubmit)="facade.saveType()">
+          <div class="editor-head">
+            <app-locale-chips
+              [languages]="facade.languages()"
+              [active]="facade.activeLanguage()"
+              [translated]="facade.translatedLanguages()"
+              [label]="t('catalogue.copy.languageLabel')"
+              (picked)="facade.setLanguage($event)"
+            />
+
+            @if (!creating() && selected(); as type) {
+              <button
+                class="danger-action"
+                type="button"
+                [disabled]="facade.saving()"
+                (click)="facade.askDelete('types', type.id, type.name)"
+              >
+                <app-icon name="trash" />
+                {{ t('catalogue.types.delete') }}
+              </button>
+            }
+          </div>
+
+          <!--
+            Said once, at the top of the editor, rather than as five disabled controls further
+            down. A type genuinely is this small on this platform, and the operator is better
+            served by knowing that than by a panel of fields that never do anything.
+          -->
+          <app-notice-bar icon="info" tone="blue" [message]="t('catalogue.types.noAttributes')" />
+
+          <app-copy-fields
+            [form]="form.controls.copy"
+            scope="type"
+            [languageName]="facade.activeLanguageName()"
+            [showSlug]="false"
+            (nameChanged)="onNameInput($event)"
+          />
+
+          <hr class="divider" />
+
+          <div class="field-grid">
+            <div class="field field-wide">
+              <label for="type-code">
+                {{ t('catalogue.code') }} <span class="required" aria-hidden="true">*</span>
+              </label>
+              <span class="control">
+                <input id="type-code" type="text" formControlName="code" dir="ltr" required />
+                <!--
+                  Three states on one control: checking, taken, free. The spinner is not decoration —
+                  the check is debounced, so without it the field looks like it has already passed.
+                -->
+                @if (form.controls.code.pending) {
+                  <span class="check-pending" role="status" [attr.aria-label]="t('catalogue.codeChecking')"></span>
+                } @else if (form.controls.code.hasError('codeTaken')) {
+                  <app-icon name="alertCircle" [size]="14" class="check-taken" />
+                } @else if (creating() && form.controls.code.valid && form.controls.code.value) {
+                  <app-icon name="checkCircle" [size]="14" class="check-free" />
+                }
+              </span>
+              @if (form.controls.code.hasError('codeTaken')) {
+                <p class="field-hint error">{{ t('catalogue.codeTaken') }}</p>
+              }
+              <p class="field-hint">{{ t('catalogue.types.codeHint') }}</p>
+              <app-field-error [control]="form.controls.code" [fallback]="t('catalogue.codeInvalid')" />
+            </div>
+
+            <div class="field field-wide">
+              <app-toggle
+                [checked]="form.controls.visible.value"
+                (checkedChange)="form.controls.visible.setValue($event)"
+                [label]="t('catalogue.types.visible')"
+                [description]="t('catalogue.types.visibleHint')"
+              />
+            </div>
+
+            <div class="field field-wide">
+              <app-toggle
+                [checked]="form.controls.allowAddToCart.value"
+                (checkedChange)="form.controls.allowAddToCart.setValue($event)"
+                [label]="t('catalogue.types.allowAddToCart')"
+                [description]="t('catalogue.types.allowAddToCartHint')"
+              />
+            </div>
+          </div>
+
+          <div class="editor-actions">
+            <button class="secondary-action" type="button" (click)="facade.cancelEdit()">
+              {{ t('actions.cancel') }}
+            </button>
+            <button
+              class="primary-action"
+              type="submit"
+              [disabled]="facade.saving()"
+              [attr.aria-busy]="facade.saving()"
+            >
+              {{ creating() ? t('catalogue.types.create') : t('catalogue.types.save') }}
+            </button>
+          </div>
+        </form>
+      }
+    </app-panel>
+  </div>
+</ng-container>

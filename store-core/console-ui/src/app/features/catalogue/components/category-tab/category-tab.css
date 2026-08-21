@@ -1,0 +1,49 @@
+/*
+ * List on one side, editor on the other. The proportion is deliberate: the tree needs less width
+ * than the form, and giving them equal halves left every category name truncated next to a lot of
+ * empty space.
+ */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.panel-controls {
+  display: flex;
+  gap: .35rem;
+}
+
+.tree-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  padding: .75rem;
+}
+
+.add-root {
+  align-self: flex-start;
+}
+
+.tree-hint {
+  margin: 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Below the console's own two-column breakpoint the panels stack rather than shrink. */
+@media (max-width: 1100px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
