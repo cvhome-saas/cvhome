@@ -52,6 +52,14 @@ class StoreProvisioningServiceTest {
 
     private static final String STORE_NAME = "a-store";
 
+    private static final String REFUSAL_DETAIL = "refused";
+
+    private static final String REFUSAL_CODE = "MERCHANT.STORE.INVALID";
+
+    private static final String FIELD = "email";
+
+    private static final String FIELD_MESSAGE = "must not be null";
+
     private InternalStoreService storeService;
 
     private MerchantStorePodClient podClient;
@@ -120,14 +128,14 @@ class StoreProvisioningServiceTest {
         when(storeService.findStore(STORE)).thenReturn(storeIn(ProvisioningState.NOT_STARTED_PROVISIONING));
         when(podClient.create(any())).thenThrow(
                 UnmappedRemoteFailureException.of(com.asrevo.cvhome.errors.CommonErrors.REMOTE_UNAVAILABLE,
-                        "refused", Map.of(), java.util.List.of(), MERCHANT, "MERCHANT.STORE.INVALID", 422));
+                        REFUSAL_DETAIL, Map.of(), java.util.List.of(), MERCHANT, REFUSAL_CODE, 422));
 
         assertThatCode(() -> service.provisioning(ORG, STORE, POD, request())).doesNotThrowAnyException();
 
         // The reason the pod gave is what the row records; without it the console can only say "failed".
         ArgumentCaptor<String> reason = ArgumentCaptor.forClass(String.class);
         verify(storeService).failProvisioning(eq(STORE), reason.capture());
-        assertThat(reason.getValue()).contains("MERCHANT.STORE.INVALID").contains("refused");
+        assertThat(reason.getValue()).contains(REFUSAL_CODE).contains(REFUSAL_DETAIL);
     }
 
     @Test
@@ -137,14 +145,14 @@ class StoreProvisioningServiceTest {
         when(podClient.create(any())).thenThrow(
                 UnmappedRemoteFailureException.of(com.asrevo.cvhome.errors.CommonErrors.REMOTE_UNAVAILABLE,
                         "Request validation failed.", Map.of(),
-                        java.util.List.of(FieldError.of("email", "VALIDATION.REQUIRED", "must not be null")),
+                        java.util.List.of(FieldError.of(FIELD, "VALIDATION.REQUIRED", FIELD_MESSAGE)),
                         MERCHANT, "COMMON.VALIDATION_FAILED", 400));
 
         service.provisioning(ORG, STORE, POD, request());
 
         ArgumentCaptor<String> reason = ArgumentCaptor.forClass(String.class);
         verify(storeService).failProvisioning(eq(STORE), reason.capture());
-        assertThat(reason.getValue()).contains("email").contains("must not be null");
+        assertThat(reason.getValue()).contains(FIELD).contains(FIELD_MESSAGE);
     }
 
     @Test
