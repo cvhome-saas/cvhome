@@ -3,7 +3,6 @@ import {Observable, catchError, forkJoin, map, of} from 'rxjs';
 
 import {StatisticService} from '@api/analytics/statistic.service';
 import {PaymentService} from '@api/payment/payment.service';
-import {AWAITING_VERIFICATION} from '@models/payment';
 import type {
   AttentionItem,
   CustomerSplitSegment,
@@ -87,11 +86,16 @@ export class DashboardApi {
       previousOrders: this.statistics.orderStatistic(previous),
       countries: this.statistics.customerStatistic(current),
       products: this.statistics.productStatistic(current),
-      // TODO(lessons.md): counting requires fetching a page — see lessons.md, "Dashboard — counting
-      // requires fetching". Null rather than 0 when payments cannot be reached.
-      awaitingApproval: this.payments
-        .countByStatus(AWAITING_VERIFICATION)
-        .pipe(catchError(() => of(null))),
+      /*
+       * TODO(lessons.md): counting requires fetching a page — see lessons.md, "Dashboard — counting
+       * requires fetching". Null rather than 0 when payments cannot be reached.
+       *
+       * This counted `WAITING_VERIFICATION` when the tile shipped, and therefore counted **zero,
+       * always**: no processor ever sets that status — a manual transfer awaiting a person sits in
+       * `PENDING`. It was not visibly wrong, because zero is a plausible answer, which is what made
+       * it worth finding. See lessons.md, "Payments — the approval queue's own status is never set".
+       */
+      awaitingApproval: this.payments.countAwaitingApproval().pipe(catchError(() => of(null))),
     }).pipe(
       map(({orders, previousOrders, countries, products, awaitingApproval}) => {
         const byStatus = sumByName(orders);

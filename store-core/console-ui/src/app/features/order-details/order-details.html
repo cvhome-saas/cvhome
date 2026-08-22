@@ -293,6 +293,37 @@
                 </div>
               </app-panel>
 
+              <!--
+                The payments behind this order — the panel seller-ui drew and never filled: its
+                transactions dialog read a signal nothing ever set. Reachable now only because
+                checkout writes the order id into the payment request's `ref`, which is a convention
+                and not a relation. See lessons.md, "Payments — the link from a transaction to its
+                order is a convention".
+
+                Read-only: approving and rejecting live on /payments, where the queue is.
+              -->
+              <app-panel [title]="t('orderDetails.payments')">
+                @if (facade.payments().length) {
+                  <ul class="panel-pad payment-list">
+                    @for (payment of facade.payments(); track payment.id) {
+                      <li class="payment-row">
+                        <div class="payment-copy">
+                          <strong>{{ payment.method }}</strong>
+                          <small class="payment-ref">{{ payment.internalRef }}</small>
+                        </div>
+                        <app-badge [tone]="payment.tone" shape="square">{{ payment.status }}</app-badge>
+                        <span class="payment-amount">{{ payment.amount }}</span>
+                        <span class="payment-date">
+                          {{ payment.takenOn ? (payment.takenOn | translocoDate: {dateStyle: 'medium'}) : '—' }}
+                        </span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="panel-pad muted">{{ t('orderDetails.noPayments') }}</p>
+                }
+              </app-panel>
+
               <app-panel [title]="t('orderDetails.status')">
                 <dl class="panel-pad flags">
                   @for (flag of facade.flags(); track flag.labelKey) {

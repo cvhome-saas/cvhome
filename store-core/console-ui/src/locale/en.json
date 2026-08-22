@@ -1309,7 +1309,9 @@
     "emailInvoice": "Email",
     "emailNotAvailable": "Emailing invoices is not available yet.",
     "commentVisible": "Visible to the customer",
-    "badReference": "“{reference}” is not an order reference."
+    "badReference": "“{reference}” is not an order reference.",
+    "payments": "Payments",
+    "noPayments": "No payment has been recorded against this order."
   },
   "status": {
     "CREATED": "Created",

@@ -13,7 +13,10 @@ import {
   type OrderStatus,
   type OrderTotal,
 } from '@models/checkout';
-import {STATUS_TONE} from '@models/orders';
+import {STATUS_TONE, humanizeStatus} from '@models/orders';
+import {PAYMENT_TYPE_LABEL_KEY, isPaymentType} from '@models/store-settings';
+import {TRANSACTION_TONE} from '@models/transactions';
+import type {Tone} from '@models/ui';
 import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
 import {TotalLabel} from '@shared/i18n/total-label';
@@ -62,6 +65,17 @@ export interface FulfilmentStage {
   readonly reachedAt: string | null;
   /** How full the stage's bar is: 1 for reached, a half-step for the one in progress. */
   readonly fill: number;
+}
+
+/** One payment taken against this order, as the panel prints it. */
+export interface OrderPayment {
+  readonly id: number;
+  readonly internalRef: string;
+  readonly method: string;
+  readonly status: string;
+  readonly tone: Tone;
+  readonly amount: string;
+  readonly takenOn: string | null;
 }
 
 export interface TimelineEntry {
@@ -279,6 +293,31 @@ export class OrderDetailsFacade {
 
   readonly billing = computed(() => this.addressOf(this.order()?.billing, this.order()?.billing?.email));
   readonly delivery = computed(() => this.addressOf(this.order()?.delivery, null));
+
+  /**
+   * The payments taken against this order.
+   *
+   * Found through `requestRef`, which holds the order id by a checkout convention rather than by a
+   * typed relation — see lessons.md, "Payments — the link from a transaction to its order is a
+   * convention". This is the panel seller-core's own comment said was never populated: its
+   * transactions dialog read a signal nothing ever set.
+   *
+   * Read-only. Approving and rejecting live on `/payments`, where the queue is.
+   */
+  readonly payments = computed<readonly OrderPayment[]>(() => {
+    const taken = this.detail.hasValue() ? (this.detail.value()?.payments ?? []) : [];
+    return taken.map((payment) => ({
+      id: payment.id,
+      internalRef: payment.internalRef,
+      method: isPaymentType(payment.paymentType)
+        ? this.transloco.translate(PAYMENT_TYPE_LABEL_KEY[payment.paymentType])
+        : humanizeStatus(payment.paymentType),
+      status: this.statusLabels.label(payment.status),
+      tone: TRANSACTION_TONE[payment.status] ?? 'slate',
+      amount: this.money.format(payment.amount ?? null, payment.currency?.code ?? null),
+      takenOn: payment.transactionDate || null,
+    }));
+  });
 
   readonly flags = computed(() => {
     const order = this.order();

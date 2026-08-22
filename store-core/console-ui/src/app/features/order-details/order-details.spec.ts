@@ -54,6 +54,20 @@ const DETAIL: OrderDetail = {
     {id: 2, orderStatus: 'PROCESSING', comments: 'Picking started', date: '2026-08-04T14:00:00Z'},
   ],
   countries: new Map([['US', 'United States']]),
+  payments: [
+    {
+      id: 7,
+      internalRef: '2f2a9d18-6c4c-4f0e-9f7a-1c0a2b3d4e5f',
+      // The order id, which is the only thing linking a payment to an order.
+      requestRef: '4187',
+      amount: 248.5,
+      currency: {code: 'USD'},
+      paymentType: 'STRIPE',
+      status: 'PAID',
+      transactionDate: '2026-08-04T10:16:00Z',
+      transactionNo: 'ch_3P9xyz',
+    },
+  ],
 };
 
 class FakeOrderDetailsApi {
@@ -365,5 +379,26 @@ describe('OrderDetails', () => {
 
     expect(element.querySelector('app-load-error')).toBeNull();
     expect(element.querySelectorAll('.items tbody tr').length).toBe(2);
+  }));
+
+  /*
+   * The panel seller-ui drew and never filled — its transactions dialog read a signal nothing ever
+   * set. Reachable only through the `requestRef` convention; see lessons.md.
+   */
+  it('lists the payments taken against the order', fakeAsync(() => {
+    const element = load();
+
+    const row = element.querySelector('.payment-row')!;
+    expect(row.textContent).toContain('Stripe');
+    expect(row.textContent).toContain('Paid');
+    expect(row.textContent).toContain('$248.50');
+  }));
+
+  it('says so rather than showing a blank panel when an order has no payments', fakeAsync(() => {
+    api.detail = {...DETAIL, payments: []};
+    const element = load();
+
+    expect(element.querySelector('.payment-row')).toBeNull();
+    expect(element.textContent).toContain('No payment has been recorded against this order.');
   }));
 });

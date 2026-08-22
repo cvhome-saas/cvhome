@@ -34,8 +34,15 @@ class FakeStatisticService {
 
 class FakePaymentService {
   count: number | null = 3;
+  calls = 0;
 
-  countByStatus(): Observable<number> {
+  /*
+   * `countAwaitingApproval`, not `countByStatus`. The tile counted `WAITING_VERIFICATION` when it
+   * shipped and therefore counted zero forever — nothing sets that status. This fake having only the
+   * one method is what would fail if the dashboard reverted to the other.
+   */
+  countAwaitingApproval(): Observable<number> {
+    this.calls += 1;
     return this.count === null ? throwError(() => new Error('payments is down')) : of(this.count);
   }
 }

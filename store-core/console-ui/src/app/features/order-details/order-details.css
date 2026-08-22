@@ -1127,3 +1127,61 @@
 .invoice-items small {
   unicode-bidi: plaintext;
 }
+
+/* ---- Payments panel ---------------------------------------------------------------- */
+
+/*
+ * The payments taken against this order. Four columns rather than a table: there is rarely more
+ * than one row, and a `data-table` for a single line reads as an empty grid.
+ */
+.payment-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.payment-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+}
+
+.payment-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.payment-copy strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The gateway's own reference: Latin data that must not reorder inside an Arabic page. */
+.payment-ref {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.payment-amount {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: end;
+}
+
+.payment-date {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-align: end;
+}

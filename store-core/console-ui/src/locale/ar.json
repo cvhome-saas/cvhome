@@ -1309,7 +1309,9 @@
     "emailInvoice": "إرسال بالبريد",
     "emailNotAvailable": "إرسال الفواتير بالبريد غير متاح بعد.",
     "commentVisible": "مرئي للعميل",
-    "badReference": "«{reference}» ليس رقم طلب صالحًا."
+    "badReference": "«{reference}» ليس رقم طلب صالحًا.",
+    "payments": "المدفوعات",
+    "noPayments": "لم تُسجَّل أي دفعة على هذا الطلب."
   },
   "status": {
     "CREATED": "أُنشئ",
