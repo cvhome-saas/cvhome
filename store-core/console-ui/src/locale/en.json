@@ -1924,7 +1924,8 @@
       "noItems": "This order has no line items.",
       "total": "Order total",
       "quantity": "×",
-      "close": "Close the order summary"
+      "close": "Close the order summary",
+      "items": "Items"
     },
     "viewOrderFor": "Open a summary of order {{order}}"
   }

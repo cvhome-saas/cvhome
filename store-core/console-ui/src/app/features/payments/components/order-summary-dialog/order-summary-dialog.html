@@ -36,15 +36,25 @@
       </dl>
 
       @if (order.lines.length) {
-        <ul class="summary-lines">
-          @for (line of order.lines; track line.id) {
-            <li class="summary-line">
-              <span class="summary-line-name">{{ line.name }}</span>
-              <span class="summary-line-qty">{{ quantityLabel() }} {{ line.quantity }}</span>
-              <span class="summary-line-total">{{ line.lineTotal }}</span>
-            </li>
-          }
-        </ul>
+        <p class="summary-items-head">
+          {{ itemsHeading() }} <span class="summary-items-count">{{ order.lines.length }}</span>
+        </p>
+        <!--
+          The fade belongs to the wrapper, not the list: a pseudo-element inside the scroller would
+          scroll away with the content. It is harmless on a short order, where it overlays the
+          dialog's own background and cannot be seen.
+        -->
+        <div class="summary-lines-wrap">
+          <ul class="summary-lines">
+            @for (line of order.lines; track line.id) {
+              <li class="summary-line">
+                <span class="summary-line-name">{{ line.name }}</span>
+                <span class="summary-line-qty">{{ quantityLabel() }} {{ line.quantity }}</span>
+                <span class="summary-line-total">{{ line.lineTotal }}</span>
+              </li>
+            }
+          </ul>
+        </div>
       } @else {
         <p class="summary-note">{{ itemsLabel() }}</p>
       }

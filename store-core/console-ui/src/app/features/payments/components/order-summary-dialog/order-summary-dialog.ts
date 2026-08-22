@@ -40,6 +40,7 @@ export class OrderSummaryDialog {
   readonly customerLabel = input.required<string>();
   readonly placedLabel = input.required<string>();
   readonly itemsLabel = input.required<string>();
+  readonly itemsHeading = input.required<string>();
   readonly totalLabel = input.required<string>();
   readonly quantityLabel = input.required<string>();
   readonly closeLabel = input.required<string>();

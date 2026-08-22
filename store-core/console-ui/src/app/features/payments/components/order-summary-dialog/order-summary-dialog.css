@@ -115,6 +115,46 @@
   unicode-bidi: plaintext;
 }
 
+.summary-items-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* The figure is data, not a label, so it does not take the label's letter-spacing. */
+.summary-items-count {
+  color: var(--secondary-foreground);
+  letter-spacing: normal;
+}
+
+/*
+ * Holds the fade over the scroller's bottom edge.
+ *
+ * Without it a capped list ends on a half-cut row that reads as a rendering fault rather than as
+ * "there is more". The gradient runs to the dialog's own background, so on a short order it covers
+ * empty space and is invisible — no need to detect whether the list actually overflows.
+ */
+.summary-lines-wrap {
+  position: relative;
+  min-block-size: 0;
+}
+
+.summary-lines-wrap::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1.75rem;
+  background: linear-gradient(to bottom, transparent, var(--background));
+  pointer-events: none;
+}
+
 .summary-lines {
   display: grid;
   gap: 0.55rem;
@@ -122,13 +162,25 @@
   max-block-size: 15rem;
   margin: 0;
   padding-inline-start: 0;
+  /* Room under the last row so the fade never sits on top of a figure. */
+  padding-block-end: 0.75rem;
   overflow-y: auto;
   list-style: none;
+  scrollbar-width: thin;
 }
 
+/*
+ * Fixed tracks for the two right-hand columns, not `auto`.
+ *
+ * Each row is its own grid — `display: contents` would share one, but it costs the `<li>` its list
+ * semantics in some browsers — so `auto` columns size to *their own row's* content and the quantity
+ * column lands at a different x on every line. With one item that is invisible; with seven the
+ * column is visibly ragged. Naming the widths lines them up, and both cells align to their end so
+ * the figures read as columns rather than as runs of text.
+ */
 .summary-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) 2.75rem minmax(7rem, auto);
   gap: 0.75rem;
   align-items: baseline;
   font-size: var(--text-xs);
@@ -144,11 +196,13 @@
 .summary-line-qty {
   color: var(--foreground-subtle);
   font-size: var(--text-3xs);
+  text-align: end;
 }
 
 .summary-line-total {
   color: var(--foreground-strong);
   font-weight: 600;
+  text-align: end;
 }
 
 .summary-total {
