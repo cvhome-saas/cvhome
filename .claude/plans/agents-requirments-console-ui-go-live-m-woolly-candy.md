@@ -726,6 +726,38 @@ known-set pattern, `core/http/crud.service.ts`, `core/errors/*`.
 
 ---
 
+## Between Module 6 and Module 7 — the alignment pass — **done**
+
+Shipped in nine commits (`chore(console-ui): the dead layer…` through
+`docs(console-ui): the base architecture`). Not a module: no feature gained a capability and no
+endpoint was newly called. Six modules had each been built against their own plan, and the shared
+layer had grown by accretion — a control added when a module needed it, never retrofitted to the
+modules before it.
+
+**What it changed, which every later module now depends on:**
+
+- **`store-core/console-ui/ARCHITECTURE.md` exists**, and it is the contract a module plan cites
+  rather than restating. The tiers, the shape of a feature, the facade naming, the loading/empty/
+  error trio, the shared control catalogue, the form rules, the page contract, the i18n and styling
+  rules, and the QA checklist are all there.
+- **A module plan's "New components" section must first check §4 of that document.** Five copies of
+  the field vocabulary existed because each module wrote its own; the catalogue is what stops a
+  sixth.
+- **There are no raw `<input>`, `<select>`, `<textarea>` or checkbox elements left in a feature.**
+  `app-form-field` with `app-text-field`, `app-textarea`, `app-select`, `app-number-field` and
+  `app-checkbox` is how a form is built now.
+- **`snapshot()`, `optionalOne`/`optionalList`, `uniqueAsync` and `formDirty`** replace the
+  copy-pasted versions in seven facades, four api services and three form services.
+- **`models/` is a leaf, one feature may not import another, and every branch declares its render
+  mode** — all four enforced by eslint or a spec rather than by convention.
+- **`npm run lint` now runs stylelint, a lessons.md citation check and an unused-key check** beside
+  eslint. The citation check found two references that had already rotted.
+- **The api tier went from 1 spec to 22.** 696 specs in total, up from 539.
+
+Module 7 starts from a documented base rather than from Module 6's habits.
+
+---
+
 ## Module 6 — Product catalogue
 
 ### Context

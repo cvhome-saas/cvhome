@@ -1,59 +1,43 @@
-# ConsoleUi
+# console-ui
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.28.
+The seller console for cvhome — the application a merchant signs into to run their stores.
 
-## Development server
+Angular 20 (standalone, SSR), Tailwind v4 over a three-theme token layer, Transloco for English and
+Arabic with full right-to-left support. It is replacing `store-core/seller-ui`, module by module;
+`lessons.md` records what the platform cannot do yet and what the console does instead.
 
-To start a local development server, run:
+## Running it
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+The console expects the gateway, tenancy and the pods to be up, so the usual way to run it is as
+part of the local stack:
 
 ```bash
-ng generate component component-name
+./run-lcl.sh            # from the repository root — starts everything, console-ui included
+restart console-ui      # rebuild just this app; never `kill` it, the stack tracks its pid
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Then open `http://console-ui.gateway.com` (`configure-domain.sh` adds the hosts entry).
+
+On its own, against whatever the environment points at:
 
 ```bash
-ng generate --help
+npm install
+npm run dev             # http://localhost:4200
 ```
 
-## Building
-
-To build the project run:
+## Working on it
 
 ```bash
-ng build
+npm run build           # AOT. Run before committing — strict template checking lives here
+npm run lint            # eslint + stylelint + lessons citations + unused i18n keys
+npm run test:ci         # non-interactive
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Documentation
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| | |
+|---|---|
+| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | The tiers, the shape of a feature, the shared control catalogue, and the rules a new page follows. |
+| [`DESIGN.md`](./DESIGN.md) | The visual system: tokens, the three themes, the named rules. Read by the design-review tooling. |
+| [`lessons.md`](./lessons.md) | Every backend capability the console needs and does not have. Append-only, one entry per gap. |
+| [`CLAUDE.md`](./CLAUDE.md) | The short version, plus the rules that are easiest to break. |

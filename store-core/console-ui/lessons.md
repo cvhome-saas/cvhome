@@ -1791,3 +1791,59 @@ behind it worth keeping.
   Absent keys mean "not counted", which the console must render differently from zero.
 - **Placeholder:** `TODO(lessons.md)` in `features/billing/billing.html`; the list renders the ceiling
   alone under a note saying usage is not available yet.
+
+## The alignment pass — what six modules of drift looked like
+
+Not backend gaps. The console-side findings from the pass between Module 6 and Module 7, recorded
+because each has a rule behind it that `ARCHITECTURE.md` now states, and because several were
+invisible until something was measured rather than read.
+
+- **A field was defined five times.** `.field`, `.control`, `.field-label` and `.required` existed
+  in the catalogue's `editor-card.css`, the product form's near-identical copy of it, store
+  management's `settings-card.css`, create-store's page sheet and auth's element selectors. They had
+  drifted to two paddings, two textarea heights and one invalid state between them. Nobody decided
+  that; each was copied from the last one at the moment a module needed a form.
+
+- **The same is true of everything a page does that is not its content.** Nine load-error blocks in
+  four shapes, eight first-load slabs at three heights, seven entry keyframes from 8px to 20px, six
+  spinners for one rotating circle, four names for one square icon button, seven class names for an
+  empty state. The pattern is always the same: the second module copies the first because copying is
+  cheaper than extracting, and the fourth no longer knows the first exists.
+
+- **A `[value]` or `[checked]` binding only writes when the expression differs from what it last
+  *wrote*.** A click changes the DOM behind its back, so a model reset to the value it held before
+  the click writes nothing and the control stays visibly wrong — which is exactly what a rejected
+  save looks like from the operator's side. A control that owns DOM state has to drive it from the
+  signal. `app-toggle` never had the problem, because a button with `aria-checked` has no DOM state
+  of its own to fall out of step.
+
+- **Passing `id` to a component with an `id` input puts it on the host as well as on the control.**
+  Two elements shared one id, `<label for>` resolved to the host — which is not labelable — and the
+  association silently did not happen. Four of the six controls with an `id` input had shipped that
+  way. Found by probing where the id actually went, not by reading the template.
+
+- **Setting a `model()` emits synchronously.** A host listening to the output runs *inside* the
+  input handler, so writing the form control after setting the model overwrites anything the host
+  normalised. The domain field's paste-a-URL cleanup was being undone one line later.
+
+- **A test fake must not import the production constant it stands in for.** `console-api.fake` read
+  the real navigation, so a spec asserting on the rail could not fail however wrong that constant
+  became.
+
+- **Two of the audits I commissioned were confidently wrong, in both directions.** One reported 37
+  dead translation keys; 25 were composed at runtime — `marketing.entitlement.${key}.limit`,
+  `'legal.' + document + '.title'` — and deleting them would have taken the pricing table and both
+  legal pages down under the strict missing-key handler. Another reported a dozen dead exports that
+  were types in public signatures. And `details-section`'s `['KG','LB']` looks exactly like the
+  invented uppercase subset lessons.md records fixing in the product form, but the backend genuinely
+  has two enums: `WeightUnit {LB, KG}` for a store and `WeightUnitOfMeasure {g,kg,l,lb,T}` for a
+  product. Verify before deleting; a grep does not know what a template literal builds.
+
+- **A rule that cannot fire is worse than no rule.** An eslint rule to catch backticks inside inline
+  templates can never run, because the backtick makes the file unparseable and the AST never forms.
+  The parse error is the signal; it is just an unhelpfully worded one, and `CLAUDE.md` now says so.
+
+- **`npm test` and `tsc --noEmit` both pass on templates that do not compile.** Strict template
+  checking lives in the AOT build. A bare boolean attribute on a component input, an unknown
+  element, a mistyped binding — none of them appear until `npm run build`.
+
