@@ -65,6 +65,9 @@
     },
     "users": {
       "title": "Users"
+    },
+    "acceptInvitation": {
+      "title": "Join an organization"
     }
   },
   "notFound": {
@@ -1961,7 +1964,10 @@
       "user": "User",
       "roles": "Roles",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "email": "Email",
+      "role": "Role",
+      "expires": "Expires"
     },
     "status": {
       "active": "Active",
@@ -1999,7 +2005,8 @@
       "rolesHint": "What this person may do. At least one is required.",
       "rolesUnavailable": "The list of roles could not be loaded, so only the roles this account already has are shown.",
       "active": "Allow sign-in",
-      "activeHint": "A disabled account keeps its history and cannot sign in."
+      "activeHint": "A disabled account keeps its history and cannot sign in.",
+      "role": "Role"
     },
     "action": {
       "addUser": "Add user",
@@ -2011,7 +2018,12 @@
       "disable": "Block sign-in",
       "resetPassword": "Set password",
       "closeDetails": "Close details",
-      "notOnYourself": "You cannot do this to your own account."
+      "notOnYourself": "You cannot do this to your own account.",
+      "invite": "Invite user",
+      "resend": "Resend",
+      "resendFor": "Resend the invitation to {{email}}",
+      "revoke": "Revoke",
+      "revokeFor": "Revoke the invitation to {{email}}"
     },
     "delete": {
       "title": "Delete this account?",
@@ -2032,7 +2044,46 @@
       "deleted": "{{name}} was deleted.",
       "enabled": "{{name}} can sign in again.",
       "disabled": "{{name}} can no longer sign in.",
-      "passwordReset": "A new password was set for {{name}}."
+      "passwordReset": "A new password was set for {{name}}.",
+      "revoked": "The invitation to {{email}} was revoked."
+    },
+    "tabsLabel": "Team and invitations",
+    "tab": {
+      "team": "Team",
+      "invitations": "Invitations"
+    },
+    "invitationStatus": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REVOKED": "Revoked",
+      "EXPIRED": "Expired"
+    },
+    "invitations": {
+      "title": "Invitations",
+      "subtitle": "Everyone who has been asked to join this organization.",
+      "empty": {
+        "title": "No invitations yet",
+        "message": "Invite someone to give them access to this organization's stores."
+      }
+    },
+    "invite": {
+      "title": "Invite someone to join",
+      "message": "They will join this organization with the role you choose. They need a cvhome account to accept.",
+      "invalid": "Enter a valid email address and choose a role.",
+      "noMailHint": "Nothing is emailed. You will be given a link to send them yourself.",
+      "confirm": "Create invitation",
+      "busy": "Creating…"
+    },
+    "issued": {
+      "title": "Send them this link",
+      "message": "The invitation for {{email}} is ready. Copy the link and send it to them however you normally would.",
+      "linkLabel": "Invitation link",
+      "warning": "This is the only time this link can be shown. Close this and it cannot be recovered — you would have to resend the invitation, which creates a different link.",
+      "done": "I have copied it"
+    },
+    "revoke": {
+      "title": "Revoke this invitation?",
+      "message": "The link sent to {{email}} will stop working. You can invite them again later."
     }
   },
   "role": {
@@ -2042,5 +2093,23 @@
     "STORE_MODERATOR": "Store moderator",
     "STORE_RETAIL": "Retail",
     "USER": "User"
+  },
+  "acceptInvitation": {
+    "title": "Join this organization",
+    "message": "You have been invited to join. Accepting adds your account to the organization and gives you access to its stores.",
+    "action": "Accept invitation",
+    "busy": "Accepting…",
+    "hint": "An invitation can only be accepted once.",
+    "joined": {
+      "title": "You are in",
+      "message": "Your account has been added to the organization. You can open the console now.",
+      "action": "Open the console"
+    },
+    "refused": {
+      "title": "This invitation cannot be used",
+      "noToken": "This link is missing its invitation token, so there is nothing to accept.",
+      "retry": "Try again",
+      "hint": "It may have already been used, been revoked, or expired. Ask whoever invited you to send a new one."
+    }
   }
 }

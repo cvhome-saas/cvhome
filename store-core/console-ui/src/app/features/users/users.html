@@ -11,7 +11,14 @@
       [subtitle]="heading().context"
       [disabled]="isLoading() || isEmpty()"
     />
-    @if (facade.canManageUsers) {
+    @if (facade.activeTab() === 'invitations') {
+      @if (facade.canManageInvitations) {
+        <button class="primary-action" type="button" (click)="facade.startInvite()">
+          <app-icon name="send" />
+          {{ t('users.action.invite') }}
+        </button>
+      }
+    } @else if (facade.canManageUsers) {
       <button class="primary-action" type="button" (click)="facade.startCreate()">
         <app-icon name="userPlus" />
         {{ t('users.action.addUser') }}
@@ -48,7 +55,87 @@
           [message]="t('users.scopedToStore', {store: facade.storeName()})"
         />
 
-        <div class="split users-split">
+        <app-tab-switcher
+          [tabs]="facade.tabs()"
+          [active]="facade.activeTab()"
+          (activeChange)="onTab($event)"
+          [label]="t('users.tabsLabel')"
+          panelId="users-panel"
+        />
+
+        @if (facade.activeTab() === 'invitations') {
+          <app-panel
+            id="users-panel"
+            class="invitations-panel"
+            [title]="t('users.invitations.title')"
+            [subtitle]="t('users.invitations.subtitle')"
+          >
+            @if (facade.invitationsError(); as failure) {
+              <app-load-error [message]="failure.message" (retry)="facade.reloadInvitations()" />
+            } @else if (facade.invitationRows().length) {
+              <app-data-table [columns]="invitationColumns()" [label]="t('users.invitations.title')">
+                @for (invitation of facade.invitationRows(); track invitation.id) {
+                  <app-table-row>
+                    <span class="cell-email" role="cell" [attr.data-label]="t('users.column.email')" dir="auto">
+                      {{ invitation.email }}
+                    </span>
+
+                    <span class="cell-roles" role="cell" [attr.data-label]="t('users.column.role')">
+                      {{ facade.roleLabel(invitation.role) }}
+                    </span>
+
+                    <div class="cell-status" role="cell" [attr.data-label]="t('users.column.status')">
+                      <app-badge [tone]="invitation.tone" shape="square">
+                        {{ facade.invitationStatusLabel(invitation.status) }}
+                      </app-badge>
+                    </div>
+
+                    <span class="cell-date" role="cell" [attr.data-label]="t('users.column.expires')">
+                      {{ invitation.expiresAt | translocoDate: {dateStyle: 'medium'} }}
+                    </span>
+
+                    <div class="cell-actions" role="cell" [attr.data-label]="t('users.column.actions')">
+                      <!--
+                        Only a pending invitation can be acted on. Resending rotates the token and
+                        invalidates the old link, which is why it is offered rather than "copy the
+                        link again" — that is impossible, only the hash is stored.
+                      -->
+                      @if (invitation.pending && facade.canManageInvitations) {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          [title]="t('users.action.resend')"
+                          [attr.aria-label]="t('users.action.resendFor', {email: invitation.email})"
+                          [disabled]="busy()"
+                          (click)="facade.resend(invitation)"
+                        >
+                          <app-icon name="undo" />
+                        </button>
+                        <button
+                          class="icon-action danger-action"
+                          type="button"
+                          [title]="t('users.action.revoke')"
+                          [attr.aria-label]="t('users.action.revokeFor', {email: invitation.email})"
+                          [disabled]="busy()"
+                          (click)="facade.askToRevoke(invitation)"
+                        >
+                          <app-icon name="x" />
+                        </button>
+                      }
+                    </div>
+                  </app-table-row>
+                }
+              </app-data-table>
+            } @else {
+              <app-empty-state
+                icon="send"
+                [title]="t('users.invitations.empty.title')"
+                [message]="t('users.invitations.empty.message')"
+              />
+            }
+          </app-panel>
+        } @else {
+        <div class="split users-split" id="users-panel">
           <app-panel class="team-panel" [title]="t('users.allUsers')" [subtitle]="facade.subtitle()">
             @if (rows().length) {
               <app-data-table id="users-table" [columns]="columns()" [label]="t('users.allUsers')">
@@ -308,6 +395,7 @@
             </app-panel>
           }
         </div>
+        }
       </div>
     }
   </app-busy-overlay>
@@ -345,4 +433,47 @@
     />
   }
 
+  @if (facade.inviting()) {
+    <app-invite-dialog
+      [open]="true"
+      [busy]="busy()"
+      [title]="t('users.invite.title')"
+      [message]="t('users.invite.message')"
+      [emailLabel]="t('users.field.email')"
+      [roleLabel]="t('users.field.role')"
+      [roles]="roleOptions()"
+      [invalidMessage]="t('users.invite.invalid')"
+      [noMailHint]="t('users.invite.noMailHint')"
+      [confirmLabel]="t('users.invite.confirm')"
+      [busyLabel]="t('users.invite.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (invited)="facade.invite($event.email, $event.role)"
+      (dismissed)="facade.dismissInvite()"
+    />
+  }
+
+  @if (facade.issued(); as issued) {
+    <app-invitation-link-dialog
+      [open]="true"
+      [title]="t('users.issued.title')"
+      [message]="t('users.issued.message', {email: issued.email})"
+      [linkLabel]="t('users.issued.linkLabel')"
+      [link]="issued.link"
+      [warning]="t('users.issued.warning')"
+      [doneLabel]="t('users.issued.done')"
+      (dismissed)="facade.dismissIssued()"
+    />
+  }
+
+  @if (facade.revoking(); as invitation) {
+    <app-confirm-dialog
+      [open]="true"
+      [title]="t('users.revoke.title')"
+      [message]="t('users.revoke.message', {email: invitation.email})"
+      [confirmLabel]="t('users.action.revoke')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (confirmed)="facade.confirmRevoke()"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
 </ng-container>

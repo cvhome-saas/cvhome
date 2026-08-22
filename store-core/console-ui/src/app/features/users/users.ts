@@ -3,6 +3,8 @@ import {Router} from '@angular/router';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
+import {TranslocoDatePipe} from '@jsverse/transloco-locale';
+
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Checkbox} from '@shared/ui/checkbox/checkbox';
@@ -20,8 +22,12 @@ import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Pagination} from '@shared/ui/pagination/pagination';
 import {Panel} from '@shared/ui/panel/panel';
+import {Select, type SelectOption} from '@shared/ui/select/select';
+import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
+import {InvitationLinkDialog} from './components/invitation-link-dialog/invitation-link-dialog';
+import {InviteDialog} from './components/invite-dialog/invite-dialog';
 import {SetPasswordDialog} from './components/set-password-dialog/set-password-dialog';
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 
@@ -33,8 +39,17 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
   {key: 'actions', labelKey: '', width: '5rem'},
 ];
 
+/** The invitations table's columns. */
+const INVITATION_COLUMN_KEYS: readonly {key: string; labelKey: string; width: string}[] = [
+  {key: 'email', labelKey: 'users.column.email', width: 'minmax(11rem, 2fr)'},
+  {key: 'role', labelKey: 'users.column.role', width: 'minmax(8rem, 1fr)'},
+  {key: 'status', labelKey: 'users.column.status', width: 'minmax(6rem, 0.8fr)'},
+  {key: 'expires', labelKey: 'users.column.expires', width: 'minmax(7rem, 1fr)'},
+  {key: 'actions', labelKey: '', width: '5rem'},
+];
+
 /**
- * User management — the team half.
+ * User management — the team, and who has been asked to join it.
  *
  * Everyone with access to the open store, and what may be done to their account. The design merges
  * staff and customers into one table; they come from two services with no key in common and the
@@ -59,6 +74,8 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     FieldError,
     FormField,
     Icon,
+    InvitationLinkDialog,
+    InviteDialog,
     KpiGrid,
     LoadError,
     NoticeBar,
@@ -66,10 +83,13 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     Pagination,
     Panel,
     ReactiveFormsModule,
+    Select,
     SetPasswordDialog,
+    TabSwitcher,
     TableRow,
     TextField,
     Toggle,
+    TranslocoDatePipe,
     TranslocoDirective,
   ],
   providers: [UsersFacade],
@@ -89,6 +109,15 @@ export class Users {
    * and can be linked to — the page contract, applied to a master-detail page.
    */
   readonly user = input<string>();
+
+  /**
+   * The active tab, from `:tab`, bound by `withComponentInputBinding()`.
+   *
+   * An unknown value falls back to `team` in the effect below rather than being matched in the route
+   * — a fixed list there would make adding a tab a two-file change, which is the call the catalogue
+   * made for the same reason.
+   */
+  readonly tab = input<string>();
 
   protected readonly isLoading = this.facade.isLoading;
   protected readonly isEmpty = this.facade.isEmpty;
@@ -112,12 +141,47 @@ export class Users {
     }));
   });
 
+  protected readonly invitationColumns = computed<readonly TableColumn[]>(() => {
+    this.transloco.activeLang();
+    return INVITATION_COLUMN_KEYS.map((column) => ({
+      key: column.key,
+      label: column.labelKey ? this.transloco.translate(column.labelKey) : '',
+      width: column.width,
+    }));
+  });
+
+  /**
+   * The roles the invite dialog offers.
+   *
+   * The same narrowed set the create form uses, so an invitation cannot grant a role a directly
+   * created account could not. `STORE_ADMIN` leads because it is the endpoint's own default, which
+   * makes the pre-selection match what omitting the parameter would do.
+   */
+  protected readonly roleOptions = computed<readonly SelectOption[]>(() => {
+    this.transloco.activeLang();
+    return ['STORE_ADMIN', 'STORE_MODERATOR']
+      .filter((role) => this.facade.assignableRoles().includes(role))
+      .map((role) => ({value: role, label: this.facade.roleLabel(role)}));
+  });
+
   constructor() {
     /*
      * The URL is what a reload and a shared link restore the rail from. It is not the only writer —
      * `select` sets the facade directly and mirrors here — so this only has to carry the cases the
      * page did not cause: a first render, a back button, a pasted link.
      */
+    /*
+     * The route segment is what a reload and a shared link restore the tab from — `onTab` is the
+     * other writer. An unknown segment settles on `team` here rather than being matched in the
+     * route, so adding a tab stays a one-file change.
+     */
+    effect(() => {
+      const requested = this.tab();
+      if (requested) {
+        this.facade.activeTab.set(requested === 'invitations' ? 'invitations' : 'team');
+      }
+    });
+
     effect(() => {
       const fromUrl = this.user();
       if (fromUrl && fromUrl !== this.facade.selectedId()) {
@@ -164,6 +228,19 @@ export class Users {
   protected closeRail(): void {
     this.facade.clearSelection();
     void this.router.navigate([], {queryParams: {user: null}, queryParamsHandling: 'merge'});
+  }
+
+  /**
+   * The tab is a route segment, not a query parameter.
+   *
+   * `?user=` is dropped on the way: a selection made on the team tab means nothing on the
+   * invitations one, and carrying it would restore a rail the operator cannot see.
+   */
+  protected onTab(tab: string): void {
+    // The state leads and the URL mirrors it, as with the selection: a tab that waited for the
+    // navigation to resolve would lag a click behind.
+    this.facade.activeTab.set(tab === 'invitations' ? 'invitations' : 'team');
+    void this.router.navigate(['/users', tab]);
   }
 
   protected onPage(page: number): void {

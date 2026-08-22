@@ -42,6 +42,10 @@ class FakeUsersApi {
   readonly resets: {userId: string; password: string}[] = [];
   readonly actives: {userId: string; active: boolean}[] = [];
   readonly deleted: string[] = [];
+  readonly invited: {email: string; role: string}[] = [];
+  readonly resent: {email: string; role: string}[] = [];
+  readonly revoked: string[] = [];
+  inviteFails = false;
   /** When set, list requests hang until `resolve()` — used to observe the loading state. */
   pending: Subject<TeamSnapshot> | null = null;
   failure = false;
@@ -59,8 +63,10 @@ class FakeUsersApi {
     return of(this.snapshot(query));
   }
 
+  invitations: InvitationsSnapshot = {rows: [], pending: 0};
+
   loadInvitations(): Observable<InvitationsSnapshot> {
-    return of({rows: [], pending: 0});
+    return of(this.invitations);
   }
 
   create(user: unknown): Observable<void> {
@@ -85,6 +91,23 @@ class FakeUsersApi {
 
   delete(userId: string): Observable<void> {
     this.deleted.push(userId);
+    return of(undefined);
+  }
+
+  invite(email: string, role: string): Observable<{token: string; expiresAt: string}> {
+    this.invited.push({email, role});
+    return this.inviteFails
+      ? throwError(() => new Error('that address has already been invited'))
+      : of({token: 'the-only-copy', expiresAt: '2026-09-01T00:00:00Z'});
+  }
+
+  resend(email: string, role: string): Observable<{token: string; expiresAt: string}> {
+    this.resent.push({email, role});
+    return of({token: 'a-different-token', expiresAt: '2026-09-08T00:00:00Z'});
+  }
+
+  revoke(invitationId: string): Observable<void> {
+    this.revoked.push(invitationId);
     return of(undefined);
   }
 
@@ -129,7 +152,12 @@ describe('Users', () => {
     await TestBed.configureTestingModule({
       imports: [Users, ...translocoTesting().imports],
       providers: [
-        provideRouter([]),
+        /*
+         * The page mirrors its tab into the route and its selection into `?user=`, so the router
+         * needs somewhere for those to land. Registering the real shape rather than `[]` also means
+         * a navigation the page gets wrong fails here instead of being swallowed.
+         */
+        provideRouter([{path: 'users/:tab', children: []}]),
         {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
         {provide: UsersApi, useValue: api},
         {provide: NOTIFICATION_PORT, useValue: toasts},
@@ -443,13 +471,159 @@ describe('Users', () => {
     expect(kpis.textContent).toContain('3');
   }));
 
-  /* Pending invitations are not known until that tab has loaded — an em dash, never a zero. */
-  it('shows an em dash for a figure it has not earned', fakeAsync(() => {
+  it('counts the pending invitations once that list has loaded', fakeAsync(() => {
+    api.invitations = {rows: [], pending: 2};
+    const host = load();
+
+    const kpis = host.querySelector('app-kpi-grid') as HTMLElement;
+    expect(kpis.textContent).toContain('Pending invitations');
+    expect(kpis.textContent).toContain('2');
+  }));
+
+  /*
+   * A store admin cannot read invitations at all — OrgMemberApi is org-admin-only class-wide — so
+   * the figure is an em dash rather than a zero. "Nobody is waiting to join" is a claim the page has
+   * not earned, and the tab is not offered either.
+   */
+  it('shows an em dash, not a zero, for a figure it is not allowed to read', fakeAsync(() => {
+    roles = {...roles, isOrgAdmin: false, isStoreAdmin: true};
     const host = load();
 
     const kpis = host.querySelector('app-kpi-grid') as HTMLElement;
     expect(kpis.textContent).toContain('Pending invitations');
     expect(kpis.textContent).toContain('—');
+    expect(host.querySelector('app-tab-switcher')?.textContent).not.toContain('Invitations');
+  }));
+
+  /* ----------------------------------------------------------------- invitations ---- */
+
+  function openInvitations(host: HTMLElement): void {
+    const tab = Array.from(host.querySelectorAll('app-tab-switcher button')).find((button) =>
+      /Invitations/.test(button.textContent ?? ''),
+    ) as HTMLButtonElement;
+    tab.click();
+    settle();
+  }
+
+  it('lists the organization\'s invitations, with the pending one actionable', fakeAsync(() => {
+    api.invitations = {
+      rows: [
+        {
+          id: 'inv-1',
+          email: 'newbie@example.com',
+          role: 'STORE_ADMIN',
+          status: 'PENDING',
+          tone: 'amber',
+          expiresAt: '2026-09-01T00:00:00Z',
+          createdAt: '2026-08-22T00:00:00Z',
+          createdBy: 'org1-admin',
+          pending: true,
+        },
+        {
+          id: 'inv-2',
+          email: 'joined@example.com',
+          role: 'STORE_MODERATOR',
+          status: 'ACCEPTED',
+          tone: 'green',
+          expiresAt: '2026-09-01T00:00:00Z',
+          createdAt: '2026-08-20T00:00:00Z',
+          createdBy: 'org1-admin',
+          pending: false,
+        },
+      ],
+      pending: 1,
+    };
+    const host = load();
+    openInvitations(host);
+
+    const rows = rowsOnScreen(host);
+    expect(rows.length).toBe(2);
+    expect(rows[0].textContent).toContain('newbie@example.com');
+    expect(rows[0].textContent).toContain('Pending');
+    expect(rows[0].querySelectorAll('.cell-actions button').length).toBe(2);
+    // An accepted invitation is history: there is nothing left to resend or revoke.
+    expect(rows[1].querySelectorAll('.cell-actions button').length).toBe(0);
+  }));
+
+  /*
+   * The whole point of the flow. The token comes back once — only its hash is stored — so the
+   * console has to show the link, and it must not be a toast that dismisses itself.
+   */
+  it('shows the invitation link once, in something that does not dismiss itself', fakeAsync(() => {
+    const host = load();
+    openInvitations(host);
+
+    (Array.from(host.querySelectorAll('button')).find((button) =>
+      /Invite user/.test(button.textContent ?? ''),
+    ) as HTMLButtonElement).click();
+    settle();
+
+    const dialog = host.querySelector('app-invite-dialog') as HTMLElement;
+    const email = dialog.querySelector('input') as HTMLInputElement;
+    email.value = 'newbie@example.com';
+    email.dispatchEvent(new Event('input'));
+    settle();
+    (dialog.querySelector('form') as HTMLFormElement).dispatchEvent(new Event('submit'));
+    settle();
+
+    expect(api.invited).toEqual([{email: 'newbie@example.com', role: 'STORE_ADMIN'}]);
+
+    const link = host.querySelector('app-invitation-link-dialog') as HTMLElement;
+    expect(link).not.toBeNull();
+    expect(link.textContent).toContain('only time this link can be shown');
+    expect(link.querySelector('app-copy-field code')?.textContent)
+      .toContain('accept-invitation?token=the-only-copy');
+  }));
+
+  it('refuses an address that is not one, without asking the server', fakeAsync(() => {
+    const host = load();
+    openInvitations(host);
+
+    (Array.from(host.querySelectorAll('button')).find((button) =>
+      /Invite user/.test(button.textContent ?? ''),
+    ) as HTMLButtonElement).click();
+    settle();
+
+    const dialog = host.querySelector('app-invite-dialog') as HTMLElement;
+    const email = dialog.querySelector('input') as HTMLInputElement;
+    email.value = 'not-an-address';
+    email.dispatchEvent(new Event('input'));
+    settle();
+    (dialog.querySelector('form') as HTMLFormElement).dispatchEvent(new Event('submit'));
+    settle();
+
+    expect(api.invited.length).toBe(0);
+    expect(dialog.textContent).toContain('valid email address');
+  }));
+
+  /* Resending rotates the token, so it produces a new link — not the old one again. */
+  it('hands over a new link when an invitation is resent', fakeAsync(() => {
+    api.invitations = {
+      rows: [
+        {
+          id: 'inv-1',
+          email: 'newbie@example.com',
+          role: 'STORE_ADMIN',
+          status: 'PENDING',
+          tone: 'amber',
+          expiresAt: '2026-09-01T00:00:00Z',
+          createdAt: '2026-08-22T00:00:00Z',
+          createdBy: 'org1-admin',
+          pending: true,
+        },
+      ],
+      pending: 1,
+    };
+    const host = load();
+    openInvitations(host);
+
+    (rowsOnScreen(host)[0].querySelectorAll('.cell-actions button')[0] as HTMLButtonElement).click();
+    settle();
+
+    expect(api.resent).toEqual([{email: 'newbie@example.com', role: 'STORE_ADMIN'}]);
+    const link = host.querySelector('app-invitation-link-dialog') as HTMLElement;
+    expect(link.querySelector('app-copy-field code')?.textContent)
+      .toContain('token=a-different-token');
   }));
 
   it('keeps the previous rows on screen while the next page loads', fakeAsync(() => {

@@ -136,10 +136,33 @@ export const routes: Routes = [
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
     children: [
+      {path: '', redirectTo: 'team', pathMatch: 'full'},
       {
-        path: '',
+        // An unknown tab falls back to `team` in the page rather than being matched here — a fixed
+        // `:tab` list would make adding a tab a two-file change. Same call as the catalogue.
+        path: ':tab',
         loadComponent: () => import('@features/users/users').then((page) => page.Users),
         data: {titleKey: 'route.users.title', breadcrumbKey: 'shell.breadcrumb.users'},
+      },
+    ],
+  },
+  {
+    /*
+     * Accepting an invitation, and the one console page that cannot sit inside the console shell.
+     *
+     * An invitee is authenticated and is **not yet a member of the organization**, so `consoleContext`
+     * and `requiresStore` would both refuse them — which is exactly why `OrgMemberApi.accept` carries
+     * no permission token either. The bearer token in the link is the authorization.
+     */
+    path: 'accept-invitation',
+    loadComponent: () => import('@layouts/auth-shell/auth-shell').then((layout) => layout.AuthShell),
+    canActivate: [canAccessSecuredPages],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('@features/accept-invitation/accept-invitation').then((page) => page.AcceptInvitation),
+        data: {titleKey: 'route.acceptInvitation.title'},
       },
     ],
   },

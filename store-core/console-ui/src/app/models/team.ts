@@ -50,6 +50,20 @@ export const KNOWN_ROLES: ReadonlySet<string> = new Set<string>([
   'USER',
 ]);
 
+/**
+ * The invitation statuses the console has words for.
+ *
+ * A Java enum rather than a database table, so unlike a role it cannot grow underneath the console
+ * — but it goes through the same known-set guard anyway, because Transloco throws on a missing key
+ * and a fifth value would take the tab down rather than render oddly.
+ */
+export const INVITATION_STATUSES: ReadonlySet<string> = new Set<string>([
+  'PENDING',
+  'ACCEPTED',
+  'REVOKED',
+  'EXPIRED',
+]);
+
 /** Invitation status to its categorical tone, consistent with the rest of the console's badges. */
 export const INVITATION_TONE: Readonly<Record<InvitationStatus, Tone>> = {
   PENDING: 'amber',

@@ -6,11 +6,14 @@ import {ApiErrorService} from '@core/errors/api-error.service';
 import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
 import {AuthService} from '@core/auth/auth.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import type {TeamKpiSource, TeamRow} from '@models/team';
+import {humanizeStatus} from '@models/orders';
+import type {InvitationStatus} from '@models/users';
+import {INVITATION_STATUSES, USERS_TABS, type InvitationRow, type IssuedInvitation, type TeamKpiSource, type TeamRow, type UsersTab} from '@models/team';
 import {RoleLabel} from '@shared/i18n/role-label';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {snapshot} from '@shared/state/snapshot';
 import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
+import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import {UsersApi} from '../services/users.api.service';
 import {UserFormService, type UserForm} from '../services/user-form.service';
@@ -183,13 +186,153 @@ export class UsersFacade {
     }));
   });
 
+  /* ----------------------------------------------------------- the invitations tab ---- */
+
+  readonly activeTab = signal<UsersTab>('team');
+
+  readonly canManageInvitations = this.permissions.canManageInvitations();
+
+  /**
+   * The invitations, on their own key.
+   *
+   * Keyed on the store only so that it re-reads when the console changes tenant, and **not** on the
+   * active tab: switching back to Team and forward again should not re-ask a question whose answer
+   * did not move. `OrgMemberApi` is org-scoped, so the store is a proxy for the org rather than a
+   * filter — there is no org id on the client to key on.
+   *
+   * Gated on the permission as well: `OrgMemberApi` is org-admin-only class-wide, so for a store
+   * admin this would be a guaranteed 403 on every page load.
+   */
+  private readonly invitations = snapshot(
+    () => (this.canManageInvitations ? (this.shell.currentStoreId() ?? undefined) : undefined),
+    () => this.api.loadInvitations(),
+  );
+
+  readonly invitationRows = computed<readonly InvitationRow[]>(() => this.invitations.value()?.rows ?? []);
+  readonly invitationsLoading = this.invitations.isLoading;
+  readonly invitationsError = this.invitations.error;
+
+  /**
+   * The tab strip.
+   *
+   * Invitations carries the pending count as a badge — it is the one tab that is a to-do list rather
+   * than a view, the same reason the payments ledger badges its approval queue.
+   */
+  readonly tabs = computed<readonly TabItem[]>(() => {
+    this.transloco.activeLang();
+    const waiting = this.pendingInvitations();
+    return USERS_TABS.filter((tab) => tab !== 'invitations' || this.canManageInvitations).map((tab) => ({
+      key: tab,
+      label: this.transloco.translate(`users.tab.${tab}`),
+      badge:
+        tab === 'invitations' && waiting
+          ? this.localeFormat.localizeNumber(waiting, 'decimal')
+          : undefined,
+      badgeTone: tab === 'invitations' && waiting ? ('amber' as const) : undefined,
+    }));
+  });
+
+  /**
+   * The link an operator has to hand over, or null.
+   *
+   * Held here because it exists **exactly once**: the token is returned in the response that created
+   * the invitation and only its hash is stored, so nothing can fetch it again. Closing the dialog
+   * loses it for good, which is why the dialog says so. See lessons.md, "Users — nothing emails an
+   * invitation".
+   */
+  readonly issued = signal<IssuedInvitation | null>(null);
+
+  /** Whether the invite dialog is open. */
+  readonly inviting = signal(false);
+
+  /** The invitation queued for revocation, or null. */
+  readonly revoking = signal<InvitationRow | null>(null);
+
+  startInvite(): void {
+    this.inviting.set(true);
+  }
+
+  dismissInvite(): void {
+    this.inviting.set(false);
+  }
+
+  dismissIssued(): void {
+    this.issued.set(null);
+  }
+
+  askToRevoke(row: InvitationRow): void {
+    this.revoking.set(row);
+  }
+
+  invite(email: string, role: string): void {
+    this.sendInvitation(email, role, false);
+  }
+
+  /**
+   * Issues a fresh token and invalidates the previous one.
+   *
+   * Not "show me that link again", which is impossible — only the hash is stored. A link that went
+   * astray should stop working, so resending is a rotation, and the dialog that follows carries the
+   * new link exactly as the first one did.
+   */
+  resend(row: InvitationRow): void {
+    this.sendInvitation(row.email, row.role, true);
+  }
+
+  confirmRevoke(): void {
+    const row = this.revoking();
+    if (!row || this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    this.api.revoke(row.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.revoking.set(null);
+        this.toast.success(this.transloco.translate('users.toast.revoked', {email: row.email}));
+        this.invitations.reload();
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
+  }
+
+  private sendInvitation(email: string, role: string, resending: boolean): void {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    const request = resending ? this.api.resend(email, role) : this.api.invite(email, role);
+    request.subscribe({
+      next: ({token, expiresAt}) => {
+        this.busy.set(false);
+        this.inviting.set(false);
+        // The link is assembled against the console's own origin: the token is meaningless anywhere else.
+        this.issued.set({email, role, link: this.acceptLink(token), expiresAt});
+        this.invitations.reload();
+      },
+      error: (failure: unknown) => {
+        this.busy.set(false);
+        this.toast.danger(this.apiErrors.messageFor(failure));
+      },
+    });
+  }
+
+  private acceptLink(token: string): string {
+    const origin = typeof window === 'undefined' ? '' : window.location.origin;
+    return `${origin}/accept-invitation?token=${encodeURIComponent(token)}`;
+  }
+
   /**
    * How many invitations are outstanding.
    *
-   * Set by the invitations tab once it has loaded, and `null` until then — an em dash rather than a
-   * zero, because "nobody is waiting to join" is a claim the page has not yet earned.
+   * `null` until the invitation list has loaded, and for a store admin forever — the endpoint is
+   * org-admin-only, so they cannot be told. An em dash rather than a zero either way, because
+   * "nobody is waiting to join" is a claim the page has not earned in either case.
    */
-  readonly pendingInvitations = signal<number | null>(null);
+  readonly pendingInvitations = computed<number | null>(() => this.invitations.value()?.pending ?? null);
 
   /** The open store's name, for the scope notice and the rail's "store access" fact. */
   storeName(): string {
@@ -461,6 +604,24 @@ export class UsersFacade {
 
   reload(): void {
     this.team.reload();
+  }
+
+  reloadInvitations(): void {
+    this.invitations.reload();
+  }
+
+  /**
+   * An invitation's status, in the reader's language.
+   *
+   * `InvitationStatus` is a real Java enum rather than a database table, so it cannot grow the way
+   * a role can — but it goes through the same known-set guard as everything else the server names,
+   * because Transloco throws on a missing key and a fifth value would take the tab down.
+   */
+  invitationStatusLabel(status: InvitationStatus): string {
+    this.transloco.activeLang();
+    return INVITATION_STATUSES.has(status)
+      ? this.transloco.translate(`users.invitationStatus.${status}`)
+      : humanizeStatus(status);
   }
 
   /** A KPI's figure in the reader's digits, or an em dash where it could not be read. */

@@ -1,0 +1,82 @@
+/*
+ * Follows `shared/ui/confirm-dialog/confirm-dialog.css` — same surface, same backdrop, same
+ * top-layer entry — so the several dialogs on this page do not read as coming from different apps.
+ * It is wider than the others because it holds a URL, and a link that wraps across three lines is
+ * harder to trust than one that does not.
+ */
+.invite-link {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  inline-size: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+.invite-link::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.invite-link-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.35rem;
+}
+
+.invite-link-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.invite-link-message {
+  margin: 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/*
+ * A warning rather than a hint, and toned as one: closing this without copying the link loses it
+ * for good, because only the token's hash is stored.
+ */
+.invite-link-warning {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--chart-4-wash);
+  color: var(--chart-4-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.invite-link-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: 0.25rem;
+}
+
+/*
+ * Dialogs animate in the top layer, which `display` transitions cannot reach without
+ * `allow-discrete`; without it the box would pop. Off entirely for reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @starting-style {
+    .invite-link[open] {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+
+  .invite-link[open] {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--default-transition-duration),
+      transform var(--default-transition-duration);
+  }
+}
