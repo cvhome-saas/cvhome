@@ -79,6 +79,19 @@ export class AuthService {
     }
   }
 
+  /**
+   * The cached principal, without a request, or `undefined` before one has been fetched.
+   *
+   * `canAccessSecuredPages` fetches and caches it before any console route renders, so on a guarded
+   * page this always answers — and it answers `undefined` anywhere else, which is the honest result
+   * rather than a promise. `getRoles()` below has read the same cache since Module 1; this exposes
+   * the rest of it, because the username is the **only** identity a row and a token share: the JWT
+   * `sub` is the username, not uaa's id. See lessons.md, "Users — the JWT carries no user id".
+   */
+  getCachedAuthUser(): AuthUser | undefined {
+    return this.authUser;
+  }
+
   getRoles(): Roles {
     const authorities = this.authUser?.authorities ?? [];
     const isSuperAdmin = authorities.indexOf("ROLE_SUPER_ADMIN") != -1;

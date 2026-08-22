@@ -2114,3 +2114,262 @@ invisible until something was measured rather than read.
   the current page, not the full result set, and it is not machine-readable — but it needs no
   backend and it is honest about being a printout.
 - **Placeholder:** `TODO(lessons.md):` in `features/payments/payments.html`.
+
+---
+
+## Users — the JWT carries no user id
+
+**Found by reading `JwtCustomizerConfig` against what `/api/v1/auth/me` returns, on the running stack.**
+
+- **Screen:** `/profile`, and every path by which the console would read the signed-in operator's own
+  account record.
+- **What is missing:** any way for the console to name itself to the server. Spring Authorization
+  Server sets `sub` from `principal.getName()`, which here is the **username**, and
+  `JwtCustomizerConfig.addUserClaims` adds `roles` and spreads `users.metadata` (`org`, `store`) into
+  the access token — and **no id claim at all**. Meanwhile every read-by-id path in tenancy ends at
+  `AdminUserClient.getUser(id)` → `GET {uaa}/api/v1/admin/users/{uuid}`, and uaa exposes no
+  get-by-username (only `GET /exists?username=`, and that controller is super-admin only).
+- **Why it matters:** it is the root cause of the two entries below it, and it is why the standing
+  "Shell — user-account/current is broken for JWT callers" entry understates the problem. Binding
+  `@AuthenticationPrincipal Jwt` there would fix the NPE and then pass a *username* to a by-UUID
+  lookup, so the 500 becomes a 404 rather than an answer. **Both defects have to be fixed for either
+  to matter.**
+- **Expected contract:** add a `uid` claim carrying `users.id` in `JwtCustomizerConfig` — one line
+  beside the metadata spread — or give uaa `GET /api/v1/admin/users/by-username?username=`. The claim
+  is the cheaper of the two and closes the whole family.
+- **What console-ui does meanwhile:** `/profile` shows the username and the roles, which are the only
+  identity the token genuinely carries, and reads no account record at all. `/users` is unaffected,
+  because a row there carries a real `ReadableUser.id`. The two sides are matched on **username** for
+  "is this me", which is the only field they share.
+- **Placeholder:** `TODO(lessons.md):` in `api/tenancy/user-account.service.ts`.
+
+## Users — the ID token requests only the `openid` scope
+
+**The one-row cause of the already-logged "Shell — uaa's ID token carries no profile claims".**
+
+- **Screen:** the toolbar's profile menu and `/profile`, both of which show a username where a person
+  should be.
+- **What is missing:** the `profile` and `email` scopes. `uaa/init-sql/data-common.sql`'s `web-app`
+  client row declares `scopes = 'openid'` and nothing else, so the ID token the gateway obtains has
+  no `given_name`, `family_name` or `email` to carry — which is exactly what
+  `AuthService`'s `AuthUser` documents as null.
+- **Why it matters:** it is one row of seed data and one entry in whatever provisions that client in
+  a real environment. Of everything in this file it is the cheapest thing to fix, and it would give
+  the console a person's name without a single new endpoint.
+- **Expected contract:** `scopes = 'openid,profile,email'` on the `web-app` client, and
+  `JwtCustomizerConfig` populating the standard claims on the ID token as well as the access token.
+- **What console-ui does meanwhile:** shows `principal.name`, the username.
+- **Placeholder:** documented in `core/auth/auth.service.ts`.
+
+## Users — the user list is store-scoped, so an org admin is in no list
+
+- **Screen:** `/users`, the team table.
+- **What is missing:** an org-scoped read. `ManagedUserAccountServiceImpl.list` filters uaa on
+  `{org, store}` — both, always — and `validateUserAccess` refuses `find-one` for any user whose
+  metadata `store` differs from the requested one. An org admin is stored with `{"org": …}` and **no
+  store** (`uaa/init-sql/data-test-stores.sql`), so:
+  - they appear in no store's user list, including the one they are looking at;
+  - `find-one` refuses them under every store, including to themselves;
+  - a console that only ever reads through this API cannot show an organization's full staff.
+- **Why it is required:** the page is called user management and it silently omits the people with
+  the most access. An operator counting heads gets the wrong number and has no way to know it.
+- **Expected contract:** either `GET …/user-account/list` gains an org-scoped mode when the caller is
+  an org admin, or a null `store` in a user's metadata is read as "every store in the org" by both
+  the list filter and `validateUserAccess`. The second is closer to what the data already means.
+- **What console-ui does meanwhile:** renders the list as the server scopes it and says so, in a
+  notice above the table naming the open store. Not a filter the operator can turn off — there is
+  nothing to turn it into.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/facades/users.facade.ts`,
+  `models/team.ts` and `models/users.ts`.
+
+## Users — assignable-roles offers SUPER_ADMIN to an org admin
+
+- **Screen:** `/users`, the role picker in the detail rail.
+- **What is wrong:** `UserAccountServiceImpl.getAssignableRoles` filters uaa's role table down by
+  removing exactly two names — `USER` and `ORG_ADMIN`. The seeded table is
+  `{SUPER_ADMIN, USER, ORG_ADMIN, STORE_ADMIN, STORE_MODERATOR}`, so what an org admin is offered
+  includes **platform superuser**. The endpoint also carries no `@PreAuthorize` at all.
+- **Why it matters:** a console that rendered this list verbatim would put a privilege escalation in
+  a checkbox. Whether `create` would then honour the role is a separate question the UI should not be
+  the thing answering.
+- **Expected contract:** filter to the roles the *caller* may grant — never above their own — and put
+  a permission token on the endpoint.
+- **What console-ui does meanwhile:** intersects the server's answer with `OFFERABLE_ROLES`
+  (`models/team.ts`), which is `STORE_MODERATOR` and `STORE_ADMIN`. An intersection rather than a
+  filter of one name, so a role added to uaa's table later cannot appear in a picker unreviewed
+  either. **This is defence in depth and not a fix** — the server is still offering it to anything
+  else that asks.
+- **Placeholder:** `TODO(lessons.md):` in `api/tenancy/user-account.service.ts` and `models/team.ts`.
+
+## Users — no self-service password change
+
+- **Screen:** `/profile`, "Sign-in & security" in `Account Profile.dc.html`.
+- **What is missing:** two things.
+  1. **A self-service endpoint.** The only password path is `POST …/user-account/reset`, an
+     administrative action addressed by `userId`, guarded by a maintain-level permission. There is
+     nothing an operator can call about their own password — and per "Users — the JWT carries no user
+     id" they could not name themselves to it anyway.
+  2. **Any verification of the current password.** `UserPassword` has a `password` field beside
+     `changePassword` and **it is read by nothing**: `UserAccountServiceImpl.changePassword` passes
+     only `getChangePassword()` to uaa's admin reset. `grep -i "currentPassword\|oldPassword"` over
+     the whole repo returns nothing.
+- **Why it is required:** every console has this, and its absence means a password can only be
+  changed by someone else, who then knows it.
+- **Expected contract:** `POST /tenancy/api/v1/user-account/change-password` taking
+  `{currentPassword, newPassword}` for the authenticated caller, verifying the first.
+- **What console-ui does meanwhile:** the password card is **not built** on `/profile`. Setting a
+  password lives on `/users`, where it belongs — an admin action on a named account — and its dialog
+  asks for the new password twice and for no current one, because asking for a value nothing verifies
+  would be theatre. The dialog says the operator has to hand the password over themselves.
+- **Placeholder:** `TODO(lessons.md):` in `models/users.ts`.
+
+## Users — a permission token that locked every password reset
+
+**Fixed here, not merely recorded — the second resolved entry in this file, after the dashboard
+statistics outage.**
+
+- **What was wrong:** `UserAccountApi.resetPassword` declares
+  `@PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.USERS.RESET_PASSWORD')")`, and
+  that token appeared in exactly one file in the repository — the annotation itself.
+  `CustomPermissionEvaluator.hasStoreCorePermission` wires the other six `USERS.*` tokens and falls
+  through `hasBillingPermission` and `hasPodRegistryPermission` to `default -> false`. **The endpoint
+  was 403 for every caller, super admin included, from the day it was written.**
+- **Why nothing reported it:** an unmapped permission token is indistinguishable from a refused one,
+  and no frontend called the endpoint. seller-ui's change-password screen points at
+  `PATCH /v1/private/user/{id}/password`, which is mapped nowhere either, so it failed earlier for a
+  different reason and the 403 behind it was never reached.
+- **Resolved by:** `fix(commons): the permission token that locked every password reset` — one `case`
+  resolving to `hasMaintainAccessOnUsers`, the same audience as create/update/delete/enable/disable,
+  and deliberately not the moderator who has read access only. It carries the first tests in
+  `store-commons`; reverting the case fails two of them.
+- **Left standing:** nothing checks that a declared token is *mapped*. The next one added without a
+  case will fail the same silent way, and only in a QA pass. A test that scans every `@PreAuthorize`
+  literal in the repo against the evaluator's switches would close it for good.
+
+## Users — no password policy anywhere
+
+- **Screen:** `/users`, the create form and the set-password dialog.
+- **What is missing:** any server-side rule. `AdminService.resetPassword` encodes whatever string it
+  is handed, and `CreateUserRequest` validates only `@NotBlank username` and `@Email email`. Length,
+  complexity, reuse, breach lists — none of it exists, and there is no place to configure any.
+- **Why it is required:** the console's rule is currently the only rule, so anything that talks to
+  uaa directly — a script, a migration, the admin API — can set a one-character password.
+- **Expected contract:** validation on `ResetUserPasswordRequest` and `CreateUserRequest`, ideally
+  configurable, so the policy lives with the store of record rather than with one of its clients.
+- **What console-ui does meanwhile:** enforces eight or more characters with an uppercase, a
+  lowercase and a digit (`PASSWORD_PATTERN` in `features/users/services/user-form.service.ts`).
+  seller-ui's equivalent capped passwords at **twelve** characters; that upper bound is deliberately
+  not carried over, because a maximum length blocks passphrases and bcrypt has no trouble with them.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/services/user-form.service.ts`.
+
+## Users — a taken username cannot be checked before submitting
+
+- **Screen:** `/users`, the username field when creating.
+- **What is missing:** a uniqueness pre-flight reachable by a merchant. Every other create form in
+  this console has one — `…/store/unique?name=`, `…/product/unique?code=`,
+  `…/category/unique?code=` — and drives `uniqueAsync` with it. uaa does expose
+  `GET /api/v1/admin/users/exists?username=`, but that controller is
+  `hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')` and tenancy does not proxy it.
+- **Why it is required:** usernames are unique platform-wide, so an operator picking one is guessing
+  against a namespace they cannot see, and finds out only after filling in the whole form.
+- **Expected contract:** `GET /tenancy/api/v1/user-account/unique?userName=` → `{exists}`, scoped so
+  it answers only yes-or-no and cannot be used to enumerate other tenants' users — the same shape and
+  the same caveat as `…/store/unique`.
+- **What console-ui does meanwhile:** submits and binds the conflict onto the field.
+  `ApiErrorService.applyToForm` handles it, and — as with signup — a 409 arrives as
+  `COMMON.DATA_INTEGRITY_VIOLATION` with no `fieldErrors[]`, so it lands as a message rather than on
+  the username itself.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/services/user-form.service.ts`.
+
+## Users — no user search of any kind
+
+- **Screen:** `/users`, the "Name or email" box in `User Management.dc.html`.
+- **What is missing:** any query at all. `AdminService.getUsers` builds its `Specification` from
+  `UserSpecifications.hasMetadataField` — **metadata equality and nothing else** — and tenancy passes
+  it exactly `{org, store}`. There is no name, email or username predicate, no partial match, and no
+  sort parameter that reaches the repository.
+- **Why it is required:** the list is paged at twenty. A store with sixty staff is three pages an
+  operator has to read in order to find one person.
+- **Expected contract:** a `q` parameter on `GET …/user-account/list` matching `username`, `email`,
+  `first_name` and `last_name` case-insensitively, and a `sort` that reaches the query.
+- **What console-ui does meanwhile:** **the search box is not built.** A box that filtered only the
+  twenty rows already on screen would look like a search and answer a different question — the exact
+  "fixture standing in for a real answer" this file exists to prevent.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/services/users.api.service.ts` and
+  `api/tenancy/user-account.service.ts`.
+
+## Users — a user has no last-login, no avatar and no profile fields
+
+- **Screen:** `/users`' detail rail and `/profile`, against `User Management.dc.html` and
+  `Account Profile.dc.html`.
+- **What is missing:** almost everything the design shows about a person. `uaa.users` is
+  `{id, email, username, first_name, last_name, password_hash, metadata, enabled, created_at,
+  updated_at}`. Verified by grepping the whole repository for each of the designed fields:
+  - `avatar` — **zero hits.** No photo, no upload, no URL.
+  - `lastLogin` / `last_login` — **zero hits.** `ReadableUser.lastAccess` and `.loginTime` exist on
+    the DTO and are set by **no mapper** — dead fields, and the "Last active" column rests on them.
+  - `jobTitle`, `timezone`, `dateFormat`, `bio` — **zero hits** each.
+  - a phone number on a user — none; the design's phone row and the addresses card have no source at
+    all, staff having no address model.
+  - `defaultLanguage` is on `UserEntity` and has no uaa column either — declared, never persisted.
+- **Why it is required:** less than it looks. Most of these are decoration. The two that are not are
+  **last-login**, which is how an operator decides whether an account is still in use before removing
+  it, and **a display name that is not a username**, which is what makes a console feel like it knows
+  who is using it.
+- **Expected contract:** a `last_login_at` column written on successful authentication and carried on
+  `ReadableUser`; the rest belong in a per-user profile document that does not exist and should
+  probably not live in uaa.
+- **What console-ui does meanwhile:** renders a monogram from the name, and does not render the
+  fields it has no source for — no greyed-out "Last active: —", no empty address card. Where the rail
+  would show "Last active", it shows the username and whether sign-in is allowed, both of which an
+  operator actually needs when someone says they cannot get in.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/services/users.api.service.ts`.
+
+## Users — creating a user is two calls
+
+- **Screen:** `/users`, "Add user".
+- **What is wrong:** `UserAccountServiceImpl.createUser` calls uaa twice —
+  `client.createUser(...)`, then `client.resetPassword(createdUser.id, user.getPassword())` — with no
+  transaction spanning them, which there could not be across an HTTP boundary. If the second fails,
+  the first has already committed: the account exists, has no password, and **until the permission
+  fix above there was no endpoint that could give it one.**
+- **Also:** `PersistableUser.repeatPassword` is never compared server-side. The confirmation is a
+  client-side courtesy only, the same finding as "Auth — public signup validates nothing".
+- **Why it matters:** the failure is silent from the console's side — the create returns an error, so
+  an operator retries, and the retry fails with a username conflict against the half-made account
+  they cannot see in the list until it appears there unusable.
+- **Expected contract:** have uaa's `POST /api/v1/admin/users` accept the password on
+  `CreateUserRequest`, so the account is made in one call or not at all.
+- **What console-ui does meanwhile:** nothing it can. The failure is reported and the list re-read, so
+  a half-made account at least becomes visible.
+- **Placeholder:** `TODO(lessons.md):` in `api/tenancy/user-account.service.ts`.
+
+## Users — nothing emails an invitation
+
+**Not a defect. The constraint that shapes the invite flow, recorded so it is not mistaken for one.**
+
+- **Screen:** `/users`, the Invitations tab, and the accept page.
+- **What is missing:** a mail sender, anywhere on the platform. `OrgMemberApi` and
+  `CreatedInvitationDto` both say so in their own javadoc: *"there is no mail sender in this
+  platform"*.
+- **The consequence for the UI:** the token is readable **exactly once**, in the response that
+  created the invitation — only its hash is stored, so it cannot be fetched again and "resend" is a
+  rotation rather than a repeat. The console therefore has to present the link at the moment of
+  creation, prominently enough that an operator does not close the dialog past it, and say plainly
+  that nothing was sent.
+- **Why it is required:** an invitation flow whose UI implies an email was sent is worse than no
+  invitation flow, because the invitee waits for something that will never arrive.
+- **Expected contract:** a mail service, and `POST …/invitations` sending the link. Until then the
+  API is correct to hand the token back — that is the honest design given the constraint.
+- **What console-ui does meanwhile:** shows the link once, with a copy control, and names the
+  constraint in the dialog.
+- **Placeholder:** `TODO(lessons.md):` in `api/tenancy/org-member.service.ts` and `models/team.ts`.
+
+## Users — no export of any kind
+
+- **Screen:** `/users`, the header's "Export CSV" in `User Management.dc.html`.
+- **What is missing:** any export endpoint — the third time this file has reached the same finding,
+  after the catalogue and payments.
+- **What console-ui does meanwhile:** exports a **PDF** of what is on screen, through the existing
+  `core/export/pdf-export.service.ts` and `shared/ui/export-button`, as `/orders` and `/payments` do.
+- **Placeholder:** `TODO(lessons.md):` in `features/users/users.html`.

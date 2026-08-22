@@ -53,6 +53,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'users/**',
+    renderMode: RenderMode.Client,
+  },
+  {
     // Required, not optional: `SelectedStoreRequestContext.params()` throws during SSR.
     path: 'store-management/**',
     renderMode: RenderMode.Client,

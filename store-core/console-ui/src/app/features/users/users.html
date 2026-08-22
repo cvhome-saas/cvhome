@@ -1,0 +1,348 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="heading().context">
+    <!--
+      The template's control says "Export CSV". Nothing on the platform produces one and the console
+      already renders PDFs from the DOM it is showing — see lessons.md, "Users — no export of any kind".
+    -->
+    <app-export-button
+      [target]="report()"
+      fileName="team"
+      [title]="heading().title"
+      [subtitle]="heading().context"
+      [disabled]="isLoading() || isEmpty()"
+    />
+    @if (facade.canManageUsers) {
+      <button class="primary-action" type="button" (click)="facade.startCreate()">
+        <app-icon name="userPlus" />
+        {{ t('users.action.addUser') }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="isLoading()" [label]="t('users.loading')">
+    @if (!isEmpty()) {
+      <div class="page-body">
+        <div #report>
+          <!--
+            Two tiles, not the template's four. Customers are a different service and their own
+            module; "orders placed" per person is not a figure anything computes; and "suspended"
+            could only be counted across the page currently loaded, which would report a number about
+            the screen rather than about the team.
+          -->
+          <app-kpi-grid [label]="t('users.metricsLabel')" [data]="kpis()" />
+        </div>
+
+        <!--
+          The list is scoped to the open store, and that genuinely hides people: an account whose uaa
+          metadata carries no store — which is how an org admin is stored — is in no store's list at
+          all. Said here rather than left for an operator to conclude their team is smaller than it is.
+          See lessons.md, "Users — the user list is store-scoped, so an org admin is in no list".
+        -->
+        <app-notice-bar
+          icon="info"
+          tone="blue"
+          [message]="t('users.scopedToStore', {store: facade.storeName()})"
+        />
+
+        <div class="split users-split">
+          <app-panel class="team-panel" [title]="t('users.allUsers')" [subtitle]="facade.subtitle()">
+            @if (rows().length) {
+              <app-data-table id="users-table" [columns]="columns()" [label]="t('users.allUsers')">
+                @for (row of rows(); track row.id) {
+                  <app-table-row [interactive]="true" [class.selected]="row.id === facade.selectedId()">
+                    <div class="cell-user" role="cell" [attr.data-label]="t('users.column.user')">
+                      <span class="avatar" aria-hidden="true">{{ facade.initialsOf(row) }}</span>
+                      <!--
+                        The name is the affordance rather than the whole row: a row-wide click
+                        handler is invisible to a keyboard and to a screen reader, and this cell has
+                        to stay reachable in the same tab order as the actions beside it.
+                      -->
+                      <button
+                        class="identity"
+                        type="button"
+                        [attr.aria-pressed]="row.id === facade.selectedId()"
+                        (click)="select(row.id)"
+                      >
+                        <strong>
+                          {{ row.name }}
+                          @if (row.isSelf) {
+                            <span class="self-tag">{{ t('users.you') }}</span>
+                          }
+                        </strong>
+                        <!-- Latin data inside a page that may be right-to-left. -->
+                        <span class="email" dir="auto">{{ row.email }}</span>
+                      </button>
+                    </div>
+
+                    <span class="cell-roles" role="cell" [attr.data-label]="t('users.column.roles')">
+                      {{ facade.roleList(row.roles) }}
+                    </span>
+
+                    <div class="cell-status" role="cell" [attr.data-label]="t('users.column.status')">
+                      <app-badge [tone]="row.active ? 'green' : 'slate'" shape="square">
+                        {{ row.active ? t('users.status.active') : t('users.status.disabled') }}
+                      </app-badge>
+                    </div>
+
+                    <div class="cell-actions" role="cell" [attr.data-label]="t('users.column.actions')">
+                      @if (facade.canManageUsers) {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          [title]="t('users.action.edit')"
+                          [attr.aria-label]="t('users.action.editFor', {name: row.name})"
+                          [disabled]="busy()"
+                          (click)="edit(row)"
+                        >
+                          <app-icon name="pencil" />
+                        </button>
+                      }
+                    </div>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.pageIndex()"
+                [totalPages]="facade.totalPages()"
+                [totalElements]="facade.totalElements()"
+                [pageSize]="pageSize"
+                [unit]="t('users.unit')"
+                [label]="t('users.paginationLabel')"
+                (pageChange)="onPage($event)"
+              />
+            } @else {
+              <app-empty-state icon="users" [message]="t('users.empty.message')" [title]="t('users.empty.title')" />
+            }
+          </app-panel>
+
+          <!-- The detail rail: reading an account, editing one, or creating one. -->
+          @if (facade.form(); as form) {
+            <app-panel
+              class="rail"
+              padded
+              [title]="facade.railMode() === 'create' ? t('users.rail.newUser') : t('users.rail.editUser')"
+            >
+              <form class="rail-form" [formGroup]="form" (ngSubmit)="facade.save()">
+                <app-form-field [label]="t('users.field.userName')" [control]="form.controls.userName" required>
+                  <app-text-field
+                    formControlName="userName"
+                    latin
+                    autocomplete="off"
+                    [maxLength]="190"
+                  />
+                  <app-field-error [control]="form.controls.userName" />
+                </app-form-field>
+
+                <div class="name-pair">
+                  <app-form-field [label]="t('users.field.firstName')" [control]="form.controls.firstName">
+                    <app-text-field formControlName="firstName" [maxLength]="50" />
+                    <app-field-error [control]="form.controls.firstName" />
+                  </app-form-field>
+                  <app-form-field [label]="t('users.field.lastName')" [control]="form.controls.lastName">
+                    <app-text-field formControlName="lastName" [maxLength]="50" />
+                    <app-field-error [control]="form.controls.lastName" />
+                  </app-form-field>
+                </div>
+
+                <app-form-field [label]="t('users.field.email')" [control]="form.controls.emailAddress" required>
+                  <app-text-field formControlName="emailAddress" type="email" latin autocomplete="off" />
+                  <app-field-error [control]="form.controls.emailAddress" />
+                </app-form-field>
+
+                @if (facade.railMode() === 'create') {
+                  <!--
+                    Only on create: `PUT …/update` does not change a password, and a field here on an
+                    edit would imply that it did. Changing one is the Reset password action, which is
+                    its own endpoint and its own permission.
+                  -->
+                  <app-form-field
+                    [label]="t('users.field.password')"
+                    [control]="form.controls.password"
+                    [hint]="t('users.field.passwordHint')"
+                    required
+                  >
+                    <app-text-field formControlName="password" type="password" autocomplete="new-password" />
+                    <app-field-error [control]="form.controls.password" />
+                  </app-form-field>
+
+                  <app-form-field
+                    [label]="t('users.field.repeatPassword')"
+                    [control]="form.controls.repeatPassword"
+                    required
+                  >
+                    <app-text-field formControlName="repeatPassword" type="password" autocomplete="new-password" />
+                    <app-field-error [control]="form.controls.repeatPassword" />
+                  </app-form-field>
+                }
+
+                <app-form-field
+                  [label]="t('users.field.roles')"
+                  [control]="form.controls.roles"
+                  [hint]="t('users.field.rolesHint')"
+                  required
+                >
+                  <fieldset class="role-picker">
+                    <legend class="sr-only">{{ t('users.field.roles') }}</legend>
+                    @for (role of facade.assignableRoles(); track role) {
+                      <app-checkbox
+                        [label]="facade.roleLabel(role)"
+                        [checked]="facade.hasRole(role)"
+                        (checkedChange)="facade.toggleRole(role)"
+                      />
+                    } @empty {
+                      <p class="field-hint">{{ t('users.field.rolesUnavailable') }}</p>
+                    }
+                  </fieldset>
+                  <app-field-error [control]="form.controls.roles" />
+                </app-form-field>
+
+                <app-toggle
+                  [label]="t('users.field.active')"
+                  [description]="t('users.field.activeHint')"
+                  [checked]="form.controls.active.value"
+                  (checkedChange)="facade.setActiveFlag($event)"
+                />
+
+                <div class="rail-actions">
+                  <button class="ghost-action" type="button" [disabled]="busy()" (click)="cancelEdit()">
+                    {{ t('shared.actions.cancel') }}
+                  </button>
+                  <button class="primary-action" type="submit" [disabled]="busy() || form.invalid">
+                    {{ t('users.action.save') }}
+                  </button>
+                </div>
+              </form>
+            </app-panel>
+          } @else if (facade.selected(); as selected) {
+            <app-panel class="rail" padded [title]="selected.name">
+              <div class="rail-identity">
+                <span class="avatar avatar-lg" aria-hidden="true">{{ facade.initialsOf(selected) }}</span>
+                <div class="rail-identity-text">
+                  <strong>{{ selected.name }}</strong>
+                  <span class="email" dir="auto">{{ selected.email }}</span>
+                </div>
+                <app-badge [tone]="selected.active ? 'green' : 'slate'" shape="square">
+                  {{ selected.active ? t('users.status.active') : t('users.status.disabled') }}
+                </app-badge>
+              </div>
+
+              <!--
+                Four facts, where the template draws role, store access, phone and last active. The
+                last two have no source at all — a uaa user has no phone column and no last-login —
+                so username and account state take their place, both of which an operator needs when
+                someone says they cannot sign in.
+              -->
+              <dl class="rail-facts">
+                <div>
+                  <dt>{{ t('users.fact.roles') }}</dt>
+                  <dd>{{ facade.roleList(selected.roles) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ t('users.fact.userName') }}</dt>
+                  <dd dir="auto">{{ selected.userName }}</dd>
+                </div>
+                <div>
+                  <dt>{{ t('users.fact.storeAccess') }}</dt>
+                  <dd>{{ selected.store ? facade.storeName() : t('users.fact.organizationWide') }}</dd>
+                </div>
+                <div>
+                  <dt>{{ t('users.fact.signIn') }}</dt>
+                  <dd>{{ selected.active ? t('users.fact.allowed') : t('users.fact.blocked') }}</dd>
+                </div>
+              </dl>
+
+              @if (facade.canManageUsers) {
+                <div class="rail-actions rail-actions-wrap">
+                  <button class="secondary-action" type="button" [disabled]="busy()" (click)="facade.startEdit()">
+                    <app-icon name="pencil" />
+                    {{ t('users.action.edit') }}
+                  </button>
+                  <button
+                    class="secondary-action"
+                    type="button"
+                    [disabled]="busy()"
+                    (click)="facade.askToResetPassword(selected)"
+                  >
+                    <app-icon name="lock" />
+                    {{ t('users.action.resetPassword') }}
+                  </button>
+                  <!--
+                    Disabling yourself would end your own session on the next request, and deleting
+                    yourself is worse. The server does not stop either, so the console does.
+                  -->
+                  <button
+                    class="secondary-action"
+                    type="button"
+                    [disabled]="busy() || selected.isSelf"
+                    [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+                    (click)="facade.toggleActive(selected)"
+                  >
+                    <app-icon [name]="selected.active ? 'eyeOff' : 'eye'" />
+                    {{ selected.active ? t('users.action.disable') : t('users.action.enable') }}
+                  </button>
+                  <button
+                    class="ghost-action danger-action"
+                    type="button"
+                    [disabled]="busy() || selected.isSelf"
+                    [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+                    (click)="facade.askToDelete(selected)"
+                  >
+                    <app-icon name="trash" />
+                    {{ t('users.action.delete') }}
+                  </button>
+                </div>
+              }
+
+              <button class="ghost-action rail-close" type="button" (click)="closeRail()">
+                {{ t('users.action.closeDetails') }}
+              </button>
+            </app-panel>
+          } @else {
+            <app-panel class="rail" padded [title]="t('users.rail.noSelection')">
+              <app-empty-state icon="user" [message]="t('users.rail.selectPrompt')" />
+            </app-panel>
+          }
+        </div>
+      </div>
+    }
+  </app-busy-overlay>
+
+  @if (facade.deleting(); as target) {
+    <app-confirm-dialog
+      [open]="true"
+      [title]="t('users.delete.title')"
+      [message]="t('users.delete.message', {name: target.name})"
+      [confirmLabel]="t('users.action.delete')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      [confirmationText]="target.userName"
+      (confirmed)="facade.confirmDelete()"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+
+  @if (facade.resetting(); as target) {
+    <app-set-password-dialog
+      [open]="true"
+      [busy]="busy()"
+      [title]="t('users.reset.title')"
+      [message]="t('users.reset.message', {name: target.name})"
+      [passwordLabel]="t('users.field.newPassword')"
+      [repeatLabel]="t('users.field.repeatPassword')"
+      [hint]="t('users.field.passwordHint')"
+      [handoverHint]="t('users.reset.handoverHint')"
+      [weakMessage]="t('users.reset.weak')"
+      [mismatchMessage]="t('users.reset.mismatch')"
+      [confirmLabel]="t('users.reset.confirm')"
+      [busyLabel]="t('users.reset.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (submitted)="facade.confirmReset($event)"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+
+</ng-container>

@@ -62,6 +62,9 @@
     },
     "payments": {
       "title": "Payments | cvhome"
+    },
+    "users": {
+      "title": "Users"
     }
   },
   "notFound": {
@@ -341,7 +344,8 @@
       "phone": "Enter a valid phone number.",
       "taken": "This is already in use.",
       "mismatch": "These two do not match."
-    }
+    },
+    "listSeparator": ", "
   },
   "orders": {
     "allOrders": "All orders",
@@ -1142,7 +1146,8 @@
       "products": "Products",
       "newProduct": "New product",
       "productForm": "Product",
-      "payments": "Payments"
+      "payments": "Payments",
+      "users": "Users"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1930,5 +1935,112 @@
     "viewOrderFor": "Open a summary of order {{order}}",
     "externalRef": "Ref",
     "externalRefHint": "The reference this payment is known by outside the console — from the bank statement or the gateway."
+  },
+  "users": {
+    "loading": "Loading the team…",
+    "metricsLabel": "Team overview",
+    "allUsers": "All users",
+    "unit": "users",
+    "paginationLabel": "Team pages",
+    "you": "You",
+    "scopedToStore": "This list shows accounts that belong to {{store}}. Someone whose access is organization-wide rather than tied to one store does not appear here.",
+    "heading": {
+      "title": "User management",
+      "context": "Everyone with access to {{store}}"
+    },
+    "subtitle": {
+      "none": "No one to show",
+      "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {user} other {users}}"
+    },
+    "kpi": {
+      "teamMembers": "Team members",
+      "pendingInvitations": "Pending invitations",
+      "thisStore": "In this store"
+    },
+    "column": {
+      "user": "User",
+      "roles": "Roles",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "empty": {
+      "title": "No one here yet",
+      "message": "This store has no staff accounts. Add one to give a colleague access."
+    },
+    "rail": {
+      "newUser": "New user",
+      "editUser": "Edit user",
+      "noSelection": "Details",
+      "selectPrompt": "Choose someone from the list to see their account."
+    },
+    "fact": {
+      "roles": "Roles",
+      "userName": "Username",
+      "storeAccess": "Store access",
+      "organizationWide": "Organization-wide",
+      "signIn": "Sign-in",
+      "allowed": "Allowed",
+      "blocked": "Blocked"
+    },
+    "field": {
+      "userName": "Username",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "repeatPassword": "Repeat password",
+      "passwordHint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+      "roles": "Roles",
+      "rolesHint": "What this person may do. At least one is required.",
+      "rolesUnavailable": "The list of roles could not be loaded, so only the roles this account already has are shown.",
+      "active": "Allow sign-in",
+      "activeHint": "A disabled account keeps its history and cannot sign in."
+    },
+    "action": {
+      "addUser": "Add user",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "editFor": "Edit {{name}}",
+      "enable": "Allow sign-in",
+      "disable": "Block sign-in",
+      "resetPassword": "Set password",
+      "closeDetails": "Close details",
+      "notOnYourself": "You cannot do this to your own account."
+    },
+    "delete": {
+      "title": "Delete this account?",
+      "message": "{{name}} will be removed and will no longer be able to sign in. Their past activity is kept. This cannot be undone."
+    },
+    "reset": {
+      "title": "Set a new password",
+      "message": "Choose a new password for {{name}}. They will not be told — you will need to pass it on yourself.",
+      "confirm": "Set password",
+      "busy": "Setting…",
+      "handoverHint": "Nothing on this platform sends email, so hand the password over yourself and ask them to change it.",
+      "weak": "Use at least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+      "mismatch": "The two passwords do not match."
+    },
+    "toast": {
+      "created": "{{name}} was added.",
+      "updated": "{{name}} was updated.",
+      "deleted": "{{name}} was deleted.",
+      "enabled": "{{name}} can sign in again.",
+      "disabled": "{{name}} can no longer sign in.",
+      "passwordReset": "A new password was set for {{name}}."
+    }
+  },
+  "role": {
+    "SUPER_ADMIN": "Platform administrator",
+    "ORG_ADMIN": "Organization administrator",
+    "STORE_ADMIN": "Store administrator",
+    "STORE_MODERATOR": "Store moderator",
+    "STORE_RETAIL": "Retail",
+    "USER": "User"
   }
 }

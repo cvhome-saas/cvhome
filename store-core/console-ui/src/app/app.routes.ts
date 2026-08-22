@@ -127,6 +127,23 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * Users. Store-scoped like every other console route, because `user-account/list` is: it filters
+     * uaa on `{org, store}`, so the page is a reading of the open store's team and not of the
+     * organization's.
+     */
+    path: 'users',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/users/users').then((page) => page.Users),
+        data: {titleKey: 'route.users.title', breadcrumbKey: 'shell.breadcrumb.users'},
+      },
+    ],
+  },
+  {
     path: 'payments',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     canActivate: [canAccessSecuredPages, consoleContext, requiresStore],

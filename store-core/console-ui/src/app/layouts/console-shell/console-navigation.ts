@@ -18,7 +18,8 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
       {labelKey: 'shell.nav.item.storeManagement', icon: 'building', route: '/store-management'},
       // `/subscription`, not `/billing` — the gateway owns that prefix. See app.routes.ts.
       {labelKey: 'shell.nav.item.billing', icon: 'creditCard', route: '/subscription'},
-      {labelKey: 'shell.nav.item.userManagement', icon: 'users'},
+      // Routed by Module 8. The team of the *open store*, which is what user-account/list answers.
+      {labelKey: 'shell.nav.item.userManagement', icon: 'users', route: '/users'},
     ],
   },
   {
