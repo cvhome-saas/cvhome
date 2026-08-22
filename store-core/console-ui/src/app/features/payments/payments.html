@@ -221,6 +221,8 @@
     [totalLabel]="t('payments.summary.total')"
     [quantityLabel]="t('payments.summary.quantity')"
     [closeLabel]="t('payments.summary.close')"
+    [openOrderLabel]="t('payments.summary.openOrder')"
+    (opened)="openFullOrder()"
     (dismissed)="facade.closeOrderSummary()"
   />
 

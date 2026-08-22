@@ -355,20 +355,39 @@ describe('Payments', () => {
     expect(dialog.open).toBe(true);
   }));
 
-  /* No approve, no reject, no invoice — the summary answers a question, it does not act. */
-  it('offers no action on the summary but a way to close it', fakeAsync(() => {
+  /*
+   * No approve, no reject, no invoice — the summary answers a question, it does not act on the
+   * order. Its only two controls are a way out to the order page and a way to close.
+   */
+  it('offers no action on the summary beyond leaving it', fakeAsync(() => {
     const element = load();
     element.querySelector<HTMLButtonElement>('.order-ref')!.click();
     settle();
 
     const dialog = element.querySelector<HTMLDialogElement>('dialog.summary')!;
-    const buttons = [...dialog.querySelectorAll('button')];
-    expect(buttons.length).toBe(1);
-    expect(buttons[0].getAttribute('aria-label')).toBe('Close the order summary');
+    const labels = [...dialog.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'));
+    expect(labels).toEqual(['Open the full order', 'Close the order summary']);
 
-    buttons[0].click();
+    dialog.querySelector<HTMLButtonElement>('.summary-close')!.click();
     settle();
     expect(dialog.open).toBe(false);
+  }));
+
+  /* The escalation: the summary answers the small question, the order page answers the rest. */
+  it('routes to the order page from the summary, closing it on the way', fakeAsync(() => {
+    const element = load();
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+
+    element.querySelector<HTMLButtonElement>('.order-ref')!.click();
+    settle();
+    element.querySelector<HTMLDialogElement>('dialog.summary')!
+      .querySelector<HTMLButtonElement>('.summary-open')!
+      .click();
+    settle();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/orders', 10481]);
+    expect(element.querySelector<HTMLDialogElement>('dialog.summary')!.open).toBe(false);
   }));
 
   /*

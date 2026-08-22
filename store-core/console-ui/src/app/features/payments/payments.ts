@@ -148,6 +148,20 @@ export class Payments {
     return `${format(from)} – ${format(to)}`;
   });
 
+  /**
+   * Leaves the summary for the order page.
+   *
+   * Closes the dialog first: coming back to the ledger with a modal still open over it would be a
+   * surprise, and the route change is the operator choosing to leave.
+   */
+  protected openFullOrder(): void {
+    const pending = this.facade.summaryFor();
+    if (pending) {
+      this.facade.closeOrderSummary();
+      void this.router.navigate(['/orders', pending.id]);
+    }
+  }
+
   protected openGatewaySettings(): void {
     this.router.navigate(['/store-management', 'payments']);
   }

@@ -9,6 +9,21 @@
       @if (summary(); as order) {
         <app-badge [tone]="order.tone" shape="square">{{ order.status }}</app-badge>
       }
+      <!--
+        The way out of the summary. Only offered once the order has actually loaded — a link to a
+        page that could not be read is worse than no link.
+      -->
+      @if (summary()) {
+        <button
+          class="icon-action summary-open"
+          type="button"
+          [attr.aria-label]="openOrderLabel()"
+          [title]="openOrderLabel()"
+          (click)="opened.emit()"
+        >
+          <app-icon name="externalLink" />
+        </button>
+      }
       <button class="icon-action summary-close" type="button" [attr.aria-label]="closeLabel()" (click)="close()">
         <app-icon name="x" />
       </button>

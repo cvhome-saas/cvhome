@@ -2,6 +2,7 @@ import {Component, computed, inject, input, signal} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {Icon} from '@shared/ui/icon/icon';
+import {copyText} from '@core/platform/clipboard';
 
 /**
  * A stored credential: masked, revealable, copyable, editable.
@@ -106,17 +107,17 @@ export class SecretField {
    * Puts the value on the clipboard.
    *
    * `navigator.clipboard` is undefined on an insecure origin — which the console is, over plain
-   * HTTP in development — so the failure is caught and the tick simply does not appear, rather than
-   * an unhandled rejection. Same footgun as `crypto.randomUUID`, found during the orders review.
+   * HTTP on a named host — so this used to catch the failure and simply never show the tick, which
+   * left an operator pressing a button that did nothing. `copyText` falls back to a selection-based
+   * copy that works there, and the tick now means the value really was copied.
    */
   protected copy(): void {
-    void navigator.clipboard
-      ?.writeText(this.value())
-      .then(() => {
+    void copyText(this.value()).then((copied) => {
+      if (copied) {
         this.copied.set(true);
         setTimeout(() => this.copied.set(false), COPIED_MS);
-      })
-      .catch(() => undefined);
+      }
+    });
   }
 }
 

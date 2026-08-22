@@ -13,7 +13,9 @@ import {Icon} from '@shared/ui/icon/icon';
  * can reach anyway would make this a slower route to the same place. It answers one question, "what
  * did this pay for": who bought, what, how many, and what it came to.
  *
- * There are no actions on it for the same reason. The only control is Close.
+ * The one thing it does carry is a way *out* of itself: an open-order control beside the close,
+ * because a summary that raises a question it cannot answer has to point somewhere. It is a link to
+ * the order page, not an action on the order.
  *
  * Its copy arrives as inputs rather than through `*transloco` in this template, following
  * `approve-dialog`: a structural directive around the `<dialog>` defers the embedded view past the
@@ -44,8 +46,11 @@ export class OrderSummaryDialog {
   readonly totalLabel = input.required<string>();
   readonly quantityLabel = input.required<string>();
   readonly closeLabel = input.required<string>();
+  readonly openOrderLabel = input.required<string>();
 
   readonly dismissed = output<void>();
+  /** The escalation: the summary answers the small question, the order page answers the rest. */
+  readonly opened = output<void>();
 
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
 

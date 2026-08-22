@@ -56,8 +56,19 @@
   unicode-bidi: plaintext;
 }
 
+.summary-open,
 .summary-close {
   flex: none;
+}
+
+/* The escalation is quieter than the close: leaving is a choice, closing is the default. */
+.summary-open {
+  color: var(--foreground-subtle);
+}
+
+.summary-open:hover,
+.summary-open:focus-visible {
+  color: var(--primary-emphasis);
 }
 
 .summary-note {
