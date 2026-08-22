@@ -6,7 +6,9 @@ import {Badge} from '@shared/ui/badge/badge';
 import {CopyField} from '@shared/ui/copy-field/copy-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {SecretField} from '@shared/ui/secret-field/secret-field';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {
   LOGIN_PROVIDER_LABEL_KEY,
@@ -36,7 +38,18 @@ import type {
  */
 @Component({
   selector: 'app-social-login-section',
-  imports: [Badge, CopyField, Icon, Panel, ReactiveFormsModule, SecretField, Toggle, TranslocoDirective],
+  imports: [
+    Badge,
+    CopyField,
+    FormField,
+    Icon,
+    Panel,
+    ReactiveFormsModule,
+    SecretField,
+    TextField,
+    Toggle,
+    TranslocoDirective,
+  ],
   template: `
     <app-panel
       [title]="t('storeSettings.socialLogin.title')"
@@ -67,20 +80,23 @@ import type {
 
             @if (on) {
               <div class="provider-body">
-                <div class="field">
-                  <label [attr.for]="'app-id-' + provider.providerId">{{ t('storeSettings.socialLogin.appId') }}</label>
-                  <input
+                <app-form-field
+                  [label]="t('storeSettings.socialLogin.appId')"
+                  [controlId]="'app-id-' + provider.providerId"
+                >
+                  <app-text-field
+                    mono
                     [id]="'app-id-' + provider.providerId"
-                    class="control mono"
-                    type="text"
                     formControlName="appId"
+                    latin
+                    autocomplete="off"
                   />
-                </div>
+                </app-form-field>
 
-                <div class="field">
-                  <label [attr.for]="'app-secret-' + provider.providerId">
-                    {{ t('storeSettings.socialLogin.appSecret') }}
-                  </label>
+                <app-form-field
+                  [label]="t('storeSettings.socialLogin.appSecret')"
+                  [hint]="t('storeSettings.socialLogin.appSecretHint')"
+                >
                   <app-secret-field
                     [label]="t('storeSettings.socialLogin.appSecret')"
                     [value]="group.controls.appSecret.value"
@@ -92,8 +108,7 @@ import type {
                       formControlName="appSecret"
                     />
                   </app-secret-field>
-                  <p class="field-hint">{{ t('storeSettings.socialLogin.appSecretHint') }}</p>
-                </div>
+                </app-form-field>
 
                 @if (missingCredentials(group)) {
                   <p class="cross-field-error field-wide" role="alert">
@@ -115,7 +130,7 @@ import type {
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css'],
 })
 export class SocialLoginSection {
   readonly form = input.required<SocialLoginForm>();

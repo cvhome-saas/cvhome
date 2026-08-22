@@ -137,7 +137,7 @@ import {SLIDER_CAPACITY, type SliderSlide} from '@models/store-settings';
       />
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './slider-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './slider-section.css'],
 })
 export class SliderSection {
   readonly slides = input.required<readonly SliderSlide[]>();

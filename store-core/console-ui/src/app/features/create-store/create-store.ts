@@ -6,7 +6,9 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {Badge} from '@shared/ui/badge/badge';
 import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {Select} from '@shared/ui/select/select';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
@@ -32,7 +34,9 @@ import {CreateStoreFacade} from './facades/create-store.facade';
   imports: [
     Badge,
     DatePicker,
-    FieldError,
+    FormField,
+    Select,
+    TextField,
     Icon,
     PageHeader,
     Panel,
@@ -43,9 +47,40 @@ import {CreateStoreFacade} from './facades/create-store.facade';
     TranslocoDirective,
   ],
   templateUrl: './create-store.html',
-  styleUrl: './create-store.css',
+  styleUrls: ['../../shared/styles/field.css', './create-store.css'],
 })
 export class CreateStore {
+  /**
+   * Where the store-name uniqueness check has got to.
+   *
+   * The page used to draw this itself — a spinning clock, then a tick — and said nothing at all
+   * when a name was taken except a line of hint text, so the answer appeared in a different place
+   * depending on what it was. `app-text-field` has one affordance for this, shared with the
+   * catalogue's codes and the product SKU.
+   */
+  protected nameCheck(): 'idle' | 'pending' | 'free' | 'taken' {
+    const control = this.facade.form.controls.name;
+    if (control.pending) {
+      return 'pending';
+    }
+    if (control.hasError('nameTaken')) {
+      return 'taken';
+    }
+    return control.valid && control.value ? 'free' : 'idle';
+  }
+
+  /** The line under the name field: whether it is free, taken, or nothing yet. */
+  protected nameHint(t: (key: string) => string): string {
+    switch (this.nameCheck()) {
+      case 'taken':
+        return t('createStore.identity.nameTaken');
+      case 'free':
+        return t('createStore.identity.nameAvailable');
+      default:
+        return '';
+    }
+  }
+
   protected readonly facade = inject(CreateStoreFacade);
   /** Read only for whether this is the account's first store — the page owns nothing else of the shell. */
   protected readonly shell = inject(ConsoleShellFacade);

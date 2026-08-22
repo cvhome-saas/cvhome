@@ -7,7 +7,9 @@ import {CopyField} from '@shared/ui/copy-field/copy-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {SecretField} from '@shared/ui/secret-field/secret-field';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {
   GATEWAY_STATE_TAG,
@@ -37,11 +39,13 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
   imports: [
     Badge,
     CopyField,
+    FormField,
     Icon,
     NoticeBar,
     Panel,
     ReactiveFormsModule,
     SecretField,
+    TextField,
     Toggle,
     TranslocoDirective,
   ],
@@ -82,22 +86,21 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
             @if (on) {
               @if (gateway.credentials; as credentials) {
               <div class="provider-body">
-                <div class="field">
-                  <label [attr.for]="'api-key-' + gateway.paymentType">
-                    {{ t('storeSettings.payments.apiKey') }} <span class="field-note">{{ t('storeSettings.payments.publishable') }}</span>
-                  </label>
-                  <input
+                <app-form-field
+                  [label]="t('storeSettings.payments.apiKey')"
+                  [hint]="t('storeSettings.payments.publishable')"
+                  [controlId]="'api-key-' + gateway.paymentType"
+                >
+                  <app-text-field
+                    mono
                     [id]="'api-key-' + gateway.paymentType"
-                    class="control mono"
-                    type="text"
                     formControlName="apiKey"
+                    latin
+                    autocomplete="off"
                   />
-                </div>
+                </app-form-field>
 
-                <div class="field">
-                  <label [attr.for]="'secret-key-' + gateway.paymentType">
-                    {{ t('storeSettings.payments.secretKey') }}
-                  </label>
+                <app-form-field [label]="t('storeSettings.payments.secretKey')">
                   <app-secret-field
                     [label]="t('storeSettings.payments.secretKey')"
                     [value]="group.controls.secretKey.value"
@@ -109,12 +112,13 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
                       formControlName="secretKey"
                     />
                   </app-secret-field>
-                </div>
+                </app-form-field>
 
-                <div class="field field-wide">
-                  <label [attr.for]="'webhook-secret-' + gateway.paymentType">
-                    {{ t('storeSettings.payments.webhookSecret') }}
-                  </label>
+                <app-form-field
+                  wide
+                  [label]="t('storeSettings.payments.webhookSecret')"
+                  [hint]="t('storeSettings.payments.webhookSecretHint')"
+                >
                   <app-secret-field
                     [label]="t('storeSettings.payments.webhookSecret')"
                     [value]="group.controls.webhookSecret.value"
@@ -126,8 +130,7 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
                       formControlName="webhookSecret"
                     />
                   </app-secret-field>
-                  <p class="field-hint">{{ t('storeSettings.payments.webhookSecretHint') }}</p>
-                </div>
+                </app-form-field>
 
                 <!--
                   The endpoint the gateway posts to. Not returned by anything — assembled from the
@@ -150,7 +153,7 @@ import type {GatewayForm, PaymentsForm} from '../../services/store-settings-form
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './payments-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './payments-section.css'],
 })
 export class PaymentsSection {
   readonly form = input.required<PaymentsForm>();

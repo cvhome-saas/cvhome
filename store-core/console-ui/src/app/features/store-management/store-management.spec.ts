@@ -304,15 +304,57 @@ describe('StoreManagement', () => {
     return element.querySelector<HTMLButtonElement>('.primary-action')!;
   }
 
-  /** The phone control's own `.field`, so an assertion cannot pick up the store name's error. */
-  function phoneField(element: HTMLElement): HTMLElement {
-    return element.querySelector('#support-phone')!.closest('.field') as HTMLElement;
+  /*
+   * Controls are addressed by the form control they are bound to, not by a DOM id.
+   *
+   * They used to be `#store-name`, `#support-phone` and so on, because each field wrote its own
+   * `<input id>`. `app-form-field` associates the control by containment instead, so there is no id
+   * to query — and `formControlName` is the better handle anyway: it is the thing that identifies
+   * the control to the form, and it does not change when the markup does.
+   */
+  function control(element: HTMLElement, name: string): HTMLInputElement {
+    // A `#id` for the controls that keep one — the per-provider credential fields, where
+    // `formControlName="apiKey"` appears once per enabled gateway and would not say which.
+    const selector = name.startsWith('#')
+      ? name
+      : `app-text-field[formcontrolname="${name}"] input, textarea[formcontrolname="${name}"]`;
+    return element.querySelector<HTMLInputElement>(selector)!;
   }
 
-  function type(element: HTMLElement, selector: string, value: string): void {
-    const field = element.querySelector<HTMLInputElement>(selector)!;
-    field.value = value;
-    field.dispatchEvent(new Event('input'));
+  /** One of the supported-language switches, by the language it names. */
+  function languageToggle(element: HTMLElement, language: string): HTMLElement {
+    return Array.from(element.querySelectorAll<HTMLElement>('.check-grid [role="switch"]')).find(
+      (toggle) => toggle.closest('app-toggle')?.textContent?.includes(language),
+    )!;
+  }
+
+  /** The named field's own wrapper, so an assertion cannot pick up a neighbour's error. */
+  function field(element: HTMLElement, name: string): HTMLElement {
+    return element
+      .querySelector(`app-text-field[formcontrolname="${name}"]`)!
+      .closest('app-form-field') as HTMLElement;
+  }
+
+  function type(element: HTMLElement, name: string, value: string): void {
+    const input = control(element, name);
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+  }
+
+  /**
+   * Opens a themed select and returns what it offers.
+   *
+   * `app-select` draws a listbox behind a button, so its options exist only while it is open —
+   * which is the whole reason it replaced the native control: an operating-system dropdown cannot
+   * be themed, and in two of three themes it opened a white sheet.
+   */
+  function optionsOf(fixture: ComponentFixture<unknown>, element: HTMLElement, name: string): string[] {
+    const select = element.querySelector(`app-select[formcontrolname="${name}"]`)!;
+    select.querySelector<HTMLButtonElement>('.select-trigger')!.click();
+    fixture.detectChanges();
+    return Array.from(select.querySelectorAll('.option-label')).map(
+      (option) => option.textContent?.trim() ?? '',
+    );
   }
 
   it('renders the branding section by default and none of the console chrome', fakeAsync(() => {
@@ -387,7 +429,7 @@ describe('StoreManagement', () => {
 
     expect(saveButton(element).disabled).toBeTrue();
 
-    type(element, '#store-name', 'Acme Supply Group');
+    type(element, 'name', 'Acme Supply Group');
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeFalse();
@@ -396,7 +438,7 @@ describe('StoreManagement', () => {
   it('saves the active section and goes clean again', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    type(element, '#store-name', 'Acme Supply Group');
+    type(element, 'name', 'Acme Supply Group');
     settle(fixture);
     saveButton(element).click();
     settle(fixture);
@@ -411,13 +453,13 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('details');
 
     api.saveFailure = new Error('Unable to save.');
-    type(element, '#store-name', 'Acme Supply Group');
+    type(element, 'name', 'Acme Supply Group');
     settle(fixture);
     saveButton(element).click();
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeFalse();
-    expect(element.querySelector<HTMLInputElement>('#store-name')!.value).toBe(
+    expect(control(element, 'name').value).toBe(
       'Acme Supply Group',
     );
   }));
@@ -425,7 +467,7 @@ describe('StoreManagement', () => {
   it('blocks Save and shows the error when a required field is cleared', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    type(element, '#store-name', '');
+    type(element, 'name', '');
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeTrue();
@@ -437,10 +479,10 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('domain');
 
     // What an operator actually pastes out of the address bar.
-    type(element, '#custom-domain', 'https://Shop.Example.com:8443/collections/new?a=1');
+    type(element, 'customDomain', 'https://Shop.Example.com:8443/collections/new?a=1');
     settle(fixture);
 
-    expect(element.querySelector<HTMLInputElement>('#custom-domain')!.value).toBe(
+    expect(control(element, 'customDomain').value).toBe(
       'shop.example.com',
     );
     // The DNS record follows the field, so it names the host the CNAME will be for.
@@ -456,7 +498,7 @@ describe('StoreManagement', () => {
   it('still refuses something that is not a host name at all', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
-    type(element, '#custom-domain', 'not a domain');
+    type(element, 'customDomain', 'not a domain');
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeTrue();
@@ -480,7 +522,7 @@ describe('StoreManagement', () => {
   }));
 
   it('offers every country and every currency, not just the ones the store trades in', fakeAsync(() => {
-    const {element} = load('details');
+    const {fixture, element} = load('details');
 
     /*
      * The platform serves neither list, so both are built from ISO codes plus `Intl`. The counts
@@ -488,32 +530,27 @@ describe('StoreManagement', () => {
      * matters is that neither is the store's own four-item supported set, which is what the
      * country select used to be reduced to.
      */
-    const countries = element.querySelectorAll('#store-country option');
+    const countries = optionsOf(fixture, element, 'country');
     expect(countries.length).toBe(249);
-    expect(Array.from(countries).map((option) => option.getAttribute('value'))).toContain('JP');
+    expect(countries.join('|')).toContain('Japan');
 
-    const currencies = element.querySelectorAll('#store-currency option');
+    const currencies = optionsOf(fixture, element, 'currency');
     expect(currencies.length).toBeGreaterThan(100);
-    expect(Array.from(currencies).map((option) => option.getAttribute('value'))).toContain('SAR');
+    expect(currencies.join('|')).toContain('SAR');
   }));
 
   it('offers the default language as a name, and only from the supported set', fakeAsync(() => {
-    const {element} = load('details');
+    const {fixture, element} = load('details');
 
-    const options = Array.from(element.querySelectorAll('#store-language option'));
-    expect(options.map((option) => option.getAttribute('value'))).toEqual(['ar', 'en']);
     // Named rather than coded, and ordered by that name: the select used to read "en".
-    expect(options[0].textContent).toContain('Arabic');
-    expect(options[1].textContent).toContain('English');
+    expect(optionsOf(fixture, element, 'language')).toEqual(['Arabic', 'English']);
   }));
 
   it('ticks a supported language, marks the section dirty and sends the whole list', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    const french = Array.from(element.querySelectorAll<HTMLInputElement>('.check input')).find(
-      (box) => box.closest('label')?.textContent?.includes('French'),
-    )!;
-    expect(french.checked).toBeFalse();
+    const french = languageToggle(element, 'French');
+    expect(french.getAttribute('aria-checked')).toBe('false');
 
     french.click();
     settle(fixture);
@@ -529,10 +566,7 @@ describe('StoreManagement', () => {
   it('refuses a default language the store no longer supports', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    const english = Array.from(element.querySelectorAll<HTMLInputElement>('.check input')).find(
-      (box) => box.closest('label')?.textContent?.includes('English'),
-    )!;
-    english.click();
+    languageToggle(element, 'English').click();
     settle(fixture);
 
     expect(saveButton(element).disabled).toBeTrue();
@@ -545,18 +579,18 @@ describe('StoreManagement', () => {
   it('rejects a phone number that is not one, and requires it', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    type(element, '#support-phone', 'call the shop');
+    type(element, 'supportPhone', 'call the shop');
     settle(fixture);
     expect(saveButton(element).disabled).toBeTrue();
 
-    type(element, '#support-phone', '');
+    type(element, 'supportPhone', '');
     settle(fixture);
     expect(saveButton(element).disabled).toBeTrue();
-    expect(phoneField(element).querySelector('app-field-error')?.textContent).toContain(
+    expect(field(element, 'supportPhone').querySelector('app-field-error')?.textContent).toContain(
       'phone number',
     );
 
-    type(element, '#support-phone', '+44 20 7946 0958');
+    type(element, 'supportPhone', '+44 20 7946 0958');
     settle(fixture);
     expect(saveButton(element).disabled).toBeFalse();
   }));
@@ -564,13 +598,13 @@ describe('StoreManagement', () => {
   it('renders the fields the platform cannot store as disabled, and never submits them', fakeAsync(() => {
     const {fixture, element} = load('details');
 
-    for (const id of ['#legal-name', '#store-slug', '#store-category', '#store-timezone', '#store-tax']) {
-      expect(element.querySelector<HTMLInputElement>(id)!.disabled)
-        .withContext(`${id} must stay disabled`)
+    for (const name of ['legalName', 'slug', 'category', 'timezone', 'taxNumber']) {
+      expect(control(element, name).disabled)
+        .withContext(`${name} must stay disabled`)
         .toBeTrue();
     }
 
-    type(element, '#store-name', 'Acme Supply Group');
+    type(element, 'name', 'Acme Supply Group');
     settle(fixture);
     saveButton(element).click();
     settle(fixture);
@@ -746,7 +780,7 @@ describe('StoreManagement', () => {
     expect(element.querySelector('.status')).toBeNull();
     expect(dns.looked.length).toBe(0);
 
-    type(element, '#custom-domain', 'shop.acmesupply.co');
+    type(element, 'customDomain', 'shop.acmesupply.co');
     settle(fixture);
     tick(600);
     settle(fixture);
@@ -809,7 +843,7 @@ describe('StoreManagement', () => {
   it('adds a domain once its CNAME is confirmed to point here', fakeAsync(() => {
     const {fixture, element} = load('domain');
 
-    type(element, '#custom-domain', 'store.example.com');
+    type(element, 'customDomain', 'store.example.com');
     settle(fixture);
 
     // The check is debounced, and Save stays out of reach while it is in flight.
@@ -834,7 +868,7 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('domain');
 
     dns.outcome = 'points-elsewhere';
-    type(element, '#custom-domain', 'store.example.com');
+    type(element, 'customDomain', 'store.example.com');
     settle(fixture);
     tick(600);
     settle(fixture);
@@ -858,7 +892,7 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('domain');
 
     dns.outcome = 'no-record';
-    type(element, '#custom-domain', 'store.example.com');
+    type(element, 'customDomain', 'store.example.com');
     settle(fixture);
     tick(600);
     settle(fixture);
@@ -875,7 +909,7 @@ describe('StoreManagement', () => {
      * the field unusable on any network that filters dns.google, so it warns and allows.
      */
     dns.failure = new Error('offline');
-    type(element, '#custom-domain', 'store.example.com');
+    type(element, 'customDomain', 'store.example.com');
     settle(fixture);
     tick(600);
     settle(fixture);
@@ -913,8 +947,9 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('home');
     const title = () => element.querySelector<HTMLInputElement>('#home-title')!.value;
     // Scoped to the section: the page's own section rail is a tab switcher too.
+    // A radio group now, not a tablist — see `app-locale-switcher`.
     const tabs = () =>
-      Array.from(element.querySelectorAll<HTMLButtonElement>('app-home-section .lang-track .tab'));
+      Array.from(element.querySelectorAll<HTMLButtonElement>('app-home-section .chip'));
 
     /*
      * `supportedLanguages` is ['en', 'ar'] here, and the track is named rather than coded — five
@@ -979,7 +1014,7 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('details');
 
     expect(api.loads).toBe(1);
-    expect(element.querySelector<HTMLInputElement>('#store-name')!.value).toBe('Acme Supply Co.');
+    expect(control(element, 'name').value).toBe('Acme Supply Co.');
 
     api.settingsWith({
       storeName: 'Acme Outlet - West',
@@ -994,7 +1029,7 @@ describe('StoreManagement', () => {
      * store's values onto the other.
      */
     expect(api.loads).toBe(2);
-    expect(element.querySelector<HTMLInputElement>('#store-name')!.value).toBe('Acme Outlet - West');
+    expect(control(element, 'name').value).toBe('Acme Outlet - West');
   }));
 
   it('surfaces a failed load with a retry that refetches', fakeAsync(() => {

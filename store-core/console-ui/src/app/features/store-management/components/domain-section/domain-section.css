@@ -191,7 +191,6 @@
  * A hostname is one Latin string, whatever language the console is in.
  *
  * `dir="ltr"` on the wrapper puts the scheme before the field and stops the RTL algorithm
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list */
  * reordering `https://` into `//:https`, and `text-align: left` keeps the caret where a reader of
  * that string expects it — direction alone leaves the text hugging the right edge of the box.
  */

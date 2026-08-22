@@ -11,197 +11,168 @@
       <div class="column-main">
         <app-panel [title]="t('createStore.identity.title')" [subtitle]="t('createStore.identity.subtitle')">
           <form class="panel-pad identity-grid" [formGroup]="facade.form">
-            <div class="field">
-              <label for="store-name">{{ t('createStore.identity.storeName') }} <span class="required">*</span></label>
-              <span class="control" [class.invalid]="facade.form.controls.name.hasError('nameTaken')">
-                <input id="store-name" type="text" formControlName="name" [placeholder]="t('createStore.identity.storeNamePlaceholder')" />
-                @if (facade.form.controls.name.pending) {
-                  <app-icon name="clock" class="spin" />
-                } @else if (facade.form.controls.name.valid && facade.form.controls.name.value) {
-                  <app-icon name="checkCircle" class="ok" />
-                }
-              </span>
-              @if (facade.form.controls.name.hasError('nameTaken')) {
-                <p class="field-hint error">{{ t('createStore.identity.nameTaken') }}</p>
-              } @else if (facade.form.controls.name.valid && facade.form.controls.name.value) {
-                <p class="field-hint ok">{{ t('createStore.identity.nameAvailable') }}</p>
-              }
-            </div>
-
-            <div class="field">
-              <label for="store-email">{{ t('createStore.identity.email') }} <span class="required">*</span></label>
-              <span class="control">
-                <app-icon name="envelope" />
-                <input id="store-email" type="email" formControlName="email" dir="ltr" autocomplete="email" required />
-              </span>
-              <app-field-error
-                [control]="facade.form.controls.email"
-                [fallback]="t('createStore.identity.emailFallback')"
+            <app-form-field
+              [label]="t('createStore.identity.storeName')"
+              [control]="facade.form.controls.name"
+              required
+              controlId="store-name"
+              [hint]="nameHint(t)"
+            >
+              <!--
+                One uniqueness affordance, the same one the catalogue's codes and the product SKU
+                use. This field used to draw its own: a spinning clock and a tick, with no mark at
+                all for a name already taken — that was a line of hint text instead, so the answer
+                appeared in two different places depending on what it was.
+              -->
+              <app-text-field
+                id="store-name"
+                formControlName="name"
+                [placeholder]="t('createStore.identity.storeNamePlaceholder')"
+                [check]="nameCheck()"
+                [checkLabel]="nameHint(t)"
+                [invalid]="facade.form.controls.name.hasError('nameTaken')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-phone">{{ t('createStore.identity.phone') }} <span class="required">*</span></label>
-              <span class="control">
-                <app-icon name="phone" />
-                <input id="store-phone" type="tel" formControlName="phone" dir="ltr" autocomplete="tel" required />
-              </span>
-              <app-field-error
-                [control]="facade.form.controls.phone"
-                [fallback]="t('createStore.identity.phoneFallback')"
+            <app-form-field
+              [label]="t('createStore.identity.email')"
+              [control]="facade.form.controls.email"
+              required
+              [fallback]="t('createStore.identity.emailFallback')"
+            >
+              <app-text-field type="email" formControlName="email" icon="envelope" latin autocomplete="email" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.phone')"
+              [control]="facade.form.controls.phone"
+              required
+              [fallback]="t('createStore.identity.phoneFallback')"
+            >
+              <app-text-field type="tel" formControlName="phone" icon="phone" latin autocomplete="tel" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.country')"
+              [control]="facade.form.controls.country"
+              required
+              [fallback]="t('createStore.identity.countryFallback')"
+            >
+              <app-select
+                formControlName="country"
+                [options]="facade.countryChoices()"
+                [placeholder]="t('createStore.identity.choose')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-country">{{ t('createStore.identity.country') }} <span class="required">*</span></label>
-              <select id="store-country" class="control" formControlName="country" required>
-                <option value="" disabled>{{ t('createStore.identity.choose') }}</option>
-                @for (country of facade.countryOptions(); track country.code) {
-                  <option [value]="country.code">{{ country.label }}</option>
-                }
-              </select>
-              <app-field-error
-                [control]="facade.form.controls.country"
-                [fallback]="t('createStore.identity.countryFallback')"
+            <app-form-field
+              [label]="t('createStore.identity.currency')"
+              [control]="facade.form.controls.currency"
+              required
+              [fallback]="t('createStore.identity.currencyFallback')"
+            >
+              <app-select
+                formControlName="currency"
+                [options]="facade.currencyChoices()"
+                [placeholder]="t('createStore.identity.choose')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-currency">{{ t('createStore.identity.currency') }} <span class="required">*</span></label>
-              <select id="store-currency" class="control" formControlName="currency" dir="ltr" required>
-                <option value="" disabled>{{ t('createStore.identity.choose') }}</option>
-                @for (currency of facade.currencyOptions(); track currency.code) {
-                  <option [value]="currency.code">{{ currency.label }}</option>
-                }
-              </select>
-              <app-field-error
-                [control]="facade.form.controls.currency"
-                [fallback]="t('createStore.identity.currencyFallback')"
-              />
-            </div>
-
-            <div class="field field-wide">
-              <p class="field-label" id="create-languages-label">
-                {{ t('createStore.identity.supportedLanguages') }} <span class="required">*</span>
-              </p>
-              <div class="check-grid" role="group" aria-labelledby="create-languages-label">
+            <app-form-field
+              wide
+              [label]="t('createStore.identity.supportedLanguages')"
+              [control]="facade.form.controls.supportedLanguages"
+              required
+              [fallback]="t('createStore.identity.supportedLanguagesFallback')"
+            >
+              <div class="check-grid" role="group" [attr.aria-label]="t('createStore.identity.supportedLanguages')">
                 @for (language of facade.languageOptions(); track language.code) {
-                  <label class="check">
-                    <input
-                      type="checkbox"
-                      [checked]="facade.isSupported(language.code)"
-                      (change)="facade.toggleLanguage(language.code)"
-                    />
-                    <span>{{ language.label }}</span>
-                  </label>
+                  <app-toggle
+                    [label]="language.label"
+                    [checked]="facade.isSupported(language.code)"
+                    (checkedChange)="facade.toggleLanguage(language.code)"
+                  />
                 }
               </div>
-              <app-field-error
-                [control]="facade.form.controls.supportedLanguages"
-                [fallback]="t('createStore.identity.supportedLanguagesFallback')"
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.language')" required>
+              <app-select formControlName="language" [options]="facade.languageChoices()" />
+            </app-form-field>
+
+            @if (facade.form.hasError('defaultLanguageNotSupported')) {
+              <p class="cross-field-error" role="alert">{{ t('createStore.identity.languageNotSupported') }}</p>
+            }
+
+            <app-form-field
+              [label]="t('createStore.identity.theme')"
+              [control]="facade.form.controls.theme"
+              required
+              [fallback]="t('createStore.identity.themeFallback')"
+            >
+              <app-select
+                formControlName="theme"
+                [options]="facade.themeChoices()"
+                [placeholder]="t('createStore.identity.choose')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-language">{{ t('createStore.identity.language') }} <span class="required">*</span></label>
-              <select id="store-language" class="control" formControlName="language" required>
-                @for (language of facade.languageOptions(); track language.code) {
-                  <option [value]="language.code">{{ language.label }}</option>
-                }
-              </select>
-              @if (facade.form.hasError('defaultLanguageNotSupported')) {
-                <p class="field-hint error">{{ t('createStore.identity.languageNotSupported') }}</p>
-              }
-            </div>
-
-            <div class="field">
-              <label for="store-theme">{{ t('createStore.identity.theme') }} <span class="required">*</span></label>
-              <select id="store-theme" class="control" formControlName="theme" required>
-                <option value="" disabled>{{ t('createStore.identity.choose') }}</option>
-                @for (name of facade.choices().themes; track name) {
-                  <option [value]="name">{{ name }}</option>
-                }
-              </select>
-              <app-field-error
-                [control]="facade.form.controls.theme"
-                [fallback]="t('createStore.identity.themeFallback')"
+            <app-form-field
+              [label]="t('createStore.identity.colorTheme')"
+              [control]="facade.form.controls.colorTheme"
+              required
+              [fallback]="t('createStore.identity.colorThemeFallback')"
+            >
+              <app-select
+                formControlName="colorTheme"
+                [options]="facade.colorThemeChoices()"
+                [placeholder]="t('createStore.identity.choose')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-color-theme">{{ t('createStore.identity.colorTheme') }} <span class="required">*</span></label>
-              <select id="store-color-theme" class="control" formControlName="colorTheme" required>
-                <option value="" disabled>{{ t('createStore.identity.choose') }}</option>
-                @for (name of facade.choices().colorThemes; track name) {
-                  <option [value]="name">{{ name }}</option>
-                }
-              </select>
-              <app-field-error
-                [control]="facade.form.controls.colorTheme"
-                [fallback]="t('createStore.identity.colorThemeFallback')"
-              />
-            </div>
+            <app-form-field wide [label]="t('createStore.identity.address')">
+              <app-text-field formControlName="addressLine" icon="mapPin" />
+            </app-form-field>
 
-            <div class="field field-wide">
-              <label for="store-address">{{ t('createStore.identity.address') }}</label>
-              <span class="control">
-                <app-icon name="mapPin" />
-                <input id="store-address" type="text" formControlName="addressLine" dir="auto" />
-              </span>
-            </div>
+            <app-form-field
+              [label]="t('createStore.identity.city')"
+              [control]="facade.form.controls.city"
+              required
+              [fallback]="t('createStore.identity.cityFallback')"
+            >
+              <app-text-field formControlName="city" />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-city">{{ t('createStore.identity.city') }} <span class="required">*</span></label>
-              <input id="store-city" class="control" type="text" formControlName="city" dir="auto" required />
-              <app-field-error
-                [control]="facade.form.controls.city"
-                [fallback]="t('createStore.identity.cityFallback')"
-              />
-            </div>
+            <app-form-field [label]="t('createStore.identity.stateProvince')">
+              <app-text-field formControlName="stateProvince" />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-state">{{ t('createStore.identity.stateProvince') }}</label>
-              <input id="store-state" class="control" type="text" formControlName="stateProvince" dir="auto" />
-            </div>
+            <app-form-field
+              [label]="t('createStore.identity.postalCode')"
+              [control]="facade.form.controls.postalCode"
+              required
+              [fallback]="t('createStore.identity.postalCodeFallback')"
+            >
+              <app-text-field formControlName="postalCode" latin />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-postal">{{ t('createStore.identity.postalCode') }} <span class="required">*</span></label>
-              <input id="store-postal" class="control" type="text" formControlName="postalCode" dir="ltr" required />
-              <app-field-error
-                [control]="facade.form.controls.postalCode"
-                [fallback]="t('createStore.identity.postalCodeFallback')"
-              />
-            </div>
-
-            <div class="field">
-              <label for="store-since">{{ t('createStore.identity.inBusinessSince') }}</label>
+            <app-form-field [label]="t('createStore.identity.inBusinessSince')">
               <!-- The console's own picker: a native date input is the one control on this form that
-                   ignores the app's tokens, theme and language. See `DatePicker`. -->
+                   ignores the app's tokens, theme and language. See DatePicker. -->
               <app-date-picker
-                id="store-since"
                 formControlName="inBusinessSince"
                 [max]="today"
                 [placeholder]="t('createStore.identity.inBusinessSincePlaceholder')"
               />
-            </div>
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-weight">{{ t('createStore.identity.weightUnit') }}</label>
-              <select id="store-weight" class="control" formControlName="weightUnit">
-                @for (unit of facade.weightUnits; track unit) {
-                  <option [value]="unit">{{ t('storeSettings.unit.' + unit) }}</option>
-                }
-              </select>
-            </div>
+            <app-form-field [label]="t('createStore.identity.weightUnit')">
+              <app-select formControlName="weightUnit" [options]="facade.weightUnitChoices(t)" />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-dimension">{{ t('createStore.identity.dimensionUnit') }}</label>
-              <select id="store-dimension" class="control" formControlName="dimensionUnit">
-                @for (unit of facade.dimensionUnits; track unit) {
-                  <option [value]="unit">{{ t('storeSettings.unit.' + unit) }}</option>
-                }
-              </select>
-            </div>
+            <app-form-field [label]="t('createStore.identity.dimensionUnit')">
+              <app-select formControlName="dimensionUnit" [options]="facade.dimensionUnitChoices(t)" />
+            </app-form-field>
 
             <!-- The same switch, with the same wording and description, as the identical setting in
                  store management. A bare checkbox here made one setting look like two controls. -->

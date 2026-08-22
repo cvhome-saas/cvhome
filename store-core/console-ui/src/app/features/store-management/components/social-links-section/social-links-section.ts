@@ -4,6 +4,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {FieldError} from '@shared/ui/form-field/field-error';
 import {Icon} from '@shared/ui/icon/icon';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Panel} from '@shared/ui/panel/panel';
 import {
   SOCIAL_LINK_LABEL_KEY,
@@ -23,7 +24,7 @@ import type {SocialLinksForm} from '../../services/store-settings-form.service';
  */
 @Component({
   selector: 'app-social-links-section',
-  imports: [FieldError, Icon, Panel, ReactiveFormsModule, TranslocoDirective],
+  imports: [FieldError, Icon, Panel, ReactiveFormsModule, TextField, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.social.title')"
@@ -39,28 +40,29 @@ import type {SocialLinksForm} from '../../services/store-settings-form.service';
             </label>
 
             <div class="link-field">
-              <span class="control">
-                <input
-                  [id]="'social-' + link.provider"
-                  type="url"
-                  [formControlName]="link.provider"
-                  [placeholder]="t('storeSettings.social.addProfileUrl')"
-                />
-                @if (isSet(link.provider)) {
-                  <app-icon name="checkCircle" class="ok" />
-                }
-              </span>
-              <app-field-error
-                [control]="controlOf(link.provider)"
-                [fallback]="errorFor(link, t)"
+              <!--
+                The shared check affordance rather than a hand-placed tick: the same mark the
+                catalogue's code fields and the product SKU use, so "this is set" looks the same
+                wherever it appears.
+              -->
+              <app-text-field
+                type="url"
+                [id]="'social-' + link.provider"
+                [formControlName]="link.provider"
+                [placeholder]="t('storeSettings.social.addProfileUrl')"
+                latin
+                [check]="isSet(link.provider) ? 'free' : 'idle'"
+                [checkLabel]="t('storeSettings.social.linkSet')"
+                [invalid]="controlOf(link.provider).invalid && controlOf(link.provider).touched"
               />
+              <app-field-error [control]="controlOf(link.provider)" [fallback]="errorFor(link, t)" />
             </div>
           </div>
         }
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './social-links-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './social-links-section.css'],
 })
 export class SocialLinksSection {
   readonly form = input.required<SocialLinksForm>();

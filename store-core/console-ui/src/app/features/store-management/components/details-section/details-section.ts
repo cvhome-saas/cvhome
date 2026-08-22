@@ -8,9 +8,11 @@ import {dateKey} from '@core/i18n/calendar';
 import {ReferenceDataService, STOREFRONT_LANGUAGES} from '@core/reference/reference-data.service';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
+import {Select, type SelectOption} from '@shared/ui/select/select';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {SHORT_DESCRIPTION_MAX, type SettingsChoices} from '@models/store-settings';
 import type {DetailsForm} from '../../services/store-settings-form.service';
@@ -31,10 +33,12 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
   imports: [
     ConfirmDialog,
     DatePicker,
-    FieldError,
+    FormField,
     Icon,
     Panel,
     ReactiveFormsModule,
+    Select,
+    TextField,
     Toggle,
     TranslocoDirective,
   ],
@@ -46,199 +50,139 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
     >
       <div class="section-body" [formGroup]="form()">
         <div class="field-grid">
-          <div class="field">
-            <label for="store-name">
-              {{ t('storeSettings.details.storeName') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <input id="store-name" class="control" type="text" formControlName="name" dir="auto" required />
-            <app-field-error
-              [control]="form().controls.name"
-              [fallback]="t('storeSettings.details.storeNameFallback')"
-            />
-          </div>
+          <app-form-field
+            [label]="t('storeSettings.details.storeName')"
+            [control]="form().controls.name"
+            controlId="store-name"
+            required
+            [fallback]="t('storeSettings.details.storeNameFallback')"
+          >
+            <app-text-field id="store-name" formControlName="name" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="support-email">
-              {{ t('storeSettings.details.supportEmail') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <span class="control">
-              <app-icon name="envelope" />
-              <input id="support-email" type="email" formControlName="supportEmail" dir="ltr" required />
-            </span>
-            <app-field-error
-              [control]="form().controls.supportEmail"
-              [fallback]="t('storeSettings.details.supportEmailFallback')"
-            />
-          </div>
+          <app-form-field
+            [label]="t('storeSettings.details.supportEmail')"
+            [control]="form().controls.supportEmail"
+            required
+            [fallback]="t('storeSettings.details.supportEmailFallback')"
+          >
+            <app-text-field type="email" formControlName="supportEmail" icon="envelope" latin autocomplete="email" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="support-phone">
-              {{ t('storeSettings.details.supportPhone') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <span class="control">
-              <app-icon name="phone" />
-              <input
-                id="support-phone"
-                type="tel"
-                formControlName="supportPhone"
-                dir="ltr"
-                autocomplete="tel"
-                required
-              />
-            </span>
-            <app-field-error
-              [control]="form().controls.supportPhone"
-              [fallback]="t('storeSettings.details.supportPhoneFallback')"
+          <app-form-field
+            [label]="t('storeSettings.details.supportPhone')"
+            [control]="form().controls.supportPhone"
+            controlId="support-phone"
+            required
+            [fallback]="t('storeSettings.details.supportPhoneFallback')"
+          >
+            <app-text-field
+              id="support-phone"
+              type="tel"
+              formControlName="supportPhone"
+              icon="phone"
+              latin
+              autocomplete="tel"
             />
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-currency">
-              {{ t('storeSettings.details.currency') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <select id="store-currency" class="control" formControlName="currency" dir="ltr" required>
-              @for (currency of currencyOptions(); track currency.code) {
-                <option [value]="currency.code">{{ currency.label }}</option>
-              }
-            </select>
-            <app-field-error
-              [control]="form().controls.currency"
-              [fallback]="t('storeSettings.details.currencyFallback')"
-            />
-          </div>
+          <app-form-field
+            [label]="t('storeSettings.details.currency')"
+            [control]="form().controls.currency"
+            required
+            [fallback]="t('storeSettings.details.currencyFallback')"
+          >
+            <app-select formControlName="currency" [options]="currencyChoices()" />
+          </app-form-field>
 
-          <div class="field field-wide">
-            <p class="field-label" id="supported-languages-label">
-              {{ t('storeSettings.details.supportedLanguages') }}
-              <span class="required" aria-hidden="true">*</span>
-            </p>
-            <div class="check-grid" role="group" aria-labelledby="supported-languages-label">
+          <app-form-field
+            wide
+            [label]="t('storeSettings.details.supportedLanguages')"
+            [control]="form().controls.supportedLanguages"
+            required
+            [fallback]="t('storeSettings.details.supportedLanguagesFallback')"
+            [hint]="t('storeSettings.details.supportedLanguagesNote')"
+            controlId="supported-languages"
+          >
+            <!--
+              The hint above is not decoration: the platform adds but never removes — the populator
+              calls add() per entry and drops nothing, so unticking is accepted and ignored. Said
+              before the operator spends a save finding out. TODO(lessons.md): see lessons.md,
+              "Store management — a supported language can be added but never removed".
+            -->
+            <div class="check-grid" role="group" [attr.aria-label]="t('storeSettings.details.supportedLanguages')">
               @for (language of supportedLanguageOptions(); track language.code) {
-                <label class="check">
-                  <input
-                    type="checkbox"
-                    [checked]="isSupported(language.code)"
-                    (change)="toggleLanguage(language.code)"
-                  />
-                  <span>{{ language.label }}</span>
-                </label>
+                <app-toggle
+                  [label]="language.label"
+                  [checked]="isSupported(language.code)"
+                  (checkedChange)="toggleLanguage(language.code)"
+                />
               }
             </div>
-            <!--
-              The platform adds but never removes: the populator calls add() per entry and drops
-              nothing, so unticking is accepted and ignored. Said here rather than discovered after
-              a reload. TODO(lessons.md): see lessons.md, "Store management — a supported language
-              can be added but never removed".
-            -->
-            <p class="field-hint">{{ t('storeSettings.details.supportedLanguagesNote') }}</p>
-            <app-field-error
-              [control]="form().controls.supportedLanguages"
-              [fallback]="t('storeSettings.details.supportedLanguagesFallback')"
-            />
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-language">
-              {{ t('storeSettings.details.language') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <select id="store-language" class="control" formControlName="language" required>
-              @for (language of defaultLanguageOptions(); track language.code) {
-                <option [value]="language.code">{{ language.label }}</option>
-              }
-            </select>
-            <app-field-error
-              [control]="form().controls.language"
-              [fallback]="t('storeSettings.details.languageFallback')"
-            />
-            <!-- The pair is wrong rather than either field, so the message sits under the one to change. -->
-            @if (defaultLanguageUnsupported()) {
-              <p class="cross-field-error" role="alert">{{ t('storeSettings.details.languageNotSupported') }}</p>
-            }
-          </div>
+          <app-form-field
+            [label]="t('storeSettings.details.language')"
+            [control]="form().controls.language"
+            required
+            [fallback]="t('storeSettings.details.languageFallback')"
+          >
+            <app-select formControlName="language" [options]="defaultLanguageChoices()" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-country">
-              {{ t('storeSettings.details.country') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <select id="store-country" class="control" formControlName="country" required>
-              @for (country of countryOptions(); track country.code) {
-                <option [value]="country.code">{{ country.label }}</option>
-              }
-            </select>
-            <app-field-error
-              [control]="form().controls.country"
-              [fallback]="t('storeSettings.details.countryFallback')"
-            />
-          </div>
+          <!-- The pair is wrong rather than either field, so the message sits under the one to change. -->
+          @if (defaultLanguageUnsupported()) {
+            <p class="cross-field-error" role="alert">{{ t('storeSettings.details.languageNotSupported') }}</p>
+          }
 
-          <div class="field">
-            <label for="store-theme">{{ t('storeSettings.details.theme') }}</label>
-            <select id="store-theme" class="control" formControlName="theme">
-              @for (name of choices().themes; track name) {
-                <option [value]="name">{{ name }}</option>
-              }
-            </select>
-          </div>
+          <app-form-field
+            [label]="t('storeSettings.details.country')"
+            [control]="form().controls.country"
+            required
+            [fallback]="t('storeSettings.details.countryFallback')"
+          >
+            <app-select formControlName="country" [options]="countryChoices()" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-color-theme">{{ t('storeSettings.details.colorTheme') }}</label>
-            <select id="store-color-theme" class="control" formControlName="colorTheme">
-              @for (name of choices().colorThemes; track name) {
-                <option [value]="name">{{ name }}</option>
-              }
-            </select>
-          </div>
+          <app-form-field [label]="t('storeSettings.details.theme')">
+            <app-select formControlName="theme" [options]="themeChoices()" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-since">{{ t('storeSettings.details.inBusinessSince') }}</label>
+          <app-form-field [label]="t('storeSettings.details.colorTheme')">
+            <app-select formControlName="colorTheme" [options]="colorThemeChoices()" />
+          </app-form-field>
+
+          <app-form-field [label]="t('storeSettings.details.inBusinessSince')">
             <app-date-picker
-              id="store-since"
               formControlName="inBusinessSince"
               [max]="today"
               [placeholder]="t('storeSettings.details.inBusinessSincePlaceholder')"
             />
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-weight">{{ t('storeSettings.details.weightUnit') }}</label>
-            <select id="store-weight" class="control" formControlName="weightUnit">
-              @for (unit of weightUnits; track unit) {
-                <option [value]="unit">{{ t('storeSettings.unit.' + unit) }}</option>
-              }
-            </select>
-          </div>
+          <app-form-field [label]="t('storeSettings.details.weightUnit')">
+            <app-select formControlName="weightUnit" [options]="weightUnitChoices(t)" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-dimension">{{ t('storeSettings.details.dimensionUnit') }}</label>
-            <select id="store-dimension" class="control" formControlName="dimensionUnit">
-              @for (unit of dimensionUnits; track unit) {
-                <option [value]="unit">{{ t('storeSettings.unit.' + unit) }}</option>
-              }
-            </select>
-          </div>
+          <app-form-field [label]="t('storeSettings.details.dimensionUnit')">
+            <app-select formControlName="dimensionUnit" [options]="dimensionUnitChoices(t)" />
+          </app-form-field>
 
-          <div class="field field-wide">
-            <label for="store-address">{{ t('storeSettings.details.address') }}</label>
-            <span class="control">
-              <app-icon name="mapPin" />
-              <input id="store-address" type="text" formControlName="addressLine" dir="auto" />
-            </span>
-          </div>
+          <app-form-field wide [label]="t('storeSettings.details.address')">
+            <app-text-field formControlName="addressLine" icon="mapPin" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-city">{{ t('storeSettings.details.city') }}</label>
-            <input id="store-city" class="control" type="text" formControlName="city" dir="auto" />
-          </div>
+          <app-form-field [label]="t('storeSettings.details.city')">
+            <app-text-field formControlName="city" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-state">{{ t('storeSettings.details.stateProvince') }}</label>
-            <input id="store-state" class="control" type="text" formControlName="stateProvince" dir="auto" />
-          </div>
+          <app-form-field [label]="t('storeSettings.details.stateProvince')">
+            <app-text-field formControlName="stateProvince" />
+          </app-form-field>
 
-          <div class="field">
-            <label for="store-postal">{{ t('storeSettings.details.postalCode') }}</label>
-            <input id="store-postal" class="control" type="text" formControlName="postalCode" dir="ltr" />
-          </div>
+          <app-form-field [label]="t('storeSettings.details.postalCode')">
+            <app-text-field formControlName="postalCode" latin />
+          </app-form-field>
         </div>
 
         <hr class="divider" />
@@ -276,39 +220,33 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
           <p class="unbacked-note">{{ t('storeSettings.details.notRecordedNote') }}</p>
 
           <div class="field-grid">
-            <div class="field">
-              <label for="legal-name">{{ t('storeSettings.details.legalName') }}</label>
-              <input id="legal-name" class="control" type="text" formControlName="legalName" />
-            </div>
+            <app-form-field [label]="t('storeSettings.details.legalName')">
+              <app-text-field formControlName="legalName" />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-slug">{{ t('storeSettings.details.slug') }}</label>
-              <span class="control">
-                <app-icon name="link" />
-                <input id="store-slug" type="text" formControlName="slug" />
-              </span>
-            </div>
+            <app-form-field [label]="t('storeSettings.details.slug')">
+              <app-text-field formControlName="slug" icon="link" latin />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-category">{{ t('storeSettings.details.category') }}</label>
-              <input id="store-category" class="control" type="text" formControlName="category" />
-            </div>
+            <app-form-field [label]="t('storeSettings.details.category')">
+              <app-text-field formControlName="category" />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-timezone">{{ t('storeSettings.details.timezone') }}</label>
-              <input id="store-timezone" class="control" type="text" formControlName="timezone" />
-            </div>
+            <app-form-field [label]="t('storeSettings.details.timezone')">
+              <app-text-field formControlName="timezone" latin />
+            </app-form-field>
 
-            <div class="field">
-              <label for="store-tax">{{ t('storeSettings.details.taxNumber') }}</label>
-              <input id="store-tax" class="control" type="text" formControlName="taxNumber" />
-            </div>
+            <app-form-field [label]="t('storeSettings.details.taxNumber')">
+              <app-text-field formControlName="taxNumber" latin />
+            </app-form-field>
 
-            <div class="field field-wide">
-              <label for="store-blurb">{{ t('storeSettings.details.shortDescription') }}</label>
-              <input id="store-blurb" class="control" type="text" formControlName="shortDescription" />
-              <p class="field-hint">{{ t('storeSettings.details.upToCharacters', {max: descriptionMax}) }}</p>
-            </div>
+            <app-form-field
+              wide
+              [label]="t('storeSettings.details.shortDescription')"
+              [hint]="t('storeSettings.details.upToCharacters', {max: descriptionMax})"
+            >
+              <app-text-field formControlName="shortDescription" [maxLength]="descriptionMax" />
+            </app-form-field>
           </div>
 
           <div class="switch-row">
@@ -360,7 +298,7 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
       />
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './details-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './details-section.css'],
 })
 export class DetailsSection {
   readonly form = input.required<DetailsForm>();
@@ -400,6 +338,43 @@ export class DetailsSection {
   /** Today, as the date picker's upper bound — a store cannot have traded since tomorrow. */
   protected readonly today = dateKey(new Date());
   protected readonly dimensionUnits = ['CM', 'IN'] as const;
+
+  /**
+   * The reference lists, as `app-select` options.
+   *
+   * `SelectOption` rather than the raw arrays because the native `<select>`s these replaced built
+   * their own `<option>` elements — and did so with `[value]`, which is the binding that loses its
+   * value when the options arrive after it. `formControlName` on `app-select` re-applies as each
+   * option appears, which is the fix lessons.md records for exactly this.
+   */
+  protected readonly countryChoices = computed<readonly SelectOption[]>(() =>
+    this.countryOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  protected readonly currencyChoices = computed<readonly SelectOption[]>(() =>
+    this.currencyOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  protected readonly defaultLanguageChoices = computed<readonly SelectOption[]>(() =>
+    this.defaultLanguageOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  /** A theme is named by the server and has no translation; the code is the label. */
+  protected readonly themeChoices = computed<readonly SelectOption[]>(() =>
+    this.choices().themes.map((name) => ({value: name, label: name})),
+  );
+
+  protected readonly colorThemeChoices = computed<readonly SelectOption[]>(() =>
+    this.choices().colorThemes.map((name) => ({value: name, label: name})),
+  );
+
+  protected weightUnitChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.weightUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));
+  }
+
+  protected dimensionUnitChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.dimensionUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));
+  }
 
   /**
    * Every country and every currency, named in the reader's language.

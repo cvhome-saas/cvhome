@@ -23,6 +23,7 @@ import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '../create-store.content';
 import type {CreateStorePhase} from '@models/create-store';
 import type {Pod} from '@models/pod';
 import type {CreateStoreRequest, ManagerStore, ProvisioningState} from '@models/tenancy';
+import type {SelectOption} from '@shared/ui/select/select';
 
 /** How often the new store's row is re-read while it builds. */
 const POLL_MS = 2000;
@@ -141,6 +142,42 @@ export class CreateStoreFacade {
   readonly choices = computed<CreateStoreChoices>(
     () => this.choiceList.value() ?? {themes: [], colorThemes: []},
   );
+
+  /**
+   * The reference lists, as `app-select` options.
+   *
+   * The native selects these replaced bound their options with `[value]`, which is the binding that
+   * loses its value when the options arrive after it — the trap lessons.md records for the Organize
+   * step's Brand and Type. `formControlName` on `app-select` re-applies as each option appears.
+   */
+  readonly countryChoices = computed<readonly SelectOption[]>(() =>
+    this.countryOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  readonly currencyChoices = computed<readonly SelectOption[]>(() =>
+    this.currencyOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  readonly languageChoices = computed<readonly SelectOption[]>(() =>
+    this.languageOptions().map((option) => ({value: option.code, label: option.label})),
+  );
+
+  /** A theme is named by the server and has no translation; the code is the label. */
+  readonly themeChoices = computed<readonly SelectOption[]>(() =>
+    this.choices().themes.map((name) => ({value: name, label: name})),
+  );
+
+  readonly colorThemeChoices = computed<readonly SelectOption[]>(() =>
+    this.choices().colorThemes.map((name) => ({value: name, label: name})),
+  );
+
+  weightUnitChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.weightUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));
+  }
+
+  dimensionUnitChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.dimensionUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));
+  }
 
   /** Countries and currencies come from `Intl`, not the platform — see `ReferenceDataService`. */
   readonly countryOptions = computed<readonly ReferenceOption[]>(() => this.reference.countries());

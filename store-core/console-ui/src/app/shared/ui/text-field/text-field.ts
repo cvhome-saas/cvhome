@@ -1,7 +1,8 @@
-import {Component, computed, forwardRef, input, model, signal} from '@angular/core';
+import {Component, booleanAttribute, computed, forwardRef, input, model, signal} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 import {Icon} from '@shared/ui/icon/icon';
+import type {IconName} from '@models/ui';
 
 /** The types this covers. Anything numeric belongs in `app-number-field`, which is a different job. */
 export type TextFieldType = 'text' | 'email' | 'url' | 'tel' | 'search' | 'password';
@@ -45,6 +46,7 @@ export type UniquenessCheck = 'idle' | 'pending' | 'free' | 'taken';
   host: {
     '[class.text-disabled]': 'isDisabled()',
     '[class.text-invalid]': 'invalid()',
+    '[class.text-mono]': 'mono()',
   },
   providers: [{provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TextField), multi: true}],
 })
@@ -56,13 +58,20 @@ export class TextField implements ControlValueAccessor {
   readonly ariaLabel = input<string | null>(null);
   readonly describedBy = input<string | null>(null);
   readonly placeholder = input('');
-  readonly disabled = input(false);
+  readonly disabled = input(false, {transform: booleanAttribute});
   /** The consumer's `control.invalid && touched`. Draws the error frame; does not block typing. */
-  readonly invalid = input(false);
+  readonly invalid = input(false, {transform: booleanAttribute});
   readonly autocomplete = input<string | null>(null);
   readonly inputmode = input<string | null>(null);
   /** Shown before the value — a scheme, a currency, an `@`. Not part of the value. */
   readonly prefix = input<string | null>(null);
+  /**
+   * A glyph before the value — an envelope on a support address, a pin on a street.
+   *
+   * Decoration, so it is `aria-hidden`: the field already has a label, and "envelope, Support
+   * email" is worse than "Support email".
+   */
+  readonly icon = input<IconName | null>(null);
   /** Shown after it — a domain suffix, a unit. Not part of the value. */
   readonly suffix = input<string | null>(null);
   /**
@@ -71,7 +80,16 @@ export class TextField implements ControlValueAccessor {
    */
   readonly maxLength = input<number | null>(null);
   /** Latin data inside a page that may be right-to-left — a SKU, a slug, a domain, an email. */
-  readonly latin = input(false);
+  readonly latin = input(false, {transform: booleanAttribute});
+  /**
+   * Sets the value in a monospaced face — an API key, an app id, a token.
+   *
+   * An input rather than a class the caller adds, because a class on the host cannot reach the
+   * inner `<input>`: Angular scopes styles by the defining component, so a rule written outside
+   * this template matches the host and stops there (lessons.md, "The design pass — encapsulation,
+   * and three more things a native control hid").
+   */
+  readonly mono = input(false, {transform: booleanAttribute});
   /** Progress of an asynchronous uniqueness check, when the field has one. */
   readonly check = input<UniquenessCheck>('idle');
   /** What a screen reader is told while `check` is pending, free or taken. */
@@ -118,9 +136,19 @@ export class TextField implements ControlValueAccessor {
 
   /* ------------------------------------------------------------------------ editing ---- */
 
+  /**
+   * A keystroke.
+   *
+   * **`onChange` before `value.set`, and the order is load-bearing.** Setting a `model()` emits its
+   * output synchronously, so a host listening to `(valueChange)` runs *inside* this method — and
+   * the domain field does exactly that, normalising `https://Shop.Example.com:8443/x` down to a
+   * bare hostname and writing it back to the control. With the writes the other way round, that
+   * normalised value was immediately overwritten by the raw one on the next line, and the field
+   * kept whatever had been pasted. Caught by a store-management spec, not by looking at it.
+   */
   protected onInput(element: HTMLInputElement): void {
-    this.value.set(element.value);
     this.onChange(element.value);
+    this.value.set(element.value);
   }
 
   protected onBlur(): void {

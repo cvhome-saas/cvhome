@@ -514,7 +514,6 @@
     },
     "home": {
       "characters": "{count} characters",
-      "empty": "Empty",
       "fallbackNotice": "Untranslated languages fall back to English.",
       "landingText": "Landing text",
       "landingTextHint": "Shown under the headline on your storefront's front page.",

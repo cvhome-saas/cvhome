@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, booleanAttribute, input} from '@angular/core';
 
 import {Icon} from '@shared/ui/icon/icon';
 import {IconName} from '@shared/ui/icon/icon-paths';
@@ -44,5 +44,5 @@ export class EmptyState {
   /** A heading above the message, for an empty state that fills a whole panel rather than a table. */
   readonly title = input<string | null>(null);
   /** Tightens the padding for an empty state inside a narrow column rather than a full table. */
-  readonly compact = input(false);
+  readonly compact = input(false, {transform: booleanAttribute});
 }

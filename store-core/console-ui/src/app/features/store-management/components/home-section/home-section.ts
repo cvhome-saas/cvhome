@@ -8,7 +8,7 @@ import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {FieldError} from '@shared/ui/form-field/field-error';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
-import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
+import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
 import {TagInput} from '@shared/ui/tag-input/tag-input';
 import {HOME_TITLE_MAX, META_DESCRIPTION_MAX, META_DESCRIPTION_MIN} from '@models/store-settings';
 import type {HomeCopyForm} from '../../services/store-settings-form.service';
@@ -27,21 +27,26 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
  */
 @Component({
   selector: 'app-home-section',
-  imports: [FieldError, NoticeBar, Panel, ReactiveFormsModule, TabSwitcher, TagInput, TranslocoDirective],
+  imports: [FieldError, LocaleSwitcher, NoticeBar, Panel, ReactiveFormsModule, TagInput, TranslocoDirective],
   template: `
     <app-panel
       [title]="t('storeSettings.home.title')"
       [subtitle]="t('storeSettings.home.subtitle')"
       *transloco="let t"
     >
-      <app-tab-switcher
+      <!--
+        A radio group, not a tablist. These are values of one field on the page, not views of it —
+        which is what app-locale-switcher is for, and what the catalogue and the product form now
+        also use. Pressing app-tab-switcher into service here announced a tablist for something that
+        is not one, and gave the strip a different shape from the same control two pages away.
+      -->
+      <app-locale-switcher
         panelAction
-        class="lang-track"
-        [tabs]="tabs(t)"
-        [active]="language()"
-        (activeChange)="language.set($any($event))"
+        [languages]="localeOptions()"
+        [(active)]="language"
+        [filled]="written()"
+        display="label"
         [label]="t('storeSettings.home.writeIn')"
-        panelId="home-copy"
       />
 
       <div class="section-body" id="home-copy" [formGroup]="copy()">
@@ -156,7 +161,7 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './home-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './home-section.css'],
 })
 export class HomeSection {
   /** One group per storefront language, keyed by code. */
@@ -172,15 +177,20 @@ export class HomeSection {
    * The track marks which languages have copy, so an operator can see at a glance that a
    * language is empty without opening it.
    */
-  protected tabs(t: (key: string) => string): readonly TabItem[] {
-    return this.locales().map((locale) => ({
-      key: locale.code,
-      // Named rather than coded: five storefront languages as "EN FR AR ES RU" is a puzzle.
-      label: locale.label,
-      badge: this.forms()[locale.code]?.controls.title.value ? undefined : t('storeSettings.home.empty'),
-      badgeTone: 'slate' as const,
-    }));
-  }
+  /** The storefront's languages, as the switcher's options. */
+  protected readonly localeOptions = computed<readonly ReferenceOption[]>(() =>
+    this.locales().map((locale) => ({code: locale.code, label: locale.label})),
+  );
+
+  /** Which languages already carry a headline. The switcher marks the rest as untranslated. */
+  protected readonly written = computed<ReadonlySet<string>>(() => {
+    const forms = this.forms();
+    return new Set(
+      this.locales()
+        .map((locale) => locale.code)
+        .filter((code) => !!forms[code]?.controls.title.value),
+    );
+  });
 
   protected readonly copy = computed(() => this.forms()[this.language()]);
   protected readonly title = computed(() => this.copy().controls.title);

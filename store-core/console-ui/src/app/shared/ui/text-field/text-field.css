@@ -48,6 +48,12 @@
   outline: none;
 }
 
+/* A key, an app id, a token: fixed-width, and a size down because it is a machine value. */
+:host(.text-mono) .text-input {
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+}
+
 .text-input::placeholder {
   color: var(--foreground-quiet);
 }
@@ -65,6 +71,13 @@
  */
 .text-input.latin {
   unicode-bidi: plaintext;
+}
+
+/* A leading glyph. Quiet, and never the only thing naming the field. */
+.text-icon {
+  flex: none;
+  color: var(--foreground-quiet);
+  --icon-size: .9rem;
 }
 
 /* A scheme, a currency, a domain suffix. A label on the value rather than part of it. */

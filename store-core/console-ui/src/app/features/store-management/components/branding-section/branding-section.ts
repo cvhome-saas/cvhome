@@ -65,7 +65,7 @@ import type {BrandingSettings} from '@models/store-settings';
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './branding-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './branding-section.css'],
 })
 export class BrandingSection {
   readonly branding = input.required<BrandingSettings>();

@@ -16,10 +16,19 @@ import {TextField, type UniquenessCheck} from './text-field';
       ariaLabel="SKU"
       revealLabel="Show password"
       checkLabel="Checking"
+      (valueChange)="normalise($event)"
     />
   `,
 })
 class Host {
+  /** Stands in for the domain field, which strips a pasted scheme as it is typed. */
+  normalise(value: string): void {
+    const trimmed = value.replace(/^https?:\/\//, '');
+    if (trimmed !== value) {
+      this.control.setValue(trimmed);
+    }
+  }
+
   readonly control = new FormControl('', {nonNullable: true});
   readonly type = signal<'text' | 'password'>('text');
   readonly latin = signal(false);
@@ -52,6 +61,24 @@ describe('TextField', () => {
     input().value = 'ACME-2';
     input().dispatchEvent(new Event('input'));
     expect(host.control.value).toBe('ACME-2');
+  });
+
+  /*
+   * The order `onInput` writes in, pinned.
+   *
+   * Setting a `model()` emits synchronously, so a host listening to `(valueChange)` runs *inside*
+   * the input handler. The domain field does exactly that — it normalises a pasted URL down to a
+   * bare hostname and writes it back — and with the writes the other way round the raw value
+   * landed on the control immediately afterwards, so the paste survived and the normalisation
+   * appeared not to work at all.
+   */
+  it('lets a listener normalise what was typed without being overwritten by it', () => {
+    input().value = 'https://example.com';
+    input().dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(host.control.value).toBe('example.com');
+    expect(input().value).toBe('example.com');
   });
 
   it('reports touched on blur, so the error can show', () => {

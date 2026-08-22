@@ -30,6 +30,14 @@
     color var(--default-transition-duration);
 }
 
+/* A name is prose, so it keeps sentence case where a code is a shouted token. */
+.chip .name {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .chip:hover {
   color: var(--foreground);
 }

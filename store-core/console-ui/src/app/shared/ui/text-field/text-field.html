@@ -1,4 +1,8 @@
 <span class="text-shell">
+  @if (icon(); as glyph) {
+    <app-icon class="text-icon" [name]="glyph" />
+  }
+
   @if (prefix()) {
     <span class="text-affix" aria-hidden="true">{{ prefix() }}</span>
   }

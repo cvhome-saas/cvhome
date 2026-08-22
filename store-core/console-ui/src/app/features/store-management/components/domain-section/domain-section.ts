@@ -4,7 +4,8 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Badge} from '@shared/ui/badge/badge';
 import {CopyField} from '@shared/ui/copy-field/copy-field';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {Panel} from '@shared/ui/panel/panel';
 import type {CnameOutcome} from '@api/dns/dns-check.service';
@@ -34,7 +35,16 @@ import type {DomainForm} from '../../services/store-settings-form.service';
  */
 @Component({
   selector: 'app-domain-section',
-  imports: [Badge, CopyField, FieldError, Icon, Panel, ReactiveFormsModule, TranslocoDirective],
+  imports: [
+    Badge,
+    CopyField,
+    FormField,
+    Icon,
+    Panel,
+    ReactiveFormsModule,
+    TextField,
+    TranslocoDirective,
+  ],
   template: `
     <app-panel
       [title]="t('storeSettings.domain.title')"
@@ -117,27 +127,33 @@ import type {DomainForm} from '../../services/store-settings-form.service';
 
         <hr class="divider" />
 
-        <div class="field">
-          <label for="custom-domain">{{ t('storeSettings.domain.addCustomDomain') }}</label>
+        <app-form-field
+          [label]="t('storeSettings.domain.addCustomDomain')"
+          [control]="form().controls.customDomain"
+          controlId="custom-domain"
+          [fallback]="t('storeSettings.domain.fallback')"
+          [hint]="t('storeSettings.domain.addHint')"
+        >
           <div class="domain-row">
             <!--
-              The direction is set on the wrapper, not just the input: the scheme and the host are
-              one Latin string read left to right, and in an Arabic page an RTL flex row put the
-              prefix after the field and reordered it into a mangled //:https.
+              The field is marked latin rather than the wrapper carrying a direction: the scheme
+              and the host are one Latin string read left to right, and in an Arabic page an RTL
+              flex row put the prefix after the field and reordered it into a mangled //:https.
+              Rendering the scheme as the control's own prefix is what keeps the two together
+              whatever the page direction is.
             -->
-            <span class="control host" dir="ltr" [class.invalid]="domainInvalid()">
-              <span class="scheme">{{ scheme }}</span>
-              <input
-                id="custom-domain"
-                type="text"
-                formControlName="customDomain"
-                [attr.inputmode]="'url'"
-                [attr.autocapitalize]="'none'"
-                [attr.spellcheck]="'false'"
-                [placeholder]="exampleDomain"
-                (input)="onDomainInput($event)"
-              />
-            </span>
+            <app-text-field
+              class="host"
+              id="custom-domain"
+              type="url"
+              formControlName="customDomain"
+              [prefix]="scheme"
+              latin
+              inputmode="url"
+              [invalid]="domainInvalid()"
+              [placeholder]="exampleDomain"
+              (valueChange)="onDomainValue($event)"
+            />
             <!--
               The field checks itself as it is typed; this re-runs it, for the operator who has just
               fixed the record at their registrar and does not want to retype the domain to find out.
@@ -156,18 +172,6 @@ import type {DomainForm} from '../../services/store-settings-form.service';
               }
             </button>
           </div>
-          <p class="field-hint">{{ t('storeSettings.domain.addHint') }}</p>
-          <!--
-            The inline error speaks for the shape of the value only. What the DNS check found is the
-            status panel's job, below — it has room to name the domain and say what to do about it,
-            and one message in two places would be two places to keep in step.
-          -->
-          @if (form().controls.customDomain.hasError('pattern')) {
-            <app-field-error
-              [control]="form().controls.customDomain"
-              [fallback]="t('storeSettings.domain.fallback')"
-            />
-          }
           @if (checkUnavailable()) {
             <!--
               The resolver could not be reached, so the domain is neither approved nor refused. Said
@@ -176,7 +180,7 @@ import type {DomainForm} from '../../services/store-settings-form.service';
             -->
             <p class="field-warning" role="status">{{ t('storeSettings.domain.checkUnavailable') }}</p>
           }
-        </div>
+        </app-form-field>
 
         @if (typedStatus(); as status) {
           <div class="status" [class]="statusTone(status)">
@@ -219,7 +223,7 @@ import type {DomainForm} from '../../services/store-settings-form.service';
       </div>
     </app-panel>
   `,
-  styleUrls: ['../settings-card.css', './domain-section.css'],
+  styleUrls: ['../../../../shared/styles/field.css', '../settings-card.css', './domain-section.css'],
 })
 export class DomainSection {
   // A URL scheme and an example host: neither is language-dependent text, so neither is translated.
@@ -256,9 +260,9 @@ export class DomainSection {
    * can be named after. Normalising as they type means the DNS record below always shows the host it
    * will actually be for, rather than showing a URL and rejecting it a moment later.
    */
-  protected onDomainInput(event: Event): void {
+  protected onDomainValue(value: string): void {
     const control = this.form().controls.customDomain;
-    const cleaned = bareHostname((event.target as HTMLInputElement).value);
+    const cleaned = bareHostname(value);
     if (cleaned !== control.value) {
       control.setValue(cleaned);
       control.markAsDirty();

@@ -59,9 +59,17 @@ import type {ReferenceOption} from '@core/reference/reference-data.service';
           "
           (click)="choose(index)"
         >
-          <!-- The code, not the name: four full language names do not fit and the codes are what
-               the operator sees on every other language control in the console. -->
-          <span class="code" dir="ltr">{{ language.code }}</span>
+          <!--
+            The code by default: the catalogue's editors put four of these in a narrow header, where
+            full names do not fit and the codes match every other language control on the page.
+            Named where there is room — the store's home page shows five storefront languages, and
+            "EN FR AR ES RU" is a puzzle rather than a label.
+          -->
+          @if (display() === 'code') {
+            <span class="code" dir="ltr">{{ language.code }}</span>
+          } @else {
+            <span class="name">{{ language.label }}</span>
+          }
           @if (filled().has(language.code)) {
             <app-icon
               name="checkCircle"
@@ -83,6 +91,8 @@ export class LocaleSwitcher {
   /** Language codes that already hold copy. */
   readonly filled = input.required<ReadonlySet<string>>();
   readonly label = input.required<string>();
+  /** Whether a chip reads as `EN` or as `English`. See the template. */
+  readonly display = input<'code' | 'label'>('code');
 
   private readonly chips = viewChildren<ElementRef<HTMLButtonElement>>('chip');
 

@@ -1,4 +1,4 @@
-import {Component, computed, forwardRef, input, model, signal} from '@angular/core';
+import {Component, booleanAttribute, computed, forwardRef, input, model, signal} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 /**
@@ -29,14 +29,14 @@ export class TextareaField implements ControlValueAccessor {
   readonly ariaLabel = input<string | null>(null);
   readonly describedBy = input<string | null>(null);
   readonly placeholder = input('');
-  readonly disabled = input(false);
+  readonly disabled = input(false, {transform: booleanAttribute});
   /** The consumer's `control.invalid && touched`. Draws the error frame; does not block typing. */
-  readonly invalid = input(false);
+  readonly invalid = input(false, {transform: booleanAttribute});
   readonly rows = input(4);
   /** Caps the length and shows a counter — a limit the operator cannot see is one they hit mid-word. */
   readonly maxLength = input<number | null>(null);
   /** Latin data inside a page that may be right-to-left. */
-  readonly latin = input(false);
+  readonly latin = input(false, {transform: booleanAttribute});
 
   private readonly formDisabled = signal(false);
   protected readonly isDisabled = computed(() => this.disabled() || this.formDisabled());

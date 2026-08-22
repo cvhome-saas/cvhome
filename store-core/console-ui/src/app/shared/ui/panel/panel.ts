@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, booleanAttribute, input} from '@angular/core';
 
 /**
  * The card chrome every dashboard widget sits in: a titled header with optional meta and
@@ -56,5 +56,5 @@ export class Panel {
    * a table, a list of full-bleed rows, an image — as it is a form, and a table inset from the
    * panel's border looks like a mistake.
    */
-  readonly padded = input(false);
+  readonly padded = input(false, {transform: booleanAttribute});
 }

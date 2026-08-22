@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, booleanAttribute, input} from '@angular/core';
 import {AbstractControl} from '@angular/forms';
 
 import {FieldError} from './field-error';
@@ -70,13 +70,13 @@ export class FormField {
    */
   readonly control = input<AbstractControl | null>(null);
   /** Drawn as an asterisk, `aria-hidden` because the control's own `required` is what a reader needs. */
-  readonly required = input(false);
+  readonly required = input(false, {transform: booleanAttribute});
   /** A line under the control saying what is expected, or what the platform will do with it. */
   readonly hint = input<string | null>(null);
   /** A message for this field in particular; `shared.validation.*` covers the rest. */
   readonly fallback = input('');
   /** Spans every column of a `.field-grid`. */
-  readonly wide = input(false);
+  readonly wide = input(false, {transform: booleanAttribute});
   /** Set when the projected control renders its own `<input id>` and wants an explicit label link. */
   readonly controlId = input<string | null>(null);
 

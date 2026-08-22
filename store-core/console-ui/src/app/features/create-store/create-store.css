@@ -42,107 +42,21 @@
   gap: 1.25rem;
 }
 
-.field-wide {
-  grid-column: 1 / -1;
-}
-
-.field {
-  min-width: 0;
-}
-
-.field > label,
-.field-label {
-  display: block;
-  margin: 0 0 0.4rem;
-  color: var(--foreground-strong);
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.required {
-  color: var(--chart-5-foreground);
-}
-
-.control {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  inline-size: 100%;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--input);
-  color: var(--foreground-strong);
-  font-size: var(--text-sm);
-  transition: border-color var(--default-transition-duration);
-}
-
-.control:hover,
-.control:focus-within {
-  border-color: var(--primary);
-}
-
 /*
- * An invalid field keeps its error border even while focused. Without the specificity the
- * `:focus-within` rule above wins and the control reads as accepted while the hint below it says the
- * name is taken — which is what it did on first pass.
+ * The field vocabulary moved.
+ *
+ * `.field`, `.control`, `.field-label`, `.required`, the invalid state and the ok/error hint tones
+ * described what a *control* looks like — and this page's copies had already drifted from store
+ * management's, which asks for the same fields with the same validators: two different paddings,
+ * and `.control.invalid` existed only here. They are `app-form-field` with `app-text-field` and
+ * `app-select` now, where the encapsulation can reach them. `.field-grid`, `.field-wide` and
+ * `.cross-field-error` come from `@shared/styles/field.css`.
+ *
+ * A `.field` wrapper around something that is not a form control — the require-login switch row —
+ * still needs a min-width, and that is all that is left.
  */
-.control.invalid,
-.control.invalid:hover,
-.control.invalid:focus-within {
-  border-color: var(--destructive);
-}
-
-input.control,
-select.control {
-  display: block;
-}
-
-.control > input,
-.control > select {
-  flex: 1;
+.field {
   min-inline-size: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font-size: inherit;
-}
-
-.control > input:focus,
-.control > select:focus,
-input.control:focus,
-select.control:focus {
-  outline: none;
-}
-
-.control.readonly {
-  background: var(--muted);
-  color: var(--muted-foreground);
-}
-
-.mono {
-  font-family: ui-monospace, monospace;
-}
-
-.control > app-icon.ok {
-  flex: none;
-  color: var(--chart-1-foreground);
-  --icon-size: 0.8rem;
-}
-
-.field-hint {
-  margin: 0.35rem 0 0;
-  color: var(--foreground-subtle);
-  font-size: var(--text-2xs);
-}
-
-.field-hint.ok {
-  color: var(--chart-1-foreground);
-}
-
-.field-hint.error {
-  color: var(--destructive);
 }
 
 /* ---- Hosting region -------------------------------------------------------------------- */
