@@ -71,6 +71,15 @@ export class OrdersFacade {
   readonly search = signal('');
 
   /**
+   * One customer's orders, or null for everyone's.
+   *
+   * Set from `?customerId=` when the customers page hands off "view all orders". An equality on the
+   * column checkout writes at placement, so unlike the search term it cannot over-match — which is
+   * the whole reason the parameter was bound. Null is the ordinary state of this page.
+   */
+  readonly customerId = signal<number | null>(null);
+
+  /**
    * `computed()` rather than a static object — see `DashboardFacade.heading` for why:
    * a root-singleton field would freeze at whatever language booted the app.
    */
@@ -91,7 +100,13 @@ export class OrdersFacade {
    * did not choose.
    */
   readonly pageIndex = linkedSignal<unknown, number>({
-    source: () => [this.dateRange(), this.activeTab(), this.search(), this.shell.currentStoreId()],
+    source: () => [
+      this.dateRange(),
+      this.activeTab(),
+      this.search(),
+      this.customerId(),
+      this.shell.currentStoreId(),
+    ],
     computation: () => 0,
   });
 
@@ -115,6 +130,7 @@ export class OrdersFacade {
       range: this.dateRange(),
       tab: this.activeTab(),
       search: this.search(),
+      customerId: this.customerId(),
       page: {page: this.pageIndex(), count: PAGE_SIZE},
       storeId,
     };

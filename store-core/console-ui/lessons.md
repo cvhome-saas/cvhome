@@ -2511,3 +2511,123 @@ found by a person looking at the built page, not by a check.**
 - **A control the width of the page reads as a text field.** Two settings of two and three options
   were stacked full-width, giving a two-word label an 1100px measure. They sit side by side and cap
   at 20rem.
+
+## Customers — no customer detail endpoint
+
+- **Screen:** `/customers`, the dialog behind every row; and `/orders/:id`'s "View profile" link.
+- **What the UI needs:** one customer, by id.
+- **What is present, and why it is not enough:** `CustomerFacade.getCustomerById` exists in
+  `customer-core` and **is exposed by no controller**. The only detail endpoint is
+  `GET /api/v1/private/customer/info`, and it is not usable here twice over: it takes no id — it
+  resolves the caller from the JWT `sub` via `cuaExternalId` — and it is guarded by
+  `STORE-POD.CUSTOMER.*`, which `CustomPermissionEvaluator` maps to `isCustomerInSameStore`, a
+  **shopper** token. A seller JWT is refused by it.
+- **Why it is required:** without it a customer can only be read while they happen to be on the
+  page of the list currently loaded, which makes a durable link to a person impossible.
+- **Expected contract:** `GET …/private/customers/{id}` → `ReadableCustomer`, guarded
+  `STORE-POD.CHECKOUT.*` like the list beside it. `getCustomerById` already implements the body.
+- **What console-ui does meanwhile:** the dialog renders **the row it already has**, and a link into
+  the page carries the buyer's email as `?q=` rather than an id — the page filters on it server-side
+  and opens the record when exactly one comes back. That is why `viewProfile()` on the order page
+  navigates with a search term for a customer whose id it is holding.
+- **Placeholder:** `TODO(lessons.md)` in `api/customers/customers.service.ts`.
+
+## Customers — a customer's name comes from the billing address
+
+- **Screen:** `/customers`, the Customer column and the dialog's heading.
+- **What is missing:** the mapping. `Customer` has its own `firstName` and `lastName` columns and
+  `ReadableCustomerPopulator.populate` never reads them: `applyBilling` sets
+  `target.setFirstName(source.getBilling().getFirstName())`, so **the name on the DTO is the billing
+  address's name**, and a customer with no billing address has none at all.
+- **Why it is required:** two visible consequences, and the second is the worse one. A record shows
+  no name; and because `CustomerRepository` filters names on `billing.firstName`/`billing.lastName`,
+  that customer **cannot be found by name either** — only by email.
+- **Expected contract:** populate `firstName`/`lastName` from the customer's own columns, falling
+  back to billing. The filter should then match either.
+- **What console-ui does meanwhile:** shows the record as nameless in as many words, rather than
+  filling the slot from the email. The email is rendered beside it, so the row still identifies
+  itself; but a name derived from an address would be a value under a label the record does not
+  hold. The empty-search state says a customer without a billing address is findable by email only.
+- **Placeholder:** `TODO(lessons.md)` in `features/customers/services/customers.api.service.ts` and
+  `models/customers.ts`.
+
+## Customers — no lifetime or per-customer aggregate
+
+- **Screen:** `/customers`, the dialog's Lifetime value / Returns / Customer since figures, and the
+  design's per-row "Completed orders" and "Open orders" columns with their summed values.
+- **What is missing:** any aggregate keyed on a customer. The only customer-shaped statistic on the
+  platform is `POST …/v2/private/customer-statistic`, which is `count(orders) group by
+  billing.country` — see "Dashboard — customer-statistic counts orders, not customers".
+- **Expected contract:** the one already named in "Orders — no customer analytics" —
+  `GET …/customers/{id}/summary` → `{orderCount, lifetimeValue, returnRate, firstOrderAt}`. One
+  endpoint answers this page, that page and the dashboard's new-vs-returning gap.
+- **What console-ui does meanwhile:** the **order count is real and exact** — `totalElements` from
+  `GET …/private/orders?customerId={id}`, which this module bound. The money figures are not, and
+  are drawn at the design's weight reading an em dash under a note that says so. Summing the five
+  orders the panel lists would be a different number under the same label. The design's two per-row
+  order columns are not built at all: they would be one request per row for a figure that does not
+  exist as a query.
+- **Placeholder:** `TODO(lessons.md)` in `customer-dialog.html`.
+
+## Customers — no created-at on the DTO
+
+- **Screen:** `/customers`, the dialog's "Customer since"; and the design's "+38 this month" tile.
+- **What is present, and why it is not enough:** the column exists — `customer` carries the shared
+  `AuditSection` (`checkout/init-sql/schema.sql`) — and `ReadableCustomerPopulator` never maps it.
+  So the data is recorded and the console cannot read it.
+- **Why it is required:** "customer since" is the cheapest true thing that can be said about a
+  customer, and a new-customers-over-time series needs nothing else.
+- **Expected contract:** add `dateCreated` to `ReadableCustomer` and populate it.
+- **Placeholder:** the em dash in `customer-dialog.html`, under the same note as the figures above.
+
+## Customers — no groups, tags, notes or reviews
+
+- **Screen:** none — this records four things that look implemented and are not, so the next person
+  does not plan a module around them.
+- **What is present, and why it is not enough:**
+  - `checkout.customer_group` **exists in the DDL** and has no entity, no repository, no service and
+    no endpoint.
+  - `CustomerReview` and `CustomerReviewDescription` have entities, a `CustomerReviewRepository` and
+    DDL, and **zero references outside their own package** — no facade, no controller.
+  - `CustomerGender` is an enum referenced by nothing, with no column behind it.
+  - Notes do not exist in any form. `Order.comments` is the order's, and status-history comments are
+    the customer-facing record — a note *about* a customer is a third thing.
+- **Expected contract:** each is a feature to design rather than an endpoint to expose; the tables
+  are a starting point and not a specification.
+- **What console-ui does meanwhile:** none of the four is drawn.
+
+## Customers — no write endpoint and no mail service
+
+- **Screen:** `/customers`, the design's "Edit details" and "Email" actions.
+- **What is missing:** any customer write. `CustomerFacade.getOrCreateCustomer` and
+  `CustomerServiceImpl.saveOrUpdate`/`delete` exist and are called **only from order placement**;
+  no POST, PUT, PATCH or DELETE customer endpoint exists anywhere. Mail has no service at all,
+  platform-wide — the same gap "Users — nothing emails an invitation" records.
+- **Why it is required:** correcting a misspelled name or a wrong address is ordinary support work.
+- **Expected contract:** `PUT …/private/customers/{id}` taking the identity fields and the two
+  addresses.
+- **What console-ui does meanwhile:** the dialog is read-only in full, and neither action is drawn.
+  A disabled button that is never going to work is worse than its absence.
+
+## Checkout — dead filter capability, now wired
+
+Recorded because it departs from the standing rule that `store-pod` is not modified during this
+migration, as Module 8's `RESET_PASSWORD` permission `case` did. Both are the same judgement: a
+defect small enough to fix in one commit, in code the console is the first caller of.
+
+- **What was turned on.** `CustomerRepository.findByStoreMerchantId` had implemented filtering on
+  `name`, `firstName`, `lastName`, `email` and `country` since it was written.
+  `CustomerApi.list` built an empty `CustomerCriteria`, set only the pageable and bound **none** of
+  them. That is the whole reason seller-ui's customer page is four read-only columns with no search:
+  not a thin backend, an unwired one.
+- **A second defect underneath it.** Inside that repository the `name` branch computed
+  `cb.or(...)` and **never added it to `predicates`** — so the filter would have narrowed nothing
+  even once bound. It is added now, and extended to span `emailAddress`: the predicates are AND-ed,
+  so one search box sending both `name` and `email` would match nothing. One box, one parameter.
+- **And a third, in orders.** `OrderCriteria.customerId` was honoured by `OrderRepository` and
+  exposed as no request parameter, so "the orders of customer X" was only askable through `email` —
+  a LIKE, which also matches an address the query is a substring of. `OrderServiceImpl` writes the
+  id on every placement, so the join was always available.
+- **Still standing:** the customer list takes no `sort`. `Pageable` would accept one, but there is
+  no default ordering and no whitelist of sortable fields, so a column header that sorted would be
+  sending an unvalidated property name into a JPA specification. Not built.

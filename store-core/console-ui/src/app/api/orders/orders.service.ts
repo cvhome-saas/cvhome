@@ -20,6 +20,14 @@ export interface OrderQuery extends PageRequest {
   readonly status?: OrderStatus;
   readonly phone?: string;
   readonly email?: string;
+  /**
+   * The exact join onto a customer.
+   *
+   * `email` is a LIKE, so it also matches an address the term is a substring of; `customerId` is an
+   * equality on the column `OrderServiceImpl` writes at placement. It was honoured by
+   * `OrderRepository` all along and bound to no request parameter until the customers module.
+   */
+  readonly customerId?: number;
 }
 
 const CHECKOUT_API_BASE = '/spg/checkout/api/v1';

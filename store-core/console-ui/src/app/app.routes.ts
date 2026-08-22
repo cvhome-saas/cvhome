@@ -186,6 +186,27 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * Customers. Store-scoped like every other console route, because `CustomerApi.list` is: it
+     * filters on `storeMerchantId`, so a shopper who has bought from two of the merchant's stores is
+     * a separate record in each.
+     *
+     * `?customer=` opens one and `?q=` carries the search term. Both are query parameters rather
+     * than segments because neither is a different view of the page — and `?q=` is how another
+     * screen links *in*, there being no endpoint that fetches a customer by id.
+     */
+    path: 'customers',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/customers/customers').then((page) => page.Customers),
+        data: {titleKey: 'route.customers.title', breadcrumbKey: 'shell.breadcrumb.customers'},
+      },
+    ],
+  },
+  {
     path: 'payments',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     canActivate: [canAccessSecuredPages, consoleContext, requiresStore],

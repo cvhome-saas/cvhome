@@ -71,6 +71,9 @@
     },
     "profile": {
       "title": "حسابك"
+    },
+    "customers": {
+      "title": "العملاء"
     }
   },
   "notFound": {
@@ -1154,7 +1157,8 @@
       "productForm": "منتج",
       "payments": "المدفوعات",
       "users": "المستخدمون",
-      "profile": "الحساب"
+      "profile": "الحساب",
+      "customers": "العملاء"
     },
     "toolbar": {
       "breadcrumbNav": "مسار التنقل",
@@ -1299,7 +1303,6 @@
       "delivered": "التسليم"
     },
     "viewProfile": "عرض الملف",
-    "profileNotAvailable": "ملفات العملاء غير متاحة بعد.",
     "invoiceWord": "فاتورة",
     "order": "الطلب",
     "issued": "تاريخ الإصدار",
@@ -1321,7 +1324,8 @@
     "commentVisible": "مرئي للعميل",
     "badReference": "«{reference}» ليس رقم طلب صالحًا.",
     "payments": "المدفوعات",
-    "noPayments": "لم تُسجَّل أي دفعة على هذا الطلب."
+    "noPayments": "لم تُسجَّل أي دفعة على هذا الطلب.",
+    "profileNeedsEmail": "لا يوجد بريد إلكتروني لهذا الطلب، لذا لا يوجد ما يُبحث به عن العميل."
   },
   "status": {
     "CREATED": "أُنشئ",
@@ -1941,6 +1945,71 @@
     "viewOrderFor": "فتح ملخص الطلب {{order}}",
     "externalRef": "المرجع",
     "externalRefHint": "المرجع الذي تُعرف به هذه الدفعة خارج لوحة التحكم — من كشف الحساب البنكي أو من بوابة الدفع."
+  },
+  "customers": {
+    "loading": "جارٍ تحميل العملاء…",
+    "allCustomers": "جميع العملاء",
+    "unit": "عملاء",
+    "paginationLabel": "صفحات العملاء",
+    "unnamed": "لا يوجد اسم مسجل",
+    "totalLabel": "{{total}} {count, plural, =1 {عميل} =2 {عميلان} other {عميل}}",
+    "heading": {
+      "title": "العملاء",
+      "context": "الأشخاص الذين اشتروا من {{store}}"
+    },
+    "subtitle": {
+      "none": "لا يوجد أحد لعرضه",
+      "range": "عرض {{from}}–{{to}} من أصل {{total}} {count, plural, =1 {عميل} =2 {عميلان} other {عميل}}"
+    },
+    "column": {
+      "customer": "العميل",
+      "location": "الموقع",
+      "id": "المعرّف",
+      "actions": "إجراءات"
+    },
+    "search": {
+      "label": "البحث في العملاء",
+      "placeholder": "الاسم أو البريد الإلكتروني",
+      "clear": "مسح البحث"
+    },
+    "empty": {
+      "title": "لا يوجد عملاء بعد",
+      "message": "لم يطلب أحد من هذا المتجر. يظهر العملاء هنا بعد أول طلب لهم."
+    },
+    "noMatches": {
+      "title": "لا يوجد عملاء مطابقون",
+      "message": "لم يطابق شيء ذلك الاسم أو البريد. العميل الذي لم يسجل عنوان فوترة لا يمكن العثور عليه إلا بالبريد الإلكتروني."
+    },
+    "fact": {
+      "company": "الشركة",
+      "phone": "الهاتف",
+      "ordersPlaced": "الطلبات المقدمة",
+      "customerId": "معرّف العميل"
+    },
+    "lifetime": {
+      "title": "أرقام مدى الحياة",
+      "value": "القيمة الإجمالية",
+      "returns": "المرتجعات",
+      "since": "عميل منذ",
+      "unavailable": "أرقام مدى الحياة غير متاحة بعد."
+    },
+    "addresses": {
+      "title": "العناوين",
+      "billing": "الفوترة",
+      "delivery": "التوصيل",
+      "none": "لا يوجد عنوان مسجل لهذا العميل."
+    },
+    "orders": {
+      "title": "الطلبات",
+      "viewAll": "عرض الكل",
+      "loading": "جارٍ تحميل الطلبات…",
+      "empty": "لا توجد طلبات بعد."
+    },
+    "action": {
+      "openDetails": "فتح",
+      "openDetailsFor": "فتح {{name}}",
+      "closeDetails": "إغلاق التفاصيل"
+    }
   },
   "users": {
     "loading": "جارٍ تحميل الفريق…",

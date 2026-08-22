@@ -1,4 +1,4 @@
-import {Component, ElementRef, computed, inject, viewChild} from '@angular/core';
+import {Component, ElementRef, computed, effect, inject, input, untracked, viewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
@@ -79,6 +79,15 @@ export class Orders {
 
   protected readonly facade = inject(OrdersFacade);
 
+  /**
+   * One customer's orders, from `?customerId=`, bound by `withComponentInputBinding()`.
+   *
+   * How the customers page hands off "view all orders": its dialog lists the most recent few, and
+   * everything beyond them belongs on the page built for reading orders. Cleared by Clear filters
+   * like any other narrowing.
+   */
+  readonly customerId = input<string>();
+
   protected readonly heading = this.facade.heading;
   protected readonly dateRange = this.facade.dateRange;
   protected readonly activeTab = this.facade.activeTab;
@@ -95,6 +104,23 @@ export class Orders {
   protected readonly context = this.facade.context;
   protected readonly search = this.facade.search;
   protected readonly pageSize = 10;
+
+  constructor() {
+    /*
+     * The URL is what a link from another page and a reload restore the customer narrowing from.
+     * `setCustomerFilter` is the other writer, so this only carries what the page did not cause.
+     */
+    effect(() => {
+      const raw = this.customerId();
+      const id = raw ? Number(raw) : null;
+      const next = id !== null && Number.isFinite(id) ? id : null;
+      // Untracked, so this follows the URL rather than racing `setCustomerFilter`, which sets the
+      // signal before navigating and would otherwise be undone by its own effect.
+      if (next !== untracked(() => this.facade.customerId())) {
+        this.facade.customerId.set(next);
+      }
+    });
+  }
 
   protected readonly columns = computed<readonly TableColumn[]>(() => {
     this.transloco.activeLang();
@@ -130,11 +156,20 @@ export class Orders {
   }
 
   /** True when what is on screen is narrowed by something the operator can undo. */
-  protected readonly filtered = computed(() => this.activeTab() !== 'all' || this.search().trim() !== '');
+  protected readonly filtered = computed(
+    () => this.activeTab() !== 'all' || this.search().trim() !== '' || this.facade.customerId() !== null,
+  );
 
   protected clearFilters(): void {
     this.activeTab.set('all');
     this.facade.search.set('');
+    this.setCustomerFilter(null);
+  }
+
+  /** The customer narrowing, in the facade and in the URL together. */
+  private setCustomerFilter(id: number | null): void {
+    this.facade.customerId.set(id);
+    void this.router.navigate([], {queryParams: {customerId: id}, queryParamsHandling: 'merge'});
   }
 
   protected totalLabel(order: OrderRow): string {

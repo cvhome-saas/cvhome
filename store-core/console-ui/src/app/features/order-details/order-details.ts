@@ -1,6 +1,6 @@
 import {A11yModule} from '@angular/cdk/a11y';
 import {Component, ElementRef, computed, effect, inject, input, linkedSignal, signal, viewChild} from '@angular/core';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe, TranslocoDecimalPipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
 
@@ -51,6 +51,7 @@ export class OrderDetails {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly pdf = inject(PdfExportService);
   private readonly toasts = inject(ToastService);
+  private readonly router = inject(Router);
 
   protected readonly facade = inject(OrderDetailsFacade);
 
@@ -178,10 +179,23 @@ export class OrderDetails {
   }
 
   /**
-   * TODO(lessons.md): a customer profile — no screen and no per-customer aggregate exist yet. See
-   * lessons.md, "Orders — no customer analytics".
+   * The buyer, on the customers page.
+   *
+   * By search term rather than by id, because there is no `GET …/private/customers/{id}` to link
+   * to: the customers page filters on the email and opens the record when exactly one comes back.
+   * The order carries the customer's id — the detail endpoint populates `customer` where the list
+   * does not — and it is of no use here for that reason. See lessons.md, "Customers — no customer
+   * detail endpoint".
+   *
+   * Without an email there is nothing to search on, so the button says so rather than opening an
+   * unfiltered list of everyone.
    */
   protected viewProfile(): void {
-    this.toasts.info(this.transloco.translate('orderDetails.profileNotAvailable'));
+    const email = this.facade.customer().email;
+    if (!email) {
+      this.toasts.info(this.transloco.translate('orderDetails.profileNeedsEmail'));
+      return;
+    }
+    void this.router.navigate(['/customers'], {queryParams: {q: email}});
   }
 }

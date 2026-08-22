@@ -71,6 +71,9 @@
     },
     "profile": {
       "title": "Your account"
+    },
+    "customers": {
+      "title": "Customers"
     }
   },
   "notFound": {
@@ -1154,7 +1157,8 @@
       "productForm": "Product",
       "payments": "Payments",
       "users": "Users",
-      "profile": "Account"
+      "profile": "Account",
+      "customers": "Customers"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1299,7 +1303,6 @@
       "delivered": "Delivered"
     },
     "viewProfile": "View profile",
-    "profileNotAvailable": "Customer profiles are not available yet.",
     "invoiceWord": "INVOICE",
     "order": "Order",
     "issued": "Issued",
@@ -1321,7 +1324,8 @@
     "commentVisible": "Visible to the customer",
     "badReference": "“{reference}” is not an order reference.",
     "payments": "Payments",
-    "noPayments": "No payment has been recorded against this order."
+    "noPayments": "No payment has been recorded against this order.",
+    "profileNeedsEmail": "This order has no email address, so there is nothing to look the customer up by."
   },
   "status": {
     "CREATED": "Created",
@@ -1941,6 +1945,71 @@
     "viewOrderFor": "Open a summary of order {{order}}",
     "externalRef": "Ref",
     "externalRefHint": "The reference this payment is known by outside the console — from the bank statement or the gateway."
+  },
+  "customers": {
+    "loading": "Loading customers…",
+    "allCustomers": "All customers",
+    "unit": "customers",
+    "paginationLabel": "Customer pages",
+    "unnamed": "No name on record",
+    "totalLabel": "{{total}} {count, plural, =1 {customer} other {customers}}",
+    "heading": {
+      "title": "Customers",
+      "context": "The people who have bought from {{store}}"
+    },
+    "subtitle": {
+      "none": "No one to show",
+      "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {customer} other {customers}}"
+    },
+    "column": {
+      "customer": "Customer",
+      "location": "Location",
+      "id": "ID",
+      "actions": "Actions"
+    },
+    "search": {
+      "label": "Search customers",
+      "placeholder": "Name or email",
+      "clear": "Clear the search"
+    },
+    "empty": {
+      "title": "No customers yet",
+      "message": "Nobody has ordered from this store. Customers appear here after their first order."
+    },
+    "noMatches": {
+      "title": "No customers match",
+      "message": "Nothing matched that name or email. A customer who has never given a billing address can only be found by email."
+    },
+    "fact": {
+      "company": "Company",
+      "phone": "Phone",
+      "ordersPlaced": "Orders placed",
+      "customerId": "Customer ID"
+    },
+    "lifetime": {
+      "title": "Lifetime figures",
+      "value": "Lifetime value",
+      "returns": "Returns",
+      "since": "Customer since",
+      "unavailable": "Lifetime figures are not available yet."
+    },
+    "addresses": {
+      "title": "Addresses",
+      "billing": "Billing",
+      "delivery": "Delivery",
+      "none": "This customer has no address on record."
+    },
+    "orders": {
+      "title": "Orders",
+      "viewAll": "View all",
+      "loading": "Loading orders…",
+      "empty": "No orders yet."
+    },
+    "action": {
+      "openDetails": "Open",
+      "openDetailsFor": "Open {{name}}",
+      "closeDetails": "Close details"
+    }
   },
   "users": {
     "loading": "Loading the team…",

@@ -25,7 +25,8 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
   {
     groupKey: 'shell.nav.group.storefront',
     items: [
-      {labelKey: 'shell.nav.item.customers', icon: 'user'},
+      // Was routeless — this app's marker for "not built". Module 9 built it.
+      {labelKey: 'shell.nav.item.customers', icon: 'user', route: '/customers'},
       {labelKey: 'shell.nav.item.contentManagement', icon: 'fileEdit'},
     ],
   },

@@ -13,6 +13,8 @@ import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picke
 export interface OrdersQuery {
   readonly tab: OrderTab;
   readonly search: string;
+  /** One customer's orders, or null for everyone's. An equality, not a LIKE. */
+  readonly customerId?: number | null;
   readonly page: PageRequest;
   readonly range: DateRangeValue;
 }
@@ -88,6 +90,7 @@ function toOrderQuery(query: OrdersQuery): OrderQuery {
     count: query.page.count,
     ...(query.tab === 'all' ? {} : {status: query.tab}),
     ...(field ? {[field]: term} : {}),
+    ...(query.customerId ? {customerId: query.customerId} : {}),
   };
 }
 
