@@ -80,6 +80,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             case "STORE-CORE.USERS.DELETE" -> checker.hasAccessOnStoreUsersDelete(authentication, (StoreMerchantId) targetId);
             case "STORE-CORE.USERS.ENABLE" -> checker.hasAccessOnStoreUsersEnable(authentication, (StoreMerchantId) targetId);
             case "STORE-CORE.USERS.DISABLE" -> checker.hasAccessOnStoreUsersDisable(authentication, (StoreMerchantId) targetId);
+            case "STORE-CORE.USERS.RESET_PASSWORD" ->
+                    checker.hasAccessOnStoreUsersResetPassword(authentication, (StoreMerchantId) targetId);
             default -> hasBillingPermission(authentication, targetId, action);
         };
     }

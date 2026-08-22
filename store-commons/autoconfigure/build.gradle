@@ -25,4 +25,19 @@ dependencies {
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    // The first tests in store-commons. Everything above is compileOnly, so a test needs its own copies of the
+    // few things the code under test actually touches: the value objects, and the resource-server types that
+    // make a JwtAuthenticationToken constructible without a mocking framework.
+    // Library modules carry no Boot dependency management, so the versionless catalog aliases the services use
+    // do not resolve here. The BOM is imported for the test classpath only.
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
+    testImplementation project(":store-commons:commons")
+    testImplementation libs.spring.boot.starter.security.oauth2.resource.server
+    testImplementation libs.spring.boot.starter.test
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

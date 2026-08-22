@@ -41,6 +41,14 @@ public class PermissionAccessChecker {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
+    /**
+     * Setting another user's password. Deliberately the maintain audience rather than the read one: a moderator can
+     * see who has access to a store without being able to take it over.
+     */
+    public boolean hasAccessOnStoreUsersResetPassword(Authentication authentication, StoreMerchantId requestedStoreId) {
+        return hasMaintainAccessOnUsers(authentication, requestedStoreId);
+    }
+
     public boolean hasAccessOnStoreFindOne(Authentication authentication, StoreMerchantId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);
     }
