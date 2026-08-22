@@ -197,11 +197,26 @@ describe('PaymentsApi', () => {
     expect(row.amount).toEqual({value: 94, currency: 'SAR'});
   });
 
-  it('marks a pending transaction actionable and a paid one not', () => {
+  it('marks a pending manual transfer actionable and a settled one not', () => {
     payments.transactionsInStore = [TRANSACTION, {...TRANSACTION, id: 42, status: 'PAID'}];
     const rows = load().page.content;
     expect(rows[0].actionable).toBe(true);
     expect(rows[1].actionable).toBe(false);
+  });
+
+  /*
+   * The guard QA put here. `approve` sets PAID and fires PaymentPaidEvent whatever it is given, so a
+   * pending Stripe payment with an Approve button is an invitation to tell checkout an order was
+   * paid for which no money was taken — and nothing can refund it.
+   */
+  it('offers no action on a pending card payment, which the processor still holds', () => {
+    payments.transactionsInStore = [{...TRANSACTION, paymentType: 'STRIPE'}];
+    expect(load().page.content[0].actionable).toBe(false);
+  });
+
+  it('offers an action on cash on delivery, which a person also settles', () => {
+    payments.transactionsInStore = [{...TRANSACTION, paymentType: 'COD'}];
+    expect(load().page.content[0].actionable).toBe(true);
   });
 
   it('keeps the page envelope the server sent', () => {

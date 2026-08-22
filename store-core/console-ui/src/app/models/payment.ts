@@ -38,13 +38,29 @@ export const PENDING_APPROVAL: PaymentStatus = 'PENDING';
 export const MANUAL_TRANSFER = 'MANUAL_TRANSFER';
 
 /**
- * The statuses that get Approve and Reject buttons.
+ * The gateways where a person, not a processor, decides that the money arrived.
  *
- * seller-ui's list, carried over unchanged. It is wider than the approval queue on purpose: the
- * queue is what the console *surfaces*, this is what it permits an operator to act on when they have
- * found the row some other way. The server permits far more — `approve` has no state guard at all —
- * so this set is the only thing standing between an operator and re-firing `PaymentPaidEvent` on a
- * transaction that is already paid.
+ * `PaymentType.attrs` is empty for exactly these two — they have no credentials because there is no
+ * gateway behind them. A bank transfer is confirmed by reading a statement and cash on delivery by
+ * the courier handing it over; both are human facts the platform cannot observe.
+ *
+ * Stripe and PayPal are the opposite: the processor settles them and reports back through the
+ * webhook. Nothing about them is waiting on the operator.
+ */
+export const MANUALLY_SETTLED_TYPES: readonly string[] = ['MANUAL_TRANSFER', 'COD'];
+
+/**
+ * The statuses on which Approve and Reject are offered — **for a manually settled gateway only**.
+ *
+ * seller-ui offered them on these four statuses for *every* gateway, and QA against the live stack
+ * showed what that costs: a `PENDING` Stripe payment the gateway had not settled sat there with an
+ * Approve button. `approve` has no state guard and no gateway guard — it sets `PAID` and fires
+ * `PaymentPaidEvent` whatever it is given — so pressing it would have told checkout an order was
+ * paid for which no money had been taken, with no refund endpoint anywhere to undo it.
+ *
+ * Narrowing this is a deliberate removal from seller-ui's behaviour, and the only guard there is:
+ * see `isApprovable`, and lessons.md, "Payments — approve and reject are unguarded and not
+ * idempotent".
  */
 export const ACTIONABLE_STATUSES: readonly PaymentStatus[] = [
   'PENDING',
@@ -52,6 +68,16 @@ export const ACTIONABLE_STATUSES: readonly PaymentStatus[] = [
   'WAITING_VERIFICATION',
   'AUTHORIZED',
 ];
+
+/**
+ * Whether an operator may approve or reject this transaction.
+ *
+ * Both halves matter. The status half keeps a settled payment from being re-approved; the gateway
+ * half keeps a card payment from being marked paid by hand. Neither is enforced server-side.
+ */
+export function isApprovable(status: PaymentStatus, paymentType: string): boolean {
+  return ACTIONABLE_STATUSES.includes(status) && MANUALLY_SETTLED_TYPES.includes(paymentType);
+}
 
 export interface PaymentTransaction {
   /**

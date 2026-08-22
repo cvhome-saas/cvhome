@@ -2051,10 +2051,18 @@ invisible until something was measured rather than read.
   client.
 - **Expected contract:** reject any transition out of a terminal status with a 409, and answer 404
   for an unknown ref.
-- **What console-ui does meanwhile:** offers the two actions only on `PENDING`, `PROCESSING`,
-  `WAITING_VERIFICATION` and `AUTHORIZED` (`ACTIONABLE_STATUSES`), disables both buttons while a
-  write is in flight, and re-reads the list afterwards rather than assuming the outcome. That is a
-  guard on the common case, not on the race.
+- **What console-ui does meanwhile:** guards on two axes, in `isApprovable`. The **status** must be
+  one of `PENDING`, `PROCESSING`, `WAITING_VERIFICATION`, `AUTHORIZED`, and the **gateway** must be
+  one a person actually settles — `MANUAL_TRANSFER` or `COD`. Both buttons are disabled while a
+  write is in flight, and the list is re-read afterwards rather than assumed.
+- **The gateway half came out of QA against the live stack**, and is a deliberate narrowing of
+  seller-ui, which offered the actions on every gateway. The store had one real transaction: a
+  `PENDING` **Stripe** payment for SAR 8,500 that the processor had not settled, sitting under an
+  Approve button. Pressing it would have set `PAID` and fired `PaymentPaidEvent` — telling checkout
+  an order was paid for which no money had been taken, with no refund endpoint anywhere to reverse
+  it. A card payment is never waiting on the operator; the processor has it.
+- **Still only a guard on the common case, not on the race.** Two operators on two screens cannot be
+  prevented from the client, and the server checks neither axis.
 - **Placeholder:** `TODO(lessons.md):` in `api/payment/payment.service.ts`.
 
 ## Payments — a gateway is offered that cannot take money

@@ -28,7 +28,9 @@ function row(
     status,
     amount: {value: 100 + id, currency: 'SAR'},
     placedOn: '2026-08-18T09:00:00Z',
-    actionable: ['PENDING', 'PROCESSING', 'WAITING_VERIFICATION', 'AUTHORIZED'].includes(status),
+    actionable:
+      ['PENDING', 'PROCESSING', 'WAITING_VERIFICATION', 'AUTHORIZED'].includes(status) &&
+      ['MANUAL_TRANSFER', 'COD'].includes(paymentType),
   };
 }
 
@@ -265,13 +267,18 @@ describe('Payments', () => {
 
   /* --------------------------------------------------------------------- the writes ---- */
 
-  it('offers approve and reject only on an actionable row', fakeAsync(() => {
+  /*
+   * Row 1 is a pending manual transfer; row 2 is a pending *Stripe* payment. Only the first is
+   * waiting on a person, and only the first may be approved — see `isApprovable`.
+   */
+  it('offers approve and reject on a manual transfer, and not on a pending card payment', fakeAsync(() => {
     const element = load();
     clickTab(element, 'All');
 
     const rows = [...element.querySelectorAll('app-table-row')];
-    // Two pending rows are actionable; paid, failed and refunded are not.
     expect(rows[0].querySelectorAll('.cell-actions button').length).toBe(2);
+    expect(rows[1].querySelectorAll('.cell-actions button').length).toBe(0);
+    // And nothing settled is actionable either.
     expect(rows[2].querySelectorAll('.cell-actions button').length).toBe(0);
   }));
 

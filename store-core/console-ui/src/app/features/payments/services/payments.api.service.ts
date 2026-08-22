@@ -5,9 +5,9 @@ import {PaymentService} from '@api/payment/payment.service';
 import {optionalOne} from '@core/http/optional';
 import type {PageRequest, PageT} from '@core/table/table.types';
 import {
-  ACTIONABLE_STATUSES,
   MANUAL_TRANSFER,
   PENDING_APPROVAL,
+  isApprovable,
   type PaymentApproval,
   type PaymentTransaction,
   type TransactionQuery,
@@ -138,6 +138,10 @@ export function rangeParams(range: DateRangeValue): TransactionQuery {
  * The columns the template designs and this cannot fill: the customer (a transaction carries no
  * reference to one), the card brand and last four (they live inside the gateway, not on the row),
  * and the per-row fee (no fee field exists anywhere in payment or checkout). See lessons.md.
+ *
+ * `actionable` reads the gateway as well as the status. A `PENDING` Stripe payment is not waiting on
+ * a person — the processor has it — and offering Approve there would let an operator tell checkout
+ * an order was paid that was not. See `isApprovable`.
  */
 function toRow(transaction: PaymentTransaction): TransactionRow {
   return {
@@ -151,7 +155,7 @@ function toRow(transaction: PaymentTransaction): TransactionRow {
     // The amount and its currency, not a rendered string: the row survives a language change.
     amount: {value: transaction.amount ?? null, currency: transaction.currency?.code ?? null},
     placedOn: transaction.transactionDate,
-    actionable: ACTIONABLE_STATUSES.includes(transaction.status),
+    actionable: isApprovable(transaction.status, transaction.paymentType),
   };
 }
 
