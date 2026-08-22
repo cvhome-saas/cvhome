@@ -6,3 +6,23 @@ Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f02363
 
 ###
 
+
+# The single "name or email" query a console search box sends. Matches the billing first name, the
+# billing last name or the email address. Before the filters were bound this narrowed nothing.
+GET {{SELLER-UI_URL}}/spg/checkout/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0&name=a
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# An exact-field filter. These are AND-ed with each other and with `name`, which is why a caller with
+# one search box sends `name` alone.
+GET {{SELLER-UI_URL}}/spg/checkout/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0&email=example.com
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# Billing country, by ISO code.
+GET {{SELLER-UI_URL}}/spg/checkout/api/v1/private/customers?store=65f023632bc46470c104b76f&lang=en&count=10&page=0&country=DE
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###

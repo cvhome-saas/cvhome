@@ -195,7 +195,9 @@ public class OrderApi {
                                   @RequestParam(value = "id", required = false) Long id,
                                   @RequestParam(value = "status", required = false) String status,
                                   @RequestParam(value = "phone", required = false) String phone,
-                                  @RequestParam(value = "email", required = false) String email, StoreMerchantId merchantStore,
+                                  @RequestParam(value = "email", required = false) String email,
+                                  @RequestParam(value = "customerId", required = false) Long customerId,
+                                  StoreMerchantId merchantStore,
                                   LanguageCode language, Pageable pageable) {
 
         OrderCriteria orderCriteria = new OrderCriteria();
@@ -206,6 +208,9 @@ public class OrderApi {
         orderCriteria.setStatus(status);
         orderCriteria.setEmail(email);
         orderCriteria.setId(id);
+        // The exact join onto a customer. `email` is a LIKE, so it also matches an address this one is a
+        // substring of; the repository has honoured `customerId` all along and nothing could send it.
+        orderCriteria.setCustomerId(customerId);
         return orderFacade.getReadableOrderList(orderCriteria, merchantStore);
     }
 

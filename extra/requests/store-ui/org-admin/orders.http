@@ -38,3 +38,11 @@ Content-Type: application/json
 
 ###
 
+
+# One customer's orders, joined exactly. `email` is a LIKE and also matches an address this one is a
+# substring of; `customerId` is the real join, honoured by the repository all along and sendable by
+# nothing until it was bound.
+GET {{SELLER-UI_URL}}/spg/checkout/api/v1/private/orders?store=65f023632bc46470c104b76f&lang=en&count=5&page=0&customerId=1
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
