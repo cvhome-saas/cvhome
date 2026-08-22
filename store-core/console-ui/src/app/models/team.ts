@@ -1,5 +1,5 @@
 import type {InvitationStatus} from '@models/users';
-import type {KpiDatum, Tone} from '@models/ui';
+import type {Tone} from '@models/ui';
 
 /**
  * The user-management page's view models.
@@ -129,14 +129,4 @@ export interface IssuedInvitation {
   /** The absolute link to hand over, already assembled against the console's own origin. */
   readonly link: string;
   readonly expiresAt: string;
-}
-
-/** One KPI's source data, resolved into a `KpiDatum` by the facade. */
-export interface TeamKpiSource {
-  readonly labelKey: string;
-  /** Null when the figure could not be read — an em dash under a flag, never a zero. */
-  readonly value: string | null;
-  readonly icon: KpiDatum['icon'];
-  readonly tone: KpiDatum['tone'];
-  readonly flagKey?: string;
 }

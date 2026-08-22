@@ -1,5 +1,5 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
-import {Router, provideRouter} from '@angular/router';
+import {provideRouter} from '@angular/router';
 
 import {AuthService} from '@core/auth/auth.service';
 import {LocaleService} from '@core/i18n/locale.service';
@@ -117,16 +117,14 @@ describe('Profile', () => {
     expect(host.textContent).toContain('this browser only');
   }));
 
-  /* Billing belongs to a store, and is already built. Linked, not drawn again. */
-  it('sends the operator to the billing page rather than repeating it', fakeAsync(() => {
+  /*
+   * Billing is not here at all. A plan belongs to a **store**, not to a person, so it lives with
+   * the store in the nav rail rather than under an account page that cannot say whose it is.
+   */
+  it('does not draw billing on a personal page', fakeAsync(() => {
     const host = load();
-    const navigate = spyOn(TestBed.inject(Router), 'navigate');
 
-    (Array.from(host.querySelectorAll('button')).find((button) =>
-      /Open billing/.test(button.textContent ?? ''),
-    ) as HTMLButtonElement).click();
-
-    expect(navigate).toHaveBeenCalledWith(['/subscription']);
+    expect(host.textContent).not.toContain('Billing');
   }));
 
   /*

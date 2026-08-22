@@ -2176,9 +2176,12 @@ invisible until something was measured rather than read.
 - **Expected contract:** either `GET …/user-account/list` gains an org-scoped mode when the caller is
   an org admin, or a null `store` in a user's metadata is read as "every store in the org" by both
   the list filter and `validateUserAccess`. The second is closer to what the data already means.
-- **What console-ui does meanwhile:** renders the list as the server scopes it and says so, in a
-  notice above the table naming the open store. Not a filter the operator can turn off — there is
-  nothing to turn it into.
+- **What console-ui does meanwhile:** renders the list as the server scopes it, and the page header
+  already says whose it is ("Everyone with access to ORG1-STORE1"). A notice restating it above the
+  table was removed at the user's direction: it repeated the header on every visit to say something
+  that is only occasionally relevant, and a banner an operator learns to skip is worse than no
+  banner. **The gap itself is unchanged** — an org-level account is still in no list, and there is
+  still no filter that would show one.
 - **Placeholder:** `TODO(lessons.md):` in `features/users/facades/users.facade.ts`,
   `models/team.ts` and `models/users.ts`.
 

@@ -1944,12 +1944,10 @@
   },
   "users": {
     "loading": "Loading the team…",
-    "metricsLabel": "Team overview",
     "allUsers": "All users",
     "unit": "users",
     "paginationLabel": "Team pages",
     "you": "You",
-    "scopedToStore": "This list shows accounts that belong to {{store}}. Someone whose access is organization-wide rather than tied to one store does not appear here.",
     "heading": {
       "title": "User management",
       "context": "Everyone with access to {{store}}"
@@ -1958,11 +1956,6 @@
       "none": "No one to show",
       "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {user} other {users}}"
     },
-    "kpi": {
-      "teamMembers": "Team members",
-      "pendingInvitations": "Pending invitations",
-      "thisStore": "In this store"
-    },
     "column": {
       "user": "User",
       "roles": "Roles",
@@ -1970,7 +1963,8 @@
       "actions": "Actions",
       "email": "Email",
       "role": "Role",
-      "expires": "Expires"
+      "expires": "Expires",
+      "userName": "Username"
     },
     "status": {
       "active": "Active",
@@ -1982,9 +1976,7 @@
     },
     "rail": {
       "newUser": "New user",
-      "editUser": "Edit user",
-      "noSelection": "Details",
-      "selectPrompt": "Choose someone from the list to see their account."
+      "editUser": "Edit user"
     },
     "fact": {
       "roles": "Roles",
@@ -2016,7 +2008,6 @@
       "save": "Save",
       "delete": "Delete",
       "edit": "Edit",
-      "editFor": "Edit {{name}}",
       "enable": "Allow sign-in",
       "disable": "Block sign-in",
       "resetPassword": "Set password",
@@ -2026,7 +2017,9 @@
       "resend": "Resend",
       "resendFor": "Resend the invitation to {{email}}",
       "revoke": "Revoke",
-      "revokeFor": "Revoke the invitation to {{email}}"
+      "revokeFor": "Revoke the invitation to {{email}}",
+      "openDetails": "Open",
+      "openDetailsFor": "Open {{name}}'s account"
     },
     "delete": {
       "title": "Delete this account?",
@@ -2129,8 +2122,6 @@
     },
     "account": {
       "title": "Account",
-      "userName": "Username",
-      "roles": "Roles",
       "limited": "The console can only see your username and your roles. Your name and email address live in the sign-in service and are not sent to it yet, so there is nothing here to edit."
     },
     "preferences": {
@@ -2139,11 +2130,6 @@
       "language": "Language",
       "theme": "Theme",
       "thisBrowserOnly": "These are remembered in this browser only. There is nowhere to keep them against your account yet, so they will not follow you to another device."
-    },
-    "billing": {
-      "title": "Billing",
-      "subtitle": "Plans and invoices belong to a store rather than to you.",
-      "action": "Open billing"
     }
   }
 }

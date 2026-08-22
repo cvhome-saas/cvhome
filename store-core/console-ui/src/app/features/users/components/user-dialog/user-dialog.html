@@ -1,0 +1,193 @@
+<dialog #dialog class="user-dialog" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <ng-container *transloco="let t">
+    @if (form(); as userForm) {
+      <form class="user-dialog-body" [formGroup]="userForm" (submit)="onSubmit($event)">
+        <header class="user-dialog-head">
+          <h2>{{ mode() === 'create' ? t('users.rail.newUser') : t('users.rail.editUser') }}</h2>
+          <button
+            class="icon-action"
+            type="button"
+            [attr.aria-label]="t('shared.actions.cancel')"
+            (click)="close()"
+          >
+            <app-icon name="x" />
+          </button>
+        </header>
+
+        <div class="user-dialog-scroll">
+          <app-form-field [label]="t('users.field.userName')" [control]="userForm.controls.userName" required>
+            <app-text-field formControlName="userName" latin autocomplete="off" [maxLength]="190" />
+            <app-field-error [control]="userForm.controls.userName" />
+          </app-form-field>
+
+          <div class="pair">
+            <app-form-field [label]="t('users.field.firstName')" [control]="userForm.controls.firstName">
+              <app-text-field formControlName="firstName" [maxLength]="50" />
+              <app-field-error [control]="userForm.controls.firstName" />
+            </app-form-field>
+            <app-form-field [label]="t('users.field.lastName')" [control]="userForm.controls.lastName">
+              <app-text-field formControlName="lastName" [maxLength]="50" />
+              <app-field-error [control]="userForm.controls.lastName" />
+            </app-form-field>
+          </div>
+
+          <app-form-field [label]="t('users.field.email')" [control]="userForm.controls.emailAddress" required>
+            <app-text-field formControlName="emailAddress" type="email" latin autocomplete="off" />
+            <app-field-error [control]="userForm.controls.emailAddress" />
+          </app-form-field>
+
+          @if (mode() === 'create') {
+            <!--
+              Only on create: `PUT …/update` does not change a password, and a field here on an edit
+              would imply that it did. Changing one is Set password, its own endpoint and permission.
+            -->
+            <div class="pair">
+              <app-form-field
+                [label]="t('users.field.password')"
+                [control]="userForm.controls.password"
+                [hint]="t('users.field.passwordHint')"
+                required
+              >
+                <app-text-field formControlName="password" type="password" autocomplete="new-password" />
+                <app-field-error [control]="userForm.controls.password" />
+              </app-form-field>
+              <app-form-field
+                [label]="t('users.field.repeatPassword')"
+                [control]="userForm.controls.repeatPassword"
+                required
+              >
+                <app-text-field formControlName="repeatPassword" type="password" autocomplete="new-password" />
+                <app-field-error [control]="userForm.controls.repeatPassword" />
+              </app-form-field>
+            </div>
+          }
+
+          <app-form-field
+            [label]="t('users.field.roles')"
+            [control]="userForm.controls.roles"
+            [hint]="t('users.field.rolesHint')"
+            required
+          >
+            <fieldset class="role-picker">
+              <legend class="sr-only">{{ t('users.field.roles') }}</legend>
+              @for (role of roles(); track role) {
+                <app-checkbox
+                  [label]="roleLabel()(role)"
+                  [checked]="hasRole()(role)"
+                  (checkedChange)="toggleRole.emit(role)"
+                />
+              } @empty {
+                <p class="dialog-hint">{{ t('users.field.rolesUnavailable') }}</p>
+              }
+            </fieldset>
+            <app-field-error [control]="userForm.controls.roles" />
+          </app-form-field>
+
+          <app-toggle
+            [label]="t('users.field.active')"
+            [description]="t('users.field.activeHint')"
+            [checked]="userForm.controls.active.value"
+            (checkedChange)="setActive.emit($event)"
+          />
+        </div>
+
+        <footer class="user-dialog-actions">
+          <button class="secondary-action" type="button" [disabled]="busy()" (click)="cancelEdit.emit()">
+            {{ t('shared.actions.cancel') }}
+          </button>
+          <button class="primary-action" type="submit" [disabled]="busy() || userForm.invalid">
+            {{ t('users.action.save') }}
+          </button>
+        </footer>
+      </form>
+    } @else if (user(); as selected) {
+      <div class="user-dialog-body">
+        <header class="user-dialog-head">
+          <div class="who">
+            <span class="avatar" aria-hidden="true">{{ initials()(selected) }}</span>
+            <div class="who-text">
+              <h2>{{ selected.name }}</h2>
+              <span class="email" dir="auto">{{ selected.email }}</span>
+            </div>
+          </div>
+          <app-badge [tone]="selected.active ? 'green' : 'slate'" shape="square">
+            {{ selected.active ? t('users.status.active') : t('users.status.disabled') }}
+          </app-badge>
+          <button
+            class="icon-action"
+            type="button"
+            [attr.aria-label]="t('users.action.closeDetails')"
+            (click)="close()"
+          >
+            <app-icon name="x" />
+          </button>
+        </header>
+
+        <!--
+          Four facts, where the template draws role, store access, phone and last active. The last
+          two have no source at all — a uaa user has no phone column and no last-login — so username
+          and account state take their place, both of which an operator needs when someone says they
+          cannot sign in.
+        -->
+        <dl class="facts">
+          <div>
+            <dt>{{ t('users.fact.roles') }}</dt>
+            <dd>{{ roleList()(selected.roles) }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('users.fact.userName') }}</dt>
+            <dd dir="auto">{{ selected.userName }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('users.fact.storeAccess') }}</dt>
+            <dd>{{ selected.store ? storeName() : t('users.fact.organizationWide') }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('users.fact.signIn') }}</dt>
+            <dd>{{ selected.active ? t('users.fact.allowed') : t('users.fact.blocked') }}</dd>
+          </div>
+        </dl>
+
+        @if (canManage()) {
+          <footer class="user-dialog-actions spread">
+            <!--
+              Disabling yourself would end your own session on the next request, and deleting
+              yourself is worse. The server stops neither, so the console does.
+            -->
+            <button
+              class="ghost-action danger-action"
+              type="button"
+              [disabled]="busy() || selected.isSelf"
+              [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+              (click)="remove.emit(selected)"
+            >
+              <app-icon name="trash" />
+              {{ t('users.action.delete') }}
+            </button>
+
+            <div class="spacer"></div>
+
+            <button
+              class="secondary-action"
+              type="button"
+              [disabled]="busy() || selected.isSelf"
+              [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+              (click)="toggleActive.emit(selected)"
+            >
+              <app-icon [name]="selected.active ? 'eyeOff' : 'eye'" />
+              {{ selected.active ? t('users.action.disable') : t('users.action.enable') }}
+            </button>
+            <button class="secondary-action" type="button" [disabled]="busy()" (click)="resetPassword.emit(selected)">
+              <app-icon name="lock" />
+              {{ t('users.action.resetPassword') }}
+            </button>
+            <button class="primary-action" type="button" [disabled]="busy()" (click)="edit.emit()">
+              <app-icon name="pencil" />
+              {{ t('users.action.edit') }}
+            </button>
+          </footer>
+        }
+      </div>
+    }
+  </ng-container>
+</dialog>

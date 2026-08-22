@@ -1,42 +1,38 @@
 import {Component, ElementRef, computed, effect, inject, input, viewChild} from '@angular/core';
+
+import type {TeamRow} from '@models/team';
 import {Router} from '@angular/router';
-import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {TranslocoDatePipe} from '@jsverse/transloco-locale';
 
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
-import {Checkbox} from '@shared/ui/checkbox/checkbox';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
 import {TableRow} from '@shared/ui/data-table/table-row';
 import {EmptyState} from '@shared/ui/empty-state/empty-state';
 import {ExportButton} from '@shared/ui/export-button/export-button';
-import {FieldError} from '@shared/ui/form-field/field-error';
-import {FormField} from '@shared/ui/form-field/form-field';
 import {Icon} from '@shared/ui/icon/icon';
-import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
 import {LoadError} from '@shared/ui/load-error/load-error';
-import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Pagination} from '@shared/ui/pagination/pagination';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
-import {TextField} from '@shared/ui/text-field/text-field';
-import {Toggle} from '@shared/ui/toggle/toggle';
 import {InvitationLinkDialog} from './components/invitation-link-dialog/invitation-link-dialog';
 import {InviteDialog} from './components/invite-dialog/invite-dialog';
+import {UserDialog} from './components/user-dialog/user-dialog';
 import {SetPasswordDialog} from './components/set-password-dialog/set-password-dialog';
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 
 /** The team table's columns. Widths are grid tracks, read straight into the row layout. */
 const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align?: 'start' | 'end'}[] = [
-  {key: 'user', labelKey: 'users.column.user', width: 'minmax(11rem, 2fr)'},
-  {key: 'roles', labelKey: 'users.column.roles', width: 'minmax(8rem, 1.2fr)'},
-  {key: 'status', labelKey: 'users.column.status', width: 'minmax(6rem, 0.8fr)'},
-  {key: 'actions', labelKey: '', width: '5rem'},
+  {key: 'user', labelKey: 'users.column.user', width: 'minmax(14rem, 2.2fr)'},
+  {key: 'username', labelKey: 'users.column.userName', width: 'minmax(9rem, 1.2fr)'},
+  {key: 'roles', labelKey: 'users.column.roles', width: 'minmax(9rem, 1.3fr)'},
+  {key: 'status', labelKey: 'users.column.status', width: 'minmax(6rem, 0.7fr)'},
+  {key: 'actions', labelKey: '', width: '3.5rem'},
 ];
 
 /** The invitations table's columns. */
@@ -66,31 +62,24 @@ const INVITATION_COLUMN_KEYS: readonly {key: string; labelKey: string; width: st
   imports: [
     Badge,
     BusyOverlay,
-    Checkbox,
     ConfirmDialog,
     DataTable,
     EmptyState,
     ExportButton,
-    FieldError,
-    FormField,
     Icon,
     InvitationLinkDialog,
     InviteDialog,
-    KpiGrid,
     LoadError,
-    NoticeBar,
     PageHeader,
     Pagination,
     Panel,
-    ReactiveFormsModule,
     Select,
     SetPasswordDialog,
     TabSwitcher,
     TableRow,
-    TextField,
-    Toggle,
     TranslocoDatePipe,
     TranslocoDirective,
+    UserDialog,
   ],
   providers: [UsersFacade],
   templateUrl: './users.html',
@@ -99,7 +88,7 @@ const INVITATION_COLUMN_KEYS: readonly {key: string; labelKey: string; width: st
    * pulls it in beside its own sheet — it is not global. Omitting it left `.split` as a plain block,
    * so the master-detail panes stacked no matter how wide the page was. Found in QA.
    */
-  styleUrls: ['../../shared/styles/field.css', './users.css'],
+  styleUrl: './users.css',
 })
 export class Users {
   private readonly transloco = inject(TranslocoService);
@@ -128,13 +117,22 @@ export class Users {
   protected readonly isEmpty = this.facade.isEmpty;
   protected readonly error = this.facade.error;
   protected readonly rows = this.facade.rows;
-  protected readonly kpis = this.facade.kpis;
   protected readonly heading = this.facade.heading;
   protected readonly busy = this.facade.busy;
   protected readonly pageSize = PAGE_SIZE;
 
   /** The region the export captures. Absent until the first response renders it. */
   protected readonly report = viewChild('report', {read: ElementRef});
+
+  /*
+   * Bound once as fields rather than passed as `facade.x.bind(facade)` in the template: a method
+   * reference created in a binding is a new function every change detection, which makes the
+   * dialog's inputs look changed on every tick.
+   */
+  protected readonly roleLabel = (role: string) => this.facade.roleLabel(role);
+  protected readonly roleList = (roles: readonly string[]) => this.facade.roleList(roles);
+  protected readonly initials = (row: TeamRow) => this.facade.initialsOf(row);
+  protected readonly hasRole = (role: string) => this.facade.hasRole(role);
 
   protected readonly columns = computed<readonly TableColumn[]>(() => {
     this.transloco.activeLang();
@@ -203,34 +201,20 @@ export class Users {
    * around would lag a click behind — and would not open at all anywhere the navigation does not
    * resolve. The effect above then re-sets the same value, which is a no-op.
    */
-  protected select(id: string): void {
+  protected open(id: string): void {
     this.facade.selectRow(id);
     void this.router.navigate([], {queryParams: {user: id}, queryParamsHandling: 'merge'});
   }
 
-  /**
-   * Selecting and editing in one gesture, for the row's pencil.
-   *
-   * Sets the facade's selection before navigating rather than waiting for the URL to come back
-   * around: `startEdit` refuses when nothing is selected, and a `Router.navigate` has not resolved
-   * by the time the next statement runs. The effect above then re-sets the same value, which is a
-   * no-op.
-   */
-  protected edit(row: {id: string}): void {
-    this.facade.selectRow(row.id);
-    this.facade.startEdit();
-    void this.router.navigate([], {queryParams: {user: row.id}, queryParamsHandling: 'merge'});
-  }
-
-  /** Leaving the form returns to reading the same user, or to nothing when there was none. */
-  protected cancelEdit(): void {
+  /** Leaving the form returns to reading the same account, or closes when there was none. */
+  protected onCancelEdit(): void {
     this.facade.cancelEdit();
     if (!this.facade.selectedId()) {
-      this.closeRail();
+      this.closeDialog();
     }
   }
 
-  protected closeRail(): void {
+  protected closeDialog(): void {
     this.facade.clearSelection();
     void this.router.navigate([], {queryParams: {user: null}, queryParamsHandling: 'merge'});
   }

@@ -8,20 +8,16 @@ import {AuthService} from '@core/auth/auth.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {humanizeStatus} from '@models/orders';
 import type {InvitationStatus} from '@models/users';
-import {INVITATION_STATUSES, USERS_TABS, type InvitationRow, type IssuedInvitation, type TeamKpiSource, type TeamRow, type UsersTab} from '@models/team';
+import {INVITATION_STATUSES, USERS_TABS, type InvitationRow, type IssuedInvitation, type TeamRow, type UsersTab} from '@models/team';
 import {RoleLabel} from '@shared/i18n/role-label';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {snapshot} from '@shared/state/snapshot';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import {UsersApi} from '../services/users.api.service';
 import {UserFormService, type UserForm} from '../services/user-form.service';
 
 export const PAGE_SIZE = 20;
-
-/** What a KPI with no readable count shows in place of a figure. */
-const NO_FIGURE = '—';
 
 /** What the detail rail is doing: reading a user, editing one, or creating one. */
 export type RailMode = 'view' | 'edit' | 'create';
@@ -143,47 +139,6 @@ export class UsersFacade {
         store: this.shell.currentStore()?.name ?? '',
       }),
     };
-  });
-
-  /**
-   * The KPI row: two tiles, not the template's four.
-   *
-   * The template shows Team members, Customers, Orders placed and Suspended. Customers are a
-   * different service and Module 9's page; orders placed per person is not a figure anything
-   * computes; and Suspended could only be counted across the page currently loaded, which would
-   * report "1 suspended" on a team of eighty because that is how many happened to be on screen. Two
-   * true tiles beat four where half are decoration — the rule Module 6 set when it removed the
-   * inventory KPI row outright.
-   *
-   * Both figures are read off the load that already happened: the team count is the list's own
-   * `totalElements`, the pending count a length. Neither costs a request.
-   */
-  readonly kpis = computed<readonly KpiDatum[]>(() => {
-    this.transloco.activeLang();
-    const loaded = this.team.value();
-    const sources: readonly TeamKpiSource[] = [
-      {
-        labelKey: 'users.kpi.teamMembers',
-        value: loaded ? String(loaded.totalElements) : null,
-        icon: 'users',
-        tone: 'blue',
-        flagKey: 'users.kpi.thisStore',
-      },
-      {
-        labelKey: 'users.kpi.pendingInvitations',
-        value: this.pendingInvitations() === null ? null : String(this.pendingInvitations()),
-        icon: 'envelope',
-        tone: this.pendingInvitations() ? 'amber' : 'slate',
-      },
-    ];
-
-    return sources.map((kpi) => ({
-      label: this.transloco.translate(kpi.labelKey),
-      value: this.figure(kpi.value),
-      icon: kpi.icon,
-      tone: kpi.tone,
-      flag: kpi.flagKey ? this.transloco.translate(kpi.flagKey) : undefined,
-    }));
   });
 
   /* ----------------------------------------------------------- the invitations tab ---- */
@@ -624,12 +579,4 @@ export class UsersFacade {
       : humanizeStatus(status);
   }
 
-  /** A KPI's figure in the reader's digits, or an em dash where it could not be read. */
-  private figure(value: string | null): string {
-    if (value === null) {
-      return NO_FIGURE;
-    }
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? this.localeFormat.localizeNumber(numeric, 'decimal') : value;
-  }
 }

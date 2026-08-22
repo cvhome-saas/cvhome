@@ -1,5 +1,4 @@
 import {Component, inject} from '@angular/core';
-import {Router} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Badge} from '@shared/ui/badge/badge';
@@ -19,8 +18,9 @@ import {ProfileFacade} from './facades/profile.facade';
  * Removed, each with a `lessons.md` entry: the avatar, full name, job title, email, phone, timezone,
  * date format and bio — none has a column anywhere, and the account record they would come from is
  * unreachable twice over. The notification toggles, two-factor and the session list have no service.
- * The Organization tab needs `org-manager/find-one`, which is super-admin only. The billing tabs are
- * already shipped at `/subscription` and are linked rather than drawn again here.
+ * The Organization tab needs `org-manager/find-one`, which is super-admin only. Billing is not here
+ * at all: a plan belongs to a **store**, not to a person, so it lives with the store in the nav rail
+ * rather than under an account page that cannot show whose it is.
  *
  * The password card is not here either: setting one needs a user id, and the JWT carries the
  * username instead. That action lives on `/users`, where a row has a real id — which is also the
@@ -31,15 +31,8 @@ import {ProfileFacade} from './facades/profile.facade';
   imports: [Badge, Icon, NoticeBar, PageHeader, Panel, TranslocoDirective],
   providers: [ProfileFacade],
   templateUrl: './profile.html',
-  /* `.page-body` and `.field-hint` live in `field.css`, which each feature pulls in beside its own. */
-  styleUrls: ['../../shared/styles/field.css', './profile.css'],
+  styleUrl: './profile.css',
 })
 export class Profile {
-  private readonly router = inject(Router);
-
   protected readonly facade = inject(ProfileFacade);
-
-  protected openBilling(): void {
-    void this.router.navigate(['/subscription']);
-  }
 }

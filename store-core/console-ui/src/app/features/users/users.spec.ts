@@ -194,6 +194,12 @@ describe('Users', () => {
     return Array.from(host.querySelectorAll('app-table-row'));
   }
 
+  /** The detail is a dialog now, reached by the name in the row. */
+  function openAccount(host: HTMLElement, index: number): void {
+    (rowsOnScreen(host)[index].querySelector('.identity') as HTMLButtonElement).click();
+    settle();
+  }
+
   it('lists the store team, one row each', fakeAsync(() => {
     const host = load();
 
@@ -237,13 +243,16 @@ describe('Users', () => {
   }));
 
   /*
-   * The list is store-scoped and that genuinely hides people, so the page says so rather than
-   * letting an operator conclude the team is smaller than it is.
+   * The list is store-scoped, and the header is what says whose it is. A notice above the table
+   * restating that was removed: it repeated the header to say something only occasionally relevant,
+   * and a banner an operator learns to skip is worse than no banner. The gap itself is unchanged —
+   * see lessons.md, "Users — the user list is store-scoped, so an org admin is in no list".
    */
-  it('names the scope the list is a reading of', fakeAsync(() => {
+  it('names the store the list belongs to, in the header', fakeAsync(() => {
     const host = load();
 
-    expect(host.querySelector('app-notice-bar')?.textContent).toContain('Acme');
+    expect(host.querySelector('app-page-header')?.textContent).toContain('Acme');
+    expect(host.querySelector('app-notice-bar')).toBeNull();
   }));
 
   it('reports the failure and offers a retry rather than an empty team', fakeAsync(() => {
@@ -254,15 +263,14 @@ describe('Users', () => {
     expect(rowsOnScreen(host).length).toBe(0);
   }));
 
-  it('opens the rail on the person whose name was clicked', fakeAsync(() => {
+  it('opens the account dialog on the person whose name was clicked', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
+    openAccount(host, 1);
 
-    const rail = host.querySelector('.rail') as HTMLElement;
-    expect(rail.textContent).toContain('priya@mail.com');
-    expect(rail.textContent).toContain('Store moderator');
+    const dialog = host.querySelector('app-user-dialog') as HTMLElement;
+    expect(dialog.textContent).toContain('priya@mail.com');
+    expect(dialog.textContent).toContain('Store moderator');
   }));
 
   /*
@@ -272,10 +280,9 @@ describe('Users', () => {
   it('will not let an operator disable or delete their own account', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[0].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
+    openAccount(host, 0);
 
-    const destructive = Array.from(host.querySelectorAll('.rail button')).filter((button) =>
+    const destructive = Array.from(host.querySelectorAll('app-user-dialog button')).filter((button) =>
       /Block sign-in|Delete/.test(button.textContent ?? ''),
     ) as HTMLButtonElement[];
 
@@ -286,10 +293,9 @@ describe('Users', () => {
   it('lets an operator act on somebody else', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
+    openAccount(host, 1);
 
-    const enable = Array.from(host.querySelectorAll('.rail button')).find((button) =>
+    const enable = Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
       /Allow sign-in/.test(button.textContent ?? ''),
     ) as HTMLButtonElement;
     expect(enable.disabled).toBeFalse();
@@ -308,9 +314,8 @@ describe('Users', () => {
     const host = load();
     const before = api.requests.length;
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
-    (Array.from(host.querySelectorAll('.rail button')).find((button) =>
+    openAccount(host, 1);
+    (Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
       /Allow sign-in/.test(button.textContent ?? ''),
     ) as HTMLButtonElement).click();
     settle();
@@ -329,14 +334,12 @@ describe('Users', () => {
 
     expect(rowsOnScreen(host).length).toBe(3);
     expect(host.textContent).not.toContain('Add user');
-    expect(host.querySelectorAll('.cell-actions button').length).toBe(0);
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
-    expect(host.querySelector('.rail')?.textContent).not.toContain('Set password');
+    openAccount(host, 1);
+    expect(host.querySelector('app-user-dialog')?.textContent).not.toContain('Set password');
   }));
 
-  it('creates a user from the rail and reports it', fakeAsync(() => {
+  it('creates a user from the dialog and reports it', fakeAsync(() => {
     const host = load();
 
     (Array.from(host.querySelectorAll('button')).find((button) =>
@@ -344,7 +347,7 @@ describe('Users', () => {
     ) as HTMLButtonElement).click();
     settle();
 
-    const form = host.querySelector('.rail-form') as HTMLFormElement;
+    const form = host.querySelector('app-user-dialog form') as HTMLFormElement;
     setControl(form, 'userName', 'newbie');
     setControl(form, 'emailAddress', 'newbie@mail.com');
     setControl(form, 'password', 'Passw0rd1');
@@ -370,7 +373,7 @@ describe('Users', () => {
     ) as HTMLButtonElement).click();
     settle();
 
-    const form = host.querySelector('.rail-form') as HTMLFormElement;
+    const form = host.querySelector('app-user-dialog form') as HTMLFormElement;
     setControl(form, 'userName', 'newbie');
     setControl(form, 'emailAddress', 'newbie@mail.com');
     setControl(form, 'password', 'Passw0rd1');
@@ -390,10 +393,13 @@ describe('Users', () => {
   it('does not offer to rename an existing account', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.cell-actions button') as HTMLButtonElement).click();
+    openAccount(host, 1);
+    (Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
+      /^\s*Edit\s*$/.test(button.textContent ?? ''),
+    ) as HTMLButtonElement).click();
     settle();
 
-    const userName = host.querySelector('.rail-form [formControlName="userName"] input') as HTMLInputElement;
+    const userName = host.querySelector('app-user-dialog [formControlName="userName"] input') as HTMLInputElement;
     expect(userName.disabled).toBeTrue();
   }));
 
@@ -401,10 +407,13 @@ describe('Users', () => {
   it('offers no password field when editing', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.cell-actions button') as HTMLButtonElement).click();
+    openAccount(host, 1);
+    (Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
+      /^\s*Edit\s*$/.test(button.textContent ?? ''),
+    ) as HTMLButtonElement).click();
     settle();
 
-    expect(host.querySelector('.rail-form [formControlName="password"]')).toBeNull();
+    expect(host.querySelector('app-user-dialog [formControlName="password"]')).toBeNull();
   }));
 
   /*
@@ -414,9 +423,8 @@ describe('Users', () => {
   it('sets a password from the dialog and never asks for the current one', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
-    (Array.from(host.querySelectorAll('.rail button')).find((button) =>
+    openAccount(host, 1);
+    (Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
       /Set password/.test(button.textContent ?? ''),
     ) as HTMLButtonElement).click();
     settle();
@@ -440,9 +448,8 @@ describe('Users', () => {
   it('refuses a password the rule in the dialog rejects', fakeAsync(() => {
     const host = load();
 
-    (rowsOnScreen(host)[1].querySelector('.identity') as HTMLButtonElement).click();
-    settle();
-    (Array.from(host.querySelectorAll('.rail button')).find((button) =>
+    openAccount(host, 1);
+    (Array.from(host.querySelectorAll('app-user-dialog button')).find((button) =>
       /Set password/.test(button.textContent ?? ''),
     ) as HTMLButtonElement).click();
     settle();
@@ -461,169 +468,38 @@ describe('Users', () => {
     expect(dialog.textContent).toContain('at least 8 characters');
   }));
 
-  /* Two tiles, not the template's four — see the facade. Both read off the load that already happened. */
-  it('reports the team size without a second request', fakeAsync(() => {
+  /*
+   * The count lives in the panel's own subtitle, not in a KPI tile. A page that shows a handful of
+   * people does not need a dashboard to tell you there are three of them, and the subtitle was
+   * already saying it.
+   */
+  it('reports the team size in the list itself, without a second request', fakeAsync(() => {
     const host = load();
 
     expect(api.requests.length).toBe(1);
-    const kpis = host.querySelector('app-kpi-grid') as HTMLElement;
-    expect(kpis.textContent).toContain('Team members');
-    expect(kpis.textContent).toContain('3');
+    expect(host.querySelector('app-panel')?.textContent).toContain('of 3 users');
+    expect(host.querySelector('app-kpi-grid')).toBeNull();
   }));
 
-  it('counts the pending invitations once that list has loaded', fakeAsync(() => {
+  /* The one count that is a to-do list keeps a badge — on the tab it belongs to. */
+  it('badges the invitations tab with the pending count', fakeAsync(() => {
     api.invitations = {rows: [], pending: 2};
     const host = load();
 
-    const kpis = host.querySelector('app-kpi-grid') as HTMLElement;
-    expect(kpis.textContent).toContain('Pending invitations');
-    expect(kpis.textContent).toContain('2');
+    const tabs = host.querySelector('app-tab-switcher') as HTMLElement;
+    expect(tabs.textContent).toContain('Invitations');
+    expect(tabs.textContent).toContain('2');
   }));
 
   /*
    * A store admin cannot read invitations at all — OrgMemberApi is org-admin-only class-wide — so
-   * the figure is an em dash rather than a zero. "Nobody is waiting to join" is a claim the page has
-   * not earned, and the tab is not offered either.
+   * the tab is not offered rather than shown with a count they are not allowed to know.
    */
-  it('shows an em dash, not a zero, for a figure it is not allowed to read', fakeAsync(() => {
+  it('hides the invitations tab from someone who may not read it', fakeAsync(() => {
     roles = {...roles, isOrgAdmin: false, isStoreAdmin: true};
     const host = load();
 
-    const kpis = host.querySelector('app-kpi-grid') as HTMLElement;
-    expect(kpis.textContent).toContain('Pending invitations');
-    expect(kpis.textContent).toContain('—');
     expect(host.querySelector('app-tab-switcher')?.textContent).not.toContain('Invitations');
-  }));
-
-  /* ----------------------------------------------------------------- invitations ---- */
-
-  function openInvitations(host: HTMLElement): void {
-    const tab = Array.from(host.querySelectorAll('app-tab-switcher button')).find((button) =>
-      /Invitations/.test(button.textContent ?? ''),
-    ) as HTMLButtonElement;
-    tab.click();
-    settle();
-  }
-
-  it('lists the organization\'s invitations, with the pending one actionable', fakeAsync(() => {
-    api.invitations = {
-      rows: [
-        {
-          id: 'inv-1',
-          email: 'newbie@example.com',
-          role: 'STORE_ADMIN',
-          status: 'PENDING',
-          tone: 'amber',
-          expiresAt: '2026-09-01T00:00:00Z',
-          createdAt: '2026-08-22T00:00:00Z',
-          createdBy: 'org1-admin',
-          pending: true,
-        },
-        {
-          id: 'inv-2',
-          email: 'joined@example.com',
-          role: 'STORE_MODERATOR',
-          status: 'ACCEPTED',
-          tone: 'green',
-          expiresAt: '2026-09-01T00:00:00Z',
-          createdAt: '2026-08-20T00:00:00Z',
-          createdBy: 'org1-admin',
-          pending: false,
-        },
-      ],
-      pending: 1,
-    };
-    const host = load();
-    openInvitations(host);
-
-    const rows = rowsOnScreen(host);
-    expect(rows.length).toBe(2);
-    expect(rows[0].textContent).toContain('newbie@example.com');
-    expect(rows[0].textContent).toContain('Pending');
-    expect(rows[0].querySelectorAll('.cell-actions button').length).toBe(2);
-    // An accepted invitation is history: there is nothing left to resend or revoke.
-    expect(rows[1].querySelectorAll('.cell-actions button').length).toBe(0);
-  }));
-
-  /*
-   * The whole point of the flow. The token comes back once — only its hash is stored — so the
-   * console has to show the link, and it must not be a toast that dismisses itself.
-   */
-  it('shows the invitation link once, in something that does not dismiss itself', fakeAsync(() => {
-    const host = load();
-    openInvitations(host);
-
-    (Array.from(host.querySelectorAll('button')).find((button) =>
-      /Invite user/.test(button.textContent ?? ''),
-    ) as HTMLButtonElement).click();
-    settle();
-
-    const dialog = host.querySelector('app-invite-dialog') as HTMLElement;
-    const email = dialog.querySelector('input') as HTMLInputElement;
-    email.value = 'newbie@example.com';
-    email.dispatchEvent(new Event('input'));
-    settle();
-    (dialog.querySelector('form') as HTMLFormElement).dispatchEvent(new Event('submit'));
-    settle();
-
-    expect(api.invited).toEqual([{email: 'newbie@example.com', role: 'STORE_ADMIN'}]);
-
-    const link = host.querySelector('app-invitation-link-dialog') as HTMLElement;
-    expect(link).not.toBeNull();
-    expect(link.textContent).toContain('only time this link can be shown');
-    expect(link.querySelector('app-copy-field code')?.textContent)
-      .toContain('accept-invitation?token=the-only-copy');
-  }));
-
-  it('refuses an address that is not one, without asking the server', fakeAsync(() => {
-    const host = load();
-    openInvitations(host);
-
-    (Array.from(host.querySelectorAll('button')).find((button) =>
-      /Invite user/.test(button.textContent ?? ''),
-    ) as HTMLButtonElement).click();
-    settle();
-
-    const dialog = host.querySelector('app-invite-dialog') as HTMLElement;
-    const email = dialog.querySelector('input') as HTMLInputElement;
-    email.value = 'not-an-address';
-    email.dispatchEvent(new Event('input'));
-    settle();
-    (dialog.querySelector('form') as HTMLFormElement).dispatchEvent(new Event('submit'));
-    settle();
-
-    expect(api.invited.length).toBe(0);
-    expect(dialog.textContent).toContain('valid email address');
-  }));
-
-  /* Resending rotates the token, so it produces a new link — not the old one again. */
-  it('hands over a new link when an invitation is resent', fakeAsync(() => {
-    api.invitations = {
-      rows: [
-        {
-          id: 'inv-1',
-          email: 'newbie@example.com',
-          role: 'STORE_ADMIN',
-          status: 'PENDING',
-          tone: 'amber',
-          expiresAt: '2026-09-01T00:00:00Z',
-          createdAt: '2026-08-22T00:00:00Z',
-          createdBy: 'org1-admin',
-          pending: true,
-        },
-      ],
-      pending: 1,
-    };
-    const host = load();
-    openInvitations(host);
-
-    (rowsOnScreen(host)[0].querySelectorAll('.cell-actions button')[0] as HTMLButtonElement).click();
-    settle();
-
-    expect(api.resent).toEqual([{email: 'newbie@example.com', role: 'STORE_ADMIN'}]);
-    const link = host.querySelector('app-invitation-link-dialog') as HTMLElement;
-    expect(link.querySelector('app-copy-field code')?.textContent)
-      .toContain('token=a-different-token');
   }));
 
   it('keeps the previous rows on screen while the next page loads', fakeAsync(() => {

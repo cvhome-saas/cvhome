@@ -3,34 +3,29 @@
 }
 
 /*
- * The list leads and the rail supports it, which is the reverse of `.split`'s 5fr/7fr — that
- * proportion is for a page whose editor is the subject. Here the table is, and the rail is a
- * fixed-width panel beside it, as the design draws it.
- *
- * **The breakpoint is a container query, not a media query, and it is derived rather than chosen.**
- * `.split`'s own 1100px is measured against the viewport while the workspace is some 270px narrower
- * because of the nav rail, so the two panes never lined up with the space actually available.
- *
- * `app-data-table` drops to its stacked card layout below its own `data-table` container query at
- * 45rem, so the table needs 720px to stay a table. 720 + 1rem of gap + 24rem of rail is 1120px, and
- * that is the number: above it both panes get what they need, below it the rail sits under a
- * full-width table instead of squeezing it into cards. Splitting sooner produced a two-pane layout
- * whose left pane was no longer a table, which is worse than not splitting. Both found in QA.
+ * The page owns its own rhythm, as `payments.css` does. `.page-body` was cited here and in
+ * `ARCHITECTURE.md` and is defined nowhere.
  */
-.split-container {
-  container-type: inline-size;
+.team-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.users-split {
-  grid-template-columns: minmax(0, 1fr);
+/*
+ * The tab strip is a control, not a band: it sizes to its tabs and sits at the start of the row
+ * rather than stretching the width of the page. As a full-width bar with two tabs in it, the
+ * 900px of empty rule to their right read as a broken table header.
+ */
+app-tab-switcher {
+  align-self: flex-start;
 }
 
-@container (min-width: 1120px) {
-  .users-split {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
-  }
-}
-
+/*
+ * The table is the page. It had been sharing the width with a detail rail that was empty on
+ * arrival and permanently a third of the page, which squeezed five columns hard enough that
+ * `app-data-table` dropped them to stacked cards. The detail is a dialog now.
+ */
 .cell-user {
   display: flex;
   align-items: center;
@@ -46,19 +41,13 @@
   inline-size: 2.25rem;
   block-size: 2.25rem;
   border-radius: var(--radius-full);
-  background: var(--accent);
+  background: var(--accent-strong);
   color: var(--accent-foreground);
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
   font-weight: var(--font-weight-bold);
 }
 
-.avatar-lg {
-  inline-size: 3rem;
-  block-size: 3rem;
-  font-size: var(--text-sm);
-}
-
-/* A button that reads as text: the affordance is the hover and the pressed state, not a chrome box. */
+/* A button that reads as text: the affordance is the hover and the row's own interactive state. */
 .identity {
   display: grid;
   gap: 0.15rem;
@@ -84,9 +73,8 @@
   white-space: nowrap;
 }
 
-.identity:hover strong,
-.identity[aria-pressed='true'] strong {
-  color: var(--primary);
+.identity:hover strong {
+  color: var(--primary-emphasis);
 }
 
 .identity:focus-visible {
@@ -116,12 +104,48 @@
   text-transform: uppercase;
 }
 
-.cell-roles {
+.cell-username {
   overflow: hidden;
   color: var(--secondary-foreground);
   font-size: var(--text-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* `latin` is the app's name for plaintext bidi; the class is declared here because it is a cell. */
+.latin {
+  unicode-bidi: plaintext;
+}
+
+/*
+ * Roles are badges rather than a joined sentence. Two operators with "Store administrator" and
+ * "Store administrator, Store moderator" are the same shape as prose and different at a glance
+ * as chips, which is the question this column is actually asked.
+ */
+.cell-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+
+.muted-value {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.cell-email {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.cell-date {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
 }
 
 .cell-actions {
@@ -130,102 +154,11 @@
   gap: 0.25rem;
 }
 
-app-table-row.selected {
-  background: var(--accent);
+/* The chevron points the way the page reads, so it mirrors under RTL. */
+.cell-actions app-icon {
+  transform: scaleX(1);
 }
 
-/* ------------------------------------------------------------------------- the rail ---- */
-
-.rail-identity {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-}
-
-.rail-identity-text {
-  display: grid;
-  gap: 0.2rem;
-  min-inline-size: 0;
-  flex: 1;
-}
-
-/*
- * In the rail the address wraps rather than ellipsing. The table has other columns competing for
- * the width and truncating there is the right trade; here the address *is* the content, and
- * `org1-store1-moderator@mail.…` is not something an operator can act on. Found in QA.
- */
-.rail-identity-text .email {
-  overflow-wrap: anywhere;
-  text-overflow: clip;
-  white-space: normal;
-}
-
-.rail-identity-text strong {
-  color: var(--foreground-strong);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.rail-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-block: 1.25rem 0;
-}
-
-.rail-facts dt {
-  color: var(--muted-foreground);
-  font-size: var(--text-2xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.rail-facts dd {
-  margin: 0.3rem 0 0;
-  color: var(--foreground-strong);
-  font-size: var(--text-xs);
-}
-
-.rail-form {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.name-pair {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-@media (max-width: 520px) {
-  .name-pair,
-  .rail-facts {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.role-picker {
-  display: grid;
-  gap: 0.35rem;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.rail-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-block-start: 0.5rem;
-}
-
-.rail-actions-wrap {
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-block-start: 1.25rem;
-}
-
-.rail-close {
-  margin-block-start: 0.75rem;
+:host-context([dir='rtl']) .cell-actions app-icon {
+  transform: scaleX(-1);
 }
