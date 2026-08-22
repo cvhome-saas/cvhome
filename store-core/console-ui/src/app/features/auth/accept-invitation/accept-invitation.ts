@@ -21,6 +21,10 @@ import {AcceptInvitationFacade} from './facades/accept-invitation.facade';
  * `OrgMemberApi.accept` carries no permission token either — the bearer token in the link is the
  * authorization.
  *
+ * TODO(lessons.md): an invitee with no cvhome account has no way through this page — see
+ * lessons.md, "Users — an invitee needs an account before the link can work". The invite dialog
+ * says so up front, which is the only place the console can.
+ *
  * Accepting is a button rather than something that happens on load. The token is single-use and is
  * burned on the first success, so firing it from an effect would turn a refresh, a prefetch or a
  * link preview into "this invitation has already been used".

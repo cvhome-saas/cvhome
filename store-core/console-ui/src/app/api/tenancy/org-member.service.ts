@@ -31,10 +31,17 @@ export class OrgMemberService {
   private readonly crudService = inject(CrudService);
 
   /**
-   * Everyone in the caller's organization.
+   * Everyone who **accepted an invitation** into the caller's organization.
    *
-   * `OrgMemberDto` carries a bare `userId` with no name and no email, so this answers who joined
-   * rather than who they are. The Team tab reads `user-account/list` for the people themselves.
+   * Not the team, despite the name. `tenancy.org_member` has one writer — `InvitationService.accept`
+   * — so the founder is absent (they are `manager_org.owner_user_id`) and so is anyone an
+   * administrator created directly. `OrgMemberService.add` exists and is called by nothing.
+   *
+   * The id is not joinable either: accept stores `authentication.getName()`, the username, while
+   * every id-taking endpoint wants uaa's UUID.
+   *
+   * TODO(lessons.md): the member list is not the team — see lessons.md, "Users — the member list is
+   * not the team". The Team tab reads `user-account/list`, which is the real answer for a store.
    */
   members(): Observable<OrgMember[]> {
     return this.crudService.get(`${ORG_MEMBER_API_BASE}/list`);

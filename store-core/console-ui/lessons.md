@@ -2376,3 +2376,51 @@ statistics outage.**
 - **What console-ui does meanwhile:** exports a **PDF** of what is on screen, through the existing
   `core/export/pdf-export.service.ts` and `shared/ui/export-button`, as `/orders` and `/payments` do.
 - **Placeholder:** `TODO(lessons.md):` in `features/users/users.html`.
+
+## Users — the member list is not the team
+
+**Found by reading `InvitationService` and `OrgMemberService` while testing the accept flow.**
+
+- **Screen:** nothing, and that is the point — `GET /org-member/list` reads like the answer to "who
+  is in this organization" and is not, so no console screen is built on it.
+- **What is wrong:** `tenancy.org_member` has exactly one writer. `InvitationService.accept` adds a
+  row; `OrgMemberService.add` exists and **is called by nothing**; signup does not add one, and
+  neither does `user-account/create`. An organization records its founder as
+  `manager_org.owner_user_id`, which is a different column in a different table. So the member list
+  contains *people who accepted an invitation* and no one else — not the owner, not anyone an
+  administrator created directly.
+- **And the key does not join.** `accept` stores `authentication.getName()`, which for a JWT
+  principal is the **username**; `OrgMemberDto.userId` is documented as "uaa's id for the user", and
+  every other id-taking endpoint (`find-one`, `reset`, `delete`) wants uaa's **UUID**. A row written
+  by accept therefore cannot be looked up against a user record without knowing which of the two it
+  holds.
+- **Why it matters:** it is a trap rather than a missing feature. A console that built its team page
+  on the obvious-sounding endpoint would show an organization of twelve as an organization of one,
+  and would do it silently.
+- **Expected contract:** write a member row wherever membership actually begins — signup for the
+  founder, `user-account/create` for a created account — and store uaa's id, consistently with every
+  other endpoint that takes one.
+- **What console-ui does meanwhile:** the Team tab reads `user-account/list`, which is the real
+  answer for a store. `org-member` is used **only** for invitations, where it is correct.
+- **Placeholder:** `TODO(lessons.md):` in `api/tenancy/org-member.service.ts`.
+
+## Users — an invitee needs an account before the link can work
+
+- **Screen:** `/accept-invitation`.
+- **What is missing:** a path from the invitation link to *having an account*. `accept` requires an
+  authenticated principal — it has to, since it is the caller who joins — so the guard sends a
+  signed-out invitee to uaa's sign-in page. Someone who has never used cvhome has nothing to sign in
+  with, and the only public route from there is `/sign-up`, which is
+  `SignUpApi.public/create`: **it creates a new organization with the signer as its administrator.**
+  An invitee who takes it ends up owning an org they did not want, and then accepts an invitation
+  into a second one.
+- **Why it is required:** it is the ordinary case. An invitation is normally the first thing a new
+  colleague ever sees of the product.
+- **Expected contract:** an invitation-scoped registration — `POST …/invitations/{token}/register`
+  taking a username and password, creating the uaa account and accepting in one step — or a signup
+  mode that takes a token and joins the inviting org instead of creating one.
+- **What console-ui does meanwhile:** the invite dialog says plainly that the person needs a cvhome
+  account to accept, so an operator inviting a colleague who has none finds out before sending the
+  link rather than after. The accept page handles the authenticated case correctly and does not
+  pretend to handle the other one.
+- **Placeholder:** `TODO(lessons.md):` in `features/auth/accept-invitation/accept-invitation.ts`.
