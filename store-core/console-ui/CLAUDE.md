@@ -28,6 +28,10 @@ Each of these has already cost someone an afternoon.
   §4 of `ARCHITECTURE.md` says which. A native select cannot be themed and a native checkbox reads
   as checked when it is not.
 - **No `@features/*` import from another feature.** What two features need belongs one tier down.
+- **`@shared/styles/field.css` is not global** — `.page-body`, `.split` and `.field-hint` come from it,
+  and every feature that uses them lists it in its own `styleUrls` beside its stylesheet. Omit it and
+  `.split` is a plain block: the panes stack at every width, while the component's *own* rules apply
+  normally, so it reads as a layout puzzle rather than a missing import.
 - **No literal hex, and no physical direction property** (`margin-left`, `left`, `text-align: left`).
   Stylelint fails on both.
 - **No fixture standing in for a real answer.** If the platform cannot do it, the control says so

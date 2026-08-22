@@ -219,6 +219,10 @@ view), `.secondary-action`, `.ghost-action`, `.danger-action` (the hue in the te
   light in all three themes because it is a document rather than a surface — and it lives in
   `theme.css`, named, so it can be told apart from an oversight.
 - **Logical properties only.** No `margin-left`, `left`, `right`, `text-align: left`. Also enforced.
+- **`@shared/styles/field.css` is included per component, not globally.** A feature that uses
+  `.page-body`, `.split` or `.field-hint` lists it in `styleUrls` ahead of its own sheet. Two pages
+  shipped without it and their two-pane layouts stacked at every width — the component's own rules
+  applied, so the missing import looked like a broken breakpoint.
 - A page cannot style anything inside a child component's template: Angular scopes styles by the
   *defining* component. The two ways out are a stylesheet the child itself includes, or a custom
   property the child exposes. A selector written from outside is not one of them.
