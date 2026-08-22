@@ -54,7 +54,39 @@
   appearance: none;
 }
 
+/* Sized and toned like the one on `app-select`, because they sit in the same filter row. */
+.search-clear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.search-clear:hover {
+  background: var(--muted);
+  color: var(--foreground-strong);
+}
+
+.search-clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .search-clear {
+    transition: none;
+  }
+
   .search-box {
     transition: none;
   }

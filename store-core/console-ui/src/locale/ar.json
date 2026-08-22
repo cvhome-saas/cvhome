@@ -342,19 +342,9 @@
     }
   },
   "orders": {
-    "heading": {
-      "title": "الطلبات",
-      "context": "{store} · ٤ أغسطس ٢٠٢٦",
-      "contextWithCount": "{store} · {count, plural, zero {لا طلبات} one {طلب واحد} two {طلبان} few {# طلبات} many {# طلبًا} other {# طلب}} في الفترة المحددة"
-    },
-    "createOrder": "إنشاء طلب",
-    "loading": "جارٍ تحميل الطلبات…",
-    "metricsLabel": "مقاييس الطلبات",
     "allOrders": "كل الطلبات",
-    "filterByStatus": "تصفية الطلبات حسب الحالة",
-    "noneMatch": "لا توجد طلبات مطابقة لهذا الفلتر.",
-    "unit": "طلب",
-    "pagesLabel": "صفحات الطلبات",
+    "clearFilters": "مسح عوامل التصفية",
+    "clearSearch": "مسح البحث في الطلبات",
     "column": {
       "order": "الطلب",
       "customer": "العميل",
@@ -365,14 +355,12 @@
       "actions": "إجراءات",
       "city": "المدينة"
     },
-    "tab": {
-      "all": "الكل"
-    },
-    "subtitle": {
-      "range": "عرض {from}–{to} من {total}",
-      "rangeForStatus": "{status} · عرض {from}–{to} من {total}",
-      "none": "لا توجد طلبات في هذه الفترة.",
-      "noneForStatus": "لا توجد طلبات {status} في هذه الفترة."
+    "createOrder": "إنشاء طلب",
+    "filterByStatus": "تصفية الطلبات حسب الحالة",
+    "heading": {
+      "title": "الطلبات",
+      "context": "{store} · ٤ أغسطس ٢٠٢٦",
+      "contextWithCount": "{store} · {count, plural, zero {لا طلبات} one {طلب واحد} two {طلبان} few {# طلبات} many {# طلبًا} other {# طلب}} في الفترة المحددة"
     },
     "kpi": {
       "orders": "الطلبات",
@@ -383,17 +371,30 @@
       "awaiting": "بحاجة إلى تجهيز",
       "unavailable": "غير متاح بعد"
     },
+    "loading": "جارٍ تحميل الطلبات…",
+    "metricsLabel": "مقاييس الطلبات",
+    "noneInPeriod": "لا توجد طلبات في هذه الفترة.",
+    "noneMatch": "لا توجد طلبات مطابقة لهذا الفلتر.",
     "notAvailable": {
       "create": "إنشاء الطلبات من وحدة التحكم غير متاح بعد.",
       "bulkFulfilment": "التنفيذ الجماعي غير متاح بعد.",
       "pickingLists": "قوائم الالتقاط غير متاحة بعد."
     },
+    "pagesLabel": "صفحات الطلبات",
     "searchLabel": "البحث في الطلبات",
     "searchPlaceholder": "اسم العميل أو بريده أو هاتفه",
+    "subtitle": {
+      "range": "عرض {from}–{to} من {total}",
+      "rangeForStatus": "{status} · عرض {from}–{to} من {total}",
+      "none": "لا توجد طلبات في هذه الفترة.",
+      "noneForStatus": "لا توجد طلبات {status} في هذه الفترة."
+    },
+    "tab": {
+      "all": "الكل"
+    },
+    "unit": "طلب",
     "viewOrder": "عرض الطلب",
-    "viewOrderFor": "عرض الطلب {id}",
-    "noneInPeriod": "لا توجد طلبات في هذه الفترة.",
-    "clearFilters": "مسح عوامل التصفية"
+    "viewOrderFor": "عرض الطلب {id}"
   },
   "storeSettings": {
     "branding": {
@@ -1142,9 +1143,10 @@
     },
     "toolbar": {
       "breadcrumbNav": "مسار التنقل",
+      "clearSearch": "مسح البحث",
+      "languageAriaLabel": "اللغة، {name}",
       "search": "البحث في الطلبات والمنتجات",
       "searchPlaceholder": "ابحث في الطلبات والمنتجات…",
-      "languageAriaLabel": "اللغة، {name}",
       "themeAriaLabel": "المظهر، {name}"
     },
     "profile": {
@@ -1651,6 +1653,7 @@
       "category": "التصفية حسب الفئة",
       "clearBrand": "مسح فلتر العلامة التجارية",
       "clearCategory": "مسح فلتر الفئة",
+      "clearSku": "مسح البحث برمز المنتج",
       "sku": "البحث برمز SKU",
       "skuPlaceholder": "ابحث برمز SKU…"
     },

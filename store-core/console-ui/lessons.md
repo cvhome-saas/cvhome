@@ -1847,3 +1847,30 @@ invisible until something was measured rather than read.
   checking lives in the AOT build. A bare boolean attribute on a component input, an unknown
   element, a mistyped binding — none of them appear until `npm run build`.
 
+
+## Catalogue — the inventory KPI row, revisited: the page wants tiles it can have
+
+- **Screen:** `/products`, the band above the table — the four tiles of `Inventory.dc.html` that
+  "Catalogue — the inventory KPI row is removed rather than reported unavailable" took out.
+- **What happened:** with the row gone, `/products` is the only list page in the console that opens
+  on a bare table. `/orders` and `/dashboard` both lead with a KPI grid, and a seller moving between
+  them reads the products page as unfinished rather than as honest. The earlier decision is still
+  right about those four tiles — Stock on hand, Inventory value, Low stock and Out of stock each
+  need something the platform does not have — but "these four are unbacked" was answered by removing
+  the band rather than by asking what a backed tile would be.
+- **What the platform can already answer.** Three figures are in the snapshot the page fetches on
+  every load, at no extra cost: the total SKU count (`page.totalElements` unfiltered), how many are
+  available and how many are not (the counts behind the All / Available / Unavailable switcher), and
+  how many categories and brands the catalogue spans (the two filter lists the same response
+  carries). None of them needs a new endpoint.
+- **What is missing for the rest:** a `quantity = 0` predicate on `ProductCriteria` would make Out of
+  stock real without a reorder point; a sum of `price × quantity` over the filtered set would make
+  Inventory value real. Both are aggregates over a query the repository already builds.
+- **Expected contract:** `GET /private/products/summary?store=` answering
+  `{total, available, unavailable, outOfStock, inventoryValue, currency}` for the current filter, so
+  the tiles narrow with the table rather than standing apart from it. Failing that, `ProductCriteria`
+  gaining `quantityEquals` is the smaller half and would carry two of the tiles on its own.
+- **Placeholder:** none yet — the band is still absent, and the spec
+  `shows no KPI row — all four tiles the design draws are unbacked` in `products.spec.ts` pins that.
+  The console change is a follow-up, not a gap in the backend: the three figures above can be built
+  from what `/products` already receives, and should be, before any of the endpoints above exist.

@@ -67,6 +67,16 @@
 }
 
 /*
+ * The grip only where it still does something. A box that sizes itself to its content has nothing
+ * for a drag to accomplish, and the guard keeps it on the engines that ignore `field-sizing`.
+ */
+@supports (field-sizing: content) {
+  .textarea-input.auto-grow {
+    resize: none;
+  }
+}
+
+/*
  * The counter sits under the text rather than inside it: a textarea's own resize grip occupies the
  * bottom corner, and anything placed there is either covered by it or moves when it is dragged.
  */

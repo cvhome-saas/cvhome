@@ -188,9 +188,9 @@ describe('Products', () => {
     expect(names(element)).toEqual(['Copy paper']);
     expect(api.requests[api.requests.length - 1].filters.sku).toBe('ACM-PPR');
 
-    const clear = [...element.querySelectorAll('button')].find(
-      (button) => button.textContent?.trim() === 'Clear filters',
-    ) as HTMLButtonElement;
+    // The way back is the cross inside the box itself, not a separate "clear filters" link:
+    // every control in the filter row now clears the one thing it filters on.
+    const clear = element.querySelector('app-search-box .search-clear') as HTMLButtonElement;
     clear.click();
     tick();
     fixture.detectChanges();

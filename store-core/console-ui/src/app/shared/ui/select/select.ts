@@ -74,6 +74,8 @@ let nextId = 0;
      */
     '[attr.id]': 'null',
     '[class.select-disabled]': 'isDisabled()',
+    /* Reserves the room the clear button is drawn over. Without it a long option runs under it. */
+    '[class.has-clear]': 'showClear()',
     '(keydown)': 'onKeydown($event)',
     '(focusout)': 'onFocusOut($event)',
   },

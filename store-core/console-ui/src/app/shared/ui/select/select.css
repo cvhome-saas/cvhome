@@ -69,6 +69,13 @@
 }
 
 .select-value {
+  /*
+   * Shrinks and truncates rather than pushing. `overflow: hidden` alone is not enough: a flex item
+   * is at least its content wide unless `min-inline-size` says otherwise, so a long option pushed
+   * the caret out and ran under the clear button instead of ending in an ellipsis.
+   */
+  flex: 1;
+  min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -207,12 +214,31 @@
 }
 
 :host(.has-clear) .select-trigger {
-  padding-inline-end: 2.6rem;
+  padding-inline-end: 3.4rem;
+}
+
+/*
+ * With a clear button in play the caret comes out of the flow.
+ *
+ * The button cannot be a child of the trigger, so it is drawn over it — and anything drawn over the
+ * trigger sits nearer the edge than the trigger's own last flex child, which put the cross outside
+ * the caret and the two of them touching. Pinning the caret to the edge instead lets the cross take
+ * the place before it, which is the order every field with both affordances uses.
+ */
+:host(.has-clear) .select-caret {
+  position: absolute;
+  inset-inline-end: .7rem;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+:host(.has-clear) .select-trigger.is-open .select-caret {
+  transform: translateY(-50%) rotate(180deg);
 }
 
 .select-clear {
   position: absolute;
-  inset-inline-end: 1.75rem;
+  inset-inline-end: 1.95rem;
   inset-block-start: 50%;
   display: grid;
   place-items: center;

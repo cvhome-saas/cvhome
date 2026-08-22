@@ -171,9 +171,10 @@
                     <span class="composer-avatar" aria-hidden="true">{{ operator() }}</span>
                     <div class="composer-body">
                       <app-textarea
+                        autoGrow
                         [value]="comment()"
                         (valueChange)="comment.set($event)"
-                        [rows]="2"
+                        [rows]="3"
                         [ariaLabel]="t('orderDetails.comment')"
                         [placeholder]="t('orderDetails.commentPlaceholder')"
                       />

@@ -66,24 +66,18 @@
 }
 
 /*
- * Sized to the widest label it has to show rather than to a share of the row, with a floor so a
- * store whose categories are all short does not get two tiny boxes.
+ * A fixed width, not one sized to the label.
+ *
+ * It used to be `auto` between a 9rem floor and a 13rem ceiling, which meant picking a long
+ * category widened the box and shoved the search field and everything else in the row sideways —
+ * the row rearranged itself every time a filter changed. The select truncates its value with an
+ * ellipsis, so a fixed width costs nothing and the row stays where the eye left it.
  */
 .filter-select {
   flex: none;
-  inline-size: auto;
-  min-inline-size: 9rem;
-  max-inline-size: 13rem;
+  inline-size: 11rem;
   /* The one hook the component offers — see select.css. */
   --select-height: 2.25rem;
-}
-
-.rail-clear {
-  flex: none;
-  block-size: 2.25rem;
-  min-block-size: 0;
-  padding-block: 0;
-  --icon-size: .8rem;
 }
 
 /* ---- Cells ------------------------------------------------------------------------- */

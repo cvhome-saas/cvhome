@@ -44,6 +44,7 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
         [(value)]="searchTerm"
         [label]="t('shell.toolbar.search')"
         [placeholder]="t('shell.toolbar.searchPlaceholder')"
+        [clearLabel]="t('shell.toolbar.clearSearch')"
       />
 
       <!--

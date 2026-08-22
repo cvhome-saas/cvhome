@@ -80,6 +80,7 @@
             (valueChange)="facade.setFilter('sku', $event)"
             [label]="t('products.filter.sku')"
             [placeholder]="t('products.filter.skuPlaceholder')"
+            [clearLabel]="t('products.filter.clearSku')"
           />
 
           <!--
@@ -119,12 +120,12 @@
             panelId="products-table"
           />
 
-          @if (facade.filtered()) {
-            <button class="ghost-action rail-clear" type="button" (click)="facade.clearFilters()">
-              <app-icon name="x" [size]="13" />
-              {{ t('products.clearFilters') }}
-            </button>
-          }
+          <!--
+            No "clear filters" link here. Every control in the row clears itself — the two selects
+            and the search box each carry their own cross, and "All" is the availability switcher's
+            own reset — so a separate button would be a second way to do what is already in reach,
+            and one that says nothing about which filter it is about to drop.
+          -->
         </div>
 
         @if (facade.products().length) {

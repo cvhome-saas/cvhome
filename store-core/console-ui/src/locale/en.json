@@ -342,19 +342,9 @@
     }
   },
   "orders": {
-    "heading": {
-      "title": "Orders",
-      "context": "{store} · Aug 4, 2026",
-      "contextWithCount": "{store} · {count, plural, one {# order} other {# orders}} in the selected period"
-    },
-    "createOrder": "Create order",
-    "loading": "Loading orders…",
-    "metricsLabel": "Order metrics",
     "allOrders": "All orders",
-    "filterByStatus": "Filter orders by status",
-    "noneMatch": "No orders match this filter.",
-    "unit": "orders",
-    "pagesLabel": "Order pages",
+    "clearFilters": "Clear filters",
+    "clearSearch": "Clear the order search",
     "column": {
       "order": "Order",
       "customer": "Customer",
@@ -365,14 +355,12 @@
       "actions": "Actions",
       "city": "City"
     },
-    "tab": {
-      "all": "All"
-    },
-    "subtitle": {
-      "range": "{count, plural, one {Showing {from}–{to} of {total} order} other {Showing {from}–{to} of {total} orders}}",
-      "rangeForStatus": "{status} · showing {from}–{to} of {total}",
-      "none": "No orders in this period.",
-      "noneForStatus": "No {status} orders in this period."
+    "createOrder": "Create order",
+    "filterByStatus": "Filter orders by status",
+    "heading": {
+      "title": "Orders",
+      "context": "{store} · Aug 4, 2026",
+      "contextWithCount": "{store} · {count, plural, one {# order} other {# orders}} in the selected period"
     },
     "kpi": {
       "orders": "Orders",
@@ -383,17 +371,30 @@
       "awaiting": "Needs picking",
       "unavailable": "Not available yet"
     },
+    "loading": "Loading orders…",
+    "metricsLabel": "Order metrics",
+    "noneInPeriod": "No orders were placed in this period.",
+    "noneMatch": "No orders match this filter.",
     "notAvailable": {
       "create": "Creating orders from the console is not available yet.",
       "bulkFulfilment": "Bulk fulfilment is not available yet.",
       "pickingLists": "Picking lists are not available yet."
     },
+    "pagesLabel": "Order pages",
     "searchLabel": "Search orders",
     "searchPlaceholder": "Customer name, email or phone",
+    "subtitle": {
+      "range": "{count, plural, one {Showing {from}–{to} of {total} order} other {Showing {from}–{to} of {total} orders}}",
+      "rangeForStatus": "{status} · showing {from}–{to} of {total}",
+      "none": "No orders in this period.",
+      "noneForStatus": "No {status} orders in this period."
+    },
+    "tab": {
+      "all": "All"
+    },
+    "unit": "orders",
     "viewOrder": "View order",
-    "viewOrderFor": "View order {id}",
-    "noneInPeriod": "No orders were placed in this period.",
-    "clearFilters": "Clear filters"
+    "viewOrderFor": "View order {id}"
   },
   "storeSettings": {
     "branding": {
@@ -1142,9 +1143,10 @@
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
+      "clearSearch": "Clear the search",
+      "languageAriaLabel": "Language, {name}",
       "search": "Search orders and products",
       "searchPlaceholder": "Search orders, products…",
-      "languageAriaLabel": "Language, {name}",
       "themeAriaLabel": "Theme, {name}"
     },
     "profile": {
@@ -1651,6 +1653,7 @@
       "category": "Filter by category",
       "clearBrand": "Clear the brand filter",
       "clearCategory": "Clear the category filter",
+      "clearSku": "Clear the SKU search",
       "sku": "Search by SKU",
       "skuPlaceholder": "Search by SKU…"
     },

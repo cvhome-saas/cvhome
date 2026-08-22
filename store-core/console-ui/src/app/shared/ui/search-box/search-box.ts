@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, input, model} from '@angular/core';
+import {Component, computed, DestroyRef, inject, input, linkedSignal, model} from '@angular/core';
 
 import {Icon} from '@shared/ui/icon/icon';
 
@@ -35,6 +35,22 @@ let nextId = 0;
         [attr.aria-describedby]="describedBy()"
         (input)="onInput(input.value)"
       />
+
+      <!--
+        Inside the label, so it is part of the box rather than something beside it. WebKit's own
+        cancel button is suppressed in the stylesheet: it is drawn at a size and colour from a
+        different design language, and it exists on no other engine.
+      -->
+      @if (showClear()) {
+        <button
+          class="search-clear"
+          type="button"
+          [attr.aria-label]="clearLabel()"
+          (click)="clear(input)"
+        >
+          <app-icon name="x" />
+        </button>
+      }
     </label>
   `,
   styleUrl: './search-box.css',
@@ -46,6 +62,12 @@ export class SearchBox {
   readonly label = input.required<string>();
   readonly placeholder = input('');
   readonly describedBy = input<string | null>(null);
+  /**
+   * Names the clear button. Required for one to be drawn — a control whose only label is an icon
+   * is unusable to a screen reader, and there is no sensible default here: what it clears is the
+   * caller's word for what the box searches.
+   */
+  readonly clearLabel = input<string | null>(null);
   /**
    * Overrides the intrinsic width, for a header with room for more or less. A custom property
    * rather than a class, because the width is the one thing a host legitimately decides and a
@@ -66,11 +88,21 @@ export class SearchBox {
 
   protected readonly id = `search-${nextId++}`;
 
+  /**
+   * What is in the box right now, which is not what `value` holds while the term is settling.
+   *
+   * The clear button has to appear on the first keystroke rather than after the debounce, or it
+   * arrives a third of a second late and moves under a cursor already on its way to it. Linked
+   * rather than plain, so a term restored from the URL is reflected here without having been typed.
+   */
+  private readonly typed = linkedSignal(() => this.value());
+  protected readonly showClear = computed(() => !!this.clearLabel() && this.typed() !== '');
+
   private readonly destroyRef = inject(DestroyRef);
   private pending: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.clear());
+    this.destroyRef.onDestroy(() => this.stopTimer());
   }
 
   /**
@@ -84,7 +116,8 @@ export class SearchBox {
    * the problem has, and the kind that is hard to reason about when it misbehaves.
    */
   protected onInput(next: string): void {
-    this.clear();
+    this.typed.set(next);
+    this.stopTimer();
     const wait = this.debounceMs();
     if (wait <= 0) {
       this.value.set(next);
@@ -96,7 +129,22 @@ export class SearchBox {
     }, wait);
   }
 
-  private clear(): void {
+  /**
+   * Clearing is immediate, and does not wait out the debounce.
+   *
+   * A debounce exists so a filter is not sent per keystroke; pressing a clear button is one
+   * deliberate act, and a list that keeps its old filter for another 300ms after it reads as
+   * broken.
+   */
+  protected clear(element: HTMLInputElement): void {
+    this.stopTimer();
+    element.value = '';
+    this.typed.set('');
+    this.value.set('');
+    element.focus();
+  }
+
+  private stopTimer(): void {
     if (this.pending !== null) {
       clearTimeout(this.pending);
       this.pending = null;
