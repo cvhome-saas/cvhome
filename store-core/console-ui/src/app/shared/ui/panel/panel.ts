@@ -36,6 +36,7 @@ import {Component, input} from '@angular/core';
     </div>
   `,
   styleUrl: './panel.css',
+  host: {'[class.padded]': 'padded()'},
 })
 export class Panel {
   readonly title = input.required<string>();
@@ -43,4 +44,17 @@ export class Panel {
   readonly meta = input<string | null>(null);
   /** A line under the title saying what the panel is showing. */
   readonly subtitle = input<string | null>(null);
+  /**
+   * Gives the body the console's standard interior.
+   *
+   * The body has no padding of its own, so every panel holding ordinary content used to supply one:
+   * `.panel-pad` in order-details, create-store and billing — three declarations at `1.25rem`,
+   * `1.5rem` and `1.25rem 1.5rem` — plus `.section-body` in store management and `.editor-body` in
+   * the product form. Same interior, five definitions, three of them different.
+   *
+   * Opt-in rather than default because a panel body is as often something that owns its own edges —
+   * a table, a list of full-bleed rows, an image — as it is a form, and a table inset from the
+   * panel's border looks like a mistake.
+   */
+  readonly padded = input(false);
 }

@@ -226,6 +226,10 @@
     "kpiCard": {
       "vsLastPeriod": "مقارنة بالفترة السابقة"
     },
+    "localeSwitcher": {
+      "translatedIn": "مُترجَم بـ{language}",
+      "notTranslatedIn": "غير مُترجَم بـ{language}"
+    },
     "pagination": {
       "previousPage": "الصفحة السابقة",
       "nextPage": "الصفحة التالية",
@@ -325,6 +329,19 @@
         "showing": "جارٍ إظهار {name} في تنقّل المتجر",
         "settled": "{name}، المستوى {level}، {position} من {size}"
       }
+    },
+    "validation": {
+      "required": "هذا الحقل مطلوب.",
+      "email": "أدخل بريدًا إلكترونيًا صالحًا.",
+      "minLength": "استخدم {requiredLength} أحرف على الأقل.",
+      "maxLength": "استخدم {requiredLength} حرفًا كحد أقصى.",
+      "min": "أدخل {min} أو أكثر.",
+      "max": "أدخل {max} أو أقل.",
+      "pattern": "هذه ليست قيمة صالحة.",
+      "url": "أدخل عنوان ويب صالحًا.",
+      "phone": "أدخل رقم هاتف صالحًا.",
+      "taken": "هذا مستخدم بالفعل.",
+      "mismatch": "القيمتان غير متطابقتين."
     }
   },
   "orders": {

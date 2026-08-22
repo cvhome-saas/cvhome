@@ -78,6 +78,7 @@
 
   --shadow-lift: var(--lift);
   --shadow-lift-primary: var(--lift-primary);
+  --shadow-lift-subtle: var(--lift-subtle);
 
   --container-rail: var(--rail-width);
 }

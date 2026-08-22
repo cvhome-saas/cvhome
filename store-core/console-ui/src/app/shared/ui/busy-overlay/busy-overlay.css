@@ -3,6 +3,20 @@
   display: block;
 }
 
+/*
+ * The first-load slab. Applies only while genuinely busy, so a page that has loaded and is
+ * legitimately empty collapses to its own height and shows its empty state rather than 60vh of
+ * nothing. `min-block-size` on the host rather than a child element, so the reserved space is the
+ * overlay's own and the veil centres in it.
+ */
+:host(.reserve-panel[aria-busy='true']) {
+  min-block-size: 26rem;
+}
+
+:host(.reserve-page[aria-busy='true']) {
+  min-block-size: 60vh;
+}
+
 .busy-content {
   transition: opacity var(--default-transition-duration) ease;
 }

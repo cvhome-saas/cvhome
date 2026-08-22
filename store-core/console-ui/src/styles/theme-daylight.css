@@ -111,6 +111,7 @@
   /* Shadows lighten: the same opacity that reads as depth on dark reads as dirt on white. */
   --lift: 0 20px 45px rgb(4 18 13 / 10%);
   --lift-primary: 0 12px 30px --alpha(var(--color-emerald-500) / 28%);
+  --lift-subtle: 0 1px 2px rgb(4 18 13 / 8%);
 
   --glow-color: --alpha(var(--color-emerald-500) / 16%);
 }

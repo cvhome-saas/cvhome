@@ -1,0 +1,78 @@
+/* Shares `text-field.css`'s frame so a one-line and a several-line field agree. */
+
+:host {
+  display: block;
+}
+
+.textarea-shell {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  transition: border-color var(--default-transition-duration);
+}
+
+.textarea-shell:hover,
+.textarea-shell:focus-within {
+  border-color: var(--primary);
+}
+
+:host(.textarea-invalid) .textarea-shell {
+  border-color: var(--chart-5-foreground);
+}
+
+:host(.textarea-disabled) .textarea-shell {
+  background: var(--muted);
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.textarea-input {
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+}
+
+.textarea-input::placeholder {
+  color: var(--foreground-quiet);
+}
+
+.textarea-input:disabled {
+  cursor: not-allowed;
+}
+
+.textarea-input.latin {
+  unicode-bidi: plaintext;
+}
+
+/*
+ * The counter sits under the text rather than inside it: a textarea's own resize grip occupies the
+ * bottom corner, and anything placed there is either covered by it or moves when it is dragged.
+ */
+.textarea-counter {
+  display: block;
+  margin-block-start: .3rem;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textarea-shell {
+    transition: none;
+  }
+}

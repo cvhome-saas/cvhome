@@ -226,6 +226,10 @@
     "kpiCard": {
       "vsLastPeriod": "vs last period"
     },
+    "localeSwitcher": {
+      "translatedIn": "Translated in {language}",
+      "notTranslatedIn": "Not translated in {language}"
+    },
     "pagination": {
       "previousPage": "Previous page",
       "nextPage": "Next page",
@@ -325,6 +329,19 @@
         "showing": "Showing {name} in the storefront navigation",
         "settled": "{name}, level {level}, {position} of {size}"
       }
+    },
+    "validation": {
+      "required": "This field is required.",
+      "email": "Enter a valid email address.",
+      "minLength": "Use at least {requiredLength} characters.",
+      "maxLength": "Use at most {requiredLength} characters.",
+      "min": "Enter {min} or more.",
+      "max": "Enter {max} or less.",
+      "pattern": "This is not a valid value.",
+      "url": "Enter a valid web address.",
+      "phone": "Enter a valid phone number.",
+      "taken": "This is already in use.",
+      "mismatch": "These two do not match."
     }
   },
   "orders": {

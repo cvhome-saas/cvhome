@@ -62,7 +62,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .primary-action,
 .secondary-action,
 .ghost-action,
-.danger-action {
+.danger-action,
+.icon-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,13 +115,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 /* Tertiary: no chrome until touched. For actions that must not compete with the two above. */
-.ghost-action {
+.ghost-action,
+.icon-action {
   border: 1px solid transparent;
   background: none;
   color: var(--muted-foreground);
 }
 
-.ghost-action:hover:not(:disabled):not(.disabled) {
+.ghost-action:hover:not(:disabled):not(.disabled),
+.icon-action:hover:not(:disabled):not(.disabled) {
   border-color: var(--border);
   background: var(--input);
   color: var(--foreground-strong);
@@ -141,12 +144,30 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background: var(--chart-5-wash);
 }
 
+/*
+ * The square icon-only action that sits at the end of a row.
+ *
+ * Four names for one object before this: `.row-action` in products, orders and the category tree,
+ * `.icon-action` in the slider and domain sections, `.icon-button` on the dashboard and in the
+ * toolbar, and `.invoice-action` in order details — each with its own size, radius and hover.
+ * It is a `.ghost-action` with equal sides, so it inherits the family's transition and disabled
+ * treatment and cannot drift from them again.
+ *
+ * Always give it an `aria-label`: there is no text in it to read.
+ */
+.icon-action {
+  padding: .4rem;
+  min-inline-size: 2.25rem;
+  --icon-size: .95rem;
+}
+
 /* One disabled treatment, whatever the variant — including the `<span>` first-run uses as a gate. */
 .primary-action:disabled,
 .primary-action.disabled,
 .secondary-action:disabled,
 .secondary-action.disabled,
 .ghost-action:disabled,
+.icon-action:disabled,
 .danger-action:disabled {
   border-color: var(--border);
   background: var(--input);

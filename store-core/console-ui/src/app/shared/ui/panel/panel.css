@@ -42,5 +42,10 @@
 
 .panel-body {
   flex: 1;
-  min-width: 0;
+  min-inline-size: 0;
+}
+
+/* The standard interior, for a body that is content rather than a table. See `padded`. */
+:host(.padded) .panel-body {
+  padding: 1.25rem 1.5rem;
 }

@@ -45,6 +45,7 @@ const THEMED_TOKENS = [
   '--scrim',
   '--lift',
   '--lift-primary',
+  '--lift-subtle',
   '--glow-color',
   '--seat-1',
   '--seat-2',

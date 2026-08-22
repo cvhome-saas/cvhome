@@ -139,6 +139,7 @@
    */
   --lift: 0 20px 45px rgb(0 0 0 / 20%);
   --lift-primary: 0 12px 30px --alpha(var(--color-emerald-500) / 25%);
+  --lift-subtle: 0 1px 2px rgb(0 0 0 / 24%);
 
   /* The hero and auth-story atmosphere. One definition, three call sites. */
   --glow-color: --alpha(var(--color-emerald-500) / 27%);

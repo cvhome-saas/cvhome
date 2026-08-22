@@ -1,0 +1,23 @@
+<span class="textarea-shell">
+  <textarea
+    #area
+    class="textarea-input"
+    [class.latin]="latin()"
+    [id]="id()"
+    [value]="value()"
+    [rows]="rows()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [attr.maxlength]="maxLength()"
+    [attr.dir]="latin() ? 'ltr' : null"
+    (input)="onInput(area)"
+    (blur)="onBlur()"
+  ></textarea>
+
+  @if (counter(); as text) {
+    <span class="textarea-counter" aria-hidden="true">{{ text }}</span>
+  }
+</span>
