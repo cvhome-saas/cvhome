@@ -25,5 +25,6 @@ export const LEGACY_THEME_MAP: Readonly<Record<string, RegisteredThemeId>> = {
     watches: 'starter',
     baby: 'starter',
     tools: 'starter',
+    'basic': 'basic',
     // @legacy-themes:end
 };

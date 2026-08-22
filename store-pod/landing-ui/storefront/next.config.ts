@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
         '@store-front/theme-starter',
         '@store-front/theme-beauty',
         '@store-front/theme-fashion',
+        '@store-front/theme-basic',
         // @themes:end
     ],
 };

@@ -3,6 +3,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/cvhome
     username: postgres
     password: password
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
   cloud:
     discovery:
       client:

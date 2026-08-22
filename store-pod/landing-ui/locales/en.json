@@ -7,7 +7,8 @@
       "HOME_PRODUCT": "Home Product",
       "RECOMMENDED": "Recommended",
       "SHOP_NOW": "Shop now",
-      "HERO_SLIDE": "Slide {index} of {total}"
+      "HERO_SLIDE": "Slide {index} of {total}",
+      "SINCE": "Since {year}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Product Details",
@@ -124,7 +125,8 @@
       "FILTER_BY_OPTION": "Filter by {option}",
       "LISTING_ERROR": "We couldn't load the products.",
       "SHOW_FILTERS": "Show filters",
-      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {No products} =1 {1 product} other {# products}}"
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {No products} =1 {1 product} other {# products}}",
+      "SUBCATEGORIES": "Subcategories"
     },
     "CUSTOMER": {
       "TITLE": "My Account",
@@ -182,7 +184,8 @@
       "FAILED_TO_UPDATE_QUANTITY": "Failed to update quantity.",
       "SALE": "Sale",
       "LOW_STOCK": "Low stock",
-      "ADDED": "Added"
+      "ADDED": "Added",
+      "CATALOGUE_NO": "No."
     },
     "HEADER": {
       "HOME_TITLE": "Home",
@@ -207,7 +210,8 @@
       "SEARCH": "Search",
       "CART_WITH_COUNT": "Cart, {count, plural, =0 {empty} =1 {1 item} other {# items}}",
       "VIEW_ALL_IN": "All {name}",
-      "ANNOUNCEMENT": "Note"
+      "ANNOUNCEMENT": "Note",
+      "INDEX": "Categories"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

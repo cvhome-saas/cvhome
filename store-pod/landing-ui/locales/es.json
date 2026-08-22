@@ -7,7 +7,8 @@
       "HOME_PRODUCT": "Producto de Inicio",
       "RECOMMENDED": "Recomendados",
       "SHOP_NOW": "Comprar ahora",
-      "HERO_SLIDE": "Diapositiva {index} de {total}"
+      "HERO_SLIDE": "Diapositiva {index} de {total}",
+      "SINCE": "Desde {year}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Detalles del Producto",
@@ -124,7 +125,8 @@
       "FILTER_BY_OPTION": "Filtrar por {option}",
       "LISTING_ERROR": "No pudimos cargar los productos.",
       "SHOW_FILTERS": "Mostrar filtros",
-      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Sin productos} =1 {1 producto} other {# productos}}"
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Sin productos} =1 {1 producto} other {# productos}}",
+      "SUBCATEGORIES": "Subcategorías"
     },
     "CUSTOMER": {
       "TITLE": "Mi cuenta",
@@ -182,7 +184,8 @@
       "FAILED_TO_UPDATE_QUANTITY": "No se pudo actualizar la cantidad.",
       "SALE": "Oferta",
       "LOW_STOCK": "Pocas unidades",
-      "ADDED": "Añadido"
+      "ADDED": "Añadido",
+      "CATALOGUE_NO": "N.º"
     },
     "HEADER": {
       "HOME_TITLE": "Inicio",
@@ -207,7 +210,8 @@
       "SEARCH": "Buscar",
       "CART_WITH_COUNT": "Carrito, {count, plural, =0 {vacío} =1 {1 artículo} other {# artículos}}",
       "VIEW_ALL_IN": "Todo en {name}",
-      "ANNOUNCEMENT": "Aviso"
+      "ANNOUNCEMENT": "Aviso",
+      "INDEX": "Categorías"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

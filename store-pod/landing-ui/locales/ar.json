@@ -7,7 +7,8 @@
       "HOME_PRODUCT": "منتجات الصفحة الرئيسية",
       "RECOMMENDED": "نوصي بها",
       "SHOP_NOW": "تسوّق الآن",
-      "HERO_SLIDE": "الشريحة {index} من {total}"
+      "HERO_SLIDE": "الشريحة {index} من {total}",
+      "SINCE": "منذ {year}"
     },
     "PRODUCT": {
       "HOME_TITLE": "تفاصيل المنتج",
@@ -124,7 +125,8 @@
       "FILTER_BY_OPTION": "تصفية حسب {option}",
       "LISTING_ERROR": "تعذّر تحميل المنتجات.",
       "SHOW_FILTERS": "إظهار عوامل التصفية",
-      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {لا توجد منتجات} =1 {منتج واحد} other {# منتجات}}"
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {لا توجد منتجات} =1 {منتج واحد} other {# منتجات}}",
+      "SUBCATEGORIES": "الفئات الفرعية"
     },
     "CUSTOMER": {
       "TITLE": "حسابي",
@@ -182,7 +184,8 @@
       "FAILED_TO_UPDATE_QUANTITY": "فشل تحديث الكمية.",
       "SALE": "تخفيض",
       "LOW_STOCK": "كمية محدودة",
-      "ADDED": "أُضيف"
+      "ADDED": "أُضيف",
+      "CATALOGUE_NO": "رقم"
     },
     "HEADER": {
       "HOME_TITLE": "الرئيسية",
@@ -207,7 +210,8 @@
       "SEARCH": "بحث",
       "CART_WITH_COUNT": "السلة، {count, plural, =0 {فارغة} =1 {عنصر واحد} other {# عناصر}}",
       "VIEW_ALL_IN": "كل {name}",
-      "ANNOUNCEMENT": "تنبيه"
+      "ANNOUNCEMENT": "تنبيه",
+      "INDEX": "الفئات"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "فيسبوك",

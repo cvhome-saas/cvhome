@@ -7,7 +7,8 @@
       "HOME_PRODUCT": "Товар на главной",
       "RECOMMENDED": "Рекомендуем",
       "SHOP_NOW": "Купить",
-      "HERO_SLIDE": "Слайд {index} из {total}"
+      "HERO_SLIDE": "Слайд {index} из {total}",
+      "SINCE": "С {year} года"
     },
     "PRODUCT": {
       "HOME_TITLE": "Детали продукта",
@@ -124,7 +125,8 @@
       "FILTER_BY_OPTION": "Фильтр: {option}",
       "LISTING_ERROR": "Не удалось загрузить товары.",
       "SHOW_FILTERS": "Показать фильтры",
-      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Нет товаров} =1 {1 товар} other {# товаров}}"
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Нет товаров} =1 {1 товар} other {# товаров}}",
+      "SUBCATEGORIES": "Подкатегории"
     },
     "CUSTOMER": {
       "TITLE": "Мой аккаунт",
@@ -182,7 +184,8 @@
       "FAILED_TO_UPDATE_QUANTITY": "Не удалось обновить количество.",
       "SALE": "Скидка",
       "LOW_STOCK": "Мало на складе",
-      "ADDED": "Добавлено"
+      "ADDED": "Добавлено",
+      "CATALOGUE_NO": "№"
     },
     "HEADER": {
       "HOME_TITLE": "Главная",
@@ -207,7 +210,8 @@
       "SEARCH": "Поиск",
       "CART_WITH_COUNT": "Корзина, {count, plural, =0 {пусто} =1 {1 товар} other {# товаров}}",
       "VIEW_ALL_IN": "Все в {name}",
-      "ANNOUNCEMENT": "Заметка"
+      "ANNOUNCEMENT": "Заметка",
+      "INDEX": "Категории"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",

@@ -25,6 +25,7 @@
     "@store-front/i18n": "0.0.0",
     "@store-front/services": "0.0.0",
     "@store-front/theme": "0.0.0",
+    "@store-front/theme-basic": "*",
     "@store-front/theme-beauty": "*",
     "@store-front/theme-fashion": "*",
     "@store-front/theme-starter": "*",
