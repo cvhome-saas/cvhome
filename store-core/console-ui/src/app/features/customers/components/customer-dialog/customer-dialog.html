@@ -143,7 +143,7 @@
                       <app-badge [tone]="statusTone()(order.status)" shape="square">
                         {{ statusLabel()(order.status) }}
                       </app-badge>
-                      <span class="order-total">{{ order.total || '—' }}</span>
+                      <span class="order-total">{{ orderTotal()(order) }}</span>
                     </button>
                   </li>
                 }

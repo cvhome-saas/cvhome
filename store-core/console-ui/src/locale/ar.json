@@ -409,7 +409,9 @@
     },
     "unit": "طلب",
     "viewOrder": "عرض الطلب",
-    "viewOrderFor": "عرض الطلب {id}"
+    "viewOrderFor": "عرض الطلب {id}",
+    "filteredByCustomer": "عرض طلبات {{customer}} فقط.",
+    "clearCustomerFilter": "عرض كل الطلبات"
   },
   "storeSettings": {
     "branding": {

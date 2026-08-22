@@ -2,6 +2,7 @@ import {Component, ElementRef, computed, effect, inject, input, linkedSignal, un
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
+import type {CustomerOrderRow} from '@models/customers';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {DataTable, type TableColumn} from '@shared/ui/data-table/data-table';
 import {TableRow} from '@shared/ui/data-table/table-row';
@@ -98,6 +99,7 @@ export class Customers {
    */
   protected readonly statusLabel = (status: string | undefined) => this.facade.statusLabel(status);
   protected readonly statusTone = (status: string | undefined) => this.facade.statusTone(status);
+  protected readonly orderTotal = (order: CustomerOrderRow) => this.facade.orderTotal(order);
 
   /**
    * Whether the auto-open above has had its one chance for the current term.
@@ -155,9 +157,14 @@ export class Customers {
      * nothing opens and the auto-open is suppressed for good. Keyed off `selected()` alone it would
      * fight the operator instead, re-opening the dialog the moment they closed it. A flag that
      * resets with the term does neither.
+     *
+     * **And it waits for the rows to answer the term.** `isLoading` is not enough on its own: there
+     * is a moment where the term has changed, the request has not started, and the previous query's
+     * rows are still on screen — the flag would be spent counting them. Found in QA, where a link
+     * carrying a term landed on the list without opening the one customer it matched.
      */
     effect(() => {
-      if (!this.facade.search() || this.autoOpened() || this.isLoading()) {
+      if (!this.facade.search() || this.autoOpened() || this.isLoading() || !this.facade.rowsMatchSearch()) {
         return;
       }
       const only = this.rows();

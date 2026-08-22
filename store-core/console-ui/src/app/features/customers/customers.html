@@ -59,7 +59,7 @@
                     </button>
                   </div>
 
-                  <span class="cell-location" role="cell" [attr.data-label]="t('customers.column.location')">
+                  <span class="cell-location" role="cell" dir="auto" [attr.data-label]="t('customers.column.location')">
                     {{ row.location || '—' }}
                   </span>
 
@@ -119,6 +119,7 @@
       [orderCount]="facade.orderCountLabel()"
       [statusLabel]="statusLabel"
       [statusTone]="statusTone"
+      [orderTotal]="orderTotal"
       (openOrder)="openOrder($event)"
       (viewAllOrders)="viewAllOrders()"
       (retryOrders)="facade.reloadOrders()"

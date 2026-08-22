@@ -304,3 +304,22 @@ app-kpi-grid {
 .cell-city {
   unicode-bidi: plaintext;
 }
+
+/*
+ * The customer narrowing announces itself, because nothing else on the page does: the tab strip
+ * shows the status and the search box shows its term, but this one arrives in a URL that a link
+ * from the customers page set. The way out sits beside the notice rather than in the empty state,
+ * which is where the other filters keep theirs — an operator whose filter *matched* needs it too.
+ */
+.customer-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block-end: 1rem;
+}
+
+.customer-filter app-notice-bar {
+  flex: 1;
+  min-inline-size: 12rem;
+}

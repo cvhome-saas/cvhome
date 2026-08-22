@@ -15,6 +15,7 @@ import {LoadError} from '@shared/ui/load-error/load-error';
 import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Pagination} from '@shared/ui/pagination/pagination';
+import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {SearchBox} from '@shared/ui/search-box/search-box';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
@@ -58,6 +59,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     ExportButton,
     Icon,
     KpiGrid,
+    NoticeBar,
     PageHeader,
     Pagination,
     Panel,
@@ -163,6 +165,26 @@ export class Orders {
   protected clearFilters(): void {
     this.activeTab.set('all');
     this.facade.search.set('');
+    this.setCustomerFilter(null);
+  }
+
+  /**
+   * Who the list is narrowed to, or null when it is not narrowed at all.
+   *
+   * Named from the rows rather than from the id, because "orders for ashraf mahmoud" is what the
+   * operator followed a link to see. Falls back to the id when the filter matches nothing, which is
+   * the case where saying *something* matters most.
+   */
+  protected readonly customerFilter = computed<string | null>(() => {
+    const id = this.facade.customerId();
+    if (id === null) {
+      return null;
+    }
+    const named = this.orders().find((order) => order.customer && order.customer !== '—');
+    return named?.customer ?? `#${id}`;
+  });
+
+  protected clearCustomerFilter(): void {
     this.setCustomerFilter(null);
   }
 

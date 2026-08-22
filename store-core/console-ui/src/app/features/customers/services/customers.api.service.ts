@@ -27,6 +27,15 @@ export interface CustomersSnapshot {
   readonly rows: readonly CustomerRow[];
   readonly totalElements: number;
   readonly totalPages: number;
+  /**
+   * The term these rows answer, echoed back.
+   *
+   * The page keeps the last good rows on screen while the next request is in flight, so "the term"
+   * and "the rows" are briefly out of step — and anything deciding something from both at once
+   * needs to know when they agree. Without it the auto-open fires against the previous query's
+   * rows and spends its one chance before the real answer lands.
+   */
+  readonly search: string;
 }
 
 /**
@@ -61,6 +70,7 @@ export class CustomersApi {
           rows: (page.content ?? []).map((customer) => toRow(customer, names)),
           totalElements: page.totalElements,
           totalPages: page.totalPages,
+          search: query.search,
         };
       }),
     );
@@ -170,13 +180,18 @@ function toAddress(
   return {kind, name, company: address.company ?? '', phone: address.phone ?? '', lines};
 }
 
-/** One order, as the dialog's activity panel reads it. Amounts stay server-formatted. */
+/**
+ * One order, as the dialog's activity panel reads it.
+ *
+ * The amount and its currency rather than a rendered string, exactly as `OrderRow` carries it: the
+ * list endpoint sends `total.text` as null, and the page formats in the language being read.
+ */
 function toOrderRow(order: ReadableOrder): CustomerOrderRow {
   return {
     id: order.id ?? 0,
     status: order.orderStatus,
     datePurchased: order.datePurchased ?? '',
-    total: order.total?.text ?? '',
+    total: {value: order.total?.value ?? null, currency: order.currency ?? null, text: order.total?.text ?? null},
   };
 }
 

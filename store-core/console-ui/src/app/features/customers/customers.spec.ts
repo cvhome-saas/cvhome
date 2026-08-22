@@ -43,7 +43,15 @@ class FakeCustomersApi {
   ordersFailure = false;
   customers: readonly CustomerRow[] = CUSTOMERS;
   orders: CustomerOrdersSnapshot = {
-    rows: [{id: 10431, status: 'DELIVERED', datePurchased: '2026-08-12T10:00:00Z', total: '€2,410.00'}],
+    rows: [
+      {
+        id: 10431,
+        status: 'DELIVERED' as const,
+        datePurchased: '2026-08-12T10:00:00Z',
+        // `text` is null on every total the list endpoint sends, which is the case that matters.
+        total: {value: 2410, currency: 'EUR', text: null},
+      },
+    ],
     totalElements: 12,
   };
 
@@ -91,6 +99,7 @@ class FakeCustomersApi {
       rows: matched.slice(pageNumber * size, pageNumber * size + size),
       totalElements: matched.length,
       totalPages,
+      search: query.search,
     };
   }
 }
@@ -215,6 +224,23 @@ describe('Customers', () => {
 
     fixture.componentInstance['onSearch']('tobias');
     settle();
+
+    expect(host.querySelector('app-customer-dialog')).not.toBeNull();
+    expect(api.orderRequests).toContain(2);
+  }));
+
+  /*
+   * The case QA found: arriving with the term already in the URL, which is what a link from an
+   * order details page is. The auto-open used to spend its one chance on the previous query's rows
+   * — still on screen while the new request had not started — and the customer never opened.
+   */
+  it('opens the record when the term arrives in the URL rather than the box', fakeAsync(() => {
+    fixture = TestBed.createComponent(Customers);
+    fixture.componentRef.setInput('q', 'tobias');
+    fixture.detectChanges();
+    settle();
+    settle();
+    const host = fixture.nativeElement as HTMLElement;
 
     expect(host.querySelector('app-customer-dialog')).not.toBeNull();
     expect(api.orderRequests).toContain(2);

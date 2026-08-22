@@ -44,6 +44,7 @@ export class CustomerDialog {
 
   readonly statusLabel = input.required<(status: string | undefined) => string>();
   readonly statusTone = input.required<(status: string | undefined) => Tone>();
+  readonly orderTotal = input.required<(order: CustomerOrderRow) => string>();
 
   readonly openOrder = output<number>();
   readonly viewAllOrders = output<void>();

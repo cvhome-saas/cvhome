@@ -409,7 +409,9 @@
     },
     "unit": "orders",
     "viewOrder": "View order",
-    "viewOrderFor": "View order {id}"
+    "viewOrderFor": "View order {id}",
+    "filteredByCustomer": "Showing only the orders of {{customer}}.",
+    "clearCustomerFilter": "Show all orders"
   },
   "storeSettings": {
     "branding": {

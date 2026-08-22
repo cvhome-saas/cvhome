@@ -2631,3 +2631,36 @@ defect small enough to fix in one commit, in code the console is the first calle
 - **Still standing:** the customer list takes no `sort`. `Pageable` would accept one, but there is
   no default ordering and no whitelist of sortable fields, so a column header that sorted would be
   sending an unvalidated property name into a JPA specification. Not built.
+
+## The customers QA pass — five things a page that only reads still got wrong
+
+Recorded because four of the five are general, and three of them cost a red test before they were
+understood.
+
+- **A page that sets state and then navigates must read its own state untracked.** Both URL-mirroring
+  effects tracked the signal they were writing, so the effect woken by `onSearch`'s own write saw
+  the new term beside a URL that had not caught up and put the old one straight back. The term never
+  reached the server. The rule the console already had — *the state leads and the URL follows* —
+  needs `untracked` to actually hold.
+- **`isLoading` is not "the data answers the question on screen".** The auto-open that makes a link
+  from an order reach a person fired against the *previous* query's rows: the term had changed, the
+  request had not started, and the last good rows were still up. It spent its one chance counting
+  them. The snapshot now echoes back the term it answers, and the page compares. Any one-shot
+  decision made from two signals that settle at different times has this shape.
+- **A total is an amount, not a string.** `total.text` is null on every order the list endpoint
+  returns — `Money`'s own comment says so — and the dialog rendered an em dash in place of every
+  figure. Carrying `{value, currency, text}` the way `OrderRow` does is not a style choice; it is
+  the only version that shows a number.
+- **A filter that arrives in a URL needs something on screen to show for it.** `/orders?customerId=`
+  narrowed the table with no indication and no way back: the tab strip shows the status and the box
+  shows its term, but this one had no representation at all. An operator following "View all" would
+  have read a store with one order. Its clear action lives beside the notice rather than in the
+  empty state, where the other filters keep theirs — a filter that *matched* needs a way out too.
+- **A value that begins with a neutral character needs plaintext bidi, not just a Latin one.**
+  `789798789, Egypt` rendered as `Egypt ,789798789` under RTL: the row beside it was fine only
+  because it happened to start with a letter. The existing rule — plaintext bidi is for values —
+  had been applied to emails and usernames and missed on a city, because the failure is invisible
+  until a record starts with a digit.
+- **`tsc --noEmit` does not check templates.** `tone="info"` on a component whose tone is a closed
+  union passed the typecheck and the lint and was caught by `ng build`. The template typecheck is
+  part of the build; a change touching templates is not verified until it has run.

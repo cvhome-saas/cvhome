@@ -59,8 +59,14 @@ export interface CustomerOrderRow {
   readonly id: number;
   readonly status: OrderStatus | undefined;
   readonly datePurchased: string;
-  /** Server-formatted, like every other amount on an order — the console does not re-derive it. */
-  readonly total: string;
+  /**
+   * The amount and its currency, not a rendered string — the same shape `OrderRow` carries.
+   *
+   * The server's own `text` is null on every total the list returns, which QA caught here as an em
+   * dash in place of every figure. `Money` formats from the numeric value and keeps the amount in
+   * the language the operator is reading, rather than the browser's.
+   */
+  readonly total: {readonly value: number | null; readonly currency: string | null; readonly text: string | null};
 }
 
 /**

@@ -198,11 +198,13 @@
   text-transform: uppercase;
 }
 
+/* Address lines are data, and take their own direction — see the note in `customers.css`. */
 .address p {
   margin: 0;
   color: var(--secondary-foreground);
   font-size: var(--text-xs);
   line-height: 1.5;
+  unicode-bidi: plaintext;
 }
 
 .address-name {

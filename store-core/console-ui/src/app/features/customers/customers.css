@@ -87,12 +87,18 @@
   unicode-bidi: plaintext;
 }
 
+/*
+ * A city and a country are *data*, so they take their own direction. Without this, a value that
+ * begins with a neutral character — "789798789, Egypt" — inherits the paragraph direction under RTL
+ * and renders as "Egypt ,789798789", with the comma thrown to the far end. Found in QA.
+ */
 .cell-location {
   overflow: hidden;
   color: var(--secondary-foreground);
   font-size: var(--text-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
+  unicode-bidi: plaintext;
 }
 
 .cell-id {

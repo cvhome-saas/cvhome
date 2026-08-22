@@ -6,6 +6,7 @@ import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.f
 import {STATUS_TONE} from '@models/orders';
 import type {CustomerOrderRow, CustomerRow} from '@models/customers';
 import type {Tone} from '@models/ui';
+import {Money} from '@shared/i18n/money';
 import {StatusLabel} from '@shared/i18n/status-label';
 import {snapshot} from '@shared/state/snapshot';
 import {CustomersApi} from '../services/customers.api.service';
@@ -32,6 +33,7 @@ export class CustomersFacade {
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly statusLabels = inject(StatusLabel);
+  private readonly money = inject(Money);
 
   /** Which customer the dialog is showing, by id. Mirrored into the URL by the page. */
   readonly selectedId = signal<number | null>(null);
@@ -82,6 +84,15 @@ export class CustomersFacade {
   readonly reload = () => this.customers.reload();
 
   readonly rows = computed<readonly CustomerRow[]>(() => this.customers.value()?.rows ?? []);
+
+  /**
+   * Whether the rows on screen answer the term in the box.
+   *
+   * False while a new term is in flight, because the last good rows stay up in the meantime. Only
+   * the auto-open reads it, and only because acting on a stale row count would be acting on the
+   * previous question's answer.
+   */
+  readonly rowsMatchSearch = computed(() => this.customers.value()?.search === this.search());
   readonly totalElements = computed(() => this.customers.value()?.totalElements ?? 0);
   readonly totalPages = computed(() => this.customers.value()?.totalPages ?? 0);
 
@@ -167,6 +178,11 @@ export class CustomersFacade {
       count: this.totalElements(),
     });
   });
+
+  /** An order's amount, in the reader's language. `text` is null on every total the list sends. */
+  orderTotal(row: CustomerOrderRow): string {
+    return this.money.format(row.total.value, row.total.currency, row.total.text);
+  }
 
   statusLabel(status: string | undefined): string {
     return this.statusLabels.label(status);

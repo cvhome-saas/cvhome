@@ -61,6 +61,25 @@
             "Orders — no stale-order signal".
           -->
 
+          <!--
+            The customer narrowing is the one filter with nothing on screen to show for it: the tab
+            strip shows the status and the box shows the term, but this arrives in a URL a link set.
+            Without this an operator following "View all" from a customer would read a store with one
+            order — and have no way back to the rest.
+          -->
+          @if (customerFilter(); as narrowing) {
+            <div class="customer-filter">
+              <app-notice-bar
+                icon="user"
+                tone="blue"
+                [message]="t('orders.filteredByCustomer', {customer: narrowing})"
+              />
+              <button class="secondary-action" type="button" (click)="clearCustomerFilter()">
+                {{ t('orders.clearCustomerFilter') }}
+              </button>
+            </div>
+          }
+
           @if (orders().length) {
             <app-data-table id="orders-table" [columns]="columns()" [label]="t('orders.allOrders')">
               @for (order of orders(); track order.id) {
