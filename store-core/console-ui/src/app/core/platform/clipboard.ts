@@ -28,6 +28,19 @@ export async function copyText(value: string): Promise<boolean> {
   return copyBySelection(value);
 }
 
+/**
+ * The open modal dialog the carrier has to live inside, or null when nothing is modal.
+ *
+ * The last one in document order is the topmost: `showModal()` stacks the top layer in call order,
+ * and a dialog opened from a dialog is appended later. `:modal` matches only dialogs opened with
+ * `showModal()`, which is exactly the case that makes the rest of the document inert — a
+ * non-modal `<dialog open>` does not.
+ */
+function topmostModal(): HTMLElement | null {
+  const modals = document.querySelectorAll<HTMLDialogElement>('dialog:modal');
+  return modals.length ? modals[modals.length - 1] : null;
+}
+
 function copyBySelection(value: string): boolean {
   if (typeof document === 'undefined' || typeof document.execCommand !== 'function') {
     return false;
@@ -48,7 +61,16 @@ function copyBySelection(value: string): boolean {
   carrier.setAttribute('aria-hidden', 'true');
 
   const previous = document.activeElement;
-  document.body.appendChild(carrier);
+  /*
+   * Into the open modal dialog when there is one, not into `<body>`.
+   *
+   * `showModal()` puts the dialog in the top layer and makes everything outside it inert, so a
+   * carrier appended to `<body>` cannot be selected and `execCommand` lifts nothing out of it. The
+   * copy button reported failure on every dialog in the app and worked everywhere else, which is
+   * what made it look like a clipboard problem rather than a placement one.
+   */
+  const host = topmostModal() ?? document.body;
+  host.appendChild(carrier);
 
   try {
     carrier.select();
