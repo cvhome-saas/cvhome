@@ -12,10 +12,20 @@
  * controls taking more width than the table's first three columns, for a job that is incidental to
  * the table. Compact and in the header is what the template draws and what leaves the data the room.
  */
+/*
+ * The filters claim a basis so the panel's title does not pay for them.
+ *
+ * `.panel-copy` is `flex: 1` with `min-width: 0`, and this row is unusually wide — eleven status
+ * tabs and a search box — so with no basis of its own it shrank the title to two words per line
+ * and squeezed the subtitle into a column. A basis makes the header wrap the controls onto their
+ * own row instead, which is what there is room for.
+ */
 .panel-controls {
   display: flex;
+  flex: 1 1 26rem;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: .5rem;
 }
 
