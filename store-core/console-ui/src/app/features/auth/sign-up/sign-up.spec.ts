@@ -59,7 +59,11 @@ describe('SignUp', () => {
   });
 
   function set(name: string, value: string): void {
-    const input = fixture.nativeElement.querySelector(`[formControlName="${name}"]`) as HTMLInputElement;
+    // The control is inside `app-text-field` now, so the binding is on the component and the
+    // element to type into is the input it draws.
+    const input = fixture.nativeElement.querySelector(
+      `app-text-field[formControlName="${name}"] input`,
+    ) as HTMLInputElement;
     input.value = value;
     input.dispatchEvent(new Event('input'));
   }

@@ -2,8 +2,8 @@
    encapsulation keeps the sign-in/sign-up stylesheet from reaching these elements. */
 :host { display: contents; }
 
-.auth-story { position: relative; display: flex; flex-direction: column; min-height: 100svh; padding: 2.5rem 3.5rem; overflow: hidden; border-right: 1px solid var(--border-soft); }
-.auth-glow { position: absolute; top: -220px; left: -160px; width: 720px; height: 560px; border-radius: 50%; background: radial-gradient(circle, var(--glow-color), transparent var(--glow-stop)); filter: blur(var(--glow-blur)); animation: drift 14s ease-in-out infinite; }
+.auth-story { position: relative; display: flex; flex-direction: column; min-height: 100svh; padding: 2.5rem 3.5rem; overflow: hidden; border-inline-end: 1px solid var(--border-soft); }
+.auth-glow { position: absolute; top: -220px; inset-inline-start: -160px; width: 720px; height: 560px; border-radius: 50%; background: radial-gradient(circle, var(--glow-color), transparent var(--glow-stop)); filter: blur(var(--glow-blur)); animation: drift 14s ease-in-out infinite; }
 .auth-brand { position: relative; display: inline-flex; align-items: center; gap: .6rem; width: fit-content; color: var(--foreground-strong); font-weight: 700; letter-spacing: -.02em; }
 .auth-brand svg { width: 14px; fill: none; stroke: var(--muted-foreground); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
 
@@ -18,7 +18,7 @@
 .trust { position: relative; margin: 0; color: var(--foreground-quiet); font-size: .8125rem; font-weight: 350; }
 
 @media (max-width: 800px) {
-  .auth-story { min-height: auto; padding: 1.5rem; border-right: 0; }
+  .auth-story { min-height: auto; padding: 1.5rem; border-inline-end: 0; }
   .auth-message { margin: 4.5rem 0 3rem; }
   .auth-message ul { margin-top: 2rem; }
   .trust { display: none; }

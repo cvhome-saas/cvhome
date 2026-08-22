@@ -198,10 +198,22 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
           <p class="form-intro">{{ t('marketing.contact.formIntro') }}</p>
 
           <div class="field-row">
-            <label>{{ t('marketing.contact.name') }}<input formControlName="name" autocomplete="name" required></label>
-            <label>{{ t('marketing.contact.company') }}<input formControlName="organization" autocomplete="organization"></label>
+            <app-form-field [label]="t('marketing.contact.name')" [control]="contactForm.controls.name" required>
+              <app-text-field formControlName="name" autocomplete="name" />
+            </app-form-field>
+
+            <app-form-field [label]="t('marketing.contact.company')">
+              <app-text-field formControlName="organization" autocomplete="organization" />
+            </app-form-field>
           </div>
-          <label>{{ t('marketing.contact.workEmail') }}<input type="email" formControlName="email" autocomplete="email" required></label>
+
+          <app-form-field
+            [label]="t('marketing.contact.workEmail')"
+            [control]="contactForm.controls.email"
+            required
+          >
+            <app-text-field type="email" formControlName="email" latin autocomplete="email" />
+          </app-form-field>
           <fieldset>
             <legend>{{ t('marketing.contact.whatDoYouNeed') }}</legend>
             <div class="topics">
@@ -210,7 +222,13 @@ RISK: the dark palette is protected with high-contrast type, generous spacing, a
               }
             </div>
           </fieldset>
-          <label>{{ t('marketing.contact.message') }}<textarea formControlName="message" rows="4" [attr.placeholder]="facade.messageHint()" required></textarea></label>
+          <app-form-field
+            [label]="t('marketing.contact.message')"
+            [control]="contactForm.controls.message"
+            required
+          >
+            <app-textarea formControlName="message" [rows]="4" [placeholder]="facade.messageHint()" />
+          </app-form-field>
           <button class="button submit" type="submit" [disabled]="!facade.contactSubmitAvailable">
             {{ t('marketing.contact.sendMessage') }}
             <app-icon name="arrowRight" />

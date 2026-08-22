@@ -3,16 +3,17 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {AuthStory} from '../components/auth-story';
 import {AuthFacade} from '../facades/auth.facade';
 import {SignUpFormService} from '../services/sign-up-form.service';
 
 @Component({
   selector: 'app-sign-up',
-  imports: [AuthStory, FieldError, ReactiveFormsModule, RouterLink, TranslocoDirective],
+  imports: [AuthStory, FormField, ReactiveFormsModule, RouterLink, TextField, TranslocoDirective],
   templateUrl: './sign-up.html',
-  styleUrl: '../auth.css',
+  styleUrls: ['../../../shared/styles/field.css', '../auth.css'],
 })
 export class SignUp {
   protected readonly facade = inject(AuthFacade);

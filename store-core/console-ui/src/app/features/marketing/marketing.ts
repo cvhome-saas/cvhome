@@ -5,14 +5,20 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import type {ContactTopicId} from '@models/marketing';
 import {Icon} from '@shared/ui/icon/icon';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {TextField} from '@shared/ui/text-field/text-field';
+import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
 import {ContactFormService} from './services/contact-form.service';
 import {MarketingFacade} from './facades/marketing.facade';
 
 @Component({
   selector: 'app-marketing',
-  imports: [CurrencyPipe, ReactiveFormsModule, Icon, TranslocoDirective],
+  imports: [
+    FormField,
+    TextField,
+    TextareaField,CurrencyPipe, ReactiveFormsModule, Icon, TranslocoDirective],
   templateUrl: './marketing.html',
-  styleUrl: './marketing.css',
+  styleUrls: ['../../shared/styles/field.css', './marketing.css'],
 })
 export class Marketing implements OnInit {
   protected readonly facade = inject(MarketingFacade);

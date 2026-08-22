@@ -9,24 +9,67 @@
       </div>
 
       <div class="auth-fields" formGroupName="user">
-        <label>{{ t('auth.signUp.firstName') }}<input formControlName="firstName" type="text" autocomplete="given-name" required><app-field-error [control]="user.controls.firstName" [fallback]="t('auth.signUp.firstNameFallback')" /></label>
-        <label>{{ t('auth.signUp.lastName') }}<input formControlName="lastName" type="text" autocomplete="family-name" required><app-field-error [control]="user.controls.lastName" [fallback]="t('auth.signUp.lastNameFallback')" /></label>
-        <label>{{ t('auth.signUp.email') }}<input formControlName="emailAddress" type="email" autocomplete="email" required><app-field-error [control]="user.controls.emailAddress" [fallback]="t('auth.signUp.emailFallback')" /></label>
-        <label>{{ t('auth.signUp.password') }}
-          <span class="password-field">
-            <input formControlName="password" [type]="facade.passwordVisible() ? 'text' : 'password'" autocomplete="new-password" required>
-            <button type="button" (click)="facade.passwordVisible.set(!facade.passwordVisible())" [attr.aria-label]="facade.passwordVisible() ? t('auth.signUp.hidePassword') : t('auth.signUp.showPassword')">
-              <span aria-hidden="true">{{ facade.passwordVisible() ? t('auth.signUp.hide') : t('auth.signUp.show') }}</span>
-            </button>
-          </span>
-          <app-field-error [control]="user.controls.password" [fallback]="t('auth.signUp.passwordFallback')" />
-        </label>
-        <label>{{ t('auth.signUp.repeatPassword') }}
-          <input formControlName="repeatPassword" [type]="facade.passwordVisible() ? 'text' : 'password'" autocomplete="new-password" required>
-          <app-field-error [control]="user.controls.repeatPassword" [fallback]="t('auth.signUp.repeatPasswordFallback')" />
-        </label>
+        <app-form-field
+          [label]="t('auth.signUp.firstName')"
+          [control]="user.controls.firstName"
+          required
+          [fallback]="t('auth.signUp.firstNameFallback')"
+        >
+          <app-text-field formControlName="firstName" autocomplete="given-name" />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.lastName')"
+          [control]="user.controls.lastName"
+          required
+          [fallback]="t('auth.signUp.lastNameFallback')"
+        >
+          <app-text-field formControlName="lastName" autocomplete="family-name" />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.email')"
+          [control]="user.controls.emailAddress"
+          required
+          [fallback]="t('auth.signUp.emailFallback')"
+        >
+          <app-text-field type="email" formControlName="emailAddress" latin autocomplete="email" />
+        </app-form-field>
+
+        <!--
+          The reveal is the control's own now. This page drew it with `position: absolute` and
+          `right: .55rem`, which put the eye on the wrong side of the field in Arabic — and the two
+          password fields disagreed about whether they had one at all.
+        -->
+        <app-form-field
+          [label]="t('auth.signUp.password')"
+          [control]="user.controls.password"
+          required
+          [fallback]="t('auth.signUp.passwordFallback')"
+        >
+          <app-text-field
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [revealLabel]="t('auth.signUp.showPassword')"
+          />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.repeatPassword')"
+          [control]="user.controls.repeatPassword"
+          required
+          [fallback]="t('auth.signUp.repeatPasswordFallback')"
+        >
+          <app-text-field
+            type="password"
+            formControlName="repeatPassword"
+            autocomplete="new-password"
+            [revealLabel]="t('auth.signUp.showPassword')"
+          />
+        </app-form-field>
         @if (user.errors?.['passwordMismatch'] && user.controls.repeatPassword.touched) {
-          <small class="field-error" aria-live="polite">{{ t('auth.signUp.passwordMismatch') }}</small>
+          <p class="cross-field-error" role="alert">{{ t('auth.signUp.passwordMismatch') }}</p>
         }
 
         <button class="auth-submit" type="submit" [disabled]="facade.submitting() || facade.submitted()">

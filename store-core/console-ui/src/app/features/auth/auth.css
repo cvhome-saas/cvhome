@@ -1,6 +1,13 @@
 :host { display: block; }
 
-/* The left story column is owned by app-auth-story and styled in its own stylesheet. */
+/*
+ * The story column is owned by app-auth-story and styled in its own stylesheet.
+ *
+ * What used to be here as well: a `.field`-less field vocabulary written against bare `input`
+ * elements, and a password reveal positioned with `right: .55rem` — which put the eye on the wrong
+ * side of the field in Arabic, on the one page a visitor sees before anything else. Both are
+ * `app-form-field` with `app-text-field` now.
+ */
 .auth-shell { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; background: var(--background); }
 
 .auth-entry { display: flex; align-items: center; justify-content: center; padding: 3rem; }
@@ -9,18 +16,10 @@ form { width: 100%; max-width: 26rem; padding: 1.75rem; border: 1px solid var(--
 .auth-tabs a { flex: 1; padding: .6rem 1rem; border-radius: var(--radius-full); color: var(--secondary-foreground); font-size: .8125rem; font-weight: 700; text-align: center; transition: background .2s ease, color .2s ease; }
 .auth-tabs a.active { background: var(--primary); color: var(--primary-foreground); }
 .auth-fields { display: grid; gap: 1rem; margin-top: 1.5rem; }
-.auth-fields > label { color: var(--secondary-foreground); font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
-input:not([type='checkbox']) { display: block; width: 100%; margin-top: .5rem; padding: .75rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-lg); outline: 0; background: var(--muted); color: var(--foreground-strong); transition: border-color .2s ease, background .2s ease; }
-input:not([type='checkbox']):focus { border-color: var(--edge-strong); background: var(--accent); }
-input:user-invalid { border-color: var(--destructive); }
-.password-field { position: relative; display: block; }
-.password-field input { padding-right: 3rem; }
-.password-field button { position: absolute; top: calc(50% + .25rem); right: .55rem; display: grid; place-items: center; width: 38px; height: 38px; transform: translateY(-50%); border: 0; background: transparent; color: var(--secondary-foreground); cursor: pointer; }
-.password-field svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; }
 .auth-options { display: flex; align-items: center; gap: .7rem; }
 .remember { display: flex; align-items: center; gap: .55rem; color: var(--secondary-foreground); font-size: .8125rem; }
 .remember input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
-.auth-options a { margin-left: auto; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 600; }
+.auth-options a { margin-inline-start: auto; color: var(--primary-emphasis); font-size: .8125rem; font-weight: 600; }
 .auth-submit { display: flex; align-items: center; justify-content: center; gap: .6rem; min-height: 48px; margin-top: .5rem; padding: .8rem 1rem; border: 1px solid var(--primary); border-radius: var(--radius-full); background: var(--primary); color: var(--primary-foreground); font-size: .9375rem; font-weight: 700; cursor: pointer; transition: background .2s ease, box-shadow .2s ease; }
 .auth-submit:hover { background: var(--primary-emphasis); box-shadow: var(--lift-primary); }
 .auth-submit:disabled { border-color: var(--edge); background: var(--accent-strong); color: var(--primary-muted); box-shadow: none; cursor: default; }
@@ -37,7 +36,7 @@ input:user-invalid { border-color: var(--destructive); }
 
 @media (max-width: 800px) {
   .auth-shell { grid-template-columns: 1fr; }
-  .auth-story { min-height: auto; padding: 1.5rem; border-right: 0; }
+  .auth-story { min-height: auto; padding: 1.5rem; border-inline-end: 0; }
   .auth-message { margin: 4.5rem 0 3rem; }
   .auth-message ul { margin-top: 2rem; }
   .trust { display: none; }
