@@ -87,7 +87,7 @@
             >
               <div class="check-grid" role="group" [attr.aria-label]="t('createStore.identity.supportedLanguages')">
                 @for (language of facade.languageOptions(); track language.code) {
-                  <app-toggle
+                  <app-checkbox
                     [label]="language.label"
                     [checked]="facade.isSupported(language.code)"
                     (checkedChange)="facade.toggleLanguage(language.code)"

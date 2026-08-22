@@ -3,13 +3,15 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {Autocomplete, type AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {TextField} from '@shared/ui/text-field/text-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {CopyFields} from '../copy-fields/copy-fields';
-import {LocaleChips} from '../locale-chips/locale-chips';
+import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
 import {CatalogueFacade} from '../../facades/catalogue.facade';
 
 /**
@@ -32,9 +34,11 @@ import {CatalogueFacade} from '../../facades/catalogue.facade';
   imports: [
     Autocomplete,
     CopyFields,
-    FieldError,
+    EmptyState,
+    FormField,
+    TextField,
     Icon,
-    LocaleChips,
+    LocaleSwitcher,
     NoticeBar,
     Panel,
     ReactiveFormsModule,
@@ -77,4 +81,21 @@ export class GroupTab {
       this.facade.addMember(code, option.id);
     }
   }
+  /**
+   * Where the code's uniqueness check has got to, in the shared vocabulary.
+   *
+   * `taken` only ever shows while creating: an existing record's code is disabled, and the check
+   * that lands on a disabled control is the bug `uniqueAsync` guards against.
+   */
+  protected codeCheck(): 'idle' | 'pending' | 'free' | 'taken' {
+    const code = this.form.controls.code;
+    if (code.pending) {
+      return 'pending';
+    }
+    if (code.hasError('codeTaken')) {
+      return 'taken';
+    }
+    return this.creating() && code.valid && code.value ? 'free' : 'idle';
+  }
+
 }

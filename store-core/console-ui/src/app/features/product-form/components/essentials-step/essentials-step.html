@@ -7,38 +7,30 @@
     >
       <div class="editor-body">
         <div class="field-grid">
-          <div class="field">
-            <label for="product-sku">
-              {{ t('productForm.essentials.sku') }} <span class="required" aria-hidden="true">*</span>
-            </label>
-            <!-- An identifier: left-to-right even inside the Arabic console. -->
-            <span class="control">
-              <input id="product-sku" type="text" formControlName="sku" dir="ltr" required />
-              <!--
-                Checking, taken, free. The check is debounced, so without the spinner the field looks
-                like it has already passed.
-              -->
-              @if (form().controls.sku.pending) {
-                <span class="check-pending" role="status" [attr.aria-label]="t('productForm.essentials.skuChecking')"></span>
-              } @else if (form().controls.sku.hasError('skuTaken')) {
-                <app-icon name="alertCircle" [size]="14" class="check-taken" />
-              } @else if (!saved() && form().controls.sku.valid && form().controls.sku.value) {
-                <app-icon name="checkCircle" [size]="14" class="check-free" />
-              }
-            </span>
-            <p class="field-hint">{{ t('productForm.essentials.skuHint') }}</p>
-            <!--
-              The uniqueness answer now reaches the operator the same way every other failure does,
-              rather than through a signal and a bespoke line.
-            -->
-            <app-field-error
-              [control]="form().controls.sku"
-              [fallback]="t('productForm.essentials.skuInvalid')"
+          <!-- An identifier: left-to-right even inside the Arabic console. -->
+          <app-form-field
+            [label]="t('productForm.essentials.sku')"
+            [control]="form().controls.sku"
+            required
+            controlId="product-sku"
+            [hint]="t('productForm.essentials.skuHint')"
+            [fallback]="t('productForm.essentials.skuInvalid')"
+          >
+            <app-text-field
+              id="product-sku"
+              formControlName="sku"
+              latin
+              [check]="skuCheck()"
+              [checkLabel]="t('productForm.essentials.skuChecking')"
+              [invalid]="form().controls.sku.hasError('skuTaken')"
             />
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="product-available-from">{{ t('productForm.essentials.dateAvailable') }}</label>
+          <app-form-field
+            [label]="t('productForm.essentials.dateAvailable')"
+            controlId="product-available-from"
+            [hint]="t('productForm.essentials.dateAvailableHint')"
+          >
             <!--
               The console's own picker, not the native control: it is a `ControlValueAccessor` over
               the same `YYYY-MM-DD` string, it is themed and localised, and it is what create-store
@@ -49,19 +41,20 @@
               formControlName="dateAvailable"
               [placeholder]="t('productForm.essentials.dateAvailablePlaceholder')"
             />
-            <p class="field-hint">{{ t('productForm.essentials.dateAvailableHint') }}</p>
-          </div>
+          </app-form-field>
 
-          <div class="field">
-            <label for="product-sort-order">{{ t('productForm.essentials.sortOrder') }}</label>
+          <app-form-field
+            [label]="t('productForm.essentials.sortOrder')"
+            controlId="product-sort-order"
+            [hint]="t('productForm.essentials.sortOrderHint')"
+          >
             <app-number-field
-                id="product-sort-order"
-                formControlName="sortOrder"
-                [decimals]="0"
-                [min]="0"
-              />
-            <p class="field-hint">{{ t('productForm.essentials.sortOrderHint') }}</p>
-          </div>
+              id="product-sort-order"
+              formControlName="sortOrder"
+              [decimals]="0"
+              [min]="0"
+            />
+          </app-form-field>
 
           <div class="field">
             <app-toggle
@@ -94,61 +87,66 @@
           [message]="t('productForm.essentials.perLanguage', {language: activeLanguageName()})"
         />
 
-        <div class="language-track" role="radiogroup" [attr.aria-label]="t('productForm.essentials.languageLabel')">
-          @for (language of languages(); track language.code; let index = $index) {
-            <button
-              class="language"
-              type="button"
-              role="radio"
-              [class.current]="index === activeLanguage()"
-              [attr.aria-checked]="index === activeLanguage()"
-              [tabindex]="index === activeLanguage() ? 0 : -1"
-              (click)="activeLanguage.set(index)"
-            >
-              {{ language.label }}
-            </button>
-          }
-        </div>
+        <!--
+          The shared strip, not a hand-rolled one. This was its own radiogroup keyed by *index*
+          rather than by language code, with no arrow keys and no mark for a language that already
+          holds copy — three differences from the identical control in the catalogue.
+        -->
+        <app-locale-switcher
+          [languages]="languages()"
+          [active]="activeLanguageCode()"
+          (activeChange)="onLanguagePicked($event)"
+          [filled]="translatedLanguages()"
+          display="label"
+          [label]="t('productForm.essentials.languageLabel')"
+        />
 
         @if (activeRow(); as row) {
           <div class="field-grid" [formGroup]="row">
-            <div class="field field-wide">
-              <label for="product-name">
-                {{ t('productForm.essentials.name') }} <span class="required" aria-hidden="true">*</span>
-              </label>
-              <input id="product-name" class="control" type="text" formControlName="name" dir="auto" />
-              <p class="field-hint">{{ t('productForm.essentials.nameHint') }}</p>
-            </div>
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.name')"
+              required
+              controlId="product-name"
+              [hint]="t('productForm.essentials.nameHint')"
+            >
+              <app-text-field id="product-name" formControlName="name" />
+            </app-form-field>
 
-            <div class="field field-wide">
-              <label for="product-slug">{{ t('productForm.essentials.slug') }}</label>
-              <span class="control">
-                <span class="prefix" dir="ltr">{{ t('productForm.essentials.slugPrefix') }}</span>
-                <input id="product-slug" type="text" formControlName="friendlyUrl" dir="ltr" />
-              </span>
-              <p class="field-hint">{{ t('productForm.essentials.slugHint') }}</p>
-            </div>
-
-            <div class="field field-wide">
-              <label for="product-highlights">{{ t('productForm.essentials.highlights') }}</label>
-              <!--
-                One line, not a textarea. `product_highlight` is `varchar(255)`, and a box three
-                rows tall is an invitation to write a paragraph into a column that cannot hold one.
-                seller-ui used an input here for the same reason.
-              -->
-              <input
-                id="product-highlights"
-                class="control"
-                type="text"
-                formControlName="highlights"
-                dir="auto"
-                maxlength="255"
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.slug')"
+              controlId="product-slug"
+              [hint]="t('productForm.essentials.slugHint')"
+            >
+              <app-text-field
+                id="product-slug"
+                formControlName="friendlyUrl"
+                [prefix]="t('productForm.essentials.slugPrefix')"
+                latin
               />
-              <p class="field-hint">{{ t('productForm.essentials.highlightsHint') }}</p>
-            </div>
+            </app-form-field>
 
-            <div class="field field-wide">
-              <label for="product-description">{{ t('productForm.essentials.description') }}</label>
+            <!--
+              One line, not a textarea. The product_highlight column is varchar(255), and a box
+              three rows tall is an invitation to write a paragraph into a column that cannot hold
+              one. seller-ui used an input here for the same reason. The counter is the control's,
+              so the limit is stated once and enforced in the same place.
+            -->
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.highlights')"
+              controlId="product-highlights"
+              [hint]="t('productForm.essentials.highlightsHint')"
+            >
+              <app-text-field id="product-highlights" formControlName="highlights" [maxLength]="255" />
+            </app-form-field>
+
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.description')"
+              controlId="product-description"
+            >
               <!--
                 The one field on this platform that genuinely holds HTML: the seeded descriptions
                 are `<h2>`/`<p>`/`<ul>` documents and the Arabic rows carry a `dir="rtl"` wrapper.
@@ -161,27 +159,27 @@
                 [placeholder]="t('productForm.essentials.descriptionPlaceholder')"
                 [contentDir]="activeLanguageDir()"
               />
-            </div>
+            </app-form-field>
 
             <div class="field field-wide">
               <hr class="divider" />
             </div>
 
-            <div class="field field-wide">
-              <label for="product-seo-title">{{ t('productForm.essentials.seoTitle') }}</label>
-              <input id="product-seo-title" class="control" type="text" formControlName="title" dir="auto" />
-            </div>
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.seoTitle')"
+              controlId="product-seo-title"
+            >
+              <app-text-field id="product-seo-title" formControlName="title" />
+            </app-form-field>
 
-            <div class="field field-wide">
-              <label for="product-meta">{{ t('productForm.essentials.metaDescription') }}</label>
-              <textarea
-                id="product-meta"
-                class="control"
-                formControlName="metaDescription"
-                dir="auto"
-                rows="2"
-              ></textarea>
-            </div>
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.metaDescription')"
+              controlId="product-meta"
+            >
+              <app-textarea id="product-meta" formControlName="metaDescription" [rows]="2" />
+            </app-form-field>
 
             <div class="field field-wide">
               <span class="field-label" [id]="'product-keywords-label'">

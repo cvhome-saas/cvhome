@@ -9,7 +9,7 @@ import {NumberField} from '@shared/ui/number-field/number-field';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {Toggle} from '@shared/ui/toggle/toggle';
-import type {ProductForm} from '../../services/product-form.service';
+import type {ProductForm} from '../../services/product-draft-form.service';
 
 /**
  * Step 3 — what it costs and how much there is.

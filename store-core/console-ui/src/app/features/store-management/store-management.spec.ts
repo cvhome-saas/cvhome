@@ -321,11 +321,18 @@ describe('StoreManagement', () => {
     return element.querySelector<HTMLInputElement>(selector)!;
   }
 
-  /** One of the supported-language switches, by the language it names. */
-  function languageToggle(element: HTMLElement, language: string): HTMLElement {
-    return Array.from(element.querySelectorAll<HTMLElement>('.check-grid [role="switch"]')).find(
-      (toggle) => toggle.closest('app-toggle')?.textContent?.includes(language),
-    )!;
+  /**
+   * One of the supported-language boxes, by the language it names.
+   *
+   * A checkbox, not a switch: this is a selection from a set, and a screen reader announcing
+   * "switch, Arabic, on" for membership of a list is telling the operator something slightly
+   * untrue. Drawn rather than tinted, because a native box on a dark theme reads as checked when
+   * it is not — lessons.md records that from the catalogue.
+   */
+  function languageToggle(element: HTMLElement, language: string): HTMLInputElement {
+    return Array.from(
+      element.querySelectorAll<HTMLInputElement>('.check-grid input[type="checkbox"]'),
+    ).find((box) => box.closest('app-checkbox')?.textContent?.includes(language))!;
   }
 
   /** The named field's own wrapper, so an assertion cannot pick up a neighbour's error. */
@@ -550,7 +557,7 @@ describe('StoreManagement', () => {
     const {fixture, element} = load('details');
 
     const french = languageToggle(element, 'French');
-    expect(french.getAttribute('aria-checked')).toBe('false');
+    expect(french.checked).toBeFalse();
 
     french.click();
     settle(fixture);

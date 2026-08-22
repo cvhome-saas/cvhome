@@ -1,7 +1,8 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {ImageBroken} from '@shared/directives/image-broken';
+import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {Icon} from '@shared/ui/icon/icon';
 import {ImagePicker, type ImageRules} from '@shared/ui/image-picker/image-picker';
 import {ImagePreview} from '@shared/ui/image-preview/image-preview';
@@ -9,7 +10,6 @@ import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import type {ProductImageItem} from '@models/products';
 import {ProductFormFacade} from '../../facades/product-form.facade';
-import {signal} from '@angular/core';
 
 /**
  * Step 2 — the product's pictures.
@@ -28,7 +28,7 @@ import {signal} from '@angular/core';
  */
 @Component({
   selector: 'app-media-step',
-  imports: [Icon, ImageBroken, ImagePicker, ImagePreview, NoticeBar, Panel, TranslocoDirective],
+  imports: [ConfirmDialog, Icon, ImageBroken, ImagePicker, ImagePreview, NoticeBar, Panel, TranslocoDirective],
   templateUrl: './media-step.html',
   styleUrls: ['../editor-card.css', './media-step.css'],
 })
@@ -72,4 +72,15 @@ export class MediaStep {
       this.viewing.set(null);
     }
   }
+  /** Which image the operator has asked to remove, while they confirm it. */
+  protected readonly pendingRemove = signal<number | null>(null);
+
+  protected confirmRemove(): void {
+    const id = this.pendingRemove();
+    this.pendingRemove.set(null);
+    if (id !== null) {
+      this.facade.removeImage(id);
+    }
+  }
+
 }

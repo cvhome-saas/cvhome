@@ -17,6 +17,16 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
   templateUrl: './textarea-field.html',
   styleUrl: './textarea-field.css',
   host: {
+    /*
+     * The id belongs to the control this draws, not to the host.
+     *
+     * A static or bound `id` on a component element lands in the DOM *as well as* matching the
+     * `id` input, so the host and the inner control ended up carrying the same id — invalid HTML,
+     * and `<label for>` then resolves to the host, which is not a labelable element, so the
+     * association silently does not happen. Found by probing where the id actually went; four of
+     * these six components had shipped with it.
+     */
+    '[attr.id]': 'null',
     '[class.textarea-disabled]': 'isDisabled()',
     '[class.textarea-invalid]': 'invalid()',
   },

@@ -6,6 +6,7 @@ import {TranslocoDirective} from '@jsverse/transloco';
 
 import {dateKey} from '@core/i18n/calendar';
 import {ReferenceDataService, STOREFRONT_LANGUAGES} from '@core/reference/reference-data.service';
+import {Checkbox} from '@shared/ui/checkbox/checkbox';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {DatePicker} from '@shared/ui/date-picker/date-picker';
 import {FormField} from '@shared/ui/form-field/form-field';
@@ -31,6 +32,7 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
 @Component({
   selector: 'app-details-section',
   imports: [
+    Checkbox,
     ConfirmDialog,
     DatePicker,
     FormField,
@@ -112,7 +114,7 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
             -->
             <div class="check-grid" role="group" [attr.aria-label]="t('storeSettings.details.supportedLanguages')">
               @for (language of supportedLanguageOptions(); track language.code) {
-                <app-toggle
+                <app-checkbox
                   [label]="language.label"
                   [checked]="isSupported(language.code)"
                   (checkedChange)="toggleLanguage(language.code)"

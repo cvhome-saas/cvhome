@@ -45,12 +45,17 @@
                       <app-icon name="eye" [size]="13" />
                     </button>
                   }
+                  <!--
+                    Behind a confirmation, like every other destructive action in the console.
+                    Deleting an image is not undoable and there is no re-upload of the same file
+                    from here — the operator has to find it again.
+                  -->
                   <button
                     type="button"
                     class="danger"
                     [disabled]="facade.uploading()"
                     [attr.aria-label]="t('productForm.media.remove', {position: index + 1})"
-                    (click)="facade.removeImage(image.id)"
+                    (click)="pendingRemove.set(image.id)"
                   >
                     <app-icon name="trash" [size]="13" />
                   </button>
@@ -112,3 +117,14 @@
     />
   </app-panel>
 </ng-container>
+
+<app-confirm-dialog
+  *transloco="let t"
+  [open]="pendingRemove() !== null"
+  [title]="t('productForm.media.removeTitle')"
+  [message]="t('productForm.media.removeConfirm')"
+  [confirmLabel]="t('productForm.media.removeAccept')"
+  [cancelLabel]="t('shared.actions.cancel')"
+  (confirmed)="confirmRemove()"
+  (dismissed)="pendingRemove.set(null)"
+/>

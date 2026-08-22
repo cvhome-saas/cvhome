@@ -32,126 +32,23 @@
   padding: 1.25rem;
 }
 
-.field-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.field-wide {
-  grid-column: 1 / -1;
-}
-
+/*
+ * What is left after the field vocabulary moved.
+ *
+ * This file and the catalogue's copy of it differed by 42 lines out of 238 — two hand-maintained
+ * copies of one thing, a few months apart. The control, its label, its hint, its counter and its
+ * uniqueness marks are `app-form-field` with `app-text-field` and friends now; `.field-grid`,
+ * `.field-wide` and `.split` are layout and come from `@shared/styles/field.css`.
+ */
 .field {
   min-inline-size: 0;
 }
 
-.field > label,
-.field-label {
-  display: block;
-  margin-block-end: .4rem;
-  color: var(--foreground-strong);
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.required {
-  color: var(--chart-5-foreground);
-}
-
-.control {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  inline-size: 100%;
-  padding: .55rem .7rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--input);
-  color: var(--foreground-strong);
-  font-size: var(--text-sm);
-  transition: border-color var(--default-transition-duration);
-}
-
-.control:hover,
-.control:focus-within {
-  border-color: var(--primary);
-}
-
-input.control,
-textarea.control,
-select.control {
-  display: block;
-}
-
-textarea.control {
-  min-block-size: 5.5rem;
-  line-height: 1.6;
-  resize: vertical;
-}
-
-.control > input,
-.control > select {
-  flex: 1;
-  min-inline-size: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font-size: inherit;
-}
-
-.control > input:focus,
-.control > select:focus,
-input.control:focus,
-textarea.control:focus,
-select.control:focus {
-  outline: none;
-}
-
-.control > .prefix {
-  flex: none;
+.field-hint {
+  margin: .35rem 0 0;
   color: var(--foreground-quiet);
   font-size: var(--text-2xs);
-}
-
-/* A field the server owns: a code, once the record exists. */
-.control:disabled,
-.control.readonly {
-  background: var(--muted);
-  color: var(--muted-foreground);
-  cursor: not-allowed;
-}
-
-.field-hint,
-.field-foot {
-  margin: .35rem 0 0;
-  color: var(--foreground-subtle);
-  font-size: var(--text-2xs);
-}
-
-.field-foot {
-  display: flex;
-  gap: 1rem;
-}
-
-.field-foot .counter {
-  margin-inline-start: auto;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Over the recommended length is worth saying, and it is not an error — nothing rejects it. */
-.counter.over {
-  color: var(--chart-4-foreground);
-}
-
-app-field-error {
-  display: block;
-  margin-block-start: .35rem;
-  color: var(--chart-5-foreground);
-  font-size: var(--text-2xs);
-  font-weight: 500;
+  line-height: 1.5;
 }
 
 .divider {
@@ -187,53 +84,9 @@ app-field-error {
   color: var(--primary-emphasis);
 }
 
-.editor-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .75rem;
-  padding: 3rem 1.5rem;
-  color: var(--foreground-quiet);
-  font-size: var(--text-xs);
-  text-align: center;
-  --icon-size: 1.5rem;
-}
 
 @media (max-width: 900px) {
   .field-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .control {
-    transition: none;
-  }
-}
-
-/* ---- Uniqueness check ------------------------------------------------------------------- */
-
-.check-free {
-  color: var(--primary-emphasis);
-}
-
-.check-taken {
-  color: var(--chart-5-foreground);
-}
-
-/* Reuses the autocomplete's spin rather than authoring another spinner keyframe. */
-.check-pending {
-  flex: none;
-  inline-size: .85rem;
-  block-size: .85rem;
-  border: 2px solid var(--track);
-  border-block-start-color: var(--primary);
-  border-radius: var(--radius-full);
-  animation: autocomplete-spin .7s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .check-pending {
-    animation-duration: 2s;
   }
 }

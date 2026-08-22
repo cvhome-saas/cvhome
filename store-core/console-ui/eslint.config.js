@@ -129,25 +129,6 @@ module.exports = tseslint.config(
     },
   },
   {
-    /*
-     * A backtick inside an inline `template:` closes the template literal.
-     *
-     * It fails as a run of baffling `',' expected` errors pointing at the *next* declaration, which
-     * costs several minutes each time to trace back to a comment written in Markdown out of habit.
-     * Three of those in one afternoon is enough; name the components in prose instead.
-     */
-    files: ['src/app/**/*.ts'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "Property[key.name='template'] > TemplateLiteral > TemplateElement[value.raw=/\\u0060/]",
-          message: 'A backtick inside an inline template closes the template literal. Write the name in prose.',
-        },
-      ],
-    },
-  },
-  {
     files: ['**/*.html'],
     // src/index.html is the static host page rendered before Angular boots — it isn't a
     // component template, so Transloco bindings don't apply there.

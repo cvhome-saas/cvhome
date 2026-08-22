@@ -4,9 +4,11 @@ import {ReactiveFormsModule, type FormControl, type FormGroup} from '@angular/fo
 import {TranslocoDirective} from '@jsverse/transloco';
 import {startWith, switchMap} from 'rxjs';
 
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {RichText} from '@shared/ui/rich-text/rich-text';
+import {TextField} from '@shared/ui/text-field/text-field';
+import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
 import {SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT} from '@models/taxonomy';
 
 /** The copy `FormGroup` every catalogue editor carries. */
@@ -31,7 +33,15 @@ export type CopyFormGroup = FormGroup<{
  */
 @Component({
   selector: 'app-copy-fields',
-  imports: [FieldError, Icon, ReactiveFormsModule, RichText, TranslocoDirective],
+  imports: [
+    FormField,
+    Icon,
+    ReactiveFormsModule,
+    RichText,
+    TextField,
+    TextareaField,
+    TranslocoDirective,
+  ],
   template: `
     <div class="field-grid" [formGroup]="form()" *transloco="let t">
       <!--
@@ -50,39 +60,37 @@ export type CopyFormGroup = FormGroup<{
         </span>
       </p>
 
-      <div class="field" [class.field-wide]="!showSlug()">
-        <label [attr.for]="idFor('name')">
-          {{ t('catalogue.copy.name') }} <span class="required" aria-hidden="true">*</span>
-        </label>
-        <!-- Automatic direction throughout: a store trading in Arabic and English writes both
-             into the same control, and the value decides which way it runs. -->
-        <input
-          class="control"
-          type="text"
-          [id]="idFor('name')"
-          formControlName="name"
-          dir="auto"
-          required
-        />
-        <app-field-error [control]="form().controls.name" [fallback]="t('catalogue.copy.nameRequired')" />
-      </div>
+      <!-- Automatic direction throughout: a store trading in Arabic and English writes both into
+           the same control, and the value decides which way it runs — so none of these is marked
+           latin, unlike the slug below. -->
+      <app-form-field
+        [wide]="!showSlug()"
+        [label]="t('catalogue.copy.name')"
+        [control]="form().controls.name"
+        required
+        [controlId]="idFor('name')"
+        [fallback]="t('catalogue.copy.nameRequired')"
+      >
+        <app-text-field [id]="idFor('name')" formControlName="name" />
+      </app-form-field>
 
       @if (showSlug()) {
-        <div class="field">
-          <label [attr.for]="idFor('slug')">{{ t('catalogue.copy.slug') }}</label>
-          <span class="control">
-            @if (slugPrefix()) {
-              <span class="prefix" dir="ltr">{{ slugPrefix() }}</span>
-            }
-            <!-- A URL segment, so always left-to-right even inside the Arabic console. -->
-            <input [id]="idFor('slug')" type="text" formControlName="friendlyUrl" dir="ltr" />
-          </span>
-          <p class="field-hint">{{ t('catalogue.copy.slugHint') }}</p>
-        </div>
+        <!-- A URL segment, so always left-to-right even inside the Arabic console. -->
+        <app-form-field
+          [label]="t('catalogue.copy.slug')"
+          [controlId]="idFor('slug')"
+          [hint]="t('catalogue.copy.slugHint')"
+        >
+          <app-text-field
+            [id]="idFor('slug')"
+            formControlName="friendlyUrl"
+            [prefix]="slugPrefix()"
+            latin
+          />
+        </app-form-field>
       }
 
-      <div class="field field-wide">
-        <label [attr.for]="idFor('description')">{{ t('catalogue.copy.description') }}</label>
+      <app-form-field wide [label]="t('catalogue.copy.description')" [controlId]="idFor('description')">
         @if (richDescription()) {
           <!--
             A rich editor where the storefront renders the description as markup. Product types and
@@ -96,52 +104,46 @@ export type CopyFormGroup = FormGroup<{
             [contentDir]="contentDir()"
           />
         } @else {
-          <textarea
-            class="control"
-            [id]="idFor('description')"
-            formControlName="description"
-            dir="auto"
-            rows="3"
-          ></textarea>
+          <app-textarea [id]="idFor('description')" formControlName="description" [rows]="3" />
         }
-      </div>
+      </app-form-field>
 
       @if (showSeo()) {
         <div class="field field-wide">
           <hr class="divider" />
         </div>
 
-        <div class="field field-wide">
-          <label [attr.for]="idFor('seo-title')">{{ t('catalogue.copy.seoTitle') }}</label>
-          <input class="control" type="text" [id]="idFor('seo-title')" formControlName="title" dir="auto" />
-          <p class="field-foot">
-            <span>{{ t('catalogue.copy.seoTitleHint') }}</span>
-            <span class="counter" [class.over]="titleLength() > titleLimit">
-              {{ t('catalogue.copy.counter', {count: titleLength(), limit: titleLimit}) }}
-            </span>
-          </p>
-        </div>
+        <!--
+          The counters are the control's own now. They used to be a field-foot row this component
+          drew, with the hint beside them — which meant a limit lived in two places, the markup and
+          the maxLength input, and only one of them stopped you typing.
+        -->
+        <app-form-field
+          wide
+          [label]="t('catalogue.copy.seoTitle')"
+          [controlId]="idFor('seo-title')"
+          [hint]="t('catalogue.copy.seoTitleHint')"
+        >
+          <app-text-field [id]="idFor('seo-title')" formControlName="title" [maxLength]="titleLimit" />
+        </app-form-field>
 
-        <div class="field field-wide">
-          <label [attr.for]="idFor('meta')">{{ t('catalogue.copy.metaDescription') }}</label>
-          <textarea
-            class="control"
+        <app-form-field
+          wide
+          [label]="t('catalogue.copy.metaDescription')"
+          [controlId]="idFor('meta')"
+          [hint]="t('catalogue.copy.metaHint')"
+        >
+          <app-textarea
             [id]="idFor('meta')"
             formControlName="metaDescription"
-            dir="auto"
-            rows="2"
-          ></textarea>
-          <p class="field-foot">
-            <span>{{ t('catalogue.copy.metaHint') }}</span>
-            <span class="counter" [class.over]="metaLength() > metaLimit">
-              {{ t('catalogue.copy.counter', {count: metaLength(), limit: metaLimit}) }}
-            </span>
-          </p>
-        </div>
+            [rows]="2"
+            [maxLength]="metaLimit"
+          />
+        </app-form-field>
       }
     </div>
   `,
-  styleUrl: '../editor-card.css',
+  styleUrls: ['../../../../shared/styles/field.css', '../editor-card.css'],
 })
 export class CopyFields {
   readonly form = input.required<CopyFormGroup>();

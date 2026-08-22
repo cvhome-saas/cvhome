@@ -5,6 +5,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {Badge} from '@shared/ui/badge/badge';
+import {Checkbox} from '@shared/ui/checkbox/checkbox';
 import {DatePicker} from '@shared/ui/date-picker/date-picker';
 import {FormField} from '@shared/ui/form-field/form-field';
 import {Select} from '@shared/ui/select/select';
@@ -33,6 +34,7 @@ import {CreateStoreFacade} from './facades/create-store.facade';
   selector: 'app-create-store',
   imports: [
     Badge,
+    Checkbox,
     DatePicker,
     FormField,
     Select,

@@ -1,12 +1,6 @@
 import {Injectable, inject} from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ValidationErrors,
-  Validators,
-  type AsyncValidatorFn,
-} from '@angular/forms';
-import {Observable, catchError, first, map, of, switchMap, timer} from 'rxjs';
+import {AsyncValidatorFn, FormBuilder, Validators} from '@angular/forms';
+import {Observable} from 'rxjs';
 
 import {
   CATEGORY_SLUG_MAX,
@@ -18,6 +12,8 @@ import {
   TYPE_CODE_MAX,
   UNIQUENESS_DEBOUNCE_MS,
 } from '@models/taxonomy';
+import {uniqueAsync} from '@shared/forms/unique-async';
+import {CODE_PATTERN, slugify} from '@shared/validators/slug';
 import {CatalogueApi} from './catalogue.api.service';
 
 /**
@@ -123,67 +119,26 @@ export class CatalogueFormService {
   /**
    * Whether a code is already taken in this store.
    *
-   * The shape `create-store.facade.ts`'s `uniqueName` and `store-settings-form.service.ts`'s
-   * `dnsPointsToPod` established: `timer` at the head of the stream is the debounce — Angular's own
-   * cancellation of the previous run does the rest — then one call, then a **named** error key.
+   * The pipeline itself is `@shared/forms/unique-async`, which is where the two behaviours that
+   * matter live: the debounce at the head of the stream, and the `control.enabled` check at the
+   * point of *reporting* rather than of asking. That second one is the bug this module shipped —
+   * an existing record's code is disabled once loaded, so an answer arriving afterwards marked
+   * every category, brand, type and group a duplicate of itself.
    *
-   * **A check that could not be made is not a failed check.** An unreachable endpoint answers
-   * `null`, so the field stays usable and the server has the last word on the save. Locking a field
-   * because a lookup timed out is the worse failure.
+   * What stays here is the part that is the catalogue's: which endpoint answers, and the fact that
+   * a code failing `CODE_PATTERN` is not worth a round trip.
    */
   private uniqueCode(check: (code: string) => Observable<boolean>): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      const code = String(control.value ?? '').trim();
-      if (!code || !CODE_PATTERN.test(code)) {
-        // Nothing to ask about, and the sync validators are already saying so.
-        return of(null);
-      }
-      return timer(UNIQUENESS_DEBOUNCE_MS).pipe(
-        switchMap(() => check(code)),
-        /*
-         * `control.enabled` is not belt and braces — it is the whole bug.
-         *
-         * The code of an existing record is disabled, because a code identifies the record. But the
-         * form is filled while the control is still enabled, so the check starts, and the facade
-         * disables it a tick later. `disable()` nulls the errors it finds; it cannot null an error
-         * that has not arrived yet. The answer landed afterwards and marked every existing category,
-         * brand, type and group as a duplicate of itself — a red "already taken" against a code the
-         * operator cannot even edit.
-         */
-        map((taken) => (taken && control.enabled ? {codeTaken: true} : null)),
-        catchError(() => of(null)),
-        first(),
-      );
-    };
+    return uniqueAsync(check, 'codeTaken', {
+      debounceMs: UNIQUENESS_DEBOUNCE_MS,
+      when: (code) => CODE_PATTERN.test(code),
+    });
   }
 }
 
-/**
- * What a code may be.
- *
- * Letters, digits, hyphen and underscore. The pod does not validate this — it accepts anything a
- * `String` can hold — but a code with a slash or a space in it becomes a path segment on
- * `…/groups/{code}` and on the storefront's URLs, where it either breaks routing or arrives
- * percent-encoded and unrecognisable. Refusing it here is cheaper than discovering it there.
+/*
+ * Re-exported: what a code may be, and how to suggest one, are shared — every taxonomy the
+ * console has is a coded record created from a typed name — but the catalogue is where they are
+ * used and where readers look for them.
  */
-export const CODE_PATTERN = /^[A-Za-z0-9_-]+$/;
-
-/** Combining diacritics, stripped after NFKD so "Café" slugifies to "cafe" rather than "caf". */
-const COMBINING_MARKS = /[\u0300-\u036f]/g;
-
-/**
- * A code derived from a name.
- *
- * Nothing on the platform generates one and every create needs one, so the console offers the name
- * slugified, which is what seller-ui did. It stays editable: this is a suggestion, not a rule, and
- * a name written only in Arabic slugifies to nothing — which the caller falls back from.
- */
-export function slugify(value: string): string {
-  return value
-    .normalize('NFKD')
-    .replace(COMBINING_MARKS, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, CODE_MAX);
-}
+export {CODE_PATTERN, slugify};

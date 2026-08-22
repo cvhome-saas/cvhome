@@ -3,12 +3,13 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {Autocomplete, type AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
+import {Checkbox} from '@shared/ui/checkbox/checkbox';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {ProductFormFacade} from '../../facades/product-form.facade';
-import type {ProductForm} from '../../services/product-form.service';
+import type {ProductForm} from '../../services/product-draft-form.service';
 
 /**
  * Step 4 — where the product sits and what it is related to.
@@ -29,7 +30,16 @@ import type {ProductForm} from '../../services/product-form.service';
  */
 @Component({
   selector: 'app-organize-step',
-  imports: [Autocomplete, Icon, NoticeBar, Panel, ReactiveFormsModule, Select, TranslocoDirective],
+  imports: [
+    Autocomplete,
+    Checkbox,
+    Icon,
+    NoticeBar,
+    Panel,
+    ReactiveFormsModule,
+    Select,
+    TranslocoDirective,
+  ],
   templateUrl: './organize-step.html',
   styleUrls: ['../editor-card.css', '../../../../shared/styles/product-picker.css', './organize-step.css'],
 })

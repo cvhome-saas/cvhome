@@ -7,7 +7,10 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {LocaleService} from '@core/i18n/locale.service';
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import {DatePicker} from '@shared/ui/date-picker/date-picker';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
+import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
+import {TextField} from '@shared/ui/text-field/text-field';
+import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
 import {Icon} from '@shared/ui/icon/icon';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
@@ -16,7 +19,7 @@ import {RichText} from '@shared/ui/rich-text/rich-text';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {NumberField} from '@shared/ui/number-field/number-field';
 import {ProductFormFacade} from '../../facades/product-form.facade';
-import type {ProductForm} from '../../services/product-form.service';
+import type {ProductForm} from '../../services/product-draft-form.service';
 
 /**
  * Step 1 — what the product is called and whether it is on sale.
@@ -34,7 +37,10 @@ import type {ProductForm} from '../../services/product-form.service';
   selector: 'app-essentials-step',
   imports: [
     DatePicker,
-    FieldError,
+    FormField,
+    LocaleSwitcher,
+    TextField,
+    TextareaField,
     Icon,
     NoticeBar,
     Panel,
@@ -111,6 +117,52 @@ export class EssentialsStep {
    * `<div dir="rtl">`. Passing the direction is what lets a newly written Arabic description
    * acquire the same wrapper instead of arriving unmarked.
    */
+  /**
+   * The active language as a *code*, for the shared switcher.
+   *
+   * The step tracks the language by index into `copyRows()`, which is what the form array is keyed
+   * by; the switcher speaks codes, because keying a language strip by position is how a reordered
+   * list silently starts editing the wrong translation.
+   */
+  protected readonly activeLanguageCode = computed(
+    () => this.languages()[this.activeLanguage()]?.code ?? '',
+  );
+
+  /** Which languages already carry a name. The switcher marks the rest as untranslated. */
+  protected readonly translatedLanguages = computed<ReadonlySet<string>>(() => {
+    const rows = this.copyRows();
+    return new Set(
+      this.languages()
+        .map((language, index) => ({language, row: rows[index]}))
+        .filter(({row}) => !!row?.controls.name.value)
+        .map(({language}) => language.code),
+    );
+  });
+
+  protected onLanguagePicked(code: string): void {
+    const index = this.languages().findIndex((language) => language.code === code);
+    if (index >= 0) {
+      this.activeLanguage.set(index);
+    }
+  }
+
+  /**
+   * Where the SKU's uniqueness check has got to, in the shared vocabulary.
+   *
+   * `taken` only while unsaved: an existing product's SKU is disabled, and a check landing on a
+   * disabled control is the bug `uniqueAsync` guards against.
+   */
+  protected skuCheck(): 'idle' | 'pending' | 'free' | 'taken' {
+    const sku = this.form().controls.sku;
+    if (sku.pending) {
+      return 'pending';
+    }
+    if (sku.hasError('skuTaken')) {
+      return 'taken';
+    }
+    return !this.saved() && sku.valid && sku.value ? 'free' : 'idle';
+  }
+
   protected readonly activeLanguageDir = computed<'auto' | 'ltr' | 'rtl'>(() => {
     const code = this.languages()[this.activeLanguage()]?.code;
     return this.locale.locales.find((entry) => entry.code === code)?.dir ?? 'auto';

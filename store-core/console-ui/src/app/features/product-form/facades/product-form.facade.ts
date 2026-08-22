@@ -25,7 +25,7 @@ import {ToastService} from '@shared/ui/toast/toast';
 import {ProductsCache} from '@api/catalog/products-cache';
 import {ProductSearch} from '@api/catalog/product-search.service';
 import {ProductFormApi, type CategoryOption, type ProductFormSnapshot, type ProductTypeOption} from '../services/product-form.api.service';
-import {ProductFormService} from '../services/product-form.service';
+import {ProductDraftFormService} from '../services/product-draft-form.service';
 
 /**
  * The product wizard's data, its form and its writes.
@@ -38,7 +38,7 @@ import {ProductFormService} from '../services/product-form.service';
 @Injectable()
 export class ProductFormFacade {
   private readonly api = inject(ProductFormApi);
-  private readonly formService = inject(ProductFormService);
+  private readonly formService = inject(ProductDraftFormService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);

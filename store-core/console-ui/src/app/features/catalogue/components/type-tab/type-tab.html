@@ -48,22 +48,20 @@
       [subtitle]="creating() ? t('catalogue.types.newSubtitle') : (selected()?.code ?? null)"
     >
       @if (!creating() && !selected()) {
-        <div class="editor-empty">
-          <app-icon name="tag" />
-          <p>{{ t('catalogue.types.empty') }}</p>
+        <app-empty-state icon="tag" [message]="t('catalogue.types.empty')">
           <button class="secondary-action" type="button" (click)="facade.startCreate()">
             {{ t('catalogue.add.types') }}
           </button>
-        </div>
+        </app-empty-state>
       } @else {
         <form class="editor-body" [formGroup]="form" (ngSubmit)="facade.saveType()">
           <div class="editor-head">
-            <app-locale-chips
+            <app-locale-switcher
               [languages]="facade.languages()"
               [active]="facade.activeLanguage()"
-              [translated]="facade.translatedLanguages()"
+              [filled]="facade.translatedLanguages()"
               [label]="t('catalogue.copy.languageLabel')"
-              (picked)="facade.setLanguage($event)"
+              (activeChange)="facade.setLanguage($event)"
             />
 
             @if (!creating() && selected(); as type) {
@@ -97,30 +95,30 @@
           <hr class="divider" />
 
           <div class="field-grid">
-            <div class="field field-wide">
-              <label for="type-code">
-                {{ t('catalogue.code') }} <span class="required" aria-hidden="true">*</span>
-              </label>
-              <span class="control">
-                <input id="type-code" type="text" formControlName="code" dir="ltr" required />
-                <!--
-                  Three states on one control: checking, taken, free. The spinner is not decoration —
-                  the check is debounced, so without it the field looks like it has already passed.
-                -->
-                @if (form.controls.code.pending) {
-                  <span class="check-pending" role="status" [attr.aria-label]="t('catalogue.codeChecking')"></span>
-                } @else if (form.controls.code.hasError('codeTaken')) {
-                  <app-icon name="alertCircle" [size]="14" class="check-taken" />
-                } @else if (creating() && form.controls.code.valid && form.controls.code.value) {
-                  <app-icon name="checkCircle" [size]="14" class="check-free" />
-                }
-              </span>
-              @if (form.controls.code.hasError('codeTaken')) {
-                <p class="field-hint error">{{ t('catalogue.codeTaken') }}</p>
-              }
-              <p class="field-hint">{{ t('catalogue.types.codeHint') }}</p>
-              <app-field-error [control]="form.controls.code" [fallback]="t('catalogue.codeInvalid')" />
-            </div>
+            <!--
+              One uniqueness affordance for the whole console: checking, taken, free. The spinner is not
+              decoration — the check is debounced, so without it the field looks like it has already
+              passed. It used to be three hand-placed marks here, a fourth arrangement in create-store,
+              and a lone tick in the social links.
+            -->
+            <app-form-field
+              wide
+              [label]="t('catalogue.code')"
+              [control]="form.controls.code"
+              required
+              controlId="type-code"
+              [hint]="creating() ? t('catalogue.codeHintNew') : t('catalogue.codeHintExisting')"
+              [fallback]="form.controls.code.hasError('codeTaken') ? t('catalogue.codeTaken') : ''"
+            >
+              <app-text-field
+                id="type-code"
+                formControlName="code"
+                latin
+                [check]="codeCheck()"
+                [checkLabel]="t('catalogue.codeChecking')"
+                [invalid]="form.controls.code.hasError('codeTaken')"
+              />
+            </app-form-field>
 
             <div class="field field-wide">
               <app-toggle

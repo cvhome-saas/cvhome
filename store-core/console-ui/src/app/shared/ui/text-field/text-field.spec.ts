@@ -13,6 +13,7 @@ import {TextField, type UniquenessCheck} from './text-field';
       [latin]="latin()"
       [maxLength]="maxLength()"
       [check]="check()"
+      [id]="fieldId()"
       ariaLabel="SKU"
       revealLabel="Show password"
       checkLabel="Checking"
@@ -34,6 +35,7 @@ class Host {
   readonly latin = signal(false);
   readonly maxLength = signal<number | null>(null);
   readonly check = signal<UniquenessCheck>('idle');
+  readonly fieldId = signal<string | null>(null);
 }
 
 describe('TextField', () => {
@@ -49,6 +51,20 @@ describe('TextField', () => {
     host = fixture.componentInstance;
     fixture.detectChanges();
     element = fixture.nativeElement as HTMLElement;
+  });
+
+  /*
+   * A component with an `id` input gets that id in the DOM *as well as* on the input it draws, so
+   * the host and the control carried the same one: invalid HTML, and `<label for>` resolves to the
+   * host, which is not a labelable element, so the association silently does not happen. Four of
+   * the six controls with an `id` input had shipped with this.
+   */
+  it('gives its id to the control, not to the host', () => {
+    host.fieldId.set('sku-field');
+    fixture.detectChanges();
+
+    const carriers = Array.from(element.querySelectorAll('#sku-field')).map((node) => node.tagName);
+    expect(carriers).toEqual(['INPUT']);
   });
 
   it('writes the control value into the box', () => {

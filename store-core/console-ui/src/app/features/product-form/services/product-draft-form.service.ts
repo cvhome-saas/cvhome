@@ -1,15 +1,12 @@
 import {Injectable, inject} from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
-  ValidationErrors,
   Validators,
   type AsyncValidatorFn,
   type FormArray,
   type FormControl,
   type FormGroup,
 } from '@angular/forms';
-import {Observable, catchError, first, map, of, switchMap, timer} from 'rxjs';
 
 import type {ProductDraft} from '@models/products';
 import {
@@ -24,6 +21,7 @@ import {
   type LocalisedCopy,
 } from '@models/taxonomy';
 import {ProductFormApi} from './product-form.api.service';
+import {uniqueAsync} from '@shared/forms/unique-async';
 
 /** One language's copy on the product form. */
 export type ProductCopyForm = FormGroup<{
@@ -84,7 +82,7 @@ export const SKU_PATTERN = /^[A-Za-z0-9._-]+$/;
  * make the real ones hard to find — so they are removed, each with an entry in lessons.md.
  */
 @Injectable({providedIn: 'root'})
-export class ProductFormService {
+export class ProductDraftFormService {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ProductFormApi);
 
@@ -165,33 +163,21 @@ export class ProductFormService {
   /**
    * Whether a SKU is already taken in this store.
    *
-   * Same shape as the catalogue's code check and `create-store`'s name check: `timer` as the
-   * debounce, one call, a named error key, and `catchError → null` because a check that could not
-   * be made is not a check that failed.
+   * The pipeline is `@shared/forms/unique-async`, which the catalogue's code check and
+   * create-store's name check also use — three copies of the same five operators before that, each
+   * copied from the last.
    *
-   * Only runs while creating — the facade disables the control once the product exists, and Angular
-   * does not validate a disabled control.
+   * The `control.enabled` guard it carries is the one that matters here: the SKU is disabled once
+   * the product exists, but the form is filled before that happens, so the check starts on the
+   * product's own SKU and the server truthfully answers "yes, that exists". `disable()` nulls the
+   * errors present at the time and cannot null one still in flight, so every saved product carried
+   * a duplicate-SKU warning about itself.
    */
   private uniqueSku(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      const sku = String(control.value ?? '').trim();
-      if (!sku || !SKU_PATTERN.test(sku)) {
-        return of(null);
-      }
-      return timer(UNIQUENESS_DEBOUNCE_MS).pipe(
-        switchMap(() => this.api.skuTaken(sku)),
-        /*
-         * Guarded on `control.enabled` for the same reason the catalogue's code check is: the SKU is
-         * disabled once the product exists, but the form is filled before that happens, so the check
-         * starts on the product's own SKU and the server truthfully answers "yes, that exists".
-         * `disable()` nulls the errors present at the time and cannot null one still in flight, so
-         * every saved product carried a duplicate-SKU warning about itself.
-         */
-        map((taken) => (taken && control.enabled ? {skuTaken: true} : null)),
-        catchError(() => of(null)),
-        first(),
-      );
-    };
+    return uniqueAsync((sku) => this.api.skuTaken(sku), 'skuTaken', {
+      debounceMs: UNIQUENESS_DEBOUNCE_MS,
+      when: (sku) => SKU_PATTERN.test(sku),
+    });
   }
 
   /** Loads a draft into the form, replacing the copy rows outright. */

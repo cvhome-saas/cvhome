@@ -1734,17 +1734,20 @@
       "keywordsPlaceholder": "Add a keyword…"
     },
     "media": {
-      "title": "Images",
-      "subtitle": "The first image is the storefront thumbnail.",
-      "saveFirst": "Save the product first. Images are attached to a product, so there has to be one to attach them to.",
       "drop": "Drop an image, or browse",
+      "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free.",
       "image": "Product image",
-      "storefrontThumbnail": "Storefront thumbnail",
-      "view": "View image {position} full size",
-      "moveUp": "Move image {position} earlier",
       "moveDown": "Move image {position} later",
+      "moveUp": "Move image {position} earlier",
       "remove": "Remove image {position}",
-      "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free."
+      "removeAccept": "Remove image",
+      "removeConfirm": "The image is deleted from the product. Uploading it again means finding the file.",
+      "removeTitle": "Remove this image?",
+      "saveFirst": "Save the product first. Images are attached to a product, so there has to be one to attach them to.",
+      "storefrontThumbnail": "Storefront thumbnail",
+      "subtitle": "The first image is the storefront thumbnail.",
+      "title": "Images",
+      "view": "View image {position} full size"
     },
     "pricing": {
       "title": "Price and stock",

@@ -1,52 +1,14 @@
-
-
-.language-track {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .25rem;
-  padding: .2rem;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  background: var(--muted);
-}
-
-.language {
-  padding: .35rem .7rem;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: none;
-  color: var(--foreground-quiet);
-  font-size: var(--text-2xs);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color var(--default-transition-duration),
-    color var(--default-transition-duration);
-}
-
-.language:hover {
-  color: var(--foreground);
-}
-
-.language.current {
-  background: var(--card);
-  color: var(--foreground-strong);
-}
-
-.language:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
-}
+/*
+ * What is left after the language strip moved.
+ *
+ * The strip was its own radiogroup here, keyed by *index* rather than language code, with no
+ * arrow keys and no mark for a language that already holds copy — three differences from the
+ * identical control in the catalogue. Both are `app-locale-switcher` now.
+ */
 
 .field-hint.warn {
   display: flex;
   align-items: center;
   gap: .3rem;
   color: var(--chart-4-foreground);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .language {
-    transition: none;
-  }
 }

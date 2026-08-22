@@ -14,14 +14,13 @@
           <fieldset class="category-picker">
             <legend class="sr-only">{{ t('productForm.organize.categories') }}</legend>
             @for (category of facade.categories(); track category.id) {
-              <label class="category" [style.--depth]="category.depth">
-                <input
-                  type="checkbox"
-                  [checked]="selected().has(category.id)"
-                  (change)="facade.toggleCategory(category.id)"
-                />
-                <span dir="auto">{{ category.label }}</span>
-              </label>
+              <app-checkbox
+                class="category"
+                [label]="category.label"
+                [depth]="category.depth"
+                [checked]="selected().has(category.id)"
+                (checkedChange)="facade.toggleCategory(category.id)"
+              />
             }
           </fieldset>
 
