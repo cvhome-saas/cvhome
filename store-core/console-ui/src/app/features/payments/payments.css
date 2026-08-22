@@ -62,12 +62,39 @@ app-kpi-grid {
 }
 
 /*
- * The external reference the gateway or the bank gave, under the console's own. Latin data that
- * must not reorder inside an Arabic page.
+ * The external reference, under the console's own.
+ *
+ * It used to be a bare `<small>` — an unlabelled scrap of text under a long UUID, which read as
+ * noise rather than as the one value in the row a merchant can reconcile against their statement.
+ * A caption says what it is and the value is set as a reference token: monospaced, in a quiet chip,
+ * so it is legible as data and does not compete with the copy-field above it.
  */
 .transaction-external {
-  overflow: hidden;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+  margin-block-start: 0.1rem;
+}
+
+.transaction-external-label {
+  flex: none;
   color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Latin data that must not reorder inside an Arabic page. */
+.transaction-external-value {
+  overflow: hidden;
+  min-width: 0;
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--secondary-foreground);
+  font-family: ui-monospace, monospace;
   font-size: var(--text-3xs);
   text-overflow: ellipsis;
   white-space: nowrap;

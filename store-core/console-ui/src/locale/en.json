@@ -1927,6 +1927,8 @@
       "close": "Close the order summary",
       "items": "Items"
     },
-    "viewOrderFor": "Open a summary of order {{order}}"
+    "viewOrderFor": "Open a summary of order {{order}}",
+    "externalRef": "Ref",
+    "externalRefHint": "The reference this payment is known by outside the console — from the bank statement or the gateway."
   }
 }

@@ -81,8 +81,21 @@
                 <app-table-row>
                   <div class="cell-transaction" role="cell" [attr.data-label]="t('payments.column.transaction')">
                     <app-copy-field [value]="row.internalRef" [label]="t('payments.column.transaction')" />
+                    <!--
+                      The reference the *outside world* knows this payment by — the number an
+                      operator typed off a bank statement when confirming a transfer, or the id the
+                      gateway settled it under. It is the only value in the row a merchant can match
+                      against their own records, and unlabelled it read as a stray word.
+                    -->
                     @if (row.transactionNo; as external) {
-                      <small class="transaction-external" dir="auto">{{ external }}</small>
+                      <span class="transaction-external">
+                        <span class="transaction-external-label">{{ t('payments.externalRef') }}</span>
+                        <span
+                          class="transaction-external-value"
+                          [title]="t('payments.externalRefHint')"
+                          dir="auto"
+                        >{{ external }}</span>
+                      </span>
                     }
                   </div>
 

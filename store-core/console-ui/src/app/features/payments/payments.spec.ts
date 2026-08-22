@@ -283,6 +283,30 @@ describe('Payments', () => {
     expect(dialog.textContent).toContain('Processing');
   }));
 
+  /*
+   * The one value in the row a merchant can match against their own statement. Unlabelled it read
+   * as a stray word under a UUID.
+   */
+  it('names the external reference rather than printing it bare', fakeAsync(() => {
+    api.ledger = [{...row(1, 'PAID'), transactionNo: 'ACME-2291'}];
+    const element = load();
+    clickTab(element, 'All');
+
+    const external = element.querySelector('.transaction-external')!;
+    expect(external.querySelector('.transaction-external-label')!.textContent!.trim()).toBe('Ref');
+    expect(external.querySelector('.transaction-external-value')!.textContent!.trim()).toBe('ACME-2291');
+    expect(external.querySelector('.transaction-external-value')!.getAttribute('title')).toContain('bank statement');
+  }));
+
+  /* A transfer awaiting confirmation has no external reference yet, and must not show an empty chip. */
+  it('shows no reference line before one exists', fakeAsync(() => {
+    api.ledger = [{...row(1, 'PENDING'), transactionNo: null}];
+    const element = load();
+    clickTab(element, 'All');
+
+    expect(element.querySelector('.transaction-external')).toBeNull();
+  }));
+
   /* The icon is what tells the operator the reference does anything at all. */
   it('marks the order reference as something that opens', fakeAsync(() => {
     const element = load();
