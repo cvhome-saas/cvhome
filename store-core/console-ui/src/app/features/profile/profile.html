@@ -1,0 +1,98 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context" />
+
+  <div class="page-body">
+    <app-panel class="account" padded [title]="t('profile.account.title')">
+      <div class="identity">
+        <span class="avatar" aria-hidden="true">{{ facade.initials() }}</span>
+        <div class="identity-text">
+          <!-- The username, because it is the only human-readable identity the platform carries. -->
+          <strong dir="auto">{{ facade.userName() }}</strong>
+          <span>{{ facade.roleLabel() }}</span>
+        </div>
+      </div>
+
+      <dl class="facts">
+        <div>
+          <dt>{{ t('profile.account.userName') }}</dt>
+          <dd dir="auto">{{ facade.userName() }}</dd>
+        </div>
+        <div>
+          <dt>{{ t('profile.account.roles') }}</dt>
+          <dd class="role-badges">
+            @for (role of facade.roles(); track role) {
+              <app-badge tone="blue" shape="square">{{ facade.labelFor(role) }}</app-badge>
+            } @empty {
+              <span>—</span>
+            }
+          </dd>
+        </div>
+      </dl>
+
+      <!--
+        Says plainly why there is no name, email or photo here, rather than showing empty fields
+        that read as "you have not filled these in". See lessons.md, "Users — the JWT carries no
+        user id" and "Users — the ID token requests only the `openid` scope".
+      -->
+      <app-notice-bar icon="info" tone="blue" [message]="t('profile.account.limited')" />
+    </app-panel>
+
+    <app-panel class="preferences" padded [title]="t('profile.preferences.title')" [subtitle]="t('profile.preferences.subtitle')">
+      <fieldset class="choice">
+        <legend>{{ t('profile.preferences.language') }}</legend>
+        <div class="choice-options">
+          @for (locale of facade.localeOptions; track locale.code) {
+            <button
+              class="choice-option"
+              type="button"
+              [attr.aria-pressed]="locale.code === facade.activeLocale()"
+              (click)="facade.selectLocale(locale.code)"
+            >
+              <span class="choice-label" dir="auto">{{ facade.localeLabel(locale) }}</span>
+              @if (locale.code === facade.activeLocale()) {
+                <app-icon name="check" />
+              }
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset class="choice">
+        <legend>{{ t('profile.preferences.theme') }}</legend>
+        <div class="choice-options">
+          @for (option of facade.themeOptions; track option.id) {
+            <button
+              class="choice-option"
+              type="button"
+              [attr.aria-pressed]="option.id === facade.activeTheme().id"
+              (click)="facade.selectTheme(option.id)"
+            >
+              <span class="choice-text">
+                <span class="choice-label">{{ facade.themeLabel(option) }}</span>
+                <span class="choice-hint">{{ facade.themeHint(option) }}</span>
+              </span>
+              @if (option.id === facade.activeTheme().id) {
+                <app-icon name="check" />
+              }
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <!--
+        Both preferences live in this browser and nowhere else. There is no per-user document to
+        put them in — see lessons.md, "Shell — no user-preferences endpoint" — so saying so is the
+        difference between a preference and a promise.
+      -->
+      <p class="field-hint">{{ t('profile.preferences.thisBrowserOnly') }}</p>
+    </app-panel>
+
+    <app-panel class="billing" padded [title]="t('profile.billing.title')" [subtitle]="t('profile.billing.subtitle')">
+      <!-- Already built, per store, at /subscription. Linked rather than drawn a second time. -->
+      <button class="secondary-action" type="button" (click)="openBilling()">
+        <app-icon name="creditCard" />
+        {{ t('profile.billing.action') }}
+      </button>
+    </app-panel>
+  </div>
+</ng-container>

@@ -148,6 +148,25 @@ export const routes: Routes = [
   },
   {
     /*
+     * The operator's own account.
+     *
+     * `requiresStore` is deliberately absent, and it is the only console route without it: a
+     * personal page is not a reading of a store, and an account that has not created one yet still
+     * has a language and a theme to set.
+     */
+    path: 'profile',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/profile/profile').then((page) => page.Profile),
+        data: {titleKey: 'route.profile.title', breadcrumbKey: 'shell.breadcrumb.profile'},
+      },
+    ],
+  },
+  {
+    /*
      * Accepting an invitation, and the one console page that cannot sit inside the console shell.
      *
      * An invitee is authenticated and is **not yet a member of the organization**, so `consoleContext`

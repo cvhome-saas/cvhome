@@ -68,6 +68,9 @@
     },
     "acceptInvitation": {
       "title": "Join an organization"
+    },
+    "profile": {
+      "title": "Your account"
     }
   },
   "notFound": {
@@ -1150,7 +1153,8 @@
       "newProduct": "New product",
       "productForm": "Product",
       "payments": "Payments",
-      "users": "Users"
+      "users": "Users",
+      "profile": "Account"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1162,7 +1166,6 @@
     },
     "profile": {
       "profile": "Profile",
-      "settings": "Settings",
       "logOut": "Log out",
       "loading": "Signing in…"
     },
@@ -2110,6 +2113,30 @@
       "noToken": "This link is missing its invitation token, so there is nothing to accept.",
       "retry": "Try again",
       "hint": "It may have already been used, been revoked, or expired. Ask whoever invited you to send a new one."
+    }
+  },
+  "profile": {
+    "heading": {
+      "title": "Your account",
+      "context": "How you are signed in, and how the console looks to you"
+    },
+    "account": {
+      "title": "Account",
+      "userName": "Username",
+      "roles": "Roles",
+      "limited": "The console can only see your username and your roles. Your name and email address live in the sign-in service and are not sent to it yet, so there is nothing here to edit."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "subtitle": "How the console looks and reads.",
+      "language": "Language",
+      "theme": "Theme",
+      "thisBrowserOnly": "These are remembered in this browser only. There is nowhere to keep them against your account yet, so they will not follow you to another device."
+    },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Plans and invoices belong to a store rather than to you.",
+      "action": "Open billing"
     }
   }
 }

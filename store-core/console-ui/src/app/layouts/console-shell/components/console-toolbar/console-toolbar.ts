@@ -139,8 +139,15 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
                 <span>{{ email }}</span>
               }
             </header>
-            <button type="button"><app-icon name="user" />{{ t('shell.profile.profile') }}</button>
-            <button type="button"><app-icon name="cog" />{{ t('shell.profile.settings') }}</button>
+            <a routerLink="/profile" (click)="shell.closeMenus()">
+              <app-icon name="user" />{{ t('shell.profile.profile') }}
+            </a>
+            <!--
+              The "Settings" button beside this one is gone rather than routed. There is no
+              console-wide settings page and there will not be: settings are per store and live at
+              /store-management. A control that goes nowhere is the same promise the notification
+              bell was.
+            -->
             <hr />
             <a class="sign-out" routerLink="/external-logout-link"><app-icon name="signOut" />{{ t('shell.profile.logOut') }}</a>
           </div>
