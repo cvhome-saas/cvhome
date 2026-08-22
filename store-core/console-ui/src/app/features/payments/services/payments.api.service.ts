@@ -1,6 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, forkJoin, map} from 'rxjs';
 
+import {OrdersService} from '@api/orders/orders.service';
 import {PaymentService} from '@api/payment/payment.service';
 import {optionalOne} from '@core/http/optional';
 import type {PageRequest, PageT} from '@core/table/table.types';
@@ -12,6 +13,7 @@ import {
   type PaymentTransaction,
   type TransactionQuery,
 } from '@models/payment';
+import type {ReadableOrder} from '@models/checkout';
 import type {PaymentTab, TransactionRow, TransactionsSnapshot} from '@models/transactions';
 import type {DateRangeValue} from '@shared/ui/date-range-picker/date-range-picker';
 
@@ -47,6 +49,7 @@ export interface PaymentsQuery {
 @Injectable({providedIn: 'root'})
 export class PaymentsApi {
   private readonly payments = inject(PaymentService);
+  private readonly orders = inject(OrdersService);
 
   /**
    * The four KPI counts over a period.
@@ -75,6 +78,19 @@ export class PaymentsApi {
     return this.payments
       .transactions({...toTransactionQuery(query), page: query.page.page, count: query.page.count})
       .pipe(map((page): TransactionsSnapshot => ({page: {...page, content: page.content.map(toRow)}})));
+  }
+
+  /**
+   * The order a transaction paid for, for the summary dialog.
+   *
+   * Returned as the wire shape rather than a formatted view model: the dialog's money, dates and
+   * status label all have to re-read when the operator switches language, and a string formatted
+   * here would keep the language it was mapped in. The facade shapes it inside a `computed`.
+   *
+   * The detail endpoint, not the list: only it populates `products` and `customer`.
+   */
+  loadOrder(orderId: number): Observable<ReadableOrder> {
+    return this.orders.get(orderId);
   }
 
   approve(internalRef: string, approval: PaymentApproval): Observable<void> {

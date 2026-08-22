@@ -78,8 +78,17 @@ app-kpi-grid {
   min-width: 0;
 }
 
+/*
+ * The order number, as an affordance rather than a label.
+ *
+ * The icon carries the whole message: without it the reference reads as data and nothing suggests
+ * it opens anything. It sits at 55% until the row is hovered or the control focused, so a column of
+ * them does not turn into a column of icons.
+ */
 .order-ref {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0;
   border: 0;
   background: none;
@@ -91,8 +100,25 @@ app-kpi-grid {
   unicode-bidi: plaintext;
 }
 
-.order-ref:hover {
+.order-ref-icon {
+  color: var(--foreground-subtle);
+  opacity: 0.55;
+  transition:
+    opacity var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.7rem;
+}
+
+.order-ref:hover,
+.order-ref:focus-visible {
   color: var(--primary-emphasis);
+}
+
+.order-ref:hover .order-ref-icon,
+.order-ref:focus-visible .order-ref-icon,
+app-table-row:hover .order-ref-icon {
+  color: var(--primary-emphasis);
+  opacity: 1;
 }
 
 /* A reference that is not an order id: shown, not linked. */

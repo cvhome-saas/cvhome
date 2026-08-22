@@ -89,13 +89,27 @@
                   <div class="cell-order" role="cell" [attr.data-label]="t('payments.column.order')">
                     @if (row.orderId !== null) {
                       <!--
-                        The link exists because `requestRef` holds the order id — a checkout
-                        convention, not a contract. A reference that does not read as an id is shown
-                        as itself rather than linked somewhere that would 404. See lessons.md,
-                        "Payments — the link from a transaction to its order is a convention".
+                        Opens a summary of the order rather than navigating: the operator is here to
+                        judge a payment, and leaving the ledger to answer "what did this pay for"
+                        loses their filter, their page and their place.
+
+                        The icon is the point of it. A bare `#10482` reads as a label, and the old
+                        version gave no sign it did anything at all until you hovered it.
+
+                        There is a link at all only because `requestRef` holds the order id — a
+                        checkout convention, not a contract. A reference that does not read as an id
+                        is shown as itself rather than opening something that would 404. See
+                        lessons.md, "Payments — the link from a transaction to its order is a
+                        convention".
                       -->
-                      <button class="order-ref" type="button" (click)="openOrder(row)">
-                        #{{ row.orderId }}
+                      <button
+                        class="order-ref"
+                        type="button"
+                        [attr.aria-label]="t('payments.viewOrderFor', {order: row.orderId})"
+                        (click)="facade.openOrderSummary(row)"
+                      >
+                        <span>#{{ row.orderId }}</span>
+                        <app-icon name="externalLink" class="order-ref-icon" />
                       </button>
                     } @else {
                       <span class="order-ref-plain" dir="auto">{{ row.reference || '—' }}</span>
@@ -177,6 +191,24 @@
       </div>
     }
   </app-busy-overlay>
+
+  <app-order-summary-dialog
+    [open]="facade.summaryFor() !== null"
+    [reference]="facade.summaryFor()?.reference ?? ''"
+    [summary]="facade.summary()"
+    [loading]="facade.summaryLoading()"
+    [error]="facade.summaryError()"
+    [title]="t('payments.summary.title')"
+    [loadingLabel]="t('payments.summary.loading')"
+    [errorLabel]="t('payments.summary.failed')"
+    [customerLabel]="t('payments.summary.customer')"
+    [placedLabel]="t('payments.summary.placed')"
+    [itemsLabel]="t('payments.summary.noItems')"
+    [totalLabel]="t('payments.summary.total')"
+    [quantityLabel]="t('payments.summary.quantity')"
+    [closeLabel]="t('payments.summary.close')"
+    (dismissed)="facade.closeOrderSummary()"
+  />
 
   <app-approve-dialog
     [open]="approving() !== null"

@@ -74,7 +74,20 @@ export class ApproveDialog {
     }
   }
 
+  /**
+   * Asks the parent to close, rather than closing the element and hoping the parent notices.
+   *
+   * The dialog is driven by `open`, so the state has to lead: emitting `dismissed` clears it and the
+   * effect closes the element on the way back down. Closing imperatively here instead left the
+   * parent believing the dialog was still open — `open` stayed `true`, the effect had no new value
+   * to react to, and the dialog could never be opened a second time. Found in QA; it opened once
+   * and then the order reference did nothing.
+   *
+   * `(close)` and `(cancel)` on the element stay wired for the dismissals the platform owns —
+   * Escape and the backdrop — and emitting twice is harmless, since clearing a cleared signal is a
+   * no-op.
+   */
   protected close(): void {
-    this.dialog().nativeElement.close();
+    this.dismissed.emit();
   }
 }

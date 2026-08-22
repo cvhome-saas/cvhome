@@ -1,0 +1,205 @@
+/*
+ * The order behind a transaction, as a modal summary.
+ *
+ * Shares `confirm-dialog`'s surface and backdrop so the three dialogs on this page read as one
+ * family, and differs where it should: wider, because it holds a list rather than a sentence, and
+ * it *pops* rather than rising — the user asked for a popup, and a modal opened from a table row
+ * reads better scaling out of the page than sliding up it.
+ */
+.summary {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  inline-size: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+.summary::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.summary-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+
+.summary-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.summary-heading {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.summary-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+/* An order number is Latin data that must not reorder inside an Arabic page. */
+.summary-ref {
+  color: var(--foreground-subtle);
+  font-size: var(--text-xs);
+  unicode-bidi: plaintext;
+}
+
+.summary-close {
+  flex: none;
+}
+
+.summary-note {
+  margin: 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.summary-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding-block: 0.85rem;
+  border-block: 1px solid var(--border);
+}
+
+.summary-facts div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.summary-facts dt {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.summary-facts dd {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  min-width: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+}
+
+.summary-facts strong {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A buyer's own address, laid out by its own direction inside a page that may be RTL. */
+.summary-email {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.summary-lines {
+  display: grid;
+  gap: 0.55rem;
+  /* Long orders scroll inside the box rather than growing the dialog past the viewport. */
+  max-block-size: 15rem;
+  margin: 0;
+  padding-inline-start: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.summary-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: var(--text-xs);
+}
+
+.summary-line-name {
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-line-qty {
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+}
+
+.summary-line-total {
+  color: var(--foreground-strong);
+  font-weight: 600;
+}
+
+.summary-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block-start: 0.85rem;
+  border-block-start: 1px solid var(--border);
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.summary-total strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+/*
+ * The popup. Dialogs animate in the top layer, which `display` transitions cannot reach without
+ * `allow-discrete`; without it the box would appear fully formed. A scale from 92% with a slight
+ * lift reads as the row opening out, which is what it is. Off entirely for reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @starting-style {
+    .summary[open] {
+      opacity: 0;
+      transform: scale(0.92) translateY(0.75rem);
+    }
+  }
+
+  .summary[open] {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    transition:
+      opacity 0.22s ease,
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .summary::backdrop {
+    animation: summary-veil 0.22s ease both;
+  }
+}
+
+@keyframes summary-veil {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

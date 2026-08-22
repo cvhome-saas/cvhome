@@ -4,6 +4,7 @@ import {Observable, Subject, of, throwError} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
+import type {ReadableOrder} from '@models/checkout';
 import type {PaymentStatus} from '@models/payment';
 import type {TransactionRow, TransactionsSnapshot} from '@models/transactions';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
@@ -47,6 +48,7 @@ class FakePaymentsApi {
   readonly requests: PaymentsQuery[] = [];
   readonly approvals: {ref: string; transactionNo: string}[] = [];
   readonly rejections: string[] = [];
+  readonly orderLoads: number[] = [];
   /** When set, list requests hang until `resolve()` — used to observe the loading state. */
   pending: Subject<TransactionsSnapshot> | null = null;
   failure = false;
@@ -60,6 +62,21 @@ class FakePaymentsApi {
       return throwError(() => new Error('Unable to load payments.'));
     }
     return this.pending ?? of(this.snapshot(query));
+  }
+
+  loadOrder(orderId: number): Observable<ReadableOrder> {
+    this.orderLoads.push(orderId);
+    return of({
+      id: orderId,
+      orderStatus: 'PROCESSING' as const,
+      currency: 'SAR',
+      datePurchased: '2026-08-18T09:00:00Z',
+      customer: {firstName: 'Maya', lastName: 'Chen', emailAddress: 'maya@example.com'},
+      products: [
+        {id: 1, productName: 'Chanel Ballerinas', orderedQuantity: 2, subTotal: '1700.00'},
+      ],
+      total: {id: 3, code: 'order.total.total', module: 'total', value: 1700},
+    });
   }
 
   loadCounts(): Observable<TransactionCounts> {
@@ -243,14 +260,91 @@ describe('Payments', () => {
 
   /* ------------------------------------------------------------------ the order link ---- */
 
-  it('links a transaction to the order its reference names', fakeAsync(() => {
+  /*
+   * A summary rather than a navigation: leaving the ledger to answer "what did this pay for" would
+   * cost the operator their filter, their page and their place.
+   */
+  it('opens a summary of the order the reference names, without leaving the page', fakeAsync(() => {
     const element = load();
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate');
 
     element.querySelector<HTMLButtonElement>('.order-ref')!.click();
+    settle();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/orders', 10481]);
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(api.orderLoads).toEqual([10481]);
+
+    const dialog = element.querySelector<HTMLDialogElement>('dialog.summary')!;
+    expect(dialog.open).toBe(true);
+    expect(dialog.textContent).toContain('#10481');
+    expect(dialog.textContent).toContain('Maya Chen');
+    expect(dialog.textContent).toContain('Chanel Ballerinas');
+    expect(dialog.textContent).toContain('Processing');
+  }));
+
+  /* The icon is what tells the operator the reference does anything at all. */
+  it('marks the order reference as something that opens', fakeAsync(() => {
+    const element = load();
+
+    const trigger = element.querySelector<HTMLButtonElement>('.order-ref')!;
+    expect(trigger.querySelector('.order-ref-icon')).not.toBeNull();
+    expect(trigger.getAttribute('aria-label')).toContain('10481');
+  }));
+
+  /*
+   * The regression QA found: it opened once, and after that the order reference did nothing. The
+   * dialog closed itself imperatively, so the parent's `open` stayed true and the effect had no new
+   * value to react to.
+   */
+  it('reopens after being closed', fakeAsync(() => {
+    const element = load();
+    const trigger = () => element.querySelector<HTMLButtonElement>('.order-ref')!;
+    const dialog = () => element.querySelector<HTMLDialogElement>('dialog.summary')!;
+
+    trigger().click();
+    settle();
+    expect(dialog().open).toBe(true);
+
+    dialog().querySelector<HTMLButtonElement>('.summary-close')!.click();
+    settle();
+    expect(dialog().open).toBe(false);
+
+    trigger().click();
+    settle();
+    expect(dialog().open).toBe(true);
+  }));
+
+  /* Escape and the backdrop are the platform's dismissals, and must clear the state too. */
+  it('clears its state when the platform closes it', fakeAsync(() => {
+    const element = load();
+    element.querySelector<HTMLButtonElement>('.order-ref')!.click();
+    settle();
+
+    const dialog = element.querySelector<HTMLDialogElement>('dialog.summary')!;
+    dialog.dispatchEvent(new Event('cancel'));
+    settle();
+
+    expect(dialog.open).toBe(false);
+    element.querySelector<HTMLButtonElement>('.order-ref')!.click();
+    settle();
+    expect(dialog.open).toBe(true);
+  }));
+
+  /* No approve, no reject, no invoice — the summary answers a question, it does not act. */
+  it('offers no action on the summary but a way to close it', fakeAsync(() => {
+    const element = load();
+    element.querySelector<HTMLButtonElement>('.order-ref')!.click();
+    settle();
+
+    const dialog = element.querySelector<HTMLDialogElement>('dialog.summary')!;
+    const buttons = [...dialog.querySelectorAll('button')];
+    expect(buttons.length).toBe(1);
+    expect(buttons[0].getAttribute('aria-label')).toBe('Close the order summary');
+
+    buttons[0].click();
+    settle();
+    expect(dialog.open).toBe(false);
   }));
 
   /*

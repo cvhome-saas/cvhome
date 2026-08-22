@@ -3,7 +3,6 @@ import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoDatePipe, TranslocoLocaleService} from '@jsverse/transloco-locale';
 
-import type {TransactionRow} from '@models/transactions';
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
@@ -23,6 +22,7 @@ import {SearchBox} from '@shared/ui/search-box/search-box';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {ApproveDialog} from './components/approve-dialog/approve-dialog';
+import {OrderSummaryDialog} from './components/order-summary-dialog/order-summary-dialog';
 import {PaymentsFacade, PAGE_SIZE} from './facades/payments.facade';
 
 /** The ledger's columns. Widths are grid tracks, read straight into the row layout. */
@@ -63,6 +63,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
     Icon,
     KpiGrid,
     LoadError,
+    OrderSummaryDialog,
     PageHeader,
     Pagination,
     Panel,
@@ -146,12 +147,6 @@ export class Payments {
     const format = (date: Date) => this.localeFormat.localizeDate(date, undefined, {dateStyle: 'medium'});
     return `${format(from)} – ${format(to)}`;
   });
-
-  protected openOrder(row: TransactionRow): void {
-    if (row.orderId !== null) {
-      this.router.navigate(['/orders', row.orderId]);
-    }
-  }
 
   protected openGatewaySettings(): void {
     this.router.navigate(['/store-management', 'payments']);

@@ -106,3 +106,31 @@ export interface TransactionKpiSource {
 export interface TransactionsSnapshot {
   readonly page: PageT<TransactionRow>;
 }
+
+/** One line of the order, as the summary dialog prints it. */
+export interface OrderSummaryLine {
+  readonly id: number;
+  readonly name: string;
+  readonly quantity: number;
+  readonly lineTotal: string;
+}
+
+/**
+ * An order, small enough to read without leaving the ledger.
+ *
+ * Deliberately a *summary* and not the detail page in a box: no status composer, no invoice, no
+ * address editing, no payment panel — the operator is already looking at the payment. It answers
+ * "what did this pay for", which is the question the order number in a transaction row raises.
+ */
+export interface OrderSummary {
+  readonly id: number;
+  readonly reference: string;
+  readonly status: string;
+  readonly tone: Tone;
+  readonly placedOn: string | null;
+  readonly customer: string;
+  readonly email: string;
+  readonly lines: readonly OrderSummaryLine[];
+  readonly itemCount: number;
+  readonly total: string;
+}

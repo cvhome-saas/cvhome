@@ -8,9 +8,13 @@ import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.f
 import {humanizeStatus} from '@models/orders';
 import type {PaymentStatus} from '@models/payment';
 import {PAYMENT_TYPE_LABEL_KEY, isPaymentType} from '@models/store-settings';
+import {STATUS_TONE} from '@models/orders';
+import {parseAmount, type ReadableOrder} from '@models/checkout';
 import {
   PAYMENT_TABS,
   TRANSACTION_TONE,
+  type OrderSummary,
+  type OrderSummaryLine,
   type PaymentTab,
   type TransactionKpiSource,
   type TransactionRow,
@@ -305,6 +309,82 @@ export class PaymentsFacade {
   reload(): void {
     this.ledger.reload();
   }
+
+  /* ------------------------------------------------------------- the order summary ---- */
+
+  /** The order whose summary is open, or null. Drives both the fetch and the dialog. */
+  readonly summaryFor = signal<{id: number; reference: string} | null>(null);
+
+  private readonly orderSummary = snapshot(
+    () => this.summaryFor()?.id,
+    (orderId) => this.api.loadOrder(orderId),
+  );
+
+  readonly summaryLoading = this.orderSummary.isLoading;
+  readonly summaryError = this.orderSummary.error;
+
+  /**
+   * The order, shaped for the dialog.
+   *
+   * A `computed` over the loaded order rather than a mapping done once: money, the date and the
+   * status label all have to re-read when the operator switches language, and a string mapped at
+   * fetch time would keep whichever language was active then.
+   */
+  readonly summary = computed<OrderSummary | null>(() => {
+    this.transloco.activeLang();
+    const order = this.orderSummary.value();
+    if (!order || this.summaryFor() === null) {
+      return null;
+    }
+    return this.toSummary(order);
+  });
+
+  openOrderSummary(row: TransactionRow): void {
+    if (row.orderId !== null) {
+      this.summaryFor.set({id: row.orderId, reference: `#${row.orderId}`});
+    }
+  }
+
+  closeOrderSummary(): void {
+    this.summaryFor.set(null);
+  }
+
+  private toSummary(order: ReadableOrder): OrderSummary {
+    const person = order.customer ?? order.billing;
+    const name = [person?.firstName, person?.lastName].filter(Boolean).join(' ').trim();
+    const email = order.customer?.emailAddress ?? order.billing?.email ?? '';
+    const currency = order.currency ?? null;
+    const lines: readonly OrderSummaryLine[] = (order.products ?? []).map((product, index) => ({
+      id: product.id ?? index,
+      name: product.productName ?? product.sku ?? '—',
+      quantity: product.orderedQuantity ?? 0,
+      lineTotal: this.money.format(parseAmount(product.subTotal), currency),
+    }));
+
+    return {
+      id: order.id ?? 0,
+      reference: order.id === undefined ? '—' : `#${order.id}`,
+      status: this.statusLabels.label(order.orderStatus),
+      tone: order.orderStatus ? STATUS_TONE[order.orderStatus] : 'slate',
+      placedOn: order.datePurchased || null,
+      customer: name || email || '—',
+      email,
+      lines,
+      itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
+      /*
+       * Both figures are formatted from their amounts, and the server's own `text` is deliberately
+       * ignored for both.
+       *
+       * A line has no usable `text` and the grand total does, so honouring it — which is what the
+       * orders page does — put `SAR8,500.00` on the line and `SAR 8,500.00` in the footer of the
+       * same small box. Two money figures an inch apart cannot be spaced differently. Formatting
+       * both from the amount also makes them locale-correct, which the server's string is not.
+       */
+      total: this.money.format(order.total?.value ?? null, currency),
+    };
+  }
+
+  /* ------------------------------------------------------------------- the writes ---- */
 
   askToApprove(row: TransactionRow): void {
     this.approving.set({internalRef: row.internalRef, reference: row.reference});

@@ -1,9 +1,11 @@
 import {TestBed} from '@angular/core/testing';
 import {Observable, of, throwError} from 'rxjs';
 
+import {OrdersService} from '@api/orders/orders.service';
 import {PaymentService} from '@api/payment/payment.service';
 import type {PageT} from '@core/table/table.types';
 import type {PaymentApproval, PaymentStatus, PaymentTransaction, TransactionQuery} from '@models/payment';
+import type {ReadableOrder} from '@models/checkout';
 import type {TransactionsSnapshot} from '@models/transactions';
 import {PaymentsApi, type PaymentsQuery, type TransactionCounts} from './payments.api.service';
 
@@ -67,6 +69,15 @@ class FakePaymentService {
   }
 }
 
+class FakeOrdersService {
+  loaded: (number | string)[] = [];
+
+  get(orderId: number | string): Observable<ReadableOrder> {
+    this.loaded.push(orderId);
+    return of({id: Number(orderId)});
+  }
+}
+
 function query(overrides: Partial<PaymentsQuery> = {}): PaymentsQuery {
   return {
     tab: 'all',
@@ -81,11 +92,17 @@ function query(overrides: Partial<PaymentsQuery> = {}): PaymentsQuery {
 describe('PaymentsApi', () => {
   let api: PaymentsApi;
   let payments: FakePaymentService;
+  let orders: FakeOrdersService;
 
   beforeEach(() => {
     payments = new FakePaymentService();
+    orders = new FakeOrdersService();
     TestBed.configureTestingModule({
-      providers: [PaymentsApi, {provide: PaymentService, useValue: payments}],
+      providers: [
+        PaymentsApi,
+        {provide: PaymentService, useValue: payments},
+        {provide: OrdersService, useValue: orders},
+      ],
     });
     api = TestBed.inject(PaymentsApi);
   });
@@ -267,5 +284,11 @@ describe('PaymentsApi', () => {
   it('rejects against the internal ref', () => {
     api.reject(TRANSACTION.internalRef).subscribe();
     expect(payments.rejections).toEqual([TRANSACTION.internalRef]);
+  });
+
+  /* The detail endpoint, not the list: only it populates `products` and `customer`. */
+  it('reads the order behind a transaction for the summary', () => {
+    api.loadOrder(10482).subscribe();
+    expect(orders.loaded).toEqual([10482]);
   });
 });

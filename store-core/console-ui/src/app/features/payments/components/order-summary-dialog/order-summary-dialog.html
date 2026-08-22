@@ -1,0 +1,58 @@
+<!-- close/cancel are the platform's own dismissal signals: the backdrop and Escape. -->
+<dialog #dialog class="summary" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <div class="summary-body">
+    <header class="summary-head">
+      <div class="summary-heading">
+        <h2 class="summary-title">{{ title() }}</h2>
+        <span class="summary-ref" dir="auto">{{ reference() }}</span>
+      </div>
+      @if (summary(); as order) {
+        <app-badge [tone]="order.tone" shape="square">{{ order.status }}</app-badge>
+      }
+      <button class="icon-action summary-close" type="button" [attr.aria-label]="closeLabel()" (click)="close()">
+        <app-icon name="x" />
+      </button>
+    </header>
+
+    @if (error()) {
+      <p class="summary-note" role="alert">{{ errorLabel() }}</p>
+    } @else if (loading() && !summary()) {
+      <p class="summary-note">{{ loadingLabel() }}</p>
+    } @else if (summary(); as order) {
+      <dl class="summary-facts">
+        <div>
+          <dt>{{ customerLabel() }}</dt>
+          <dd>
+            <strong>{{ order.customer }}</strong>
+            @if (order.email) {
+              <small class="summary-email">{{ order.email }}</small>
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ placedLabel() }}</dt>
+          <dd>{{ order.placedOn ? (order.placedOn | translocoDate: {dateStyle: 'medium', timeStyle: 'short'}) : '—' }}</dd>
+        </div>
+      </dl>
+
+      @if (order.lines.length) {
+        <ul class="summary-lines">
+          @for (line of order.lines; track line.id) {
+            <li class="summary-line">
+              <span class="summary-line-name">{{ line.name }}</span>
+              <span class="summary-line-qty">{{ quantityLabel() }} {{ line.quantity }}</span>
+              <span class="summary-line-total">{{ line.lineTotal }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="summary-note">{{ itemsLabel() }}</p>
+      }
+
+      <footer class="summary-total">
+        <span>{{ totalLabel() }}</span>
+        <strong>{{ order.total }}</strong>
+      </footer>
+    }
+  </div>
+</dialog>

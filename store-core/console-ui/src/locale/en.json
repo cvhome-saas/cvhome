@@ -1914,6 +1914,18 @@
     "toast": {
       "approved": "Payment {{reference}} approved.",
       "rejected": "Payment {{reference}} rejected. The order was not changed."
-    }
+    },
+    "summary": {
+      "title": "Order",
+      "loading": "Loading the order…",
+      "failed": "This order could not be loaded.",
+      "customer": "Customer",
+      "placed": "Placed",
+      "noItems": "This order has no line items.",
+      "total": "Order total",
+      "quantity": "×",
+      "close": "Close the order summary"
+    },
+    "viewOrderFor": "Open a summary of order {{order}}"
   }
 }
