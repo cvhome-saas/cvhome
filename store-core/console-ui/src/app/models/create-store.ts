@@ -2,22 +2,6 @@ import type {IconName} from '@shared/ui/icon/icon-paths';
 
 export type CreateStorePhase = 'form' | 'running';
 
-/**
- * A server region the store can be provisioned in. `code` and `latencyMs` are the physical
- * facts; everything else describes it to the operator.
- */
-export interface HostingRegionOption {
-  readonly id: string;
-  readonly labelKey: string;
-  readonly code: string;
-  readonly metaKey: string;
-  readonly metaParams?: Record<string, string | number>;
-  readonly latencyMs: number;
-  readonly recommended: boolean;
-  readonly locked: boolean;
-  readonly residencyKey: string;
-}
-
 export interface StorePlanSpec {
   readonly key: string;
   readonly params?: Record<string, string | number>;

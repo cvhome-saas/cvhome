@@ -129,7 +129,6 @@
       "title": "الرئيسية",
       "context": "{store} · {date}"
     },
-    "tryAgain": "حاول مرة أخرى",
     "loadingMetrics": "جارٍ تحميل المقاييس…",
     "storeMetrics": "مقاييس المتجر",
     "needsAttention": "يحتاج انتباهك",
@@ -159,11 +158,29 @@
     }
   },
   "shared": {
+    "actions": {
+      "cancel": "إلغاء",
+      "retry": "حاول مرة أخرى"
+    },
+    "autocomplete": {
+      "searching": "جارٍ البحث…",
+      "noMatches": "لا توجد نتائج."
+    },
     "copyField": {
       "defaultLabel": "القيمة",
       "copy": "نسخ {what}",
       "copied": "تم نسخ {what} إلى الحافظة.",
       "failed": "تعذّر نسخ {what}. حدّده وانسخه يدويًا."
+    },
+    "datePicker": {
+      "selectDate": "اختر تاريخًا",
+      "dialogLabel": "اختيار تاريخ",
+      "previousMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي",
+      "today": "اليوم",
+      "clear": "مسح",
+      "applied": "تم ضبط التاريخ على {date}",
+      "cleared": "تم مسح التاريخ."
     },
     "dateRangePicker": {
       "selectRange": "اختر نطاق التاريخ",
@@ -218,11 +235,51 @@
       "noRecords": "لا يوجد {unit}",
       "summary": "عرض {first}–{last} من {total} {unit}"
     },
+    "richText": {
+      "defaultLabel": "نص منسّق",
+      "toolbarLabel": "تنسيق النص",
+      "heading2": "عنوان",
+      "heading3": "عنوان فرعي",
+      "bold": "عريض",
+      "italic": "مائل",
+      "bulletList": "قائمة نقطية",
+      "numberList": "قائمة مرقّمة",
+      "link": "رابط",
+      "clear": "إزالة التنسيق",
+      "sourceLabel": "تحرير شفرة HTML",
+      "sourceFieldLabel": "شفرة HTML لـ{field}",
+      "sourceOn": "عُرضت شفرة HTML. سجلّ التراجع يبدأ من جديد من هنا.",
+      "sourceOff": "عُرض النص المنسّق. سجلّ التراجع يبدأ من جديد من هنا.",
+      "linkUrl": "عنوان الرابط",
+      "linkPlaceholder": "https://example.com",
+      "linkApply": "إضافة الرابط",
+      "linkRefused": "لا يمكن استخدام هذا العنوان في رابط.",
+      "keys": {
+        "heading2": "Ctrl+Alt+2",
+        "heading3": "Ctrl+Alt+3",
+        "bold": "Ctrl+B",
+        "italic": "Ctrl+I",
+        "bulletList": "Ctrl+Shift+8",
+        "numberList": "Ctrl+Shift+7",
+        "link": "Ctrl+K",
+        "clear": "Ctrl+\\"
+      }
+    },
     "secretField": {
       "copy": "نسخ {field}",
       "hide": "إخفاء {field}",
       "notSet": "غير محدد",
       "reveal": "إظهار {field}"
+    },
+    "sectionNav": {
+      "ariaLabel": "الأقسام",
+      "heading": "الأقسام",
+      "collapse": "طي الأقسام",
+      "expand": "توسيع الأقسام",
+      "needsAttention": "يحتاج انتباهك"
+    },
+    "stepper": {
+      "complete": "مكتملة"
     },
     "tagInput": {
       "defaultLabel": "الوسوم",
@@ -238,23 +295,6 @@
         "warning": "تحذير:",
         "danger": "خطأ:"
       }
-    },
-    "datePicker": {
-      "selectDate": "اختر تاريخًا",
-      "dialogLabel": "اختيار تاريخ",
-      "previousMonth": "الشهر السابق",
-      "nextMonth": "الشهر التالي",
-      "today": "اليوم",
-      "clear": "مسح",
-      "applied": "تم ضبط التاريخ على {date}",
-      "cleared": "تم مسح التاريخ."
-    },
-    "sectionNav": {
-      "ariaLabel": "الأقسام",
-      "heading": "الأقسام",
-      "collapse": "طي الأقسام",
-      "expand": "توسيع الأقسام",
-      "needsAttention": "يحتاج انتباهك"
     },
     "tree": {
       "expand": "توسيع {name}",
@@ -284,43 +324,6 @@
         "hiding": "جارٍ إخفاء {name} من تنقّل المتجر",
         "showing": "جارٍ إظهار {name} في تنقّل المتجر",
         "settled": "{name}، المستوى {level}، {position} من {size}"
-      }
-    },
-    "autocomplete": {
-      "searching": "جارٍ البحث…",
-      "noMatches": "لا توجد نتائج."
-    },
-    "stepper": {
-      "complete": "مكتملة"
-    },
-    "richText": {
-      "defaultLabel": "نص منسّق",
-      "toolbarLabel": "تنسيق النص",
-      "heading2": "عنوان",
-      "heading3": "عنوان فرعي",
-      "bold": "عريض",
-      "italic": "مائل",
-      "bulletList": "قائمة نقطية",
-      "numberList": "قائمة مرقّمة",
-      "link": "رابط",
-      "clear": "إزالة التنسيق",
-      "sourceLabel": "تحرير شفرة HTML",
-      "sourceFieldLabel": "شفرة HTML لـ{field}",
-      "sourceOn": "عُرضت شفرة HTML. سجلّ التراجع يبدأ من جديد من هنا.",
-      "sourceOff": "عُرض النص المنسّق. سجلّ التراجع يبدأ من جديد من هنا.",
-      "linkUrl": "عنوان الرابط",
-      "linkPlaceholder": "https://example.com",
-      "linkApply": "إضافة الرابط",
-      "linkRefused": "لا يمكن استخدام هذا العنوان في رابط.",
-      "keys": {
-        "heading2": "Ctrl+Alt+2",
-        "heading3": "Ctrl+Alt+3",
-        "bold": "Ctrl+B",
-        "italic": "Ctrl+I",
-        "bulletList": "Ctrl+Shift+8",
-        "numberList": "Ctrl+Shift+7",
-        "link": "Ctrl+K",
-        "clear": "Ctrl+\\"
       }
     }
   },
@@ -694,28 +697,6 @@
       "title": "منطقة الاستضافة",
       "subtitle": "المكان الفعلي الذي يُجهَّز فيه المتجر — لا يمكن تغييره لاحقًا",
       "permanent": "دائم",
-      "meta": {
-        "gdpr": "توافق مع GDPR لتخزين البيانات · {nodes, plural, =0 {لا عقد متاحة} one {عقدة واحدة متاحة} two {عقدتان متاحتان} few {# عقد متاحة} many {# عقدة متاحة} other {# عقدة متاحة}}",
-        "shared": "مجموعة مشتركة مع {store} · {nodes, plural, =0 {لا عقد متاحة} one {عقدة واحدة متاحة} two {عقدتان متاحتان} few {# عقد متاحة} many {# عقدة متاحة} other {# عقدة متاحة}}",
-        "arabicPack": "حزمة اللغة العربية مثبتة مسبقًا · {nodes, plural, =0 {لا عقد متاحة} one {عقدة واحدة متاحة} two {عقدتان متاحتان} few {# عقد متاحة} many {# عقدة متاحة} other {# عقدة متاحة}}",
-        "proOnly": "يتطلب خطة Pro أو أعلى"
-      },
-      "eu": {
-        "label": "وسط أوروبا · فرانكفورت",
-        "residency": "تبقى بيانات العملاء والطلبات داخل الاتحاد الأوروبي. تُنسخ النسخ الاحتياطية إلى eu-west-1 (دبلن) فقط."
-      },
-      "us": {
-        "label": "غرب الولايات المتحدة · أوريغون",
-        "residency": "تُخزَّن البيانات في الولايات المتحدة. البيع إلى الاتحاد الأوروبي من هذه المنطقة يتطلب ملحق معالجة بيانات."
-      },
-      "me": {
-        "label": "الشرق الأوسط · البحرين",
-        "residency": "تبقى البيانات داخل منطقة الخليج. تُطبَّق صيغ الفوترة المحلية وضريبة القيمة المضافة تلقائيًا."
-      },
-      "ap": {
-        "label": "آسيا والمحيط الهادئ · سنغافورة",
-        "residency": "تبقى البيانات في سنغافورة. متاحة فقط في اشتراكات Pro وEnterprise."
-      },
       "automatic": "يُخصَّص تلقائيًا",
       "automaticMeta": "يختار السجل الـpod الذي يتّسع لمتجرك.",
       "preferenceNote": "اختيار الـpod تفضيل وليس ضمانًا — يأخذ به السجل فقط إذا توفرت السعة."
@@ -1355,9 +1336,6 @@
     "credit": "رصيد",
     "refund": "مبلغ مسترد",
     "product": "المنتجات"
-  },
-  "actions": {
-    "cancel": "إلغاء"
   },
   "plans": {
     "title": "الباقات",

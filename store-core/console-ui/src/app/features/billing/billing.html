@@ -5,7 +5,7 @@
     <div class="load-error" role="alert">
       <app-icon name="bolt" />
       <p>{{ failure.message }}</p>
-      <button type="button" (click)="billing.refresh()">{{ t('dashboard.tryAgain') }}</button>
+      <button type="button" (click)="billing.refresh()">{{ t('shared.actions.retry') }}</button>
     </div>
   }
 
@@ -128,7 +128,7 @@
               <app-icon name="clock" />
               <p>{{ t('billing.plan.noSubscription') }}</p>
               <button type="button" class="secondary-action" (click)="billing.refresh()">
-                {{ t('dashboard.tryAgain') }}
+                {{ t('shared.actions.retry') }}
               </button>
             </div>
           }

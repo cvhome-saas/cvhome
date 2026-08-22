@@ -1,7 +1,7 @@
 import {Component, signal} from '@angular/core';
 import {TestBed, type ComponentFixture} from '@angular/core/testing';
 
-import {ImageBroken} from './image-loaded';
+import {ImageBroken} from './image-broken';
 
 /** A 1×1 transparent GIF: the smallest thing that genuinely decodes. */
 const REAL_GIF =

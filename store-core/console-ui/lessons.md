@@ -1121,9 +1121,9 @@ requirements document, with the entry here reduced to a link. There is already o
   carries an empty entitlement map, and reading it through the catalogue's rule rendered every
   allowance as "Unlimited" — telling a merchant mid-provisioning that they had unlimited everything.
   Caught in QA on a real store. No plan now means no allowances to report.
-- **Still open:** entitlements are *ceilings* with no usage behind them — billing publishes no counters,
-  so "3 of 500 products" cannot be drawn and the panel says so. Immediate cancellation is a super-admin
-  operation and is never sent from the console.
+- **Still open:** entitlements are *ceilings* with no usage behind them — see "Billing — entitlements
+  are ceilings with no usage behind them" below. Immediate cancellation is a super-admin operation and
+  is never sent from the console.
 
 ## Console — the action vocabulary was copied into five stylesheets
 
@@ -1770,3 +1770,24 @@ behind it worth keeping.
   `product_image` for the same product — the upload endpoint sets the flag without clearing the
   previous one, and nothing enforces uniqueness. Which image the storefront picks is then arbitrary.
   Not fixed here; `store-pod` is not modified by a module.
+
+## Billing — entitlements are ceilings with no usage behind them
+
+- **Screen:** `/subscription/plan`, the "Plan allowances" list.
+- **What the UI needs:** each allowance as a *fraction* — "3 of 500 products", "1 of 3 stores" — so an
+  operator can see how close they are to the ceiling, which is the only reason to show an allowance at
+  all. A bare "500 products" tells them what they bought, not whether it is running out.
+- **What is missing:** the numerator. `PlanView.entitlements` publishes the ceiling for each
+  `EntitlementKey`, and nothing anywhere counts what a store has actually used against one. Billing
+  makes quota *decisions* (`ExternalStoreQuotaApi.private/store-create` answers yes or refuses) but
+  exposes no counter, and each ceiling would have to be counted in a different pod anyway — products
+  in catalog, orders in checkout, storage in whatever owns the object store.
+- **Why it is required:** an allowance a merchant cannot measure themselves against is decoration, and
+  the first they learn of a limit is the refusal when they cross it. That refusal arrives at store
+  creation or product save, which is the worst possible moment to discover it.
+- **Expected contract:** `GET /billing/api/v1/private/subscription/usage?store=` →
+  `{MAX_PRODUCTS: 3, MAX_ORDERS_MONTH: 41, ...}`, one entry per entitlement key the plan carries,
+  aggregated by billing from the owning services rather than by the console making one call per pod.
+  Absent keys mean "not counted", which the console must render differently from zero.
+- **Placeholder:** `TODO(lessons.md)` in `features/billing/billing.html`; the list renders the ceiling
+  alone under a note saying usage is not available yet.

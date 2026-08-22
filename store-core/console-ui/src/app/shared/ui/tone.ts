@@ -32,10 +32,3 @@ export function toneColor(theme: Theme, tone: Tone): string {
     ? theme.color('--track')
     : theme.color(`--chart-${CHART_SLOT[tone]}`);
 }
-
-/** The on-dark ink paired with a tone's wash, for text and icons. */
-export function toneInk(theme: Theme, tone: Tone): string {
-  return tone === 'slate'
-    ? theme.color('--muted-foreground')
-    : theme.color(`--chart-${CHART_SLOT[tone]}-foreground`);
-}

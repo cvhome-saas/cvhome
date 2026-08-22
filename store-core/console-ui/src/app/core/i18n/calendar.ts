@@ -60,7 +60,7 @@ export function isBefore(left: Date, right: Date): boolean {
   return dateOnly(left).getTime() < dateOnly(right).getTime();
 }
 
-export function isAfter(left: Date, right: Date): boolean {
+function isAfter(left: Date, right: Date): boolean {
   return dateOnly(left).getTime() > dateOnly(right).getTime();
 }
 

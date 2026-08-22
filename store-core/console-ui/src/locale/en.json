@@ -129,7 +129,6 @@
       "title": "Home",
       "context": "{store} · {date}"
     },
-    "tryAgain": "Try again",
     "loadingMetrics": "Loading metrics…",
     "storeMetrics": "Store metrics",
     "needsAttention": "Needs your attention",
@@ -159,11 +158,29 @@
     }
   },
   "shared": {
+    "actions": {
+      "cancel": "Cancel",
+      "retry": "Try again"
+    },
+    "autocomplete": {
+      "searching": "Searching…",
+      "noMatches": "No matches."
+    },
     "copyField": {
       "defaultLabel": "value",
       "copy": "Copy {what}",
       "copied": "{what} copied to the clipboard.",
       "failed": "{what} could not be copied. Select it and copy by hand."
+    },
+    "datePicker": {
+      "selectDate": "Select a date",
+      "dialogLabel": "Choose a date",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "clear": "Clear",
+      "applied": "Date set to {date}",
+      "cleared": "Date cleared."
     },
     "dateRangePicker": {
       "selectRange": "Select date range",
@@ -218,11 +235,51 @@
       "noRecords": "No {unit}",
       "summary": "Showing {first}–{last} of {total} {unit}"
     },
+    "richText": {
+      "defaultLabel": "Formatted text",
+      "toolbarLabel": "Text formatting",
+      "heading2": "Heading",
+      "heading3": "Subheading",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bulletList": "Bulleted list",
+      "numberList": "Numbered list",
+      "link": "Link",
+      "clear": "Clear formatting",
+      "sourceLabel": "Edit HTML source",
+      "sourceFieldLabel": "HTML source of {field}",
+      "sourceOn": "HTML source shown. Undo history starts again from here.",
+      "sourceOff": "Formatted view shown. Undo history starts again from here.",
+      "linkUrl": "Link address",
+      "linkPlaceholder": "https://example.com",
+      "linkApply": "Add link",
+      "linkRefused": "That address cannot be used in a link.",
+      "keys": {
+        "heading2": "Ctrl+Alt+2",
+        "heading3": "Ctrl+Alt+3",
+        "bold": "Ctrl+B",
+        "italic": "Ctrl+I",
+        "bulletList": "Ctrl+Shift+8",
+        "numberList": "Ctrl+Shift+7",
+        "link": "Ctrl+K",
+        "clear": "Ctrl+\\"
+      }
+    },
     "secretField": {
       "copy": "Copy {field}",
       "hide": "Hide {field}",
       "notSet": "Not set",
       "reveal": "Show {field}"
+    },
+    "sectionNav": {
+      "ariaLabel": "Sections",
+      "heading": "Sections",
+      "collapse": "Collapse sections",
+      "expand": "Expand sections",
+      "needsAttention": "Needs attention"
+    },
+    "stepper": {
+      "complete": "Complete"
     },
     "tagInput": {
       "defaultLabel": "Tags",
@@ -238,23 +295,6 @@
         "warning": "Warning:",
         "danger": "Error:"
       }
-    },
-    "datePicker": {
-      "selectDate": "Select a date",
-      "dialogLabel": "Choose a date",
-      "previousMonth": "Previous month",
-      "nextMonth": "Next month",
-      "today": "Today",
-      "clear": "Clear",
-      "applied": "Date set to {date}",
-      "cleared": "Date cleared."
-    },
-    "sectionNav": {
-      "ariaLabel": "Sections",
-      "heading": "Sections",
-      "collapse": "Collapse sections",
-      "expand": "Expand sections",
-      "needsAttention": "Needs attention"
     },
     "tree": {
       "expand": "Expand {name}",
@@ -284,43 +324,6 @@
         "hiding": "Hiding {name} from the storefront navigation",
         "showing": "Showing {name} in the storefront navigation",
         "settled": "{name}, level {level}, {position} of {size}"
-      }
-    },
-    "autocomplete": {
-      "searching": "Searching…",
-      "noMatches": "No matches."
-    },
-    "stepper": {
-      "complete": "Complete"
-    },
-    "richText": {
-      "defaultLabel": "Formatted text",
-      "toolbarLabel": "Text formatting",
-      "heading2": "Heading",
-      "heading3": "Subheading",
-      "bold": "Bold",
-      "italic": "Italic",
-      "bulletList": "Bulleted list",
-      "numberList": "Numbered list",
-      "link": "Link",
-      "clear": "Clear formatting",
-      "sourceLabel": "Edit HTML source",
-      "sourceFieldLabel": "HTML source of {field}",
-      "sourceOn": "HTML source shown. Undo history starts again from here.",
-      "sourceOff": "Formatted view shown. Undo history starts again from here.",
-      "linkUrl": "Link address",
-      "linkPlaceholder": "https://example.com",
-      "linkApply": "Add link",
-      "linkRefused": "That address cannot be used in a link.",
-      "keys": {
-        "heading2": "Ctrl+Alt+2",
-        "heading3": "Ctrl+Alt+3",
-        "bold": "Ctrl+B",
-        "italic": "Ctrl+I",
-        "bulletList": "Ctrl+Shift+8",
-        "numberList": "Ctrl+Shift+7",
-        "link": "Ctrl+K",
-        "clear": "Ctrl+\\"
       }
     }
   },
@@ -694,28 +697,6 @@
       "title": "Hosting region",
       "subtitle": "Where the store is physically provisioned — this cannot be changed afterwards",
       "permanent": "Permanent",
-      "meta": {
-        "gdpr": "GDPR data residency · {nodes, plural, one {# node} other {# nodes}} available",
-        "shared": "Shared cluster with {store} · {nodes, plural, one {# node} other {# nodes}} available",
-        "arabicPack": "Arabic locale pack preinstalled · {nodes, plural, one {# node} other {# nodes}} available",
-        "proOnly": "Requires the Pro plan or above"
-      },
-      "eu": {
-        "label": "EU Central · Frankfurt",
-        "residency": "Customer and order data stays inside the EU. Backups replicate to eu-west-1 (Dublin) only."
-      },
-      "us": {
-        "label": "US West · Oregon",
-        "residency": "Data is stored in the United States. Selling into the EU from this region requires a processing addendum."
-      },
-      "me": {
-        "label": "Middle East · Bahrain",
-        "residency": "Data stays in the GCC region. Local invoicing and VAT formats are applied by default."
-      },
-      "ap": {
-        "label": "Asia Pacific · Singapore",
-        "residency": "Data stays in Singapore. Available on Pro and Enterprise subscriptions only."
-      },
       "automatic": "Assigned automatically",
       "automaticMeta": "The registry picks the pod with room for your store.",
       "preferenceNote": "A pod is a preference, not a guarantee — the registry honours it only if it has capacity."
@@ -1355,9 +1336,6 @@
     "credit": "Credit",
     "refund": "Refund",
     "product": "Products"
-  },
-  "actions": {
-    "cancel": "Cancel"
   },
   "plans": {
     "title": "Plans",

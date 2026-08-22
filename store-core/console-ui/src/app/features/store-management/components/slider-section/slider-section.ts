@@ -1,7 +1,7 @@
 import {Component, computed, input, output, signal} from '@angular/core';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {ImageBroken} from '@shared/directives/image-loaded';
+import {ImageBroken} from '@shared/directives/image-broken';
 import {ImagePicker, type ImageRules} from '@shared/ui/image-picker/image-picker';
 import {ImagePreview} from '@shared/ui/image-preview/image-preview';
 import {Icon} from '@shared/ui/icon/icon';

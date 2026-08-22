@@ -354,7 +354,7 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
         [confirmationText]="storeName()"
         [confirmationLabel]="t('storeSettings.details.deleteStoreType')"
         [confirmLabel]="t('storeSettings.details.deleteStoreAccept')"
-        [cancelLabel]="t('actions.cancel')"
+        [cancelLabel]="t('shared.actions.cancel')"
         (confirmed)="onConfirmed()"
         (dismissed)="confirming.set(false)"
       />

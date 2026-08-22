@@ -10,11 +10,11 @@ import {ProblemFieldError} from './problem-detail.model';
 /**
  * Backend codes are dotted, so keys are flattened. Exported for tests and future coverage tooling.
  */
-export function codeToKey(code: string): string {
+function codeToKey(code: string): string {
   return `ERRORS.CODE.${code.replace(/\./g, '_')}`;
 }
 
-export function categoryToKey(category: string): string {
+function categoryToKey(category: string): string {
   return `ERRORS.CATEGORY.${category}`;
 }
 

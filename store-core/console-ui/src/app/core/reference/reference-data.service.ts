@@ -16,7 +16,7 @@ export interface ReferenceOption {
  * select could only ever read English. Every code here resolves under `Intl`, and this list is a
  * superset of that file's 237.
  */
-export const ISO_3166_ALPHA2: readonly string[] = (
+const ISO_3166_ALPHA2: readonly string[] = (
   'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR ' +
   'BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ ' +
   'EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW ' +
@@ -33,8 +33,8 @@ export const ISO_3166_ALPHA2: readonly string[] = (
  * A constant because the platform offers no endpoint for it: `GET /store/languages` answers with
  * the languages *this store* has turned on, and nothing anywhere lists the ones it could turn on.
  * These five are seller-ui's `environment.client.language.array`, which was the only place the set
- * was written down. See lessons.md, "Store management — no list of the languages a store may
- * support".
+ * was written down. See lessons.md, "Store management — no reference lists for countries, currencies
+ * or storefront languages".
  */
 export const STOREFRONT_LANGUAGES: readonly string[] = ['en', 'fr', 'ar', 'es', 'ru'];
 

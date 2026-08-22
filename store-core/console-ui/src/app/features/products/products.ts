@@ -2,7 +2,7 @@ import {Component, ElementRef, computed, inject, signal, viewChild} from '@angul
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {ImageBroken} from '@shared/directives/image-loaded';
+import {ImageBroken} from '@shared/directives/image-broken';
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';

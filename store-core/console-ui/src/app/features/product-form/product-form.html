@@ -1,6 +1,6 @@
 <ng-container *transloco="let t">
   <app-page-header [title]="title()" [context]="context()">
-    <button class="secondary-action" type="button" (click)="cancel()">{{ t('actions.cancel') }}</button>
+    <button class="secondary-action" type="button" (click)="cancel()">{{ t('shared.actions.cancel') }}</button>
     <!--
       Save draft is not a lesser Publish: on a new product it is the only way through, because
       images and related products both need an id. The step rail says so before anything is clicked.
@@ -31,7 +31,7 @@
       <app-icon name="bolt" />
       <p>{{ failure.message }}</p>
       <button class="secondary-action" type="button" (click)="facade.retry()">
-        {{ t('dashboard.tryAgain') }}
+        {{ t('shared.actions.retry') }}
       </button>
     </div>
   }

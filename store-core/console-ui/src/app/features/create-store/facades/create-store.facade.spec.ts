@@ -12,7 +12,7 @@ import type {Pod} from '@models/pod';
 import type {CreateStoreRequest, ManagerStore, ProvisioningState} from '@models/tenancy';
 import {FakeConsoleApi} from '@testing/console-api.fake';
 import {translocoTesting} from '@testing/transloco-testing';
-import {CreateStoreFacade} from './facades/create-store.facade';
+import {CreateStoreFacade} from './create-store.facade';
 
 function store(state: ProvisioningState, provisioningError: string | null = null): ManagerStore {
   return {

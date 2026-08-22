@@ -23,7 +23,7 @@
       <app-icon name="bolt" />
       <p>{{ failure.message }}</p>
       <button class="secondary-action" type="button" (click)="facade.retry()">
-        {{ t('dashboard.tryAgain') }}
+        {{ t('shared.actions.retry') }}
       </button>
     </div>
   }
@@ -312,7 +312,7 @@
     [title]="deleteTitle()"
     [message]="t('products.delete.message')"
     [confirmLabel]="t('products.delete.confirm')"
-    [cancelLabel]="t('actions.cancel')"
+    [cancelLabel]="t('shared.actions.cancel')"
     (confirmed)="facade.confirmDelete()"
     (dismissed)="facade.dismissDelete()"
   />
