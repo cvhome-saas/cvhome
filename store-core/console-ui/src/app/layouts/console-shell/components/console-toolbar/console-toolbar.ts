@@ -1,16 +1,17 @@
 import {UpperCasePipe} from '@angular/common';
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
 import {ThemeService} from '@core/theme/theme.service';
 import {Icon} from '@shared/ui/icon/icon';
+import {SearchBox} from '@shared/ui/search-box/search-box';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 
 /** Breadcrumb, search, and the notification / theme / language / profile menus. */
 @Component({
   selector: 'app-console-toolbar',
-  imports: [Icon, RouterLink, TranslocoDirective, UpperCasePipe],
+  imports: [SearchBox, Icon, RouterLink, TranslocoDirective, UpperCasePipe],
   template: `
     <header class="toolbar" *transloco="let t">
       <nav class="breadcrumb" [attr.aria-label]="t('shell.toolbar.breadcrumbNav')">
@@ -31,11 +32,19 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
         }
       </nav>
 
-      <label class="search">
-        <app-icon name="search" />
-        <span class="sr-only">{{ t('shell.toolbar.search') }}</span>
-        <input type="search" [placeholder]="t('shell.toolbar.searchPlaceholder')" autocomplete="off" />
-      </label>
+      <!--
+        TODO(lessons.md): this box searches nothing — there is no cross-entity search on the
+        platform, and it is decorative in seller-ui too. See lessons.md, "Shell — no global search".
+        It is the shared control rather than a hand-rolled one so the console has a single search
+        field, but whether a box that cannot answer should be here at all is a product question the
+        bell and the sidebar badge counts were both decided the other way on.
+      -->
+      <app-search-box
+        class="search"
+        [(value)]="searchTerm"
+        [label]="t('shell.toolbar.search')"
+        [placeholder]="t('shell.toolbar.searchPlaceholder')"
+      />
 
       <!--
         TODO(lessons.md): the notification bell, its unread count, the feed, "mark all read" and
@@ -141,6 +150,9 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
   styleUrl: './console-toolbar.css',
 })
 export class ConsoleToolbar {
+  /** Held so the box is a controlled field; nothing reads it — see the note in the template. */
+  protected readonly searchTerm = signal('');
+
   protected readonly shell = inject(ConsoleShellFacade);
   protected readonly theme = inject(ThemeService);
 }

@@ -2,6 +2,14 @@
   display: block;
 }
 
+/*
+ * The shared search box draws itself; the toolbar only says how wide it is. What was here — a
+ * frame, an icon colour, a focus ring and a WebKit cancel-button reset — is `app-search-box` now.
+ */
+.search {
+  --search-width: 230px;
+}
+
 .toolbar {
   position: relative;
   z-index: 50;
@@ -36,46 +44,6 @@
 .breadcrumb strong {
   color: var(--foreground);
   font-weight: 600;
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  inline-size: 230px;
-  padding: 0.45rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  transition:
-    border-color var(--default-transition-duration),
-    box-shadow var(--default-transition-duration);
-  --icon-size: 0.8rem;
-}
-
-.search app-icon {
-  color: var(--foreground-subtle);
-}
-
-.search input {
-  inline-size: 100%;
-  min-width: 0;
-  block-size: 1.25rem;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: none;
-  color: var(--foreground);
-  font-size: var(--text-xs);
-}
-
-.search input::placeholder {
-  color: var(--foreground-subtle);
-}
-
-.search:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--chart-1-wash);
 }
 
 .menu {
@@ -376,12 +344,7 @@
     padding-inline-start: 3rem;
   }
 
-  .search {
-    flex: 1;
-    inline-size: auto;
-  }
-
-  .profile-toggle strong {
+    .profile-toggle strong {
     display: none;
   }
 

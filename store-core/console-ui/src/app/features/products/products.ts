@@ -105,7 +105,16 @@ export class Products {
   }
 
   /** The region the export captures. Absent until the first response renders it. */
-  protected readonly report = viewChild<ElementRef<HTMLElement>>('report');
+  /*
+   * `{read: ElementRef}` is load-bearing.
+   *
+   * A template reference on a *component* element resolves to the component instance, not to an
+   * element — so `#report` on `<app-panel>` handed `app-export-button` a `Panel` object, which is
+   * neither an `ElementRef` nor an `HTMLElement`, and Export on the products page did nothing at
+   * all. Orders, order details and the dashboard happened to anchor theirs on a plain `<div>` and
+   * so happened to work. Asking for the element explicitly is correct on either anchor.
+   */
+  protected readonly report = viewChild('report', {read: ElementRef});
   protected readonly heading = this.facade.heading;
 
   protected readonly columns = computed<readonly TableColumn[]>(() => {

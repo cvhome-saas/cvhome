@@ -61,7 +61,8 @@ export class Dashboard {
   protected readonly topProducts = this.facade.topProducts;
 
   /** The region the export captures. Absent until the first response renders it. */
-  protected readonly widgets = viewChild<ElementRef<HTMLElement>>('widgets');
+  // Explicitly the element — see the note in `products.ts`.
+  protected readonly widgets = viewChild('widgets', {read: ElementRef});
 
   /** Names the period on the exported PDF's first page. */
   protected readonly exportSubtitle = computed(() => {

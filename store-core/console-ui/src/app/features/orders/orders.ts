@@ -107,7 +107,8 @@ export class Orders {
   });
 
   /** The region the export captures. Absent until the first response renders it. */
-  protected readonly report = viewChild<ElementRef<HTMLElement>>('report');
+  // Explicitly the element — see the note in `products.ts`.
+  protected readonly report = viewChild('report', {read: ElementRef});
 
   /** Names the period on the exported PDF's first page. */
   protected readonly exportSubtitle = computed(() => {

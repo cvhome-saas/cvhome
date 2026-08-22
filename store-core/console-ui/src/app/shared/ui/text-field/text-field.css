@@ -90,7 +90,15 @@
   user-select: none;
 }
 
+/*
+ * A count over a limit is a numeric expression, not prose, so it is pinned left-to-right.
+ *
+ * Without this the RTL page lays "0 / 160" out as "160 / 0" — visually inverting what it means, so
+ * an empty field looks like one already 160 characters over. Found in Arabic on the store details
+ * page. The same rule `number-field` applies to a price, for the same reason.
+ */
 .text-counter {
+  direction: ltr;
   flex: none;
   color: var(--foreground-quiet);
   font-size: var(--text-3xs);

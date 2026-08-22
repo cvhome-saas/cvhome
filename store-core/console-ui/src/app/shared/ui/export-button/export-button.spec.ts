@@ -3,6 +3,7 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
 
 import {PdfExportService, type PdfExportRequest} from '@core/export/pdf-export.service';
 import {translocoTesting} from '@testing/transloco-testing';
+import {Panel} from '@shared/ui/panel/panel';
 import {ExportButton} from './export-button';
 
 class FakePdfExportService {
@@ -50,13 +51,36 @@ class Host {
   readonly region = viewChild<ElementRef<HTMLElement>>('region');
 }
 
+/*
+ * The products page anchored its `#report` on `<app-panel>` rather than a `<div>`, and a template
+ * reference on a *component* element resolves to the component instance — so `target` received a
+ * `Panel` object, and Export did nothing at all. Orders, order details and the dashboard happened
+ * to anchor theirs on plain elements and so happened to work. This host reproduces the anchor.
+ */
+@Component({
+  imports: [ExportButton, Panel],
+  template: `
+    <app-export-button [target]="panelElement()" [fileName]="'report'" [title]="'Products'" />
+    <app-panel #panelRef [title]="'All products'">rows</app-panel>
+  `,
+})
+class ComponentAnchoredHost {
+  /*
+   * The reference and the property are named differently on purpose: a template reference shadows
+   * a component property of the same name *within its scope*, so `report()` beside a `#report`
+   * resolves to the reference and blows up. Products got away with it only because its `#report`
+   * lives inside an `@if` block that the binding sits outside of.
+   */
+  readonly panelElement = viewChild('panelRef', {read: ElementRef});
+}
+
 describe('ExportButton', () => {
   let pdf: FakePdfExportService;
 
   beforeEach(async () => {
     pdf = new FakePdfExportService();
     await TestBed.configureTestingModule({
-      imports: [Host, ...translocoTesting().imports],
+      imports: [Host, ComponentAnchoredHost, ...translocoTesting().imports],
       providers: [{provide: PdfExportService, useValue: pdf}, ...translocoTesting().providers],
     }).compileComponents();
   });
@@ -83,6 +107,21 @@ describe('ExportButton', () => {
     expect(pdf.requests[0].title).toBe('Orders');
     expect(pdf.requests[0].subtitle).toBe('Jul 1 – Jul 31');
     expect(pdf.requests[0].element.classList).toContain('region');
+  }));
+
+  it('exports an element even when the reference is anchored on a component', fakeAsync(() => {
+    const fixture = TestBed.createComponent(ComponentAnchoredHost);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    (element.querySelector('app-export-button button') as HTMLButtonElement).click();
+    tick();
+    fixture.detectChanges();
+
+    expect(pdf.requests.length).toBe(1);
+    // An element, not a `Panel`. `viewChild(..., {read: ElementRef})` is what makes that true.
+    expect(pdf.requests[0].element instanceof HTMLElement).toBeTrue();
+    expect(pdf.requests[0].element.tagName.toLowerCase()).toBe('app-panel');
   }));
 
   it('stays disabled until a target exists', () => {

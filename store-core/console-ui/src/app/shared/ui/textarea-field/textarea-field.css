@@ -61,6 +61,13 @@
  * The counter sits under the text rather than inside it: a textarea's own resize grip occupies the
  * bottom corner, and anything placed there is either covered by it or moves when it is dragged.
  */
+/*
+ * A count over a limit is a numeric expression, not prose, so it is pinned left-to-right.
+ *
+ * Without this the RTL page lays "0 / 160" out as "160 / 0" — visually inverting what it means, so
+ * an empty field looks like one already 160 characters over. Found in Arabic on the store details
+ * page. The same rule `number-field` applies to a price, for the same reason.
+ */
 .textarea-counter {
   display: block;
   margin-block-start: .3rem;
@@ -69,6 +76,16 @@
   font-variant-numeric: tabular-nums;
   text-align: end;
   user-select: none;
+}
+
+/*
+ * The alignment follows the page — under an RTL box the counter sits at the left edge — but the
+ * expression inside it does not. `direction` on the block would move both, so the run is isolated
+ * separately.
+ */
+.textarea-counter > span {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 @media (prefers-reduced-motion: reduce) {

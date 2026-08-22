@@ -75,7 +75,8 @@ export class OrderDetails {
   protected readonly invoiceOpen = signal(false);
   protected readonly exporting = signal(false);
 
-  protected readonly invoiceSheet = viewChild<ElementRef<HTMLElement>>('invoiceSheet');
+  // Explicitly the element — see the note in `products.ts`.
+  protected readonly invoiceSheet = viewChild('invoiceSheet', {read: ElementRef});
 
   /** The operator composing the status note, for the composer's avatar. */
   protected readonly operator = computed(() => this.shell.user()?.initials ?? '');

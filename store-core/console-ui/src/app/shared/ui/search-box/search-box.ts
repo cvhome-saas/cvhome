@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, inject, input, model, signal} from '@angular/core';
+import {Component, DestroyRef, inject, input, model} from '@angular/core';
 
 import {Icon} from '@shared/ui/icon/icon';
 
@@ -68,22 +68,22 @@ export class SearchBox {
 
   private readonly destroyRef = inject(DestroyRef);
   private pending: ReturnType<typeof setTimeout> | null = null;
-  /** What is in the box right now, which is ahead of `value` while the operator is still typing. */
-  private readonly typed = signal<string | null>(null);
 
   constructor() {
     this.destroyRef.onDestroy(() => this.clear());
-    // A value set from outside — a filter restored from the URL, or cleared by a button — lands in
-    // the box directly and must not be echoed back out as though it had been typed.
-    effect(() => {
-      this.value();
-      this.typed.set(null);
-      this.clear();
-    });
   }
 
+  /**
+   * A keystroke restarts the clock; the timer carries the value it was started with.
+   *
+   * **No mirror signal and no effect.** The first version kept "what is in the box right now" in a
+   * separate signal and had an `effect` on `value` reset it, so that a value set from outside would
+   * not be echoed back out as though it had been typed. Neither is needed: the timer closes over
+   * the value it was started with, and a later external set simply wins the race it should win.
+   * Writing to a signal from inside an effect to coordinate with a timer was more machinery than
+   * the problem has, and the kind that is hard to reason about when it misbehaves.
+   */
   protected onInput(next: string): void {
-    this.typed.set(next);
     this.clear();
     const wait = this.debounceMs();
     if (wait <= 0) {
@@ -92,9 +92,7 @@ export class SearchBox {
     }
     this.pending = setTimeout(() => {
       this.pending = null;
-      if (this.typed() !== null) {
-        this.value.set(this.typed()!);
-      }
+      this.value.set(next);
     }, wait);
   }
 
