@@ -30,14 +30,21 @@
 }
 
 /* The page's recurring shape: the work on the left, its context on the right. */
-.split {
+/*
+ * Not the shared `.guide-split`.
+ *
+ * `@shared/styles/field.css` owns a list-and-editor split at 5fr/7fr that stacks below 1100px; this
+ * is the getting-started page's own guide-and-aside proportion. Named apart so the two cannot be
+ * mistaken for each other, or shadow one another if this page ever pulls the shared sheet in.
+ */
+.guide-split {
   display: grid;
   grid-template-columns: 1.55fr 1fr;
   gap: 1.5rem;
   align-items: stretch;
 }
 
-.split > * {
+.guide-split > * {
   min-width: 0;
 }
 
@@ -585,7 +592,7 @@
 /* ---- Responsive -------------------------------------------------------------------------- */
 
 @media (max-width: 73.75rem) {
-  .split {
+  .guide-split {
     grid-template-columns: minmax(0, 1fr);
   }
 
