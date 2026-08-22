@@ -39,6 +39,7 @@
 
 .number-input {
   flex: 1;
+  font-variant-numeric: tabular-nums;
   inline-size: 100%;
   min-inline-size: 0;
   border: 0;
@@ -75,6 +76,24 @@
   font-weight: 500;
   white-space: nowrap;
   user-select: none;
+}
+
+/*
+ * Compact: the same field, sized for a table cell.
+ *
+ * Only the four measurements that make it tall are reduced — the border, radius, background and
+ * focus behaviour are the ones the field shares with every other control, and a cell is not a
+ * reason for them to differ.
+ */
+:host(.number-compact) .number-shell {
+  gap: .35rem;
+  padding: .3rem .45rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+}
+
+:host(.number-end) .number-input {
+  text-align: end;
 }
 
 @media (prefers-reduced-motion: reduce) {

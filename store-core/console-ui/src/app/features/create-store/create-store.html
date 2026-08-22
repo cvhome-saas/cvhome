@@ -318,7 +318,11 @@
             states and no detail".
           -->
           @if (!facade.isDone() && !facade.hasFailed()) {
-            <app-progress-track class="run-track indeterminate" [value]="100" />
+            <app-progress-track
+              class="run-track indeterminate"
+              [value]="100"
+              [label]="t('createStore.progressLabel')"
+            />
           }
           @if (facade.isDone()) {
             <div class="done-banner">

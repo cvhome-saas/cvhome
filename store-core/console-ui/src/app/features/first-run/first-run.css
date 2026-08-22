@@ -184,7 +184,6 @@
 
 .run-track {
   margin: 0.85rem 1.5rem 0;
-  color: var(--primary);
 }
 
 .task-list {
@@ -515,7 +514,6 @@
 
 .limit-track {
   margin-block-start: 0.6rem;
-  color: var(--primary);
 }
 
 .limit-note {

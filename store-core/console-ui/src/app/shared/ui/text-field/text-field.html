@@ -22,7 +22,7 @@
     [attr.autocomplete]="autocomplete()"
     [attr.inputmode]="inputmode()"
     [attr.maxlength]="maxLength()"
-    [attr.dir]="latin() ? 'ltr' : null"
+    [attr.dir]="latin() ? 'ltr' : 'auto'"
     (input)="onInput(input)"
     (blur)="onBlur()"
   />

@@ -82,20 +82,28 @@
             [placeholder]="t('products.filter.skuPlaceholder')"
           />
 
+          <!--
+            Clearable, because these are filters: "all categories" is a real answer and getting
+            back to it should not mean finding the right option in a list of forty.
+          -->
           <app-select
             class="filter-select"
+            clearable
             [options]="categoryOptions()"
             [value]="facade.filters().categoryId?.toString() ?? ''"
             (valueChange)="onCategoryFilter($event)"
             [ariaLabel]="t('products.filter.category')"
+            [clearLabel]="t('products.filter.clearCategory')"
           />
 
           <app-select
             class="filter-select"
+            clearable
             [options]="brandOptions()"
             [value]="facade.filters().brandId?.toString() ?? ''"
             (valueChange)="onBrandFilter($event)"
             [ariaLabel]="t('products.filter.brand')"
+            [clearLabel]="t('products.filter.clearBrand')"
           />
 
           <!--
@@ -162,6 +170,8 @@
                   @if (facade.editingId() === row.id) {
                     <app-number-field
                       class="inline-input"
+                      compact
+                      [align]="'end'"
                       [(value)]="draftPrice"
                       [decimals]="2"
                       [min]="0"
@@ -176,6 +186,8 @@
                   @if (facade.editingId() === row.id) {
                     <app-number-field
                       class="inline-input"
+                      compact
+                      [align]="'end'"
                       [(value)]="draftQuantity"
                       [decimals]="0"
                       [min]="0"

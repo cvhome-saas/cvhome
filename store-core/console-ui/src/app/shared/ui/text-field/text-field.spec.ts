@@ -142,8 +142,11 @@ describe('TextField', () => {
       expect(getComputedStyle(input()).unicodeBidi).toBe('plaintext');
     });
 
-    it('follows the page otherwise', () => {
-      expect(input().getAttribute('dir')).toBeNull();
+    it('reads its direction from what is typed otherwise', () => {
+      // Not the page's direction: a field may hold Arabic copy while the console runs in English,
+      // and the store-management home section is written in languages the console does not run in
+      // at all.
+      expect(input().getAttribute('dir')).toBe('auto');
     });
   });
 

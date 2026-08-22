@@ -194,3 +194,54 @@
     transition: none;
   }
 }
+
+/*
+ * The clear button, for a select that is a filter.
+ *
+ * Absolutely positioned over the trigger rather than inside it: a button inside a button is
+ * invalid HTML, and nesting them meant clearing also opened the list. The trigger reserves room
+ * for it with padding so the two never overlap the value.
+ */
+:host {
+  position: relative;
+}
+
+:host(.has-clear) .select-trigger {
+  padding-inline-end: 2.6rem;
+}
+
+.select-clear {
+  position: absolute;
+  inset-inline-end: 1.75rem;
+  inset-block-start: 50%;
+  display: grid;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.select-clear:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.select-clear:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-clear {
+    transition: none;
+  }
+}

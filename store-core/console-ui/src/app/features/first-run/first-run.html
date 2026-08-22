@@ -64,7 +64,11 @@
               </span>
             </header>
 
-            <app-progress-track class="run-track" [value]="progressPct()" />
+            <app-progress-track
+              class="run-track"
+              [value]="progressPct()"
+              [label]="t('firstRun.progressLabel')"
+            />
 
             <ol class="task-list">
               @for (step of steps(); track step.id) {
@@ -154,7 +158,7 @@
                   <span>{{ t('firstRun.limit.of', {cap: limit.cap}) }}</span>
                 </p>
                 <p class="limit-label">{{ limit.label }}</p>
-                <app-progress-track class="limit-track" [value]="limit.pct" />
+                <app-progress-track class="limit-track" [value]="limit.pct" [label]="limit.label" />
                 <p class="limit-note">{{ limit.note }}</p>
               </div>
             }

@@ -5,11 +5,13 @@ import {TranslocoDirective} from '@jsverse/transloco';
 import {startWith, switchMap} from 'rxjs';
 
 import type {ReferenceOption} from '@core/reference/reference-data.service';
-import {FieldError} from '@shared/ui/form-field/field-error';
+import {FormField} from '@shared/ui/form-field/form-field';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {Panel} from '@shared/ui/panel/panel';
 import {LocaleSwitcher} from '@shared/ui/locale-switcher/locale-switcher';
 import {TagInput} from '@shared/ui/tag-input/tag-input';
+import {TextField} from '@shared/ui/text-field/text-field';
+import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
 import {HOME_TITLE_MAX, META_DESCRIPTION_MAX, META_DESCRIPTION_MIN} from '@models/store-settings';
 import type {HomeCopyForm} from '../../services/store-settings-form.service';
 
@@ -27,7 +29,17 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
  */
 @Component({
   selector: 'app-home-section',
-  imports: [FieldError, LocaleSwitcher, NoticeBar, Panel, ReactiveFormsModule, TagInput, TranslocoDirective],
+  imports: [
+    FormField,
+    LocaleSwitcher,
+    NoticeBar,
+    Panel,
+    ReactiveFormsModule,
+    TagInput,
+    TextField,
+    TextareaField,
+    TranslocoDirective,
+  ],
   template: `
     <app-panel
       [title]="t('storeSettings.home.title')"
@@ -49,90 +61,86 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
         [label]="t('storeSettings.home.writeIn')"
       />
 
-      <div class="section-body" id="home-copy" [formGroup]="copy()">
+      <div class="section-body field-grid" id="home-copy" [formGroup]="copy()">
         <!--
-          One authoring surface, not three form controls.
-          
-          The headline, the body and the search snippet are the parts of a single page, so they are
-          drawn as one bordered sheet with hairline rules between them rather than as a stack of
-          grey slabs. Each field is transparent and borderless — the sheet carries the frame — and
-          the headline is set at headline size, because it is the H1 the visitor will read. What an
-          operator is looking at is the page taking shape, which is what the section is for.
+          Three ordinary fields, in the shape every other section uses.
+
+          They were one bordered "composer" sheet before, with borderless transparent controls, a
+          hand-written counter and a bespoke fill meter for the recommended length — a third field
+          pattern that existed on this page alone. Two pages away the same three kinds of value are
+          a label, a framed control and a message, and a seller moving between them had to learn
+          the surface twice. Everything the composer did that was worth keeping — the counters, the
+          headline limit, the advised meta length, the growing box — the shared controls now do.
         -->
-        <div class="composer">
-          <div class="row title-row">
-            <label for="home-title">{{ t('storeSettings.home.landingTitle') }}</label>
-            <!--
-              Not required. A storefront publishes in several languages and a seller fills them in
-              over time; demanding a headline in every one would make the section unsavable until
-              the last translation arrived. A language with no title is marked empty on the track.
+        <app-form-field
+          wide
+          [label]="t('storeSettings.home.landingTitle')"
+          [hint]="t('storeSettings.home.landingTitleHint')"
+          [control]="title()"
+          [fallback]="t('storeSettings.home.landingTitleFallback')"
+          controlId="home-title"
+        >
+          <!--
+            Not required. A storefront publishes in several languages and a seller fills them in
+            over time; demanding a headline in every one would make the section unsavable until the
+            last translation arrived. A language with no title is marked empty on the track.
 
-              Automatic direction on every copy field, and it is not cosmetic: this section is
-              written in languages the console is not necessarily running in. Without it, Arabic
-              copy typed while the console is in English renders left-to-right and reads as
-              nonsense.
-            -->
-            <input
-              id="home-title"
-              type="text"
-              formControlName="title"
-              dir="auto"
-              [placeholder]="t('storeSettings.home.landingTitlePlaceholder')"
-            />
-            <span class="row-foot">
-              <span>{{ t('storeSettings.home.landingTitleHint') }}</span>
-              <span class="counter">{{ titleLength() }}/{{ titleMax }}</span>
-            </span>
-          </div>
+            The control resolves its own direction from what is typed, which is not cosmetic here:
+            this section is written in languages the console is not necessarily running in, and
+            Arabic copy typed while the console is in English would otherwise read as nonsense.
+          -->
+          <app-text-field
+            id="home-title"
+            formControlName="title"
+            [maxLength]="titleMax"
+            [placeholder]="t('storeSettings.home.landingTitlePlaceholder')"
+          />
+        </app-form-field>
 
-          <div class="row">
-            <label for="home-text">{{ t('storeSettings.home.landingText') }}</label>
-            <textarea
-              id="home-text"
-              formControlName="text"
-              dir="auto"
-              rows="5"
-              [placeholder]="t('storeSettings.home.landingTextPlaceholder')"
-            ></textarea>
-            <span class="row-foot">
-              <span>{{ t('storeSettings.home.landingTextHint') }}</span>
-            </span>
-          </div>
+        <app-form-field
+          wide
+          [label]="t('storeSettings.home.landingText')"
+          [hint]="t('storeSettings.home.landingTextHint')"
+          [control]="text()"
+          controlId="home-text"
+        >
+          <app-textarea
+            id="home-text"
+            autoGrow
+            formControlName="text"
+            [rows]="5"
+            [placeholder]="t('storeSettings.home.landingTextPlaceholder')"
+          />
+        </app-form-field>
 
-          <!-- Metadata rather than page copy, so it is set apart and set quieter. -->
-          <div class="row meta-row">
-            <label for="home-meta">{{ t('storeSettings.home.metaDescription') }}</label>
-            <textarea
-              id="home-meta"
-              formControlName="metaDescription"
-              dir="auto"
-              rows="2"
-              [placeholder]="t('storeSettings.home.metaPlaceholder')"
-            ></textarea>
-            <span class="row-foot">
-              <span>{{ t('storeSettings.home.metaRecommended', {min: metaMin, max: metaMax}) }}</span>
-              <!--
-                A recommendation, so it is a counter that changes tone, never a blocking error. The
-                track beside it fills toward the recommended window and goes amber outside it, which
-                answers "how close am I" before the number is read.
-              -->
-              <span class="meter" [class.over]="metaOutsideRange()" aria-hidden="true">
-                <span class="meter-fill" [style.inline-size.%]="metaProgress()"></span>
-              </span>
-              <span class="counter" [class.over]="metaOutsideRange()">
-                {{ t('storeSettings.home.characters', {count: metaLength()}) }}
-              </span>
-            </span>
-          </div>
-        </div>
+        <app-form-field
+          wide
+          [label]="t('storeSettings.home.metaDescription')"
+          [hint]="t('storeSettings.home.metaRecommended', {min: metaMin, max: metaMax})"
+          [control]="metaDescription()"
+          controlId="home-meta"
+        >
+          <!--
+            A recommendation, so the counter changes tone outside the window and nothing blocks the
+            save. It is not a a hard limit: a description over the advised length is still a
+            description, and truncating one mid-word would be worse than a long one.
+          -->
+          <app-textarea
+            id="home-meta"
+            formControlName="metaDescription"
+            [rows]="2"
+            [recommendedMin]="metaMin"
+            [recommendedMax]="metaMax"
+            [placeholder]="t('storeSettings.home.metaPlaceholder')"
+          />
+        </app-form-field>
 
-        <app-field-error [control]="title()" [fallback]="t('storeSettings.home.landingTitleFallback')" />
         <!--
           The rule reads three controls, so it lives on the group — but the field to fix is the
           headline, and a description with no name cannot be stored at all.
         -->
         @if (needsTitle()) {
-          <p class="cross-field-error" role="alert">{{ t('storeSettings.home.titleForCopy') }}</p>
+          <p class="cross-field-error field-wide" role="alert">{{ t('storeSettings.home.titleForCopy') }}</p>
         }
 
         <!--
@@ -142,7 +150,7 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
           TODO(lessons.md): see lessons.md, "Store management — a content description's keywords are
           dropped by both mappers".
         -->
-        <div class="field unbacked">
+        <div class="field unbacked field-wide">
           <p class="field-label">{{ t('storeSettings.home.tags') }}</p>
           <app-tag-input
             [tags]="tags().value"
@@ -153,7 +161,7 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
         </div>
 
         <app-notice-bar
-          class="fallback-notice"
+          class="fallback-notice field-wide"
           tone="blue"
           icon="alertCircle"
           [message]="t('storeSettings.home.fallbackNotice')"
@@ -185,6 +193,7 @@ export class HomeSection {
   /** Which languages already carry a headline. The switcher marks the rest as untranslated. */
   protected readonly written = computed<ReadonlySet<string>>(() => {
     const forms = this.forms();
+    this.value();
     return new Set(
       this.locales()
         .map((locale) => locale.code)
@@ -194,13 +203,16 @@ export class HomeSection {
 
   protected readonly copy = computed(() => this.forms()[this.language()]);
   protected readonly title = computed(() => this.copy().controls.title);
+  protected readonly text = computed(() => this.copy().controls.text);
+  protected readonly metaDescription = computed(() => this.copy().controls.metaDescription);
   protected readonly tags = computed(() => this.copy().controls.tags);
 
 
   /**
    * The active group's value, as a signal.
    *
-   * The counters have to track what is being typed, and a control's `value` is not reactive.
+   * The empty-language dots and the cross-field rule both have to track what is being typed, and
+   * a control's `value` is not reactive.
    * Following the group through `toObservable` rather than subscribing once matters because
    * the group itself is swapped by the language track.
    */
@@ -210,16 +222,6 @@ export class HomeSection {
     ),
     {initialValue: null},
   );
-
-  protected readonly titleLength = computed(() => {
-    this.value();
-    return this.title().value.length;
-  });
-
-  protected readonly metaLength = computed(() => {
-    this.value();
-    return this.copy().controls.metaDescription.value.length;
-  });
 
   /**
    * Whether this language has copy but no headline to file it under.
@@ -231,16 +233,6 @@ export class HomeSection {
     this.value();
     const group = this.copy();
     return group.hasError('titleForCopy') && (group.dirty || group.touched);
-  });
-
-  /** How full the meta description is, against the top of the recommended window. */
-  protected readonly metaProgress = computed(() =>
-    Math.min(100, Math.round((this.metaLength() / META_DESCRIPTION_MAX) * 100)),
-  );
-
-  protected readonly metaOutsideRange = computed(() => {
-    const length = this.metaLength();
-    return length > 0 && (length < META_DESCRIPTION_MIN || length > META_DESCRIPTION_MAX);
   });
 
 }

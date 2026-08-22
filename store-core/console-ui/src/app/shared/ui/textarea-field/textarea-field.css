@@ -58,6 +58,15 @@
 }
 
 /*
+ * `rows` becomes the floor rather than the height. Where `field-sizing` is unsupported the
+ * declaration is dropped and the field is exactly what it was, which is why `rows` is still set.
+ */
+.textarea-input.auto-grow {
+  field-sizing: content;
+  max-block-size: 22rem;
+}
+
+/*
  * The counter sits under the text rather than inside it: a textarea's own resize grip occupies the
  * bottom corner, and anything placed there is either covered by it or moves when it is dragged.
  */
@@ -86,6 +95,12 @@
 .textarea-counter > span {
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* Amber, not red: being outside an advised range is not an error and never blocks a save. */
+.textarea-counter.off-recommendation {
+  color: var(--chart-4-foreground);
+  font-weight: 500;
 }
 
 @media (prefers-reduced-motion: reduce) {

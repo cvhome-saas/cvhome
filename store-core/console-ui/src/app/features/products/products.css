@@ -173,22 +173,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Width only.
+ *
+ * Everything else this used to declare — the border, radius, background, type size and alignment —
+ * belongs to the field, and setting it here drew a second frame around the component's own while
+ * the font-size and text-align never reached the input at all. `compact` and `align="end"` on
+ * `app-number-field` are where those live now.
+ */
 .inline-input {
   inline-size: 100%;
-  max-inline-size: 6rem;
-  padding: .3rem .4rem;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  color: var(--foreground-strong);
-  font-size: var(--text-2xs);
-  font-variant-numeric: tabular-nums;
-  text-align: end;
-}
-
-.inline-input:focus {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+  max-inline-size: 6.5rem;
 }
 
 .availability {

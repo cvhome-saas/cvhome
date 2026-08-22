@@ -1,5 +1,6 @@
 import {
   Component,
+  booleanAttribute,
   ElementRef,
   Injector,
   afterNextRender,
@@ -94,6 +95,16 @@ export class Select implements ControlValueAccessor {
   readonly disabled = input(false);
   /** The consumer's `control.invalid && touched`. Draws the error frame; does not block choosing. */
   readonly invalid = input(false);
+  /**
+   * Offers a clear button once something is chosen.
+   *
+   * For a *filter*, where "no choice" is a real answer and getting back to it should not mean
+   * hunting for the right option in a list. A form field should not use this: there, an empty value
+   * is expressed by an option, so that the control always says what it holds.
+   */
+  readonly clearable = input(false, {transform: booleanAttribute});
+  /** Names the clear button. Required for one to be drawn. */
+  readonly clearLabel = input<string | null>(null);
 
   protected readonly listId = `select-list-${nextId++}`;
   protected readonly open = signal(false);
@@ -214,6 +225,20 @@ export class Select implements ControlValueAccessor {
     if (next && !this.host.nativeElement.contains(next)) {
       this.close(false);
     }
+  }
+
+  /** Whether the clear button has anything to clear. */
+  protected readonly showClear = computed(
+    () => this.clearable() && !!this.clearLabel() && this.value() !== '' && !this.isDisabled(),
+  );
+
+  /** Back to no choice, without opening the list. */
+  protected clear(event: Event): void {
+    // The trigger wraps this button, so a click here would otherwise also open the list.
+    event.stopPropagation();
+    this.value.set('');
+    this.onChange('');
+    this.onTouched();
   }
 
   protected choose(index: number): void {

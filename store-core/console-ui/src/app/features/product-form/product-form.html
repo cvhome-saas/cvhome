@@ -92,7 +92,10 @@
             [subtitle]="t('productForm.readiness.subtitle', {percent: facade.readyPercent()})"
           >
             <div class="side-body">
-              <app-progress-track [value]="facade.readyPercent()" />
+              <app-progress-track
+                [value]="facade.readyPercent()"
+                [label]="t('productForm.readiness.subtitle', {percent: facade.readyPercent()})"
+              />
 
               <!--
                 Computed from the form's own fields rather than fetched: it costs no endpoint and

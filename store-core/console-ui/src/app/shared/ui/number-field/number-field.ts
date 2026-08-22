@@ -1,8 +1,10 @@
 import {
+  booleanAttribute,
   Component,
   computed,
   forwardRef,
   input,
+  linkedSignal,
   model,
   signal,
 } from '@angular/core';
@@ -50,6 +52,8 @@ const PARTIAL = /^-?\d*(?:[.,]\d*)?$/;
     '[attr.id]': 'null',
     '[class.number-disabled]': 'isDisabled()',
     '[class.number-invalid]': 'invalid()',
+    '[class.number-compact]': 'compact()',
+    '[class.number-end]': "align() === 'end'",
   },
   providers: [{provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => NumberField), multi: true}],
 })
@@ -71,6 +75,16 @@ export class NumberField implements ControlValueAccessor {
   readonly max = input<number | null>(null);
   /** How many decimals the figure is rounded to on blur. `0` makes it an integer field. */
   readonly decimals = input<number | null>(null);
+  /**
+   * The size for a field inside a table cell: shorter, smaller type, tighter radius.
+   *
+   * A size on the component rather than a class on the host. The host is not the frame — the frame
+   * is the shell inside this template — so a stylesheet outside could only ever draw a *second*
+   * border around this one, which is what the products table did until this input existed.
+   */
+  readonly compact = input(false, {transform: booleanAttribute});
+  /** `end` for a figure in a numeric column, where the digits should line up with the ones above. */
+  readonly align = input<'start' | 'end'>('start');
 
   /**
    * What is in the box.
@@ -78,7 +92,18 @@ export class NumberField implements ControlValueAccessor {
    * Held separately from `value` because they are legitimately out of step mid-edit: `-`, `1.` and
    * an empty box are all things you type on the way to a number and none of them is one.
    */
-  protected readonly text = signal('');
+  protected readonly text = linkedSignal<number | null, string>({
+    source: this.value,
+    computation: (value, previous) => {
+      // What is already in the box wins when it means the same number: `1.`, `1.0` and `01` all
+      // parse to 1, and rewriting them mid-keystroke would move the caret out from under the
+      // operator. Only a value that genuinely differs redraws the text.
+      if (previous !== undefined && parse(previous.value) === value) {
+        return previous.value;
+      }
+      return value === null ? '' : String(value);
+    },
+  });
 
   private readonly formDisabled = signal(false);
   protected readonly isDisabled = computed(() => this.disabled() || this.formDisabled());
@@ -89,10 +114,13 @@ export class NumberField implements ControlValueAccessor {
   /* --------------------------------------------------------------------------- CVA ---- */
 
   writeValue(value: number | null): void {
+    // The text follows `value`, so this is the whole of it.
+    //
+    // It used to set the text itself, and *only* here — which meant a field driven by `[(value)]`
+    // rather than by a form never had its text set at all, and the products table's inline editor
+    // opened empty over a product that plainly had a price. The link between the two now lives in
+    // `text` for both ways of driving the control.
     this.value.set(value ?? null);
-    // Not reformatted here: a value written while the operator is typing would fight them. `blur`
-    // is where the figure is tidied.
-    this.text.set(value === null || value === undefined ? '' : String(value));
   }
 
   registerOnChange(fn: (value: number | null) => void): void {

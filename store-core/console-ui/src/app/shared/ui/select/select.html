@@ -26,6 +26,21 @@
   <app-icon name="chevronDown" [size]="14" class="select-caret" />
 </button>
 
+<!--
+  Outside the trigger, not inside it: a button inside a button is invalid, and nesting them made
+  the clear click open the list on its way past. Positioned over the caret's inner edge instead.
+-->
+@if (showClear()) {
+  <button
+    class="select-clear"
+    type="button"
+    [attr.aria-label]="clearLabel()"
+    (click)="clear($event)"
+  >
+    <app-icon name="x" [size]="12" />
+  </button>
+}
+
 @if (open()) {
   <!--
     Inside an `@if` so `animate.leave` has something to run on, and so an idle select adds nothing
