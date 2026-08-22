@@ -2424,3 +2424,90 @@ statistics outage.**
   link rather than after. The accept page handles the authenticated case correctly and does not
   pretend to handle the other one.
 - **Placeholder:** `TODO(lessons.md):` in `features/auth/accept-invitation/accept-invitation.ts`.
+
+## Users — the login redirect broke every deep link with a query string
+
+**Fixed here, not merely recorded — the third resolved entry in this file. Reported by the user
+against the invitation link, and not an invitation defect at all.**
+
+- **Screen:** every console route reached by a signed-out visitor with anything after the `?` — a
+  filtered list, a selected row, an invitation link.
+- **What was wrong:** `canAccessSecuredPages` sends an unauthenticated visitor to
+  `/oauth2/authorization/uaa?redirectTo=<target>`, and the gateway's
+  `CapturingServerOAuth2AuthorizationRequestResolver` forwards that parameter on to uaa. It read the
+  value with `getQueryParams()` — which **decodes** — appended it verbatim, and then built the URI
+  with `build(true)`, which asserts that everything in it is already encoded. The bare `?` and `=`
+  inside the target were then illegal:
+  ```
+  IllegalArgumentException: Invalid character '=' for QUERY_PARAM
+    in "/accept-invitation?token=abc"
+  ```
+  Reproduced side by side: `redirectTo=%2Fdashboard` answered **302**,
+  `redirectTo=%2Faccept-invitation%3Ftoken%3Dabc` answered **500**.
+- **Why nothing reported it:** every URL anyone types by hand is a bare path. The parameterised ones
+  are produced by the app — a shared link, a copied row, an invitation — and only ever followed by
+  someone who is *already* signed in, where the guard never fires. Module 8 is the first flow whose
+  whole point is a link carrying a query string, followed by someone with no session.
+- **Resolved by:** `fix(console-ui): the copy button, and every login redirect with a query string` —
+  the forwarded values are `UriUtils.encode`d before they are appended, which is what `build(true)`
+  was always promised.
+- **Left standing:** the pairing of a decoding read with an encoded build is not checked anywhere,
+  and the resolver forwards a configurable list of parameters, so a second one added later inherits
+  the same trap.
+
+## Users — copying inside a dialog was decorative
+
+**Fixed here. A console defect rather than a backend gap, recorded because it was invisible for as
+long as it existed and because the next dialog would have inherited it.**
+
+- **Screen:** the invitation link dialog, and — as it turned out — every dialog in the app.
+- **What was wrong:** `navigator.clipboard` is gated to secure contexts, and the console runs over
+  plain HTTP on a named host, so **every** copy button in development takes the selection fallback:
+  a hidden `<textarea>`, `select()`, `document.execCommand('copy')`. That carrier was appended to
+  `document.body` — and a dialog opened with `showModal()` sits in the top layer and makes
+  everything outside it inert. The carrier could not be selected, so the copy lifted nothing and the
+  control reported failure.
+- **Why nothing reported it:** the same component works perfectly in a table, which is where it had
+  been used until now. `app-copy-field` had no spec at all, and its own failure toast made the
+  breakage look like an environment limitation rather than a bug.
+- **Resolved by:** the carrier is appended to the topmost `dialog:modal` when one is open. It
+  carries the first spec for that helper; reverting the placement fails exactly the modal case.
+- **Left standing:** the secure-context problem itself. Over HTTPS the fallback is never reached, so
+  this was only ever a development defect — which is precisely why it survived: nobody copies a
+  value in production from a machine that reproduces it. Same family as `crypto.randomUUID`, which
+  `toast.ts` already works around, and as the DoH check in `dns-check.service.ts`.
+
+## Users — what the first design pass got wrong
+
+**Console-side, in the shape of "The design pass" and "The alignment pass" above. Every item was
+found by a person looking at the built page, not by a check.**
+
+- **A dashboard was built for a list of three people.** `/users` opened with a KPI row reporting
+  "Team members 2" directly above a table whose own subtitle read "Showing 1–2 of 2 users". The
+  template draws four tiles because it imagines a marketplace; a team is a handful of accounts, and
+  a metric tile for a number the next line already states is decoration. The row was removed
+  outright — the same call the catalogue made about its inventory KPIs, for the same reason.
+- **A master-detail rail is for a list you scan, not a list you can count.** The rail was empty on
+  arrival, permanently took a third of the width, and squeezed the table hard enough that
+  `app-data-table` fell through its own 45rem container query into stacked cards — so the page had a
+  two-pane layout whose left pane was no longer a table. Reading one account is a discrete task with
+  a commit at the end, which is what a dialog is for, and it costs the list no width.
+- **`.page-body` is cited in `ARCHITECTURE.md` and defined nowhere.** Two pages shipped stacking
+  their panels with it and got no gap at all. Worse, `@shared/styles/field.css` is included **per
+  component**, so a page that forgets it gets `.split` as a plain block while its own scoped rules
+  apply normally — which reads as a broken breakpoint rather than a missing import. Now noted in
+  `CLAUDE.md` and `ARCHITECTURE.md`.
+- **A light token used as a background is a contrast failure waiting for a theme switch.**
+  `/profile` painted the selected preference with `--primary-muted` — a *light* emerald whose job is
+  to be ink on a dark field. Under Forest it looked merely loud; under Midnight it resolved to pale
+  lavender carrying `--foreground-strong` white. The accent pair (`--accent` with
+  `--accent-foreground`) is the system's idiom for "this one is chosen" and survives all three
+  themes because both halves move together. **A token's name says what it is, not where it goes.**
+- **`dir="auto"` on chrome makes a list disagree with itself.** The language picker set it per
+  option, so "English" and "العربية" each took their own script's direction and aligned to opposite
+  edges of the same list — and the pair swapped over when the page direction changed. Plaintext bidi
+  is for *values* whose own direction matters: an email, a SKU, a domain. A language name in a fixed
+  picker is a label, and labels align with the page.
+- **A control the width of the page reads as a text field.** Two settings of two and three options
+  were stacked full-width, giving a two-word label an 1100px measure. They sit side by side and cap
+  at 20rem.
