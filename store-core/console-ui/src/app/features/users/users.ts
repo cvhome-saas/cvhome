@@ -94,7 +94,12 @@ const INVITATION_COLUMN_KEYS: readonly {key: string; labelKey: string; width: st
   ],
   providers: [UsersFacade],
   templateUrl: './users.html',
-  styleUrl: './users.css',
+  /*
+   * `field.css` carries `.page-body`, `.split` and `.field-hint`, and every feature that uses them
+   * pulls it in beside its own sheet — it is not global. Omitting it left `.split` as a plain block,
+   * so the master-detail panes stacked no matter how wide the page was. Found in QA.
+   */
+  styleUrls: ['../../shared/styles/field.css', './users.css'],
 })
 export class Users {
   private readonly transloco = inject(TranslocoService);

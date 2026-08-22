@@ -6,14 +6,28 @@
  * The list leads and the rail supports it, which is the reverse of `.split`'s 5fr/7fr — that
  * proportion is for a page whose editor is the subject. Here the table is, and the rail is a
  * fixed-width panel beside it, as the design draws it.
+ *
+ * **The breakpoint is a container query, not a media query, and it is derived rather than chosen.**
+ * `.split`'s own 1100px is measured against the viewport while the workspace is some 270px narrower
+ * because of the nav rail, so the two panes never lined up with the space actually available.
+ *
+ * `app-data-table` drops to its stacked card layout below its own `data-table` container query at
+ * 45rem, so the table needs 720px to stay a table. 720 + 1rem of gap + 24rem of rail is 1120px, and
+ * that is the number: above it both panes get what they need, below it the rail sits under a
+ * full-width table instead of squeezing it into cards. Splitting sooner produced a two-pane layout
+ * whose left pane was no longer a table, which is worse than not splitting. Both found in QA.
  */
-.users-split {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+.split-container {
+  container-type: inline-size;
 }
 
-@media (max-width: 1100px) {
+.users-split {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 1120px) {
   .users-split {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
   }
 }
 
@@ -133,6 +147,17 @@ app-table-row.selected {
   gap: 0.2rem;
   min-inline-size: 0;
   flex: 1;
+}
+
+/*
+ * In the rail the address wraps rather than ellipsing. The table has other columns competing for
+ * the width and truncating there is the right trade; here the address *is* the content, and
+ * `org1-store1-moderator@mail.…` is not something an operator can act on. Found in QA.
+ */
+.rail-identity-text .email {
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .rail-identity-text strong {

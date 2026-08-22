@@ -180,7 +180,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('@features/accept-invitation/accept-invitation').then((page) => page.AcceptInvitation),
+          import('@features/auth/accept-invitation/accept-invitation').then((page) => page.AcceptInvitation),
         data: {titleKey: 'route.acceptInvitation.title'},
       },
     ],

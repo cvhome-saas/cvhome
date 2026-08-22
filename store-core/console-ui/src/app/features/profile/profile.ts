@@ -31,7 +31,8 @@ import {ProfileFacade} from './facades/profile.facade';
   imports: [Badge, Icon, NoticeBar, PageHeader, Panel, TranslocoDirective],
   providers: [ProfileFacade],
   templateUrl: './profile.html',
-  styleUrl: './profile.css',
+  /* `.page-body` and `.field-hint` live in `field.css`, which each feature pulls in beside its own. */
+  styleUrls: ['../../shared/styles/field.css', './profile.css'],
 })
 export class Profile {
   private readonly router = inject(Router);

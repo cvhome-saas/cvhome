@@ -2113,6 +2113,13 @@
       "noToken": "This link is missing its invitation token, so there is nothing to accept.",
       "retry": "Try again",
       "hint": "It may have already been used, been revoked, or expired. Ask whoever invited you to send a new one."
+    },
+    "story": {
+      "heading": "One console, every store",
+      "copy": "Joining an organization gives you access to the stores its administrators have put you on.",
+      "point1": "Your own sign-in — nothing is shared",
+      "point2": "The stores and permissions your administrator chose",
+      "point3": "An invitation can only be accepted once"
     }
   },
   "profile": {

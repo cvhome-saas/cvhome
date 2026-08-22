@@ -109,7 +109,7 @@ describe('AcceptInvitation', () => {
     expect(host.textContent).toContain('cannot be used');
     // The server's own message, resolved through ApiErrorService, stays on the page rather than
     // being raised as a toast that would dismiss itself.
-    expect(host.querySelector('app-load-error')).not.toBeNull();
+    expect(host.querySelector('[role="alert"]')).not.toBeNull();
     expect(host.textContent).toContain('Ask whoever invited you');
   }));
 

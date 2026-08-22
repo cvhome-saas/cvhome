@@ -1,28 +1,38 @@
-:host {
-  display: contents;
-}
-
-.accept {
+/*
+ * The frame comes from `../auth.css`, which sign-in and sign-up also carry — this only adds what a
+ * page with no form needs. `.auth-entry`'s card rule targets `form`, and there is no form here, so
+ * `.accept-card` restates it.
+ */
+.accept-card {
   display: grid;
   justify-items: center;
   gap: 0.75rem;
+  inline-size: 100%;
   max-inline-size: 26rem;
-  margin-inline: auto;
+  padding: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--panel);
   text-align: center;
+  animation: rise 0.55s 0.08s ease both;
 }
 
-.accept h1 {
+.accept-card h1 {
   margin: 0;
   color: var(--foreground-strong);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);
 }
 
-.accept p {
+.accept-card p {
   margin: 0;
   color: var(--secondary-foreground);
   font-size: var(--text-sm);
   line-height: 1.7;
+}
+
+.accept-card .auth-submit {
+  inline-size: 100%;
 }
 
 .accept-icon {
@@ -40,10 +50,6 @@
 }
 
 .accept-hint {
-  color: var(--muted-foreground);
+  color: var(--foreground-subtle);
   font-size: var(--text-xs);
-}
-
-.accept .primary-action {
-  margin-block-start: 0.5rem;
 }

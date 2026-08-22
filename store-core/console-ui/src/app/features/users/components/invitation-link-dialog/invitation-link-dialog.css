@@ -1,13 +1,16 @@
 /*
  * Follows `shared/ui/confirm-dialog/confirm-dialog.css` — same surface, same backdrop, same
  * top-layer entry — so the several dialogs on this page do not read as coming from different apps.
- * It is wider than the others because it holds a URL, and a link that wraps across three lines is
- * harder to trust than one that does not.
+ * It is the widest dialog in the console because it holds a URL that an operator has to read as
+ * well as copy. `app-copy-field` scrolls its value horizontally rather than truncating it, so
+ * nothing is ever lost — but a link that *looks* cut off reads as broken, and this is the one
+ * screen where the operator's confidence in the string matters. Widened in QA after the link
+ * showed as `…token=vioa`.
  */
 .invite-link {
   /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
   margin: auto;
-  inline-size: min(34rem, calc(100vw - 2rem));
+  inline-size: min(42rem, calc(100vw - 2rem));
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);

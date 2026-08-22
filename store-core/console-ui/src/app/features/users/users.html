@@ -44,16 +44,22 @@
         </div>
 
         <!--
-          The list is scoped to the open store, and that genuinely hides people: an account whose uaa
-          metadata carries no store — which is how an org admin is stored — is in no store's list at
-          all. Said here rather than left for an operator to conclude their team is smaller than it is.
+          The team list is scoped to the open store, and that genuinely hides people: an account
+          whose uaa metadata carries no store — which is how an org admin is stored — is in no
+          store's list at all. Said here rather than left for an operator to conclude their team is
+          smaller than it is.
+
+          **Only on the team tab.** Invitations are org-scoped, so claiming they belong to one store
+          would be worse than saying nothing. Found in QA.
           See lessons.md, "Users — the user list is store-scoped, so an org admin is in no list".
         -->
-        <app-notice-bar
-          icon="info"
-          tone="blue"
-          [message]="t('users.scopedToStore', {store: facade.storeName()})"
-        />
+        @if (facade.activeTab() !== 'invitations') {
+          <app-notice-bar
+            icon="info"
+            tone="blue"
+            [message]="t('users.scopedToStore', {store: facade.storeName()})"
+          />
+        }
 
         <app-tab-switcher
           [tabs]="facade.tabs()"
@@ -135,7 +141,12 @@
             }
           </app-panel>
         } @else {
-        <div class="split users-split" id="users-panel">
+        <!--
+          The wrapper is what the container query measures: a container sizes its descendants, not
+          itself, so `.users-split` cannot respond to its own width.
+        -->
+        <div class="split-container" id="users-panel">
+        <div class="split users-split">
           <app-panel class="team-panel" [title]="t('users.allUsers')" [subtitle]="facade.subtitle()">
             @if (rows().length) {
               <app-data-table id="users-table" [columns]="columns()" [label]="t('users.allUsers')">
@@ -394,6 +405,7 @@
               <app-empty-state icon="user" [message]="t('users.rail.selectPrompt')" />
             </app-panel>
           }
+        </div>
         </div>
         }
       </div>
