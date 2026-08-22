@@ -35,7 +35,8 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
       // Was routeless — this app's marker for "not built". Module 6 built it.
       {labelKey: 'shell.nav.item.inventory', icon: 'box', route: '/products'},
       {labelKey: 'shell.nav.item.orders', icon: 'shoppingCart', route: '/orders'},
-      {labelKey: 'shell.nav.item.payments', icon: 'creditCard'},
+      // Was routeless — this app's marker for "not built". Module 7 built it.
+      {labelKey: 'shell.nav.item.payments', icon: 'creditCard', route: '/payments'},
     ],
   },
 ];

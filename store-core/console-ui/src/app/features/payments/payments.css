@@ -1,0 +1,177 @@
+/*
+ * Page-level layout only. The console frame (banner, rail, toolbar) belongs to ConsoleShell, and
+ * the card chrome belongs to Panel. Follows `orders.css`, which this table is a sibling of.
+ */
+
+:host {
+  display: contents;
+}
+
+/* Sits below the page header so the date picker popover is never covered. */
+app-kpi-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The page owns the report's rhythm. It cannot be set on the overlay's inner wrapper — that element
+ * belongs to BusyOverlay's template and is out of this stylesheet's reach.
+ */
+.report {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.payments-panel {
+  --rise-from: 0.75rem;
+  animation: rise 0.5s 0.42s ease both;
+}
+
+/* Narrower than this the seven columns stop being readable and the table scrolls. */
+.payments-panel app-data-table {
+  --table-min-width: 56rem;
+}
+
+/* ---- Panel header controls -------------------------------------------------------- */
+
+/*
+ * The filters claim a basis so the panel's title does not pay for them — the same reasoning as
+ * `orders.css`, and more acute here: thirteen tabs, a gateway select and a search box.
+ */
+.panel-controls {
+  display: flex;
+  flex: 1 1 32rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.panel-controls app-select {
+  flex: none;
+  inline-size: 11rem;
+}
+
+/* ---- Rows ------------------------------------------------------------------------- */
+
+.cell-transaction {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+/*
+ * The external reference the gateway or the bank gave, under the console's own. Latin data that
+ * must not reorder inside an Arabic page.
+ */
+.transaction-external {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.cell-order {
+  min-width: 0;
+}
+
+.order-ref {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  unicode-bidi: plaintext;
+}
+
+.order-ref:hover {
+  color: var(--primary-emphasis);
+}
+
+/* A reference that is not an order id: shown, not linked. */
+.order-ref-plain {
+  display: block;
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.cell-method {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-status {
+  min-width: 0;
+}
+
+.cell-amount {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: end;
+}
+
+.cell-date {
+  display: grid;
+  min-width: 0;
+}
+
+.cell-date strong {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-actions {
+  display: flex;
+  gap: 0.2rem;
+  justify-content: flex-end;
+}
+
+/*
+ * Stacked-card mode. The table drops its grid below this width (see data-table.css) and every cell
+ * names itself, so the cells that were laid out as columns become rows.
+ */
+@container data-table (max-width: 45rem) {
+  [data-label] {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    text-align: start;
+  }
+
+  [data-label]::before {
+    content: attr(data-label);
+    color: var(--foreground-subtle);
+    font-size: var(--text-3xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .cell-amount {
+    text-align: start;
+  }
+
+  .cell-actions {
+    justify-content: flex-start;
+  }
+}

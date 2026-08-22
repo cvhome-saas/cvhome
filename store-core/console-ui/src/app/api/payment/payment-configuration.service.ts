@@ -28,7 +28,17 @@ const PAYMENT_CONFIG_API_BASE = '/spg/payment/api/v1/private/payment-configurati
 export class PaymentConfigurationService {
   private readonly crudService = inject(CrudService);
 
-  /** Every `PaymentType` the platform knows, by name — `COD`, `MANUAL_TRANSFER`, `STRIPE`, `PAYPAL`. */
+  /**
+   * Every `PaymentType` the platform knows, by name — `COD`, `MANUAL_TRANSFER`, `STRIPE`, `PAYPAL`.
+   *
+   * seller-core declared this **twice**, once in its `payments` entry point and once in its `stores`
+   * one, both hitting this URL. Ported once. Its sibling `supported-payment-statuses` is not ported
+   * at all: the payments ledger builds its tab strip from the typed `PaymentStatus` union so that a
+   * page load does not wait on a lookup, which leaves that endpoint with no caller.
+   *
+   * `PAYPAL` comes back even though no PayPal processor exists — see lessons.md, "Payments — a
+   * gateway is offered that cannot take money".
+   */
   supportedTypes(): Observable<string[]> {
     return this.crudService.get(`${PAYMENT_CONFIG_API_BASE}/supported-payment-types`);
   }

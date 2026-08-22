@@ -59,6 +59,9 @@
     },
     "productForm": {
       "title": "منتج | cvhome"
+    },
+    "payments": {
+      "title": "المدفوعات | cvhome"
     }
   },
   "notFound": {
@@ -1139,7 +1142,8 @@
       "catalogue": "الكتالوج",
       "products": "المنتجات",
       "newProduct": "منتج جديد",
-      "productForm": "منتج"
+      "productForm": "منتج",
+      "payments": "المدفوعات"
     },
     "toolbar": {
       "breadcrumbNav": "مسار التنقل",
@@ -1833,5 +1837,81 @@
       "filled": "{filled} من {total}"
     },
     "missingLanguages": "لا يمكن الحفظ بعد — لا يوجد اسم مكتوب بـ{languages}."
+  },
+  "payments": {
+    "heading": {
+      "title": "المدفوعات",
+      "context": "{{store}} · كل دفعة استلمها المتجر"
+    },
+    "loading": "جارٍ تحميل المدفوعات…",
+    "metricsLabel": "مؤشرات المدفوعات",
+    "allTransactions": "المعاملات",
+    "gatewaySettings": "إعدادات بوابات الدفع",
+    "filterByStatus": "تصفية المعاملات حسب الحالة",
+    "searchLabel": "ابحث برقم الطلب أو مرجع المعاملة",
+    "searchPlaceholder": "رقم الطلب أو المرجع",
+    "clearSearch": "مسح البحث في المعاملات",
+    "clearFilters": "مسح عوامل التصفية",
+    "noneMatch": "لا توجد معاملة تطابق عوامل التصفية هذه.",
+    "noneInPeriod": "لم تُستلم أي مدفوعات في هذه الفترة.",
+    "unit": "معاملة",
+    "pagesLabel": "صفحات المعاملات",
+    "filter": {
+      "gateway": "تصفية حسب البوابة",
+      "allGateways": "كل البوابات",
+      "clearGateway": "عرض كل البوابات"
+    },
+    "tab": {
+      "queue": "بانتظار الموافقة",
+      "all": "الكل"
+    },
+    "column": {
+      "transaction": "المعاملة",
+      "order": "الطلب",
+      "method": "طريقة الدفع",
+      "status": "الحالة",
+      "amount": "المبلغ",
+      "date": "التاريخ",
+      "actions": "إجراءات"
+    },
+    "kpi": {
+      "awaitingApproval": "بانتظار الموافقة",
+      "captured": "مُحصَّلة",
+      "failed": "فاشلة",
+      "refunded": "مُستردة",
+      "actionNeeded": "بحاجة إلى إجراء",
+      "allClear": "لا شيء بالانتظار",
+      "unavailable": "غير متاح"
+    },
+    "subtitle": {
+      "none": "لا شيء لعرضه",
+      "range": "عرض {{from}}–{{to}} من {{total}}",
+      "queue": "عرض {{from}}–{{to}} من {{total}} بانتظار التأكيد"
+    },
+    "action": {
+      "approve": "موافقة",
+      "approveFor": "الموافقة على المعاملة {{reference}}",
+      "reject": "رفض",
+      "rejectFor": "رفض المعاملة {{reference}}"
+    },
+    "approve": {
+      "title": "تأكيد هذه الدفعة",
+      "message": "أدخل المرجع من البنك أو بوابة الدفع لتسجيل وصول المبلغ.",
+      "messageFor": "أدخل المرجع من البنك أو بوابة الدفع لتسجيل وصول مبلغ الطلب {{reference}}.",
+      "transactionNo": "رقم المعاملة الخارجي",
+      "transactionNoHint": "المرجع الظاهر في كشف حسابك. يُحفظ مع الدفعة.",
+      "transactionNoRequired": "أدخل رقم المعاملة الخارجي.",
+      "confirm": "الموافقة على الدفعة",
+      "approving": "جارٍ الموافقة…"
+    },
+    "reject": {
+      "title": "رفض هذه الدفعة؟",
+      "message": "ستُوسم الدفعة {{reference}} بأنها مرفوضة. لن تتغير حالة الطلب ولن يُخطر العميل — عليك المتابعة بشكل منفصل.",
+      "confirm": "رفض الدفعة"
+    },
+    "toast": {
+      "approved": "تمت الموافقة على الدفعة {{reference}}.",
+      "rejected": "رُفضت الدفعة {{reference}}. لم يتغيّر الطلب."
+    }
   }
 }

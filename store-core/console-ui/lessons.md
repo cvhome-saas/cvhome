@@ -1874,3 +1874,235 @@ invisible until something was measured rather than read.
   `shows no KPI row — all four tiles the design draws are unbacked` in `products.spec.ts` pins that.
   The console change is a follow-up, not a gap in the backend: the three figures above can be built
   from what `/products` already receives, and should be, before any of the endpoints above exist.
+
+
+## Payments — nothing aggregates a transaction
+
+- **Screen:** `/payments`, the KPI row and the whole upper band of `console-template/Payments.dc.html`
+  — Captured `$48,230`, Pending approval `$12,480`, Refunded `$986`, the fourteen-bar "Volume by day"
+  chart, and the Gateways panel's `Stripe $31,410 / 65%` split.
+- **What the UI needs:** money totalled over a period, and grouped — by status, by day, by gateway.
+- **What is missing:** every aggregate. `grep -i statistic` across `store-pod/payment` returns **zero
+  hits**. `TransactionRepository` is a `JpaRepository` + `JpaSpecificationExecutor` with three
+  finders and no `@Query`, no count projection and no group-by. checkout has `order-statistic`,
+  `product-statistic` and `customer-statistic`; payment has nothing of the kind.
+- **Why it is required:** "how much did we take this month" is the first question a payments page is
+  opened to answer, and it is the one question this one cannot.
+- **Expected contract:** `POST /spg/payment/api/v1/private/payment/transaction-statistic?store=` taking
+  the same `StatisticRange` the checkout statistics take, answering entries keyed by status, by
+  payment type and by day, each with a count **and** a summed amount with its currency.
+- **What console-ui does meanwhile:** shows four **counts** instead of four amounts — awaiting
+  approval, captured, failed, refunded — each a one-row fetch read for its `totalElements`. The
+  volume chart, the gateway split and the settlement summary are absent rather than drawn from
+  invented figures. See also "Dashboard — counting requires fetching", which this page pays four
+  times over.
+- **Placeholder:** `TODO(lessons.md):` in `features/payments/payments.html` and
+  `features/payments/facades/payments.facade.ts`.
+
+## Payments — no payouts, no settlement and no gateway fee
+
+- **Screen:** `/payments` — the Payouts panel (`Payout to Chase •••• 8842 · Scheduled · $45,831.40`,
+  four rows and a "Payout schedule" link) and the settlement stack beneath the Gateways panel
+  (`Gross volume`, `Gateway fees −$1,412.60`, `Refunds`, `Net payout`). Plus the per-row `fee $36.20`
+  under every amount in the transactions table.
+- **What is missing:** all of it. `payout` has 16 hits repo-wide and **every one is inside
+  `console-template/*.dc.html`**; `settlement` has two, both CMS seed copy. `gatewayFee` has zero.
+  There is no fee column on `Transaction`, no fee field on any DTO, and no net-of-fees figure
+  anywhere in payment or checkout — the single `fee` hit in either pod is a code comment.
+- **Why it is required:** the difference between what a customer paid and what reaches the seller's
+  bank is the number a merchant reconciles against. Without it the console can say what was charged
+  and nothing about what was received.
+- **Expected contract:** a `Payout` entity keyed by store with a scheduled date, a destination, a
+  status and the transactions it covers; a `fee` and `netAmount` on `ReadableTransaction`, populated
+  from the gateway's own settlement report.
+- **What console-ui does meanwhile:** neither panel is built and the fee line is absent from the row.
+  The amount shown is the gross the customer was charged, which is the only figure that exists.
+
+## Payments — no disputes and no chargebacks
+
+- **Screen:** `/payments` — the "Disputes open" KPI tile (`1`, `Evidence due`, `$447.00 · respond by
+  Aug 11`) and the Disputed tab, whose subtitle reads "Chargebacks needing evidence within 7 days".
+- **What is missing:** the concept. `chargeback` has exactly one hit repo-wide, in the mockup.
+  `dispute` has nine, five in the mockup and four in **billing**'s subscription vocabulary, which is
+  a different domain. `store-pod/payment` has neither word.
+- **Why it is required:** a dispute has a deadline attached to it, and missing the deadline loses the
+  money. It is the one thing on a payments page that is genuinely time-critical.
+- **Expected contract:** a `Dispute` entity against a transaction, carrying a reason, an amount, an
+  evidence-due date and a state, fed by the gateway's dispute webhooks — Stripe already posts them to
+  `POST /api/v1/public/webhook/{storeId}/{paymentType}`, which currently only routes payment events.
+- **What console-ui does meanwhile:** neither the tile nor the tab exists. The tile's slot is taken
+  by a Failed count, which is real.
+
+## Payments — no refund, no capture and no void
+
+- **Screen:** `/payments`, the Refunds tab and its "Full and partial refunds issued" subtitle; and
+  `/orders/:id`, where the same gap was recorded from the other side.
+- **What is missing:** any endpoint that moves money back or completes an authorisation.
+  `PaymentStatus.REFUNDED` exists as an enum constant and `TransactionType.REFUND` exists in an enum
+  that is **dead code** — `TransactionType` is referenced by no entity, no DTO and no controller.
+  Nothing sets either. There is no capture and no void: the only cancellation is
+  `Transaction.canceled()`, driven by a Stripe webhook, never by an API.
+- **Why it is required:** a refund is the second most common thing an operator does on a payments
+  page, after confirming one.
+- **Expected contract:** `POST …/private/payment/transaction/{internalRef}/refund` taking an amount
+  and a reason, delegating to the processor, and recording a linked transaction rather than mutating
+  the original's status.
+- **What console-ui does meanwhile:** `REFUNDED` is offered as a **filter**, because a transaction
+  could in principle arrive in that state, but there is no refund action anywhere. Cross-references
+  "Orders — no refund and no capture", which found the checkout half of the same hole.
+- **Note:** `payment/init-sql/schema.sql`'s `CHECK` constraint on `transaction.status` is stale — it
+  permits `PAY_LATER`, which is not in the enum, and omits both `AUTHORIZED` and `REFUNDED`. Setting
+  either of the two real statuses would violate it, so the refund endpoint above cannot be written
+  without fixing the constraint first.
+
+## Payments — a transaction carries no customer
+
+- **Screen:** `/payments`, the Customer column — an initials avatar over a name and an email — and
+  the Method column's `•••• 4242` / `Visa` meta line.
+- **What is missing:** any reference from a transaction to a person or to a payment instrument.
+  `ReadableTransaction` is `{id, internalRef, requestRef, amount, currency, paymentType, status,
+  transactionDate, transactionNo}` and the entity behind it adds only gateway plumbing — an external
+  id, redirect URLs, an expiry and a free-text `details`. The card brand and last four live inside
+  the gateway; the platform never stores them.
+- **Why it is required:** "who paid this" is how an operator finds a transaction a customer is
+  telephoning about. Without it the only handles are two opaque references.
+- **Expected contract:** the customer's id and display name denormalised onto the transaction at
+  initiate time — checkout knows both — plus an optional `instrument` of `{brand, last4}` where the
+  processor returns one.
+- **What console-ui does meanwhile:** both columns are absent. The order link is the only route from
+  a transaction to a person, and it is a convention — see the next entry.
+
+## Payments — the link from a transaction to its order is a convention
+
+- **Screen:** `/payments`, the Order column; and `/orders/:id`, the Payments panel.
+- **What is present, and why it is not enough:** `checkout`'s `OrderPlacementFacadeImpl` builds its
+  `PaymentRequest` with `.ref(modelOrder.getId().toString())`, and that value lands in
+  `Transaction.requestRef`. So `requestRef` **is** the order id — as an untyped string, by a
+  convention held in one line of a different service. The payment service does not know it is an
+  order. `payment/init-sql/schema.sql` still declares an `order_id bigint` column on
+  `payment.transaction` that no entity maps and nothing writes, which is the shape of the intended
+  answer left unfinished.
+- **Why it matters:** it is the only join between the money and what was bought, and it will break
+  silently the moment anything else initiates a payment with a different kind of reference.
+- **Expected contract:** a typed `orderId` on `ReadableTransaction` — the dead column made real — or
+  `GET /spg/checkout/api/v1/private/orders/{id}/transactions?store=` so the traversal is the
+  platform's rather than the console's.
+- **What console-ui does meanwhile:** traverses it, in both directions, and says so. The ledger links
+  a row to `/orders/{requestRef}` **only when the reference parses as a positive integer**; anything
+  else is rendered as an opaque reference rather than a link that would 404. Order details reads the
+  same convention backwards, listing `?requestRef={orderId}`. This supersedes the "what console-ui
+  does" half of "Orders — no link from an order to its payment transactions": the panel that entry
+  says is absent now exists, on this convention, with this caveat.
+- **Placeholder:** `TODO(lessons.md):` in `models/payment.ts` and `features/payments/payments.html`.
+
+## Payments — the approval queue's own status is never set
+
+- **Screen:** `/payments`, the Awaiting approval tab and its KPI tile; and `/dashboard`, the "payment
+  approvals waiting" figure shipped in Module 3.
+- **What is missing:** anything that sets `PaymentStatus.WAITING_VERIFICATION`. The constant appears
+  in exactly two places in the platform's Java — its own declaration in the enum, and one line of
+  `TransactionServiceImpl` mapping it onto a gateway result. No processor returns it:
+  `ManualTransferredProcessor.initiate` returns `PENDING`, the same status a card payment sits in
+  while the gateway works.
+- **Why it matters:** the status that names the queue is unreachable, so a console filtering on it
+  counts **zero forever**. That is exactly what the dashboard tile did from the day it shipped — it
+  was not visibly wrong, because zero is a plausible answer, which is what makes this the more
+  dangerous kind of bug.
+- **Expected contract:** `ManualTransferredProcessor.initiate` should return `WAITING_VERIFICATION`,
+  and the status should mean "a person must act" for every processor that has such a state. Until
+  then the two meanings of `PENDING` — "waiting on a machine" and "waiting on a human" — are
+  distinguishable only by payment type.
+- **What console-ui does meanwhile:** filters the queue on `status=PENDING` **and**
+  `paymentType=MANUAL_TRANSFER`, which the server ANDs, and the dashboard tile was corrected to match.
+  `WAITING_VERIFICATION` is still rendered wherever a transaction arrives in it, and is still a tab —
+  it is only never *the* queue.
+- **Placeholder:** `TODO(lessons.md):` in `models/payment.ts` and `api/payment/payment.service.ts`.
+
+## Payments — rejecting a payment tells checkout nothing
+
+- **Screen:** `/payments`, the Reject action and its confirmation dialog.
+- **What happens:** `PrivatePaymentApi.reject` sets the transaction to `REJECTED` and fires **no
+  event**. Its sibling `approve` sets `PAID` and registers `PaymentPaidEvent`, which is what reaches
+  checkout and moves the order. So approving a manual transfer completes an order and rejecting one
+  leaves the order exactly where it was, indefinitely, with a payment that will never arrive.
+- **Why it is required:** the two halves of a decision should have symmetric consequences. As it
+  stands an operator who rejects a payment has to remember to go and cancel the order by hand, and
+  nothing tells them so.
+- **Expected contract:** a `PaymentRejectedEvent` alongside `PaymentPaidEvent`, consumed by checkout
+  the way the paid event already is, releasing any stock reservation the order holds.
+- **What console-ui does meanwhile:** says so, at the moment of the action. The confirmation dialog
+  reads "The order does not change status and the customer is not notified — you will need to follow
+  up separately", and the toast afterwards repeats that the order was not changed. It is the only
+  place an operator would ever find this out.
+- **Placeholder:** `TODO(lessons.md):` in `features/payments/payments.html` and
+  `features/payments/facades/payments.facade.ts`.
+
+## Payments — approve and reject are unguarded and not idempotent
+
+- **Screen:** `/payments`, the row actions.
+- **What happens:** neither endpoint checks the transaction's current state. `approve` sets `PAID`
+  and fires `PaymentPaidEvent` whatever the transaction was — including a transaction that is
+  already `PAID`, which re-fires the event and hands checkout a second completion for the same
+  order. `reject` will happily reject a paid payment. There is no idempotency key and no optimistic
+  lock. `getTransaction` also throws a bare `IllegalArgumentException` for an unknown `internalRef`,
+  which surfaces as a 500 rather than a 404.
+- **Why it is required:** a double-click on Approve is not an exotic input, and the server is the
+  only place this can be made safe — two operators on two screens cannot be prevented from the
+  client.
+- **Expected contract:** reject any transition out of a terminal status with a 409, and answer 404
+  for an unknown ref.
+- **What console-ui does meanwhile:** offers the two actions only on `PENDING`, `PROCESSING`,
+  `WAITING_VERIFICATION` and `AUTHORIZED` (`ACTIONABLE_STATUSES`), disables both buttons while a
+  write is in flight, and re-reads the list afterwards rather than assuming the outcome. That is a
+  guard on the common case, not on the race.
+- **Placeholder:** `TODO(lessons.md):` in `api/payment/payment.service.ts`.
+
+## Payments — a gateway is offered that cannot take money
+
+- **Screen:** `/payments`, the gateway filter; and `/store-management/payments`, the gateway list.
+- **What happens:** `GET …/private/payment-configuration/supported-payment-types` returns all four
+  `PaymentType` values, `PAYPAL` among them, but there is no PayPal processor — only
+  `StripeProcessor`, `CODProcessor` and `ManualTransferredProcessor` exist under
+  `payment-service/.../service/processor/`. Configuring PayPal succeeds, enabling it succeeds, and
+  the first customer to choose it gets `PaymentInitiateResult.failed()` with "un supported payment
+  type" in the log.
+- **Why it is required:** the endpoint's name promises support and the enum is what it answers with.
+  A merchant has no way to discover the difference before a customer does.
+- **Expected contract:** `supported-payment-types` should answer the types that have a registered
+  processor, not `PaymentType.values()`.
+- **What console-ui does meanwhile:** lists all four, because that is what the platform says, and
+  filters by them. It does not warn — the warning belongs on the configuration screen, and that
+  screen cannot tell which types are real either.
+- **Placeholder:** `TODO(lessons.md):` in `features/payments/payments.ts` and
+  `api/payment/payment-configuration.service.ts`.
+
+## Payments — no transaction detail endpoint
+
+- **Screen:** `/payments` — the row, and the detail view there is no room for in a row.
+- **What is missing:** `GET …/private/payment/transactions/{internalRef}`. The list is the only read.
+  The entity holds several fields the list's projection drops — `paymentGatewayExternalId`,
+  `redirectUrl`, `successUrl`, `cancelUrl`, `expireAt` and a free-text `details` — and a support
+  question about a failed payment is usually a question about exactly those.
+- **Why it is required:** to answer "why did this fail" an operator needs the gateway's own reference
+  and the failure detail, and both exist in the row the API declines to send.
+- **Expected contract:** `GET …/transactions/{internalRef}?store=` answering a `ReadableTransaction`
+  widened with the gateway reference, the expiry and the detail text.
+- **What console-ui does meanwhile:** shows the row and nothing more. There is no detail route,
+  because there would be nothing on it that the table does not already show.
+- **Placeholder:** `TODO(lessons.md):` in `api/payment/payment.service.ts`.
+
+## Payments — no export of any kind
+
+- **Screen:** `/payments`, the header's "Export CSV" in `Payments.dc.html`.
+- **What is missing:** any export endpoint, in payment or anywhere else — the same finding the
+  catalogue reached ("Catalogue — no CSV import or export"). Reconciliation is a spreadsheet job and
+  the platform offers no way to get the data into one.
+- **Why it is required:** a merchant reconciling a month against a bank statement works in a
+  spreadsheet, and re-keying a paged HTML table is not a workflow.
+- **Expected contract:** `GET …/private/payment/transactions.csv?store=` taking the same
+  `TransactionSearchFilter` and streaming the whole matching set, not one page.
+- **What console-ui does meanwhile:** exports a **PDF** of what is on screen, through the existing
+  `core/export/pdf-export.service.ts` and `shared/ui/export-button`, exactly as `/orders` does. It is
+  the current page, not the full result set, and it is not machine-readable — but it needs no
+  backend and it is honest about being a printout.
+- **Placeholder:** `TODO(lessons.md):` in `features/payments/payments.html`.

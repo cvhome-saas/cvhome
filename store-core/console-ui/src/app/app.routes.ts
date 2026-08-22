@@ -127,6 +127,18 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'payments',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('@features/payments/payments').then((page) => page.Payments),
+        data: {titleKey: 'route.payments.title', breadcrumbKey: 'shell.breadcrumb.payments'},
+      },
+    ],
+  },
+  {
     /*
      * Its own branch rather than a store-management section: a subscription is store-scoped but it is
      * not a *setting*, and the banner links here from every page in the console.

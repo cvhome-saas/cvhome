@@ -59,6 +59,9 @@
     },
     "productForm": {
       "title": "Product | cvhome"
+    },
+    "payments": {
+      "title": "Payments | cvhome"
     }
   },
   "notFound": {
@@ -1139,7 +1142,8 @@
       "catalogue": "Catalogue",
       "products": "Products",
       "newProduct": "New product",
-      "productForm": "Product"
+      "productForm": "Product",
+      "payments": "Payments"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1833,5 +1837,81 @@
       "filled": "{filled} of {total}"
     },
     "missingLanguages": "Cannot save yet — no name written in {languages}."
+  },
+  "payments": {
+    "heading": {
+      "title": "Payments",
+      "context": "{{store}} · every payment the store has taken"
+    },
+    "loading": "Loading payments…",
+    "metricsLabel": "Payment metrics",
+    "allTransactions": "Transactions",
+    "gatewaySettings": "Gateway settings",
+    "filterByStatus": "Filter transactions by status",
+    "searchLabel": "Search by order number or transaction reference",
+    "searchPlaceholder": "Order number or reference",
+    "clearSearch": "Clear the transaction search",
+    "clearFilters": "Clear filters",
+    "noneMatch": "No transaction matches these filters.",
+    "noneInPeriod": "No payments were taken in this period.",
+    "unit": "transactions",
+    "pagesLabel": "Transaction pages",
+    "filter": {
+      "gateway": "Filter by gateway",
+      "allGateways": "All gateways",
+      "clearGateway": "Show every gateway"
+    },
+    "tab": {
+      "queue": "Awaiting approval",
+      "all": "All"
+    },
+    "column": {
+      "transaction": "Transaction",
+      "order": "Order",
+      "method": "Method",
+      "status": "Status",
+      "amount": "Amount",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "kpi": {
+      "awaitingApproval": "Awaiting approval",
+      "captured": "Captured",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "actionNeeded": "Action needed",
+      "allClear": "Nothing waiting",
+      "unavailable": "Not available"
+    },
+    "subtitle": {
+      "none": "Nothing to show",
+      "range": "Showing {{from}}–{{to}} of {{total}}",
+      "queue": "Showing {{from}}–{{to}} of {{total}} awaiting confirmation"
+    },
+    "action": {
+      "approve": "Approve",
+      "approveFor": "Approve transaction {{reference}}",
+      "reject": "Reject",
+      "rejectFor": "Reject transaction {{reference}}"
+    },
+    "approve": {
+      "title": "Confirm this payment",
+      "message": "Enter the reference from your bank or gateway to record that the money arrived.",
+      "messageFor": "Enter the reference from your bank or gateway to record that the money for order {{reference}} arrived.",
+      "transactionNo": "External transaction number",
+      "transactionNoHint": "The reference on your statement. It is stored with the payment.",
+      "transactionNoRequired": "Enter the external transaction number.",
+      "confirm": "Approve payment",
+      "approving": "Approving…"
+    },
+    "reject": {
+      "title": "Reject this payment?",
+      "message": "Payment {{reference}} will be marked rejected. The order does not change status and the customer is not notified — you will need to follow up separately.",
+      "confirm": "Reject payment"
+    },
+    "toast": {
+      "approved": "Payment {{reference}} approved.",
+      "rejected": "Payment {{reference}} rejected. The order was not changed."
+    }
   }
 }
