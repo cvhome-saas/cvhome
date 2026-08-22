@@ -464,6 +464,15 @@
   inline-size: 232px;
 }
 
+/*
+ * The three preview swatches.
+ *
+ * Literal colours, and correctly so: a swatch shows what a theme the operator is *not* using looks
+ * like, and every semantic token resolves to the theme that is active. There is no token for "the
+ * other theme's surface". The values are the `--background`/`--primary` pair from each theme file
+ * and have to be kept in step with them by hand.
+ */
+/* stylelint-disable color-no-hex -- see above */
 [data-theme-preview='forest'] .swatch {
   background: linear-gradient(135deg, #071a13 0 50%, #10b981 50% 100%);
 }
@@ -475,6 +484,7 @@
 [data-theme-preview='daylight'] .swatch {
   background: linear-gradient(135deg, #ffffff 0 50%, #10b981 50% 100%);
 }
+/* stylelint-enable color-no-hex */
 
 .theme-copy {
   display: flex;

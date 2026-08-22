@@ -14,7 +14,7 @@ const TRANSLATED_PLAN_CODES: readonly string[] = ['FREE', 'BASIC', 'PRO'];
 /**
  * Names a plan in the reader's language.
  *
- * Its own service rather than a method on `BillingFacade`, because naming a plan has nothing to do
+ * Its own service rather than a method on `SubscriptionFacade`, because naming a plan has nothing to do
  * with a store's subscription — and because the plan dialog needs it. Reaching for the facade there
  * pulled the console shell, the store directory and the tenancy client into a presentational dialog;
  * this needs Transloco and nothing else.

@@ -1,4 +1,16 @@
-export const ICON_PATHS = {
+import type {IconName} from '@models/ui';
+
+// Re-exported so the fifty-odd call sites that import `IconName` from here keep working; the union
+// itself is declared in `@models/ui`, where a view model may name an icon without importing upward.
+export type {IconName};
+
+/**
+ * The path for every glyph.
+ *
+ * Typed as a total map over `IconName` rather than inferred, so the two cannot drift: a name with
+ * no path fails to compile here, and a path with no name fails at its `satisfies`.
+ */
+export const ICON_PATHS: Readonly<Record<IconName, string>> = {
   arrowRight: 'M4 12h16m-6-6 6 6-6 6',
   arrowLeft: 'M20 12H4m6-6-6 6 6 6',
   arrowUp: 'M12 19V5m-6 6 6-6 6 6',
@@ -119,6 +131,4 @@ export const ICON_PATHS = {
   tiktok: 'M14 4v9.6a3.6 3.6 0 1 1-3.6-3.6M14 4c.5 2.6 2.1 4.2 4.6 4.4',
   /** X, the network. `x` is already the close glyph. */
   xSocial: 'M4 3h4l12 18h-4L4 3Zm0 18 7-8m2-2.3L20 3',
-} as const;
-
-export type IconName = keyof typeof ICON_PATHS;
+};

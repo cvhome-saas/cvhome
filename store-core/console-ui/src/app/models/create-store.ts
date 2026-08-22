@@ -1,4 +1,4 @@
-import type {IconName} from '@shared/ui/icon/icon-paths';
+import type {IconName} from '@models/ui';
 
 export type CreateStorePhase = 'form' | 'running';
 

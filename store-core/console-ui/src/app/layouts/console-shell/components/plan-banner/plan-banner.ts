@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 
-import {BillingFacade} from '@layouts/billing/billing.facade';
+import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
 import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 
@@ -13,7 +13,7 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
  * to every operator on every page, whatever they were paying, and its Upgrade button did nothing. A
  * paying customer was told to upgrade; a store whose card had just failed was told nothing.
  *
- * It now renders `BillingFacade.banner()`, which is `null` for a healthy paid store — so the common
+ * It now renders `SubscriptionFacade.banner()`, which is `null` for a healthy paid store — so the common
  * case is **no banner at all**. What remains is a trial running down, a payment that failed, a
  * cancellation already scheduled, or a store billing has not caught up with yet. `Upgrade` goes to the
  * billing page (`/subscription` — the gateway owns `/billing`) rather than opening a checkout from the chrome: choosing what to pay for is a decision
@@ -59,5 +59,5 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
 })
 export class PlanBanner {
   protected readonly shell = inject(ConsoleShellFacade);
-  protected readonly billing = inject(BillingFacade);
+  protected readonly billing = inject(SubscriptionFacade);
 }

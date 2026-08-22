@@ -19,7 +19,7 @@ import {
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import {ProductsApi, type ProductsQuery} from '../services/products.api.service';
-import {ProductsCache} from '../services/products-cache';
+import {ProductsCache} from '@api/catalog/products-cache';
 
 export const PAGE_SIZE = 20;
 

@@ -1,7 +1,7 @@
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@models/page';
 import {INVENTORY_STATUSES, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus} from '@models/checkout';
-import type {KpiDatum} from '@shared/ui/kpi-card/kpi-card';
-import type {Tone} from '@shared/ui/tone';
+import type {KpiDatum} from '@models/ui';
+import type {Tone} from '@models/ui';
 
 /**
  * The orders page's view models.

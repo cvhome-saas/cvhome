@@ -1,13 +1,10 @@
 import {TestBed} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
 import {Observable, of} from 'rxjs';
 
 import {ProductService} from '@api/catalog/product.service';
 import type {PageT} from '@core/table/table.types';
-import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
-import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
-import {translocoTesting} from '@testing/transloco-testing';
-import {ProductSearch} from './product-search';
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
+import {ProductSearch} from '@api/catalog/product-search.service';
 
 interface WireProduct {
   readonly id: number;
@@ -39,21 +36,31 @@ class FakeProductService {
   }
 }
 
+/**
+ * The open store, which is all this service needs from the rest of the app.
+ *
+ * It used to read `ConsoleShellFacade`, so this spec had to stand up the console shell's api
+ * service and a router to search a list of five products. Reading `SelectedStoreService` instead is
+ * both the correct tier and a far smaller thing to fake — the pool is keyed by store id and nothing
+ * about it is reactive.
+ */
+class FakeSelectedStore {
+  currentSelectedStore() {
+    return {id: 'ORG1-STORE1'};
+  }
+}
+
 describe('ProductSearch', () => {
   let search: ProductSearch;
   let products: FakeProductService;
 
   beforeEach(() => {
-    localStorage.removeItem('cvhome.console.store');
     products = new FakeProductService();
 
     TestBed.configureTestingModule({
-      imports: [...translocoTesting().imports],
       providers: [
-        provideRouter([]),
         {provide: ProductService, useValue: products},
-        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
-        ...translocoTesting().providers,
+        {provide: SelectedStoreService, useValue: new FakeSelectedStore()},
       ],
     });
     search = TestBed.inject(ProductSearch);

@@ -1,5 +1,5 @@
-import {IconName} from '@shared/ui/icon/icon-paths';
-import type {Tone} from '@shared/ui/tone';
+import type {IconName} from '@models/ui';
+import type {Tone} from '@models/ui';
 
 /**
  * The dashboard speaks the shared categorical vocabulary; aliased so existing call sites

@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/subscriptions/src/lib/services/subscription.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
@@ -40,7 +41,7 @@ export class SubscriptionService {
    *
    * **404 is a real answer, not a fault.** Billing has never seen a store that has not been provisioned through
    * the quota flow, and a brand-new store can reach the console before its `StoreCreatedEvent` has been consumed.
-   * Callers treat "no subscription" as a state to render, not an error to report — see `BillingFacade`.
+   * Callers treat "no subscription" as a state to render, not an error to report — see `SubscriptionFacade`.
    */
   current(store: string): Observable<Subscription> {
     return this.crudService.get(`${SUBSCRIPTION_API_BASE}/current`, {store});

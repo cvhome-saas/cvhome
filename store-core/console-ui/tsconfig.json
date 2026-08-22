@@ -11,7 +11,6 @@
       "@layouts/*": ["app/layouts/*"],
       "@features/*": ["app/features/*"],
       "@models/*": ["app/models/*"],
-      "@mocks/*": ["app/mocks/*"],
       "@env/*": ["environments/*"],
       "@i18n/*": ["locale/*"],
       "@testing/*": ["app/testing/*"]

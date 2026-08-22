@@ -1,7 +1,7 @@
 import type {ProvisioningState, StoreStatus} from '@models/tenancy';
 
-import {IconName} from '@shared/ui/icon/icon-paths';
-import type {Tone} from '@shared/ui/tone';
+import type {IconName} from '@models/ui';
+import type {Tone} from '@models/ui';
 
 /**
  * The console chrome — navigation, stores, notifications and identity. Shared by every

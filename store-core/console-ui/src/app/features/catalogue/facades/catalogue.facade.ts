@@ -24,7 +24,7 @@ import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import type {TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import type {TreeMove, TreeNode} from '@shared/ui/tree/tree';
 import {ToastService} from '@shared/ui/toast/toast';
-import {ProductSearch} from '@features/product-form/services/product-search';
+import {ProductSearch} from '@api/catalog/product-search.service';
 import {CatalogueApi} from '../services/catalogue.api.service';
 import {CatalogueFormService, slugify} from '../services/catalogue-form.service';
 

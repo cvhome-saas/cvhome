@@ -3,18 +3,12 @@ import {effect, inject, Injectable} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 
-export type LocaleCode = 'en' | 'ar';
+// Declared in `@models/locale` so a model may name a locale without importing upward; re-exported
+// here because this is where the service that switches them lives and where callers look.
+import {CONSOLE_LOCALES, type ConsoleLocale, type LocaleCode} from '@models/locale';
 
-export interface ConsoleLocale {
-  readonly code: LocaleCode;
-  readonly label: string;
-  readonly dir: 'ltr' | 'rtl';
-}
-
-export const CONSOLE_LOCALES: readonly ConsoleLocale[] = [
-  {code: 'en', label: 'English', dir: 'ltr'},
-  {code: 'ar', label: 'العربية', dir: 'rtl'},
-];
+export type {ConsoleLocale, LocaleCode};
+export {CONSOLE_LOCALES};
 
 function localeOf(code: string): ConsoleLocale {
   return CONSOLE_LOCALES.find((locale) => locale.code === code) ?? CONSOLE_LOCALES[0];

@@ -1,8 +1,9 @@
+/** Console-native; not a port from seller-core. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, map, of, shareReplay} from 'rxjs';
 
 import {ProductService} from '@api/catalog/product.service';
-import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
+import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import type {RelatedProduct} from '@models/products';
 
 /**
@@ -30,11 +31,17 @@ const SEARCH_POOL = 500;
  * Since it cannot be done on the server, it is done here, honestly: one bounded read per store, held
  * for the session, filtered on the client over **both** the name and the SKU. The bound is real and
  * the pickers say so in their hint rather than pretending the whole catalogue is reachable.
+ *
+ * **In the api tier, not in a feature.** The group picker in the catalogue and the related-products
+ * picker in the product form both search, so it lived in one of them and the other reached across —
+ * the kind of import the tier rule now refuses. It reads the open store from `SelectedStoreService`
+ * rather than the shell facade: the pool is keyed by store id and nothing here is reactive, so the
+ * synchronous answer the api tier already relies on for stamping `?store=` is the right one.
  */
 @Injectable({providedIn: 'root'})
 export class ProductSearch {
   private readonly products = inject(ProductService);
-  private readonly shell = inject(ConsoleShellFacade);
+  private readonly selection = inject(SelectedStoreService);
 
   private readonly pools = new Map<string, Observable<readonly RelatedProduct[]>>();
 
@@ -76,7 +83,7 @@ export class ProductSearch {
    * without this each keystroke that missed the debounce would have re-read the catalogue.
    */
   private pool(): Observable<readonly RelatedProduct[]> {
-    const store = this.shell.currentStoreId() ?? '';
+    const store = this.selection.currentSelectedStore()?.id ?? '';
     const existing = this.pools.get(store);
     if (existing) {
       return existing;

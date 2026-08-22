@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/dns-check.service.ts. */
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';

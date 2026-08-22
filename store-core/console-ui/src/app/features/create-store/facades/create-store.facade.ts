@@ -10,19 +10,16 @@ import {
   Validators,
 } from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
-import {EMPTY, Observable, Subscription, catchError, first, forkJoin, map, of, switchMap, timer} from 'rxjs';
+import {Observable, Subscription, first, map, of, switchMap, timer} from 'rxjs';
 
-import {ManagerStoreService} from '@api/tenancy/manager-store.service';
-import {PodService} from '@api/pod-registry/pod.service';
+import {CreateStoreApi} from '../services/create-store.api.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
-import {
-  defaultLanguageIsSupported,
-  phoneNumber,
-} from '@features/store-management/services/store-settings-form.service';
-import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '@mocks/create-store.fixture';
+import {defaultLanguageIsSupported} from '@shared/validators/default-language-is-supported';
+import {phoneNumber} from '@shared/validators/phone-number';
+import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '../create-store.content';
 import type {CreateStorePhase} from '@models/create-store';
 import type {Pod} from '@models/pod';
 import type {CreateStoreRequest, ManagerStore, ProvisioningState} from '@models/tenancy';
@@ -114,8 +111,7 @@ export class CreateStoreFacade {
   private readonly destroyRef = inject(DestroyRef);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly console = inject(ConsoleApi);
-  private readonly stores = inject(ManagerStoreService);
-  private readonly pods = inject(PodService);
+  private readonly api = inject(CreateStoreApi);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly reference = inject(ReferenceDataService);
 
@@ -129,24 +125,19 @@ export class CreateStoreFacade {
    * Normally empty — `pod/list` returns only an org's own private pods — in which case the form drops
    * the control entirely and the registry places the store. See lessons.md.
    */
-  private readonly podList = rxResource({stream: () => this.pods.list()});
+  private readonly podList = rxResource({stream: () => this.api.listPods()});
   readonly pods$ = computed<readonly Pod[]>(() => this.podList.value() ?? []);
   readonly podChoiceAvailable = computed(() => this.pods$().length > 0);
 
   /**
    * Themes and colour themes, both NOT NULL columns on the store.
    *
-   * `optional` on each: neither list is worth failing the whole form over, and a store can be created
-   * with a theme the operator typed nowhere as long as one is picked. An empty list leaves the select
-   * empty and `Validators.required` then says so, which is the honest outcome of a lookup that failed.
+   * `optionalList` on each, inside the api service: neither list is worth failing the whole form
+   * over, and a store can be created with a theme the operator typed nowhere as long as one is
+   * picked. An empty list leaves the select empty and `Validators.required` then says so, which is
+   * the honest outcome of a lookup that failed.
    */
-  private readonly choiceList = rxResource({
-    stream: () =>
-      forkJoin({
-        themes: this.stores.themes().pipe(catchError(() => of<string[]>([]))),
-        colorThemes: this.stores.colorThemes().pipe(catchError(() => of<string[]>([]))),
-      }),
-  });
+  private readonly choiceList = rxResource({stream: () => this.api.loadReference()});
   readonly choices = computed<CreateStoreChoices>(
     () => this.choiceList.value() ?? {themes: [], colorThemes: []},
   );
@@ -519,7 +510,7 @@ export class CreateStoreFacade {
 
     this.poll = timer(POLL_MS, POLL_MS)
       .pipe(
-        switchMap(() => this.stores.storeInfo(store.id).pipe(catchError(() => EMPTY))),
+        switchMap(() => this.api.storeInfo(store.id)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
@@ -565,7 +556,7 @@ export class CreateStoreFacade {
         return of(null);
       }
       return timer(400).pipe(
-        switchMap(() => this.stores.nameExists(name)),
+        switchMap(() => this.api.nameExists(name)),
         map((exists) => (exists ? {nameTaken: true} : null)),
         first(),
       );

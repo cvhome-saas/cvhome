@@ -3,9 +3,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DestroyRef} from '@angular/core';
 import {TranslocoService} from '@jsverse/transloco';
 
-import {SubscriptionService} from '@api/billing/subscription.service';
+import {BillingApi} from '../services/billing.api.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
-import {BillingFacade} from '@layouts/billing/billing.facade';
+import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
 import {ToastService} from '@shared/ui/toast/toast';
 import type {EntitlementKey, EntitlementValue} from '@models/billing';
 
@@ -31,19 +31,19 @@ export interface AllowanceRow {
 /**
  * The billing page's own state: what it shows, and the four things it can do.
  *
- * Reads through `BillingFacade` rather than fetching again, so the page and the banner are the same
+ * Reads through `SubscriptionFacade` rather than fetching again, so the page and the banner are the same
  * two calls. Every action refreshes that facade on success, which is what makes the banner update in
  * place when a subscription is resumed from here.
  */
 @Injectable()
 export class BillingPageFacade {
-  private readonly subscriptions = inject(SubscriptionService);
+  private readonly api = inject(BillingApi);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly transloco = inject(TranslocoService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly billing = inject(BillingFacade);
+  readonly billing = inject(SubscriptionFacade);
 
   readonly plansOpen = signal(false);
 
@@ -121,7 +121,7 @@ export class BillingPageFacade {
     this.working.set(true);
 
     if (this.needsCheckout()) {
-      this.subscriptions
+      this.api
         .checkout(store, planPriceId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
@@ -135,7 +135,7 @@ export class BillingPageFacade {
       return;
     }
 
-    this.subscriptions
+    this.api
       .changePlan(store, planPriceId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -158,7 +158,7 @@ export class BillingPageFacade {
 
   /** Switches renewal back on, and calls off a scheduled downgrade if one is pending. */
   resume(): void {
-    this.act((store) => this.subscriptions.resume(store), 'billing.toast.resumed');
+    this.act((store) => this.api.resume(store), 'billing.toast.resumed');
   }
 
   /**
@@ -166,7 +166,7 @@ export class BillingPageFacade {
    * the merchant has already paid for.
    */
   cancel(): void {
-    this.act((store) => this.subscriptions.cancel(store, false), 'billing.toast.cancelled');
+    this.act((store) => this.api.cancelAtPeriodEnd(store), 'billing.toast.cancelled');
   }
 
   private act(

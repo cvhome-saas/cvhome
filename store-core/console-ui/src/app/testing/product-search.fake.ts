@@ -1,6 +1,6 @@
 import {Observable, of} from 'rxjs';
 
-import {ProductSearch} from '@features/product-form/services/product-search';
+import {ProductSearch} from '@api/catalog/product-search.service';
 import type {RelatedProduct} from '@models/products';
 
 /** Combining diacritics, so "cafe" matches "Café" here the way it does in the real search. */

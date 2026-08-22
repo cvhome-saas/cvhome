@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/signup/src/lib/service/sign-up.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 

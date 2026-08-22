@@ -5,8 +5,8 @@
  * belongs to `app-form-field`, `app-text-field` and their siblings, where Angular's encapsulation
  * can actually reach it. This file holds the arrangement of several fields, which is the page's
  * business and cannot live in a child component: a rule written in a page's stylesheet stops at the
- * child's host and never reaches inside it (lessons.md, "A page cannot style anything inside a
- * child component's template"), so a shared stylesheet pulled into each sibling's `styleUrls` is
+ * child's host and never reaches inside it (lessons.md, "The design pass — encapsulation, and three more
+ * things a native control hid"), so a shared stylesheet pulled into each sibling's `styleUrls` is
  * how components on one page agree on a grid.
  *
  * Pull it in beside the component's own sheet:

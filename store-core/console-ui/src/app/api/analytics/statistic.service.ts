@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/analytics/src/lib/services/statistic.api.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 

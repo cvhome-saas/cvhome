@@ -26,7 +26,13 @@ export interface BannerView {
 }
 
 /**
- * One store's billing state, shared by the plan banner and the billing page.
+ * One store's subscription, shared by the shell's plan banner and the billing page.
+ *
+ * **Named for what it holds, and filed with what it serves.** It used to be `BillingFacade` under a
+ * top-level `layouts/billing/`, one letter away from `features/billing`'s `BillingPageFacade` and
+ * in a tier it had no business defining a feature in. The banner is shell chrome, so the state
+ * behind the banner belongs to the shell; the page reads the same instance rather than fetching
+ * again, which is what keeps the two from disagreeing.
  *
  * **Why this exists.** The banner used to be a hardcoded line — "You're on the Free plan" — with a dead
  * Upgrade button, shown to everyone regardless of what they were paying. `GET subscription/current?store=`
@@ -37,7 +43,7 @@ export interface BannerView {
  * belongs to a store, and an org can run a paid store beside a free one.
  */
 @Injectable({providedIn: 'root'})
-export class BillingFacade {
+export class SubscriptionFacade {
   private readonly subscriptions = inject(SubscriptionService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly transloco = inject(TranslocoService);

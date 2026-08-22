@@ -1,3 +1,4 @@
+/** Console-native; not a port from seller-core. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 

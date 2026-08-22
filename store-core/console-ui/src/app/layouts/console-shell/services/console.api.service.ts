@@ -4,7 +4,7 @@ import {Observable, map, of} from 'rxjs';
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {AuthService} from '@core/auth/auth.service';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
-import {CONSOLE_NAVIGATION} from '@mocks/console.fixture';
+import {CONSOLE_NAVIGATION} from '../console-navigation';
 import type {ConsoleStore, ConsoleUser, StoreDirectory} from '@models/console';
 import type {CreateStoreRequest, ManagerStore} from '@models/tenancy';
 

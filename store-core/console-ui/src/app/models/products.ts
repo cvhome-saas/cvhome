@@ -1,4 +1,4 @@
-import type {PageT} from '@core/table/table.types';
+import type {PageT} from '@models/page';
 import type {LocalisedCopy} from '@models/taxonomy';
 
 /**

@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/orders/src/lib/services/orders.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 

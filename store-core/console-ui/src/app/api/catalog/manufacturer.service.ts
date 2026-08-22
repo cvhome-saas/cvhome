@@ -1,3 +1,4 @@
+/** Ported from seller-ui/projects/seller-core/catalog/src/lib/brands/services/brand.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 

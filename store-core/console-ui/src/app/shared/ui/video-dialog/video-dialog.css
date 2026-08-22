@@ -85,7 +85,8 @@
   aspect-ratio: 16 / 9;
   max-block-size: calc(100vh - 12rem);
   border-radius: var(--radius-lg);
-  background: #000;
+  /* Letterboxing behind a contained frame. `--scrim` is the token for 'nothing, darkened'. */
+  background: var(--scrim);
   object-fit: contain;
 }
 

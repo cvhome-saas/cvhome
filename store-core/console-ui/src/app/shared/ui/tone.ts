@@ -1,12 +1,9 @@
 import type {Theme} from '@core/theme/theme.provider';
+import type {Tone} from '@models/ui';
 
-/**
- * The categorical vocabulary shared by badges, pills, KPI tiles and charts.
- *
- * Tone is never the only signal: every use is accompanied by a label, a value, or
- * position, per the design system's data-integrity rule.
- */
-export type Tone = 'green' | 'blue' | 'cyan' | 'amber' | 'red' | 'violet' | 'slate';
+// The union lives in `@models/ui` so a view model may name the tone it wants without importing
+// upward into the UI tier; the resolvers below stay here, because they read the document.
+export type {Tone} from '@models/ui';
 
 /** Tone to its slot in the `--chart-*` scale. `slate` is not a hue and has none. */
 const CHART_SLOT: Readonly<Record<Exclude<Tone, 'slate'>, number>> = {

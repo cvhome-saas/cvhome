@@ -85,7 +85,7 @@ const DOMAIN_OUTCOME: Readonly<Record<CnameOutcome, DomainStatus>> = {
  * rather than the patch it was given, because the endpoints answer `void` and the page needs to
  * show what the server actually kept.
  *
- * **Every section is live.** `@mocks/store-settings.fixture` is gone, and so is the seam that used
+ * **Every section is live.** `store-settings.fixture` is gone, and so is the seam that used
  * to hold it — `saveSection` dispatches to a real endpoint for every key it accepts.
  */
 @Injectable({providedIn: 'root'})

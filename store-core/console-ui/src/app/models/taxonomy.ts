@@ -1,4 +1,4 @@
-import type {Tone} from '@shared/ui/tone';
+import type {Tone} from '@models/ui';
 
 /**
  * The catalogue page's view models — categories, product types, brands and product groups.

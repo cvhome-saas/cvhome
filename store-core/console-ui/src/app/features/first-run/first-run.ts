@@ -2,7 +2,7 @@ import {Component, computed, inject, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {PlanDialog} from '@layouts/billing/plan-dialog/plan-dialog';
+import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog';
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';

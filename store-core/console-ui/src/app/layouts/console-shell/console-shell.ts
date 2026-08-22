@@ -6,7 +6,7 @@ import {Icon} from '@shared/ui/icon/icon';
 import {ConsoleSidebar} from './components/console-sidebar/console-sidebar';
 import {ConsoleToolbar} from './components/console-toolbar/console-toolbar';
 import {PlanBanner} from './components/plan-banner/plan-banner';
-import {BillingFacade} from '@layouts/billing/billing.facade';
+import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
 import {ConsoleShellFacade} from './facades/console-shell.facade';
 
 /**
@@ -63,14 +63,14 @@ import {ConsoleShellFacade} from './facades/console-shell.facade';
 })
 export class ConsoleShell {
   protected readonly shell = inject(ConsoleShellFacade);
-  private readonly billing = inject(BillingFacade);
+  private readonly billing = inject(SubscriptionFacade);
 
   /**
    * Whether the banner occupies a row.
    *
-   * Asked here rather than on `ConsoleShellFacade` because the answer now depends on billing, and
-   * `BillingFacade` already injects the shell facade — putting it there would close a dependency
-   * cycle. The layout needs the same answer the banner does: `.banner-on` reserves the row's height,
+   * Asked here rather than on `ConsoleShellFacade` because the answer depends on the subscription,
+   * and `SubscriptionFacade` injects the shell facade for the open store — putting it there would
+   * close a dependency cycle. The cycle is only latent today, and this is what keeps it that way. The layout needs the same answer the banner does: `.banner-on` reserves the row's height,
    * so gating only the component would leave a 49px gap above every page whenever there is nothing
    * to say, which is the normal case for a paying customer.
    */

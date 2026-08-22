@@ -9,14 +9,14 @@ import {
   type ValidationErrors,
   type ValidatorFn,
 } from '@angular/forms';
-import {Observable, catchError, map, of, switchMap, timer} from 'rxjs';
+import {Observable, catchError, map, of, switchMap, timer} from 'rxjs';import {defaultLanguageIsSupported} from '@shared/validators/default-language-is-supported';
+import {phoneNumber} from '@shared/validators/phone-number';
+
 
 import {DnsCheckService} from '@api/dns/dns-check.service';
 import {
   CUSTOM_DOMAIN_PATTERN,
   HOME_TITLE_MAX,
-  PHONE_MIN_DIGITS,
-  PHONE_PATTERN,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
   SOCIAL_LINK_HOSTS,
@@ -582,43 +582,7 @@ export function socialProfileUrl(provider: string): ValidatorFn {
   };
 }
 
-/**
- * A phone number that could be dialled.
- *
- * `Validators.pattern` alone cannot express "at least six digits, however they are grouped", and
- * that is the check worth having — `(0) - .` matches any shape rule and is not a number. Runs the
- * shape test first so the two errors stay distinguishable, and passes an empty value through:
- * whether the field is mandatory is `Validators.required`'s business, not this one's.
- */
-export function phoneNumber(control: AbstractControl): ValidationErrors | null {
-  const value = String(control.value ?? '').trim();
-  if (!value) {
-    return null;
-  }
-  if (!PHONE_PATTERN.test(value)) {
-    return {phone: true};
-  }
-  const digits = value.replace(/\D/g, '').length;
-  return digits < PHONE_MIN_DIGITS ? {phone: true} : null;
-}
 
-/**
- * The default language has to be one the store actually supports.
- *
- * A group validator rather than a validator on `language`, because it is the pair that is wrong,
- * not either control on its own — and unticking a supported language has to re-run it, which a
- * validator hanging off `language` would not. seller-ui's `defaultLanguageNotInSupported` said the
- * same thing; the error is named for the field the operator should look at.
- */
-export function defaultLanguageIsSupported(group: AbstractControl): ValidationErrors | null {
-  const language = group.get('language')?.value as string | undefined;
-  const supported = group.get('supportedLanguages')?.value as readonly string[] | undefined;
-
-  if (!language || !supported || supported.length === 0) {
-    return null;
-  }
-  return supported.includes(language) ? null : {defaultLanguageNotSupported: true};
-}
 
 /**
  * The section a save posts, for the api service's patch.

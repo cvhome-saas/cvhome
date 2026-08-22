@@ -49,8 +49,8 @@ export class SearchBox {
   /**
    * Overrides the intrinsic width, for a header with room for more or less. A custom property
    * rather than a class, because the width is the one thing a host legitimately decides and a
-   * selector written from outside cannot reach into this template — see lessons.md, "A page cannot
-   * style anything inside a child component's template".
+   * selector written from outside cannot reach into this template — see lessons.md, "The design pass —
+   * encapsulation, and three more things a native control hid".
    */
   readonly width = input<string | null>(null);
 

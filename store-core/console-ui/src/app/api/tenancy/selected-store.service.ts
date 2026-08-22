@@ -1,3 +1,4 @@
+/** Console-native; not a port from seller-core. */
 import {Injectable, Injector, inject} from '@angular/core';
 import {Observable, shareReplay, tap} from 'rxjs';
 

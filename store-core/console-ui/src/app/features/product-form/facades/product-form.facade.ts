@@ -22,8 +22,8 @@ import {
 import type {AutocompleteOption} from '@shared/ui/autocomplete/autocomplete';
 import type {StepItem} from '@shared/ui/stepper/stepper';
 import {ToastService} from '@shared/ui/toast/toast';
-import {ProductsCache} from '@features/products/services/products-cache';
-import {ProductSearch} from '../services/product-search';
+import {ProductsCache} from '@api/catalog/products-cache';
+import {ProductSearch} from '@api/catalog/product-search.service';
 import {ProductFormApi, type CategoryOption, type ProductFormSnapshot, type ProductTypeOption} from '../services/product-form.api.service';
 import {ProductFormService} from '../services/product-form.service';
 

@@ -1,6 +1,6 @@
-import type {ConsoleLocale} from '@core/i18n/locale.service';
-import type {IconName} from '@shared/ui/icon/icon-paths';
-import type {Tone} from '@shared/ui/tone';
+import type {ConsoleLocale} from '@models/locale';
+import type {IconName} from '@models/ui';
+import type {Tone} from '@models/ui';
 
 /**
  * The store's settings surface.

@@ -1,3 +1,4 @@
+/** Console-native; not a port from seller-core. */
 import {Injectable, signal} from '@angular/core';
 
 /**

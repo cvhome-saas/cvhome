@@ -4,7 +4,6 @@ import {Observable, of} from 'rxjs';
 
 import {NOTIFICATION_PORT} from '@core/errors/notification.port';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
-import {ProductsFacade} from '@features/products/facades/products.facade';
 import {emptyDraft, type ProductDraft, type ProductImageItem, type RelatedProduct} from '@models/products';
 import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {provideFakeProductSearch} from '@testing/product-search.fake';
@@ -122,7 +121,6 @@ describe('ProductForm', () => {
          * The form tells the list its rows are stale after a save. Stubbed here rather than let the
          * real one drag `ProductsApi` and `HttpClient` into a spec about a form.
          */
-        {provide: ProductsFacade, useValue: {invalidate: () => undefined}},
         {provide: NOTIFICATION_PORT, useValue: toasts},
         provideFakeProductSearch(),
         ...translocoTesting().providers,

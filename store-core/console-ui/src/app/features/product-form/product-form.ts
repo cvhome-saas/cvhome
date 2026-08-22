@@ -14,6 +14,7 @@ import {MediaStep} from './components/media-step/media-step';
 import {OrganizeStep} from './components/organize-step/organize-step';
 import {PricingStep} from './components/pricing-step/pricing-step';
 import {ProductFormFacade} from './facades/product-form.facade';
+import {positiveIntParam} from '@core/routing/route-params';
 
 /**
  * The product wizard: four steps, a readiness checklist and a translations panel.
@@ -54,6 +55,9 @@ export class ProductForm {
   /** The `:id` route param, or `undefined` on `/products/new`. */
   readonly id = input<string>();
 
+  /** The route's `:id`, validated before it can reach a facade. Null on `/products/new`. */
+  private readonly productId = positiveIntParam(this.id);
+
   constructor() {
     /*
      * The route param, validated before it reaches a facade — Module 4's `/orders/abc` finding.
@@ -67,8 +71,8 @@ export class ProductForm {
         this.facade.routeSettled.set(true);
         return;
       }
-      const parsed = Number(raw);
-      if (!Number.isInteger(parsed) || parsed <= 0) {
+      const parsed = this.productId();
+      if (parsed === null) {
         this.router.navigate(['/products'], {replaceUrl: true});
         return;
       }

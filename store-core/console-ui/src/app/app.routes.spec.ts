@@ -3,6 +3,7 @@ import {Route} from '@angular/router';
 import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
 import {consoleContext, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
 import {routes} from './app.routes';
+import {serverRoutes} from './app.routes.server';
 
 /**
  * The console's routes are data, and the one thing that must be true of all of them is that none is
@@ -58,5 +59,32 @@ describe('app routes', () => {
     // Still behind authentication, and still loading the rail's stores, via the parent.
     expect(branch.canActivate).toContain(canAccessSecuredPages);
     expect(branch.canActivate).toContain(consoleContext);
+  });
+
+  /*
+   * Every branch says how it renders, in the file that decides it.
+   *
+   * `subscription`, `public/subscription` and `external-logout-link` were declared nowhere and
+   * rendered correctly anyway, because the catch-all at the foot of `app.routes.server.ts` is
+   * `Client`. Right answer, arrived at by accident — and silent, so the next branch added would
+   * inherit it too. This turns that class of omission into a failing spec.
+   */
+  describe('render modes', () => {
+    const declared = new Set(serverRoutes.map((route) => route.path.replace(/\/\*\*$/, '')));
+
+    const topLevel = routes
+      .map((route) => route.path ?? '')
+      .filter((path) => path !== '**');
+
+    for (const path of topLevel) {
+      it(`declares a render mode for /${path || '(home)'}`, () => {
+        expect(declared.has(path)).withContext(`add "${path}" to serverRoutes`).toBeTrue();
+      });
+    }
+
+    it('keeps the catch-all last, so a declared branch is never shadowed by it', () => {
+      expect(serverRoutes.at(-1)?.path).toBe('**');
+      expect(serverRoutes.filter((route) => route.path === '**').length).toBe(1);
+    });
   });
 });

@@ -6,13 +6,13 @@ import type {CheckoutSession, Invoice, PlanView, Subscription} from '@models/bil
 /**
  * A `SubscriptionService` that answers without HTTP.
  *
- * The console shell mounts `PlanBanner`, which reads `BillingFacade`, which reads this service — so
+ * The console shell mounts `PlanBanner`, which reads `SubscriptionFacade`, which reads this service — so
  * every spec that renders the shell now needs billing to be constructible. Providing this is one line
  * and keeps those specs about the shell; wiring `provideHttpClientTesting` instead would drag in the
  * request context and the whole interceptor chain for a call most of them never make.
  *
  * Defaults to "billing has never seen this store": `current` answers a 404-shaped error, which
- * `BillingFacade` treats as a state rather than a failure. Set `subscription` for a spec that needs a
+ * `SubscriptionFacade` treats as a state rather than a failure. Set `subscription` for a spec that needs a
  * live one.
  */
 export class FakeSubscriptionService {
@@ -27,7 +27,7 @@ export class FakeSubscriptionService {
   current(_store?: string): Observable<Subscription> {
     if (!this.subscription) {
       /*
-       * A real `ApiError`, not a plain object with a status: `BillingFacade` narrows on
+       * A real `ApiError`, not a plain object with a status: `SubscriptionFacade` narrows on
        * `instanceof ApiError` before treating a 404 as "no subscription", so a look-alike would take
        * the rethrow path and leave the resource in error — which is exactly the wrong state to be
        * testing against.

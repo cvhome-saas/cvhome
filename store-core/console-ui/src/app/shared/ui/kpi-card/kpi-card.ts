@@ -5,18 +5,10 @@ import {Icon} from '@shared/ui/icon/icon';
 import {IconName} from '@shared/ui/icon/icon-paths';
 import type {Tone} from '../tone';
 
-/** One metric, as consumed by `app-kpi-grid`. */
-export interface KpiDatum {
-  readonly label: string;
-  readonly value: string;
-  readonly icon: IconName;
-  readonly tone?: Tone;
-  /** Movement against the comparison period. Mutually exclusive with `flag`. */
-  readonly delta?: string;
-  readonly trend?: 'up' | 'down';
-  /** A state rather than a change, e.g. "Needs review". */
-  readonly flag?: string;
-}
+// The shape lives in `@models/ui`: a page's view model is what builds these, and
+// `models/orders.ts` was importing it from this component file — a wire-shape module depending on
+// a widget's template contract. Re-exported so existing call sites are unaffected.
+export type {KpiDatum} from '@models/ui';
 
 /**
  * A single headline metric: label, figure, tone-carrying icon tile, and a footer that is

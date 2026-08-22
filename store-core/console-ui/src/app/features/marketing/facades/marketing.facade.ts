@@ -13,7 +13,7 @@ import {
   MARKETING_REVIEWS,
   MARKETING_REVIEW_STATS,
   MARKETING_STORES,
-} from '@mocks/marketing.fixture';
+} from '../marketing.content';
 import {toPricingPlans} from '@shared/billing/pricing.mapper';
 import {MarketingApi} from '../services/marketing.api.service';
 

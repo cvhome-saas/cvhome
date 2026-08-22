@@ -3,6 +3,8 @@ import {Title} from '@angular/platform-browser';
 import {RouterStateSnapshot, TitleStrategy} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
 
+import {routeData} from '@core/routing/route-data';
+
 /**
  * Route `title` is a static string resolved once at navigation — it cannot follow a
  * language change on its own. Routes carry `data.titleKey` instead (see `app.routes.ts`);
@@ -40,8 +42,8 @@ export class TranslatedTitleStrategy extends TitleStrategy {
     let titleKey: string | undefined;
     while (route.firstChild) {
       route = route.firstChild;
-      titleKey = (route.data['titleKey'] as string | undefined) ?? titleKey;
+      titleKey = routeData(route.data).titleKey ?? titleKey;
     }
-    return titleKey ?? (snapshot.root.data['titleKey'] as string | undefined);
+    return titleKey ?? routeData(snapshot.root.data).titleKey;
   }
 }

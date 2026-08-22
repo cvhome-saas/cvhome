@@ -5,7 +5,7 @@ import {map} from 'rxjs';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {Money} from '@shared/i18n/money';
-import {PlanDialog} from '@layouts/billing/plan-dialog/plan-dialog';
+import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog';
 import {SectionNav, type NavSection} from '@shared/ui/section-nav/section-nav';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {Badge} from '@shared/ui/badge/badge';

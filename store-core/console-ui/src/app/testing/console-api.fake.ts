@@ -1,7 +1,6 @@
 import {Observable, of} from 'rxjs';
 
-import {CONSOLE_NAVIGATION} from '@mocks/console.fixture';
-import type {ConsoleStore, ConsoleUser, StoreDirectory} from '@models/console';
+import type {ConsoleStore, ConsoleUser, NavigationSection, StoreDirectory} from '@models/console';
 import type {ProvisioningState} from '@models/tenancy';
 
 /**
@@ -16,7 +15,24 @@ export class FakeConsoleApi {
   /** Shaped like what uaa actually yields today: a username, no email. */
   user: ConsoleUser = {name: 'org1-admin', initials: 'OR', email: null};
 
-  readonly navigation = CONSOLE_NAVIGATION;
+  /**
+   * A nav of its own, not the real one.
+   *
+   * This used to be `CONSOLE_NAVIGATION` itself, which meant a spec asserting on the rail could not
+   * fail however wrong that constant became — the fixture and the thing under test were the same
+   * object. Two groups and three items is enough to exercise grouping, an item with a route and an
+   * item without one, which is how the shell marks a section that is not built yet.
+   */
+  navigation: readonly NavigationSection[] = [
+    {groupKey: 'shell.nav.group.seller', items: [{labelKey: 'shell.nav.item.home', icon: 'home', route: '/dashboard'}]},
+    {
+      groupKey: 'shell.nav.group.organization',
+      items: [
+        {labelKey: 'shell.nav.item.storeManagement', icon: 'building', route: '/store-management'},
+        {labelKey: 'shell.nav.item.userManagement', icon: 'users'},
+      ],
+    },
+  ];
 
   loadUser(): Observable<ConsoleUser> {
     return of(this.user);

@@ -13,6 +13,7 @@ import {Panel} from '@shared/ui/panel/panel';
 import {PdfExportService} from '@core/export/pdf-export.service';
 import {ToastService} from '@shared/ui/toast/toast';
 import {OrderDetailsFacade} from './facades/order-details.facade';
+import {positiveIntParam} from '@core/routing/route-params';
 
 /**
  * One order.
@@ -101,10 +102,7 @@ export class OrderDetails {
    * operator as "the order failed to load" rather than "there is no such order". A reference the
    * console cannot even parse is answered here, without a request.
    */
-  protected readonly orderId = computed(() => {
-    const id = Number(this.id());
-    return Number.isInteger(id) && id > 0 ? id : null;
-  });
+  protected readonly orderId = positiveIntParam(this.id);
 
   constructor() {
     // `id` is a signal, so navigating straight from one order to another re-reads without a reload.

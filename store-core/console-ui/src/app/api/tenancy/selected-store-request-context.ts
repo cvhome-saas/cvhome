@@ -1,3 +1,4 @@
+/** Console-native; not a port from seller-core. */
 import {isPlatformServer} from '@angular/common';
 import {Injectable, PLATFORM_ID, inject} from '@angular/core';
 

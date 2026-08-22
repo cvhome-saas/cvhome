@@ -355,8 +355,6 @@
     "metricsLabel": "Order metrics",
     "allOrders": "All orders",
     "filterByStatus": "Filter orders by status",
-    "markAsProcessed": "Mark as processed",
-    "printPickingLists": "Print picking lists",
     "noneMatch": "No orders match this filter.",
     "unit": "orders",
     "pagesLabel": "Order pages",
@@ -365,7 +363,6 @@
       "customer": "Customer",
       "status": "Status",
       "payment": "Payment",
-      "items": "Items",
       "total": "Total",
       "placed": "Placed",
       "actions": "Actions",
@@ -546,13 +543,9 @@
     "nav": {
       "ariaLabel": "Store settings sections",
       "builderUnavailable": "The home page builder is not available yet.",
-      "collapse": "Collapse the section list",
-      "expand": "Expand the section list",
       "heading": "Settings",
-      "homePageBuilder": "Home page builder",
-      "needsAttention": "Needs your attention"
+      "homePageBuilder": "Home page builder"
     },
-    "notAvailable": "{what} is not available yet.",
     "paymentDescription": {
       "cod": "Collected by the courier — nothing to configure",
       "manualTransfer": "Orders wait until you confirm the transfer",
@@ -678,7 +671,6 @@
       "storeName": "Store name",
       "storeNamePlaceholder": "Acme Supply Co.",
       "country": "Country of operation",
-      "countryHint": "Where the store trades from, on its invoices and storefront",
       "currency": "Base currency",
       "nameAvailable": "That name is available.",
       "nameTaken": "That name is already in use. Store names are unique across the platform.",
@@ -763,7 +755,6 @@
       "doneTitle": "Store provisioned",
       "assigning": "assigning…",
       "pending": "pending",
-      "issued": "issued",
       "liveBanner": "{name} is live.",
       "configureStore": "Configure store",
       "doneNote": "Your store is provisioned and ready to configure.",
@@ -1206,7 +1197,6 @@
     },
     "planBanner": {
       "ariaLabel": "Plan notice",
-      "notice": "You're on the Free plan — upgrade to add more stores, users and premium features.",
       "upgrade": "Upgrade plan",
       "dismiss": "Dismiss plan notice",
       "manage": "Manage plan"
@@ -1715,7 +1705,6 @@
       "identifiersSubtitle": "Shared across every language.",
       "sku": "SKU",
       "skuHint": "Your own code for this product. Fixed once the product exists.",
-      "skuTaken": "Another product in this store already uses this SKU.",
       "skuInvalid": "Use letters, digits, dots, hyphens and underscores only.",
       "dateAvailable": "Available from",
       "dateAvailableHint": "Leave it empty to make it available immediately.",
@@ -1749,10 +1738,8 @@
       "title": "Images",
       "subtitle": "The first image is the storefront thumbnail.",
       "saveFirst": "Save the product first. Images are attached to a product, so there has to be one to attach them to.",
-      "none": "No images yet.",
       "drop": "Drop an image, or browse",
       "image": "Product image",
-      "position": "Image {position}",
       "storefrontThumbnail": "Storefront thumbnail",
       "view": "View image {position} full size",
       "moveUp": "Move image {position} earlier",
@@ -1835,8 +1822,7 @@
         "brand": "A brand",
         "image": "At least one image",
         "description": "A description"
-      },
-      "name": "A name in every language"
+      }
     },
     "translations": {
       "title": "Translations",

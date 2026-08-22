@@ -4,7 +4,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {TranslocoDirective} from '@jsverse/transloco';
 import {map} from 'rxjs';
 
-import {BillingFacade} from '@layouts/billing/billing.facade';
+import {SubscriptionFacade} from '@layouts/console-shell/billing/subscription.facade';
 import {Icon} from '@shared/ui/icon/icon';
 
 /**
@@ -15,7 +15,7 @@ import {Icon} from '@shared/ui/icon/icon';
  * landing page the payment provider redirected to, which can be reached by anyone typing the URL.
  *
  * It does **invalidate** what the console already holds, though, which is a different thing from trusting the URL:
- * `BillingFacade` caches the subscription for the open store, and after a checkout that cache is stale by
+ * `SubscriptionFacade` caches the subscription for the open store, and after a checkout that cache is stale by
  * definition. Dropping it means the billing page and the plan banner re-read from the server on the next render
  * rather than showing the plan the operator had a minute ago. The URL decides nothing; it only says "go and look
  * again".
@@ -40,7 +40,7 @@ import {Icon} from '@shared/ui/icon/icon';
 })
 export class SubscriptionOutcome {
   private readonly route = inject(ActivatedRoute);
-  private readonly billing = inject(BillingFacade);
+  private readonly billing = inject(SubscriptionFacade);
 
   constructor() {
     this.billing.refresh();

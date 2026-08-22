@@ -1,4 +1,4 @@
-import type {IconName} from '@shared/ui/icon/icon-paths';
+import type {IconName} from '@models/ui';
 
 /**
  * The getting-started page: what an operator sees before their first store exists.
