@@ -616,6 +616,7 @@
     "social": {
       "addProfileUrl": "أضف رابط الملف الشخصي…",
       "fallback": "أدخل رابط ملف شخصي، مثل instagram.com/your-store.",
+      "linkSet": "هذا الرابط مُعيَّن",
       "needsProfile": "أضف الملف الشخصي نفسه، لا {host} وحده — مثل {host}/your-store.",
       "subtitle": "تظهر في تذييل واجهة المتجر. اتركها فارغة لإخفائها.",
       "title": "روابط التواصل الاجتماعي",

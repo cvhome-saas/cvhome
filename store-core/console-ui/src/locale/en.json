@@ -616,6 +616,7 @@
     "social": {
       "addProfileUrl": "Add profile URL…",
       "fallback": "Enter a profile URL, like instagram.com/your-store.",
+      "linkSet": "This link is set",
       "needsProfile": "Add the profile itself, not just {host} — for example {host}/your-store.",
       "subtitle": "Shown in the storefront footer. Leave blank to hide.",
       "title": "Store social links",
