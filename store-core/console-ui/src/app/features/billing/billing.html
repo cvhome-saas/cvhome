@@ -2,14 +2,14 @@
   <app-page-header [title]="heading()" [context]="subtitle()" />
 
   @if (billing.error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button type="button" (click)="billing.refresh()">{{ t('shared.actions.retry') }}</button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="billing.refresh()" />
   }
 
-  <app-busy-overlay [busy]="billing.isLoading() || facade.working()" [label]="t('billing.loading')">
+  <app-busy-overlay
+    [busy]="billing.isLoading() || facade.working()"
+    reserve="page"
+    [label]="t('billing.loading')"
+  >
     <div class="billing-layout" [class.rail-collapsed]="railCollapsed()">
       <app-section-nav
         class="billing-rail"
@@ -21,16 +21,25 @@
         [(collapsed)]="railCollapsed"
       />
 
-      <div class="billing-grid">
+      <app-tab-switcher
+        class="billing-tabs"
+        [tabs]="tabs(t)"
+        [active]="section()"
+        (activeChange)="pickSection($event)"
+        [label]="t('billing.nav.ariaLabel')"
+        panelId="billing-section"
+      />
+
+      <div class="billing-grid" id="billing-section">
         @if (section() === 'plan') {
         <div class="row-lead">
-        <app-panel [title]="t('billing.plan.title')" [subtitle]="t('billing.plan.subtitle')">
+        <app-panel padded [title]="t('billing.plan.title')" [subtitle]="t('billing.plan.subtitle')">
           @if (statusLabel()) {
             <app-badge panelAction [tone]="statusTone()">{{ statusLabel() }}</app-badge>
           }
 
           @if (billing.subscription(); as subscription) {
-            <div class="panel-pad plan-body">
+            <div class="plan-body">
               <div class="plan-headline">
                 <div class="plan-identity">
                   <!-- A row with no plan says so, rather than rendering a dash where a name goes. -->
@@ -124,13 +133,11 @@
               reach this page before its subscription row exists. Not an error, and not an upgrade
               prompt — there is nothing to buy against a subscription that does not exist yet.
             -->
-            <div class="panel-pad empty-note" role="status">
-              <app-icon name="clock" />
-              <p>{{ t('billing.plan.noSubscription') }}</p>
+            <app-empty-state icon="clock" [message]="t('billing.plan.noSubscription')">
               <button type="button" class="secondary-action" (click)="billing.refresh()">
                 {{ t('shared.actions.retry') }}
               </button>
-            </div>
+            </app-empty-state>
           }
         </app-panel>
 
@@ -140,7 +147,7 @@
           @if (facade.allowances().length === 0) {
             <!-- No plan means no ceilings to report. Rendering the empty map through the
                  absent-means-unlimited rule would claim the opposite. -->
-            <p class="panel-pad empty-note" role="status">{{ t('billing.allowances.none') }}</p>
+            <app-empty-state compact icon="list" [message]="t('billing.allowances.none')" />
           } @else {
             <!--
               A ledger rather than a list of ticks. Every row has a value, so the tick would be
@@ -161,12 +168,12 @@
             publishes the entitlement map but no usage counters, so "3 of 500 products" cannot be
             drawn. See lessons.md, "Billing — entitlements are ceilings with no usage behind them".
           -->
-          <p class="panel-pad allowance-note">{{ t('billing.allowances.note') }}</p>
+          <p class="allowance-note">{{ t('billing.allowances.note') }}</p>
           </app-panel>
         } @else if (section() === 'invoices') {
         <app-panel [title]="t('billing.invoices.title')" [subtitle]="t('billing.invoices.subtitle')">
           @if (facade.invoices().length === 0) {
-            <p class="panel-pad empty-note" role="status">{{ t('billing.invoices.none') }}</p>
+            <app-empty-state compact icon="receipt" [message]="t('billing.invoices.none')" />
           } @else {
             <div class="invoice-list">
               @for (invoice of facade.invoices(); track invoice.id) {

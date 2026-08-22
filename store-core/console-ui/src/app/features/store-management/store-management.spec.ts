@@ -1046,16 +1046,16 @@ describe('StoreManagement', () => {
     settle(fixture);
     const element = fixture.nativeElement as HTMLElement;
 
-    const alert = element.querySelector('.load-error');
+    const alert = element.querySelector('app-load-error');
     expect(alert).not.toBeNull();
     expect(alert?.textContent).toContain('Unable to reach store settings.');
 
     api.failure = null;
-    element.querySelector<HTMLButtonElement>('.load-error button')!.click();
+    element.querySelector<HTMLButtonElement>('app-load-error button')!.click();
     settle(fixture);
 
     expect(api.loads).toBe(2);
-    expect(element.querySelector('.load-error')).toBeNull();
+    expect(element.querySelector('app-load-error')).toBeNull();
     expect(element.querySelector('app-branding-section')).not.toBeNull();
   }));
 

@@ -4,6 +4,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -33,6 +34,7 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
 @Component({
   selector: 'app-store-management',
   imports: [
+    LoadError,
     BrandingSection,
     BusyOverlay,
     DetailsSection,

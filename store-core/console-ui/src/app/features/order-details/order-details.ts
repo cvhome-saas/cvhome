@@ -9,6 +9,10 @@ import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.f
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
+import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {LoadError} from '@shared/ui/load-error/load-error';
+import {Select} from '@shared/ui/select/select';
+import {TextareaField} from '@shared/ui/textarea-field/textarea-field';
 import {Panel} from '@shared/ui/panel/panel';
 import {PdfExportService} from '@core/export/pdf-export.service';
 import {ToastService} from '@shared/ui/toast/toast';
@@ -29,7 +33,11 @@ import {positiveIntParam} from '@core/routing/route-params';
  */
 @Component({
   selector: 'app-order-details',
-  imports: [A11yModule, Badge, BusyOverlay, Icon, Panel, RouterLink, TranslocoDatePipe, TranslocoDecimalPipe, TranslocoDirective],
+  imports: [
+    EmptyState,
+    LoadError,
+    Select,
+    TextareaField,A11yModule, Badge, BusyOverlay, Icon, Panel, RouterLink, TranslocoDatePipe, TranslocoDecimalPipe, TranslocoDirective],
   providers: [OrderDetailsFacade],
   templateUrl: './order-details.html',
   styleUrl: './order-details.css',

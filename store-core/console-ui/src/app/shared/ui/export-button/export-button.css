@@ -49,7 +49,7 @@
   border: 2px solid var(--track);
   border-block-start-color: var(--primary);
   border-radius: 50%;
-  animation: export-spin 0.7s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 .export-error {
@@ -65,12 +65,6 @@
   background: var(--card);
   color: var(--chart-5-foreground);
   font-size: var(--text-2xs);
-}
-
-@keyframes export-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /*

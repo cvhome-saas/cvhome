@@ -154,7 +154,7 @@ module.exports = tseslint.config(
             'aria-live', 'aria-relevant', 'scope', 'stroke-linecap', 'stroke-linejoin',
             'animate.enter', 'animate.leave', 'method',
             'tone', 'icon', 'shape', 'fileName', 'slugPrefix', 'inputmode', 'contentDir', 'basePath',
-            'controlId', 'check', 'autocomplete', 'display',
+            'controlId', 'check', 'autocomplete', 'display', 'reserve',
             'd', 'preload', 'kind',
           ],
         },

@@ -1,14 +1,22 @@
 import {Component, signal} from '@angular/core';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
 
 import {SearchBox} from './search-box';
 
 @Component({
   imports: [SearchBox],
-  template: `<app-search-box [(value)]="term" label="Search orders" placeholder="Name or email" />`,
+  template: `
+    <app-search-box
+      [(value)]="term"
+      [debounceMs]="immediate() ? 0 : 300"
+      label="Search orders"
+      placeholder="Name or email"
+    />
+  `,
 })
 class Host {
   readonly term = signal('');
+  readonly immediate = signal(false);
 }
 
 describe('SearchBox', () => {
@@ -37,11 +45,35 @@ describe('SearchBox', () => {
     expect(input().type).toBe('search');
   });
 
-  it('publishes the term as it is typed', () => {
+  /*
+   * The two boxes this replaced listened to `change`, so a filter only applied on blur or Enter —
+   * you could type a SKU, look at an unchanged table and conclude the filter was broken. Live, but
+   * settled first, because both of these reach the server.
+   */
+  it('publishes the term once the typing stops', fakeAsync(() => {
+    input().value = 'acm';
+    input().dispatchEvent(new Event('input'));
+    tick(150);
+    expect(host.term()).withContext('mid-word, nothing sent yet').toBe('');
+
+    input().value = 'acme';
+    input().dispatchEvent(new Event('input'));
+    tick(150);
+    expect(host.term()).withContext('the first keystroke must not fire on its own timer').toBe('');
+
+    tick(300);
+    expect(host.term()).toBe('acme');
+  }));
+
+  it('publishes immediately when the caller filters in memory', fakeAsync(() => {
+    host.immediate.set(true);
+    fixture.detectChanges();
+
     input().value = 'acme';
     input().dispatchEvent(new Event('input'));
     expect(host.term()).toBe('acme');
-  });
+    tick(300);
+  }));
 
   it('takes a term set from outside — a filter restored from the URL', () => {
     host.term.set('restored');

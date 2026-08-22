@@ -7,20 +7,15 @@
   </app-page-header>
 
   @if (error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button class="secondary-action" type="button" (click)="facade.retry()">
-        {{ t('shared.actions.retry') }}
-      </button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="isLoading() || facade.saving()" [label]="t('catalogue.loading')">
-    @if (isEmpty()) {
-      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
-      <div class="first-load" aria-hidden="true"></div>
-    } @else {
+  <app-busy-overlay
+    reserve="panel"
+    [busy]="isLoading() || facade.saving()"
+    [label]="t('catalogue.loading')"
+  >
+    @if (!isEmpty()) {
       <div class="catalogue-body">
         <app-tab-switcher
           [tabs]="tabs()"

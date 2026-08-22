@@ -217,7 +217,7 @@ describe('Catalogue', () => {
 
     // The third row is `Displays`; "move into the row above" nests it under `Audio`.
     const rows = [...element.querySelectorAll('.tree-row')];
-    const nest = rows[2].querySelectorAll('.row-moves .row-action')[0] as HTMLButtonElement;
+    const nest = rows[2].querySelectorAll('.row-moves .icon-action')[0] as HTMLButtonElement;
     nest.click();
     tick();
     fixture.detectChanges();
@@ -233,7 +233,7 @@ describe('Catalogue', () => {
      */
     const element = load();
 
-    const actions = [...element.querySelectorAll('.tree-row')[2].querySelectorAll('.row-moves .row-action')];
+    const actions = [...element.querySelectorAll('.tree-row')[2].querySelectorAll('.row-moves .icon-action')];
     const labels = actions.map((button) => button.getAttribute('aria-label'));
 
     expect(labels.some((label) => label?.includes('up among'))).toBe(false);
@@ -246,7 +246,7 @@ describe('Catalogue', () => {
     const element = load();
 
     const rows = [...element.querySelectorAll('.tree-row')];
-    const out = rows[1].querySelectorAll('.row-moves .row-action')[1] as HTMLButtonElement;
+    const out = rows[1].querySelectorAll('.row-moves .icon-action')[1] as HTMLButtonElement;
     out.click();
     tick();
     fixture.detectChanges();
@@ -257,7 +257,7 @@ describe('Catalogue', () => {
   it('toggles storefront visibility from the row without saving the editor beside it', fakeAsync(() => {
     const element = load();
 
-    const eye = element.querySelectorAll('.tree-row .row-action')[0] as HTMLButtonElement;
+    const eye = element.querySelectorAll('.tree-row .icon-action')[0] as HTMLButtonElement;
     eye.click();
     tick();
     fixture.detectChanges();
@@ -345,7 +345,7 @@ describe('Catalogue', () => {
     api.failure = true;
     const element = load();
 
-    expect(element.querySelector('.load-error')?.textContent).toContain('Unable to load the catalogue.');
+    expect(element.querySelector('app-load-error')?.textContent).toContain('Unable to load the catalogue.');
     expect(element.querySelector('app-category-tab')).toBeNull();
   }));
 });

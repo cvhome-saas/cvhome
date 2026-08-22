@@ -33,9 +33,11 @@ describe('LoadError', () => {
     element = fixture.nativeElement as HTMLElement;
   });
 
-  it('says what failed, in a region a reader is told about', () => {
+  it('says what failed, and interrupts to do it', () => {
+    // `alert`, not `status`: this is something that has just gone wrong, not a description of what
+    // is on screen. All nine of the hand-written blocks it replaced announced assertively.
     const notice = element.querySelector('app-notice-bar') as HTMLElement;
-    expect(notice.getAttribute('role')).toBe('status');
+    expect(notice.getAttribute('role')).toBe('alert');
     expect(notice.textContent).toContain('Orders could not be loaded.');
   });
 

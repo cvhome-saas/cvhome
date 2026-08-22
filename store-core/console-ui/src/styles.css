@@ -161,6 +161,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
   --icon-size: .95rem;
 }
 
+/*
+ * Two tones the row actions need, here rather than per page: a delete that reddens on approach,
+ * and a confirmed state that stays emerald. Four pages had drawn the base button at three sizes
+ * and three radii before this, so the modifiers would have drifted along with it.
+ */
+.icon-action.danger:hover:not(:disabled) {
+  border-color: var(--chart-5-foreground);
+  color: var(--chart-5-foreground);
+}
+
+.icon-action.confirm {
+  color: var(--primary-emphasis);
+}
+
 /* One disabled treatment, whatever the variant — including the `<span>` first-run uses as a gate. */
 .primary-action:disabled,
 .primary-action.disabled,
@@ -184,7 +198,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
   cursor: progress;
 }
 
-@keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+/*
+ * One entry animation for the whole app.
+ *
+ * Seven feature keyframes said this before it was parameterised — `panel-in` twice, `section-in`
+ * twice at *different* distances, `order-rise`, `billing-rise`, `create-store-rise` and
+ * `tab-panel-enter` — ranging from 8px to 20px, so how far a page rose depended on which page it
+ * was. `--rise-from` is what actually differs between marketing (spacious) and the console
+ * (compact); everything else was copied.
+ */
+@keyframes rise { from { opacity: 0; transform: translateY(var(--rise-from, 20px)); } to { opacity: 1; transform: none; } }
+
+/* The console is dense; a panel that travels a marketing distance reads as a page that jumped. */
+@keyframes spin { to { transform: rotate(1turn); } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-14px, 10px); } }
 @keyframes glow { 0%, 100% { opacity: .5; } 50% { opacity: .9; } }

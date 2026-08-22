@@ -4,6 +4,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
 import {ProgressTrack} from '@shared/ui/progress-track/progress-track';
@@ -30,6 +31,7 @@ import {positiveIntParam} from '@core/routing/route-params';
 @Component({
   selector: 'app-product-form',
   imports: [
+    LoadError,
     BusyOverlay,
     EssentialsStep,
     Icon,

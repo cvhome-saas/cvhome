@@ -1,21 +1,46 @@
 /*
  * Billing: the plan and its invoices in the main column, what the plan grants beside them.
  *
- * The grid matches store management's and create-store's — same two-column split, same gutter — so
- * a console page is recognisably a console page whichever one you land on.
- */
-
-/*
  * Rail and work area, the same shape store management uses — so a console page with sections looks
- * like a console page with sections, whichever one it is.
+ * like a console page with sections, whichever one it is. It claimed that before and did not quite
+ * hold to it: no `:host { display: contents }`, so this was the one console page whose host box did
+ * not dissolve into the shell's workspace, and a `margin-block-start` of its own on top of the
+ * shell's gap, so it sat 1.75rem down where every sibling sat 1.5rem.
  */
+:host {
+  display: contents;
+}
+
 .billing-layout {
+  container: billing / inline-size;
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
-  margin-block-start: 1.75rem;
   transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Below the rail's useful width the sections become a tab strip, exactly as store management does.
+ * Without it this page simply lost its navigation on a narrow viewport.
+ */
+.billing-tabs {
+  display: none;
+}
+
+@container billing (max-width: 44rem) {
+  .billing-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .billing-rail {
+    display: none;
+  }
+
+  .billing-tabs {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
 .billing-layout.rail-collapsed {
@@ -34,10 +59,6 @@
   flex-direction: column;
   gap: 1.25rem;
   min-inline-size: 0;
-}
-
-.panel-pad {
-  padding: 1.25rem 1.5rem;
 }
 
 /* ---- Current plan ---------------------------------------------------------------------- */
@@ -301,60 +322,12 @@
 
 /* ---- Empty and error ------------------------------------------------------------------- */
 
-.empty-note {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0;
-  padding-block: 2rem;
-  color: var(--muted-foreground);
-  font-size: var(--text-sm);
-  text-align: center;
-  --icon-size: 1rem;
-}
-
-.load-error {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--chart-5-foreground);
-  border-radius: var(--radius-lg);
-  background: var(--muted);
-  color: var(--foreground-strong);
-  font-size: var(--text-sm);
-}
-
-.load-error p {
-  flex: 1;
-  margin: 0;
-}
-
-.load-error button {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  color: var(--foreground-strong);
-  font-size: var(--text-xs);
-  font-family: inherit;
-  cursor: pointer;
-}
-
 /* ---- Motion and narrow screens --------------------------------------------------------- */
-
-@keyframes billing-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.625rem);
-  }
-}
 
 .billing-grid > .row-lead,
 .billing-grid > app-panel {
-  animation: billing-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .billing-grid > app-panel {
@@ -367,7 +340,8 @@
  */
 .invoice-row,
 .allowance-row {
-  animation: billing-rise 0.26s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.26s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .invoice-row:nth-child(2),
@@ -383,7 +357,8 @@
 
 /* The pending-change note appears in response to an action, so it announces itself. */
 .plan-pending {
-  animation: billing-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* A control mid-request reads as busy rather than merely dead. */

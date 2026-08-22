@@ -238,13 +238,7 @@
   border: 2px solid currentColor;
   border-block-start-color: transparent;
   border-radius: 50%;
-  animation: domain-spin 0.7s linear infinite;
-}
-
-@keyframes domain-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  animation: spin 0.7s linear infinite;
 }
 
 /*

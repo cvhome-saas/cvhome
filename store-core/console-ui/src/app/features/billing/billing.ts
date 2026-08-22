@@ -1,16 +1,19 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {map} from 'rxjs';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {Money} from '@shared/i18n/money';
 import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog';
 import {SectionNav, type NavSection} from '@shared/ui/section-nav/section-nav';
+import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
+import {EmptyState} from '@shared/ui/empty-state/empty-state';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
 import type {Tone} from '@shared/ui/tone';
@@ -47,6 +50,9 @@ const STATUS_TONE: Record<SubscriptionStatus, Tone> = {
 @Component({
   selector: 'app-billing',
   imports: [
+    EmptyState,
+    TabSwitcher,
+    LoadError,
     Badge,
     BusyOverlay,
     ConfirmDialog,
@@ -67,11 +73,26 @@ export class Billing {
   private readonly money = inject(Money);
 
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   protected readonly billing = this.facade.billing;
   protected readonly confirmingCancel = signal(false);
   protected readonly sections = BILLING_SECTIONS;
   protected readonly railCollapsed = signal(false);
+
+  /**
+   * The same sections as a tab strip, for a viewport too narrow for the rail.
+   *
+   * Store management has had this since the rail was promoted to `app-section-nav`; billing grew
+   * the rail and not the fallback, so below 44rem this page simply had no navigation.
+   */
+  protected tabs(t: (key: string) => string): readonly TabItem[] {
+    return BILLING_SECTIONS.map((section) => ({key: section.key, label: t(section.labelKey)}));
+  }
+
+  protected pickSection(key: string): void {
+    void this.router.navigate(['/subscription', key]);
+  }
 
   /**
    * The open section, from the URL.

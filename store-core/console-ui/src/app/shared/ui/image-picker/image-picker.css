@@ -132,13 +132,7 @@
   border: 2px solid currentColor;
   border-block-start-color: transparent;
   border-radius: 50%;
-  animation: picker-spin 0.7s linear infinite;
-}
-
-@keyframes picker-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  animation: spin 0.7s linear infinite;
 }
 
 /* ---- Empty ---------------------------------------------------------------------------------- */

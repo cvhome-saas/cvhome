@@ -19,22 +19,14 @@
   </app-page-header>
 
   @if (facade.error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button class="secondary-action" type="button" (click)="facade.retry()">
-        {{ t('shared.actions.retry') }}
-      </button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
   <app-busy-overlay
     [busy]="facade.isLoading() || facade.saving()"
     [label]="t('products.loading')"
   >
-    @if (facade.isEmpty()) {
-      <div class="first-load" aria-hidden="true"></div>
-    } @else {
+    @if (!facade.isEmpty()) {
       <app-panel
         class="products-panel"
         #report
@@ -80,18 +72,15 @@
           manufacturer and categories, and reads no name field at all. See lessons.md.
         -->
         <div panelAction class="panel-controls" role="search">
-          <label class="filter">
-            <span class="sr-only">{{ t('products.filter.sku') }}</span>
-            <app-icon name="search" [size]="15" />
-            <!-- A SKU is an identifier: left-to-right even inside the Arabic console. -->
-            <input
-              type="search"
-              dir="ltr"
-              [value]="facade.filters().sku"
-              [placeholder]="t('products.filter.skuPlaceholder')"
-              (change)="facade.setFilter('sku', $any($event.target).value)"
-            />
-          </label>
+          <!-- A SKU is an identifier: left-to-right even inside the Arabic console, which the
+               shared box handles with `unicode-bidi: plaintext` rather than a hard direction. -->
+          <app-search-box
+            width="14.5rem"
+            [value]="facade.filters().sku"
+            (valueChange)="facade.setFilter('sku', $event)"
+            [label]="t('products.filter.sku')"
+            [placeholder]="t('products.filter.skuPlaceholder')"
+          />
 
           <app-select
             class="filter-select"
@@ -221,7 +210,7 @@
                 <div class="cell-actions" role="cell" [attr.data-label]="t('products.column.actions')">
                   @if (facade.editingId() === row.id) {
                     <button
-                      class="row-action confirm"
+                      class="icon-action confirm"
                       type="button"
                       [disabled]="facade.saving()"
                       [attr.aria-label]="t('products.saveRowFor', {name: row.name})"
@@ -230,7 +219,7 @@
                       <app-icon name="check" [size]="15" />
                     </button>
                     <button
-                      class="row-action"
+                      class="icon-action"
                       type="button"
                       [attr.aria-label]="t('products.cancelEditFor', {name: row.name})"
                       (click)="facade.cancelEdit()"
@@ -243,7 +232,7 @@
                       tooltip. An explicit control is the whole point of the row action here.
                     -->
                     <button
-                      class="row-action"
+                      class="icon-action"
                       type="button"
                       [attr.aria-label]="t('products.editRowFor', {name: row.name})"
                       [title]="t('products.editRow')"
@@ -252,7 +241,7 @@
                       <app-icon name="pencil" [size]="15" />
                     </button>
                     <button
-                      class="row-action"
+                      class="icon-action"
                       type="button"
                       [attr.aria-label]="t('products.openProductFor', {name: row.name})"
                       [title]="t('products.openProduct')"
@@ -261,7 +250,7 @@
                       <app-icon name="chevronRight" [size]="15" [flip]="true" />
                     </button>
                     <button
-                      class="row-action danger"
+                      class="icon-action danger"
                       type="button"
                       [attr.aria-label]="t('products.deleteProductFor', {name: row.name})"
                       [title]="t('products.deleteProduct')"
@@ -279,9 +268,10 @@
             Empty because of a filter, or empty because the store has no products — two different
             situations, and only one of them has a way out.
           -->
-          <div class="table-empty">
-            <app-icon name="box" />
-            <p>{{ facade.filtered() ? t('products.noneMatch') : t('products.none') }}</p>
+          <app-empty-state
+            icon="box"
+            [message]="facade.filtered() ? t('products.noneMatch') : t('products.none')"
+          >
             @if (facade.filtered()) {
               <button class="secondary-action" type="button" (click)="facade.clearFilters()">
                 {{ t('products.clearFilters') }}
@@ -291,7 +281,7 @@
                 {{ t('products.addProduct') }}
               </button>
             }
-          </div>
+          </app-empty-state>
         }
 
         <app-pagination

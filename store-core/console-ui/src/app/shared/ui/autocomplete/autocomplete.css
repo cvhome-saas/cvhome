@@ -47,7 +47,7 @@
   border: 2px solid var(--track);
   border-block-start-color: var(--primary);
   border-radius: var(--radius-full);
-  animation: autocomplete-spin .7s linear infinite;
+  animation: spin .7s linear infinite;
 }
 
 .options {
@@ -127,12 +127,6 @@
 /* The same motion, reversed and faster — the established leave. */
 .options-out {
   animation: autocomplete-options-in .13s ease-in reverse both;
-}
-
-@keyframes autocomplete-spin {
-  to {
-    transform: rotate(1turn);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

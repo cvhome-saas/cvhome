@@ -9,6 +9,7 @@ import {DonutChart} from '@shared/ui/charts/donut-chart';
 import {ExportButton} from '@shared/ui/export-button/export-button';
 import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {RankedList} from '@shared/ui/ranked-list/ranked-list';
@@ -26,6 +27,7 @@ import {DashboardFacade} from './facades/dashboard.facade';
 @Component({
   selector: 'app-dashboard',
   imports: [
+    LoadError,
     ActionList,
     BarChart,
     BusyOverlay,

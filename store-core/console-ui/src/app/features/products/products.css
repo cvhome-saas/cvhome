@@ -2,29 +2,6 @@
   display: contents;
 }
 
-.first-load {
-  block-size: 26rem;
-}
-
-.load-error {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  margin-block-end: 1rem;
-  padding: .9rem 1.1rem;
-  border: 1px solid var(--chart-5-wash);
-  border-radius: var(--radius-lg);
-  background: var(--chart-5-wash);
-  color: var(--chart-5-foreground);
-  font-size: var(--text-xs);
-  --icon-size: 1rem;
-}
-
-.load-error p {
-  flex: 1;
-  margin: 0;
-}
-
 /* ---- Filters ----------------------------------------------------------------------- */
 
 /*
@@ -228,57 +205,6 @@
   justify-content: flex-end;
 }
 
-.row-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: 1.8rem;
-  block-size: 1.8rem;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: none;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  transition:
-    background-color var(--default-transition-duration),
-    color var(--default-transition-duration);
-}
-
-.row-action:hover:not(:disabled) {
-  background: var(--input);
-  color: var(--primary-emphasis);
-}
-
-.row-action.danger:hover:not(:disabled) {
-  color: var(--destructive);
-}
-
-.row-action.confirm {
-  color: var(--primary-emphasis);
-}
-
-.row-action:disabled {
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-.table-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .75rem;
-  padding: 3.5rem 1.5rem;
-  color: var(--foreground-quiet);
-  font-size: var(--text-xs);
-  text-align: center;
-  --icon-size: 1.6rem;
-}
-
-.table-empty p {
-  margin: 0;
-}
-
 @media (max-width: 900px) {
   /* Room runs out before the row does, so the search box gives up its fixed width first. */
   .filter {
@@ -289,11 +215,5 @@
   .filter-select {
     flex: 1 1 10rem;
     max-inline-size: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .row-action {
-    transition: none;
   }
 }

@@ -223,7 +223,7 @@ describe('OrderDetails', () => {
     const element = load();
     expect(element.querySelector('.invoice-sheet')).toBeNull();
 
-    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    (element.querySelector('.icon-action') as HTMLButtonElement).click();
     fixture.detectChanges();
 
     const sheet = element.querySelector('.invoice-sheet');
@@ -251,7 +251,7 @@ describe('OrderDetails', () => {
     // A merchant-service outage must not cost the operator the invoice for an order that exists.
     api.detail = {...DETAIL, seller: null};
     const element = load();
-    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    (element.querySelector('.icon-action') as HTMLButtonElement).click();
     fixture.detectChanges();
 
     // The name still comes from the rail, which is the one thing the console always knows.
@@ -278,16 +278,19 @@ describe('OrderDetails', () => {
 
   it('shows the status it will actually submit', fakeAsync(() => {
     const element = load();
-    const select = element.querySelector('.composer select') as HTMLSelectElement;
 
-    // Binding `[value]` on the select left it displaying the first option while submitting another.
-    expect(select.value).toBe('PROCESSING');
-    expect(select.selectedOptions[0].textContent!.trim()).toBe('Processing');
+    /*
+     * The native control this replaced displayed its first option while submitting another,
+     * because a value bound before the options exist is discarded. `app-select` re-applies as each
+     * option appears, so what the trigger reads is what will be sent.
+     */
+    const trigger = element.querySelector('.composer .select-trigger') as HTMLButtonElement;
+    expect(trigger.textContent!.trim()).toBe('Processing');
   }));
 
   it('records a status change and re-reads the order rather than assuming', fakeAsync(() => {
     const element = load();
-    const comment = element.querySelector('.composer textarea') as HTMLTextAreaElement;
+    const comment = element.querySelector('.composer app-textarea textarea') as HTMLTextAreaElement;
     comment.value = 'Handed to courier';
     comment.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -326,7 +329,7 @@ describe('OrderDetails', () => {
     // The page toasts through `ToastService` itself, not through the error port the fake covers.
     const info = spyOn(TestBed.inject(ToastService), 'info');
     const element = load();
-    (element.querySelector('.invoice-action') as HTMLButtonElement).click();
+    (element.querySelector('.icon-action') as HTMLButtonElement).click();
     fixture.detectChanges();
 
     const email = [...element.querySelectorAll('.invoice-bar button')].find((b) =>
@@ -351,16 +354,16 @@ describe('OrderDetails', () => {
     api.failure = true;
     const element = load();
 
-    expect(element.querySelector('.load-error')).not.toBeNull();
+    expect(element.querySelector('app-load-error')).not.toBeNull();
 
     api.failure = false;
-    (element.querySelector('.load-error button') as HTMLButtonElement).click();
+    (element.querySelector('app-load-error button') as HTMLButtonElement).click();
     tick();
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
-    expect(element.querySelector('.load-error')).toBeNull();
+    expect(element.querySelector('app-load-error')).toBeNull();
     expect(element.querySelectorAll('.items tbody tr').length).toBe(2);
   }));
 });

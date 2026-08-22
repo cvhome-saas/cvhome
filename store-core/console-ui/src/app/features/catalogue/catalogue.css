@@ -30,15 +30,9 @@
  * No leave: the outgoing tab is replaced immediately, and animating it out would hold two panels on
  * screen at once for no gain.
  */
-@keyframes tab-panel-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-
 .tab-panel-in {
-  animation: tab-panel-enter .22s var(--ease-emphasis) both;
+  --rise-from: 0.5rem;
+  animation: rise .22s var(--ease-emphasis) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -47,26 +41,3 @@
   }
 }
 
-/* The height the first load holds, so the page does not jump when the first response lands. */
-.first-load {
-  block-size: 26rem;
-}
-
-.load-error {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  margin-block-end: 1rem;
-  padding: .9rem 1.1rem;
-  border: 1px solid var(--chart-5-wash);
-  border-radius: var(--radius-lg);
-  background: var(--chart-5-wash);
-  color: var(--chart-5-foreground);
-  font-size: var(--text-xs);
-  --icon-size: 1rem;
-}
-
-.load-error p {
-  flex: 1;
-  margin: 0;
-}

@@ -6,6 +6,7 @@ import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog
 import {Badge} from '@shared/ui/badge/badge';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Panel} from '@shared/ui/panel/panel';
@@ -27,6 +28,7 @@ import {FirstRunFacade} from './facades/first-run.facade';
 @Component({
   selector: 'app-first-run',
   imports: [
+    LoadError,
     Badge,
     BusyOverlay,
     Icon,

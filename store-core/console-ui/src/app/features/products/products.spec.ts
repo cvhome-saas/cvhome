@@ -178,10 +178,11 @@ describe('Products', () => {
   it('narrows on the SKU filter and offers a way back', fakeAsync(() => {
     const element = load();
 
-    const sku = element.querySelector('.filter input') as HTMLInputElement;
+    const sku = element.querySelector('app-search-box input') as HTMLInputElement;
     sku.value = 'ACM-PPR';
-    sku.dispatchEvent(new Event('change'));
-    tick();
+    sku.dispatchEvent(new Event('input'));
+    // The box debounces, so a filter does not reach the server per keystroke.
+    tick(300);
     fixture.detectChanges();
 
     expect(names(element)).toEqual(['Copy paper']);
@@ -202,18 +203,19 @@ describe('Products', () => {
     const element = load();
 
     // Nothing in the store: the way out is to add a product, not to clear a filter.
-    expect(element.querySelector('.table-empty')?.textContent).toContain('no products yet');
-    expect(element.querySelector('.table-empty button')?.textContent?.trim()).toBe('Add product');
+    expect(element.querySelector('app-empty-state')?.textContent).toContain('no products yet');
+    expect(element.querySelector('app-empty-state button')?.textContent?.trim()).toBe('Add product');
 
     api.catalogue = CATALOGUE;
-    const sku = element.querySelector('.filter input') as HTMLInputElement;
+    const sku = element.querySelector('app-search-box input') as HTMLInputElement;
     sku.value = 'NOTHING-AT-ALL';
-    sku.dispatchEvent(new Event('change'));
-    tick();
+    sku.dispatchEvent(new Event('input'));
+    // The box debounces, so a filter does not reach the server per keystroke.
+    tick(300);
     fixture.detectChanges();
 
-    expect(element.querySelector('.table-empty')?.textContent).toContain('No products match');
-    expect(element.querySelector('.table-empty button')?.textContent?.trim()).toBe('Clear filters');
+    expect(element.querySelector('app-empty-state')?.textContent).toContain('No products match');
+    expect(element.querySelector('app-empty-state button')?.textContent?.trim()).toBe('Clear filters');
   }));
 
   it('renders the quantity in the reader’s own numerals, like the price beside it', fakeAsync(() => {
@@ -243,7 +245,7 @@ describe('Products', () => {
     const element = load();
 
     // They belong on the panel's header row, beside the tabs, not on a rail of their own below it.
-    expect(element.querySelector('.panel-controls .filter')).not.toBeNull();
+    expect(element.querySelector('.panel-controls app-search-box')).not.toBeNull();
     expect(element.querySelector('.panel-controls app-tab-switcher')).not.toBeNull();
     expect(element.querySelector('.filter-rail')).toBeNull();
 
@@ -260,7 +262,7 @@ describe('Products', () => {
 
     expect(element.querySelector('.inline-input')).toBeNull();
 
-    const edit = element.querySelector('.cell-actions .row-action') as HTMLButtonElement;
+    const edit = element.querySelector('.cell-actions .icon-action') as HTMLButtonElement;
     edit.click();
     fixture.detectChanges();
 
@@ -277,7 +279,7 @@ describe('Products', () => {
     inputs[1].dispatchEvent(new Event('input', {bubbles: true}));
     fixture.detectChanges();
 
-    const confirm = element.querySelector('.row-action.confirm') as HTMLButtonElement;
+    const confirm = element.querySelector('.icon-action.confirm') as HTMLButtonElement;
     confirm.click();
     tick();
     fixture.detectChanges();
@@ -289,7 +291,7 @@ describe('Products', () => {
   it('keeps the old price when the field is cleared rather than pricing the product at nothing', fakeAsync(() => {
     const element = load();
 
-    (element.querySelector('.cell-actions .row-action') as HTMLButtonElement).click();
+    (element.querySelector('.cell-actions .icon-action') as HTMLButtonElement).click();
     fixture.detectChanges();
 
     const price = element.querySelector('.inline-input input') as HTMLInputElement;
@@ -297,7 +299,7 @@ describe('Products', () => {
     price.dispatchEvent(new Event('input', {bubbles: true}));
     fixture.detectChanges();
 
-    (element.querySelector('.row-action.confirm') as HTMLButtonElement).click();
+    (element.querySelector('.icon-action.confirm') as HTMLButtonElement).click();
     tick();
 
     expect(api.edits[0].price).toBe(129);
@@ -317,7 +319,7 @@ describe('Products', () => {
   it('deletes only behind the confirm dialog', fakeAsync(() => {
     const element = load();
 
-    const remove = element.querySelector('.row-action.danger') as HTMLButtonElement;
+    const remove = element.querySelector('.icon-action.danger') as HTMLButtonElement;
     remove.click();
     fixture.detectChanges();
 
@@ -337,7 +339,7 @@ describe('Products', () => {
     api.failure = true;
     const element = load();
 
-    expect(element.querySelector('.load-error')?.textContent).toContain('Unable to load products.');
-    expect(element.querySelector('.load-error button')).not.toBeNull();
+    expect(element.querySelector('app-load-error')?.textContent).toContain('Unable to load products.');
+    expect(element.querySelector('app-load-error button')).not.toBeNull();
   }));
 });

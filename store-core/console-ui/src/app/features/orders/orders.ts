@@ -10,10 +10,13 @@ import {TableRow} from '@shared/ui/data-table/table-row';
 import {DateRangePicker} from '@shared/ui/date-range-picker/date-range-picker';
 import {ExportButton} from '@shared/ui/export-button/export-button';
 import {Icon} from '@shared/ui/icon/icon';
+import {EmptyState} from '@shared/ui/empty-state/empty-state';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {Pagination} from '@shared/ui/pagination/pagination';
 import {Panel} from '@shared/ui/panel/panel';
+import {SearchBox} from '@shared/ui/search-box/search-box';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {ToastService} from '@shared/ui/toast/toast';
 import {STATUS_TONE, type OrderRow} from '@models/orders';
@@ -45,6 +48,9 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
 @Component({
   selector: 'app-orders',
   imports: [
+    SearchBox,
+    EmptyState,
+    LoadError,
     Badge,
     BusyOverlay,
     DataTable,

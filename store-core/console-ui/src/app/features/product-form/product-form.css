@@ -2,29 +2,6 @@
   display: contents;
 }
 
-.first-load {
-  block-size: 26rem;
-}
-
-.load-error {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  margin-block-end: 1rem;
-  padding: .9rem 1.1rem;
-  border: 1px solid var(--chart-5-wash);
-  border-radius: var(--radius-lg);
-  background: var(--chart-5-wash);
-  color: var(--chart-5-foreground);
-  font-size: var(--text-xs);
-  --icon-size: 1rem;
-}
-
-.load-error p {
-  flex: 1;
-  margin: 0;
-}
-
 /* Rail, work area, evidence. The middle column takes what the other two do not need. */
 .wizard {
   display: grid;

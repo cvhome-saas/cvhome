@@ -31,11 +31,21 @@ import type {Tone} from '../tone';
   styleUrl: './notice-bar.css',
   host: {
     '[class]': 'tone()',
-    role: 'status',
+    '[attr.role]': 'role()',
   },
 })
 export class NoticeBar {
   readonly message = input.required<string>();
   readonly icon = input.required<IconName>();
   readonly tone = input<Tone>('amber');
+  /**
+   * How insistently a reader is told.
+   *
+   * `status` for a notice that describes what is on screen — the usual case, and why it is the
+   * default. `alert` for something that has just gone wrong and interrupts what the operator was
+   * doing, which is what `app-load-error` is: the nine hand-written blocks it replaced all used
+   * `role="alert"`, and quietly demoting a failure announcement to polite would be a real
+   * regression for anyone not looking at the screen.
+   */
+  readonly role = input<'status' | 'alert'>('status');
 }

@@ -5,6 +5,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {ConfirmDialog} from '@shared/ui/confirm-dialog/confirm-dialog';
 import {Icon} from '@shared/ui/icon/icon';
+import {LoadError} from '@shared/ui/load-error/load-error';
 import {PageHeader} from '@shared/ui/page-header/page-header';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {isCatalogueTab} from '@models/taxonomy';
@@ -32,6 +33,7 @@ import {CatalogueFacade} from './facades/catalogue.facade';
 @Component({
   selector: 'app-catalogue',
   imports: [
+    LoadError,
     BrandTab,
     BusyOverlay,
     CategoryTab,

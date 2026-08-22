@@ -647,13 +647,7 @@
 /* ---- Spin ------------------------------------------------------------------------------- */
 
 .spin {
-  animation: create-store-spin 1s linear infinite;
-}
-
-@keyframes create-store-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  animation: spin 1s linear infinite;
 }
 
 /*
@@ -746,16 +740,10 @@
  * the second phase the same rule covers the progress card, so committing the form is a transition
  * rather than a swap. `prefers-reduced-motion` is handled globally in `styles.css`.
  */
-@keyframes create-store-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.625rem);
-  }
-}
-
 .create-store-grid > .column-main,
 .create-store-grid > .column-side {
-  animation: create-store-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .create-store-grid > .column-side {
@@ -768,7 +756,8 @@
  * panel arrives late enough to feel like a loading delay.
  */
 .column-main > app-panel {
-  animation: create-store-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .column-main > app-panel:nth-of-type(2) {
@@ -785,5 +774,6 @@
  */
 .progress-card > .done-banner,
 .progress-card > .failure-reason {
-  animation: create-store-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.625rem;
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }

@@ -77,8 +77,8 @@ describe('Billing', () => {
     billing.subscription = null;
     const {element} = page();
 
-    expect(element.querySelector('.load-error')).toBeNull();
-    expect(element.querySelector('.empty-note')).not.toBeNull();
+    expect(element.querySelector('app-load-error')).toBeNull();
+    expect(element.querySelector('app-empty-state')).not.toBeNull();
   }));
 
   it('offers resume rather than cancel once renewal is already off', fakeAsync(() => {

@@ -70,7 +70,7 @@
 
         @if (showVisibility() && row.node.visible !== undefined) {
           <button
-            class="row-action"
+            class="icon-action"
             type="button"
             tabindex="-1"
             [disabled]="busy()"
@@ -90,7 +90,7 @@
         -->
         <span class="row-moves">
           <button
-            class="row-action"
+            class="icon-action"
             type="button"
             tabindex="-1"
             [disabled]="busy() || !canNest(row)"
@@ -101,7 +101,7 @@
             <app-icon name="arrowRight" [size]="14" [flip]="true" />
           </button>
           <button
-            class="row-action"
+            class="icon-action"
             type="button"
             tabindex="-1"
             [disabled]="busy() || !canUnnest(row)"
@@ -112,7 +112,7 @@
             <app-icon name="arrowLeft" [size]="14" [flip]="true" />
           </button>
           <button
-            class="row-action"
+            class="icon-action"
             type="button"
             tabindex="-1"
             [disabled]="busy()"
@@ -128,7 +128,7 @@
             beside it — which is the only place an operator can find out the shortcuts exist.
           -->
           <button
-            class="row-action row-more"
+            class="icon-action row-more"
             type="button"
             tabindex="-1"
             [disabled]="busy()"

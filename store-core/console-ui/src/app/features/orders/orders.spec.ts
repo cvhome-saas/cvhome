@@ -138,17 +138,18 @@ describe('Orders', () => {
     const element = load();
 
     // Nothing placed in the period: there is nothing for the operator to undo.
-    expect(element.querySelector('.table-empty')?.textContent).toContain('No orders were placed');
-    expect(element.querySelector('.table-empty button')).toBeNull();
+    expect(element.querySelector('app-empty-state')?.textContent).toContain('No orders were placed');
+    expect(element.querySelector('app-empty-state button')).toBeNull();
 
-    const search = element.querySelector('.order-search input') as HTMLInputElement;
+    const search = element.querySelector('app-search-box input') as HTMLInputElement;
     search.value = 'nobody@example.com';
-    search.dispatchEvent(new Event('change'));
-    tick();
+    search.dispatchEvent(new Event('input'));
+    // The box debounces, so a filter does not reach the server per keystroke.
+    tick(300);
     fixture.detectChanges();
 
-    const clear = element.querySelector('.table-empty button') as HTMLButtonElement;
-    expect(element.querySelector('.table-empty')?.textContent).toContain('No orders match');
+    const clear = element.querySelector('app-empty-state button') as HTMLButtonElement;
+    expect(element.querySelector('app-empty-state')?.textContent).toContain('No orders match');
     expect(clear).not.toBeNull();
 
     clear.click();
@@ -185,11 +186,12 @@ describe('Orders', () => {
 
   it('sends the search term to the server rather than filtering on screen', fakeAsync(() => {
     const element = load();
-    const search = element.querySelector('.order-search input') as HTMLInputElement;
+    const search = element.querySelector('app-search-box input') as HTMLInputElement;
 
     search.value = 'Tobias';
-    search.dispatchEvent(new Event('change'));
-    tick();
+    search.dispatchEvent(new Event('input'));
+    // The box debounces, so a filter does not reach the server per keystroke.
+    tick(300);
     fixture.detectChanges();
 
     expect(api.requests[api.requests.length - 1].search).toBe('Tobias');
@@ -262,21 +264,21 @@ describe('Orders', () => {
     const element = load();
 
     expect(element.querySelector('app-data-table')).toBeNull();
-    expect(element.querySelector('.table-empty')).not.toBeNull();
+    expect(element.querySelector('app-empty-state')).not.toBeNull();
   }));
 
   it('surfaces a failed request with a retry that refetches', fakeAsync(() => {
     api.failure = true;
     const element = load();
 
-    expect(element.querySelector('.load-error')).not.toBeNull();
+    expect(element.querySelector('app-load-error')).not.toBeNull();
 
     api.failure = false;
-    (element.querySelector('.load-error button') as HTMLButtonElement).click();
+    (element.querySelector('app-load-error button') as HTMLButtonElement).click();
     tick();
     fixture.detectChanges();
 
-    expect(element.querySelector('.load-error')).toBeNull();
+    expect(element.querySelector('app-load-error')).toBeNull();
     expect(references(element).length).toBe(5);
   }));
 

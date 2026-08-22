@@ -92,7 +92,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.invoice-action,
+.icon-action,
 .panel-link {
   display: inline-flex;
   flex: none;
@@ -112,7 +112,7 @@
     color var(--default-transition-duration);
 }
 
-.invoice-action:hover,
+.icon-action:hover,
 .panel-link:hover {
   border-color: var(--edge);
   background: var(--accent);
@@ -247,35 +247,6 @@
 
 :host {
   display: contents;
-}
-
-.load-error {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--destructive);
-  border-radius: var(--radius-lg);
-  background: --alpha(var(--destructive) / 8%);
-  color: var(--foreground-strong);
-}
-
-.load-error p {
-  flex: 1;
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.load-error button {
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--destructive);
-  border-radius: var(--radius-full);
-  color: var(--destructive);
-  font-size: var(--text-xs);
-}
-
-.first-load {
-  min-block-size: 24rem;
 }
 
 /* The mockup's two columns; the side column drops under the main one when the shell narrows. */
@@ -1111,23 +1082,12 @@
  * columns, a beat apart. Short and small — 12px and 320ms — because this is a screen an operator
  * opens dozens of times a day, and anything longer would be in the way by the third visit.
  */
-@keyframes order-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.75rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 .order-head,
 .fulfilment,
 .off-path,
 .order-grid {
-  animation: order-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --rise-from: 0.75rem;
+  animation: rise 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .fulfilment,

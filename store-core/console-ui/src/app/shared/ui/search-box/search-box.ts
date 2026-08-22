@@ -1,4 +1,4 @@
-import {Component, input, model} from '@angular/core';
+import {Component, DestroyRef, effect, inject, input, model, signal} from '@angular/core';
 
 import {Icon} from '@shared/ui/icon/icon';
 
@@ -33,7 +33,7 @@ let nextId = 0;
         [value]="value()"
         [placeholder]="placeholder()"
         [attr.aria-describedby]="describedBy()"
-        (input)="value.set(input.value)"
+        (input)="onInput(input.value)"
       />
     </label>
   `,
@@ -54,5 +54,54 @@ export class SearchBox {
    */
   readonly width = input<string | null>(null);
 
+  /**
+   * How long the operator has to stop typing before the term is published.
+   *
+   * The two boxes this replaced listened to `change`, so a filter only applied on blur or Enter —
+   * you could type a SKU, look at an unchanged table, and conclude the filter was broken. Listening
+   * to `input` instead is live, but a filter that reaches the server cannot fire per keystroke, so
+   * the term settles first. `0` publishes immediately, for a box that filters in memory.
+   */
+  readonly debounceMs = input(300);
+
   protected readonly id = `search-${nextId++}`;
+
+  private readonly destroyRef = inject(DestroyRef);
+  private pending: ReturnType<typeof setTimeout> | null = null;
+  /** What is in the box right now, which is ahead of `value` while the operator is still typing. */
+  private readonly typed = signal<string | null>(null);
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.clear());
+    // A value set from outside — a filter restored from the URL, or cleared by a button — lands in
+    // the box directly and must not be echoed back out as though it had been typed.
+    effect(() => {
+      this.value();
+      this.typed.set(null);
+      this.clear();
+    });
+  }
+
+  protected onInput(next: string): void {
+    this.typed.set(next);
+    this.clear();
+    const wait = this.debounceMs();
+    if (wait <= 0) {
+      this.value.set(next);
+      return;
+    }
+    this.pending = setTimeout(() => {
+      this.pending = null;
+      if (this.typed() !== null) {
+        this.value.set(this.typed()!);
+      }
+    }, wait);
+  }
+
+  private clear(): void {
+    if (this.pending !== null) {
+      clearTimeout(this.pending);
+      this.pending = null;
+    }
+  }
 }

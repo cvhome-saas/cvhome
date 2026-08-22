@@ -27,19 +27,15 @@
   </app-page-header>
 
   @if (facade.error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button class="secondary-action" type="button" (click)="facade.retry()">
-        {{ t('shared.actions.retry') }}
-      </button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="facade.isLoading() || facade.saving()" [label]="t('productForm.loading')">
-    @if (facade.isEmpty()) {
-      <div class="first-load" aria-hidden="true"></div>
-    } @else {
+  <app-busy-overlay
+    reserve="panel"
+    [busy]="facade.isLoading() || facade.saving()"
+    [label]="t('productForm.loading')"
+  >
+    @if (!facade.isEmpty()) {
       <div class="wizard">
         <aside class="rail">
           <app-stepper

@@ -15,18 +15,15 @@
   </app-page-header>
 
   @if (error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button type="button" (click)="facade.retry()">{{ t('shared.actions.retry') }}</button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="isLoading()" [label]="t('orders.loading')">
-    @if (isEmpty()) {
-      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
-      <div class="first-load" aria-hidden="true"></div>
-    } @else {
+  <app-busy-overlay
+    reserve="page"
+    [busy]="isLoading()"
+    [label]="t('orders.loading')"
+  >
+    @if (!isEmpty()) {
       <div class="report" #report>
         <app-kpi-grid [label]="t('orders.metricsLabel')" [data]="kpis()" />
 
@@ -49,16 +46,12 @@
               separately, so the term is routed to whichever its shape implies — see `toOrderQuery`.
               A channel filter used to sit here; orders carry no channel.
             -->
-            <label class="order-search">
-              <app-icon name="search" />
-              <span class="sr-only">{{ t('orders.searchLabel') }}</span>
-              <input
-                type="search"
-                [value]="search()"
-                [placeholder]="t('orders.searchPlaceholder')"
-                (change)="onSearch($any($event.target).value)"
-              />
-            </label>
+            <app-search-box
+              [value]="search()"
+              (valueChange)="onSearch($event)"
+              [label]="t('orders.searchLabel')"
+              [placeholder]="t('orders.searchPlaceholder')"
+            />
           </div>
 
           <!--
@@ -111,7 +104,7 @@
                       moved to the detail page where it is rendered from the order itself.
                     -->
                     <button
-                      class="row-action"
+                      class="icon-action"
                       type="button"
                       [title]="t('orders.viewOrder')"
                       [attr.aria-label]="t('orders.viewOrderFor', {id: order.id})"
@@ -128,13 +121,16 @@
               Empty because of a filter, or empty because the period holds no orders — the two are
               different situations and only one of them has a way out.
             -->
-            <div class="table-empty">
-              <app-icon name="shoppingCart" />
-              <p>{{ filtered() ? t('orders.noneMatch') : t('orders.noneInPeriod') }}</p>
+            <app-empty-state
+              icon="shoppingCart"
+              [message]="filtered() ? t('orders.noneMatch') : t('orders.noneInPeriod')"
+            >
               @if (filtered()) {
-                <button type="button" (click)="clearFilters()">{{ t('orders.clearFilters') }}</button>
+                <button class="secondary-action" type="button" (click)="clearFilters()">
+                  {{ t('orders.clearFilters') }}
+                </button>
               }
-            </div>
+            </app-empty-state>
           }
 
           <app-pagination

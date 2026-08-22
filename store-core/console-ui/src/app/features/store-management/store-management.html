@@ -23,18 +23,15 @@
   </app-page-header>
 
   @if (error(); as failure) {
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ failure.message }}</p>
-      <button type="button" (click)="facade.retry()">{{ t('shared.actions.retry') }}</button>
-    </div>
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="isLoading()" [label]="t('storeSettings.loading')">
-    @if (isEmpty()) {
-      <!-- Nothing has arrived yet, so the veil is the whole story on a first load. -->
-      <div class="first-load" aria-hidden="true"></div>
-    } @else if (settings(); as store) {
+  <app-busy-overlay
+    reserve="page"
+    [busy]="isLoading()"
+    [label]="t('storeSettings.loading')"
+  >
+    @if (settings(); as store) {
       <!--
         The region owns the container; the grid inside it is what the container query restyles.
         They cannot be the same element — a container query never matches its own container.

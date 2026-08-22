@@ -1,24 +1,27 @@
 <ng-container *transloco="let t">
   @if (orderId() === null) {
     <!-- Not a reference at all — answered without asking the server about it. -->
-    <div class="load-error" role="alert">
-      <app-icon name="bolt" />
-      <p>{{ t('orderDetails.badReference', {reference: id()}) }}</p>
-      <a routerLink="/orders">{{ t('orderDetails.backToOrders') }}</a>
-    </div>
+    <!--
+      Not a load failure: the reference in the URL is not a number, so nothing was ever asked for.
+      An empty state with a way back, rather than a retry that would ask the same wrong question.
+    -->
+    <app-empty-state
+      icon="search"
+      [message]="t('orderDetails.badReference', {reference: id()})"
+    >
+      <a class="secondary-action" routerLink="/orders">{{ t('orderDetails.backToOrders') }}</a>
+    </app-empty-state>
   } @else {
     @if (facade.error(); as failure) {
-      <div class="load-error" role="alert">
-        <app-icon name="bolt" />
-        <p>{{ failure.message }}</p>
-        <button type="button" (click)="facade.retry()">{{ t('shared.actions.retry') }}</button>
-      </div>
+      <app-load-error [message]="failure.message" (retry)="facade.retry()" />
     }
 
-    <app-busy-overlay [busy]="facade.isLoading()" [label]="t('orderDetails.loading')">
-      @if (facade.isEmpty()) {
-        <div class="first-load" aria-hidden="true"></div>
-      } @else if (facade.order(); as order) {
+    <app-busy-overlay
+    reserve="panel"
+    [busy]="facade.isLoading()"
+    [label]="t('orderDetails.loading')"
+  >
+      @if (facade.order(); as order) {
         <!--
           The page owns its own vertical rhythm. Everything on it sits inside one busy-overlay slot,
           so the shell's stack gap never reaches these blocks — they were flush against each other.
@@ -52,7 +55,7 @@
               </p>
             </div>
 
-            <button class="invoice-action" type="button" (click)="openInvoice()">
+            <button class="icon-action" type="button" (click)="openInvoice()">
               <app-icon name="receipt" />
               {{ t('orderDetails.invoice') }}
             </button>
@@ -167,34 +170,37 @@
                   <div class="composer">
                     <span class="composer-avatar" aria-hidden="true">{{ operator() }}</span>
                     <div class="composer-body">
-                      <label class="sr-only" for="status-comment">{{ t('orderDetails.comment') }}</label>
-                      <textarea
-                        id="status-comment"
-                        rows="2"
+                      <app-textarea
                         [value]="comment()"
-                        (input)="comment.set($any($event.target).value)"
+                        (valueChange)="comment.set($event)"
+                        [rows]="2"
+                        [ariaLabel]="t('orderDetails.comment')"
                         [placeholder]="t('orderDetails.commentPlaceholder')"
-                      ></textarea>
+                      />
 
                       <div class="composer-actions">
                         <!-- The reassurance stays put once there is text in the field. -->
                         <p class="composer-hint">{{ t('orderDetails.commentVisible') }}</p>
-                        <label class="status-picker">
+                        <!--
+                          The themed listbox, not a native select. The comment this replaces
+                          described binding round the native control's habit of dropping a value set
+                          before its options existed — `app-select` re-applies as each option
+                          appears, which is the fix rather than the workaround.
+                        -->
+                        <!--
+                          A `<span>` rather than a `<label>`: `app-select` is a button behind a
+                          listbox, and a label cannot be associated with one — the control names
+                          itself through `ariaLabel` instead.
+                        -->
+                        <span class="status-picker">
                           <span>{{ t('orderDetails.newStatus') }}</span>
-                          <!--
-                            `[selected]` on the option, not `[value]` on the select: Angular sets the
-                            select's value before its options exist, so the control displayed the first
-                            status while submitting a different one.
-                          -->
-                          <select (change)="nextStatus.set($any($event.target).value)">
-                            @for (option of facade.statusOptions(); track option.value) {
-                              <option [value]="option.value" [selected]="option.value === nextStatus()">
-                                {{ option.label }}
-                              </option>
-                            }
-                          </select>
-                          <app-icon name="chevronDown" />
-                        </label>
+                          <app-select
+                            [value]="nextStatus()"
+                            (valueChange)="nextStatus.set($any($event))"
+                            [options]="facade.statusOptions()"
+                            [ariaLabel]="t('orderDetails.newStatus')"
+                          />
+                        </span>
                         <button class="primary-action" type="button" [disabled]="facade.submitting()" (click)="submitStatus()">
                           {{ facade.submitting() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
                         </button>

@@ -27,7 +27,7 @@ import {NoticeBar} from '@shared/ui/notice-bar/notice-bar';
   selector: 'app-load-error',
   imports: [NoticeBar],
   template: `
-    <app-notice-bar tone="red" icon="alertCircle" [message]="message()">
+    <app-notice-bar tone="red" icon="alertCircle" role="alert" [message]="message()">
       <button class="secondary-action" type="button" (click)="retry.emit()">
         {{ retryLabel() }}
       </button>
