@@ -74,6 +74,14 @@ public interface ContentTypeBinding<P extends PersistableContent, R extends P> {
     }
 
     /**
+     * The media assets the item references, by field name ({@code hero}, {@code artwork.desktop}…), for the usage
+     * index. The common {@code og} image is added by the caller.
+     */
+    default java.util.Map<String, Long> mediaReferences(Content entity) {
+        return java.util.Map.of();
+    }
+
+    /**
      * The storefront path of the item ({@code /content/<slug>}, {@code /blog/<slug>}), or {@code null} when the type
      * has no page of its own. A slug change of a published item writes a redirect from the old path to the new.
      */

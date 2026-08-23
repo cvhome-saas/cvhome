@@ -153,3 +153,127 @@ create table if not exists content.redirect
     created_at        timestamp(6) not null,
     constraint redirect_store_from_unique unique (store_merchant_id, from_path)
 );
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- FAQ groups, post categories, policy versions
+-- ---------------------------------------------------------------------------------------------------------------
+create table if not exists content.faq_group
+(
+    id                bigint      not null primary key,
+    store_merchant_id varchar(50) not null,
+    group_key         varchar(60) not null,
+    position          integer     not null default 0,
+    names             jsonb       not null,
+    constraint faq_group_store_key_unique unique (store_merchant_id, group_key)
+);
+
+create table if not exists content.post_category
+(
+    id                bigint      not null primary key,
+    store_merchant_id varchar(50) not null,
+    slug              varchar(60) not null,
+    position          integer     not null default 0,
+    names             jsonb       not null,
+    constraint post_category_store_slug_unique unique (store_merchant_id, slug)
+);
+
+create table if not exists content.policy_version
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    content_id        bigint       not null,
+    version           integer      not null,
+    status            varchar(12)  not null check (status in ('DRAFT', 'LIVE', 'ARCHIVED')),
+    effective_from    timestamp(6),
+    note              varchar(200),
+    translations      jsonb        not null,
+    published_at      timestamp(6) not null,
+    published_by      varchar(120),
+    constraint policy_version_unique unique (content_id, version)
+);
+create unique index if not exists policy_version_one_live_idx on content.policy_version (content_id)
+    where status = 'LIVE';
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- menus
+-- ---------------------------------------------------------------------------------------------------------------
+create table if not exists content.menu
+(
+    id                bigint      not null primary key,
+    store_merchant_id varchar(50) not null,
+    handle            varchar(20) not null check (handle in ('MAIN', 'FOOTER')),
+    names             jsonb,
+    constraint menu_store_handle_unique unique (store_merchant_id, handle)
+);
+
+create table if not exists content.menu_item
+(
+    id              bigint       not null primary key,
+    menu_id         bigint       not null constraint menu_item_menu_fk references content.menu on delete cascade,
+    parent_id       bigint,
+    position        integer      not null default 0,
+    labels          jsonb        not null,
+    target_kind     varchar(20)  not null
+        check (target_kind in ('PAGE', 'CATEGORY', 'PRODUCT', 'POLICY', 'BLOG_INDEX', 'FAQ_INDEX', 'URL')),
+    target_value    varchar(255),
+    open_in_new_tab boolean      not null default false,
+    visible         boolean      not null default true
+);
+create index if not exists menu_item_menu_idx on content.menu_item (menu_id, position);
+
+-- ---------------------------------------------------------------------------------------------------------------
+-- media
+-- ---------------------------------------------------------------------------------------------------------------
+create table if not exists content.media_folder
+(
+    id                bigint      not null primary key,
+    store_merchant_id varchar(50) not null,
+    name              varchar(60) not null,
+    folder_key        varchar(60) not null,
+    position          integer     not null default 0,
+    system_folder     boolean     not null default false,
+    constraint media_folder_store_key_unique unique (store_merchant_id, folder_key)
+);
+
+create table if not exists content.media_asset
+(
+    id                bigint       not null primary key,
+    store_merchant_id varchar(50)  not null,
+    folder_id         bigint,
+    filename          varchar(255) not null,
+    original_filename varchar(255) not null,
+    mime_type         varchar(120) not null,
+    kind              varchar(12)  not null check (kind in ('IMAGE', 'VIDEO', 'DOCUMENT', 'ARCHIVE', 'VECTOR')),
+    bytes             bigint       not null,
+    width             integer,
+    height            integer,
+    checksum          varchar(64)  not null,
+    storage_key       varchar(255) not null,
+    public_url        varchar(500) not null,
+    alt_texts         jsonb,
+    title             varchar(200),
+    tags              jsonb,
+    uploaded_by       varchar(120),
+    uploaded_at       timestamp(6) not null,
+    constraint media_asset_store_checksum_unique unique (store_merchant_id, checksum)
+);
+create index if not exists media_asset_store_folder_idx on content.media_asset (store_merchant_id, folder_id);
+create index if not exists media_asset_store_kind_idx on content.media_asset (store_merchant_id, kind);
+
+create table if not exists content.media_usage
+(
+    id           bigint      not null primary key,
+    asset_id     bigint      not null,
+    content_id   bigint      not null,
+    content_type varchar(10) not null,
+    field        varchar(40) not null,
+    constraint media_usage_unique unique (asset_id, content_id, field)
+);
+create index if not exists media_usage_content_idx on content.media_usage (content_id);
+
+create table if not exists content.media_quota
+(
+    store_merchant_id varchar(50) not null primary key,
+    bytes_used        bigint      not null default 0,
+    file_count        bigint      not null default 0
+);

@@ -58,6 +58,8 @@ public class ContentItemService {
 
     private final RedirectService redirects;
 
+    private final MediaUsageTracker mediaUsage;
+
     private final Clock clock;
 
     // ---------------------------------------------------------------- reads
@@ -143,6 +145,7 @@ public class ContentItemService {
         binding.apply(c, dto);
         c = repository.saveAndFlush(c);
         binding.afterSave(c);
+        trackMedia(binding, c);
         revisions.record(c, toReadable(binding, c), actor);
         return new SavedContent(c.getId(), c.getStatus(), c.getVersion());
     }
@@ -172,6 +175,7 @@ public class ContentItemService {
         c.setUpdatedBy(actor);
         c = repository.saveAndFlush(c);
         binding.afterSave(c);
+        trackMedia(binding, c);
         String newPath = binding.storefrontPath(c);
         if (wasPublished && oldPath != null && !oldPath.equals(newPath)) {
             redirects.moved(store, oldPath, newPath);
@@ -233,6 +237,7 @@ public class ContentItemService {
         binding.beforeDelete(c, force);
         revisions.forget(id);
         auditRepository.deleteByContentId(id);
+        mediaUsage.forget(c);
         repository.delete(c);
         binding.afterDelete(c);
     }
@@ -268,6 +273,14 @@ public class ContentItemService {
     }
 
     // -------------------------------------------------------------- helpers
+
+    private void trackMedia(ContentTypeBinding<?, ?> binding, Content c) {
+        java.util.Map<String, Long> refs = new java.util.LinkedHashMap<>(binding.mediaReferences(c));
+        if (c.getOgMediaId() != null) {
+            refs.put("og", c.getOgMediaId());
+        }
+        mediaUsage.record(c, refs);
+    }
 
     private void markOthersStale(Content c, LanguageCode source) {
         for (ContentDescription d : c.getDescriptions()) {

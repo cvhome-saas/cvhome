@@ -54,6 +54,9 @@ public abstract class WorkflowContentApi<P extends PersistableContent, R extends
 
     protected final ContentTypeBinding<P, R> binding;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.asrevo.cvhome.content.api.v1.support.PreviewTokens previews;
+
     protected WorkflowContentApi(ContentItemService items, ContentTypeBinding<P, R> binding) {
         this.items = items;
         this.binding = binding;
@@ -163,6 +166,19 @@ public abstract class WorkflowContentApi<P extends PersistableContent, R extends
                                     @PathVariable String locale, @RequestBody @Valid ContentTranslation body)
             throws ContentNotFoundException {
         return items.updateTranslation(binding, id, new LanguageCode(locale), body, merchantStore, Actors.current());
+    }
+
+    /**
+     * A short-lived token the storefront accepts to render this item unpublished ({@code ?preview=<token>}).
+     */
+    @PostMapping("{id}/preview-token")
+    @PreAuthorize(ContentPermissions.READ)
+    public java.util.Map<String, String> previewToken(StoreMerchantId merchantStore, LanguageCode language,
+                                                      @PathVariable Long id) throws ContentNotFoundException {
+        var entity = items.load(binding, id, merchantStore);
+        String path = binding.storefrontPath(entity);
+        return java.util.Map.of("token", previews.issue(merchantStore, entity.getCode()),
+                "path", path == null ? "" : path);
     }
 
     @GetMapping("slug-available")
