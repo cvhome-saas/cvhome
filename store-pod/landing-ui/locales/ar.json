@@ -168,6 +168,28 @@
       "ORDER_NOT_FOUND": "تعذّر العثور على هذا الطلب.",
       "ERROR_LOADING": "تعذّر تحميل حسابك الآن.",
       "SIGNED_IN_AS": "مسجّل الدخول باسم {name}"
+    },
+    "BLOG": {
+      "TITLE": "المدونة",
+      "SUBTITLE": "أخبار وأدلة وقصص من المتجر.",
+      "READ_MORE": "اقرأ المزيد",
+      "MIN_READ": "{minutes} دقائق قراءة",
+      "BY": "بقلم {author}",
+      "RELATED": "مقالات ذات صلة",
+      "EMPTY": "لا مقالات بعد.",
+      "FILTERED_BY": "مصفّى حسب {value}",
+      "ALL_POSTS": "كل المقالات",
+      "PREVIOUS": "الأحدث",
+      "NEXT": "الأقدم"
+    },
+    "FAQ": {
+      "TITLE": "المساعدة والأسئلة الشائعة",
+      "SUBTITLE": "إجابات عن أكثر الأسئلة التي نسمعها.",
+      "EMPTY": "لا أسئلة منشورة بعد."
+    },
+    "POLICY": {
+      "VERSION": "الإصدار {version}",
+      "EFFECTIVE": "ساري من {date}"
     }
   },
   "COMPONENTS": {

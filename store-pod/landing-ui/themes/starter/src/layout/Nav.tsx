@@ -13,6 +13,8 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
     const t = useTranslations('COMPONENTS.HEADER');
     const categories = data.categories.filter(c => c.description);
     const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    // Main-menu entries that are not pages (blog, help, categories, plain paths): the merchant's menu, resolved server-side.
+    const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     return (
         <NavigationMenu aria-label={t('MAIN_NAVIGATION')} className={cn('justify-start', className)} viewport={false}>
             <NavigationMenuList className="flex-wrap">
@@ -59,6 +61,13 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
                     <NavigationMenuItem key={page.code}>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                             <Link prefetch={false} href={`/content/${page.description.friendlyUrl}`}>{page.description.name}</Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                ))}
+                {extras.map(page => (
+                    <NavigationMenuItem key={page.href}>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                            <Link prefetch={false} href={page.href}>{page.label}</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                 ))}

@@ -1,6 +1,6 @@
 import type {ThemeDefinition} from './contract';
 
-const PAGES = ['Home', 'Category', 'Product', 'Content', 'Checkout', 'CheckoutResult', 'Customer', 'Order'] as const;
+const PAGES = ['Home', 'Category', 'Product', 'Content', 'BlogIndex', 'BlogPost', 'Faq', 'Policy', 'Checkout', 'CheckoutResult', 'Customer', 'Order'] as const;
 const SKELETONS = ['home', 'category', 'product', 'content', 'checkout', 'customer', 'order'] as const;
 const STATES = ['ErrorState', 'NotFound', 'EmptyState', 'Redirecting'] as const;
 const ID = /^[a-z][a-z0-9-]*$/;

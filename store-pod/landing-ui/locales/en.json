@@ -168,6 +168,28 @@
       "ORDER_NOT_FOUND": "We couldn't find this order.",
       "ERROR_LOADING": "We couldn't load your account right now.",
       "SIGNED_IN_AS": "Signed in as {name}"
+    },
+    "BLOG": {
+      "TITLE": "Blog",
+      "SUBTITLE": "News, guides and stories from the store.",
+      "READ_MORE": "Read more",
+      "MIN_READ": "{minutes} min read",
+      "BY": "By {author}",
+      "RELATED": "Related posts",
+      "EMPTY": "No posts yet.",
+      "FILTERED_BY": "Filtered by {value}",
+      "ALL_POSTS": "All posts",
+      "PREVIOUS": "Newer",
+      "NEXT": "Older"
+    },
+    "FAQ": {
+      "TITLE": "Help & FAQ",
+      "SUBTITLE": "Answers to the questions we hear most.",
+      "EMPTY": "No questions published yet."
+    },
+    "POLICY": {
+      "VERSION": "Version {version}",
+      "EFFECTIVE": "Effective from {date}"
     }
   },
   "COMPONENTS": {

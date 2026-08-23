@@ -11,6 +11,11 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
     const {store} = data;
     const shop = data.categories.filter(c => c.description).slice(0, 8);
     const info = data.pages.filter(p => p.description);
+    // Footer-menu entries that are not pages, then the live legal policies — all resolved server-side.
+    const more = [
+        ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
+        ...data.policies.map(pl => ({key: pl.href, href: pl.href, label: pl.title})),
+    ];
     const socials = (store.socialLinks ?? []).filter(s => SOCIAL_ICONS[s.provider.toLowerCase()]);
     const col = 'flex flex-col border-foreground p-4 md:border-s first:md:border-s-0';
     const h = 'q mb-3 font-display text-sm font-semibold uppercase tracking-wide';
@@ -33,10 +38,11 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
                         {shop.map(c => <Link key={c.code} prefetch={false} href={`/category/${c.description.friendlyUrl}`} className={row}>{c.description.name}</Link>)}
                     </nav>
                 )}
-                {info.length > 0 && (
+                {(info.length > 0 || more.length > 0) && (
                     <nav aria-label={t('INFORMATION')} className={col}>
                         <h2 className={h}>{t('INFORMATION')}</h2>
                         {info.map(p => <Link key={p.code} prefetch={false} href={`/content/${p.description.friendlyUrl}`} className={row}>{p.description.name}</Link>)}
+                        {more.map(l => <Link key={l.key} prefetch={false} href={l.href} className={row}>{l.label}</Link>)}
                     </nav>
                 )}
                 <div className={col}>

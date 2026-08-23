@@ -6,6 +6,10 @@ import {Home} from './pages/Home';
 import {Category} from './pages/Category';
 import {Product} from './pages/Product';
 import {Content} from './pages/Content';
+import {BlogIndex} from './pages/BlogIndex';
+import {BlogPost} from './pages/BlogPost';
+import {Faq} from './pages/Faq';
+import {Policy} from './pages/Policy';
 import {Checkout} from './pages/Checkout';
 import {CheckoutResult} from './pages/CheckoutResult';
 import {Customer} from './pages/Customer';
@@ -41,7 +45,7 @@ export default defineTheme({
         }),
     },
     layout: {config: layoutConfig, Root},
-    pages: {Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order},
+    pages: {Home, Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {
         PageSkeleton: {
             home: HomeSkeleton,

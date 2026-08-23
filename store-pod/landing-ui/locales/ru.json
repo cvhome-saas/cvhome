@@ -168,6 +168,28 @@
       "ORDER_NOT_FOUND": "Заказ не найден.",
       "ERROR_LOADING": "Не удалось загрузить ваш аккаунт.",
       "SIGNED_IN_AS": "Вы вошли как {name}"
+    },
+    "BLOG": {
+      "TITLE": "Блог",
+      "SUBTITLE": "Новости, руководства и истории магазина.",
+      "READ_MORE": "Читать далее",
+      "MIN_READ": "{minutes} мин чтения",
+      "BY": "Автор: {author}",
+      "RELATED": "Похожие статьи",
+      "EMPTY": "Статей пока нет.",
+      "FILTERED_BY": "Фильтр: {value}",
+      "ALL_POSTS": "Все статьи",
+      "PREVIOUS": "Новее",
+      "NEXT": "Старее"
+    },
+    "FAQ": {
+      "TITLE": "Помощь и FAQ",
+      "SUBTITLE": "Ответы на самые частые вопросы.",
+      "EMPTY": "Вопросов пока нет."
+    },
+    "POLICY": {
+      "VERSION": "Версия {version}",
+      "EFFECTIVE": "Действует с {date}"
     }
   },
   "COMPONENTS": {

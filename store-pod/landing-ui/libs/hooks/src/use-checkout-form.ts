@@ -84,12 +84,24 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
 
         fetchCountries().then();
         fetchPaymentTypes().then();
-        ContentService.getBox(storeContext, "agreement").then(it => {
-            if (it == undefined) {
-                setIsAgree(true);
-            }
-            setAgreement(it);
-        });
+        // The checkout agreement: the live TERMS policy (content platform), falling back to the legacy
+        // `agreement` box; none at all means nothing to accept.
+        ContentService.getPolicy(storeContext, 'TERMS')
+            .then((policy): Box => ({
+                id: policy.id, code: 'agreement', visible: true, contentType: 'BOX',
+                description: {
+                    id: policy.id, language: policy.servedLocale, name: policy.heading, description: policy.body,
+                    friendlyUrl: policy.slug, keyWords: null, highlights: null, metaDescription: null,
+                    title: policy.heading, priceAppender: null,
+                },
+            }))
+            .catch(() => ContentService.getBox(storeContext, "agreement"))
+            .then(it => {
+                if (it == undefined) {
+                    setIsAgree(true);
+                }
+                setAgreement(it);
+            });
     }, [storeContext]);
 
     // Handle initial login required dialog
