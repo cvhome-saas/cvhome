@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.annotation.OrgStorePrincipalInfo;
@@ -95,9 +96,14 @@ public class PodApi {
      */
     @GetMapping
     @PreAuthorize(READ)
-    public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable) {
-        return isPlatformWide(identity) ? podService.listAllPods(pageable)
-                : podService.listAllPods(identity.org(), pageable);
+    public Page<Pod> findAllPods(@OrgStorePrincipalInfo UserOrgStoreIdentity identity, Pageable pageable,
+                                 @RequestParam(name = "q", required = false) String term) {
+        /*
+         * The search narrows what the caller may already see rather than widening it — the org scoping is applied
+         * inside the query alongside it — so it needs no guard of its own. A caller passing no term takes the same
+         * path as before, which is why `searchPods` handles both rather than there being two endpoints.
+         */
+        return podService.searchPods(isPlatformWide(identity) ? null : identity.org(), term, pageable);
     }
 
     /** The registry's own view, including lifecycle, capacity and health. Super admin only. */

@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.podregistry.services.placement;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
@@ -53,5 +55,21 @@ public interface ExternalPodPlacementService {
      */
     @PostExchange("/placement-recorded")
     void recordPlacement(@RequestBody RecordPlacementRequest request) throws PodRegistryUnavailableException;
+
+    /**
+     * Tells the registry about many placements at once, so it can reconcile a counter it maintains as a mirror.
+     *
+     * <p>
+     * Used by the startup reconciliation, not by the outbox: the outbox has one store in hand and durable retries,
+     * while this replays everything tenancy has placed and would otherwise be one round trip per store on every
+     * boot. The registry makes it idempotent, so replaying the whole set is safe.
+     * </p>
+     *
+     * @throws PodRegistryUnavailableException the registry could not be reached, so nothing was reconciled. The
+     *                                         caller should log and move on — the next boot tries again, and the
+     *                                         counter being stale is not a reason to hold a service up
+     */
+    @PostExchange("/placements-recorded")
+    void recordPlacements(@RequestBody List<RecordPlacementRequest> requests) throws PodRegistryUnavailableException;
 
 }

@@ -1,5 +1,9 @@
 package com.asrevo.cvhome.podregistry.service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +53,47 @@ public class PodCapacityService {
         placementRepository.recountCapacity(pod.getId().toString());
         log.info("Store {} recorded on pod {}; capacity recounted", store, pod);
         return true;
+    }
+
+    /**
+     * Records many placements at once, recounting each affected pod exactly once.
+     *
+     * <p>
+     * For the reconciliation tenancy runs at startup, which replays every store it has placed. Calling
+     * {@link #recordPlacement} in a loop would be correct but would recount a pod once per store on it; here the
+     * claims happen first and the recount follows, per pod, after they have all landed.
+     * </p>
+     *
+     * <p>
+     * Idempotent for the same reason the single-store path is: the claim is an insert on a primary key and the
+     * count is recomputed rather than incremented. A batch that is entirely redelivery claims nothing and recounts
+     * nothing, which is what makes it safe to run on every boot.
+     * </p>
+     *
+     * @return how many placements were new
+     */
+    @Transactional
+    public int recordPlacements(List<RecordPlacementRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return 0;
+        }
+        Set<String> touched = new HashSet<>();
+        int claimed = 0;
+        for (RecordPlacementRequest request : requests) {
+            String pod = request.pod().getId().toString();
+            if (placementRepository.claim(request.store().getId().toString(), pod) > 0) {
+                touched.add(pod);
+                claimed++;
+            }
+        }
+        touched.forEach(placementRepository::recountCapacity);
+        if (claimed > 0) {
+            log.info("Recorded {} new placement(s) of {} offered; recounted {} pod(s)",
+                    claimed, requests.size(), touched.size());
+        } else {
+            log.debug("All {} offered placement(s) were already known; nothing recounted", requests.size());
+        }
+        return claimed;
     }
 
 }

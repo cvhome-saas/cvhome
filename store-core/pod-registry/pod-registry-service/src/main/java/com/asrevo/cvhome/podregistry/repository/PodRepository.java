@@ -25,6 +25,39 @@ public interface PodRepository extends CrudRepository<PodEntity, PodId>, PagingA
     Optional<PodEntity> findByName(String name);
 
     /**
+     * One page of pods, scoped to an organization and narrowed by a search term.
+     *
+     * <p>
+     * The term spans the name and the endpoint. Those are the two things an operator has in hand when they come
+     * looking — a pod named in an alert, or a host in a log line — and the id is not one of them, being an
+     * ObjectId nobody reads out.
+     * </p>
+     *
+     * <p>
+     * {@code orgId} null means platform-wide: a super admin or a service principal. It is the same scoping
+     * {@code findAllByOrgId} does, expressed in the query so that the search composes with it rather than
+     * replacing it. The casts are needed because Postgres cannot infer the type of a bare null parameter.
+     * </p>
+     */
+    @Query("""
+            select * from pod_registry.pod
+            where (cast(:orgId as varchar) is null or org_id = :orgId)
+              and (cast(:term as varchar) is null
+                   or name ilike '%' || :term || '%'
+                   or endpoint ilike '%' || :term || '%')
+            order by name limit :limit offset :offset""")
+    List<PodEntity> findVisible(String orgId, String term, int limit, long offset);
+
+    /** The matching total, for the page the query above returns a slice of. */
+    @Query("""
+            select count(*) from pod_registry.pod
+            where (cast(:orgId as varchar) is null or org_id = :orgId)
+              and (cast(:term as varchar) is null
+                   or name ilike '%' || :term || '%'
+                   or endpoint ilike '%' || :term || '%')""")
+    long countVisible(String orgId, String term);
+
+    /**
      * The pods a store with no private pod may be placed on.
      *
      * <p>

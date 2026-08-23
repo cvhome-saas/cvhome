@@ -5,9 +5,11 @@ import java.util.Objects;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
@@ -26,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PodServiceImpl implements PodService {
 
+    private static final int DEFAULT_PAGE_SIZE = 100;
+
     private final PodRepository podRepository;
 
     @Override
@@ -36,6 +40,26 @@ public class PodServiceImpl implements PodService {
     @Override
     public Page<Pod> listAllPods(ManagerOrgId orgId, Pageable pageable) {
         return podRepository.findAllByOrgId(orgId, pageable).map(PodEntity::toPod);
+    }
+
+    /**
+     * The count is a separate query because Spring Data JDBC's {@code @Query} has no {@code countQuery} attribute
+     * — that is JPA's — so the page is assembled here, the same shape tenancy's store listing uses.
+     *
+     * <p>
+     * A blank term is normalised to null rather than searched for. {@code ilike '%%'} happens to match everything,
+     * but relying on that would make an empty box and a cleared box two different code paths for one behaviour.
+     * </p>
+     */
+    @Override
+    public Page<Pod> searchPods(ManagerOrgId orgId, String term, Pageable pageable) {
+        Pageable page = pageable == null || pageable.isUnpaged() ? Pageable.ofSize(DEFAULT_PAGE_SIZE) : pageable;
+        String org = orgId == null || orgId.getId() == null ? null : orgId.getId().toString();
+        String search = StringUtils.hasText(term) ? term.trim() : null;
+        List<Pod> rows = podRepository.findVisible(org, search, page.getPageSize(), page.getOffset()).stream()
+                .map(PodEntity::toPod)
+                .toList();
+        return new PageImpl<>(rows, page, podRepository.countVisible(org, search));
     }
 
     @Override
