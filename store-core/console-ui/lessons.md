@@ -12,7 +12,9 @@ grep -rn 'TODO(lessons.md)' src
 
 Anything large enough to be a service in its own right graduates out of this file into a dedicated
 requirements document, with the entry here reduced to a link. There is already one precedent:
-[`../console-template/Content Management Service - Backend Requirements.md`](../console-template/Content%20Management%20Service%20-%20Backend%20Requirements.md).
+[`../console-template/Content Management Service - Backend Requirements.md`](../console-template/Content%20Management%20Service%20-%20Backend%20Requirements.md),
+now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/plans/console-ui-content.md)
+(Module 12 — the new `content` service, the console Content module and the storefront adoption).
 
 ---
 
