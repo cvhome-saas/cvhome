@@ -2028,3 +2028,11 @@ exist.
 10. The two-tab comparison above, driven through Chrome — in particular the password reset and the
     invitation round-trip, this module's strongest evidence, because neither is something the old
     console can do at all.
+
+## Module 12 — Content — **done**
+
+Planned and built under `.agents/plans/console-ui-content.md`: a new `store-pod/content` service
+(the old one kept as `store-pod/content-deprecated`), the console-ui Content module at `/content`
+(pages, posts, banners, FAQ, media, menus, policies) and the storefront adoption in landing-ui
+(site document, blog, help, policies, banners, sitemap). Phase 7 of that plan — retiring the
+legacy compat API, `store-pod/content-deprecated` and the `Page/Box` types — rides with Module 13.
