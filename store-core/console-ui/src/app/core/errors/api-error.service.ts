@@ -175,8 +175,12 @@ export class ApiErrorService {
       return null;
     }
     const path = `errors.code.${code.replace(/\./g, '_')}`;
-    const bundle = this.transloco.getTranslation(this.transloco.getActiveLang());
-    return bundle[path] === undefined ? null : this.transloco.translate(path, params);
+    // `getTranslation` answers `{}` — or nothing at all, in a test that never loaded a bundle — before the
+    // active language has arrived, and asking `translate` for a key that is not there throws in development.
+    const bundle: Record<string, unknown> | undefined = this.transloco.getTranslation(
+      this.transloco.getActiveLang(),
+    );
+    return bundle?.[path] === undefined ? null : this.transloco.translate(path, params);
   }
 
   private interpolate(value: unknown): string | null {
