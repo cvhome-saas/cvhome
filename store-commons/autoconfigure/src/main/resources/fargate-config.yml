@@ -10,7 +10,6 @@ spring:
           - "tenancy"
           - "billing"
           - "pod-registry"
-          - "seller-ui"
           - "console-ui"
           - "spg"
           - "merchant"
@@ -29,7 +28,6 @@ spring:
         service-ports:
           "uaa": 8001
           "store-core-gateway": 8000
-          "seller-ui": 8010
           "console-ui": 8011
           "tenancy": 8020
           "billing": 8021

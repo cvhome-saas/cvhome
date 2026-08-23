@@ -5,7 +5,6 @@ com:
         domain: gateway.com
         sub:
           - www
-          - seller-ui
           - console-ui
           - uaa
         handlers:
@@ -46,13 +45,6 @@ com:
           name: pod-registry
           domain: ${com.asrevo.cvhome.app.domain}
           port: 8022
-          schema: http
-          namespace: store-core.cvhome.lcl
-          gateway-service-name: store-core-gateway
-        seller-ui:
-          name: seller-ui
-          domain: seller-ui.${com.asrevo.cvhome.app.domain}
-          port: 8010
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway

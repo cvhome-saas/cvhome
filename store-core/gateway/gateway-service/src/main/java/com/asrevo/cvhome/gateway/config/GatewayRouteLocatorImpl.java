@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class GatewayRouteLocatorImpl implements RouteLocator {
 
-    // Every path prefix that belongs to a backend. The array is negated below to build seller-ui's catch-all, so a
+    // Every path prefix that belongs to a backend. The array is negated below to build console-ui's catch-all, so a
     // service missing from here is not merely unrouted — its calls are answered with the console's shell HTML.
     private static final String[] backendServices = {"tenancy", "billing", "pod-registry", "uaa", "spg"};
 
@@ -70,9 +70,8 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()
-                        .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain),
-                                String.format("seller-ui.%s", storeCoreGatewayDomain))
-                        .uri("lb://seller-ui"))
+                        .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain))
+                        .uri("lb://console-ui"))
                 .build()
                 .getRoutes();
     }
