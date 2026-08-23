@@ -34,6 +34,8 @@ public class FaqService {
             new String[] {"general", "General"}, new String[] {"ordering", "Ordering"},
             new String[] {"shipping", "Shipping & delivery"}, new String[] {"returns", "Returns"});
 
+    private static final String KIND = "FAQ_GROUP";
+
     private final FaqGroupRepository groups;
 
     private final ContentRepository contents;
@@ -68,7 +70,7 @@ public class FaqService {
                                                                com.asrevo.cvhome.content.model.faq.FaqGroup body)
             throws ContentConflictException {
         if (groups.findByStoreMerchantIdAndKey(store.getId(), body.getKey()).isPresent()) {
-            throw ContentConflictException.slugDuplicate("FAQ_GROUP", body.getKey(), store);
+            throw ContentConflictException.slugDuplicate(KIND, body.getKey(), store);
         }
         FaqGroup g = new FaqGroup();
         g.setStoreMerchantId(store.getId());
@@ -84,7 +86,7 @@ public class FaqService {
                 .orElseThrow(() -> ContentNotFoundException.faqGroup(id, store));
         if (!g.getKey().equals(body.getKey())
                 && groups.findByStoreMerchantIdAndKey(store.getId(), body.getKey()).isPresent()) {
-            throw ContentConflictException.slugDuplicate("FAQ_GROUP", body.getKey(), store);
+            throw ContentConflictException.slugDuplicate(KIND, body.getKey(), store);
         }
         apply(g, body);
         FaqGroup saved = groups.saveAndFlush(g);

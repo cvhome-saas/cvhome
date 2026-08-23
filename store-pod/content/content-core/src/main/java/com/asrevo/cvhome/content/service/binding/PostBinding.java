@@ -73,7 +73,7 @@ public class PostBinding implements ContentTypeBinding<PersistablePost, Readable
 
     @Override
     public String subtitle(Content entity, LanguageCode language) {
-        return String.format("/blog/%s", entity.getCode());
+        return storefrontPath(entity);
     }
 
     @Override

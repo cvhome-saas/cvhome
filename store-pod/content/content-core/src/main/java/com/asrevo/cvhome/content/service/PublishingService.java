@@ -83,12 +83,7 @@ public class PublishingService {
         Instant publishAt = request != null ? request.getPublishAt() : null;
         Instant unpublishAt = request != null ? request.getUnpublishAt() : null;
         if (unpublishAt != null) {
-            if (publishAt != null && !unpublishAt.isAfter(publishAt)) {
-                throw InvalidContentRequestException.scheduleInvalid("unpublishAt must be after publishAt");
-            }
-            if (!unpublishAt.isAfter(now)) {
-                throw InvalidContentRequestException.scheduleInvalid("unpublishAt must be in the future");
-            }
+            validateUnpublish(publishAt, unpublishAt, now);
             entity.setUnpublishAt(unpublishAt);
         }
         if (publishAt != null && publishAt.isAfter(now.plus(SCHEDULE_GRACE))) {
@@ -102,6 +97,16 @@ public class PublishingService {
         return ContentStatus.PUBLISHED;
     }
 
+    private static void validateUnpublish(Instant publishAt, Instant unpublishAt, Instant now)
+            throws InvalidContentRequestException {
+        if (publishAt != null && !unpublishAt.isAfter(publishAt)) {
+            throw InvalidContentRequestException.scheduleInvalid("unpublishAt must be after publishAt");
+        }
+        if (!unpublishAt.isAfter(now)) {
+            throw InvalidContentRequestException.scheduleInvalid("unpublishAt must be in the future");
+        }
+    }
+
     /**
      * Publishing needs one complete source locale: the {@code sourceLocale} if it is present, otherwise any
      * complete one. Banners additionally need alt text; types add their own rules through the binding.
@@ -112,25 +117,29 @@ public class PublishingService {
                 .or(() -> entity.getDescriptions().stream()
                         .filter(d -> d.getState() == TranslationState.TRANSLATED).findFirst())
                 .orElseGet(entity::getDescription);
-        List<FieldError> problems = new ArrayList<>();
-        if (source == null) {
-            problems.add(FieldError.of("translations", ContentErrors.PUBLISH_INCOMPLETE,
-                    "At least one language must be written before publishing."));
-        } else {
-            String locale = source.getLanguageCode().code();
-            if (Strings.blank(source.getTitle()) && Strings.blank(source.getName())) {
-                problems.add(FieldError.of(String.format(FIELD, locale, "title"), ContentErrors.PUBLISH_INCOMPLETE,
-                        "Title is required."));
-            }
-            if (binding.requiresBody() && Strings.blank(source.getDescription())) {
-                problems.add(FieldError.of(String.format(FIELD, locale, "body"), ContentErrors.PUBLISH_INCOMPLETE,
-                        "Body is required."));
-            }
-            problems.addAll(binding.publishProblems(entity, source));
-        }
+        List<FieldError> problems = source == null
+                ? List.of(FieldError.of("translations", ContentErrors.PUBLISH_INCOMPLETE,
+                        "At least one language must be written before publishing."))
+                : sourceProblems(entity, source, binding);
         if (!problems.isEmpty()) {
             throw ContentRuleException.publishIncomplete(entity.getId(), problems);
         }
+    }
+
+    private static List<FieldError> sourceProblems(Content entity, ContentDescription source,
+                                                   ContentTypeBinding<?, ?> binding) {
+        List<FieldError> problems = new ArrayList<>();
+        String locale = source.getLanguageCode().code();
+        if (Strings.blank(source.getTitle()) && Strings.blank(source.getName())) {
+            problems.add(FieldError.of(String.format(FIELD, locale, "title"), ContentErrors.PUBLISH_INCOMPLETE,
+                    "Title is required."));
+        }
+        if (binding.requiresBody() && Strings.blank(source.getDescription())) {
+            problems.add(FieldError.of(String.format(FIELD, locale, "body"), ContentErrors.PUBLISH_INCOMPLETE,
+                    "Body is required."));
+        }
+        problems.addAll(binding.publishProblems(entity, source));
+        return problems;
     }
 
     private void apply(Content entity, ContentStatus from, ContentStatus to, String actor, String reason) {

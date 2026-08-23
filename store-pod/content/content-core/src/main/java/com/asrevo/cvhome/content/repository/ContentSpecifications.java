@@ -24,6 +24,14 @@ import com.asrevo.cvhome.store.core.entity.content.ContentType;
  */
 public final class ContentSpecifications {
 
+    private static final String STATUS = "status";
+
+    private static final String CONTENT = "content";
+
+    private static final String STATE = "state";
+
+    private static final String ID = "id";
+
     private ContentSpecifications() {
     }
 
@@ -34,7 +42,7 @@ public final class ContentSpecifications {
     }
 
     public static Specification<Content> withStatus(ContentStatus status) {
-        return (root, query, cb) -> status == null ? cb.conjunction() : cb.equal(root.get("status"), status);
+        return (root, query, cb) -> status == null ? cb.conjunction() : cb.equal(root.get(STATUS), status);
     }
 
     /**
@@ -49,12 +57,12 @@ public final class ContentSpecifications {
             Subquery<Long> sub = query.subquery(Long.class);
             var d = sub.from(ContentDescription.class);
             List<Predicate> inner = new ArrayList<>();
-            inner.add(cb.equal(d.get("content"), root));
+            inner.add(cb.equal(d.get(CONTENT), root));
             inner.add(cb.equal(d.get("languageCode"), locale));
             if (state != null && state != TranslationState.MISSING) {
-                inner.add(cb.equal(d.get("state"), state));
+                inner.add(cb.equal(d.get(STATE), state));
             }
-            sub.select(d.get("id")).where(inner.toArray(Predicate[]::new));
+            sub.select(d.get(ID)).where(inner.toArray(Predicate[]::new));
             return state == TranslationState.MISSING ? cb.not(cb.exists(sub)) : cb.exists(sub);
         };
     }
@@ -70,8 +78,8 @@ public final class ContentSpecifications {
             String like = String.format("%%%s%%", q.trim().toLowerCase(Locale.ROOT));
             Subquery<Long> sub = query.subquery(Long.class);
             var d = sub.from(ContentDescription.class);
-            sub.select(d.get("id")).where(
-                    cb.equal(d.get("content"), root),
+            sub.select(d.get(ID)).where(
+                    cb.equal(d.get(CONTENT), root),
                     cb.or(cb.like(cb.lower(d.get("name")), like),
                             cb.like(cb.lower(d.get("description")), like)));
             return cb.or(cb.like(cb.lower(root.get("code")), like), cb.exists(sub));
@@ -87,8 +95,8 @@ public final class ContentSpecifications {
             Join<Content, ContentDescription> d = root.join("descriptions", JoinType.INNER);
             query.distinct(true);
             return cb.and(
-                    root.get("status").in(ContentStatus.PUBLISHED, ContentStatus.SCHEDULED),
-                    cb.notEqual(d.get("state"), TranslationState.TRANSLATED));
+                    root.get(STATUS).in(ContentStatus.PUBLISHED, ContentStatus.SCHEDULED),
+                    cb.notEqual(d.get(STATE), TranslationState.TRANSLATED));
         };
     }
 

@@ -15,6 +15,8 @@ import com.asrevo.cvhome.errors.OperationNotAllowedException;
  */
 public class ContentRuleException extends OperationNotAllowedException {
 
+    private static final String ID = "id";
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -25,13 +27,13 @@ public class ContentRuleException extends OperationNotAllowedException {
     public static ContentRuleException transitionNotAllowed(Long id, Object from, Object to) {
         return new ErrorBuilder<>(ContentErrors.TRANSITION_NOT_ALLOWED, ContentRuleException::new)
                 .detail("Content %s cannot move from %s to %s.", id, from, to)
-                .param("id", id).param("from", from).param("to", to).build();
+                .param(ID, id).param("from", from).param("to", to).build();
     }
 
     public static ContentRuleException publishIncomplete(Long id, Collection<FieldError> fieldErrors) {
         return new ErrorBuilder<>(ContentErrors.PUBLISH_INCOMPLETE, ContentRuleException::new)
                 .detail("Content %s cannot be published until the default locale is complete.", id)
-                .param("id", id).fieldErrors(fieldErrors).build();
+                .param(ID, id).fieldErrors(fieldErrors).build();
     }
 
     public static ContentRuleException bannerCapacity(Object placement, int capacity, Long conflictingId) {
@@ -52,7 +54,7 @@ public class ContentRuleException extends OperationNotAllowedException {
         return new ErrorBuilder<>(ContentErrors.POLICY_VERSION_IMMUTABLE, ContentRuleException::new)
                 .detail("Version %s of policy %s is published and cannot be edited; create a new version.", version,
                         id)
-                .param("id", id).param("version", version).build();
+                .param(ID, id).param("version", version).build();
     }
 
 }

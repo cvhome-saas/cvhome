@@ -37,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BannerBinding implements ContentTypeBinding<PersistableBanner, ReadableBanner> {
 
+    private static final String PLACEMENT = "placement";
+
     private final MediaService media;
 
     private final ContentRepository repository;
@@ -116,12 +118,12 @@ public class BannerBinding implements ContentTypeBinding<PersistableBanner, Read
                     ContentErrors.PUBLISH_INCOMPLETE, "Alt text is required for the artwork."));
         }
         if (entity.getPlacement() == null) {
-            problems.add(FieldError.of("placement", ContentErrors.PUBLISH_INCOMPLETE, "Placement is required."));
+            problems.add(FieldError.of(PLACEMENT, ContentErrors.PUBLISH_INCOMPLETE, "Placement is required."));
             return problems;
         }
         Long conflict = capacityConflict(entity);
         if (conflict != null) {
-            problems.add(FieldError.of("placement", ContentErrors.BANNER_CAPACITY_EXCEEDED,
+            problems.add(FieldError.of(PLACEMENT, ContentErrors.BANNER_CAPACITY_EXCEEDED,
                     String.format("Placement %s is full (%d live); banner %d overlaps.", entity.getPlacement(),
                             entity.getPlacement().capacity(), conflict)));
         }

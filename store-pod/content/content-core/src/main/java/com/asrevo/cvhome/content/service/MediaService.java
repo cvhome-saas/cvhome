@@ -60,13 +60,46 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MediaService implements SummaryService.MediaFigures {
 
-    public static final Set<String> ACCEPTED = Set.of(
-            "image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml",
-            "video/mp4", "video/webm", "application/pdf", "application/zip", "application/x-zip-compressed");
+    private static final String JPEG = "image/jpeg";
+
+    private static final String PNG = "image/png";
+
+    private static final String WEBP = "image/webp";
+
+    private static final String GIF = "image/gif";
+
+    private static final String SVG = "image/svg+xml";
+
+    private static final String MP4 = "video/mp4";
+
+    private static final String WEBM = "video/webm";
+
+    private static final String PDF = "application/pdf";
+
+    private static final String ZIP = "application/zip";
+
+    private static final String PENDING = "pending";
+
+    private static final String DASH = "-";
+
+    private static final java.util.regex.Pattern NON_SLUG = java.util.regex.Pattern.compile("[^a-z0-9]+");
+
+    public static final Set<String> ACCEPTED = Set.of(JPEG, PNG, WEBP, GIF, SVG, MP4, WEBM, PDF, ZIP,
+            "application/x-zip-compressed");
+
+    /**
+     * Extension → type, for browsers that send {@code application/octet-stream} or nothing.
+     */
+    private static final Map<String, String> BY_EXTENSION = Map.ofEntries(
+            Map.entry(".jpg", JPEG), Map.entry(".jpeg", JPEG), Map.entry(".png", PNG), Map.entry(".webp", WEBP),
+            Map.entry(".gif", GIF), Map.entry(".svg", SVG), Map.entry(".mp4", MP4), Map.entry(".webm", WEBM),
+            Map.entry(".pdf", PDF), Map.entry(".zip", ZIP));
 
     private static final List<String[]> DEFAULT_FOLDERS = List.of(
             new String[] {"banners", "Banners"}, new String[] {"products", "Product shots"},
             new String[] {"brand", "Brand assets"}, new String[] {"video", "Video"}, new String[] {"docs", "Documents"});
+
+    private static final String ID = "id";
 
     private final MediaAssetRepository assets;
 
@@ -106,7 +139,7 @@ public class MediaService implements SummaryService.MediaFigures {
             if (!ACCEPTED.contains(mime)) {
                 throw InvalidContentRequestException.mediaTypeNotAllowed(u.filename(), mime);
             }
-            byte[] bytes = "image/svg+xml".equals(mime) ? SvgSanitizer.clean(u.bytes()) : u.bytes();
+            byte[] bytes = SVG.equals(mime) ? SvgSanitizer.clean(u.bytes()) : u.bytes();
             if (bytes.length > maxFileBytes) {
                 throw MediaLimitException.tooLarge(u.filename(), bytes.length, maxFileBytes);
             }
@@ -137,8 +170,8 @@ public class MediaService implements SummaryService.MediaFigures {
                 });
             }
             // key needs the id, so save a placeholder key first
-            a.setStorageKey("pending");
-            a.setPublicUrl("pending");
+            a.setStorageKey(PENDING);
+            a.setPublicUrl(PENDING);
             MediaAsset saved = assets.saveAndFlush(a);
             String key = MediaStorage.key(store.getId(), saved.getId(), saved.getFilename());
             storage.put(key, bytes, mime);
@@ -176,7 +209,7 @@ public class MediaService implements SummaryService.MediaFigures {
             if (used != null) {
                 Subquery<Long> sub = query.subquery(Long.class);
                 var u = sub.from(MediaUsageRow.class);
-                sub.select(u.get("id")).where(cb.equal(u.get("assetId"), root.get("id")));
+                sub.select(u.get(ID)).where(cb.equal(u.get("assetId"), root.get(ID)));
                 p.add(used ? cb.exists(sub) : cb.not(cb.exists(sub)));
             }
             return cb.and(p.toArray(Predicate[]::new));
@@ -438,32 +471,10 @@ public class MediaService implements SummaryService.MediaFigures {
             return mime;
         }
         String name = filename == null ? "" : filename.toLowerCase(Locale.ROOT);
-        if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-            return "image/jpeg";
-        }
-        if (name.endsWith(".png")) {
-            return "image/png";
-        }
-        if (name.endsWith(".webp")) {
-            return "image/webp";
-        }
-        if (name.endsWith(".gif")) {
-            return "image/gif";
-        }
-        if (name.endsWith(".svg")) {
-            return "image/svg+xml";
-        }
-        if (name.endsWith(".mp4")) {
-            return "video/mp4";
-        }
-        if (name.endsWith(".webm")) {
-            return "video/webm";
-        }
-        if (name.endsWith(".pdf")) {
-            return "application/pdf";
-        }
-        if (name.endsWith(".zip")) {
-            return "application/zip";
+        int dot = name.lastIndexOf('.');
+        String byExtension = dot < 0 ? null : BY_EXTENSION.get(name.substring(dot));
+        if (byExtension != null) {
+            return byExtension;
         }
         return mime.isEmpty() ? "application/octet-stream" : mime;
     }
@@ -474,7 +485,7 @@ public class MediaService implements SummaryService.MediaFigures {
         if (slash >= 0) {
             name = name.substring(slash + 1);
         }
-        name = name.replaceAll("[^A-Za-z0-9._-]", "-").replaceAll("-{2,}", "-");
+        name = name.replaceAll("[^A-Za-z0-9._-]", DASH).replaceAll("-{2,}", DASH);
         if (name.isBlank() || name.startsWith(".")) {
             name = String.format("file%s", name);
         }
@@ -482,7 +493,7 @@ public class MediaService implements SummaryService.MediaFigures {
     }
 
     static String slugify(String s) {
-        String out = s == null ? "" : s.trim().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-")
+        String out = s == null ? "" : NON_SLUG.matcher(s.trim().toLowerCase(Locale.ROOT)).replaceAll(DASH)
                 .replaceAll("^-|-$", "");
         return out.isEmpty() ? "folder" : out;
     }

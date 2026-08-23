@@ -11,6 +11,8 @@ import com.asrevo.cvhome.errors.ValidationException;
  */
 public class InvalidContentRequestException extends ValidationException {
 
+    private static final String FILENAME = "filename";
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -38,13 +40,13 @@ public class InvalidContentRequestException extends ValidationException {
     public static InvalidContentRequestException mediaTypeNotAllowed(String filename, String mimeType) {
         return new ErrorBuilder<>(ContentErrors.MEDIA_TYPE_NOT_ALLOWED, InvalidContentRequestException::new)
                 .detail("%s (%s) is not an accepted file type.", filename, mimeType)
-                .param("filename", filename).param("mimeType", mimeType).build();
+                .param(FILENAME, filename).param("mimeType", mimeType).build();
     }
 
     public static InvalidContentRequestException mediaUnreadable(String filename, Throwable cause) {
         return new ErrorBuilder<>(ContentErrors.MEDIA_UNREADABLE, InvalidContentRequestException::new)
                 .detail("%s could not be read.", filename)
-                .param("filename", filename).cause(cause).build();
+                .param(FILENAME, filename).cause(cause).build();
     }
 
 }

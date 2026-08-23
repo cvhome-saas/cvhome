@@ -64,30 +64,37 @@ public final class ContentMapper {
                     && !Objects.equals(d.getDescription(), body)) {
                 sourceBodyChanged = true;
             }
-            d.setContent(entity);
-            d.setLanguageCode(t.getLanguage());
-            d.setName(Strings.blank(t.getTitle()) ? entity.getCode() : Strings.abbreviate(t.getTitle().trim(), 120));
-            d.setTitle(Strings.abbreviate(Strings.trimToNull(t.getTitle()), 100));
-            d.setDescription(body);
-            d.setExcerpt(Strings.trimToNull(t.getExcerpt()));
-            d.setSeUrl(Strings.blank(t.getFriendlyUrl()) ? entity.getCode() : t.getFriendlyUrl().trim());
-            d.setMetatagTitle(Strings.trimToNull(t.getMetaTitle()));
-            d.setMetatagDescription(Strings.trimToNull(t.getMetaDescription()));
-            d.setMetatagKeywords(Strings.trimToNull(t.getKeywords()));
-            d.setAltText(Strings.trimToNull(t.getAltText()));
-            d.setCtaLabel(Strings.trimToNull(t.getCtaLabel()));
-            d.setSubtitle(Strings.trimToNull(t.getSubtitle()));
-            boolean complete = !Strings.blank(t.getTitle()) && (!requiresBody || !Strings.blank(t.getBody()));
-            if (t.getState() == TranslationState.STALE && complete) {
-                d.setState(TranslationState.STALE);
-            } else {
-                d.setState(complete ? TranslationState.TRANSLATED : TranslationState.DRAFT);
-            }
+            applyFields(entity, d, t, body);
+            d.setState(stateOf(t, requiresBody));
             next.add(d);
         }
         entity.getDescriptions().clear();
         entity.getDescriptions().addAll(next);
         return sourceBodyChanged;
+    }
+
+    private static void applyFields(Content entity, ContentDescription d, ContentTranslation t, String body) {
+        d.setContent(entity);
+        d.setLanguageCode(t.getLanguage());
+        d.setName(Strings.blank(t.getTitle()) ? entity.getCode() : Strings.abbreviate(t.getTitle().trim(), 120));
+        d.setTitle(Strings.abbreviate(Strings.trimToNull(t.getTitle()), 100));
+        d.setDescription(body);
+        d.setExcerpt(Strings.trimToNull(t.getExcerpt()));
+        d.setSeUrl(Strings.blank(t.getFriendlyUrl()) ? entity.getCode() : t.getFriendlyUrl().trim());
+        d.setMetatagTitle(Strings.trimToNull(t.getMetaTitle()));
+        d.setMetatagDescription(Strings.trimToNull(t.getMetaDescription()));
+        d.setMetatagKeywords(Strings.trimToNull(t.getKeywords()));
+        d.setAltText(Strings.trimToNull(t.getAltText()));
+        d.setCtaLabel(Strings.trimToNull(t.getCtaLabel()));
+        d.setSubtitle(Strings.trimToNull(t.getSubtitle()));
+    }
+
+    private static TranslationState stateOf(ContentTranslation t, boolean requiresBody) {
+        boolean complete = !Strings.blank(t.getTitle()) && (!requiresBody || !Strings.blank(t.getBody()));
+        if (t.getState() == TranslationState.STALE && complete) {
+            return TranslationState.STALE;
+        }
+        return complete ? TranslationState.TRANSLATED : TranslationState.DRAFT;
     }
 
     public static void populateCommon(Content entity, PersistableContent dto) {

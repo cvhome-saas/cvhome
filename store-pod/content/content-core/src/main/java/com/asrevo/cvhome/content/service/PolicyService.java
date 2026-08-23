@@ -46,12 +46,28 @@ public class PolicyService {
      * Which policy types a selling region requires. Until the store's regions are known here, every store is held
      * to the EU list, which is the strictest the platform sells into.
      */
+    private static final String EU = "EU";
+
+    private static final String UK = "UK";
+
+    private static final String US = "US";
+
+    private static final String AR = "ar";
+
     private static final Map<PolicyType, List<String>> REQUIRED_BY = Map.of(
-            PolicyType.TERMS, List.of("EU", "UK", "US"),
-            PolicyType.PRIVACY, List.of("EU", "UK", "US"),
-            PolicyType.RETURNS, List.of("EU", "UK"),
-            PolicyType.COOKIES, List.of("EU", "UK"),
+            PolicyType.TERMS, List.of(EU, UK, US),
+            PolicyType.PRIVACY, List.of(EU, UK, US),
+            PolicyType.RETURNS, List.of(EU, UK),
+            PolicyType.COOKIES, List.of(EU, UK),
             PolicyType.SHIPPING, List.of());
+
+    private static final Map<PolicyType, String[]> TITLES = Map.of(
+            PolicyType.TERMS, new String[] {"Terms of service", "شروط الخدمة"},
+            PolicyType.PRIVACY, new String[] {"Privacy policy", "سياسة الخصوصية"},
+            PolicyType.RETURNS, new String[] {"Returns & refunds", "الإرجاع والاسترداد"},
+            PolicyType.SHIPPING, new String[] {"Shipping policy", "سياسة الشحن"},
+            PolicyType.COOKIES, new String[] {"Cookie notice", "إشعار ملفات تعريف الارتباط"},
+            PolicyType.CUSTOM, new String[] {"Policy", "سياسة"});
 
     private final PolicyVersionRepository versions;
 
@@ -190,7 +206,7 @@ public class PolicyService {
         List<ContentTranslation> translations = new ArrayList<>();
         String base = type.name().toLowerCase(Locale.ROOT);
         String j = jurisdiction == null ? "" : jurisdiction.trim().toLowerCase(Locale.ROOT);
-        for (String lang : List.of("en", "ar")) {
+        for (String lang : List.of("en", AR)) {
             String body = read(String.format("policy-templates/%s-%s.%s.html", base, j, lang));
             if (body == null) {
                 body = read(String.format("policy-templates/%s.%s.html", base, lang));
@@ -207,15 +223,7 @@ public class PolicyService {
     }
 
     private static String titleOf(PolicyType type, String lang) {
-        boolean ar = "ar".equals(lang);
-        return switch (type) {
-            case TERMS -> ar ? "شروط الخدمة" : "Terms of service";
-            case PRIVACY -> ar ? "سياسة الخصوصية" : "Privacy policy";
-            case RETURNS -> ar ? "الإرجاع والاسترداد" : "Returns & refunds";
-            case SHIPPING -> ar ? "سياسة الشحن" : "Shipping policy";
-            case COOKIES -> ar ? "إشعار ملفات تعريف الارتباط" : "Cookie notice";
-            case CUSTOM -> ar ? "سياسة" : "Policy";
-        };
+        return TITLES.get(type)[AR.equals(lang) ? 1 : 0];
     }
 
     private static String read(String path) {

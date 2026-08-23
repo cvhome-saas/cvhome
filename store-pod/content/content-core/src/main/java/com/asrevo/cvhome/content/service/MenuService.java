@@ -39,6 +39,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MenuService implements SummaryService.MediaFigures {
 
+    private static final List<String> URL_PREFIXES = List.of("/", "http://", "https://", "mailto:", "tel:");
+
     private final MenuRepository menus;
 
     private final ContentRepository contents;
@@ -164,22 +166,28 @@ public class MenuService implements SummaryService.MediaFigures {
         return menus.saveAndFlush(menu);
     }
 
-    private MenuItem row(Menu menu, Long parentId, com.asrevo.cvhome.content.model.menu.MenuItem dto, int position)
-            throws InvalidContentRequestException {
-        if (dto.getTarget() == null || dto.getTarget().kind() == null) {
+    private static void validateTarget(MenuTarget target) throws InvalidContentRequestException {
+        if (target == null || target.kind() == null) {
             throw InvalidContentRequestException.menuTargetInvalid("every item needs a target kind");
         }
-        if (dto.getTarget().kind() == MenuTargetKind.URL) {
-            String v = dto.getTarget().value();
-            if (Strings.blank(v) || !(v.startsWith("/") || v.startsWith("http://") || v.startsWith("https://")
-                    || v.startsWith("mailto:") || v.startsWith("tel:"))) {
+        String v = target.value();
+        boolean blank = Strings.blank(v);
+        if (target.kind() == MenuTargetKind.URL) {
+            if (blank || URL_PREFIXES.stream().noneMatch(v::startsWith)) {
                 throw InvalidContentRequestException.menuTargetInvalid("URL targets must be absolute or start with /");
             }
-        } else if (dto.getTarget().kind() != MenuTargetKind.BLOG_INDEX && dto.getTarget().kind() != MenuTargetKind.FAQ_INDEX
-                && Strings.blank(dto.getTarget().value())) {
-            throw InvalidContentRequestException.menuTargetInvalid(
-                    String.format("%s targets need a value", dto.getTarget().kind()));
+            return;
         }
+        boolean needsValue = target.kind() != MenuTargetKind.BLOG_INDEX && target.kind() != MenuTargetKind.FAQ_INDEX;
+        if (needsValue && blank) {
+            throw InvalidContentRequestException.menuTargetInvalid(
+                    String.format("%s targets need a value", target.kind()));
+        }
+    }
+
+    private MenuItem row(Menu menu, Long parentId, com.asrevo.cvhome.content.model.menu.MenuItem dto, int position)
+            throws InvalidContentRequestException {
+        validateTarget(dto.getTarget());
         MenuItem item = new MenuItem();
         item.setMenu(menu);
         item.setParentId(parentId);

@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostCategoryService {
 
+    private static final String KIND = "POST_CATEGORY";
+
     private final PostCategoryRepository repository;
 
     @Transactional(readOnly = true)
@@ -46,7 +48,7 @@ public class PostCategoryService {
             StoreMerchantId store, com.asrevo.cvhome.content.model.post.PostCategory body)
             throws ContentConflictException {
         if (repository.findByStoreMerchantIdAndSlug(store.getId(), body.getSlug()).isPresent()) {
-            throw ContentConflictException.slugDuplicate("POST_CATEGORY", body.getSlug(), store);
+            throw ContentConflictException.slugDuplicate(KIND, body.getSlug(), store);
         }
         PostCategory c = new PostCategory();
         c.setStoreMerchantId(store.getId());
@@ -62,7 +64,7 @@ public class PostCategoryService {
                 .orElseThrow(() -> ContentNotFoundException.byId(id, store));
         if (!c.getSlug().equals(body.getSlug())
                 && repository.findByStoreMerchantIdAndSlug(store.getId(), body.getSlug()).isPresent()) {
-            throw ContentConflictException.slugDuplicate("POST_CATEGORY", body.getSlug(), store);
+            throw ContentConflictException.slugDuplicate(KIND, body.getSlug(), store);
         }
         apply(c, body);
         return toDto(repository.saveAndFlush(c));

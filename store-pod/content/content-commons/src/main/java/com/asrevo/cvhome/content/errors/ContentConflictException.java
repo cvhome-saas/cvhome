@@ -15,6 +15,8 @@ public class ContentConflictException extends DuplicateResourceException {
 
     private static final String STORE = "store";
 
+    private static final String ID = "id";
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -32,13 +34,13 @@ public class ContentConflictException extends DuplicateResourceException {
         return new ErrorBuilder<>(ContentErrors.VERSION_CONFLICT, ContentConflictException::new)
                 .detail("Content %s was changed by someone else (you sent version %s, current is %s).", id, sent,
                         current)
-                .param("id", id).param("sentVersion", sent).param("currentVersion", current).build();
+                .param(ID, id).param("sentVersion", sent).param("currentVersion", current).build();
     }
 
     public static ContentConflictException pageReferenced(Long id, List<String> menus) {
         return new ErrorBuilder<>(ContentErrors.PAGE_REFERENCED, ContentConflictException::new)
                 .detail("Page %s is linked from menus %s; pass force=true to delete anyway.", id, menus)
-                .param("id", id).param("menus", menus).build();
+                .param(ID, id).param("menus", menus).build();
     }
 
     public static ContentConflictException policyTypeActive(String type, Long existingId, Object store) {
@@ -51,13 +53,13 @@ public class ContentConflictException extends DuplicateResourceException {
         return new ErrorBuilder<>(ContentErrors.MEDIA_REFERENCED, ContentConflictException::new)
                 .detail("Media asset %s is still used by %s item(s); pass force=true to delete anyway.", id,
                         usage.size())
-                .param("id", id).param("usage", usage).build();
+                .param(ID, id).param("usage", usage).build();
     }
 
     public static ContentConflictException folderNotEmpty(Long id, long count) {
         return new ErrorBuilder<>(ContentErrors.MEDIA_FOLDER_NOT_EMPTY, ContentConflictException::new)
                 .detail("Folder %s still holds %s file(s); pass moveTo=<folderId> to move them first.", id, count)
-                .param("id", id).param("fileCount", count).build();
+                .param(ID, id).param("fileCount", count).build();
     }
 
 }

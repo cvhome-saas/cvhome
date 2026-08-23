@@ -112,15 +112,18 @@ public class PolicyBinding implements ContentTypeBinding<PersistablePolicy, Read
         }
         java.util.Map<String, String> left = new java.util.HashMap<>();
         for (var t : a) {
-            left.put(t.getLanguage().code(), String.valueOf(t.getTitle()) + "\u0000" + t.getBody());
+            left.put(t.getLanguage().code(), textKey(t));
         }
         for (var t : b) {
-            if (!java.util.Objects.equals(left.get(t.getLanguage().code()),
-                    String.valueOf(t.getTitle()) + "\u0000" + t.getBody())) {
+            if (!java.util.Objects.equals(left.get(t.getLanguage().code()), textKey(t))) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static String textKey(com.asrevo.cvhome.content.model.common.ContentTranslation t) {
+        return String.format("%s\u0000%s", t.getTitle(), t.getBody());
     }
 
     public static PolicyMeta meta(Content entity) {

@@ -10,13 +10,21 @@ import org.jsoup.safety.Safelist;
  */
 public final class HtmlSanitizer {
 
+    private static final String ANCHOR = "a";
+
+    private static final String IMG = "img";
+
+    private static final String HTTP = "http";
+
+    private static final String HTTPS = "https";
+
     private static final Safelist SAFELIST = Safelist.relaxed()
             .addTags("figure", "figcaption", "section", "hr", "s", "mark")
             .addAttributes(":all", "dir", "class", "id")
-            .addAttributes("a", "target", "rel")
-            .addAttributes("img", "loading", "width", "height")
-            .addProtocols("a", "href", "http", "https", "mailto", "tel")
-            .addProtocols("img", "src", "http", "https")
+            .addAttributes(ANCHOR, "target", "rel")
+            .addAttributes(IMG, "loading", "width", "height")
+            .addProtocols(ANCHOR, "href", HTTP, HTTPS, "mailto", "tel")
+            .addProtocols(IMG, "src", HTTP, HTTPS)
             .preserveRelativeLinks(true);
 
     private static final Cleaner CLEANER = new Cleaner(SAFELIST);

@@ -68,6 +68,22 @@ public class StorefrontFacade {
 
     private static final Set<String> SNIPPET_CODES = Set.of("meta-title", "meta-description");
 
+    private static final String PAGE = "page";
+
+    private static final String CATEGORY = "category";
+
+    private static final String CATEGORY_HREF = "/blog?category=%s";
+
+    private static final String CONTENT_PATH = "/content/%s";
+
+    private static final String MONTHLY = "monthly";
+
+    private static final String SPACE = " ";
+
+    private static final java.util.regex.Pattern TAGS = java.util.regex.Pattern.compile("<[^>]+>");
+
+    private static final java.util.regex.Pattern SPACES = java.util.regex.Pattern.compile("\\s+");
+
     private final ContentRepository contents;
 
     private final MenuService menus;
@@ -121,7 +137,7 @@ public class StorefrontFacade {
                 .filter(c -> c.servable(now)).toList();
         List<Content> footer = pages.stream().filter(Content::isShowInFooter).toList();
         site.setFooterPages((footer.isEmpty() ? pages : footer).stream()
-                .map(c -> link(c, language, "page")).toList());
+                .map(c -> link(c, language, PAGE)).toList());
 
         List<StorefrontLink> policyLinks = new ArrayList<>();
         for (Content head : contents.findVisibleByType(store, ContentType.POLICY)) {
@@ -158,9 +174,9 @@ public class StorefrontFacade {
         List<StorefrontLink> crumbs = new ArrayList<>();
         if (c.getParentId() != null) {
             contents.findById(c.getParentId()).filter(parent -> parent.servable(now))
-                    .ifPresent(parent -> crumbs.add(link(parent, language, "page")));
+                    .ifPresent(parent -> crumbs.add(link(parent, language, PAGE)));
         }
-        crumbs.add(link(c, language, "page"));
+        crumbs.add(link(c, language, PAGE));
         p.setBreadcrumbs(crumbs);
         p.setUpdatedAt(c.getAuditSection() == null ? null : c.getAuditSection().getDateModified());
         return p;
@@ -236,7 +252,7 @@ public class StorefrontFacade {
         List<StorefrontLink> out = new ArrayList<>();
         for (PostCategory c : categories.byIds(store).values()) {
             out.add(new StorefrontLink(c.getSlug(), localised(PostCategoryService.names(c), language, c.getSlug()),
-                    String.format("/blog?category=%s", c.getSlug()), "category"));
+                    String.format(CATEGORY_HREF, c.getSlug()), CATEGORY));
         }
         return out;
     }
@@ -299,63 +315,69 @@ public class StorefrontFacade {
     public StorefrontFaq faq(StoreMerchantId store, LanguageCode language, String groupKey) {
         Instant now = clock.instant();
         Map<Long, FaqGroup> groups = faq.byIds(store);
-        Map<Long, List<Content>> perGroup = new LinkedHashMap<>();
-        for (FaqGroup g : groups.values()) {
-            perGroup.put(g.getId(), new ArrayList<>());
-        }
-        for (Content c : contents.findVisibleByType(store, ContentType.FAQ)) {
-            if (c.servable(now) && c.getParentId() != null && perGroup.containsKey(c.getParentId())) {
-                perGroup.get(c.getParentId()).add(c);
-            }
-        }
-        StorefrontFaq out = new StorefrontFaq();
-        out.setServedLocale(language == null ? null : language.code());
+        Map<Long, List<Content>> perGroup = entriesPerGroup(store, groups, now);
         List<StorefrontFaq.Group> list = new ArrayList<>();
-        StringBuilder jsonLd = new StringBuilder("{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\","
-                + "\"mainEntity\":[");
-        boolean first = true;
         for (FaqGroup g : groups.values()) {
-            if (groupKey != null && !groupKey.equals(g.getKey())) {
-                continue;
-            }
             List<Content> entries = perGroup.get(g.getId());
-            if (entries.isEmpty()) {
+            boolean wanted = groupKey == null || groupKey.equals(g.getKey());
+            if (!wanted || entries.isEmpty()) {
                 continue;
             }
             StorefrontFaq.Group sg = new StorefrontFaq.Group();
             sg.setKey(g.getKey());
             sg.setName(localised(FaqService.names(g), language, g.getKey()));
-            List<StorefrontFaq.Entry> es = new ArrayList<>();
-            entries.sort(Comparator.comparing((Content c) -> c.getSortOrder() == null ? 0 : c.getSortOrder())
-                    .thenComparing(Content::getId));
-            for (Content c : entries) {
-                Optional<ContentDescription> d = pick(c, language);
-                if (d.isEmpty()) {
-                    continue;
-                }
-                StorefrontFaq.Entry e = new StorefrontFaq.Entry();
-                e.setId(c.getId());
-                e.setSlug(c.getCode());
-                e.setQuestion(title(d.get()));
-                e.setAnswer(d.get().getDescription());
-                FaqMeta fm = FaqBinding.meta(c);
-                e.setShowInCheckoutHelp(fm.showInCheckoutHelp());
-                es.add(e);
-                if (!first) {
-                    jsonLd.append(',');
-                }
-                first = false;
-                jsonLd.append("{\"@type\":\"Question\",\"name\":").append(JsonCodec.write(e.getQuestion()))
-                        .append(",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":")
-                        .append(JsonCodec.write(plain(e.getAnswer()))).append("}}");
-            }
-            sg.setEntries(es);
+            sg.setEntries(entries.stream().map(c -> faqEntry(c, language)).flatMap(Optional::stream).toList());
             list.add(sg);
         }
-        jsonLd.append("]}");
+        StorefrontFaq out = new StorefrontFaq();
+        out.setServedLocale(language == null ? null : language.code());
         out.setGroups(list);
-        out.setJsonLd(jsonLd.toString());
+        out.setJsonLd(faqJsonLd(list));
         return out;
+    }
+
+    private Map<Long, List<Content>> entriesPerGroup(StoreMerchantId store, Map<Long, FaqGroup> groups,
+                                                     Instant now) {
+        Map<Long, List<Content>> perGroup = new LinkedHashMap<>();
+        groups.keySet().forEach(id -> perGroup.put(id, new ArrayList<>()));
+        for (Content c : contents.findVisibleByType(store, ContentType.FAQ)) {
+            if (c.servable(now) && c.getParentId() != null && perGroup.containsKey(c.getParentId())) {
+                perGroup.get(c.getParentId()).add(c);
+            }
+        }
+        Comparator<Content> order = Comparator.comparing((Content c) -> c.getSortOrder() == null ? 0
+                : c.getSortOrder()).thenComparing(Content::getId);
+        perGroup.values().forEach(list -> list.sort(order));
+        return perGroup;
+    }
+
+    private static Optional<StorefrontFaq.Entry> faqEntry(Content c, LanguageCode language) {
+        return pick(c, language).map(d -> {
+            StorefrontFaq.Entry e = new StorefrontFaq.Entry();
+            e.setId(c.getId());
+            e.setSlug(c.getCode());
+            e.setQuestion(title(d));
+            e.setAnswer(d.getDescription());
+            FaqMeta fm = FaqBinding.meta(c);
+            e.setShowInCheckoutHelp(fm.showInCheckoutHelp());
+            return e;
+        });
+    }
+
+    /**
+     * The {@code FAQPage} structured-data document for every entry served.
+     */
+    private static String faqJsonLd(List<StorefrontFaq.Group> groups) {
+        List<String> questions = new ArrayList<>();
+        for (StorefrontFaq.Group g : groups) {
+            for (StorefrontFaq.Entry e : g.getEntries()) {
+                questions.add(String.format(
+                        "{\"@type\":\"Question\",\"name\":%s,\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":%s}}",
+                        JsonCodec.write(e.getQuestion()), JsonCodec.write(plain(e.getAnswer()))));
+            }
+        }
+        return String.format("{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[%s]}",
+                String.join(",", questions));
     }
 
     // ---------------------------------------------------------------------------------------------- policies
@@ -392,26 +414,30 @@ public class StorefrontFacade {
     public List<SitemapEntry> sitemap(StoreMerchantId store, LanguageCode language) {
         Instant now = clock.instant();
         List<SitemapEntry> out = new ArrayList<>();
-        for (Content c : contents.findVisibleByType(store, ContentType.PAGE)) {
-            if (c.servable(now) && !c.isNoindex()) {
-                out.add(new SitemapEntry(String.format("/content/%s", c.getCode()), modified(c), "monthly", "page"));
+        for (Content c : servable(store, ContentType.PAGE, now)) {
+            if (!c.isNoindex()) {
+                out.add(new SitemapEntry(String.format(CONTENT_PATH, c.getCode()), modified(c), MONTHLY, PAGE));
             }
         }
-        for (Content c : contents.findVisibleByType(store, ContentType.POST)) {
-            if (c.servable(now) && !c.isNoindex()) {
+        for (Content c : servable(store, ContentType.POST, now)) {
+            if (!c.isNoindex()) {
                 out.add(new SitemapEntry(String.format("/blog/%s", c.getCode()), modified(c), "weekly", "post"));
             }
         }
-        for (Content c : contents.findVisibleByType(store, ContentType.POLICY)) {
-            if (c.servable(now) && c.getPolicyType() != null && policies.live(c).isPresent()) {
+        for (Content c : servable(store, ContentType.POLICY, now)) {
+            if (c.getPolicyType() != null && policies.live(c).isPresent()) {
                 out.add(new SitemapEntry(MenuService.href(com.asrevo.cvhome.content.model.MenuTargetKind.POLICY,
                         c.getPolicyType().name()), modified(c), "yearly", "policy"));
             }
         }
-        if (contents.findVisibleByType(store, ContentType.FAQ).stream().anyMatch(c -> c.servable(now))) {
-            out.add(new SitemapEntry("/help", now, "monthly", "faq"));
+        if (!servable(store, ContentType.FAQ, now).isEmpty()) {
+            out.add(new SitemapEntry("/help", now, MONTHLY, "faq"));
         }
         return out;
+    }
+
+    private List<Content> servable(StoreMerchantId store, ContentType type, Instant now) {
+        return contents.findVisibleByType(store, type).stream().filter(c -> c.servable(now)).toList();
     }
 
     public Optional<String> redirect(StoreMerchantId store, String path) {
@@ -441,7 +467,7 @@ public class StorefrontFacade {
         p.setCategories(meta.categoryIds().stream().map(cats::get).filter(java.util.Objects::nonNull)
                 .map(cat -> new StorefrontLink(cat.getSlug(),
                         localised(PostCategoryService.names(cat), language, cat.getSlug()),
-                        String.format("/blog?category=%s", cat.getSlug()), "category"))
+                        String.format(CATEGORY_HREF, cat.getSlug()), CATEGORY))
                 .toList());
         p.setTags(meta.tags());
         return p;
@@ -471,7 +497,7 @@ public class StorefrontFacade {
 
     private static StorefrontLink link(Content c, LanguageCode language, String type) {
         String title = pick(c, language).map(StorefrontFacade::title).orElse(c.getCode());
-        return new StorefrontLink(c.getCode(), title, String.format("/content/%s", c.getCode()), type);
+        return new StorefrontLink(c.getCode(), title, String.format(CONTENT_PATH, c.getCode()), type);
     }
 
     /**
@@ -518,7 +544,7 @@ public class StorefrontFacade {
     }
 
     static String plain(String html) {
-        return html == null ? null : html.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim();
+        return html == null ? null : SPACES.matcher(TAGS.matcher(html).replaceAll(SPACE)).replaceAll(SPACE).trim();
     }
 
     static String excerpt(String html) {

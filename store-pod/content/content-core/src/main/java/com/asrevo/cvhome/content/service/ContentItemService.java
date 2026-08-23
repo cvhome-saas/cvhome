@@ -48,6 +48,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContentItemService {
 
+    private static final String MODIFIED = "auditSection.dateModified";
+
+    /**
+     * Public sort keys → entity paths. Title lives on the per-locale row, so it sorts by slug.
+     */
+    private static final java.util.Map<String, String> SORT_KEYS = sortKeys();
+
     private final ContentRepository repository;
 
     private final ContentStatusAuditRepository auditRepository;
@@ -274,6 +281,20 @@ public class ContentItemService {
 
     // -------------------------------------------------------------- helpers
 
+    private static java.util.Map<String, String> sortKeys() {
+        java.util.Map<String, String> m = new java.util.HashMap<>();
+        m.put("updatedAt", MODIFIED);
+        m.put("createdAt", "auditSection.dateCreated");
+        for (String key : List.of("title", "slug")) {
+            m.put(key, "code");
+        }
+        for (String key : List.of("status", "publishAt", "sortOrder")) {
+            m.put(key, key);
+        }
+        return m;
+    }
+
+
     private void trackMedia(ContentTypeBinding<?, ?> binding, Content c) {
         java.util.Map<String, Long> refs = new java.util.LinkedHashMap<>(binding.mediaReferences(c));
         if (c.getOgMediaId() != null) {
@@ -290,26 +311,14 @@ public class ContentItemService {
         }
     }
 
-    /**
-     * Maps the public sort keys onto entity paths. Title lives on the per-locale row, so it sorts by slug.
-     */
     static Pageable mapSort(Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {
             return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "auditSection.dateModified"));
+                    Sort.by(Sort.Direction.DESC, MODIFIED));
         }
         List<Sort.Order> orders = new ArrayList<>();
         for (Sort.Order o : pageable.getSort()) {
-            String p = switch (o.getProperty()) {
-                case "updatedAt" -> "auditSection.dateModified";
-                case "createdAt" -> "auditSection.dateCreated";
-                case "title", "slug" -> "code";
-                case "status" -> "status";
-                case "publishAt" -> "publishAt";
-                case "sortOrder" -> "sortOrder";
-                default -> "auditSection.dateModified";
-            };
-            orders.add(new Sort.Order(o.getDirection(), p));
+            orders.add(new Sort.Order(o.getDirection(), SORT_KEYS.getOrDefault(o.getProperty(), MODIFIED)));
         }
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(orders));
     }

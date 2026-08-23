@@ -24,6 +24,8 @@ public class PreviewTokens {
 
     private static final Duration TTL = Duration.ofMinutes(30);
 
+    private static final String ALGORITHM = "HmacSHA256";
+
     private final byte[] key = new byte[32];
 
     private final Clock clock;
@@ -67,8 +69,8 @@ public class PreviewTokens {
 
     private String sign(String payload) {
         try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(key, "HmacSHA256"));
+            Mac mac = Mac.getInstance(ALGORITHM);
+            mac.init(new SecretKeySpec(key, ALGORITHM));
             return HexFormat.of().formatHex(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
         } catch (java.security.GeneralSecurityException e) {
             throw new IllegalStateException(e);
