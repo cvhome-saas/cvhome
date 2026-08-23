@@ -12,10 +12,10 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "next": "*",
-    "next-intl": "*",
-    "react": "*",
-    "react-dom": "*"
+    "next": "16.x",
+    "next-intl": "4.x",
+    "react": "19.x",
+    "react-dom": "19.x"
   },
   "dependencies": {
     "@store-front/hooks": "0.0.0",
