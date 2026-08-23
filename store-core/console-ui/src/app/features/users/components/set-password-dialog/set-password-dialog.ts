@@ -32,7 +32,7 @@ const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
   selector: 'app-set-password-dialog',
   imports: [FormField, TextField],
   templateUrl: './set-password-dialog.html',
-  styleUrl: './set-password-dialog.css',
+  styleUrls: ['./set-password-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class SetPasswordDialog {
   readonly open = input(false);

@@ -25,7 +25,7 @@ import {Icon} from '@shared/ui/icon/icon';
   selector: 'app-order-summary-dialog',
   imports: [Badge, Icon, TranslocoDatePipe],
   templateUrl: './order-summary-dialog.html',
-  styleUrl: './order-summary-dialog.css',
+  styleUrls: ['./order-summary-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class OrderSummaryDialog {
   readonly open = input(false);

@@ -157,6 +157,15 @@ describe('Customers', () => {
     return Array.from(host.querySelectorAll('app-table-row'));
   }
 
+  /*
+   * The dialog is mounted for the life of the page and driven by `open`, so that it can animate
+   * out — asking whether the element exists would answer "yes" forever. What matters is whether it
+   * is showing.
+   */
+  function dialogIsOpen(host: HTMLElement): boolean {
+    return host.querySelector('app-customer-dialog dialog[open]') !== null;
+  }
+
   function openCustomer(host: HTMLElement, index: number): void {
     (rowsOnScreen(host)[index].querySelector('.identity') as HTMLButtonElement).click();
     settle();
@@ -225,7 +234,7 @@ describe('Customers', () => {
     fixture.componentInstance['onSearch']('tobias');
     settle();
 
-    expect(host.querySelector('app-customer-dialog')).not.toBeNull();
+    expect(dialogIsOpen(host)).toBe(true);
     expect(api.orderRequests).toContain(2);
   }));
 
@@ -242,7 +251,7 @@ describe('Customers', () => {
     settle();
     const host = fixture.nativeElement as HTMLElement;
 
-    expect(host.querySelector('app-customer-dialog')).not.toBeNull();
+    expect(dialogIsOpen(host)).toBe(true);
     expect(api.orderRequests).toContain(2);
   }));
 
@@ -254,7 +263,7 @@ describe('Customers', () => {
     fixture.componentInstance['closeDialog']();
     settle();
 
-    expect(host.querySelector('app-customer-dialog')).toBeNull();
+    expect(dialogIsOpen(host)).toBe(false);
   }));
 
   it('reads the open customer orders exactly once, on opening', fakeAsync(() => {
@@ -274,7 +283,7 @@ describe('Customers', () => {
 
     openCustomer(host, 0);
 
-    expect(host.querySelector('app-customer-dialog')).not.toBeNull();
+    expect(dialogIsOpen(host)).toBe(true);
     expect(host.querySelector('app-load-error')).not.toBeNull();
   }));
 

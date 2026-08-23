@@ -18,10 +18,6 @@
   box-shadow: var(--lift);
 }
 
-.summary::backdrop {
-  background: rgb(0 0 0 / 45%);
-}
-
 .summary-body {
   display: grid;
   gap: 1rem;
@@ -231,40 +227,4 @@
   color: var(--foreground-strong);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
-}
-
-/*
- * The popup. Dialogs animate in the top layer, which `display` transitions cannot reach without
- * `allow-discrete`; without it the box would appear fully formed. A scale from 92% with a slight
- * lift reads as the row opening out, which is what it is. Off entirely for reduced motion.
- */
-@media (prefers-reduced-motion: no-preference) {
-  @starting-style {
-    .summary[open] {
-      opacity: 0;
-      transform: scale(0.92) translateY(0.75rem);
-    }
-  }
-
-  .summary[open] {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    transition:
-      opacity 0.22s ease,
-      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .summary::backdrop {
-    animation: summary-veil 0.22s ease both;
-  }
-}
-
-@keyframes summary-veil {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }

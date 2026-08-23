@@ -22,17 +22,22 @@
       <div class="customers-stack" #report>
         <app-panel [title]="t('customers.allCustomers')" [subtitle]="facade.subtitle()">
           <!--
+            In the panel's header, where the orders table keeps its own — a control that narrows the
+            whole list belongs to the thing it narrows, not stacked on top of the first row. It sat
+            in the body, left-aligned and flush against the table's header band, reading as a stray
+            field that happened to be there.
+
             One box, one parameter. The server's `name` filter already spans the billing first name,
             the billing last name and the email address, so there is nothing to route by shape the
             way the orders page has to.
           -->
           <app-search-box
+            panelAction
             [value]="facade.search()"
             (valueChange)="onSearch($event)"
             [label]="t('customers.search.label')"
             [placeholder]="t('customers.search.placeholder')"
             [clearLabel]="t('customers.search.clear')"
-            width="18rem"
           />
 
           @if (rows().length) {
@@ -123,7 +128,7 @@
       (openOrder)="openOrder($event)"
       (viewAllOrders)="viewAllOrders()"
       (retryOrders)="facade.reloadOrders()"
-      (dismissed)="closeDialog()"
+        (dismissed)="closeDialog()"
     />
   }
 </ng-container>

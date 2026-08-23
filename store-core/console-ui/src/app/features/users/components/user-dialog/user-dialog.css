@@ -16,10 +16,6 @@
   box-shadow: var(--lift);
 }
 
-.user-dialog::backdrop {
-  background: rgb(0 0 0 / 45%);
-}
-
 .user-dialog-body {
   display: flex;
   flex-direction: column;
@@ -171,26 +167,5 @@
 
   .user-dialog-actions.spread .spacer {
     display: none;
-  }
-}
-
-/*
- * Dialogs animate in the top layer, which `display` transitions cannot reach without
- * `allow-discrete`; without it the box would pop. Off entirely for reduced motion.
- */
-@media (prefers-reduced-motion: no-preference) {
-  @starting-style {
-    .user-dialog[open] {
-      opacity: 0;
-      transform: translateY(0.5rem);
-    }
-  }
-
-  .user-dialog[open] {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--default-transition-duration),
-      transform var(--default-transition-duration);
   }
 }

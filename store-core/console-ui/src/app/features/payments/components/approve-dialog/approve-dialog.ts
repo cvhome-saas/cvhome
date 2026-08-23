@@ -23,7 +23,7 @@ import {TextField} from '@shared/ui/text-field/text-field';
   selector: 'app-approve-dialog',
   imports: [FormField, TextField],
   templateUrl: './approve-dialog.html',
-  styleUrl: './approve-dialog.css',
+  styleUrls: ['./approve-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class ApproveDialog {
   readonly open = input(false);

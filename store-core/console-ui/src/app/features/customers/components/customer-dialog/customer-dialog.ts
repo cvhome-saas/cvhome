@@ -30,7 +30,7 @@ import type {Tone} from '@models/ui';
   selector: 'app-customer-dialog',
   imports: [Badge, EmptyState, Icon, LoadError, TranslocoDatePipe, TranslocoDirective],
   templateUrl: './customer-dialog.html',
-  styleUrl: './customer-dialog.css',
+  styleUrls: ['./customer-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class CustomerDialog {
   readonly open = input(false);

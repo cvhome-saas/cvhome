@@ -15,10 +15,6 @@
   box-shadow: var(--lift);
 }
 
-.customer-dialog::backdrop {
-  background: rgb(0 0 0 / 45%);
-}
-
 .customer-dialog-body {
   display: flex;
   flex-direction: column;
@@ -281,26 +277,5 @@
   .order {
     grid-template-columns: minmax(0, 1fr) auto;
     row-gap: 0.35rem;
-  }
-}
-
-/*
- * Dialogs animate in the top layer, which `display` transitions cannot reach without
- * `allow-discrete`; without it the box would pop. Off entirely for reduced motion.
- */
-@media (prefers-reduced-motion: no-preference) {
-  @starting-style {
-    .customer-dialog[open] {
-      opacity: 0;
-      transform: translateY(0.5rem);
-    }
-  }
-
-  .customer-dialog[open] {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--default-transition-duration),
-      transform var(--default-transition-duration);
   }
 }

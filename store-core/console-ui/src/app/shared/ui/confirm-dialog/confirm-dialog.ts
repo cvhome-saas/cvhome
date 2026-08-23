@@ -57,7 +57,7 @@ import {Component, ElementRef, effect, input, output, signal, viewChild} from '@
       </form>
     </dialog>
   `,
-  styleUrl: './confirm-dialog.css',
+  styleUrls: ['./confirm-dialog.css', '../../../shared/styles/dialog-motion.css'],
 })
 export class ConfirmDialog {
   readonly open = input(false);

@@ -33,7 +33,7 @@ import type {UserForm} from '../../services/user-form.service';
   selector: 'app-user-dialog',
   imports: [Badge, Checkbox, FieldError, FormField, Icon, ReactiveFormsModule, TextField, Toggle, TranslocoDirective],
   templateUrl: './user-dialog.html',
-  styleUrl: './user-dialog.css',
+  styleUrls: ['./user-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class UserDialog {
   readonly open = input(false);

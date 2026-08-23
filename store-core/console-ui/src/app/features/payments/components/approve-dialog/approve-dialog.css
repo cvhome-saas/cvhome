@@ -16,10 +16,6 @@
   box-shadow: var(--lift);
 }
 
-.approve::backdrop {
-  background: rgb(0 0 0 / 45%);
-}
-
 .approve-body {
   display: grid;
   gap: 0.85rem;
@@ -51,25 +47,4 @@
   justify-content: flex-end;
   gap: 0.5rem;
   margin-block-start: 0.25rem;
-}
-
-/*
- * Dialogs animate in the top layer, which `display` transitions cannot reach without
- * `allow-discrete`; without it the box would pop. Off entirely for reduced motion.
- */
-@media (prefers-reduced-motion: no-preference) {
-  @starting-style {
-    .approve[open] {
-      opacity: 0;
-      transform: translateY(0.5rem);
-    }
-  }
-
-  .approve[open] {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--default-transition-duration),
-      transform var(--default-transition-duration);
-  }
 }

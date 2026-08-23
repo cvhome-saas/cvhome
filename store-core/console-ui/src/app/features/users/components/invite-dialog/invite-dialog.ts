@@ -22,7 +22,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   selector: 'app-invite-dialog',
   imports: [FormField, Select, TextField],
   templateUrl: './invite-dialog.html',
-  styleUrl: './invite-dialog.css',
+  styleUrls: ['./invite-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class InviteDialog {
   readonly open = input(false);

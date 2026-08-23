@@ -19,7 +19,7 @@ import {CopyField} from '@shared/ui/copy-field/copy-field';
   selector: 'app-invitation-link-dialog',
   imports: [CopyField],
   templateUrl: './invitation-link-dialog.html',
-  styleUrl: './invitation-link-dialog.css',
+  styleUrls: ['./invitation-link-dialog.css', '../../../../shared/styles/dialog-motion.css'],
 })
 export class InvitationLinkDialog {
   readonly open = input(false);
