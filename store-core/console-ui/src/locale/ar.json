@@ -107,7 +107,13 @@
       "newPage": "صفحة جديدة | cvhome",
       "page": "صفحة | cvhome",
       "newPost": "مقال جديد | cvhome",
-      "post": "مقال | cvhome"
+      "post": "مقال | cvhome",
+      "newBanner": "لافتة جديدة | cvhome",
+      "banner": "لافتة | cvhome",
+      "newFaq": "سؤال جديد | cvhome",
+      "faq": "سؤال شائع | cvhome",
+      "newPolicy": "سياسة جديدة | cvhome",
+      "policy": "سياسة | cvhome"
     }
   },
   "notFound": {
@@ -3136,7 +3142,8 @@
       "unpublishAtHint": "اختياري: يُؤرشف العنصر في هذا الوقت.",
       "schedule": "الجدولة",
       "scheduleTitle": "جدولة النشر",
-      "scheduleSubtitle": "يُنشر العنصر تلقائيًا في هذا الوقت."
+      "scheduleSubtitle": "يُنشر العنصر تلقائيًا في هذا الوقت.",
+      "slug": "معرّف الرابط"
     },
     "copy": {
       "title": "المحتوى",
@@ -3148,7 +3155,15 @@
       "excerpt": "مقتطف",
       "excerptHint": "يظهر في فهرس المدونة ونتائج البحث. حتى ٣٠٠ حرف.",
       "altHint": "يصف الصورة لقارئات الشاشة ومحركات البحث.",
-      "fallbackNotice": "{language} هي النص المصدر. تعود إليها اللغات الأخرى عندما تكون فارغة."
+      "fallbackNotice": "{language} هي النص المصدر. تعود إليها اللغات الأخرى عندما تكون فارغة.",
+      "headline": "العنوان الرئيسي",
+      "subtext": "النص الفرعي",
+      "buttonLabel": "نص الزر",
+      "altText": "النص البديل",
+      "question": "السؤال",
+      "answer": "الإجابة",
+      "heading": "العنوان",
+      "policyBody": "نص السياسة"
     },
     "seo": {
       "title": "الرابط والبحث",
@@ -3181,7 +3196,18 @@
       "metaLength": "وصف الميتا أقل من ١٦٠ حرفًا",
       "hero": "اختيرت الصورة الرئيسية",
       "translationsDone": "كل اللغات مترجمة",
-      "translationsMissing": "ترجمات ناقصة: {languages}"
+      "translationsMissing": "ترجمات ناقصة: {languages}",
+      "placement": "اختير الموضع",
+      "headlineAndTarget": "حُدّد العنوان والرابط",
+      "artwork": "رُفعت الصورة",
+      "altText": "كُتب النص البديل",
+      "questionAndAnswer": "كُتب السؤال والإجابة",
+      "group": "اختيرت المجموعة",
+      "keywords": "أُضيفت كلمات البحث",
+      "policyType": "اختير النوع",
+      "headingAndBody": "كُتب العنوان والنص",
+      "effectiveDate": "حُدّد تاريخ السريان",
+      "legalReview": "مراجعة قانونية لـ {languages}"
     },
     "page": {
       "newTitle": "صفحة جديدة",
@@ -3305,7 +3331,204 @@
       "empty": "لا ملفات من هذا النوع بعد."
     },
     "menus": {
-      "comingSoon": "يصل محرّر قوائم التنقّل مع التحديث القادم."
+      "comingSoon": "يصل محرّر قوائم التنقّل مع التحديث القادم.",
+      "title": "تنقّل المتجر",
+      "subtitle": "القائمة الرئيسية وقائمة التذييل · مستوى واحد من التداخل",
+      "loading": "جارٍ تحميل القوائم…",
+      "labelsIn": "التسميات بـ",
+      "handle": {
+        "MAIN": "القائمة الرئيسية",
+        "FOOTER": "قائمة التذييل"
+      },
+      "kind": {
+        "PAGE": "صفحة",
+        "CATEGORY": "تصنيف",
+        "PRODUCT": "منتج",
+        "POLICY": "سياسة",
+        "BLOG_INDEX": "المدونة",
+        "FAQ_INDEX": "المساعدة / الأسئلة",
+        "URL": "رابط"
+      },
+      "label": "التسمية",
+      "labelPlaceholder": "التسمية",
+      "target": "نوع الوجهة",
+      "value": "الوجهة",
+      "valuePlaceholder": {
+        "PAGE": "معرّف الصفحة",
+        "CATEGORY": "معرّف التصنيف",
+        "PRODUCT": "معرّف المنتج",
+        "POLICY": "TERMS, PRIVACY…",
+        "URL": "‎/path أو https://…",
+        "BLOG_INDEX": "",
+        "FAQ_INDEX": ""
+      },
+      "broken": "رابط معطّل",
+      "moveUp": "تحريك لأعلى",
+      "moveDown": "تحريك لأسفل",
+      "indent": "تداخل تحت العنصر أعلاه",
+      "outdent": "إخراج إلى المستوى الأعلى",
+      "hide": "إخفاء عن المتجر",
+      "show": "إظهار في المتجر",
+      "remove": "إزالة",
+      "empty": "لا روابط بعد.",
+      "addLink": "إضافة رابط",
+      "save": "حفظ القائمة",
+      "discard": "تجاهل",
+      "saved": "حُفظت {menu}."
+    },
+    "banner": {
+      "newTitle": "لافتة جديدة",
+      "editTitle": "لافتة",
+      "context": "الموضع والصورة والنص لعرض ترويجي في المتجر",
+      "placementTitle": "الموضع",
+      "placementSubtitle": "أين تُعرض اللافتة. يحمل كل موضع عددًا محدودًا من اللافتات الحية في آن واحد.",
+      "placement": {
+        "HERO": {
+          "label": "واجهة الرئيسية",
+          "hint": "١٩٢٠ × ٩٠٠ · واحدة حية في كل مرة"
+        },
+        "CAROUSEL": {
+          "label": "شريط الرئيسية",
+          "hint": "١٦٠٠ × ٦٤٠ · حتى ٨، مشتركة مع عروض أخرى"
+        },
+        "COLLECTION": {
+          "label": "رأس المجموعة",
+          "hint": "١٦٠٠ × ٤٢٠ · واحدة لكل مجموعة"
+        },
+        "STRIP": {
+          "label": "شريط الإعلان",
+          "hint": "نص فقط، على مستوى الموقع · واحد في كل مرة"
+        }
+      },
+      "artwork": "الصورة",
+      "artworkHint": "الموصى به {size}. JPG أو PNG أو WebP.",
+      "desktop": "سطح المكتب",
+      "mobile": "الجوال (اختياري)",
+      "chooseArtwork": "اختيار من المكتبة",
+      "targetTitle": "وجهة الرابط",
+      "targetKindLabel": "يرتبط بـ",
+      "targetValue": "الوجهة",
+      "targetValueHint": "معرّف مجموعة أو منتج، أو معرّف صفحة، أو رابط.",
+      "targetKind": {
+        "COLLECTION": "مجموعة",
+        "PRODUCT": "منتج",
+        "PAGE": "صفحة",
+        "URL": "رابط"
+      },
+      "schedule": "الجدولة والجمهور",
+      "startsAt": "يبدأ",
+      "endsAt": "ينتهي",
+      "loggedInOnly": "للزوار المسجّلين فقط",
+      "audienceHint": "استهداف الشرائح والدول غير متاح على المنصة بعد.",
+      "preview": "معاينة",
+      "previewHeadline": "عنوانك الرئيسي",
+      "previewHint": "تحلّ الصورة محل التدرّج بعد رفعها."
+    },
+    "faq": {
+      "newTitle": "سؤال شائع جديد",
+      "editTitle": "سؤال شائع",
+      "context": "سؤال واحد وإجابته ومكان ظهوره في المتجر",
+      "groupTitle": "المجموعة",
+      "groupSubtitle": "تُعرض الأسئلة مجمّعة بالترتيب الذي تحدده.",
+      "entriesInGroup": "{count} سؤال",
+      "newGroup": "مجموعة جديدة",
+      "groupName": "اسم المجموعة",
+      "placementTitle": "الموضع والبحث",
+      "slugHint": "يظهر تحت ‎/help/",
+      "position": "الترتيب في المجموعة",
+      "positionHint": "٠ هو الأول. اتركه فارغًا للإضافة في النهاية.",
+      "keywords": "كلمات البحث",
+      "keywordsHint": "مصطلحات قد يكتبها المتسوقون ولا تظهر في السؤال.",
+      "checkoutHelp": "إظهار في مساعد الدفع",
+      "checkoutHelpHint": "يعرض هذه الإجابة للمشترين أثناء الدفع.",
+      "preview": "معاينة",
+      "previewGroup": "المجموعة",
+      "previewQuestion": "سؤالك"
+    },
+    "policy": {
+      "newTitle": "سياسة جديدة",
+      "editTitle": "سياسة",
+      "context": "نص قانوني يظهر عند الدفع وفي تذييل المتجر",
+      "typeTitle": "نوع السياسة",
+      "typeSubtitle": "سياسة واحدة من كل نوع لكل متجر. لا يمكن تغيير النوع بعد الإنشاء.",
+      "type": {
+        "TERMS": {
+          "label": "شروط الخدمة",
+          "hint": "ما يوافق عليه المشترون عند الطلب."
+        },
+        "PRIVACY": {
+          "label": "سياسة الخصوصية",
+          "hint": "ما البيانات التي تجمعها ولماذا."
+        },
+        "RETURNS": {
+          "label": "الإرجاع والاسترداد",
+          "hint": "مدة الإرجاع وشروط الحالة ومن يدفع الشحن."
+        },
+        "SHIPPING": {
+          "label": "سياسة الشحن",
+          "hint": "أين تشحن، وبأي سرعة، وبأي تكلفة."
+        },
+        "COOKIES": {
+          "label": "إشعار ملفات تعريف الارتباط",
+          "hint": "مطلوب في مناطق الاتحاد الأوروبي."
+        },
+        "CUSTOM": {
+          "label": "مخصّصة",
+          "hint": "أي نص قانوني آخر."
+        }
+      },
+      "templateHint": "ابدأ من قالب {type}، أو الصق نصك.",
+      "insertTemplate": "إدراج القالب",
+      "templateInserted": "أُدرج القالب — راجعه قبل النشر.",
+      "appliesTitle": "أين تسري",
+      "jurisdiction": "الاختصاص القضائي",
+      "jurisdictionHint": "مثل NL — يحدد القالب وقواعد الامتثال.",
+      "effectiveFrom": "تاريخ السريان",
+      "effectiveFromHint": "يظهر مع الإصدار؛ الفارغ يعني عند النشر.",
+      "requiresAcceptance": "اشتراط الموافقة عند الدفع",
+      "requiresAcceptanceHint": "يؤشّر المشترون على مربع قبل الدفع. تُحفظ الموافقة مع الطلب.",
+      "notifyCustomers": "إرسال بريد للعملاء الحاليين بالتغيير",
+      "notifyCustomersHint": "لا ترسله المنصة بعد — يُسجَّل لحين توفره.",
+      "showInFooter": "رابط في التذييل",
+      "showAtCheckout": "إظهار عند الدفع",
+      "showAtSignup": "إظهار عند التسجيل",
+      "versions": "سجلّ الإصدارات",
+      "versionsSubtitle": "يقطع النشر إصدارًا جديدًا ثابتًا؛ تبقى الإصدارات الأقدم قابلة للقراءة.",
+      "versionStatus": {
+        "LIVE": "حي",
+        "DRAFT": "مسوّدة",
+        "ARCHIVED": "مؤرشف"
+      },
+      "restoreText": "استعادة النص",
+      "versionRestored": "نص الإصدار {version} أصبح المسوّدة. انشر لتفعيله.",
+      "checkoutPreview": "معاينة الدفع",
+      "acceptLabel": "أوافق على {type}"
+    },
+    "policies": {
+      "title": "الامتثال",
+      "subtitle": "ما النصوص القانونية التي يملكها المتجر، وما تتطلبه مناطقه.",
+      "requiredIn": "مطلوب في {regions}",
+      "notRequired": "اختياري",
+      "notWritten": "غير مكتوب",
+      "optional": "اختياري"
+    },
+    "snippets": {
+      "title": "مقتطفات المتجر",
+      "subtitle": "نصوص يقرؤها المتجر بالرمز: بيانات الموقع الوصفية، والنص الاحتياطي للإعلان، واتفاقية الدفع.",
+      "live": "حي",
+      "hidden": "مخفي",
+      "notSet": "غير محدد",
+      "visible": "ظاهر في المتجر",
+      "titleField": "العنوان",
+      "bodyField": "النص",
+      "saved": "حُفظ {code}.",
+      "describe": {
+        "meta-title": "عنوان علامة التبويب ونتائج البحث للموقع كله.",
+        "meta-description": "الوصف الوصفي على مستوى الموقع.",
+        "header-message": "شريط الإعلان، عندما لا توجد لافتة شريط إعلان حية.",
+        "agreement": "اتفاقية الدفع، عندما لا توجد سياسة شروط حية.",
+        "other": "مقتطف قديم ما يزال هذا المتجر يحتفظ به."
+      }
     }
   }
 }

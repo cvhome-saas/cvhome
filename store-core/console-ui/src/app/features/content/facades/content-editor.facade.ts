@@ -46,6 +46,8 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
 
   private type!: ContentListType;
   private extra: FormGroup | null = null;
+  /** Reshapes the editor's flat form into the wire shape (banners nest target/artwork). */
+  private bodyMapper: (() => Partial<P>) | null = null;
   /** Copies what the editor reads but the form does not carry (status, locales…). */
   private populateExtra: ((item: R) => void) | null = null;
 
@@ -105,6 +107,11 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     if (id !== null) {
       this.load(id);
     }
+  }
+
+  /** Installs a mapper whose result is spread over the raw extra form when building the body. */
+  setBodyMapper(mapper: () => Partial<P>): void {
+    this.bodyMapper = mapper;
   }
 
   /** Called when the store's languages arrive after init (they are a resource). */
@@ -169,7 +176,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   body(): P {
     const existing = this.item()?.translations ?? [];
     return {
-      ...(this.extra?.getRawValue() ?? {}),
+      ...(this.bodyMapper ? this.bodyMapper() : (this.extra?.getRawValue() ?? {})),
       ...this.forms.toCommon(this.common),
       translations: this.forms.toTranslations(this.translations(), existing),
       id: this.id() ?? undefined,

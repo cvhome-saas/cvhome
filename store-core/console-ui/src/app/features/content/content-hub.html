@@ -39,6 +39,9 @@
 
       <div class="hub-section" id="content-section">
         @if (listType(); as type) {
+          @if (type === 'policies') {
+            <app-policies-tab [canManage]="canManage()" (open)="openPolicy($event)" />
+          }
           <app-content-list
             [type]="type"
             [locales]="facade.localeOptions()"
@@ -46,13 +49,16 @@
             (open)="openRow($event)"
             (create)="create()"
           />
+          @if (type === 'pages') {
+            <app-snippets-card [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
+          }
         } @else {
           @switch (activeTab()) {
             @case ('media') {
               <app-media-tab [locales]="facade.localeOptions()" [canManage]="canManage()" />
             }
             @case ('menus') {
-              <p class="coming">{{ t('content.menus.comingSoon') }}</p>
+              <app-menus-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />
             }
           }
         }

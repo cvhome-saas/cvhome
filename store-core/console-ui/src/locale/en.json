@@ -107,7 +107,13 @@
       "newPage": "New page | cvhome",
       "page": "Page | cvhome",
       "newPost": "New post | cvhome",
-      "post": "Post | cvhome"
+      "post": "Post | cvhome",
+      "newBanner": "New banner | cvhome",
+      "banner": "Banner | cvhome",
+      "newFaq": "New FAQ entry | cvhome",
+      "faq": "FAQ entry | cvhome",
+      "newPolicy": "New policy | cvhome",
+      "policy": "Policy | cvhome"
     }
   },
   "notFound": {
@@ -3136,7 +3142,8 @@
       "unpublishAtHint": "Optional: the item is archived at this time.",
       "schedule": "Schedule",
       "scheduleTitle": "Schedule publishing",
-      "scheduleSubtitle": "The item publishes itself at this time."
+      "scheduleSubtitle": "The item publishes itself at this time.",
+      "slug": "URL slug"
     },
     "copy": {
       "title": "Content",
@@ -3148,7 +3155,15 @@
       "excerpt": "Excerpt",
       "excerptHint": "Shown on the blog index and in search results. Up to 300 characters.",
       "altHint": "Describes the artwork for screen readers and search engines.",
-      "fallbackNotice": "{language} is the source copy. Other languages fall back to it when empty."
+      "fallbackNotice": "{language} is the source copy. Other languages fall back to it when empty.",
+      "headline": "Headline",
+      "subtext": "Subtext",
+      "buttonLabel": "Button label",
+      "altText": "Alt text",
+      "question": "Question",
+      "answer": "Answer",
+      "heading": "Heading",
+      "policyBody": "Policy text"
     },
     "seo": {
       "title": "URL & search",
@@ -3181,7 +3196,18 @@
       "metaLength": "Meta description under 160 characters",
       "hero": "Hero image chosen",
       "translationsDone": "All languages translated",
-      "translationsMissing": "Translations missing: {languages}"
+      "translationsMissing": "Translations missing: {languages}",
+      "placement": "Placement selected",
+      "headlineAndTarget": "Headline and link target set",
+      "artwork": "Artwork uploaded",
+      "altText": "Alt text written",
+      "questionAndAnswer": "Question and answer written",
+      "group": "Group selected",
+      "keywords": "Search keywords added",
+      "policyType": "Type selected",
+      "headingAndBody": "Heading and body written",
+      "effectiveDate": "Effective date set",
+      "legalReview": "Legal review for {languages}"
     },
     "page": {
       "newTitle": "New page",
@@ -3305,7 +3331,204 @@
       "empty": "No files of this kind yet."
     },
     "menus": {
-      "comingSoon": "The navigation menu editor arrives with the next update."
+      "comingSoon": "The navigation menu editor arrives with the next update.",
+      "title": "Storefront navigation",
+      "subtitle": "Main and footer menus · one level of nesting",
+      "loading": "Loading menus…",
+      "labelsIn": "Labels in",
+      "handle": {
+        "MAIN": "Main menu",
+        "FOOTER": "Footer menu"
+      },
+      "kind": {
+        "PAGE": "Page",
+        "CATEGORY": "Category",
+        "PRODUCT": "Product",
+        "POLICY": "Policy",
+        "BLOG_INDEX": "Blog",
+        "FAQ_INDEX": "Help / FAQ",
+        "URL": "URL"
+      },
+      "label": "Label",
+      "labelPlaceholder": "Label",
+      "target": "Target kind",
+      "value": "Target",
+      "valuePlaceholder": {
+        "PAGE": "page slug",
+        "CATEGORY": "category handle",
+        "PRODUCT": "product handle",
+        "POLICY": "TERMS, PRIVACY…",
+        "URL": "/path or https://…",
+        "BLOG_INDEX": "",
+        "FAQ_INDEX": ""
+      },
+      "broken": "Broken link",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "indent": "Nest under the item above",
+      "outdent": "Move out to top level",
+      "hide": "Hide from the storefront",
+      "show": "Show on the storefront",
+      "remove": "Remove",
+      "empty": "No links yet.",
+      "addLink": "Add link",
+      "save": "Save menu",
+      "discard": "Discard",
+      "saved": "{menu} saved."
+    },
+    "banner": {
+      "newTitle": "New banner",
+      "editTitle": "Banner",
+      "context": "Placement, artwork and copy for a storefront promotion",
+      "placementTitle": "Placement",
+      "placementSubtitle": "Where the banner renders. Each placement holds a limited number of live banners at a time.",
+      "placement": {
+        "HERO": {
+          "label": "Home hero",
+          "hint": "1920 × 900 · one live at a time"
+        },
+        "CAROUSEL": {
+          "label": "Home carousel",
+          "hint": "1600 × 640 · up to 8, shared with other promos"
+        },
+        "COLLECTION": {
+          "label": "Collection header",
+          "hint": "1600 × 420 · one per collection"
+        },
+        "STRIP": {
+          "label": "Announcement strip",
+          "hint": "Text only, site-wide · one at a time"
+        }
+      },
+      "artwork": "Artwork",
+      "artworkHint": "Recommended {size}. JPG, PNG or WebP.",
+      "desktop": "Desktop",
+      "mobile": "Mobile (optional)",
+      "chooseArtwork": "Choose from library",
+      "targetTitle": "Link target",
+      "targetKindLabel": "Links to",
+      "targetValue": "Target",
+      "targetValueHint": "A collection or product handle, a page slug, or a URL.",
+      "targetKind": {
+        "COLLECTION": "Collection",
+        "PRODUCT": "Product",
+        "PAGE": "Page",
+        "URL": "URL"
+      },
+      "schedule": "Schedule & audience",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "loggedInOnly": "Signed-in visitors only",
+      "audienceHint": "Segments and country targeting are not available on this platform yet.",
+      "preview": "Preview",
+      "previewHeadline": "Your headline",
+      "previewHint": "Artwork replaces the gradient once uploaded."
+    },
+    "faq": {
+      "newTitle": "New FAQ entry",
+      "editTitle": "FAQ entry",
+      "context": "One question, its answer, and where it appears on the storefront",
+      "groupTitle": "Group",
+      "groupSubtitle": "Entries are shown grouped, in the order you set.",
+      "entriesInGroup": "{count} entries",
+      "newGroup": "New group",
+      "groupName": "Group name",
+      "placementTitle": "Placement & search",
+      "slugHint": "Appears under /help/",
+      "position": "Position in group",
+      "positionHint": "0 is first. Leave empty to append.",
+      "keywords": "Search keywords",
+      "keywordsHint": "Terms shoppers might type that do not appear in the question.",
+      "checkoutHelp": "Show in the checkout help widget",
+      "checkoutHelpHint": "Surfaces this answer to buyers mid-checkout.",
+      "preview": "Preview",
+      "previewGroup": "Group",
+      "previewQuestion": "Your question"
+    },
+    "policy": {
+      "newTitle": "New policy",
+      "editTitle": "Policy",
+      "context": "Legal text shown at checkout and in the storefront footer",
+      "typeTitle": "Policy type",
+      "typeSubtitle": "One policy of each type per store. The type cannot change once created.",
+      "type": {
+        "TERMS": {
+          "label": "Terms of service",
+          "hint": "What buyers agree to when they order."
+        },
+        "PRIVACY": {
+          "label": "Privacy policy",
+          "hint": "What data you collect and why."
+        },
+        "RETURNS": {
+          "label": "Returns & refunds",
+          "hint": "Return window, condition rules and who pays for shipping."
+        },
+        "SHIPPING": {
+          "label": "Shipping policy",
+          "hint": "Where you deliver, how fast, and what it costs."
+        },
+        "COOKIES": {
+          "label": "Cookie notice",
+          "hint": "Required in EU regions."
+        },
+        "CUSTOM": {
+          "label": "Custom",
+          "hint": "Any other legal text."
+        }
+      },
+      "templateHint": "Start from the {type} template, or paste your own text.",
+      "insertTemplate": "Insert template",
+      "templateInserted": "Template inserted — review it before publishing.",
+      "appliesTitle": "Where it applies",
+      "jurisdiction": "Jurisdiction",
+      "jurisdictionHint": "e.g. NL — picks the template and the compliance rules.",
+      "effectiveFrom": "Effective date",
+      "effectiveFromHint": "Shown with the version; empty means on publish.",
+      "requiresAcceptance": "Require acceptance at checkout",
+      "requiresAcceptanceHint": "Buyers tick a box before payment. Acceptance is stored with the order.",
+      "notifyCustomers": "Email existing customers about the change",
+      "notifyCustomersHint": "Not sent by the platform yet — recorded for when it is.",
+      "showInFooter": "Link in the footer",
+      "showAtCheckout": "Show at checkout",
+      "showAtSignup": "Show at sign-up",
+      "versions": "Version history",
+      "versionsSubtitle": "Publishing cuts a new immutable version; older ones stay readable.",
+      "versionStatus": {
+        "LIVE": "Live",
+        "DRAFT": "Draft",
+        "ARCHIVED": "Archived"
+      },
+      "restoreText": "Restore text",
+      "versionRestored": "Version {version}'s text is now the draft. Publish to make it live.",
+      "checkoutPreview": "Checkout preview",
+      "acceptLabel": "I accept the {type}"
+    },
+    "policies": {
+      "title": "Compliance",
+      "subtitle": "Which legal texts the store has, and which its regions require.",
+      "requiredIn": "Required in {regions}",
+      "notRequired": "Optional",
+      "notWritten": "Not written",
+      "optional": "Optional"
+    },
+    "snippets": {
+      "title": "Store snippets",
+      "subtitle": "Text fragments the storefront reads by code: site metadata, the announcement fallback, the checkout agreement.",
+      "live": "Live",
+      "hidden": "Hidden",
+      "notSet": "Not set",
+      "visible": "Visible on the storefront",
+      "titleField": "Title",
+      "bodyField": "Text",
+      "saved": "{code} saved.",
+      "describe": {
+        "meta-title": "The browser tab and search-result title of the whole site.",
+        "meta-description": "The site-wide meta description.",
+        "header-message": "The announcement bar, when no Announcement-strip banner is live.",
+        "agreement": "The checkout agreement, when no Terms policy is live.",
+        "other": "A legacy snippet this store still holds."
+      }
     }
   }
 }

@@ -12,6 +12,10 @@ import {SectionNav} from '@shared/ui/section-nav/section-nav';
 import {TabSwitcher, type TabItem} from '@shared/ui/tab-switcher/tab-switcher';
 import {ContentList} from './components/content-list/content-list';
 import {MediaTab} from './components/media-tab/media-tab';
+import {MenusTab} from './components/menus-tab/menus-tab';
+import {PoliciesTab} from './components/policies-tab/policies-tab';
+import {SnippetsCard} from './components/snippets-card/snippets-card';
+import type {PolicyCompliance} from '@models/content';
 import {ContentHubFacade} from './facades/content-hub.facade';
 
 const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
@@ -26,7 +30,7 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
  */
 @Component({
   selector: 'app-content-hub',
-  imports: [ContentList, Icon, KpiGrid, LoadError, MediaTab, PageHeader, SectionNav, TabSwitcher, TranslocoDirective],
+  imports: [ContentList, Icon, KpiGrid, LoadError, MediaTab, MenusTab, PageHeader, PoliciesTab, SectionNav, SnippetsCard, TabSwitcher, TranslocoDirective],
   templateUrl: './content-hub.html',
   styleUrl: './content-hub.css',
 })
@@ -86,6 +90,15 @@ export class ContentHub {
     const type = this.listType();
     if (type) {
       this.router.navigate(['/content', type, 'new']);
+    }
+  }
+
+  /** A compliance card: open the existing head, or start a new policy of that type. */
+  protected openPolicy(row: PolicyCompliance): void {
+    if (row.id !== null) {
+      this.router.navigate(['/content', 'policies', row.id]);
+    } else {
+      this.router.navigate(['/content', 'policies', 'new'], {queryParams: {type: row.type}});
     }
   }
 

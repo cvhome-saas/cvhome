@@ -420,6 +420,36 @@ export const routes: Routes = [
         data: {titleKey: 'route.content.post', breadcrumbKey: 'shell.breadcrumb.content'},
       },
       {
+        path: 'banners/new',
+        loadComponent: () => import('@features/content/editors/banner-editor/banner-editor').then((page) => page.BannerEditor),
+        data: {titleKey: 'route.content.newBanner', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'banners/:id',
+        loadComponent: () => import('@features/content/editors/banner-editor/banner-editor').then((page) => page.BannerEditor),
+        data: {titleKey: 'route.content.banner', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'faq/new',
+        loadComponent: () => import('@features/content/editors/faq-editor/faq-editor').then((page) => page.FaqEditor),
+        data: {titleKey: 'route.content.newFaq', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'faq/:id',
+        loadComponent: () => import('@features/content/editors/faq-editor/faq-editor').then((page) => page.FaqEditor),
+        data: {titleKey: 'route.content.faq', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'policies/new',
+        loadComponent: () => import('@features/content/editors/policy-editor/policy-editor').then((page) => page.PolicyEditor),
+        data: {titleKey: 'route.content.newPolicy', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'policies/:id',
+        loadComponent: () => import('@features/content/editors/policy-editor/policy-editor').then((page) => page.PolicyEditor),
+        data: {titleKey: 'route.content.policy', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
         // An unknown tab is caught in the page and replaced with `pages` — the catalogue's shape.
         path: ':tab',
         loadComponent: () => import('@features/content/content-hub').then((page) => page.ContentHub),

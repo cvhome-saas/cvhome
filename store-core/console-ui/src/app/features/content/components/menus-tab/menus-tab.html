@@ -1,0 +1,94 @@
+<ng-container *transloco="let t">
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay [busy]="facade.isLoading() || facade.saving()" [label]="t('content.menus.loading')" reserve="panel">
+    <app-panel [title]="t('content.menus.title')" [subtitle]="t('content.menus.subtitle')">
+      <app-locale-switcher
+        panelAction
+        [languages]="locales()"
+        [active]="activeLanguage()"
+        (activeChange)="language.set($event)"
+        [filled]="filled()"
+        display="label"
+        [label]="t('content.menus.labelsIn')"
+      />
+      <div class="menus-grid">
+        @for (handle of handles; track handle) {
+          <section class="menu" [attr.aria-label]="handleLabel(handle)">
+            <header class="menu-head">
+              <app-icon [name]="handle === 'MAIN' ? 'menu' : 'list'" [size]="14" />
+              <strong>{{ handleLabel(handle) }}</strong>
+              <app-badge tone="slate" shape="square">{{ rows(handle).length }}</app-badge>
+              <span class="spacer"></span>
+              @if (canManage()) {
+                @if (facade.dirty()[handle]) {
+                  <button class="ghost-action" type="button" (click)="facade.discard(handle)">{{ t('content.menus.discard') }}</button>
+                }
+                <button class="primary-action" type="button" [disabled]="!facade.dirty()[handle] || facade.saving()" (click)="facade.save(handle)">
+                  <app-icon name="check" />{{ t('content.menus.save') }}
+                </button>
+              }
+            </header>
+
+            <ol class="menu-rows">
+              @for (row of rows(handle); track row.item.key) {
+                <li class="menu-row" [class.child]="row.depth === 1" [class.hidden-item]="!row.item.visible">
+                  <div class="row-grip" aria-hidden="true"><app-icon name="grip" [size]="12" /></div>
+                  <app-text-field
+                    class="row-label"
+                    [value]="label(row.item)"
+                    (valueChange)="setLabel(handle, row.item, $event)"
+                    [placeholder]="t('content.menus.labelPlaceholder')"
+                    [ariaLabel]="t('content.menus.label')"
+                    [disabled]="!canManage()"
+                    [maxLength]="80"
+                  />
+                  <app-select
+                    class="row-kind"
+                    [options]="kindOptions()"
+                    [value]="row.item.kind"
+                    (valueChange)="setKind(handle, row.item, $event)"
+                    [ariaLabel]="t('content.menus.target')"
+                    [disabled]="!canManage()"
+                  />
+                  @if (needsValue(row.item.kind)) {
+                    @if (row.item.kind === 'PAGE' && pageOptions().length) {
+                      <app-select class="row-value" [options]="pageOptions()" [value]="row.item.value" (valueChange)="setValue(handle, row.item, $event)" [ariaLabel]="t('content.menus.value')" [disabled]="!canManage()" />
+                    } @else {
+                      <app-text-field class="row-value" latin mono [value]="row.item.value" (valueChange)="setValue(handle, row.item, $event)" [ariaLabel]="t('content.menus.value')" [placeholder]="t('content.menus.valuePlaceholder.' + row.item.kind)" [disabled]="!canManage()" [maxLength]="255" />
+                    }
+                  } @else {
+                    <span class="row-value fixed" dir="ltr">{{ row.item.kind === 'BLOG_INDEX' ? '/blog' : '/help' }}</span>
+                  }
+                  @if (row.item.broken) {
+                    <app-badge tone="amber" shape="square">{{ t('content.menus.broken') }}</app-badge>
+                  }
+                  @if (canManage()) {
+                    <div class="row-actions">
+                      <button class="icon-action" type="button" [title]="t('content.menus.moveUp')" [attr.aria-label]="t('content.menus.moveUp')" (click)="move(handle, row.item, -1)"><app-icon name="arrowUp" [size]="13" /></button>
+                      <button class="icon-action" type="button" [title]="t('content.menus.moveDown')" [attr.aria-label]="t('content.menus.moveDown')" (click)="move(handle, row.item, 1)"><app-icon name="arrowDown" [size]="13" /></button>
+                      @if (row.depth === 0) {
+                        <button class="icon-action" type="button" [disabled]="row.item.children.length > 0" [title]="t('content.menus.indent')" [attr.aria-label]="t('content.menus.indent')" (click)="indent(handle, row.item)"><app-icon name="arrowRight" [size]="13" /></button>
+                      } @else {
+                        <button class="icon-action" type="button" [title]="t('content.menus.outdent')" [attr.aria-label]="t('content.menus.outdent')" (click)="outdent(handle, row.item)"><app-icon name="arrowLeft" [size]="13" /></button>
+                      }
+                      <button class="icon-action" type="button" [attr.aria-pressed]="row.item.visible" [title]="row.item.visible ? t('content.menus.hide') : t('content.menus.show')" [attr.aria-label]="row.item.visible ? t('content.menus.hide') : t('content.menus.show')" (click)="toggleVisible(handle, row.item)"><app-icon [name]="row.item.visible ? 'eye' : 'eyeOff'" [size]="13" /></button>
+                      <button class="icon-action danger" type="button" [title]="t('content.menus.remove')" [attr.aria-label]="t('content.menus.remove')" (click)="remove(handle, row.item)"><app-icon name="trash" [size]="13" /></button>
+                    </div>
+                  }
+                </li>
+              } @empty {
+                <li class="menu-empty">{{ t('content.menus.empty') }}</li>
+              }
+            </ol>
+            @if (canManage()) {
+              <button class="secondary-action add-link" type="button" (click)="add(handle)"><app-icon name="plus" />{{ t('content.menus.addLink') }}</button>
+            }
+          </section>
+        }
+      </div>
+    </app-panel>
+  </app-busy-overlay>
+</ng-container>

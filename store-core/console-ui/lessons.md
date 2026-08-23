@@ -3238,3 +3238,16 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
 - **What is missing:** a drag-and-drop primitive in `shared/ui/`; the console has none and the
   slider section set the precedent of arrow buttons.
 - **Decision:** arrow buttons and keyboard; the server takes the whole order either way.
+
+## Content — "email existing customers about the change" is recorded, not sent
+
+- **Screen:** `/content/policies/:id`, the toggle from `New Policy.dc.html`.
+- **What the UI needs:** when a policy version with acceptance publishes, customers who accepted the
+  previous version get a summary and a link.
+- **What is missing:** the content service stores `notifyCustomers` on the policy and emits nothing;
+  there is no customer-notification channel on the platform (the requirements doc's
+  `policy.version.published` event has no consumer).
+- **Decision:** the toggle is kept, labelled as recorded-not-sent, so the intent is captured for when
+  the channel exists.
+- **Expected contract:** an outbox event from `PolicyService.publishVersion` consumed by a mailer
+  that knows the store's customers.
