@@ -3251,3 +3251,24 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
   the channel exists.
 - **Expected contract:** an outbox event from `PolicyService.publishVersion` consumed by a mailer
   that knows the store's customers.
+
+## Content — a child-row edit does not move the parent's version by itself
+
+- **Where it bit:** every content item. Title and body live in `content_description`, so editing them
+  leaves the `content` row clean: Hibernate did not increment `@Version`, the audit listener never
+  stamped `dateModified`, and the revision snapshot collided with the previous one on
+  `(content_id, version)`. The seller saw a 409 on the *second* save of a page and an empty "updated"
+  column in every list.
+- **Fix:** `ContentItemService` bumps the row explicitly (`update versioned Content …`) on each write.
+- **Watch for it elsewhere:** any entity whose editable text hangs off a `@OneToMany` description
+  table — the catalogue and merchant pods have the same shape.
+
+## Content — a checked domain exception does not roll back a Spring transaction
+
+- **Where it bit:** a refused publish. `PublishingService` applies the schedule window before the
+  publish gate throws, and the domain exceptions extend `BaseException extends Exception`, so a plain
+  `@Transactional` committed the half-applied change: an item that failed to publish kept a
+  `publishAt` it never earned.
+- **Fix:** every write in the content service is `@Transactional(rollbackFor = Exception.class)`.
+- **Watch for it elsewhere:** every pod throws checked `BaseException` subclasses; a write path that
+  mutates a managed entity before validating needs the same treatment.
