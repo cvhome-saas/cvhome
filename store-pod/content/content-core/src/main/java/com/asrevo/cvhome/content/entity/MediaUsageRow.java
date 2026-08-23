@@ -23,7 +23,8 @@ import lombok.Setter;
  * One reference from a content item's field to a media asset. Rebuilt for an item on every save.
  */
 @Entity
-@Table(name = "MEDIA_USAGE", uniqueConstraints = @UniqueConstraint(columnNames = {"ASSET_ID", "CONTENT_ID", "FIELD"}))
+@Table(name = "MEDIA_USAGE", uniqueConstraints = @UniqueConstraint(name = "media_usage_unique",
+        columnNames = {"ASSET_ID", "CONTENT_ID", "FIELD"}))
 @Getter
 @Setter
 public class MediaUsageRow implements Serializable {

@@ -22,7 +22,8 @@ import lombok.Setter;
  * An ordered group of FAQ entries ("Ordering", "Shipping & delivery"…). Names per locale as a JSON map.
  */
 @Entity
-@Table(name = "FAQ_GROUP", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "GROUP_KEY"}))
+@Table(name = "FAQ_GROUP", uniqueConstraints = @UniqueConstraint(name = "faq_group_store_key_unique",
+        columnNames = {"STORE_MERCHANT_ID", "GROUP_KEY"}))
 @Getter
 @Setter
 public class FaqGroup implements Serializable {

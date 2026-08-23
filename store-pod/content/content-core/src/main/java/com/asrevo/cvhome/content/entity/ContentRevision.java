@@ -24,7 +24,8 @@ import lombok.Setter;
  * JSON, so a restore replays it through the same mapper a {@code PUT} uses.
  */
 @Entity
-@Table(name = "CONTENT_REVISION", uniqueConstraints = @UniqueConstraint(columnNames = {"CONTENT_ID", "VERSION"}))
+@Table(name = "CONTENT_REVISION", uniqueConstraints = @UniqueConstraint(name = "content_revision_unique",
+        columnNames = {"CONTENT_ID", "VERSION"}))
 @Getter
 @Setter
 public class ContentRevision implements Serializable {

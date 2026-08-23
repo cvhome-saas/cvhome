@@ -43,7 +43,7 @@ public class PostCategoryService {
         return out;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.post.PostCategory create(
             StoreMerchantId store, com.asrevo.cvhome.content.model.post.PostCategory body)
             throws ContentConflictException {
@@ -56,7 +56,7 @@ public class PostCategoryService {
         return toDto(repository.saveAndFlush(c));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.post.PostCategory update(
             StoreMerchantId store, Long id, com.asrevo.cvhome.content.model.post.PostCategory body)
             throws ContentNotFoundException, ContentConflictException {
@@ -70,7 +70,7 @@ public class PostCategoryService {
         return toDto(repository.saveAndFlush(c));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId store, Long id) throws ContentNotFoundException {
         PostCategory c = repository.findByIdAndStoreMerchantId(id, store.getId())
                 .orElseThrow(() -> ContentNotFoundException.byId(id, store));

@@ -19,8 +19,16 @@
     (deleteDismissed)="deleteOpen.set(false)"
   >
     <ng-container main>
-      <app-panel [title]="t('content.page.templateTitle')" [subtitle]="t('content.page.templateSubtitle')" padded>
-        <div class="template-cards" role="radiogroup" [attr.aria-label]="t('content.page.templateTitle')">
+      <app-panel
+        [title]="t('content.page.templateTitle')"
+        [subtitle]="t('content.page.templateSubtitle')"
+        padded
+      >
+        <div
+          class="template-cards"
+          role="radiogroup"
+          [attr.aria-label]="t('content.page.templateTitle')"
+        >
           @for (template of templates; track template) {
             <button
               class="template-card"
@@ -45,32 +53,71 @@
           [defaultLocale]="hub.locales().defaultCode"
           [written]="facade.written()"
           [fields]="copyFields"
-          [(language)]="facade.language"
+          [language]="facade.language()"
+          (languageChange)="facade.chooseLanguage($event)"
         />
 
-        <app-seo-block [common]="facade.common" [translation]="form" pathPrefix="/content/" [fallbackTitle]="facade.title()" />
+        <app-seo-block
+          [common]="facade.common"
+          [translation]="form"
+          pathPrefix="/content/"
+          [fallbackTitle]="facade.title()"
+        />
       }
     </ng-container>
 
     <ng-container sidebar>
       <app-panel [title]="t('content.page.visibility')" padded>
         <div class="field-grid side-grid" [formGroup]="facade.common">
-          <app-form-field wide [label]="t('content.editor.publishAt')" [hint]="t('content.editor.publishAtHint')" [control]="facade.common.controls.publishAt" controlId="page-publish-at">
+          <app-form-field
+            wide
+            [label]="t('content.editor.publishAt')"
+            [hint]="t('content.editor.publishAtHint')"
+            [control]="facade.common.controls.publishAt"
+            controlId="page-publish-at"
+          >
             <app-date-time-field id="page-publish-at" formControlName="publishAt" />
           </app-form-field>
-          <app-form-field wide [label]="t('content.editor.unpublishAt')" [hint]="t('content.editor.unpublishAtHint')" [control]="facade.common.controls.unpublishAt" controlId="page-unpublish-at">
+          <app-form-field
+            wide
+            [label]="t('content.editor.unpublishAt')"
+            [hint]="t('content.editor.unpublishAtHint')"
+            [control]="facade.common.controls.unpublishAt"
+            controlId="page-unpublish-at"
+          >
             <app-date-time-field id="page-unpublish-at" formControlName="unpublishAt" />
           </app-form-field>
         </div>
         <div class="field-grid side-grid" [formGroup]="extra">
-          <app-form-field wide [label]="t('content.page.parent')" [control]="extra.controls.parentId" controlId="page-parent">
-            <app-select id="page-parent" [options]="parentOptions()" [value]="extra.controls.parentId.value === null ? '' : '' + extra.controls.parentId.value" (valueChange)="onParent($event)" [disabled]="!canManage()" />
+          <app-form-field
+            wide
+            [label]="t('content.page.parent')"
+            [control]="extra.controls.parentId"
+            controlId="page-parent"
+          >
+            <app-select
+              id="page-parent"
+              [options]="parentOptions()"
+              [value]="
+                extra.controls.parentId.value === null ? '' : '' + extra.controls.parentId.value
+              "
+              (valueChange)="onParent($event)"
+              [disabled]="!canManage()"
+            />
           </app-form-field>
           <div class="field field-wide">
-            <app-toggle formControlName="showInFooter" [label]="t('content.page.showInFooter')" [description]="t('content.page.showInFooterHint')" />
+            <app-toggle
+              formControlName="showInFooter"
+              [label]="t('content.page.showInFooter')"
+              [description]="t('content.page.showInFooterHint')"
+            />
           </div>
           <div class="field field-wide">
-            <app-toggle formControlName="linkToMenu" [label]="t('content.page.linkToMenu')" [description]="t('content.page.linkToMenuHint')" />
+            <app-toggle
+              formControlName="linkToMenu"
+              [label]="t('content.page.linkToMenu')"
+              [description]="t('content.page.linkToMenuHint')"
+            />
           </div>
         </div>
       </app-panel>
@@ -81,11 +128,28 @@
 
   @if (scheduleOpen()) {
     <div class="schedule-sheet" role="dialog" [attr.aria-label]="t('content.editor.scheduleTitle')">
-      <app-panel [title]="t('content.editor.scheduleTitle')" [subtitle]="t('content.editor.scheduleSubtitle')" padded>
+      <app-panel
+        [title]="t('content.editor.scheduleTitle')"
+        [subtitle]="t('content.editor.scheduleSubtitle')"
+        padded
+      >
         <div class="schedule-row">
-          <app-date-time-field [value]="scheduleAt()" (valueChange)="scheduleAt.set($event)" [ariaLabel]="t('content.editor.publishAt')" />
-          <button class="primary-action" type="button" [disabled]="!scheduleAt()" (click)="confirmSchedule()"><app-icon name="calendar" />{{ t('content.action.schedule') }}</button>
-          <button class="ghost-action" type="button" (click)="scheduleOpen.set(false)">{{ t('shared.actions.cancel') }}</button>
+          <app-date-time-field
+            [value]="scheduleAt()"
+            (valueChange)="scheduleAt.set($event)"
+            [ariaLabel]="t('content.editor.publishAt')"
+          />
+          <button
+            class="primary-action"
+            type="button"
+            [disabled]="!scheduleAt()"
+            (click)="confirmSchedule()"
+          >
+            <app-icon name="calendar" />{{ t('content.action.schedule') }}
+          </button>
+          <button class="ghost-action" type="button" (click)="scheduleOpen.set(false)">
+            {{ t('shared.actions.cancel') }}
+          </button>
         </div>
       </app-panel>
     </div>

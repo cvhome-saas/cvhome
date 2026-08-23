@@ -16,7 +16,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "MEDIA_FOLDER", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "FOLDER_KEY"}))
+@Table(name = "MEDIA_FOLDER", uniqueConstraints = @UniqueConstraint(name = "media_folder_store_key_unique",
+        columnNames = {"STORE_MERCHANT_ID", "FOLDER_KEY"}))
 @Getter
 @Setter
 public class MediaFolder implements Serializable {

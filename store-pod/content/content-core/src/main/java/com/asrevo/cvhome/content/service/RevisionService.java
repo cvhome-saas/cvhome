@@ -33,7 +33,12 @@ public class RevisionService {
         r.setVersion(entity.getVersion());
         r.setSnapshot(JsonCodec.write(readable));
         r.setAuthor(actor);
-        repository.findByContentIdAndVersion(entity.getId(), entity.getVersion()).ifPresent(repository::delete);
+        // Hibernate orders inserts before deletes, so a same-version rewrite (a restore, or a write that
+        // did not move the version) would hit `content_revision_unique` unless the delete is flushed first.
+        repository.findByContentIdAndVersion(entity.getId(), entity.getVersion()).ifPresent(existing -> {
+            repository.delete(existing);
+            repository.flush();
+        });
         repository.save(r);
         List<ContentRevision> all = repository.findByContentIdOrderByVersionDesc(entity.getId());
         if (all.size() > KEEP) {

@@ -108,7 +108,7 @@ public class PolicyService {
      * Cuts version n+1 from the head's current translations and makes it LIVE; the previous LIVE is ARCHIVED.
      * The head itself must be publishable (title + body in the source locale) — the caller has gated that.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ReadablePolicyVersion publishVersion(Content head, PublishPolicyVersionRequest request, String actor) {
         int next = versions.findByContentIdOrderByVersionDesc(head.getId()).stream()
                 .findFirst().map(v -> v.getVersion() + 1).orElse(1);
@@ -136,7 +136,7 @@ public class PolicyService {
      * Sets the note and effective date on the live version — what the explicit publish-version call adds on top of
      * the cut the publish transition already made.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ReadablePolicyVersion annotateLive(Content head, PublishPolicyVersionRequest request, String actor) {
         PolicyVersion live = versions.findFirstByContentIdAndStatus(head.getId(), PolicyVersionStatus.LIVE)
                 .orElseGet(() -> {

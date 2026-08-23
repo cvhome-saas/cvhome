@@ -21,7 +21,8 @@ import lombok.Setter;
  * resolving. Paths are stored the way the storefront builds them ({@code /content/<slug>}), without the locale.
  */
 @Entity
-@Table(name = "REDIRECT", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "FROM_PATH"}))
+@Table(name = "REDIRECT", uniqueConstraints = @UniqueConstraint(name = "redirect_store_from_unique",
+        columnNames = {"STORE_MERCHANT_ID", "FROM_PATH"}))
 @Getter
 @Setter
 public class Redirect implements Serializable {

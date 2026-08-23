@@ -47,7 +47,7 @@ public class MenuService implements SummaryService.MediaFigures {
 
     // --------------------------------------------------------------------------------------------- console
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<com.asrevo.cvhome.content.model.menu.Menu> list(StoreMerchantId store) {
         List<com.asrevo.cvhome.content.model.menu.Menu> out = new ArrayList<>();
         for (MenuHandle handle : MenuHandle.values()) {
@@ -56,7 +56,7 @@ public class MenuService implements SummaryService.MediaFigures {
         return out;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.menu.Menu get(StoreMerchantId store, MenuHandle handle) {
         return toDto(ensure(store, handle), store, true);
     }
@@ -65,7 +65,7 @@ public class MenuService implements SummaryService.MediaFigures {
      * Replaces the whole tree. Positions are normalised 0..n per level; depth beyond one child level is a 422;
      * internal targets that do not resolve are flagged {@code broken} in the response but saved.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.menu.Menu put(StoreMerchantId store, MenuHandle handle,
                                                          com.asrevo.cvhome.content.model.menu.Menu body)
             throws ContentRuleException, InvalidContentRequestException {
@@ -100,7 +100,7 @@ public class MenuService implements SummaryService.MediaFigures {
      * The resolved tree for the storefront: visible items only, labels in {@code language} with fallback, hrefs
      * computed, broken internal links dropped.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<StorefrontMenuNode> resolved(StoreMerchantId store, MenuHandle handle, LanguageCode language,
                                              Instant now) {
         Menu menu = ensure(store, handle);

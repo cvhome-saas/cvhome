@@ -28,7 +28,8 @@ import lombok.Setter;
  * store by checksum.
  */
 @Entity
-@Table(name = "MEDIA_ASSET", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CHECKSUM"}))
+@Table(name = "MEDIA_ASSET", uniqueConstraints = @UniqueConstraint(name = "media_asset_store_checksum_unique",
+        columnNames = {"STORE_MERCHANT_ID", "CHECKSUM"}))
 @Getter
 @Setter
 public class MediaAsset implements Serializable {

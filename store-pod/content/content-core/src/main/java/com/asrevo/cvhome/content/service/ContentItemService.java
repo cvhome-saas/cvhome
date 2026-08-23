@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.content.service;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,6 +70,21 @@ public class ContentItemService {
 
     private final Clock clock;
 
+    /**
+     * Saves {@code entity}, then bumps its version and audit stamp, and returns the row as it now stands.
+     *
+     * The bump is a separate statement because a body-only edit touches only {@code content_description};
+     * see {@link ContentRepository#touch}. It clears the persistence context, so everything after this call
+     * must work from the instance it returns.
+     */
+    private Content saveAndTouch(Content entity, String actor) {
+        entity.setUpdatedBy(actor);
+        Content saved = repository.saveAndFlush(entity);
+        Long id = saved.getId();
+        repository.touch(id, Instant.now(clock), actor);
+        return repository.findById(id).orElse(saved);
+    }
+
     // ---------------------------------------------------------------- reads
 
     @Transactional(readOnly = true)
@@ -132,7 +148,7 @@ public class ContentItemService {
 
     // --------------------------------------------------------------- writes
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> SavedContent create(ContentTypeBinding<P, R> binding, P dto,
                                                                            StoreMerchantId store,
                                                                            LanguageCode language, String actor)
@@ -157,7 +173,7 @@ public class ContentItemService {
         return new SavedContent(c.getId(), c.getStatus(), c.getVersion());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> SavedContent update(ContentTypeBinding<P, R> binding, Long id,
                                                                            P dto, StoreMerchantId store,
                                                                            LanguageCode language, String actor)
@@ -179,8 +195,7 @@ public class ContentItemService {
             markOthersStale(c, language);
         }
         binding.apply(c, dto);
-        c.setUpdatedBy(actor);
-        c = repository.saveAndFlush(c);
+        c = saveAndTouch(c, actor);
         binding.afterSave(c);
         trackMedia(binding, c);
         String newPath = binding.storefrontPath(c);
@@ -194,7 +209,7 @@ public class ContentItemService {
     /**
      * Writes one locale without touching the others — the translator's path. A blank title and body removes it.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> SavedContent updateTranslation(
             ContentTypeBinding<P, R> binding, Long id, LanguageCode locale, ContentTranslation translation,
             StoreMerchantId store, String actor) throws ContentNotFoundException {
@@ -204,13 +219,12 @@ public class ContentItemService {
         all.removeIf(t -> locale.equals(t.getLanguage()));
         all.add(translation);
         ContentMapper.applyTranslations(c, all, null, binding.requiresBody());
-        c.setUpdatedBy(actor);
-        c = repository.saveAndFlush(c);
+        c = saveAndTouch(c, actor);
         revisions.record(c, toReadable(binding, c), actor);
         return new SavedContent(c.getId(), c.getStatus(), c.getVersion());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> SavedContent transition(ContentTypeBinding<P, R> binding,
                                                                                Long id, StoreMerchantId store,
                                                                                ContentStatus target,
@@ -219,13 +233,12 @@ public class ContentItemService {
             throws ContentNotFoundException, ContentRuleException, InvalidContentRequestException {
         Content c = load(binding, id, store);
         publishing.transition(c, target, request, language, binding, actor, null);
-        c.setUpdatedBy(actor);
-        c = repository.saveAndFlush(c);
+        c = saveAndTouch(c, actor);
         binding.afterSave(c);
         return new SavedContent(c.getId(), c.getStatus(), c.getVersion());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> SavedContent restore(ContentTypeBinding<P, R> binding, Long id,
                                                                             Integer version, StoreMerchantId store,
                                                                             LanguageCode language, String actor)
@@ -237,7 +250,7 @@ public class ContentItemService {
         return update(binding, id, snapshot, store, language, actor);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(ContentTypeBinding<?, ?> binding, Long id, StoreMerchantId store, boolean force)
             throws ContentNotFoundException, ContentConflictException {
         Content c = load(binding, id, store);
@@ -252,7 +265,7 @@ public class ContentItemService {
     /**
      * Applies one action to many ids; never fails the batch on one bad id.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public <P extends PersistableContent, R extends P> List<BulkResult> bulk(ContentTypeBinding<P, R> binding,
                                                                              BulkRequest request,
                                                                              StoreMerchantId store,

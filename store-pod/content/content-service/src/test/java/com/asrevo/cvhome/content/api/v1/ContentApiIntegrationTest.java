@@ -86,6 +86,8 @@ class ContentApiIntegrationTest {
 
     private static final String PUBLISH = "publish";
 
+    private static final String REVISIONS = "revisions";
+
     private static final String CONTENT_PATH = "/content/%s";
 
     private static final String LEGACY_PAGE_BY_NAME = "%s/pages/name/%s?store=%s&lang=%s";
@@ -251,7 +253,7 @@ class ContentApiIntegrationTest {
                 .contains(String.format(CONTENT_PATH, moved));
 
         // revisions exist
-        assertThat(json(api.get(item(STORE_A, id, "revisions"), admin)).size()).isGreaterThanOrEqualTo(2);
+        assertThat(json(api.get(item(STORE_A, id, REVISIONS), admin)).size()).isGreaterThanOrEqualTo(2);
 
         // unpublish → storefront 404 again; delete → gone
         expect(post(item(STORE_A, id, "unpublish"), null), HttpStatus.OK);
@@ -274,6 +276,31 @@ class ContentApiIntegrationTest {
         assertThat(json(publish).get(CODE).asString()).isEqualTo("CONTENT.PUBLISH.INCOMPLETE");
 
         expect(post(scoped(PAGES, STORE_A), pageBody("Not A Slug", "x", "y", null)), HttpStatus.BAD_REQUEST);
+
+        // The refused publish must leave nothing behind: the domain exceptions are checked, so a write
+        // transaction without `rollbackFor` used to commit the schedule window it had already applied.
+        var reread = json(api.get(item(STORE_A, id), admin));
+        assertThat(reread.get(STATUS).asString()).isEqualTo("DRAFT");
+        assertThat(reread.get("publishAt").isNull()).isTrue();
+    }
+
+    @Test
+    void repeatedBodyOnlyEditsKeepMovingTheVersion() {
+        // Title and body live on the child row, so a body-only edit leaves `content` itself untouched. Without
+        // a forced increment the version would stand still, the revision snapshot would collide on
+        // (content_id, version) and the second save would come back 409.
+        String slug = slug("body-only");
+        long id = create(STORE_A, admin, pageBody(slug, "First", BODY_ONE, null));
+        for (int i = 0; i < 3; i++) {
+            int version = json(api.get(item(STORE_A, id), admin)).get(VERSION).asInt();
+            var saved = put(item(STORE_A, id),
+                    pageBody(slug, String.format("Take %d", i), String.format("<p>take %d</p>", i), version));
+            expect(saved, HttpStatus.OK);
+            assertThat(json(saved).get(VERSION).asInt()).isGreaterThan(version);
+        }
+        var read = json(api.get(item(STORE_A, id), admin));
+        assertThat(read.get("audit").get("updatedAt").isNull()).isFalse();
+        assertThat(json(api.get(item(STORE_A, id, REVISIONS), admin)).size()).isEqualTo(4);
     }
 
     @Test

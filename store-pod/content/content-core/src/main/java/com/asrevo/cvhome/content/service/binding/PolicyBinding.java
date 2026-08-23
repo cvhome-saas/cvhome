@@ -74,7 +74,9 @@ public class PolicyBinding implements ContentTypeBinding<PersistablePolicy, Read
     public String subtitle(Content entity, LanguageCode language) {
         String type = entity.getPolicyType() == null ? "policy" : entity.getPolicyType().name().toLowerCase();
         int live = policies.liveVersion(entity);
-        return live == 0 ? String.format("%s · unpublished", type) : String.format("%s · v%d", type, live);
+        // The type and version number carry the meaning; an English "unpublished" would sit untranslated in
+        // an Arabic console, so an unpublished policy shows the type alone.
+        return live == 0 ? type : String.format("%s · v%d", type, live);
     }
 
     @Override

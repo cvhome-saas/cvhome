@@ -27,7 +27,8 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "CONTENT_DESCRIPTION",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"CONTENT_ID", "LANGUAGE_CODE"})})
+        uniqueConstraints = {@UniqueConstraint(name = "content_description_language_unique",
+                columnNames = {"CONTENT_ID", "LANGUAGE_CODE"})})
 @TableGenerator(name = "description_gen", table = "SM_SEQUENCER", pkColumnName = "SEQ_NAME",
         valueColumnName = "SEQ_COUNT", pkColumnValue = "CONTENT_DESCRIPTION_SEQ_NEXT_VAL",
         allocationSize = SchemaConstant.DESCRIPTION_ID_ALLOCATION_SIZE,

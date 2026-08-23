@@ -42,7 +42,7 @@ public class SnippetService {
                 .orElseThrow(() -> ContentNotFoundException.byCode(code, store)));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Snippet put(StoreMerchantId store, String code, Snippet snippet, String actor) {
         Content c = repository.findByCodeAndType(code, ContentType.BOX, store).orElseGet(() -> {
             Content n = new Content();
@@ -61,7 +61,7 @@ public class SnippetService {
         return toSnippet(c);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId store, String code) throws ContentNotFoundException {
         Content c = repository.findByCodeAndType(code, ContentType.BOX, store)
                 .orElseThrow(() -> ContentNotFoundException.byCode(code, store));

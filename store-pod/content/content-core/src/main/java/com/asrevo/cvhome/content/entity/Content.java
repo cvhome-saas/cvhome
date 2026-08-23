@@ -56,7 +56,8 @@ import lombok.Setter;
 @Entity
 @EntityListeners(value = AuditListener.class)
 @Table(name = "CONTENT", indexes = {@Index(name = "CODE_IDX", columnList = "CODE")},
-        uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "CODE"}))
+        uniqueConstraints = @UniqueConstraint(name = "content_store_code_unique",
+                columnNames = {"STORE_MERCHANT_ID", "CODE"}))
 @Getter
 @Setter
 public class Content extends SalesManagerEntity<Long, Content> implements Serializable {

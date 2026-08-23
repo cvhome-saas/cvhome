@@ -26,9 +26,15 @@
           [defaultLocale]="hub.locales().defaultCode"
           [written]="facade.written()"
           [fields]="copyFields"
-          [(language)]="facade.language"
+          [language]="facade.language()"
+          (languageChange)="facade.chooseLanguage($event)"
         />
-        <app-seo-block [common]="facade.common" [translation]="form" pathPrefix="/blog/" [fallbackTitle]="facade.title()" />
+        <app-seo-block
+          [common]="facade.common"
+          [translation]="form"
+          pathPrefix="/blog/"
+          [fallbackTitle]="facade.title()"
+        />
       }
     </ng-container>
 
@@ -41,9 +47,13 @@
         }
         @if (canManage()) {
           <div class="hero-actions">
-            <button class="secondary-action" type="button" (click)="pickerOpen.set(true)"><app-icon name="images" />{{ t('content.post.chooseHero') }}</button>
+            <button class="secondary-action" type="button" (click)="pickerOpen.set(true)">
+              <app-icon name="images" />{{ t('content.post.chooseHero') }}
+            </button>
             @if (heroUrl()) {
-              <button class="ghost-action" type="button" (click)="clearHero()">{{ t('content.post.removeHero') }}</button>
+              <button class="ghost-action" type="button" (click)="clearHero()">
+                {{ t('content.post.removeHero') }}
+              </button>
             }
           </div>
         }
@@ -56,7 +66,12 @@
             @if (categoryOptions().length) {
               <div class="category-list">
                 @for (category of categoryOptions(); track category.id) {
-                  <app-checkbox [checked]="categoryChecked(category)" (checkedChange)="toggleCategory(category)" [label]="categoryName(category)" [disabled]="!canManage()" />
+                  <app-checkbox
+                    [checked]="categoryChecked(category)"
+                    (checkedChange)="toggleCategory(category)"
+                    [label]="categoryName(category)"
+                    [disabled]="!canManage()"
+                  />
                 }
               </div>
             } @else {
@@ -65,23 +80,49 @@
           </div>
           <div class="field field-wide">
             <p class="field-label">{{ t('content.post.tags') }}</p>
-            <app-tag-input [tags]="extra.controls.tags.value" (tagsChange)="setTags($event)" [label]="t('content.post.tags')" [disabled]="!canManage()" />
+            <app-tag-input
+              [tags]="extra.controls.tags.value"
+              (tagsChange)="setTags($event)"
+              [label]="t('content.post.tags')"
+              [disabled]="!canManage()"
+            />
           </div>
-          <app-form-field wide [label]="t('content.post.author')" [control]="extra.controls.authorName" controlId="post-author">
+          <app-form-field
+            wide
+            [label]="t('content.post.author')"
+            [control]="extra.controls.authorName"
+            controlId="post-author"
+          >
             <app-text-field id="post-author" formControlName="authorName" [maxLength]="120" />
           </app-form-field>
           <div class="field field-wide">
-            <app-toggle formControlName="featured" [label]="t('content.post.featured')" [description]="t('content.post.featuredHint')" />
+            <app-toggle
+              formControlName="featured"
+              [label]="t('content.post.featured')"
+              [description]="t('content.post.featuredHint')"
+            />
           </div>
         </div>
       </app-panel>
 
       <app-panel [title]="t('content.editor.schedule')" padded>
         <div class="field-grid side-grid" [formGroup]="facade.common">
-          <app-form-field wide [label]="t('content.editor.publishAt')" [hint]="t('content.editor.publishAtHint')" [control]="facade.common.controls.publishAt" controlId="post-publish-at">
+          <app-form-field
+            wide
+            [label]="t('content.editor.publishAt')"
+            [hint]="t('content.editor.publishAtHint')"
+            [control]="facade.common.controls.publishAt"
+            controlId="post-publish-at"
+          >
             <app-date-time-field id="post-publish-at" formControlName="publishAt" />
           </app-form-field>
-          <app-form-field wide [label]="t('content.editor.unpublishAt')" [hint]="t('content.editor.unpublishAtHint')" [control]="facade.common.controls.unpublishAt" controlId="post-unpublish-at">
+          <app-form-field
+            wide
+            [label]="t('content.editor.unpublishAt')"
+            [hint]="t('content.editor.unpublishAtHint')"
+            [control]="facade.common.controls.unpublishAt"
+            controlId="post-unpublish-at"
+          >
             <app-date-time-field id="post-unpublish-at" formControlName="unpublishAt" />
           </app-form-field>
         </div>
@@ -91,15 +132,38 @@
     </ng-container>
   </app-editor-shell>
 
-  <app-media-picker-dialog [open]="pickerOpen()" kind="IMAGE" [currentId]="extra.controls.heroMediaId.value" (picked)="onHero($event)" (closed)="pickerOpen.set(false)" />
+  <app-media-picker-dialog
+    [open]="pickerOpen()"
+    kind="IMAGE"
+    [currentId]="extra.controls.heroMediaId.value"
+    (picked)="onHero($event)"
+    (closed)="pickerOpen.set(false)"
+  />
 
   @if (scheduleOpen()) {
     <div class="schedule-sheet" role="dialog" [attr.aria-label]="t('content.editor.scheduleTitle')">
-      <app-panel [title]="t('content.editor.scheduleTitle')" [subtitle]="t('content.editor.scheduleSubtitle')" padded>
+      <app-panel
+        [title]="t('content.editor.scheduleTitle')"
+        [subtitle]="t('content.editor.scheduleSubtitle')"
+        padded
+      >
         <div class="schedule-row">
-          <app-date-time-field [value]="scheduleAt()" (valueChange)="scheduleAt.set($event)" [ariaLabel]="t('content.editor.publishAt')" />
-          <button class="primary-action" type="button" [disabled]="!scheduleAt()" (click)="confirmSchedule()"><app-icon name="calendar" />{{ t('content.action.schedule') }}</button>
-          <button class="ghost-action" type="button" (click)="scheduleOpen.set(false)">{{ t('shared.actions.cancel') }}</button>
+          <app-date-time-field
+            [value]="scheduleAt()"
+            (valueChange)="scheduleAt.set($event)"
+            [ariaLabel]="t('content.editor.publishAt')"
+          />
+          <button
+            class="primary-action"
+            type="button"
+            [disabled]="!scheduleAt()"
+            (click)="confirmSchedule()"
+          >
+            <app-icon name="calendar" />{{ t('content.action.schedule') }}
+          </button>
+          <button class="ghost-action" type="button" (click)="scheduleOpen.set(false)">
+            {{ t('shared.actions.cancel') }}
+          </button>
         </div>
       </app-panel>
     </div>

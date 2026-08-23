@@ -32,7 +32,8 @@ import lombok.Setter;
  * A storefront menu (MAIN or FOOTER) and its flat item rows; the tree is rebuilt from {@code parentId}.
  */
 @Entity
-@Table(name = "MENU", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "HANDLE"}))
+@Table(name = "MENU", uniqueConstraints = @UniqueConstraint(name = "menu_store_handle_unique",
+        columnNames = {"STORE_MERCHANT_ID", "HANDLE"}))
 @Getter
 @Setter
 public class Menu implements Serializable {

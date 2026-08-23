@@ -123,7 +123,7 @@ public class MediaService implements SummaryService.MediaFigures {
 
     // ------------------------------------------------------------------------------------------------ uploads
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<ReadableMediaAsset> upload(StoreMerchantId store, List<Upload> uploads, Long folderId,
                                            long maxFileBytes, long quotaBytes, String actor)
             throws InvalidContentRequestException, MediaLimitException, MediaStorageException,
@@ -270,7 +270,7 @@ public class MediaService implements SummaryService.MediaFigures {
 
     // ------------------------------------------------------------------------------------------------- writes
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ReadableMediaAsset patch(StoreMerchantId store, Long id, PersistableMediaAsset body)
             throws ContentNotFoundException {
         MediaAsset a = load(store, id);
@@ -293,7 +293,7 @@ public class MediaService implements SummaryService.MediaFigures {
         return toReadable(a, uses.size(), uses);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId store, Long id, boolean force)
             throws ContentNotFoundException, ContentConflictException, MediaStorageException {
         MediaAsset a = load(store, id);
@@ -312,7 +312,7 @@ public class MediaService implements SummaryService.MediaFigures {
 
     // ------------------------------------------------------------------------------------------------ folders
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<com.asrevo.cvhome.content.model.media.MediaFolder> folders(StoreMerchantId store) {
         ensureDefaultFolders(store);
         List<com.asrevo.cvhome.content.model.media.MediaFolder> out = new ArrayList<>();
@@ -322,7 +322,7 @@ public class MediaService implements SummaryService.MediaFigures {
         return out;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.media.MediaFolder createFolder(
             StoreMerchantId store, com.asrevo.cvhome.content.model.media.MediaFolder body) {
         String key = Strings.blank(body.getKey()) ? slugify(body.getName()) : body.getKey();
@@ -335,7 +335,7 @@ public class MediaService implements SummaryService.MediaFigures {
         return toFolder(f, assets.countByStoreMerchantIdAndFolderId(store.getId(), f.getId()));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.media.MediaFolder renameFolder(
             StoreMerchantId store, Long id, com.asrevo.cvhome.content.model.media.MediaFolder body)
             throws ContentNotFoundException {
@@ -349,7 +349,7 @@ public class MediaService implements SummaryService.MediaFigures {
         return toFolder(f, assets.countByStoreMerchantIdAndFolderId(store.getId(), f.getId()));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteFolder(StoreMerchantId store, Long id, Long moveTo)
             throws ContentNotFoundException, ContentConflictException {
         MediaFolder f = folders.findByIdAndStoreMerchantId(id, store.getId())

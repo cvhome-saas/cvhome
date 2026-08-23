@@ -22,7 +22,8 @@ import lombok.Setter;
  * A blog category. Posts reference it by id from their JSON meta.
  */
 @Entity
-@Table(name = "POST_CATEGORY", uniqueConstraints = @UniqueConstraint(columnNames = {"STORE_MERCHANT_ID", "SLUG"}))
+@Table(name = "POST_CATEGORY", uniqueConstraints = @UniqueConstraint(name = "post_category_store_slug_unique",
+        columnNames = {"STORE_MERCHANT_ID", "SLUG"}))
 @Getter
 @Setter
 public class PostCategory implements Serializable {

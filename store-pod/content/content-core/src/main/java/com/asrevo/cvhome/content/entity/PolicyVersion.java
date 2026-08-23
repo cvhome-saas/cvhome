@@ -28,7 +28,8 @@ import lombok.Setter;
  * published it. One LIVE version per policy; publishing a new one archives the previous.
  */
 @Entity
-@Table(name = "POLICY_VERSION", uniqueConstraints = @UniqueConstraint(columnNames = {"CONTENT_ID", "VERSION"}))
+@Table(name = "POLICY_VERSION", uniqueConstraints = @UniqueConstraint(name = "policy_version_unique",
+        columnNames = {"CONTENT_ID", "VERSION"}))
 @Getter
 @Setter
 public class PolicyVersion implements Serializable {

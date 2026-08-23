@@ -36,6 +36,7 @@ import type {CommonForm, TranslationForm} from '../../services/content-editor-fo
         <app-form-field
           [label]="t('content.seo.slug')"
           [hint]="t('content.seo.slugHint', {prefix: pathPrefix()})"
+          [fallback]="slugError(t)"
           [control]="common().controls.slug"
           required
           controlId="seo-slug"
@@ -162,6 +163,18 @@ export class SeoBlock {
     }
     return control.valid ? ('free' as const) : ('idle' as const);
   });
+
+  /**
+   * Why the slug is refused, in words the reader can act on. `app-field-error`'s generic map only
+   * knows "this is not a valid value", which says nothing about what a slug may contain.
+   */
+  protected slugError(t: (key: string) => string): string {
+    const control = this.common().controls.slug;
+    if (control.hasError('slugTaken')) {
+      return t('content.seo.slugTaken');
+    }
+    return control.hasError('pattern') ? t('content.seo.slugInvalid') : '';
+  }
 
   protected readonly slugCheckLabel = computed(() => {
     this.transloco.activeLang();

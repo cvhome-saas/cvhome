@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +27,22 @@ public interface ContentRepository extends JpaRepository<Content, Long>, JpaSpec
             left join fetch c.descriptions cd
             where c.id = :id and c.storeMerchantId = :store""")
     Optional<Content> findByIdAndStore(@Param("id") Long id, @Param("store") StoreMerchantId store);
+
+    /**
+     * Bumps the row's version and audit stamp when only its child rows changed.
+     *
+     * Title and body live in {@code content_description}, so editing them leaves {@code content} clean:
+     * Hibernate would neither increment {@code @Version} nor let the audit listener stamp
+     * {@code dateModified}, which left the list's "updated" column empty and made the next revision snapshot
+     * collide with the previous one on {@code (content_id, version)}. {@code update versioned} is Hibernate's
+     * way to say "this counts as a change to the row itself".
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            update versioned Content c
+            set c.auditSection.dateModified = :now, c.auditSection.modifiedBy = :actor
+            where c.id = :id""")
+    void touch(@Param("id") Long id, @Param("now") Instant now, @Param("actor") String actor);
 
     @Query("""
             select c from Content c

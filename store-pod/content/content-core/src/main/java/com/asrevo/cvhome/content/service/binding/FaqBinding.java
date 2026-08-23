@@ -73,7 +73,9 @@ public class FaqBinding implements ContentTypeBinding<PersistableFaq, ReadableFa
     public String subtitle(Content entity, LanguageCode language) {
         String group = groupName(entity, language);
         int position = entity.getSortOrder() == null ? 0 : entity.getSortOrder();
-        return String.format("%s · position %d", group == null ? "—" : group, position + 1);
+        // "#3" rather than "position 3": the row subtitle is shown as-is in a console that may be Arabic,
+        // and an English word baked in here cannot be translated there.
+        return String.format("%s · #%d", group == null ? "—" : group, position + 1);
     }
 
     private String groupName(Content entity, LanguageCode language) {

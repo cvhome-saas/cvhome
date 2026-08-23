@@ -63,6 +63,13 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   /** The language being edited. */
   readonly language = signal('en');
 
+  /**
+   * Whether the shown language is the reader's own pick rather than the fallback `init` starts on.
+   * The store's languages arrive as a resource, so an editor opened before they land would otherwise
+   * keep the 'en' placeholder even when the store writes its source copy in another language.
+   */
+  private languageChosen = false;
+
   /** Bumped on every change of the common and extra forms, so `dirty`/`invalid` re-evaluate. */
   private readonly formTick = signal(0);
   private formSubscriptions = new Subscription();
@@ -121,11 +128,18 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
       );
     }
     this.id.set(id);
+    this.languageChosen = false;
     this.language.set(this.hub.locales().defaultCode);
     this.translations.set(this.forms.translations(this.hub.locales().codes));
     if (id !== null) {
       this.load(id);
     }
+  }
+
+  /** Records that the reader picked this language, so arriving store locales leave it alone. */
+  chooseLanguage(code: string): void {
+    this.languageChosen = true;
+    this.language.set(code);
   }
 
   /** Installs a mapper whose result is spread over the raw extra form when building the body. */
@@ -136,7 +150,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   /** Called when the store's languages arrive after init (they are a resource). */
   syncLanguages(codes: readonly string[], defaultCode: string): void {
     this.translations.update((current) => this.forms.translations(codes, current));
-    if (!codes.includes(this.language())) {
+    if (!this.languageChosen || !codes.includes(this.language())) {
       this.language.set(defaultCode);
     }
     const loaded = this.item();

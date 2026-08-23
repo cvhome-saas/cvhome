@@ -64,7 +64,7 @@ export interface NavSection {
           [class.active]="section.key === active()"
           [routerLink]="[basePath(), section.key]"
           [attr.aria-current]="section.key === active() ? 'page' : null"
-          [title]="collapsed() ? t(section.labelKey) : null"
+          [attr.title]="collapsed() ? t(section.labelKey) : null"
         >
           <app-icon [name]="section.icon" />
           <!--

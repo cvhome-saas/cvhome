@@ -134,7 +134,30 @@
       "internal": "تعذر إكمال هذا الطلب. حاول مرة أخرى."
     },
     "code": {
-      "clientSessionMissing": "سجّل الدخول للمتابعة."
+      "clientSessionMissing": "سجّل الدخول للمتابعة.",
+      "CONTENT_NOT_FOUND": "لم يعد هذا المحتوى موجودًا. ربما تم حذفه.",
+      "CONTENT_SLUG_DUPLICATE": "عنصر آخر يستخدم هذا الرابط. اختر معرّفًا مختلفًا.",
+      "CONTENT_CODE_DUPLICATE": "عنصر آخر يستخدم هذا الرمز.",
+      "CONTENT_VERSION_CONFLICT": "حفظ شخص آخر هذا العنصر أثناء تحريرك. أعد التحميل لرؤية نسخته.",
+      "CONTENT_STATUS_TRANSITION_NOT_ALLOWED": "تغيير الحالة هذا غير مسموح من هنا.",
+      "CONTENT_PUBLISH_INCOMPLETE": "اكتب العنوان والمحتوى باللغة المصدر قبل النشر.",
+      "CONTENT_SCHEDULE_INVALID": "اختر تاريخ نشر في المستقبل.",
+      "CONTENT_PAGE_REFERENCED": "هذه الصفحة مستخدمة في قائمة تنقل. أزلها من القائمة أولًا.",
+      "CONTENT_BANNER_CAPACITY_EXCEEDED": "هذا الموضع ممتلئ. ألغِ نشر لافتة أخرى أولًا.",
+      "CONTENT_MENU_DEPTH_EXCEEDED": "القوائم تسمح بمستويين على الأكثر.",
+      "CONTENT_MENU_TARGET_INVALID": "رابط القائمة يشير إلى عنصر لم يعد موجودًا.",
+      "CONTENT_POLICY_VERSION_IMMUTABLE": "لا يمكن تعديل نسخة سياسة منشورة. انشر نسخة جديدة بدلًا من ذلك.",
+      "CONTENT_POLICY_TYPE_ACTIVE_EXISTS": "توجد سياسة فعّالة من هذا النوع بالفعل.",
+      "CONTENT_FAQ_GROUP_NOT_FOUND": "لم تعد مجموعة الأسئلة هذه موجودة.",
+      "CONTENT_BULK_TOO_LARGE": "اختر عناصر أقل وحاول مرة أخرى.",
+      "MEDIA_NOT_FOUND": "لم يعد هذا الملف في المكتبة.",
+      "MEDIA_TYPE_NOT_ALLOWED": "نوع الملف هذا غير مقبول.",
+      "MEDIA_TOO_LARGE": "هذا الملف كبير جدًا.",
+      "MEDIA_QUOTA_EXCEEDED": "مساحة الوسائط ممتلئة. احذف بعض الملفات أولًا.",
+      "MEDIA_REFERENCED": "هذا الملف مستخدم في محتوى منشور. أزله من هناك أولًا.",
+      "MEDIA_FOLDER_NOT_EMPTY": "أفرغ المجلد قبل حذفه.",
+      "MEDIA_UNREADABLE": "تعذّرت قراءة هذا الملف.",
+      "MEDIA_STORAGE_FAILED": "تعذّر تخزين الملف. حاول مرة أخرى."
     }
   },
   "auth": {
@@ -3170,6 +3193,8 @@
       "subtitle": "أين تقيم الصفحة وكيف تظهر في نتائج البحث.",
       "slug": "معرّف الرابط",
       "slugHint": "أحرف لاتينية صغيرة وأرقام وشرطات، بعد {prefix}",
+      "slugInvalid": "استخدم أحرفًا لاتينية صغيرة وأرقامًا وشرطات فقط.",
+      "slugTaken": "عنصر آخر يستخدم هذا الرابط بالفعل.",
       "slugCheck": {
         "pending": "جارٍ التحقق…",
         "free": "متاح",

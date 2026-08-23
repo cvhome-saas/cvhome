@@ -294,7 +294,9 @@ class ContentPlatformIntegrationTest {
         JsonNode readB = json(get(path(PRIVATE, FAQ, b)));
         assertThat(readB.get("groupId").asLong()).isEqualTo(ordering);
         assertThat(readB.get("position").asInt()).isZero();
-        assertThat(readB.get("groupName").asString()).isEqualTo("Ordering");
+        // The starter groups are seeded in both languages and the name comes back in the store's own:
+        // this store is Arabic, so an English "Ordering" here would be the untranslated-seed bug.
+        assertThat(readB.get("groupName").asString()).isEqualTo("\u0627\u0644\u0637\u0644\u0628");
 
         JsonNode sf = json(getPublic(path(STOREFRONT, FAQ)));
         assertThat(sf.get("jsonLd").asString()).contains("\"@type\":\"FAQPage\"").contains(QUESTION);
@@ -308,7 +310,7 @@ class ContentPlatformIntegrationTest {
         }
         assertThat(found).isTrue();
         JsonNode rows = json(get(path(PRIVATE, FAQ)));
-        assertThat(rows.get(CONTENT).toString()).contains("position 1");
+        assertThat(rows.get(CONTENT).toString()).contains("\u00b7 #1");
     }
 
     // ---------------------------------------------------------------------------------------------- policies

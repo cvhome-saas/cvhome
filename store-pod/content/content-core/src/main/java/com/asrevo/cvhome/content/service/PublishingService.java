@@ -165,7 +165,7 @@ public class PublishingService {
      *
      * @return the number of rows changed
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int tick() {
         Instant now = clock.instant();
         int changed = 0;

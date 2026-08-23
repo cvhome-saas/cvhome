@@ -158,7 +158,7 @@
               class="ghost-action danger-action"
               type="button"
               [disabled]="busy() || selected.isSelf"
-              [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+              [attr.title]="selected.isSelf ? t('users.action.notOnYourself') : null"
               (click)="remove.emit(selected)"
             >
               <app-icon name="trash" />
@@ -171,7 +171,7 @@
               class="secondary-action"
               type="button"
               [disabled]="busy() || selected.isSelf"
-              [title]="selected.isSelf ? t('users.action.notOnYourself') : null"
+              [attr.title]="selected.isSelf ? t('users.action.notOnYourself') : null"
               (click)="toggleActive.emit(selected)"
             >
               <app-icon [name]="selected.active ? 'eyeOff' : 'eye'" />

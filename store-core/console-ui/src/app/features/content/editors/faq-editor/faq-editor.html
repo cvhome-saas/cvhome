@@ -25,10 +25,15 @@
         [defaultLocale]="hub.locales().defaultCode"
         [written]="facade.written()"
         [fields]="copyFields"
-        [(language)]="facade.language"
+        [language]="facade.language()"
+        (languageChange)="facade.chooseLanguage($event)"
       />
 
-      <app-panel [title]="t('content.faq.groupTitle')" [subtitle]="t('content.faq.groupSubtitle')" padded>
+      <app-panel
+        [title]="t('content.faq.groupTitle')"
+        [subtitle]="t('content.faq.groupSubtitle')"
+        padded
+      >
         <div class="group-cards" role="radiogroup" [attr.aria-label]="t('content.faq.groupTitle')">
           @for (group of groups(); track group.id) {
             <button
@@ -47,9 +52,19 @@
           @if (canManage()) {
             @if (newGroupOpen()) {
               <form class="new-group" (submit)="$event.preventDefault(); createGroup()">
-                <app-text-field [value]="newGroupName()" (valueChange)="newGroupName.set($event)" [placeholder]="t('content.faq.groupName')" [ariaLabel]="t('content.faq.groupName')" [maxLength]="60" />
-                <button class="primary-action" type="submit" [disabled]="!newGroupName().trim()">{{ t('content.action.save') }}</button>
-                <button class="ghost-action" type="button" (click)="newGroupOpen.set(false)">{{ t('shared.actions.cancel') }}</button>
+                <app-text-field
+                  [value]="newGroupName()"
+                  (valueChange)="newGroupName.set($event)"
+                  [placeholder]="t('content.faq.groupName')"
+                  [ariaLabel]="t('content.faq.groupName')"
+                  [maxLength]="60"
+                />
+                <button class="primary-action" type="submit" [disabled]="!newGroupName().trim()">
+                  {{ t('content.action.save') }}
+                </button>
+                <button class="ghost-action" type="button" (click)="newGroupOpen.set(false)">
+                  {{ t('shared.actions.cancel') }}
+                </button>
               </form>
             } @else {
               <button class="group-card add" type="button" (click)="newGroupOpen.set(true)">
@@ -63,19 +78,53 @@
 
       <app-panel [title]="t('content.faq.placementTitle')" padded>
         <div class="field-grid" [formGroup]="extra">
-          <app-form-field [label]="t('content.editor.slug')" [hint]="t('content.faq.slugHint')" [control]="facade.common.controls.slug" controlId="faq-slug" required>
-            <div [formGroup]="facade.common"><app-text-field id="faq-slug" formControlName="slug" latin mono prefix="/help/" [maxLength]="100" /></div>
+          <app-form-field
+            [label]="t('content.editor.slug')"
+            [hint]="t('content.faq.slugHint')"
+            [control]="facade.common.controls.slug"
+            controlId="faq-slug"
+            required
+          >
+            <div [formGroup]="facade.common">
+              <app-text-field
+                id="faq-slug"
+                formControlName="slug"
+                latin
+                mono
+                prefix="/help/"
+                [maxLength]="100"
+              />
+            </div>
           </app-form-field>
-          <app-form-field [label]="t('content.faq.position')" [hint]="t('content.faq.positionHint')" [control]="extra.controls.position" controlId="faq-position">
-            <app-number-field id="faq-position" formControlName="position" [decimals]="0" [min]="0" />
+          <app-form-field
+            [label]="t('content.faq.position')"
+            [hint]="t('content.faq.positionHint')"
+            [control]="extra.controls.position"
+            controlId="faq-position"
+          >
+            <app-number-field
+              id="faq-position"
+              formControlName="position"
+              [decimals]="0"
+              [min]="0"
+            />
           </app-form-field>
           <div class="field field-wide">
             <p class="field-label">{{ t('content.faq.keywords') }}</p>
-            <app-tag-input [tags]="extra.controls.keywords.value" (tagsChange)="setKeywords($event)" [label]="t('content.faq.keywords')" [disabled]="!canManage()" />
+            <app-tag-input
+              [tags]="extra.controls.keywords.value"
+              (tagsChange)="setKeywords($event)"
+              [label]="t('content.faq.keywords')"
+              [disabled]="!canManage()"
+            />
             <p class="field-hint">{{ t('content.faq.keywordsHint') }}</p>
           </div>
           <div class="field field-wide">
-            <app-toggle formControlName="showInCheckoutHelp" [label]="t('content.faq.checkoutHelp')" [description]="t('content.faq.checkoutHelpHint')" />
+            <app-toggle
+              formControlName="showInCheckoutHelp"
+              [label]="t('content.faq.checkoutHelp')"
+              [description]="t('content.faq.checkoutHelpHint')"
+            />
           </div>
         </div>
       </app-panel>
@@ -85,13 +134,23 @@
       <app-panel [title]="t('content.faq.preview')" padded>
         <div class="faq-preview">
           <small>{{ t('content.faq.previewGroup') }}</small>
-          <strong dir="auto">{{ activeTranslation()?.controls?.title?.value || t('content.faq.previewQuestion') }}</strong>
-          <div class="faq-answer" dir="auto" [innerHTML]="activeTranslation()?.controls?.body?.value || ''"></div>
+          <strong dir="auto">{{
+            activeTranslation()?.controls?.title?.value || t('content.faq.previewQuestion')
+          }}</strong>
+          <div
+            class="faq-answer"
+            dir="auto"
+            [innerHTML]="activeTranslation()?.controls?.body?.value || ''"
+          ></div>
         </div>
       </app-panel>
       <app-publish-checklist [title]="t('content.checklist.title')" [items]="checklist()" />
     </ng-container>
   </app-editor-shell>
 
-  <app-schedule-sheet [(open)]="scheduleOpen" [(at)]="scheduleAt" (confirmed)="confirmSchedule($event)" />
+  <app-schedule-sheet
+    [(open)]="scheduleOpen"
+    [(at)]="scheduleAt"
+    (confirmed)="confirmSchedule($event)"
+  />
 </ng-container>

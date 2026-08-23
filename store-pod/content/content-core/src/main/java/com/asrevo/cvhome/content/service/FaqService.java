@@ -30,9 +30,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FaqService {
 
+    /**
+     * The starter groups, named in both platform languages.
+     *
+     * A store whose console and storefront are Arabic used to read "General · position 1" in an otherwise
+     * Arabic screen, because the seed carried English only and the group name is shown as stored.
+     */
     private static final List<String[]> DEFAULT_GROUPS = List.of(
-            new String[] {"general", "General"}, new String[] {"ordering", "Ordering"},
-            new String[] {"shipping", "Shipping & delivery"}, new String[] {"returns", "Returns"});
+            new String[] {"general", "General", "عام"},
+            new String[] {"ordering", "Ordering", "الطلب"},
+            new String[] {"shipping", "Shipping & delivery", "الشحن والتوصيل"},
+            new String[] {"returns", "Returns", "الإرجاع"});
 
     private static final String KIND = "FAQ_GROUP";
 
@@ -40,7 +48,7 @@ public class FaqService {
 
     private final ContentRepository contents;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<com.asrevo.cvhome.content.model.faq.FaqGroup> groups(StoreMerchantId store) {
         ensureDefaults(store);
         Map<Long, Long> counts = new LinkedHashMap<>();
@@ -65,7 +73,7 @@ public class FaqService {
         return out;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.faq.FaqGroup create(StoreMerchantId store,
                                                                com.asrevo.cvhome.content.model.faq.FaqGroup body)
             throws ContentConflictException {
@@ -78,7 +86,7 @@ public class FaqService {
         return toDto(groups.saveAndFlush(g), 0);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public com.asrevo.cvhome.content.model.faq.FaqGroup update(StoreMerchantId store, Long id,
                                                                com.asrevo.cvhome.content.model.faq.FaqGroup body)
             throws ContentNotFoundException, ContentConflictException {
@@ -98,7 +106,7 @@ public class FaqService {
     /**
      * Deletes a group; its entries move to the store's first remaining group.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId store, Long id) throws ContentNotFoundException {
         FaqGroup g = groups.findByIdAndStoreMerchantId(id, store.getId())
                 .orElseThrow(() -> ContentNotFoundException.faqGroup(id, store));
@@ -117,7 +125,7 @@ public class FaqService {
     /**
      * Moves entries between groups and positions in one transaction, then renumbers every touched group 0..n.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void reorder(StoreMerchantId store, List<FaqReorder> moves) throws ContentNotFoundException {
         Map<Long, Content> all = new LinkedHashMap<>();
         for (Content c : contents.findAllByType(store, ContentType.FAQ)) {
@@ -154,7 +162,7 @@ public class FaqService {
     /**
      * The group id to use when a request names none: the store's first group, created on demand.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long defaultGroupId(StoreMerchantId store) {
         ensureDefaults(store);
         return groups.findByStoreMerchantIdOrderByPositionAscIdAsc(store.getId()).getFirst().getId();
@@ -169,7 +177,7 @@ public class FaqService {
             FaqGroup g = new FaqGroup();
             g.setStoreMerchantId(store.getId());
             g.setKey(def[0]);
-            g.setNames(JsonCodec.write(Map.of("en", def[1])));
+            g.setNames(JsonCodec.write(Map.of("en", def[1], "ar", def[2])));
             g.setPosition(position++);
             groups.save(g);
         }

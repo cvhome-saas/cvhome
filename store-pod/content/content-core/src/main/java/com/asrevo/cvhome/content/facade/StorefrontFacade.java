@@ -104,7 +104,7 @@ public class StorefrontFacade {
 
     // ------------------------------------------------------------------------------------------------ site
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public StorefrontSite site(StoreMerchantId store, LanguageCode language) {
         Instant now = clock.instant();
         StorefrontSite site = new StorefrontSite();
@@ -311,7 +311,7 @@ public class StorefrontFacade {
 
     // -------------------------------------------------------------------------------------------------- faq
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public StorefrontFaq faq(StoreMerchantId store, LanguageCode language, String groupKey) {
         Instant now = clock.instant();
         Map<Long, FaqGroup> groups = faq.byIds(store);

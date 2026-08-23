@@ -19,7 +19,11 @@
     (deleteDismissed)="deleteOpen.set(false)"
   >
     <ng-container main>
-      <app-panel [title]="t('content.policy.typeTitle')" [subtitle]="t('content.policy.typeSubtitle')" padded>
+      <app-panel
+        [title]="t('content.policy.typeTitle')"
+        [subtitle]="t('content.policy.typeSubtitle')"
+        padded
+      >
         <div class="type-cards" role="radiogroup" [attr.aria-label]="t('content.policy.typeTitle')">
           @for (type of types; track type) {
             <button
@@ -38,8 +42,15 @@
         </div>
         @if (canManage()) {
           <div class="template-row">
-            <span>{{ t('content.policy.templateHint', {type: typeLabel(extra.controls.policyType.value)}) }}</span>
-            <button class="secondary-action" type="button" [disabled]="templateBusy()" (click)="insertTemplate()">
+            <span>{{
+              t('content.policy.templateHint', {type: typeLabel(extra.controls.policyType.value)})
+            }}</span>
+            <button
+              class="secondary-action"
+              type="button"
+              [disabled]="templateBusy()"
+              (click)="insertTemplate()"
+            >
               <app-icon name="sparkles" />{{ t('content.policy.insertTemplate') }}
             </button>
           </div>
@@ -52,39 +63,98 @@
         [defaultLocale]="hub.locales().defaultCode"
         [written]="facade.written()"
         [fields]="copyFields"
-        [(language)]="facade.language"
+        [language]="facade.language()"
+        (languageChange)="facade.chooseLanguage($event)"
       />
 
       <app-panel [title]="t('content.policy.appliesTitle')" padded>
         <div class="field-grid" [formGroup]="extra">
-          <app-form-field [label]="t('content.editor.slug')" [control]="facade.common.controls.slug" controlId="policy-slug" required>
-            <div [formGroup]="facade.common"><app-text-field id="policy-slug" formControlName="slug" latin mono prefix="/policies/" [maxLength]="100" /></div>
+          <app-form-field
+            [label]="t('content.editor.slug')"
+            [control]="facade.common.controls.slug"
+            controlId="policy-slug"
+            required
+          >
+            <div [formGroup]="facade.common">
+              <app-text-field
+                id="policy-slug"
+                formControlName="slug"
+                latin
+                mono
+                prefix="/policies/"
+                [maxLength]="100"
+              />
+            </div>
           </app-form-field>
-          <app-form-field [label]="t('content.policy.jurisdiction')" [hint]="t('content.policy.jurisdictionHint')" [control]="extra.controls.jurisdiction" controlId="policy-jurisdiction">
-            <app-text-field id="policy-jurisdiction" formControlName="jurisdiction" latin [maxLength]="60" />
+          <app-form-field
+            [label]="t('content.policy.jurisdiction')"
+            [hint]="t('content.policy.jurisdictionHint')"
+            [control]="extra.controls.jurisdiction"
+            controlId="policy-jurisdiction"
+          >
+            <app-text-field
+              id="policy-jurisdiction"
+              formControlName="jurisdiction"
+              latin
+              [maxLength]="60"
+            />
           </app-form-field>
-          <app-form-field [label]="t('content.policy.effectiveFrom')" [hint]="t('content.policy.effectiveFromHint')" [control]="extra.controls.effectiveFrom" controlId="policy-effective">
+          <app-form-field
+            [label]="t('content.policy.effectiveFrom')"
+            [hint]="t('content.policy.effectiveFromHint')"
+            [control]="extra.controls.effectiveFrom"
+            controlId="policy-effective"
+          >
             <app-date-time-field id="policy-effective" formControlName="effectiveFrom" />
           </app-form-field>
-          <div class="field field-wide"><app-toggle formControlName="requiresAcceptance" [label]="t('content.policy.requiresAcceptance')" [description]="t('content.policy.requiresAcceptanceHint')" /></div>
-          <div class="field field-wide"><app-toggle formControlName="notifyCustomers" [label]="t('content.policy.notifyCustomers')" [description]="t('content.policy.notifyCustomersHint')" /></div>
-          <div class="field"><app-toggle formControlName="showInFooter" [label]="t('content.policy.showInFooter')" /></div>
-          <div class="field"><app-toggle formControlName="showAtCheckout" [label]="t('content.policy.showAtCheckout')" /></div>
-          <div class="field"><app-toggle formControlName="showAtSignup" [label]="t('content.policy.showAtSignup')" /></div>
+          <div class="field field-wide">
+            <app-toggle
+              formControlName="requiresAcceptance"
+              [label]="t('content.policy.requiresAcceptance')"
+              [description]="t('content.policy.requiresAcceptanceHint')"
+            />
+          </div>
+          <div class="field field-wide">
+            <app-toggle
+              formControlName="notifyCustomers"
+              [label]="t('content.policy.notifyCustomers')"
+              [description]="t('content.policy.notifyCustomersHint')"
+            />
+          </div>
+          <div class="field">
+            <app-toggle formControlName="showInFooter" [label]="t('content.policy.showInFooter')" />
+          </div>
+          <div class="field">
+            <app-toggle
+              formControlName="showAtCheckout"
+              [label]="t('content.policy.showAtCheckout')"
+            />
+          </div>
+          <div class="field">
+            <app-toggle formControlName="showAtSignup" [label]="t('content.policy.showAtSignup')" />
+          </div>
         </div>
       </app-panel>
 
       @if (versions().length) {
-        <app-panel [title]="t('content.policy.versions')" [subtitle]="t('content.policy.versionsSubtitle')" padded>
+        <app-panel
+          [title]="t('content.policy.versions')"
+          [subtitle]="t('content.policy.versionsSubtitle')"
+          padded
+        >
           <ul class="version-list">
             @for (version of versions(); track version.version) {
               <li>
                 <strong>v{{ version.version }}</strong>
                 <span class="version-note" dir="auto">{{ version.note || '—' }}</span>
                 <span class="version-date">{{ versionDate(version) }}</span>
-                <app-badge [tone]="versionTone(version)" shape="square">{{ t('content.policy.versionStatus.' + version.status) }}</app-badge>
+                <app-badge [tone]="versionTone(version)" shape="square">{{
+                  t('content.policy.versionStatus.' + version.status)
+                }}</app-badge>
                 @if (canManage() && version.status !== 'LIVE') {
-                  <button class="ghost-action" type="button" (click)="restoreVersion(version)">{{ t('content.policy.restoreText') }}</button>
+                  <button class="ghost-action" type="button" (click)="restoreVersion(version)">
+                    {{ t('content.policy.restoreText') }}
+                  </button>
                 }
               </li>
             }
@@ -97,10 +167,22 @@
       <app-panel [title]="t('content.policy.checkoutPreview')" padded>
         <div class="checkout-preview">
           <app-badge tone="slate" shape="square">v{{ liveVersion() || '—' }}</app-badge>
-          <strong dir="auto">{{ activeTranslation()?.controls?.title?.value || typeLabel(extra.controls.policyType.value) }}</strong>
-          <div class="preview-body" dir="auto" [innerHTML]="activeTranslation()?.controls?.body?.value || ''"></div>
+          <strong dir="auto">{{
+            activeTranslation()?.controls?.title?.value ||
+              typeLabel(extra.controls.policyType.value)
+          }}</strong>
+          <div
+            class="preview-body"
+            dir="auto"
+            [innerHTML]="activeTranslation()?.controls?.body?.value || ''"
+          ></div>
           @if (extra.controls.requiresAcceptance.value) {
-            <label class="accept"><input type="checkbox" disabled /> {{ t('content.policy.acceptLabel', {type: typeLabel(extra.controls.policyType.value)}) }}</label>
+            <label class="accept"
+              ><input type="checkbox" disabled />
+              {{
+                t('content.policy.acceptLabel', {type: typeLabel(extra.controls.policyType.value)})
+              }}</label
+            >
           }
         </div>
       </app-panel>
@@ -108,5 +190,9 @@
     </ng-container>
   </app-editor-shell>
 
-  <app-schedule-sheet [(open)]="scheduleOpen" [(at)]="scheduleAt" (confirmed)="confirmSchedule($event)" />
+  <app-schedule-sheet
+    [(open)]="scheduleOpen"
+    [(at)]="scheduleAt"
+    (confirmed)="confirmSchedule($event)"
+  />
 </ng-container>
