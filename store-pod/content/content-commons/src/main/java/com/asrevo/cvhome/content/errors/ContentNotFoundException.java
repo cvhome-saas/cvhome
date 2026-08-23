@@ -7,12 +7,8 @@ import com.asrevo.cvhome.errors.ErrorPayload;
 import com.asrevo.cvhome.errors.ResourceNotFoundException;
 
 /**
- * No content page or box matches the identifier in this store.
- *
- * <p>
- * Covers the cross-store case too: content that exists but belongs to another store is reported as missing, not as
- * forbidden, so a caller cannot probe for the existence of another seller's pages.
- * </p>
+ * No content item, FAQ group, media asset or folder matches the identifier in this store. Content that exists but
+ * belongs to another store is reported as missing, not as forbidden, so a caller cannot probe another seller's data.
  */
 public class ContentNotFoundException extends ResourceNotFoundException {
 
@@ -28,25 +24,37 @@ public class ContentNotFoundException extends ResourceNotFoundException {
     public static ContentNotFoundException byCode(String code, Object store) {
         return new ErrorBuilder<>(ContentErrors.CONTENT_NOT_FOUND, ContentNotFoundException::new)
                 .detail("No content with code %s in store %s.", code, store)
-                .param("code", code)
-                .param(STORE, store)
-                .build();
+                .param("code", code).param(STORE, store).build();
     }
 
     public static ContentNotFoundException byId(Long id, Object store) {
         return new ErrorBuilder<>(ContentErrors.CONTENT_NOT_FOUND, ContentNotFoundException::new)
                 .detail("No content with id %s in store %s.", id, store)
-                .param("id", id)
-                .param(STORE, store)
-                .build();
+                .param("id", id).param(STORE, store).build();
     }
 
     public static ContentNotFoundException byName(String name, Object store) {
         return new ErrorBuilder<>(ContentErrors.CONTENT_NOT_FOUND, ContentNotFoundException::new)
                 .detail("No content page named %s in store %s.", name, store)
-                .param("name", name)
-                .param(STORE, store)
-                .build();
+                .param("name", name).param(STORE, store).build();
+    }
+
+    public static ContentNotFoundException faqGroup(Long id, Object store) {
+        return new ErrorBuilder<>(ContentErrors.FAQ_GROUP_NOT_FOUND, ContentNotFoundException::new)
+                .detail("No FAQ group with id %s in store %s.", id, store)
+                .param("id", id).param(STORE, store).build();
+    }
+
+    public static ContentNotFoundException media(Long id, Object store) {
+        return new ErrorBuilder<>(ContentErrors.MEDIA_NOT_FOUND, ContentNotFoundException::new)
+                .detail("No media asset with id %s in store %s.", id, store)
+                .param("id", id).param(STORE, store).build();
+    }
+
+    public static ContentNotFoundException mediaFolder(Long id, Object store) {
+        return new ErrorBuilder<>(ContentErrors.MEDIA_NOT_FOUND, ContentNotFoundException::new)
+                .detail("No media folder with id %s in store %s.", id, store)
+                .param("id", id).param(STORE, store).build();
     }
 
 }

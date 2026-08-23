@@ -777,6 +777,13 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 
 ## Store management — the landing-page endpoints seller-ui calls do not exist
 
+> **Superseded (Module 12, phase 1).** `store-pod/content` was rewritten; the box endpoints console-ui
+> used here (`/private/content/boxes/{code}`, `POST /private/content/box`, `PUT …/box/{id}`) are gone
+> with it, replaced by the snippets API. **seller-ui's content screens (pages, boxes, files) and its
+> landing-page card now 404/405 until seller-ui retires in Module 13** — they were already broken or
+> about to be replaced, and keeping the old private API alive for one release was not worth a second
+> write path. The storefront's public reads are served unchanged by `LegacyContentApi`.
+
 - **Screen:** `/store-management/home`, from `Store Management.dc.html`'s "Store home page".
 - **What the UI needs:** per-language landing copy — title, body text, meta description and tags.
 - **What is missing:** the three paths seller-core's `StoreService` uses are mapped by no
@@ -896,6 +903,10 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 
 ## Store management — a content description's keywords are dropped by both mappers
 
+> **Resolved (Module 12, phase 1).** The new `content` service reads and writes `meta_keywords` as
+> `ContentTranslation.keywords`, and the home card's keyword field is editable again. Kept for the
+> record; the old mappers live on only in `store-pod/content-deprecated`.
+
 - **Screen:** `/store-management/home`, the "Search keywords" field.
 - **What the UI needs:** the keywords a storefront's landing page is indexed on, per language.
 - **What is missing:** the column exists and nothing uses it. `ContentDescription` has
@@ -916,6 +927,11 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
   `store-settings-form.service.ts` and `home-section.ts`.
 
 ## Store management — a content box save is all-or-nothing per language
+
+> **Resolved (Module 12, phase 1).** The new service's `Content.descriptions` has `orphanRemoval`,
+> the translations list is genuinely the state, a locale with no title and no body is simply not
+> stored (no 500), and `PUT …/{type}/{id}/translations/{locale}` edits one locale in isolation. The
+> home card now saves through `PUT /private/content/snippets/LANDING_PAGE`, which upserts.
 
 - **Screen:** `/store-management/home`, the language track.
 - **What happens:** `PUT /private/content/box/{id}` replaces the box's description list with exactly

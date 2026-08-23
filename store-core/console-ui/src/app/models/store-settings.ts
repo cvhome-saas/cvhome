@@ -76,12 +76,7 @@ export interface HomePageCopy {
   readonly title: string;
   readonly text: string;
   readonly metaDescription: string;
-  /**
-   * Search keywords. Editable in the design, and **not stored**: neither mapper on the server
-   * touches `metatagKeywords`, so anything typed here is dropped in silence. Rendered disabled with
-   * the reason rather than accepting input that goes nowhere. See lessons.md, "Store management — a
-   * content description's keywords are dropped by both mappers".
-   */
+  /** Search keywords, stored on the landing snippet's translation as a comma-separated list. */
   readonly tags: readonly string[];
 }
 

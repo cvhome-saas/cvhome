@@ -1,7 +1,7 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
-import {ContentBoxService} from '@api/content/content-box.service';
+import {SnippetsService} from '@api/content/snippets.service';
 import {SocialLoginConfigService} from '@api/cua/social-login-config.service';
 import {DnsCheckService, type CnameOutcome} from '@api/dns/dns-check.service';
 import {MerchantRouterService} from '@api/merchant/router.service';
@@ -15,9 +15,8 @@ import type {
   ReadablePaymentConfiguration,
 } from '@models/payment';
 import type {
-  ContentDescription,
-  PersistableContentBox,
-  ReadableContentBox,
+  ContentTranslation,
+  Snippet,
 } from '@models/content';
 import type {
   ManagerStoreDomain,
@@ -59,11 +58,11 @@ export type SectionPatch = Readonly<Record<string, unknown>>;
  * broken while it propagates is the unhelpful reading.
  */
 /**
- * The content box the storefront's landing copy lives in.
+ * The snippet the storefront's landing copy lives in.
  *
  * seller-ui's code, kept deliberately: it is the only identifier for this copy that has ever been
  * written down, and matching it means a store that was edited in the old console is editable in the
- * new one rather than growing a second, orphaned box.
+ * new one rather than growing a second, orphaned snippet.
  */
 const HOME_BOX_CODE = 'LANDING_PAGE';
 
@@ -95,7 +94,7 @@ export class StoreSettingsApi {
   private readonly router = inject(MerchantRouterService);
   private readonly saas = inject(SaasService);
   private readonly dns = inject(DnsCheckService);
-  private readonly content = inject(ContentBoxService);
+  private readonly content = inject(SnippetsService);
   private readonly socialLogin = inject(SocialLoginConfigService);
   private readonly payments = inject(PaymentConfigurationService);
 
@@ -125,7 +124,7 @@ export class StoreSettingsApi {
    * the three the console edits — `buildDescriptions` replaces the description it matches by
    * language, so a field left out is a field cleared. This is where the rest comes from.
    */
-  private loadedHomeBox: ReadableContentBox | null = null;
+  private loadedHomeBox: Snippet | null = null;
 
   /**
    * The payment configurations the server last sent.
@@ -164,7 +163,7 @@ export class StoreSettingsApi {
        * A store that has never saved landing copy has no box, and the read is a 404 — which is the
        * normal first state of this section, not a fault. `null` means "create on first save".
        */
-      homeBox: this.optionalOne(this.content.box(HOME_BOX_CODE)),
+      homeBox: this.optionalOne(this.content.get(HOME_BOX_CODE)),
       /*
        * Four legs on two other pods. Each is optional for the same reason as the rest: cua being
        * down is not a reason the store's own details cannot be edited. A failed provider list
@@ -251,22 +250,19 @@ export class StoreSettingsApi {
           .pipe(switchMap(() => this.loadSettings()));
 
       /*
-       * Create the first time, replace after that — and which one it is comes from whether the load
-       * found a box, not from a separate `exists` call. `POST` refuses a code the store already has,
-       * so getting this wrong is a 4xx rather than a duplicate.
+       * `PUT /snippets/{code}` upserts, so there is no create-versus-update decision and no `exists`
+       * pre-flight: the same call is right the first time and every time after.
        */
       case 'home': {
-        const box = this.homeBoxBody(patch);
-        const id = this.loadedHomeBox?.id;
+        const snippet = this.homeSnippetBody(patch);
         /*
-         * Nothing written in any language and no box yet: there is nothing to create. A box with no
-         * descriptions is a storefront fragment that renders nothing, so it is not worth making.
+         * Nothing written in any language and no snippet yet: there is nothing to create. A snippet
+         * with no copy is a storefront fragment that renders nothing, so it is not worth making.
          */
-        if (!id && box.descriptions.length === 0) {
+        if (!this.loadedHomeBox?.id && snippet.translations.length === 0) {
           return this.loadSettings();
         }
-        const write: Observable<unknown> = id ? this.content.update(id, box) : this.content.create(box);
-        return write.pipe(switchMap(() => this.loadSettings()));
+        return this.content.put(HOME_BOX_CODE, snippet).pipe(switchMap(() => this.loadSettings()));
       }
 
       /*
@@ -442,71 +438,63 @@ export class StoreSettingsApi {
   }
 
   /**
-   * The landing box's descriptions, keyed by language.
-   *
-   * `tags` is always empty and always will be: the server drops `metatagKeywords` on the way in and
-   * never reads it on the way out, so there is nothing to map. The section renders the control
-   * disabled rather than pretending the value it holds is stored.
+   * The landing snippet's translations, keyed by language. `tags` are the comma-separated keywords
+   * the new content service stores and reads back.
    */
-  private home(box: ReadableContentBox | null): Readonly<Record<string, HomePageCopy>> {
+  private home(snippet: Snippet | null): Readonly<Record<string, HomePageCopy>> {
     const copy: Record<string, HomePageCopy> = {};
 
-    for (const description of box?.descriptions ?? []) {
-      if (!description.language) {
+    for (const translation of snippet?.translations ?? []) {
+      if (!translation.language) {
         continue;
       }
-      copy[description.language] = {
-        title: description.name ?? '',
-        text: description.description ?? '',
-        metaDescription: description.metaDescription ?? '',
-        tags: [],
+      copy[translation.language] = {
+        title: translation.title ?? '',
+        text: translation.body ?? '',
+        metaDescription: translation.metaDescription ?? '',
+        tags: (translation.keywords ?? '')
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
       };
     }
     return copy;
   }
 
   /**
-   * The landing box as a save body.
+   * The landing snippet as a save body.
    *
-   * Every language in the patch is sent, whether or not it was touched: the server matches
-   * descriptions by language and replaces the matched one wholesale, so a language omitted here is
-   * not merely unchanged — the entity has no `orphanRemoval`, so the row survives in the database
-   * and reappears on the next read, which would make an "edit" look like it silently reverted.
-   * Fields the console does not own — `title`, `friendlyUrl`, the description's own id — are carried
-   * through from the loaded box for the same reason.
+   * Every language in the patch is sent, whether or not it was touched: the server treats the list
+   * as authoritative and deletes the locales it does not carry, so an omitted language would not be
+   * "unchanged" but gone. Only the languages that have a headline are sent — a locale with no title
+   * and no body is "missing", and the server would not store it anyway.
    */
-  private homeBoxBody(patch: SectionPatch): PersistableContentBox {
+  private homeSnippetBody(patch: SectionPatch): Snippet {
     const stored = new Map(
-      (this.loadedHomeBox?.descriptions ?? []).map((description) => [description.language, description]),
+      (this.loadedHomeBox?.translations ?? []).map((translation) => [translation.language, translation]),
     );
 
-    /*
-     * Only the languages that have a headline. `BaseDescription.name` is `@NotEmpty` and its column
-     * is `nullable = false`, so a description without one is a constraint violation the server
-     * answers as a 500 — sending an empty placeholder for every untranslated language, which is
-     * what a naive "send them all" does, made the very first save fail. The form's `titleForCopy`
-     * validator is the other half: it refuses to let a language hold copy with no headline, so
-     * nothing an operator typed can be dropped by this filter.
-     */
-    const descriptions: ContentDescription[] = Object.entries(patch)
+    const translations: ContentTranslation[] = Object.entries(patch)
       .map(([language, raw]) => {
         const slice = this.slice(raw);
+        const tags = Array.isArray(slice['tags']) ? (slice['tags'] as readonly unknown[]) : [];
         return {
           ...stored.get(language),
           language,
-          name: this.text(slice['title'], '').trim(),
-          description: this.text(slice['text'], ''),
+          title: this.text(slice['title'], '').trim(),
+          body: this.text(slice['text'], ''),
           metaDescription: this.text(slice['metaDescription'], ''),
+          keywords: tags.map((tag) => String(tag).trim()).filter((tag) => tag.length > 0).join(', '),
         };
       })
-      .filter((description) => description.name.length > 0);
+      .filter((translation) => translation.title.length > 0);
 
     return {
       id: this.loadedHomeBox?.id,
       code: HOME_BOX_CODE,
-      // A box the storefront can render. Nothing in the console hides one, so nothing sets it false.
+      // A snippet the storefront can render. Nothing in the console hides one, so nothing sets it false.
       visible: true,
-      descriptions,
+      translations,
     };
   }
 

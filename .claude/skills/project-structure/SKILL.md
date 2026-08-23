@@ -49,7 +49,8 @@ catalog). See `references/build-system.md`.
 | Service | Category | Port | Purpose |
 |---|---|---|---|
 | `store-pod/spg` | **INFRA** | 80 | "SaaS Pod Gateway" — a **Caddy** reverse proxy (not Java). Terminates TLS with **on-demand certificates** for custom tenant domains, resolves the domain → store via `domain_lookup`, adds tracing headers, and path-routes `/merchant*`, `/catalog*`, `/checkout*`, `/cua*`, `/payment*` to the pod services; everything else falls through to `landing-ui`. Config: `Caddyfile`. |
-| `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, plus a `content` sub-domain (CMS pages/boxes). APIs: `MerchantStoreApi`, `ContentApi`, `ExternalMerchantStoreApi`. |
+| `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, domains. APIs: `MerchantStoreApi`, `ExternalMerchantStoreApi`. |
+| `store-pod/content` | **BE** | 8121 | The **content platform**: pages, blog posts, banners, FAQ, legal policies, navigation menus, media library and store snippets, with status workflow, scheduling, revisions and per-locale translation state. Private console API, public storefront API and a deprecated legacy-compat read API. `store-pod/content-deprecated` is the previous service, unregistered, reference only. |
 | `store-pod/catalog` | **BE** | 8122 | **Products & categories**: product CRUD, inventory, pricing, images, attributes/options, product types, groups, manufacturers, relationships, reservations. APIs: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi`, `ExternalProductReservationApi`. |
 | `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
 | `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
@@ -240,8 +241,7 @@ Business pods (`merchant`, `catalog`, `checkout`, `payment`) are split into up t
 | `-external-api` | Thin **client contract** so *other* services can call this pod over HTTP without pulling in `-core`. | its own `-commons` only |
 | `-service` | The deployable Spring Boot app: `*Api` controllers, `SecurityConfig`, `*Application` main class. | `-core` + `-external-api` |
 
-A pod may host more than one sub-domain in one service (e.g. `merchant-service` serves both `merchant-*` and
-`content-*` modules). Details and per-pod module lists: `references/store-pod.md`.
+Details and per-pod module lists: `references/store-pod.md`.
 
 ## Adding a whole new service
 

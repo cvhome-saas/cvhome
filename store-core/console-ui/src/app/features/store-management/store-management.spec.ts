@@ -1003,10 +1003,11 @@ describe('StoreManagement', () => {
     expect(api.saves.length).toBe(0);
   }));
 
-  it('renders the keyword field disabled, and never submits it', fakeAsync(() => {
+  it('renders the keyword field editable and submits it with the language', fakeAsync(() => {
     const {fixture, element} = load('home');
 
-    expect(element.querySelector<HTMLInputElement>('app-tag-input input')!.disabled).toBeTrue();
+    // The new content service stores keywords on the translation, so the field is no longer disabled.
+    expect(element.querySelector<HTMLInputElement>('app-tag-input input')!.disabled).toBeFalse();
 
     type(element, '#home-title', 'Workplace supplies, delivered');
     settle(fixture);
@@ -1014,7 +1015,7 @@ describe('StoreManagement', () => {
     settle(fixture);
 
     const patch = api.saves[0].patch as Record<string, Record<string, unknown>>;
-    expect(patch['en']['tags']).toBeUndefined();
+    expect(patch['en']['tags']).toEqual([]);
   }));
 
   it('reloads the whole document when the open store changes', fakeAsync(() => {

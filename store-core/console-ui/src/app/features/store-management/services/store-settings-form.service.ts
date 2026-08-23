@@ -212,13 +212,6 @@ export class StoreSettingsFormService {
         tags: copy?.tags ?? [],
       });
     }
-    /*
-     * `reset` re-enables what it is given a value for, so the keywords control goes back to how it
-     * was declared: the server drops it in both directions, so it must not be able to take input.
-     */
-    for (const language of homeLanguages) {
-      form.controls.home.controls[language].controls.tags.disable({emitEvent: false});
-    }
 
     /*
      * Emptied, not prefilled. The field adds a domain — the router has no update, only allocate and
@@ -387,15 +380,8 @@ export class StoreSettingsFormService {
        * worse for search and perfectly valid. The section shows a counter instead of an error.
        */
       metaDescription: this.fb.control(''),
-      /*
-       * Disabled at construction and never enabled: `ContentFacadeImpl.buildDescriptions` never
-       * writes `metatagKeywords` and `ReadableContentBoxPopulator` never reads it, so a value here
-       * is dropped in silence. `sectionValueOf` reads `value`, which omits disabled controls, so it
-       * cannot reach a request body either.
-       * TODO(lessons.md): see lessons.md, "Store management — a content description's keywords are
-       * dropped by both mappers".
-       */
-      tags: this.fb.control<readonly string[]>({value: [], disabled: true}),
+      /** Search keywords, stored comma-separated on the snippet's translation. */
+      tags: this.fb.control<readonly string[]>([]),
     },
     /*
      * On the group, not on `title`. The rule reads three controls, and a validator hanging off

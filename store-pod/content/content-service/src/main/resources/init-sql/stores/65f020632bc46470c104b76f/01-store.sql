@@ -19,8 +19,8 @@ Starting sort_order: 1
 
 -- Page: about-us
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (11, 'about-us', 'PAGE', true, 1, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (11, 'about-us', 'PAGE', true, 1, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -48,8 +48,8 @@ on conflict (description_id) do nothing;
 
 -- Page: contact-us
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (12, 'contact-us', 'PAGE', true, 2, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (12, 'contact-us', 'PAGE', true, 2, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -77,8 +77,8 @@ on conflict (description_id) do nothing;
 
 -- Page: terms
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (13, 'terms', 'PAGE', false, 3, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (13, 'terms', 'PAGE', false, 3, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -106,8 +106,8 @@ on conflict (description_id) do nothing;
 
 -- Page: privacy
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (14, 'privacy', 'PAGE', false, 4, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (14, 'privacy', 'PAGE', false, 4, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -136,8 +136,8 @@ on conflict (description_id) do nothing;
 
 -- Page: location
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (15, 'location', 'PAGE', false, 5, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (15, 'location', 'PAGE', false, 5, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -165,8 +165,8 @@ on conflict (description_id) do nothing;
 
 -- Page: faq
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (16, 'faq', 'PAGE', false, 6, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (16, 'faq', 'PAGE', false, 6, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -194,8 +194,8 @@ on conflict (description_id) do nothing;
 
 -- Box: header-message
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (17, 'header-message', 'BOX', false, 7, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (17, 'header-message', 'BOX', false, 7, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -219,8 +219,8 @@ on conflict (description_id) do nothing;
 
 -- Box: agreement
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (18, 'agreement', 'BOX', false, 8, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (18, 'agreement', 'BOX', false, 8, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -244,8 +244,8 @@ on conflict (description_id) do nothing;
 
 -- NEW BOX: meta-title
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (19, 'meta-title', 'BOX', false, 9, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (19, 'meta-title', 'BOX', false, 9, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr
@@ -267,8 +267,8 @@ on conflict (description_id) do nothing;
 
 -- NEW BOX: meta-description
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (20, 'meta-description', 'BOX', false, 10, true, '65f020632bc46470c104b76f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (20, 'meta-description', 'BOX', false, 10, true, '65f020632bc46470c104b76f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 -- Language: fr

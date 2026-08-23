@@ -1,0 +1,25 @@
+### Legacy public reads — what landing-ui calls today (LegacyContentApi, @Deprecated). Shapes unchanged.
+
+### Pages list (count = page size)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&count=20
+
+### Page by code
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages/about-us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Page by per-language friendly URL
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/pages/name/about-us?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Boxes the storefront reads
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes/header-message?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes/meta-title?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes/meta-description?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/content/boxes/agreement?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+
+### Legacy alias through the merchant prefix (Caddy @legacy_content) still lands here
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/content/pages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&page=0&count=20

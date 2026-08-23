@@ -143,21 +143,13 @@ import type {HomeCopyForm} from '../../services/store-settings-form.service';
           <p class="cross-field-error field-wide" role="alert">{{ t('storeSettings.home.titleForCopy') }}</p>
         }
 
-        <!--
-          Designed, and dropped by the platform in both directions: neither mapper on the server
-          touches the description's keywords column. Rendered disabled with the reason rather than
-          accepting input that goes nowhere.
-          TODO(lessons.md): see lessons.md, "Store management — a content description's keywords are
-          dropped by both mappers".
-        -->
-        <div class="field unbacked field-wide">
+        <div class="field field-wide">
           <p class="field-label">{{ t('storeSettings.home.tags') }}</p>
           <app-tag-input
             [tags]="tags().value"
-            [disabled]="true"
+            (tagsChange)="tags().setValue($event)"
             [label]="t('storeSettings.home.tagsLabel')"
           />
-          <p class="field-hint">{{ t('storeSettings.home.tagsNotStored') }}</p>
         </div>
 
         <app-notice-bar
