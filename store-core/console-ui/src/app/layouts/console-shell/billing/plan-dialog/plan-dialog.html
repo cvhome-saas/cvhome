@@ -64,10 +64,10 @@
                   <span>
                     {{
                       feature.unlimited
-                        ? t('marketing.entitlement.' + feature.key + '.unlimited')
+                        ? t('shared.entitlement.' + feature.key + '.unlimited')
                         : feature.limit === null
-                          ? t('marketing.entitlement.' + feature.key + '.granted')
-                          : t('marketing.entitlement.' + feature.key + '.limit', {count: feature.limit})
+                          ? t('shared.entitlement.' + feature.key + '.granted')
+                          : t('shared.entitlement.' + feature.key + '.limit', {count: feature.limit})
                     }}
                   </span>
                 </li>

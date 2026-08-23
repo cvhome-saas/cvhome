@@ -83,12 +83,13 @@ public class ClientsConfig {
     }
 
     /**
-     * Resolves a store's pod for the router endpoint, now that tenancy no longer holds a pod table.
+     * Resolves a store's pod for the router endpoint and for provisioning, now that tenancy no longer holds a pod
+     * table.
      *
      * <p>
      * Seeded from {@code ServiceDomainProperties} so a tenancy that starts while the registry is down still answers
-     * for the pods it was deployed alongside — the same seed {@code StorePodClientFactory} already resolves against,
-     * which is why provisioning needs no registry call at all.
+     * for the pods it was deployed alongside. {@code StorePodClientFactory} resolves through this directory too —
+     * an operator can register a pod through the API, and a store placed on it must still provision.
      * </p>
      *
      * <p>

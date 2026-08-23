@@ -14,7 +14,8 @@ export const ORG_PICKER_LIMIT = 200;
 /** One organization, as the owner picker lists it. */
 export interface OrgChoice {
   readonly id: string;
-  readonly label: string;
+  /** The organisation's name, or empty — never the contact email, which reads as a person here. */
+  readonly name: string;
 }
 
 /** One pod, plus the organizations an operator could hand a new one to. */
@@ -58,7 +59,7 @@ export class PodDetailApi {
     }).pipe(
       map(({pod, orgs}) => ({
         pod,
-        orgs: (orgs?.content ?? []).map(toOrgRow).map((org) => ({id: org.id, label: org.label})),
+        orgs: (orgs?.content ?? []).map(toOrgRow).map((org) => ({id: org.id, name: org.name})),
       })),
     );
   }

@@ -198,7 +198,7 @@ export class PodDetailFacade {
     if (!orgId) {
       return '';
     }
-    return this.orgs().find((org) => org.id === orgId)?.label ?? orgId;
+    return this.orgs().find((org) => org.id === orgId)?.name || orgId;
   }
 
   /**
@@ -310,12 +310,18 @@ export class PodDetailFacade {
     }));
   });
 
-  /** The owner picker. The empty value is a shared pod, which is what the server reads as PUBLIC. */
+  /**
+   * The owner picker. The empty value is a shared pod, which is what the server reads as PUBLIC.
+   *
+   * Options are labelled by the organisation id — it is what the pod stores and what the fleet and
+   * the registry report back, and most organisations carry no name, so a contact email here read as
+   * if the pod belonged to a person. A named organisation keeps its name beside the id.
+   */
   readonly ownerOptions = computed<readonly SelectOption[]>(() => {
     this.transloco.activeLang();
     return [
       {value: '', label: this.transloco.translate('platform.pods.public')},
-      ...this.orgs().map((org) => ({value: org.id, label: org.label})),
+      ...this.orgs().map((org) => ({value: org.id, label: org.name ? `${org.id} — ${org.name}` : org.id})),
     ];
   });
 

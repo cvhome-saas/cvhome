@@ -10,7 +10,8 @@
 #   ./extra/scripts/run-lcl.sh start --build       ./gradlew build -x test -x check first
 #   ./extra/scripts/run-lcl.sh start -d            start in the background and return after ports open
 #   ./extra/scripts/run-lcl.sh start --list        show configured services with current running/pid status
-#   ./extra/scripts/run-lcl.sh stop [--volumes]    stop the recorded stack and delete compose volumes, logs, and pids
+#   ./extra/scripts/run-lcl.sh stop                stop the recorded stack, keeping compose volumes (data survives)
+#   ./extra/scripts/run-lcl.sh stop --hard         stop and also delete compose volumes (full wipe)
 #   ./extra/scripts/run-lcl.sh stop payment        stop only payment in the recorded stack
 #   ./extra/scripts/run-lcl.sh restart [options]   stop, then start again
 #   ./extra/scripts/run-lcl.sh restart -d          restart the stack in the background and return after ports open
@@ -91,13 +92,13 @@ while [[ $# -gt 0 ]]; do
         --build)      DO_BUILD=true ;;
         --list)       LIST_ONLY=true ;;
         -d|--detach)  DETACH=true ;;
-        --volumes)
+        --hard|--volumes)
             case "$COMMAND" in
                 stop|restart) DELETE_VOLUMES=true ;;
-                *) echo "--volumes is only valid with stop or restart" >&2; exit 2 ;;
+                *) echo "$1 is only valid with stop or restart" >&2; exit 2 ;;
             esac
             ;;
-        -h|--help)    sed -n '3,20p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help)    sed -n '3,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
         -*)           echo "unknown option: $1" >&2; exit 2 ;;
         *)            WANTED+=("$1") ;;
     esac
@@ -343,8 +344,42 @@ cleanup_stale_runtime() {
 compose_down() {
     command -v docker >/dev/null || { warn "docker not found on PATH; skipping infra cleanup"; return 0; }
     docker info >/dev/null 2>&1 || { warn "docker is not running; skipping infra cleanup"; return 0; }
-    say "stopping infra containers"
-    docker compose -f "$COMPOSE_FILE" down --remove-orphans -v
+    # Volumes survive a plain stop so postgres/minio data persists across runs; `stop --hard` wipes them.
+    if $DELETE_VOLUMES; then
+        say "stopping infra containers and deleting volumes"
+        docker compose -f "$COMPOSE_FILE" down --remove-orphans -v
+    else
+        say "stopping infra containers (volumes kept)"
+        docker compose -f "$COMPOSE_FILE" down --remove-orphans
+    fi
+}
+
+# Services can outlive their supervisor (crash, closed terminal, killed pid file) and keep their ports. A stop
+# that only tears down the supervisor would leave them orphaned, and the next start would skip every busy port —
+# so always sweep the known service ports for leftover listeners.
+kill_stray_service_listeners() {
+    local entry name port listener swept=false
+    for entry in "${JAVA_SERVICES[@]}" "${NODE_SERVICES[@]}"; do
+        IFS='|' read -r name _ <<<"$entry"
+        port="$(service_port "$name")" || continue
+        for listener in $(listener_pids_on_port "$port"); do
+            $swept || say "stopping stray service processes from a previous run"
+            swept=true
+            printf '    %sstopping %s (pid %s) on :%s%s\n' "$C_DIM" "$name" "$listener" "$port" "$C_OFF"
+            kill_tree "$listener"
+        done
+    done
+    $swept || return 0
+
+    for entry in "${JAVA_SERVICES[@]}" "${NODE_SERVICES[@]}"; do
+        IFS='|' read -r name _ <<<"$entry"
+        port="$(service_port "$name")" || continue
+        wait_for_port_closed "$name" "$port" 20 && continue
+        for listener in $(listener_pids_on_port "$port"); do
+            kill_tree_kill9 "$listener"
+        done
+        wait_for_port_closed "$name" "$port" 10 || warn "$name is still holding :$port"
+    done
 }
 
 stop_recorded_stack() {
@@ -371,6 +406,7 @@ stop_recorded_stack() {
         cleanup_stale_runtime
     fi
 
+    kill_stray_service_listeners
     compose_down
     cleanup_runtime
     cleanup_logs
@@ -664,7 +700,7 @@ start_services_in_recorded_stack() {
 
 restart_selected_services() {
     validate_wanted_services
-    $DELETE_VOLUMES && die "--volumes cannot be used when restarting selected services"
+    $DELETE_VOLUMES && die "--hard cannot be used when restarting selected services"
     [[ -f "$SUPERVISOR_PID_FILE" ]] || die "no recorded local stack supervisor is running"
 
     cd "$ROOT" || die "cannot cd to $ROOT"
@@ -687,7 +723,7 @@ restart_selected_services() {
 
 stop_selected_services() {
     validate_wanted_services
-    $DELETE_VOLUMES && die "--volumes cannot be used when stopping selected services"
+    $DELETE_VOLUMES && die "--hard cannot be used when stopping selected services"
     [[ -f "$SUPERVISOR_PID_FILE" ]] || die "no recorded local stack supervisor is running"
 
     cd "$ROOT" || die "cannot cd to $ROOT"
@@ -764,7 +800,7 @@ detached_child_args() {
         args+=(--keep-infra)
     fi
     $DO_BUILD && args+=(--build)
-    $DELETE_VOLUMES && args+=(--volumes)
+    $DELETE_VOLUMES && args+=(--hard)
     if (( ${#WANTED[@]} > 0 )); then
         args+=("${WANTED[@]}")
     fi
