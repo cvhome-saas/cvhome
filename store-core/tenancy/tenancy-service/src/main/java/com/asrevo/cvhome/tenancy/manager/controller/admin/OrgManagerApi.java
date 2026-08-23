@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.tenancy.commons.dto.ListOrgQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerOrgDto;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.errors.IllegalLifecycleTransitionException;
 import com.asrevo.cvhome.tenancy.errors.OrgNotFoundException;
+import com.asrevo.cvhome.tenancy.errors.OrgOwnerUnknownException;
 import com.asrevo.cvhome.tenancy.manager.dto.CreateOrgRequest;
 import com.asrevo.cvhome.tenancy.manager.service.InternalOrgService;
 import com.asrevo.cvhome.tenancy.manager.service.InternalStoreService;
@@ -55,10 +57,32 @@ public class OrgManagerApi {
         return internalOrgService.findAll(pageable);
     }
 
+    /**
+     * The same listing, narrowed by a search term and a status.
+     *
+     * <p>
+     * A POST carrying a query body rather than parameters on {@link #findAllOrg}, matching
+     * {@code StoreManagerApi.list} — the two are the same table twice over and their filters should not be shaped
+     * differently for no reason. {@code find-all} stays as it was: it has callers, and a listing with no filter is
+     * a real thing to want.
+     * </p>
+     *
+     * <p>
+     * The term spans the name and the contact email in one predicate. Almost every organization on the platform is
+     * unnamed, so the console lists many of them by email — a box that searched only the name would fail to find
+     * exactly the rows on screen.
+     * </p>
+     */
+    @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
+    @PostMapping("list")
+    public Page<ManagerOrgDto> listOrgs(@RequestBody ListOrgQuery query, Pageable pageable) {
+        return internalOrgService.findAll(query, pageable);
+    }
+
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @GetMapping("find-one")
 
-    public ManagerOrgDto findOne(@RequestParam ManagerOrgId id) {
+    public ManagerOrgDto findOne(@RequestParam ManagerOrgId id) throws OrgNotFoundException {
         return internalOrgService.findOne(id);
     }
 
@@ -70,12 +94,36 @@ public class OrgManagerApi {
         return signupService.createOrgUser(request);
     }
 
+    /**
+     * Sets the password of the account that owns an organization.
+     *
+     * <p>
+     * <strong>This had never once worked, in three layers at the same time.</strong> It passed
+     * {@code id.toString()} — the <em>organization's</em> 24-character ObjectId — where uaa wants a user id, and
+     * uaa's {@code AdminUserController.resetPassword} declares {@code @PathVariable UUID id}, so the request could
+     * not even bind. Behind that, {@code ManagerOrgDto.ownerUserId} — the field that would have carried the right
+     * id — was written by nothing and was null for every row on the platform. And seller-ui sent {@code password}
+     * while {@code UserAccountServiceImpl.changePassword} reads {@code getChangePassword()}, so the value would
+     * have been null even had it arrived.
+     * </p>
+     *
+     * <p>
+     * The owner is now resolved from the organization, which is what turns the two ids into one hop instead of a
+     * type confusion. An organization with no recorded owner answers {@link OrgOwnerUnknownException} — a 422
+     * naming the missing fact — rather than resetting nobody's password and reporting success.
+     * </p>
+     */
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN')")
     @PostMapping("change-password")
 
     public void changePassword(@RequestParam ManagerOrgId id, @RequestBody UserPassword request)
-            throws UaaUserNotFoundException, UaaApiUnavailableException {
-        userAccountService.changePassword(id.toString(), request);
+            throws UaaUserNotFoundException, UaaApiUnavailableException, OrgNotFoundException,
+            OrgOwnerUnknownException {
+        String ownerUserId = internalOrgService.findOne(id).ownerUserId();
+        if (ownerUserId == null || ownerUserId.isBlank()) {
+            throw OrgOwnerUnknownException.of(id);
+        }
+        userAccountService.changePassword(ownerUserId, request);
     }
 
     /**

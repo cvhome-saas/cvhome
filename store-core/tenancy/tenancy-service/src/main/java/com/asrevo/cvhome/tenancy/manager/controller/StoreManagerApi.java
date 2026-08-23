@@ -29,6 +29,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.commons.dto.PodStoreCount;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
@@ -73,6 +74,27 @@ public class StoreManagerApi {
     }
 
     /**
+     * How many stores sit on each pod, across every organization.
+     *
+     * <p>
+     * Super-admin only, and deliberately narrower than {@link #STORE_VIEWER_ROLES} above: those endpoints answer a
+     * caller about their own stores and scope the rows to prove it, while this is a platform-wide aggregate that
+     * cannot be scoped to anything. It exists because the fleet screen wants one number per pod in one request —
+     * a column costing a request per row is not a column.
+     * </p>
+     *
+     * <p>
+     * Tenancy owns {@code manager_store.pod_id}, which is why this is the authoritative count and pod-registry's
+     * {@code capacity_stores} is not: that one is a mirror maintained from this service's outbox.
+     * </p>
+     */
+    @GetMapping("stores-per-pod")
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    public List<PodStoreCount> storesPerPod() {
+        return internalStoreService.storesPerPod();
+    }
+
+    /**
      * @throws StoreQuotaRefusedException      billing will not let this org have another store — 422 with the reason
      * @throws BillingApiUnavailableException  billing could not be reached, so the store is not created; the caller
      *                                         should retry rather than assume it exists
@@ -113,7 +135,7 @@ public class StoreManagerApi {
     @PreAuthorize(STORE_VIEWER_ROLES)
     public Page<ManagerStoreDto> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                                        Pageable pageable) {
-        return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
+        return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null, null), pageable);
     }
 
     @GetMapping("private/store/{code}")

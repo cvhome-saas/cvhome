@@ -1,6 +1,8 @@
 package com.asrevo.cvhome.tenancy.manager.service;
 
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +13,7 @@ import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.commons.dto.PodStoreCount;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
@@ -37,6 +40,16 @@ public interface InternalStoreService {
                                   Pageable pageable);
 
     Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable);
+
+    /**
+     * How many stores sit on each pod, across every organization.
+     *
+     * <p>
+     * Unscoped, so the controller gates it on super admin. A pod with no stores is absent from the list rather than
+     * present as zero.
+     * </p>
+     */
+    List<PodStoreCount> storesPerPod();
 
     /**
      * Unscoped lookup, for callers that have no user — outbox handlers and provisioning. Never reachable from a
