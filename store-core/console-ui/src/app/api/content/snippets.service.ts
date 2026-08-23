@@ -11,7 +11,7 @@ import type {Snippet} from '@models/content';
  * `ContentAdminApi` serves them at `/private/content/snippets/{code}`; a `PUT` upserts, so there
  * is no create-versus-update decision to make on the client.
  */
-const CONTENT_API_BASE = '/spg/content/api/v1';
+import {CONTENT_PRIVATE} from './content-api';
 
 @Injectable({providedIn: 'root'})
 export class SnippetsService {
@@ -19,16 +19,16 @@ export class SnippetsService {
 
   /** Every snippet of the store, with every language's copy. */
   list(): Observable<readonly Snippet[]> {
-    return this.crudService.get(`${CONTENT_API_BASE}/private/content/snippets`);
+    return this.crudService.get(`${CONTENT_PRIVATE}/snippets`);
   }
 
   /** One snippet by code, with every language's copy. 404 when the store has never saved it. */
   get(code: string): Observable<Snippet> {
-    return this.crudService.get(`${CONTENT_API_BASE}/private/content/snippets/${code}`);
+    return this.crudService.get(`${CONTENT_PRIVATE}/snippets/${code}`);
   }
 
   /** Creates or replaces the snippet of that code. */
   put(code: string, snippet: Snippet): Observable<Snippet> {
-    return this.crudService.put(`${CONTENT_API_BASE}/private/content/snippets/${code}`, snippet);
+    return this.crudService.put(`${CONTENT_PRIVATE}/snippets/${code}`, snippet);
   }
 }

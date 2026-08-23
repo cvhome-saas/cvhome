@@ -388,6 +388,46 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * Content management: the hub with its seven tabs at `content/:tab`, and one editor route per
+     * workflow type (`content/pages/new`, `content/pages/:id`, …). The editor routes come first so
+     * `pages/new` is not read as the tab `pages` with a stray segment — a static path beats a param
+     * in Angular's matcher, but `:tab` only matches one segment anyway, so the order is for reading.
+     */
+    path: 'content',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
+    children: [
+      {path: '', redirectTo: 'pages', pathMatch: 'full'},
+      {
+        path: 'pages/new',
+        loadComponent: () => import('@features/content/editors/page-editor/page-editor').then((page) => page.PageEditor),
+        data: {titleKey: 'route.content.newPage', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'pages/:id',
+        loadComponent: () => import('@features/content/editors/page-editor/page-editor').then((page) => page.PageEditor),
+        data: {titleKey: 'route.content.page', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'posts/new',
+        loadComponent: () => import('@features/content/editors/post-editor/post-editor').then((page) => page.PostEditor),
+        data: {titleKey: 'route.content.newPost', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        path: 'posts/:id',
+        loadComponent: () => import('@features/content/editors/post-editor/post-editor').then((page) => page.PostEditor),
+        data: {titleKey: 'route.content.post', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+      {
+        // An unknown tab is caught in the page and replaced with `pages` — the catalogue's shape.
+        path: ':tab',
+        loadComponent: () => import('@features/content/content-hub').then((page) => page.ContentHub),
+        data: {titleKey: 'route.content.title', breadcrumbKey: 'shell.breadcrumb.content'},
+      },
+    ],
+  },
+  {
     path: 'store-management',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
     // Authentication and the store list for the whole branch; a *store* is not required, because

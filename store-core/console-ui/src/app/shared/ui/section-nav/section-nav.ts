@@ -12,6 +12,8 @@ export interface NavSection {
   readonly icon: IconName;
   /** Draws the amber dot: this section has something waiting on the operator. */
   readonly attention?: boolean;
+  /** A count shown at the end of the row (items in the section); hidden when the rail is collapsed. */
+  readonly count?: string | null;
 }
 
 /**
@@ -70,6 +72,9 @@ export interface NavSection {
             the label has something to animate from when it comes back.
           -->
           <span class="nav-copy">{{ t(section.labelKey) }}</span>
+          @if (section.count) {
+            <span class="nav-count">{{ section.count }}</span>
+          }
           @if (section.attention) {
             <!-- Colour is not the signal: the dot is titled, and the section it marks says why. -->
             <span

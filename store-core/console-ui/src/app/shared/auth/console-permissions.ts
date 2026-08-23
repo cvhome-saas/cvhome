@@ -58,4 +58,13 @@ export class ConsolePermissions {
   canAdministerPlatform(): boolean {
     return this.auth.getRoles().isSuperAdmin;
   }
+
+  /**
+   * Mirrors `STORE-POD.CONTENT.*` → `hasManageAccessOnStore`: org admin or store admin. A store
+   * moderator has `STORE-POD.CONTENT.READ` and sees the lists read-only.
+   */
+  canManageContent(): boolean {
+    const roles = this.auth.getRoles();
+    return roles.isSuperAdmin || roles.isOrgAdmin || roles.isStoreAdmin;
+  }
 }

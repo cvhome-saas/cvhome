@@ -101,6 +101,13 @@
     },
     "plans": {
       "title": "Plans | cvhome"
+    },
+    "content": {
+      "title": "Content management | cvhome",
+      "newPage": "New page | cvhome",
+      "page": "Page | cvhome",
+      "newPost": "New post | cvhome",
+      "post": "Post | cvhome"
     }
   },
   "notFound": {
@@ -1216,7 +1223,8 @@
       "pod": "Pod",
       "platformUsers": "Accounts",
       "platformBilling": "Billing",
-      "plans": "Plans"
+      "plans": "Plans",
+      "content": "Content management"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -2978,6 +2986,326 @@
         "title": "No plans",
         "message": "Billing has no plan in its catalogue."
       }
+    }
+  },
+  "content": {
+    "hub": {
+      "title": "Content management",
+      "context": "{store} · pages, posts, media and storefront navigation",
+      "railHeading": "Content",
+      "railLabel": "Content sections"
+    },
+    "tab": {
+      "pages": "Pages",
+      "posts": "Blog posts",
+      "banners": "Banners & promos",
+      "faq": "FAQ entries",
+      "media": "Media library",
+      "menus": "Navigation menus",
+      "policies": "Legal & policies"
+    },
+    "create": {
+      "pages": "New page",
+      "posts": "New post",
+      "banners": "New banner",
+      "faq": "New FAQ entry",
+      "policies": "New policy",
+      "media": "Upload files",
+      "menus": "Add link"
+    },
+    "kpi": {
+      "label": "Content overview",
+      "published": "Published items",
+      "publishedMeta": "across pages, posts, banners, FAQ and policies",
+      "drafts": "Drafts",
+      "draftsMeta": "{count} untouched for 30+ days",
+      "awaitingTranslation": "Awaiting translation",
+      "allTranslated": "Everything translated",
+      "media": "Media storage",
+      "mediaMeta": "{count} files · {percent}% of {quota}"
+    },
+    "bytes": {
+      "gb": "{value} GB",
+      "mb": "{value} MB",
+      "kb": "{value} KB"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "REVIEW": "Review",
+      "SCHEDULED": "Scheduled",
+      "PUBLISHED": "Published",
+      "ARCHIVED": "Archived"
+    },
+    "translationState": {
+      "MISSING": "{code}: not translated",
+      "DRAFT": "{code}: draft",
+      "TRANSLATED": "{code}: translated",
+      "STALE": "{code}: translated, source changed since"
+    },
+    "column": {
+      "pages": "Page",
+      "posts": "Post",
+      "banners": "Placement",
+      "faq": "Question",
+      "policies": "Policy",
+      "status": "Status",
+      "languages": "Languages",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "filter": {
+      "all": "All",
+      "search": "Search content",
+      "searchPlaceholder": "Search titles and slugs…",
+      "clearSearch": "Clear the search",
+      "language": "Filter by missing language",
+      "allLanguages": "All languages",
+      "missingLanguage": "Missing {language}",
+      "clearLanguage": "Show all languages",
+      "byStatus": "Filter by status",
+      "clear": "Clear filters"
+    },
+    "list": {
+      "loading": "Loading content…",
+      "none": "Nothing here yet",
+      "range": "Showing {from}–{to} of {total}",
+      "noneMatch": "Nothing matches these filters.",
+      "publishesOn": "Publishes {date}",
+      "pagesLabel": "Content pages",
+      "unit": {
+        "pages": "pages",
+        "posts": "posts",
+        "banners": "banners",
+        "faq": "entries",
+        "policies": "policies"
+      },
+      "empty": {
+        "pages": "No pages yet. The storefront shows only the pages you publish here.",
+        "posts": "No blog posts yet.",
+        "banners": "No banners yet. The storefront falls back to the store's slider images.",
+        "faq": "No FAQ entries yet.",
+        "policies": "No policies yet. Checkout links the terms and returns policies from here."
+      }
+    },
+    "action": {
+      "edit": "Edit",
+      "editFor": "Edit {title}",
+      "moreFor": "More actions for {title}",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "submit-review": "Submit for review",
+      "archive": "Archive",
+      "restore": "Restore to draft",
+      "delete": "Delete",
+      "schedule": "Schedule…",
+      "save": "Save",
+      "close": "Close"
+    },
+    "bulk": {
+      "label": "Bulk actions",
+      "selected": "{count} selected",
+      "selectAll": "Select every row on this page",
+      "selectRow": "Select {title}",
+      "clear": "Clear selection"
+    },
+    "toast": {
+      "publish": "{title} is now {status}.",
+      "unpublish": "{title} is back to {status}.",
+      "submit-review": "{title} was sent for review.",
+      "archive": "{title} was archived.",
+      "restore": "{title} was restored to draft.",
+      "deleted": "{title} was deleted.",
+      "bulkDone": "{count} item(s) updated.",
+      "bulkPartial": "{ok} updated, {failed} could not be."
+    },
+    "delete": {
+      "title": "Delete {title}?",
+      "message": "This removes it from the storefront and cannot be undone. A page linked from a menu is removed from the menu too."
+    },
+    "editor": {
+      "back": "Back to content",
+      "saveDraft": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "loading": "Loading…",
+      "moreActions": "More actions",
+      "versionConflict": "Someone else changed this item since you opened it. It has been reloaded — apply your edits again.",
+      "publishAt": "Publish date",
+      "publishAtHint": "Leave empty to publish immediately.",
+      "unpublishAt": "Unpublish date",
+      "unpublishAtHint": "Optional: the item is archived at this time.",
+      "schedule": "Schedule",
+      "scheduleTitle": "Schedule publishing",
+      "scheduleSubtitle": "The item publishes itself at this time."
+    },
+    "copy": {
+      "title": "Content",
+      "subtitle": "Written per language; other locales fall back to the source copy.",
+      "writeIn": "Write in",
+      "pageTitle": "Title",
+      "postTitle": "Title",
+      "body": "Body",
+      "excerpt": "Excerpt",
+      "excerptHint": "Shown on the blog index and in search results. Up to 300 characters.",
+      "altHint": "Describes the artwork for screen readers and search engines.",
+      "fallbackNotice": "{language} is the source copy. Other languages fall back to it when empty."
+    },
+    "seo": {
+      "title": "URL & search",
+      "subtitle": "Where the page lives and how it appears in search results.",
+      "slug": "URL slug",
+      "slugHint": "Lower-case letters, digits and dashes, after {prefix}",
+      "slugCheck": {
+        "pending": "Checking…",
+        "free": "Available",
+        "taken": "Already used"
+      },
+      "metaTitle": "Meta title",
+      "metaTitleHint": "Falls back to the title. Up to 70 characters is best.",
+      "metaDescription": "Meta description",
+      "metaDescriptionHint": "Aim for 50–160 characters.",
+      "keywords": "Search keywords",
+      "keywordsHint": "Comma-separated.",
+      "canonical": "Canonical URL",
+      "canonicalHint": "Only when this content lives elsewhere first.",
+      "noindex": "Hide from search engines",
+      "noindexHint": "Turn on for internal or campaign-only pages.",
+      "serpHost": "your-store",
+      "serpTitlePlaceholder": "Page title",
+      "serpDescriptionPlaceholder": "The meta description appears here."
+    },
+    "checklist": {
+      "title": "Before publishing",
+      "titleAndBody": "Title and body written",
+      "slug": "Slug set and available",
+      "metaLength": "Meta description under 160 characters",
+      "hero": "Hero image chosen",
+      "translationsDone": "All languages translated",
+      "translationsMissing": "Translations missing: {languages}"
+    },
+    "page": {
+      "newTitle": "New page",
+      "editTitle": "Page",
+      "context": "Content, URL and visibility for a storefront page",
+      "templateTitle": "Template",
+      "templateSubtitle": "How the storefront lays the page out.",
+      "template": {
+        "STANDARD": {
+          "label": "Standard page",
+          "hint": "Title and rich text. For policies, about and company pages."
+        },
+        "LANDING": {
+          "label": "Landing page",
+          "hint": "Hero, sections and calls to action for campaigns."
+        },
+        "CONTACT": {
+          "label": "Contact page",
+          "hint": "Form, address block and opening hours."
+        },
+        "FAQ_PAGE": {
+          "label": "FAQ page",
+          "hint": "Pulls grouped entries from the FAQ library."
+        }
+      },
+      "visibility": "Visibility",
+      "parent": "Parent page",
+      "noParent": "None — top level",
+      "showInFooter": "Add to the footer menu",
+      "showInFooterHint": "Appears under Company alongside About and Contact.",
+      "linkToMenu": "Add to the main menu",
+      "linkToMenuHint": "Listed in the storefront navigation."
+    },
+    "post": {
+      "newTitle": "New post",
+      "editTitle": "Post",
+      "context": "Editorial content at /blog/<slug>",
+      "hero": "Hero image",
+      "heroHint": "Shown on the blog index and at the top of the post.",
+      "chooseHero": "Choose from library",
+      "removeHero": "Remove",
+      "organise": "Organise",
+      "categories": "Categories",
+      "noCategories": "No categories yet.",
+      "tags": "Tags",
+      "author": "Author",
+      "featured": "Featured",
+      "featuredHint": "Pinned to the top of the blog index."
+    },
+    "media": {
+      "folders": "Folders",
+      "allFiles": "All files",
+      "newFolder": "New folder",
+      "folderName": "Folder name",
+      "deleteFolder": "Delete folder {name}",
+      "library": "Library",
+      "shown": "{count} files",
+      "search": "Search files",
+      "searchPlaceholder": "Search by name, title or tag…",
+      "filterType": "Filter by type",
+      "allTypes": "All types",
+      "clearType": "Show all types",
+      "unusedOnly": "Unused only",
+      "view": "View",
+      "gridView": "Grid view",
+      "listView": "List view",
+      "loading": "Loading files…",
+      "dropTitle": "Drop files here to upload",
+      "dropHint": "JPG, PNG, WebP, SVG, MP4, PDF, ZIP · up to 50 MB per file",
+      "browse": "Browse files",
+      "tooLarge": "{name} is over 50 MB and was not uploaded.",
+      "uploaded": "{count} file(s) uploaded.",
+      "saved": "Saved.",
+      "deleted": "{name} was deleted.",
+      "urlCopied": "URL copied.",
+      "preview": "Preview",
+      "copyUrl": "Copy URL",
+      "details": "Details",
+      "openAsset": "Open {name}",
+      "openFile": "Open file",
+      "empty": "No files yet. Drop some above.",
+      "noneMatch": "No files match these filters.",
+      "unit": "files",
+      "pagesLabel": "Media pages",
+      "usedOn": "used on {count} item(s)",
+      "unused": "unused",
+      "usedIn": "Used in",
+      "titleField": "Title",
+      "altText": "Alt text",
+      "altLanguage": "Alt text language",
+      "altPlaceholder": "What the image shows",
+      "tags": "Tags",
+      "folder": "Folder",
+      "noFolder": "No folder",
+      "kind": {
+        "IMAGE": "Image",
+        "VIDEO": "Video",
+        "DOCUMENT": "Document",
+        "ARCHIVE": "Archive",
+        "VECTOR": "Vector"
+      },
+      "usageKind": {
+        "PAGE": "Page",
+        "POST": "Post",
+        "BANNER": "Banner",
+        "FAQ": "FAQ",
+        "POLICY": "Policy",
+        "BOX": "Snippet",
+        "SECTION": "Section"
+      },
+      "delete": {
+        "title": "Delete {name}?",
+        "message": "The file is removed from storage. This cannot be undone.",
+        "forceTitle": "{name} is still in use — delete anyway?",
+        "forceMessage": "It is referenced by: {uses}. Those places will show a missing image."
+      }
+    },
+    "mediaPicker": {
+      "title": "Choose from the media library",
+      "uploadTitle": "Or drop a new file",
+      "empty": "No files of this kind yet."
+    },
+    "menus": {
+      "comingSoon": "The navigation menu editor arrives with the next update."
     }
   }
 }

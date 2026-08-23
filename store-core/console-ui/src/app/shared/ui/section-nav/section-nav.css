@@ -181,3 +181,19 @@ hr {
     top: 1.5rem;
   }
 }
+
+.nav-count {
+  margin-inline-start: auto;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground-quiet);
+}
+
+.nav-item.active .nav-count {
+  color: var(--primary-emphasis);
+}
+
+.settings-nav.collapsed .nav-count {
+  display: none;
+}

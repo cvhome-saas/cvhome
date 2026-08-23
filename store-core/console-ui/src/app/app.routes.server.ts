@@ -90,6 +90,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    // Content management: every call is scoped by the request context's `store`.
+    path: 'content/**',
+    renderMode: RenderMode.Client,
+  },
+  {
     // The billing page. Store-scoped like the rest, and previously declared nowhere — it worked
     // only because it fell through to the catch-all below, which meant the file said nothing about
     // the one console branch a paying customer lands on.

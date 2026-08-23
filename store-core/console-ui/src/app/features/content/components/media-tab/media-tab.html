@@ -1,0 +1,248 @@
+<ng-container *transloco="let t">
+  <app-panel class="folders-panel" [title]="t('content.media.folders')" padded>
+    <div class="folder-chips">
+      <button class="chip" type="button" [class.active]="facade.folder() === null" (click)="pickFolder(null)">
+        <app-icon name="images" [size]="13" />
+        <span>{{ t('content.media.allFiles') }}</span>
+        <small>{{ totalFiles() }}</small>
+      </button>
+      @for (folder of facade.folders(); track folder.id) {
+        <button class="chip" type="button" [class.active]="facade.folder() === folder.id" (click)="pickFolder(folder)">
+          <app-icon name="file" [size]="13" />
+          <span>{{ folder.name }}</span>
+          <small>{{ folder.fileCount ?? 0 }}</small>
+          @if (canManage() && !folder.system && facade.folder() === folder.id) {
+            <span
+              class="chip-delete"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="t('content.media.deleteFolder', {name: folder.name})"
+              (click)="$event.stopPropagation(); facade.deleteFolder(folder)"
+              (keydown.enter)="$event.stopPropagation(); facade.deleteFolder(folder)"
+            ><app-icon name="x" [size]="11" /></span>
+          }
+        </button>
+      }
+      @if (canManage()) {
+        @if (newFolderOpen()) {
+          <form class="new-folder" (submit)="$event.preventDefault(); createFolder()">
+            <app-text-field
+              [value]="newFolderName()"
+              (valueChange)="newFolderName.set($event)"
+              [placeholder]="t('content.media.folderName')"
+              [ariaLabel]="t('content.media.folderName')"
+              [maxLength]="60"
+            />
+            <button class="primary-action" type="submit" [disabled]="!newFolderName().trim()">{{ t('content.action.save') }}</button>
+            <button class="ghost-action" type="button" (click)="newFolderOpen.set(false)">{{ t('shared.actions.cancel') }}</button>
+          </form>
+        } @else {
+          <button class="chip add" type="button" (click)="newFolderOpen.set(true)">
+            <app-icon name="plus" [size]="12" />
+            <span>{{ t('content.media.newFolder') }}</span>
+          </button>
+        }
+      }
+    </div>
+  </app-panel>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay [busy]="facade.isLoading() || facade.saving()" [label]="t('content.media.loading')" reserve="panel">
+    <app-panel class="library-panel" [title]="t('content.media.library')" [subtitle]="t('content.media.shown', {count: facade.page().totalElements})">
+      <div panelAction class="panel-controls" role="search">
+        <app-search-box
+          width="12rem"
+          [value]="facade.search()"
+          (valueChange)="facade.search.set($event)"
+          [label]="t('content.media.search')"
+          [placeholder]="t('content.media.searchPlaceholder')"
+          [clearLabel]="t('content.filter.clearSearch')"
+        />
+        <app-select
+          class="filter-select"
+          clearable
+          [options]="kindOptions()"
+          [value]="facade.kind() ?? ''"
+          (valueChange)="onKind($event)"
+          [ariaLabel]="t('content.media.filterType')"
+          [clearLabel]="t('content.media.clearType')"
+        />
+        <app-toggle [checked]="facade.unusedOnly()" (checkedChange)="facade.unusedOnly.set($event)" [label]="t('content.media.unusedOnly')" />
+        <div class="view-toggle" role="group" [attr.aria-label]="t('content.media.view')">
+          <button class="icon-action" type="button" [class.active]="facade.view() === 'grid'" [attr.aria-pressed]="facade.view() === 'grid'" [title]="t('content.media.gridView')" (click)="facade.view.set('grid')">
+            <app-icon name="layoutGrid" [size]="14" />
+          </button>
+          <button class="icon-action" type="button" [class.active]="facade.view() === 'list'" [attr.aria-pressed]="facade.view() === 'list'" [title]="t('content.media.listView')" (click)="facade.view.set('list')">
+            <app-icon name="list" [size]="14" />
+          </button>
+        </div>
+      </div>
+
+      @if (canManage()) {
+        <div class="dropzone-wrap">
+          <app-file-drop-zone
+            [title]="t('content.media.dropTitle')"
+            [hint]="t('content.media.dropHint')"
+            [browseLabel]="t('content.media.browse')"
+            [tooLargeLabel]="tooLarge"
+            [busy]="facade.uploading()"
+            [percent]="facade.uploadPercent()"
+            (files)="onFiles($event)"
+          />
+        </div>
+      }
+
+      @if (facade.assets().length) {
+        @if (facade.view() === 'grid') {
+          <ul class="asset-grid" [attr.aria-label]="t('content.media.library')">
+            @for (asset of facade.assets(); track asset.id) {
+              <li class="asset-card" [class.selected]="facade.openAsset()?.id === asset.id">
+                <button class="asset-preview" type="button" (click)="openAsset(asset)" [attr.aria-label]="t('content.media.openAsset', {name: asset.filename})">
+                  @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
+                    <img [src]="asset.url" [alt]="asset.altTexts?.['en'] ?? ''" loading="lazy" />
+                  } @else {
+                    <app-icon [name]="kindIcon(asset)" [size]="32" />
+                  }
+                  <app-badge class="kind-chip" tone="slate" shape="square">{{ t('content.media.kind.' + asset.kind) }}</app-badge>
+                </button>
+                <div class="asset-copy">
+                  <strong dir="ltr">{{ asset.filename }}</strong>
+                  <small>{{ meta(asset) }}</small>
+                  <div class="asset-actions">
+                    @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
+                      <button class="secondary-action compact" type="button" (click)="previewUrl.set(asset.url)">
+                        <app-icon name="eye" [size]="12" />{{ t('content.media.preview') }}
+                      </button>
+                    }
+                    <button class="icon-action" type="button" [title]="t('content.media.copyUrl')" [attr.aria-label]="t('content.media.copyUrl')" (click)="copyUrl(asset)">
+                      <app-icon name="link" [size]="13" />
+                    </button>
+                    <button class="icon-action" type="button" [title]="t('content.media.details')" [attr.aria-label]="t('content.media.details')" (click)="openAsset(asset)">
+                      <app-icon name="ellipsisH" [size]="13" />
+                    </button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <ul class="asset-list" [attr.aria-label]="t('content.media.library')">
+            @for (asset of facade.assets(); track asset.id) {
+              <li class="asset-row" [class.selected]="facade.openAsset()?.id === asset.id">
+                <button class="row-thumb" type="button" (click)="openAsset(asset)" [attr.aria-label]="t('content.media.openAsset', {name: asset.filename})">
+                  @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
+                    <img [src]="asset.url" alt="" loading="lazy" />
+                  } @else {
+                    <app-icon [name]="kindIcon(asset)" [size]="18" />
+                  }
+                </button>
+                <div class="row-copy">
+                  <strong dir="ltr">{{ asset.filename }}</strong>
+                  <small>{{ meta(asset) }} · {{ usedLabel(asset) }}</small>
+                </div>
+                <app-badge tone="slate" shape="square">{{ t('content.media.kind.' + asset.kind) }}</app-badge>
+                <span class="row-date">{{ date(asset) }}</span>
+                <div class="row-actions">
+                  <button class="icon-action" type="button" [title]="t('content.media.copyUrl')" [attr.aria-label]="t('content.media.copyUrl')" (click)="copyUrl(asset)">
+                    <app-icon name="link" [size]="13" />
+                  </button>
+                  <button class="icon-action" type="button" [title]="t('content.media.details')" [attr.aria-label]="t('content.media.details')" (click)="openAsset(asset)">
+                    <app-icon name="ellipsisH" [size]="13" />
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      } @else if (!facade.isEmpty()) {
+        <app-empty-state icon="images" [message]="facade.filtered() ? t('content.media.noneMatch') : t('content.media.empty')">
+          @if (facade.filtered()) {
+            <button class="secondary-action" type="button" (click)="facade.clearFilters()">{{ t('content.filter.clear') }}</button>
+          }
+        </app-empty-state>
+      }
+
+      <app-pagination
+        [page]="facade.page().pageNumber"
+        [totalPages]="facade.page().totalPages"
+        [totalElements]="facade.page().totalElements"
+        [pageSize]="pageSize"
+        [unit]="t('content.media.unit')"
+        [label]="t('content.media.pagesLabel')"
+        (pageChange)="facade.goToPage($event)"
+      />
+    </app-panel>
+  </app-busy-overlay>
+
+  @if (facade.openAsset(); as asset) {
+    <app-panel class="drawer" [title]="asset.filename" [subtitle]="meta(asset) + ' · ' + usedLabel(asset)">
+      <button panelAction class="icon-action" type="button" [attr.aria-label]="t('content.action.close')" (click)="closeAsset()">
+        <app-icon name="x" [size]="14" />
+      </button>
+      <div class="drawer-body">
+        <div class="drawer-preview">
+          @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
+            <img [src]="asset.url" [alt]="currentAlt()" />
+          } @else {
+            <app-icon [name]="kindIcon(asset)" [size]="40" />
+          }
+          <a class="secondary-action" [href]="asset.url" target="_blank" rel="noopener">
+            <app-icon name="externalLink" [size]="12" />{{ t('content.media.openFile') }}
+          </a>
+        </div>
+        <div class="drawer-fields">
+          <label class="field">
+            <span class="field-label">{{ t('content.media.titleField') }}</span>
+            <app-text-field [value]="draftTitle()" (valueChange)="draftTitle.set($event)" [disabled]="!canManage()" [maxLength]="200" />
+          </label>
+          <div class="field">
+            <span class="field-label">{{ t('content.media.altText') }}</span>
+            <div class="alt-row">
+              <app-select [options]="localeSelect()" [value]="altLocale()" (valueChange)="altLocale.set($event)" [ariaLabel]="t('content.media.altLanguage')" />
+              <app-text-field [value]="currentAlt()" (valueChange)="setAlt($event)" [disabled]="!canManage()" [maxLength]="255" [placeholder]="t('content.media.altPlaceholder')" />
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">{{ t('content.media.tags') }}</span>
+            <app-tag-input [tags]="draftTags()" (tagsChange)="draftTags.set($event)" [disabled]="!canManage()" [label]="t('content.media.tags')" />
+          </div>
+          <label class="field">
+            <span class="field-label">{{ t('content.media.folder') }}</span>
+            <app-select [options]="folderOptions()" [value]="draftFolder()" (valueChange)="draftFolder.set($event)" [disabled]="!canManage()" [ariaLabel]="t('content.media.folder')" />
+          </label>
+          @if (asset.usage?.length) {
+            <div class="field">
+              <span class="field-label">{{ t('content.media.usedIn') }}</span>
+              <ul class="usage-list">
+                @for (use of asset.usage; track use.itemType + use.itemId + use.field) {
+                  <li>{{ t('content.media.usageKind.' + use.itemType) }} · {{ use.itemTitle ?? '#' + use.itemId }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (canManage()) {
+            <div class="drawer-actions">
+              <button class="primary-action" type="button" [disabled]="facade.saving()" (click)="saveAsset(asset)">{{ t('content.action.save') }}</button>
+              <button class="danger-action" type="button" (click)="facade.askDelete(asset)"><app-icon name="trash" [size]="13" />{{ t('content.action.delete') }}</button>
+            </div>
+          }
+        </div>
+      </div>
+    </app-panel>
+  }
+
+  <app-image-preview [open]="previewUrl() !== null" [url]="previewUrl()" (openChange)="$event || previewUrl.set(null)" />
+
+  <app-confirm-dialog
+    [open]="facade.pendingDelete() !== null"
+    [title]="deleteTitle()"
+    [message]="deleteMessage()"
+    [confirmLabel]="t('content.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDelete()"
+  />
+</ng-container>

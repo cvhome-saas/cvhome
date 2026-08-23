@@ -1,13 +1,66 @@
 /**
  * Wire DTOs of the content service (`store-pod/content`), private console API.
  *
- * Console-native: written against the new content platform, not ported from seller-core. The full
- * set (pages, posts, banners, FAQ, policies, menus, media) lands with the Content module; what is
- * here is what store management already needs.
+ * Console-native: written against the content platform, not ported from seller-core. Field names
+ * mirror the Java DTOs in `content-commons` (`PersistableContent`, `ContentTranslation`,
+ * `ReadableContentRow`, `ContentSummary`, `Snippet`, …) so a change on either side is a grep away.
  */
+
+import type {PageT} from '@models/page';
+
+/** The content types that have a workflow and a console list. `snippets` are the legacy BOX rows. */
+export type ContentListType = 'pages' | 'posts' | 'banners' | 'faq' | 'policies';
+
+/** Every tab of the Content management hub. */
+export type ContentTab = ContentListType | 'media' | 'menus';
+
+export const CONTENT_LIST_TYPES: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
+
+export const CONTENT_TABS: readonly ContentTab[] = ['pages', 'posts', 'banners', 'faq', 'media', 'menus', 'policies'];
+
+export type ContentType = 'BOX' | 'PAGE' | 'SECTION' | 'POST' | 'BANNER' | 'FAQ' | 'POLICY';
+
+export type ContentStatus = 'DRAFT' | 'REVIEW' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
+
+export const CONTENT_STATUSES: readonly ContentStatus[] = ['DRAFT', 'REVIEW', 'SCHEDULED', 'PUBLISHED', 'ARCHIVED'];
 
 /** How complete one locale of an item is. */
 export type TranslationState = 'MISSING' | 'DRAFT' | 'TRANSLATED' | 'STALE';
+
+export type PageTemplate = 'STANDARD' | 'LANDING' | 'CONTACT' | 'FAQ_PAGE';
+
+export type BannerPlacement = 'HERO' | 'CAROUSEL' | 'COLLECTION' | 'STRIP';
+
+export const BANNER_PLACEMENTS: readonly BannerPlacement[] = ['HERO', 'CAROUSEL', 'COLLECTION', 'STRIP'];
+
+export type PolicyType = 'TERMS' | 'PRIVACY' | 'RETURNS' | 'SHIPPING' | 'COOKIES' | 'CUSTOM';
+
+export const POLICY_TYPES: readonly PolicyType[] = ['TERMS', 'PRIVACY', 'RETURNS', 'SHIPPING', 'COOKIES', 'CUSTOM'];
+
+export type PolicyVersionStatus = 'DRAFT' | 'LIVE' | 'ARCHIVED';
+
+export type MenuHandle = 'MAIN' | 'FOOTER';
+
+export type MenuTargetKind = 'PAGE' | 'CATEGORY' | 'PRODUCT' | 'POLICY' | 'BLOG_INDEX' | 'FAQ_INDEX' | 'URL';
+
+export const MENU_TARGET_KINDS: readonly MenuTargetKind[] = [
+  'PAGE',
+  'CATEGORY',
+  'PRODUCT',
+  'POLICY',
+  'BLOG_INDEX',
+  'FAQ_INDEX',
+  'URL',
+];
+
+export type MediaKind = 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'ARCHIVE' | 'VECTOR';
+
+export const MEDIA_KINDS: readonly MediaKind[] = ['IMAGE', 'VIDEO', 'DOCUMENT', 'ARCHIVE', 'VECTOR'];
+
+export type BulkAction = 'PUBLISH' | 'UNPUBLISH' | 'ARCHIVE' | 'DELETE';
+
+/** The status transitions the API exposes as `POST …/{id}/<action>`. */
+export type TransitionAction = 'publish' | 'unpublish' | 'submit-review' | 'archive' | 'restore';
 
 /**
  * One locale of a content item — maps 1:1 onto the server's `content_description` row (`title` is
@@ -23,11 +76,259 @@ export interface ContentTranslation {
   readonly friendlyUrl?: string;
   readonly metaTitle?: string;
   readonly metaDescription?: string;
-  /** Comma-separated search keywords. Stored and read back by the new service. */
+  /** Comma-separated search keywords. */
   readonly keywords?: string;
   readonly altText?: string;
   readonly ctaLabel?: string;
   readonly subtitle?: string;
+}
+
+export interface LocaleState {
+  readonly code: string;
+  readonly state: TranslationState;
+}
+
+export interface ContentAudit {
+  readonly createdAt?: string;
+  readonly createdBy?: string;
+  readonly updatedAt?: string;
+  readonly updatedBy?: string;
+}
+
+/** One row of a console list. */
+export interface ContentRow {
+  readonly id: number;
+  readonly type: ContentType;
+  readonly slug: string;
+  readonly title: string;
+  readonly subtitle: string;
+  readonly status: ContentStatus;
+  readonly publishAt?: string | null;
+  readonly locales: readonly LocaleState[];
+  readonly updatedAt?: string | null;
+  readonly updatedBy?: string | null;
+}
+
+/** The fields every workflow item carries on write. Type-specific DTOs extend it. */
+export interface PersistableContent {
+  readonly id?: number;
+  /** The optimistic lock: send what was read; a stale one is a 409 `CONTENT.VERSION.CONFLICT`. */
+  readonly version?: number;
+  readonly slug: string;
+  readonly translations: readonly ContentTranslation[];
+  readonly publishAt?: string | null;
+  readonly unpublishAt?: string | null;
+  readonly noindex?: boolean;
+  readonly canonicalUrl?: string | null;
+  readonly ogMediaId?: number | null;
+  readonly sortOrder?: number | null;
+}
+
+/** The read-only quartet every readable item adds. */
+export interface ReadableContentMeta {
+  readonly type: ContentType;
+  readonly status: ContentStatus;
+  readonly locales: readonly LocaleState[];
+  readonly audit: ContentAudit;
+}
+
+export interface PersistablePage extends PersistableContent {
+  readonly template?: PageTemplate;
+  readonly parentId?: number | null;
+  readonly showInFooter?: boolean;
+  readonly linkToMenu?: boolean;
+}
+
+export type ReadablePage = PersistablePage & ReadableContentMeta;
+
+export interface PersistablePost extends PersistableContent {
+  readonly heroMediaId?: number | null;
+  readonly categoryIds?: readonly number[];
+  readonly tags?: readonly string[];
+  readonly authorName?: string | null;
+  readonly featured?: boolean;
+}
+
+export interface ReadablePost extends PersistablePost, ReadableContentMeta {
+  readonly readingMinutes?: number;
+  readonly heroMediaUrl?: string | null;
+}
+
+export interface BannerTarget {
+  readonly kind: 'COLLECTION' | 'PRODUCT' | 'PAGE' | 'URL';
+  readonly value: string;
+}
+
+export interface BannerArtwork {
+  readonly desktopMediaId?: number | null;
+  readonly mobileMediaId?: number | null;
+  readonly mobileCrop?: string | null;
+}
+
+export interface BannerTheme {
+  readonly textColor?: string | null;
+  readonly overlayOpacity?: number | null;
+  readonly alignment?: string | null;
+}
+
+export interface PersistableBanner extends PersistableContent {
+  readonly placement: BannerPlacement;
+  readonly startsAt?: string | null;
+  readonly endsAt?: string | null;
+  readonly target?: BannerTarget | null;
+  readonly artwork?: BannerArtwork | null;
+  readonly theme?: BannerTheme | null;
+  readonly loggedInOnly?: boolean;
+}
+
+export interface ReadableBanner extends PersistableBanner, ReadableContentMeta {
+  readonly desktopUrl?: string | null;
+  readonly mobileUrl?: string | null;
+}
+
+export interface PersistableFaq extends PersistableContent {
+  readonly groupId?: number | null;
+  readonly position?: number | null;
+  readonly keywords?: readonly string[];
+  readonly showInCheckoutHelp?: boolean;
+}
+
+export interface ReadableFaq extends PersistableFaq, ReadableContentMeta {
+  readonly groupName?: string | null;
+}
+
+export interface FaqGroup {
+  readonly id?: number;
+  readonly key: string;
+  readonly names: Readonly<Record<string, string>>;
+  readonly position?: number;
+  readonly entryCount?: number;
+}
+
+export interface FaqReorder {
+  readonly id: number;
+  readonly groupId: number;
+  readonly position: number;
+}
+
+export interface PersistablePolicy extends PersistableContent {
+  readonly policyType: PolicyType;
+  readonly jurisdiction?: string | null;
+  readonly effectiveFrom?: string | null;
+  readonly requiresAcceptance?: boolean;
+  readonly notifyCustomers?: boolean;
+  readonly showInFooter?: boolean;
+  readonly showAtCheckout?: boolean;
+  readonly showAtSignup?: boolean;
+}
+
+export interface ReadablePolicyVersion {
+  readonly version: number;
+  readonly status: PolicyVersionStatus;
+  readonly note?: string | null;
+  readonly effectiveFrom?: string | null;
+  readonly publishedAt?: string | null;
+  readonly publishedBy?: string | null;
+  readonly translations?: readonly ContentTranslation[];
+}
+
+export interface ReadablePolicy extends PersistablePolicy, ReadableContentMeta {
+  readonly liveVersion: number;
+  readonly versions: readonly ReadablePolicyVersion[];
+}
+
+export interface PolicyCompliance {
+  readonly type: PolicyType;
+  readonly requiredBy: readonly string[];
+  readonly status: ContentStatus | null;
+  readonly id: number | null;
+}
+
+export interface PolicyTemplate {
+  readonly type: PolicyType;
+  readonly jurisdiction?: string | null;
+  readonly translations: readonly ContentTranslation[];
+}
+
+export interface PublishPolicyVersionRequest {
+  readonly effectiveFrom?: string | null;
+  readonly note?: string | null;
+}
+
+export interface PostCategory {
+  readonly id?: number;
+  readonly slug: string;
+  readonly names: Readonly<Record<string, string>>;
+  readonly position?: number;
+  readonly postCount?: number;
+}
+
+export interface MenuTarget {
+  readonly kind: MenuTargetKind;
+  readonly value?: string | null;
+  /** Set by the server when an internal target no longer resolves. */
+  readonly broken?: boolean | null;
+}
+
+export interface MenuItem {
+  readonly id?: number;
+  readonly position?: number;
+  readonly labels: Readonly<Record<string, string>>;
+  readonly target: MenuTarget;
+  readonly openInNewTab?: boolean;
+  readonly visible?: boolean;
+  readonly children: readonly MenuItem[];
+}
+
+export interface Menu {
+  readonly id?: number;
+  readonly handle: MenuHandle;
+  readonly names?: Readonly<Record<string, string>>;
+  readonly items: readonly MenuItem[];
+  readonly itemCount?: number;
+}
+
+export interface MediaFolder {
+  readonly id?: number;
+  readonly name: string;
+  readonly key?: string;
+  readonly position?: number;
+  readonly system?: boolean;
+  readonly fileCount?: number;
+}
+
+export interface MediaUsage {
+  readonly itemType: ContentType;
+  readonly itemId: number;
+  readonly itemTitle?: string | null;
+  readonly field: string;
+}
+
+export interface MediaAsset {
+  readonly id: number;
+  readonly filename: string;
+  readonly originalFilename: string;
+  readonly mimeType: string;
+  readonly kind: MediaKind;
+  readonly bytes: number;
+  readonly width?: number | null;
+  readonly height?: number | null;
+  readonly url: string;
+  readonly folderId?: number | null;
+  readonly altTexts?: Readonly<Record<string, string>>;
+  readonly title?: string | null;
+  readonly tags?: readonly string[];
+  readonly uploadedAt?: string;
+  readonly uploadedBy?: string | null;
+  readonly usageCount: number;
+  readonly usage?: readonly MediaUsage[] | null;
+}
+
+export interface PersistableMediaAsset {
+  readonly folderId?: number | null;
+  readonly altTexts?: Readonly<Record<string, string>>;
+  readonly title?: string | null;
+  readonly tags?: readonly string[];
 }
 
 /**
@@ -40,3 +341,59 @@ export interface Snippet {
   readonly visible: boolean;
   readonly translations: readonly ContentTranslation[];
 }
+
+export interface ContentSummary {
+  readonly publishedItems: number;
+  readonly drafts: {readonly total: number; readonly staleOver30Days: number};
+  readonly awaitingTranslation: {readonly total: number; readonly byLocale: Readonly<Record<string, number>>};
+  readonly media: {readonly bytesUsed: number; readonly bytesQuota: number; readonly fileCount: number};
+  readonly counts: Readonly<Record<string, number>>;
+}
+
+export interface SavedContent {
+  readonly id: number;
+  readonly status: ContentStatus;
+  readonly version: number;
+}
+
+export interface PublishRequest {
+  readonly publishAt?: string | null;
+  readonly unpublishAt?: string | null;
+}
+
+export interface BulkResult {
+  readonly id: number;
+  readonly ok: boolean;
+  readonly errorCode?: string | null;
+  readonly message?: string | null;
+}
+
+export interface ReadableRevision {
+  readonly version: number;
+  readonly author?: string | null;
+  readonly createdAt: string;
+}
+
+export interface Redirect {
+  readonly id: number;
+  readonly fromPath: string;
+  readonly toPath: string;
+  readonly createdAt: string;
+}
+
+export interface PreviewToken {
+  readonly token: string;
+  readonly path: string;
+}
+
+/** The filters of a console list; `status` null = all, `locale` null = all. */
+export interface ContentListQuery {
+  readonly status: ContentStatus | null;
+  readonly locale: string | null;
+  readonly state: TranslationState | null;
+  readonly q: string;
+}
+
+export const NO_CONTENT_QUERY: ContentListQuery = {status: null, locale: null, state: null, q: ''};
+
+export type ContentPage = PageT<ContentRow>;

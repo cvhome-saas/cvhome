@@ -3193,3 +3193,48 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
 - **What console-ui does meanwhile:** the Activity column renders `from → to` from what the row
   carries and does not annotate it. `SubscriptionAuditView`'s javadoc names the trap for the next
   reader.
+
+## Content — no in-console storefront preview
+
+- **Screen:** `/content/pages/:id`, `/content/posts/:id`, from `New Page.dc.html`'s "Preview" card.
+- **What the UI needs:** render the draft as the storefront would, before publishing.
+- **What is missing:** the console does not know the storefront's host for a store — that is a router
+  allocation in `merchant-service` and a Caddy lookup — and the content service's preview token
+  (`POST …/{type}/{id}/preview-token` → `?preview=<token>`) is only honoured by the storefront API,
+  which landing-ui adopts in a later phase.
+- **Decision for now:** the checklist and the SERP card show what will publish; no preview link is
+  offered. `TODO(lessons.md)` in `page-editor.ts`.
+- **Expected contract:** the storefront route `/<locale>/content/<slug>?preview=<token>` once
+  landing-ui reads `/api/v1/storefront`, plus the store's public host from the router.
+
+## Content — "Stores" pickers are not offered
+
+- **Screen:** every `New *.dc.html` sidebar has a "Stores: All stores" field.
+- **What is missing:** the content service is store-scoped like every pod service (`?store=`), and
+  org-scoped shared content (policies published to several stores) is not modelled. The design's
+  org-level sharing is in the requirements doc (§1.1) and not built.
+- **Decision:** an item belongs to the store it was created in; the field is omitted rather than
+  shown disabled.
+
+## Content — audience targeting, machine translation, banner events, FAQ votes
+
+- **Screens:** `New Banner.dc.html` "Audience" (segments, countries), the requirements doc's
+  machine-translation pass, banner impression/click counters, FAQ helpfulness votes, blog comments.
+- **What is missing:** a customer-segments service, a translation provider, an events sink. None of
+  these exist on the platform; the service models `loggedInOnly` on a banner and nothing else.
+- **Decision:** not rendered. Listed here so they are not rediscovered.
+
+## Content — list search is a substring match
+
+- **Screen:** `/content/:tab`, the search box.
+- **What happens:** `GET /private/content/{type}?q=` is an `ILIKE` over slug, title and body; the
+  requirements doc asks for a full-text index with prefix and fuzzy matching.
+- **Decision:** the box is labelled "Search titles and slugs"; good enough for a store's few hundred
+  items. A search index is a backend change once lists grow.
+
+## Content — drag-and-drop reorder is up/down buttons
+
+- **Screens:** the FAQ and menu editors ("drag to reorder").
+- **What is missing:** a drag-and-drop primitive in `shared/ui/`; the console has none and the
+  slider section set the precedent of arrow buttons.
+- **Decision:** arrow buttons and keyboard; the server takes the whole order either way.

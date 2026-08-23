@@ -101,6 +101,13 @@
     },
     "plans": {
       "title": "الخطط | cvhome"
+    },
+    "content": {
+      "title": "إدارة المحتوى | cvhome",
+      "newPage": "صفحة جديدة | cvhome",
+      "page": "صفحة | cvhome",
+      "newPost": "مقال جديد | cvhome",
+      "post": "مقال | cvhome"
     }
   },
   "notFound": {
@@ -1216,7 +1223,8 @@
       "pod": "الوحدة",
       "platformUsers": "الحسابات",
       "platformBilling": "الفوترة",
-      "plans": "الخطط"
+      "plans": "الخطط",
+      "content": "إدارة المحتوى"
     },
     "toolbar": {
       "breadcrumbNav": "مسار التنقل",
@@ -2978,6 +2986,326 @@
         "title": "لا توجد خطط",
         "message": "لا تحتوي خدمة الفوترة على أي خطة في كتالوجها."
       }
+    }
+  },
+  "content": {
+    "hub": {
+      "title": "إدارة المحتوى",
+      "context": "{store} · الصفحات والمقالات والوسائط وتنقّل المتجر",
+      "railHeading": "المحتوى",
+      "railLabel": "أقسام المحتوى"
+    },
+    "tab": {
+      "pages": "الصفحات",
+      "posts": "مقالات المدونة",
+      "banners": "اللافتات والعروض",
+      "faq": "الأسئلة الشائعة",
+      "media": "مكتبة الوسائط",
+      "menus": "قوائم التنقّل",
+      "policies": "السياسات القانونية"
+    },
+    "create": {
+      "pages": "صفحة جديدة",
+      "posts": "مقال جديد",
+      "banners": "لافتة جديدة",
+      "faq": "سؤال جديد",
+      "policies": "سياسة جديدة",
+      "media": "رفع ملفات",
+      "menus": "إضافة رابط"
+    },
+    "kpi": {
+      "label": "نظرة عامة على المحتوى",
+      "published": "عناصر منشورة",
+      "publishedMeta": "عبر الصفحات والمقالات واللافتات والأسئلة والسياسات",
+      "drafts": "مسوّدات",
+      "draftsMeta": "{count} لم تُمسّ منذ أكثر من ٣٠ يومًا",
+      "awaitingTranslation": "بانتظار الترجمة",
+      "allTranslated": "كل شيء مترجم",
+      "media": "مساحة الوسائط",
+      "mediaMeta": "{count} ملف · {percent}٪ من {quota}"
+    },
+    "bytes": {
+      "gb": "{value} غ.ب",
+      "mb": "{value} م.ب",
+      "kb": "{value} ك.ب"
+    },
+    "status": {
+      "DRAFT": "مسوّدة",
+      "REVIEW": "مراجعة",
+      "SCHEDULED": "مجدول",
+      "PUBLISHED": "منشور",
+      "ARCHIVED": "مؤرشف"
+    },
+    "translationState": {
+      "MISSING": "{code}: غير مترجم",
+      "DRAFT": "{code}: مسوّدة",
+      "TRANSLATED": "{code}: مترجم",
+      "STALE": "{code}: مترجم، وتغيّر المصدر بعده"
+    },
+    "column": {
+      "pages": "الصفحة",
+      "posts": "المقال",
+      "banners": "الموضع",
+      "faq": "السؤال",
+      "policies": "السياسة",
+      "status": "الحالة",
+      "languages": "اللغات",
+      "updated": "آخر تحديث",
+      "actions": "إجراءات"
+    },
+    "filter": {
+      "all": "الكل",
+      "search": "البحث في المحتوى",
+      "searchPlaceholder": "ابحث في العناوين والروابط…",
+      "clearSearch": "مسح البحث",
+      "language": "التصفية حسب لغة ناقصة",
+      "allLanguages": "كل اللغات",
+      "missingLanguage": "تنقصها {language}",
+      "clearLanguage": "إظهار كل اللغات",
+      "byStatus": "التصفية حسب الحالة",
+      "clear": "مسح عوامل التصفية"
+    },
+    "list": {
+      "loading": "جارٍ تحميل المحتوى…",
+      "none": "لا شيء هنا بعد",
+      "range": "عرض {from}–{to} من {total}",
+      "noneMatch": "لا شيء يطابق عوامل التصفية هذه.",
+      "publishesOn": "يُنشر {date}",
+      "pagesLabel": "صفحات المحتوى",
+      "unit": {
+        "pages": "صفحات",
+        "posts": "مقالات",
+        "banners": "لافتات",
+        "faq": "أسئلة",
+        "policies": "سياسات"
+      },
+      "empty": {
+        "pages": "لا صفحات بعد. لا يعرض المتجر إلا ما تنشره هنا.",
+        "posts": "لا مقالات بعد.",
+        "banners": "لا لافتات بعد. يعود المتجر إلى صور شريط المتجر.",
+        "faq": "لا أسئلة شائعة بعد.",
+        "policies": "لا سياسات بعد. يربط الدفع سياسات الشروط والإرجاع من هنا."
+      }
+    },
+    "action": {
+      "edit": "تعديل",
+      "editFor": "تعديل {title}",
+      "moreFor": "مزيد من الإجراءات لـ {title}",
+      "publish": "نشر",
+      "unpublish": "إلغاء النشر",
+      "submit-review": "إرسال للمراجعة",
+      "archive": "أرشفة",
+      "restore": "استعادة كمسوّدة",
+      "delete": "حذف",
+      "schedule": "جدولة…",
+      "save": "حفظ",
+      "close": "إغلاق"
+    },
+    "bulk": {
+      "label": "إجراءات جماعية",
+      "selected": "{count} محدّد",
+      "selectAll": "تحديد كل صفوف هذه الصفحة",
+      "selectRow": "تحديد {title}",
+      "clear": "إلغاء التحديد"
+    },
+    "toast": {
+      "publish": "{title} الآن {status}.",
+      "unpublish": "عاد {title} إلى {status}.",
+      "submit-review": "أُرسل {title} للمراجعة.",
+      "archive": "أُرشف {title}.",
+      "restore": "استُعيد {title} كمسوّدة.",
+      "deleted": "حُذف {title}.",
+      "bulkDone": "تم تحديث {count} عنصر.",
+      "bulkPartial": "تم تحديث {ok}، وتعذّر {failed}."
+    },
+    "delete": {
+      "title": "حذف {title}؟",
+      "message": "يزيله هذا من المتجر ولا يمكن التراجع عنه. الصفحة المرتبطة من قائمة تُزال من القائمة أيضًا."
+    },
+    "editor": {
+      "back": "العودة إلى المحتوى",
+      "saveDraft": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ.",
+      "loading": "جارٍ التحميل…",
+      "moreActions": "مزيد من الإجراءات",
+      "versionConflict": "غيّر شخص آخر هذا العنصر منذ فتحته. أُعيد تحميله — طبّق تعديلاتك مجددًا.",
+      "publishAt": "تاريخ النشر",
+      "publishAtHint": "اتركه فارغًا للنشر فورًا.",
+      "unpublishAt": "تاريخ إلغاء النشر",
+      "unpublishAtHint": "اختياري: يُؤرشف العنصر في هذا الوقت.",
+      "schedule": "الجدولة",
+      "scheduleTitle": "جدولة النشر",
+      "scheduleSubtitle": "يُنشر العنصر تلقائيًا في هذا الوقت."
+    },
+    "copy": {
+      "title": "المحتوى",
+      "subtitle": "يُكتب لكل لغة؛ تعود اللغات الأخرى إلى النص المصدر.",
+      "writeIn": "الكتابة بـ",
+      "pageTitle": "العنوان",
+      "postTitle": "العنوان",
+      "body": "النص",
+      "excerpt": "مقتطف",
+      "excerptHint": "يظهر في فهرس المدونة ونتائج البحث. حتى ٣٠٠ حرف.",
+      "altHint": "يصف الصورة لقارئات الشاشة ومحركات البحث.",
+      "fallbackNotice": "{language} هي النص المصدر. تعود إليها اللغات الأخرى عندما تكون فارغة."
+    },
+    "seo": {
+      "title": "الرابط والبحث",
+      "subtitle": "أين تقيم الصفحة وكيف تظهر في نتائج البحث.",
+      "slug": "معرّف الرابط",
+      "slugHint": "أحرف لاتينية صغيرة وأرقام وشرطات، بعد {prefix}",
+      "slugCheck": {
+        "pending": "جارٍ التحقق…",
+        "free": "متاح",
+        "taken": "مستخدم من قبل"
+      },
+      "metaTitle": "عنوان الميتا",
+      "metaTitleHint": "يعود إلى العنوان. الأفضل حتى ٧٠ حرفًا.",
+      "metaDescription": "وصف الميتا",
+      "metaDescriptionHint": "استهدف ٥٠–١٦٠ حرفًا.",
+      "keywords": "الكلمات المفتاحية",
+      "keywordsHint": "مفصولة بفواصل.",
+      "canonical": "الرابط القانوني",
+      "canonicalHint": "فقط عندما يوجد هذا المحتوى في مكان آخر أولًا.",
+      "noindex": "إخفاء عن محركات البحث",
+      "noindexHint": "فعّله للصفحات الداخلية أو صفحات الحملات فقط.",
+      "serpHost": "متجرك",
+      "serpTitlePlaceholder": "عنوان الصفحة",
+      "serpDescriptionPlaceholder": "يظهر وصف الميتا هنا."
+    },
+    "checklist": {
+      "title": "قبل النشر",
+      "titleAndBody": "كُتب العنوان والنص",
+      "slug": "المعرّف محدّد ومتاح",
+      "metaLength": "وصف الميتا أقل من ١٦٠ حرفًا",
+      "hero": "اختيرت الصورة الرئيسية",
+      "translationsDone": "كل اللغات مترجمة",
+      "translationsMissing": "ترجمات ناقصة: {languages}"
+    },
+    "page": {
+      "newTitle": "صفحة جديدة",
+      "editTitle": "صفحة",
+      "context": "المحتوى والرابط والظهور لصفحة في المتجر",
+      "templateTitle": "القالب",
+      "templateSubtitle": "كيف يصفّ المتجر الصفحة.",
+      "template": {
+        "STANDARD": {
+          "label": "صفحة عادية",
+          "hint": "عنوان ونص منسّق. للسياسات وصفحات عن الشركة."
+        },
+        "LANDING": {
+          "label": "صفحة هبوط",
+          "hint": "واجهة وأقسام ودعوات للإجراء للحملات."
+        },
+        "CONTACT": {
+          "label": "صفحة تواصل",
+          "hint": "نموذج وعنوان وساعات العمل."
+        },
+        "FAQ_PAGE": {
+          "label": "صفحة الأسئلة الشائعة",
+          "hint": "تجلب الأسئلة المجمّعة من المكتبة."
+        }
+      },
+      "visibility": "الظهور",
+      "parent": "الصفحة الأم",
+      "noParent": "بدون — المستوى الأعلى",
+      "showInFooter": "إضافة إلى قائمة التذييل",
+      "showInFooterHint": "تظهر تحت «الشركة» بجانب «عن» و«تواصل».",
+      "linkToMenu": "إضافة إلى القائمة الرئيسية",
+      "linkToMenuHint": "تُدرج في تنقّل المتجر."
+    },
+    "post": {
+      "newTitle": "مقال جديد",
+      "editTitle": "مقال",
+      "context": "محتوى تحريري على ‎/blog/<slug>",
+      "hero": "الصورة الرئيسية",
+      "heroHint": "تظهر في فهرس المدونة وأعلى المقال.",
+      "chooseHero": "اختيار من المكتبة",
+      "removeHero": "إزالة",
+      "organise": "التنظيم",
+      "categories": "التصنيفات",
+      "noCategories": "لا تصنيفات بعد.",
+      "tags": "الوسوم",
+      "author": "الكاتب",
+      "featured": "مميّز",
+      "featuredHint": "مثبّت في أعلى فهرس المدونة."
+    },
+    "media": {
+      "folders": "المجلدات",
+      "allFiles": "كل الملفات",
+      "newFolder": "مجلد جديد",
+      "folderName": "اسم المجلد",
+      "deleteFolder": "حذف المجلد {name}",
+      "library": "المكتبة",
+      "shown": "{count} ملف",
+      "search": "البحث في الملفات",
+      "searchPlaceholder": "ابحث بالاسم أو العنوان أو الوسم…",
+      "filterType": "التصفية حسب النوع",
+      "allTypes": "كل الأنواع",
+      "clearType": "إظهار كل الأنواع",
+      "unusedOnly": "غير المستخدمة فقط",
+      "view": "العرض",
+      "gridView": "عرض شبكي",
+      "listView": "عرض قائمة",
+      "loading": "جارٍ تحميل الملفات…",
+      "dropTitle": "أسقط الملفات هنا للرفع",
+      "dropHint": "JPG, PNG, WebP, SVG, MP4, PDF, ZIP · حتى ٥٠ م.ب للملف",
+      "browse": "تصفّح الملفات",
+      "tooLarge": "{name} يتجاوز ٥٠ م.ب ولم يُرفع.",
+      "uploaded": "تم رفع {count} ملف.",
+      "saved": "تم الحفظ.",
+      "deleted": "حُذف {name}.",
+      "urlCopied": "نُسخ الرابط.",
+      "preview": "معاينة",
+      "copyUrl": "نسخ الرابط",
+      "details": "التفاصيل",
+      "openAsset": "فتح {name}",
+      "openFile": "فتح الملف",
+      "empty": "لا ملفات بعد. أسقط بعضها أعلاه.",
+      "noneMatch": "لا ملفات تطابق عوامل التصفية.",
+      "unit": "ملفات",
+      "pagesLabel": "صفحات الوسائط",
+      "usedOn": "مستخدم في {count} عنصر",
+      "unused": "غير مستخدم",
+      "usedIn": "مستخدم في",
+      "titleField": "العنوان",
+      "altText": "النص البديل",
+      "altLanguage": "لغة النص البديل",
+      "altPlaceholder": "ما تُظهره الصورة",
+      "tags": "الوسوم",
+      "folder": "المجلد",
+      "noFolder": "بدون مجلد",
+      "kind": {
+        "IMAGE": "صورة",
+        "VIDEO": "فيديو",
+        "DOCUMENT": "مستند",
+        "ARCHIVE": "أرشيف",
+        "VECTOR": "متّجه"
+      },
+      "usageKind": {
+        "PAGE": "صفحة",
+        "POST": "مقال",
+        "BANNER": "لافتة",
+        "FAQ": "سؤال",
+        "POLICY": "سياسة",
+        "BOX": "مقتطف",
+        "SECTION": "قسم"
+      },
+      "delete": {
+        "title": "حذف {name}؟",
+        "message": "يُزال الملف من التخزين. لا يمكن التراجع.",
+        "forceTitle": "{name} ما يزال مستخدمًا — حذفه على أي حال؟",
+        "forceMessage": "يُشار إليه من: {uses}. ستعرض تلك الأماكن صورة مفقودة."
+      }
+    },
+    "mediaPicker": {
+      "title": "اختر من مكتبة الوسائط",
+      "uploadTitle": "أو أسقط ملفًا جديدًا",
+      "empty": "لا ملفات من هذا النوع بعد."
+    },
+    "menus": {
+      "comingSoon": "يصل محرّر قوائم التنقّل مع التحديث القادم."
     }
   }
 }
