@@ -2,7 +2,6 @@ package com.asrevo.cvhome.content.api.v1;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -24,13 +23,13 @@ import com.asrevo.cvhome.s2s.config.ServletTestCustomSecurityConfig;
 
 import tools.jackson.databind.JsonNode;
 
+import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.BODY;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.CODE;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.CONTENT;
-import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.DESCRIPTION;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.EN;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ID;
-import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.LEGACY;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.PRIVATE;
+import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.STOREFRONT;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.PUBLISHED;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ROLE_STORE_ADMIN;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ROLE_STORE_MODERATOR;
@@ -45,8 +44,8 @@ import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.slug;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * End-to-end over HTTP against Postgres + MinIO: the legacy compat shapes the storefront depends on, the page
- * workflow, tenant isolation, the read/manage permission split and scheduling.
+ * End-to-end over HTTP against Postgres + MinIO: the storefront read surface, the page workflow, tenant
+ * isolation, the read/manage permission split and scheduling.
  */
 @Import({TestcontainersConfiguration.class, TestClockConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -68,19 +67,9 @@ class ContentApiIntegrationTest {
 
     private static final String ABOUT_US = "about-us";
 
-    private static final String FR = "fr";
-
-    private static final String AR = "ar";
-
-    private static final String KEY_WORDS = "keyWords";
-
     private static final String SNIPPETS = "snippets";
 
     private static final String LANDING_PAGE = "LANDING_PAGE";
-
-    private static final String LANGUAGE = "language";
-
-    private static final String CONTENT_TYPE = "contentType";
 
     private static final String KEYWORDS = "a, b";
 
@@ -90,9 +79,7 @@ class ContentApiIntegrationTest {
 
     private static final String CONTENT_PATH = "/content/%s";
 
-    private static final String LEGACY_PAGE_BY_NAME = "%s/pages/name/%s?store=%s&lang=%s";
-
-    private static final String LEGACY_BOX = "%s/boxes/%s?store=%s&lang=%s";
+    private static final String STOREFRONT_PAGE = "%s/pages/%s?store=%s&lang=%s";
 
     private static final String PAGE_BODY = """
             {%s"slug":"%s","template":"STANDARD","linkToMenu":true,
@@ -142,8 +129,8 @@ class ContentApiIntegrationTest {
         return scoped(path(segments), store);
     }
 
-    private ResponseEntity<String> legacy(String slug, String store, String lang) {
-        return api.get(String.format(LEGACY_PAGE_BY_NAME, LEGACY, slug, store, lang), null);
+    private ResponseEntity<String> storefront(String slug, String store, String lang) {
+        return api.get(String.format(STOREFRONT_PAGE, STOREFRONT, slug, store, lang), null);
     }
 
     private long create(String store, String token, String body) {
@@ -160,55 +147,6 @@ class ContentApiIntegrationTest {
         return api.send(HttpMethod.PUT, url, admin, body);
     }
 
-    // ------------------------------------------------------------------------------------- legacy compat
-
-    @Test
-    void legacyPagesListKeepsItsShape() {
-        var r = api.get(String.format("%s/pages?page=0&count=20&store=%s&lang=ar", LEGACY, STORE_A), null);
-        expect(r, HttpStatus.OK);
-        JsonNode list = json(r);
-        assertThat(list.has("totalPages")).isTrue();
-        assertThat(list.has(CONTENT)).isTrue();
-        JsonNode about = null;
-        for (JsonNode p : list.get(CONTENT)) {
-            if (ABOUT_US.equals(p.get(CODE).asString())) {
-                about = p;
-            }
-        }
-        assertThat(about).isNotNull();
-        assertThat(about.get(CONTENT_TYPE).asString()).isEqualTo("PAGE");
-        assertThat(about.get("visible").asBoolean()).isTrue();
-        assertThat(about.get("linkToMenu").asBoolean()).isTrue();
-        JsonNode d = about.get(DESCRIPTION);
-        assertThat(d.get(LANGUAGE).asString()).isEqualTo(AR);
-        assertThat(d.get("friendlyUrl").asString()).isEqualTo(ABOUT_US);
-        assertThat(d.get("name").asString()).isNotBlank();
-        assertThat(d.get(DESCRIPTION).asString()).contains("<h1>");
-        assertThat(d.has("metaDescription")).isTrue();
-        assertThat(d.has("title")).isTrue();
-        assertThat(d.has(KEY_WORDS)).isTrue();
-    }
-
-    @Test
-    void legacyPageByNameAndBoxByCode() {
-        var page = legacy(ABOUT_US, STORE_A, FR);
-        expect(page, HttpStatus.OK);
-        assertThat(json(page).get(DESCRIPTION).get(LANGUAGE).asString()).isEqualTo(FR);
-
-        var missing = legacy("nope", STORE_A, FR);
-        expect(missing, HttpStatus.NOT_FOUND);
-        assertThat(json(missing).get(CODE).asString()).isEqualTo("CONTENT.NOT_FOUND");
-
-        for (String code : List.of("header-message", "meta-title", "meta-description", "agreement")) {
-            var box = api.get(String.format(LEGACY_BOX, LEGACY, code, STORE_A, AR), null);
-            expect(box, HttpStatus.OK);
-            JsonNode b = json(box);
-            assertThat(b.get(CODE).asString()).isEqualTo(code);
-            assertThat(b.get(CONTENT_TYPE).asString()).isEqualTo("BOX");
-            assertThat(b.get(DESCRIPTION).get(DESCRIPTION).asString()).isNotBlank();
-        }
-    }
-
     // ------------------------------------------------------------------------------------- workflow
 
     @Test
@@ -217,7 +155,7 @@ class ContentApiIntegrationTest {
         long id = create(STORE_A, admin, pageBody(slug, "Life cycle", BODY_ONE, null));
 
         // a draft is invisible to the storefront
-        expect(legacy(slug, STORE_A, EN), HttpStatus.NOT_FOUND);
+        expect(storefront(slug, STORE_A, EN), HttpStatus.NOT_FOUND);
 
         // read back: locales reflect completeness (ar has a title only → DRAFT)
         var read = api.get(item(STORE_A, id), admin);
@@ -227,13 +165,13 @@ class ContentApiIntegrationTest {
         assertThat(page.get(VERSION).asInt()).isZero();
         assertThat(page.get("locales")).hasSize(2);
 
-        // publish → visible on the legacy surface
+        // publish → visible on the storefront surface
         var published = post(item(STORE_A, id, PUBLISH), null);
         expect(published, HttpStatus.OK);
         assertThat(json(published).get(STATUS).asString()).isEqualTo(PUBLISHED);
-        var live = legacy(slug, STORE_A, EN);
+        var live = storefront(slug, STORE_A, EN);
         expect(live, HttpStatus.OK);
-        assertThat(json(live).get(DESCRIPTION).get(DESCRIPTION).asString()).isEqualTo(BODY_ONE);
+        assertThat(json(live).get(BODY).asString()).isEqualTo(BODY_ONE);
 
         // list filters by status
         var list = api.get(scoped(query(PAGES, "status=PUBLISHED&q=life"), STORE_A), admin);
@@ -257,7 +195,7 @@ class ContentApiIntegrationTest {
 
         // unpublish → storefront 404 again; delete → gone
         expect(post(item(STORE_A, id, "unpublish"), null), HttpStatus.OK);
-        expect(legacy(moved, STORE_A, EN), HttpStatus.NOT_FOUND);
+        expect(storefront(moved, STORE_A, EN), HttpStatus.NOT_FOUND);
         expect(api.send(HttpMethod.DELETE, item(STORE_A, id), admin, null), HttpStatus.NO_CONTENT);
         expect(api.get(item(STORE_A, id), admin), HttpStatus.NOT_FOUND);
     }
@@ -311,14 +249,14 @@ class ContentApiIntegrationTest {
         var scheduled = post(item(STORE_A, id, PUBLISH), String.format("{\"publishAt\":\"%s\"}", at));
         expect(scheduled, HttpStatus.OK);
         assertThat(json(scheduled).get(STATUS).asString()).isEqualTo("SCHEDULED");
-        expect(legacy(slug, STORE_A, EN), HttpStatus.NOT_FOUND);
+        expect(storefront(slug, STORE_A, EN), HttpStatus.NOT_FOUND);
 
         assertThat(publishing.tick()).isZero();
         clock.advance(Duration.ofHours(2));
         assertThat(publishing.tick()).isEqualTo(1);
         assertThat(publishing.tick()).isZero();
         assertThat(json(api.get(item(STORE_A, id), admin)).get(STATUS).asString()).isEqualTo(PUBLISHED);
-        expect(legacy(slug, STORE_A, EN), HttpStatus.OK);
+        expect(storefront(slug, STORE_A, EN), HttpStatus.OK);
     }
 
     // ------------------------------------------------------------------------------ tenancy + permissions
@@ -335,7 +273,7 @@ class ContentApiIntegrationTest {
         // a store-B token asking for store A is forbidden outright
         expect(api.get(item(STORE_A, id), other), HttpStatus.FORBIDDEN);
         // and the public surface never leaks the other store's slug
-        expect(legacy(slug, STORE_B, EN), HttpStatus.NOT_FOUND);
+        expect(storefront(slug, STORE_B, EN), HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -367,9 +305,6 @@ class ContentApiIntegrationTest {
         JsonNode s = json(api.get(snippetUrl, admin));
         assertThat(s.get(CODE).asString()).isEqualTo(LANDING_PAGE);
         assertThat(s.get("translations").get(0).get("keywords").asString()).isEqualTo(KEYWORDS);
-        // and it is readable through the legacy box surface, keywords included
-        JsonNode box = json(api.get(String.format(LEGACY_BOX, LEGACY, LANDING_PAGE, STORE_A, EN), null));
-        assertThat(box.get(DESCRIPTION).get(KEY_WORDS).asString()).isEqualTo(KEYWORDS);
     }
 
 }

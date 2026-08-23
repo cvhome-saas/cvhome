@@ -1,5 +1,0 @@
-spring:
-  config:
-    import:
-      - "classpath:fargate-config.yml"
-      - "classpath:store-pod-fargate-config.yml"

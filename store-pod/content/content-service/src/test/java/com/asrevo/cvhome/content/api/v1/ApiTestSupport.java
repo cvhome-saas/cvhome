@@ -32,8 +32,6 @@ final class ApiTestSupport {
 
     static final String STOREFRONT = "/api/v1/storefront";
 
-    static final String LEGACY = "/api/v1/content";
-
     static final String ORG = "32a034a43cd77581d105c87a";
 
     static final String ID = "id";
