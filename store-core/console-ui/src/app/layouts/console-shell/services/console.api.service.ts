@@ -3,6 +3,7 @@ import {Observable, map, of} from 'rxjs';
 
 import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {AuthService} from '@core/auth/auth.service';
+import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {SelectedStoreService} from '@api/tenancy/selected-store.service';
 import {CONSOLE_NAVIGATION} from '../console-navigation';
 import type {ConsoleStore, ConsoleUser, StoreDirectory} from '@models/console';
@@ -20,8 +21,25 @@ export class ConsoleApi {
   private readonly selection = inject(SelectedStoreService);
   private readonly stores = inject(ManagerStoreService);
   private readonly auth = inject(AuthService);
+  private readonly permissions = inject(ConsolePermissions);
 
   readonly navigation = CONSOLE_NAVIGATION;
+
+  /**
+   * Whether this account administers the platform rather than a shop.
+   *
+   * Asked through here rather than injected into the shell facade directly, and the reason is
+   * testability rather than taste: `ConsolePermissions` reaches `AuthService`, which reaches
+   * `CrudService`, which needs `HttpClient` — so a facade that injected it would drag the whole HTTP
+   * stack into every spec that renders the chrome. `ConsoleApi` is the seam those specs already fake,
+   * which is exactly what a seam is for.
+   *
+   * It costs no request: `canAccessSecuredPages` fetches and caches the principal before any console
+   * route renders, and this reads that cache.
+   */
+  canAdministerPlatform(): boolean {
+    return this.permissions.canAdministerPlatform();
+  }
 
   /**
    * The signed-in operator, as far as uaa will describe them.

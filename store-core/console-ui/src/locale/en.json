@@ -74,6 +74,30 @@
     },
     "customers": {
       "title": "Customers"
+    },
+    "platform": {
+      "title": "Platform | cvhome"
+    },
+    "organizations": {
+      "title": "Organizations | cvhome"
+    },
+    "organization": {
+      "title": "Organization | cvhome"
+    },
+    "pods": {
+      "title": "Pods | cvhome"
+    },
+    "newPod": {
+      "title": "Register a pod | cvhome"
+    },
+    "pod": {
+      "title": "Pod | cvhome"
+    },
+    "platformUsers": {
+      "title": "Platform accounts | cvhome"
+    },
+    "plans": {
+      "title": "Plans | cvhome"
     }
   },
   "notFound": {
@@ -354,7 +378,70 @@
       "taken": "This is already in use.",
       "mismatch": "These two do not match."
     },
-    "listSeparator": ", "
+    "listSeparator": ", ",
+    "storeStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "ARCHIVED": "Archived",
+      "DELETED": "Deleted"
+    },
+    "provisioningState": {
+      "NOT_STARTED_PROVISIONING": "Queued",
+      "IN_PROGRESS_PROVISIONING": "Building",
+      "SUCCESSFULLY_PROVISIONING": "Ready",
+      "FAILED_PROVISIONING": "Failed"
+    },
+    "subscriptionStatus": {
+      "PENDING": "Pending",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment failed",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Cancelled"
+    },
+    "allowance": {
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "megabytes": "{{size}} MB"
+    },
+    "entitlement": {
+      "MAX_PRODUCTS": {
+        "limit": "Up to {count} products",
+        "unlimited": "Unlimited products",
+        "granted": "Product catalog"
+      },
+      "MAX_ORDERS_MONTH": {
+        "limit": "Up to {count} orders a month",
+        "unlimited": "Unlimited orders",
+        "granted": "Order processing"
+      },
+      "MAX_ACCOUNTS": {
+        "limit": "Up to {count} staff accounts",
+        "unlimited": "Unlimited staff accounts",
+        "granted": "Staff accounts"
+      },
+      "MAX_STORAGE_MB": {
+        "limit": "{count} MB of media storage",
+        "unlimited": "Unlimited media storage",
+        "granted": "Media storage"
+      },
+      "CUSTOM_DOMAIN": {
+        "limit": "Custom domain",
+        "unlimited": "Custom domain",
+        "granted": "Custom domain"
+      },
+      "ANALYTICS": {
+        "limit": "Analytics dashboards",
+        "unlimited": "Analytics dashboards",
+        "granted": "Analytics dashboards"
+      },
+      "PRIORITY_SUPPORT": {
+        "limit": "Priority support",
+        "unlimited": "Priority support",
+        "granted": "Priority support"
+      }
+    }
   },
   "orders": {
     "allOrders": "All orders",
@@ -777,12 +864,6 @@
       "automaticMeta": "The registry picks the pod with room for your store.",
       "preferenceNote": "A pod is a preference, not a guarantee — the registry honours it only if it has capacity."
     },
-    "state": {
-      "NOT_STARTED_PROVISIONING": "Queued",
-      "IN_PROGRESS_PROVISIONING": "Building",
-      "SUCCESSFULLY_PROVISIONING": "Ready",
-      "FAILED_PROVISIONING": "Failed"
-    },
     "subtitle": {
       "form": "Provision a new store on a server in the region you sell from",
       "running": "Provisioning {name} — this takes about a minute",
@@ -1105,43 +1186,6 @@
     "footer": {
       "console": "Console",
       "copyright": "© {year} cvhome"
-    },
-    "entitlement": {
-      "MAX_PRODUCTS": {
-        "limit": "Up to {count} products",
-        "unlimited": "Unlimited products",
-        "granted": "Product catalog"
-      },
-      "MAX_ORDERS_MONTH": {
-        "limit": "Up to {count} orders a month",
-        "unlimited": "Unlimited orders",
-        "granted": "Order processing"
-      },
-      "MAX_ACCOUNTS": {
-        "limit": "Up to {count} staff accounts",
-        "unlimited": "Unlimited staff accounts",
-        "granted": "Staff accounts"
-      },
-      "MAX_STORAGE_MB": {
-        "limit": "{count} MB of media storage",
-        "unlimited": "Unlimited media storage",
-        "granted": "Media storage"
-      },
-      "CUSTOM_DOMAIN": {
-        "limit": "Custom domain",
-        "unlimited": "Custom domain",
-        "granted": "Custom domain"
-      },
-      "ANALYTICS": {
-        "limit": "Analytics dashboards",
-        "unlimited": "Analytics dashboards",
-        "granted": "Analytics dashboards"
-      },
-      "PRIORITY_SUPPORT": {
-        "limit": "Priority support",
-        "unlimited": "Priority support",
-        "granted": "Priority support"
-      }
     }
   },
   "shell": {
@@ -1160,7 +1204,15 @@
       "payments": "Payments",
       "users": "Users",
       "profile": "Account",
-      "customers": "Customers"
+      "customers": "Customers",
+      "platform": "Platform",
+      "organizations": "Organizations",
+      "organization": "Organization",
+      "pods": "Pods",
+      "newPod": "Register a pod",
+      "pod": "Pod",
+      "platformUsers": "Accounts",
+      "plans": "Plans"
     },
     "toolbar": {
       "breadcrumbNav": "Breadcrumb",
@@ -1200,7 +1252,8 @@
         "seller": "Seller",
         "organization": "Organization",
         "storefront": "Storefront",
-        "commerce": "Commerce"
+        "commerce": "Commerce",
+        "platform": "Platform"
       },
       "item": {
         "home": "Home",
@@ -1212,7 +1265,12 @@
         "orders": "Orders",
         "payments": "Payments",
         "billing": "Billing",
-        "catalogue": "Catalogue"
+        "catalogue": "Catalogue",
+        "platformHome": "Platform overview",
+        "organizations": "Organizations",
+        "pods": "Pods",
+        "platformUsers": "Accounts",
+        "plans": "Plans"
       }
     },
     "planBanner": {
@@ -1392,14 +1450,6 @@
       "on": "This store is on {plan}",
       "none": "No subscription on record for this store yet"
     },
-    "status": {
-      "PENDING": "Pending",
-      "TRIALING": "Trial",
-      "ACTIVE": "Active",
-      "PAST_DUE": "Payment failed",
-      "SUSPENDED": "Suspended",
-      "CANCELED": "Cancelled"
-    },
     "plan": {
       "title": "Current plan",
       "subtitle": "What this store is on, and when it next renews",
@@ -1421,11 +1471,6 @@
       "subtitle": "The ceilings on this store",
       "none": "No plan on this store yet, so there are no allowances to show.",
       "note": "These are the plan's limits, not what the store has used — the platform does not publish usage counters yet."
-    },
-    "allowance": {
-      "unlimited": "Unlimited",
-      "included": "Included",
-      "notIncluded": "Not included"
     },
     "invoices": {
       "title": "Invoices",
@@ -2201,6 +2246,493 @@
       "language": "Language",
       "theme": "Theme",
       "thisBrowserOnly": "These are remembered in this browser only. There is nowhere to keep them against your account yet, so they will not follow you to another device."
+    }
+  },
+  "platform": {
+    "orgStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "CLOSED": "Closed"
+    },
+    "podLifecycle": {
+      "PROVISIONING": "Provisioning",
+      "ACTIVE": "Active",
+      "DRAINING": "Draining",
+      "DECOMMISSIONED": "Decommissioned"
+    },
+    "podHealth": {
+      "GREEN": "Healthy",
+      "AMBER": "Degraded",
+      "RED": "Unhealthy"
+    },
+    "podVisibility": {
+      "PUBLIC": "Shared",
+      "PRIVATE": "Private"
+    },
+    "dashboard": {
+      "heading": {
+        "title": "Platform overview",
+        "context": "Organizations and stores created across the whole platform"
+      },
+      "loading": "Loading platform figures…",
+      "notice": {
+        "countsOnly": "These are counts, not money. Nothing on the platform aggregates revenue or subscription value yet."
+      },
+      "kpiLabel": "Platform metrics",
+      "kpi": {
+        "organizations": "New organizations in this period",
+        "stores": "New stores in this period"
+      },
+      "organizations": {
+        "title": "Organizations created per day",
+        "unit": "organizations"
+      },
+      "stores": {
+        "title": "Stores created per day",
+        "unit": "stores"
+      }
+    },
+    "organizations": {
+      "heading": {
+        "title": "Organizations",
+        "context": "Every tenant on the platform"
+      },
+      "loading": "Loading organizations…",
+      "totalLabel": "{{total}} {count, plural, =1 {organization} other {organizations}}",
+      "subtitle": {
+        "none": "No organizations to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {organization} other {organizations}}"
+      },
+      "panel": {
+        "title": "All organizations"
+      },
+      "unnamed": "Unnamed organization",
+      "unit": "organizations",
+      "paginationLabel": "Organization pages",
+      "column": {
+        "organization": "Organization",
+        "status": "Status",
+        "created": "Created",
+        "id": "Identifier",
+        "actions": "Actions"
+      },
+      "action": {
+        "create": "New organization",
+        "open": "Open organization",
+        "openNamed": "Open {{name}}"
+      },
+      "empty": {
+        "title": "No organizations yet",
+        "message": "Every organization created on the platform will appear here."
+      },
+      "create": {
+        "title": "New organization",
+        "message": "Creates the organization and its first administrator together. If the address is already registered, neither is created.",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Contact email",
+        "password": "Password",
+        "repeatPassword": "Repeat password",
+        "passwordHint": "6 to 12 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "unnamedHint": "The organization will be listed under this email address until someone gives it a name.",
+        "emailInvalid": "Enter a valid email address.",
+        "passwordWeak": "The password does not meet the rule above.",
+        "passwordMismatch": "The two passwords do not match.",
+        "confirm": "Create organization",
+        "busy": "Creating…"
+      },
+      "toast": {
+        "created": "Organization created for {{email}}."
+      },
+      "search": {
+        "label": "Search organizations",
+        "placeholder": "Name or contact email",
+        "clear": "Clear the search"
+      },
+      "filter": {
+        "statusLabel": "Filter by status",
+        "allStatuses": "All statuses"
+      },
+      "noMatches": {
+        "title": "No organizations matched",
+        "message": "Nothing on the platform matches that name, address or status. Clear the filters to see every organization."
+      }
+    },
+    "organization": {
+      "heading": {
+        "fallback": "Organization",
+        "context": "Created {{created}}"
+      },
+      "loading": "Loading organization…",
+      "nav": {
+        "heading": "Organization",
+        "ariaLabel": "Organization sections"
+      },
+      "section": {
+        "overview": "Overview",
+        "stores": "Stores",
+        "users": "Users",
+        "activity": "Activity"
+      },
+      "action": {
+        "backToList": "All organizations",
+        "resume": "Resume",
+        "suspend": "Suspend",
+        "close": "Close organization"
+      },
+      "overview": {
+        "identity": "Identity",
+        "id": "Organization id",
+        "name": "Name",
+        "saveName": "Save name",
+        "rename": "Rename organization",
+        "unnamed": "Not named yet",
+        "email": "Contact email",
+        "created": "Created",
+        "status": "Status",
+        "owner": "Owner account",
+        "ownerLede": "The administrator this organization was created with. Setting a password here changes theirs.",
+        "resetOwnerPassword": "Set owner password",
+        "noOwnerReason": "No owner account is recorded for this organization, so there is nobody to set a password for."
+      },
+      "stores": {
+        "title": "Stores",
+        "readOnly": "Read-only: a store is administered by its own organization.",
+        "loading": "Loading stores…",
+        "unit": "stores",
+        "paginationLabel": "Store pages",
+        "column": {
+          "store": "Store",
+          "status": "Status",
+          "provisioning": "Provisioning",
+          "pod": "Pod",
+          "billing": "Billing"
+        },
+        "empty": {
+          "title": "No stores yet",
+          "message": "This organization has not created a store."
+        },
+        "billingUnknown": "Billing has no subscription recorded for this store, or could not be reached. Either way it does not mean the store has lapsed.",
+        "billingUnknownShort": "Unknown"
+      },
+      "users": {
+        "title": "Users",
+        "lede": "Every account uaa holds for this organization, including administrators who belong to no store.",
+        "loading": "Loading accounts…",
+        "paginationLabel": "Account pages",
+        "empty": {
+          "title": "No accounts",
+          "message": "uaa holds no account carrying this organization's identifier."
+        }
+      },
+      "activity": {
+        "title": "Activity",
+        "empty": {
+          "title": "Not available yet",
+          "message": "Every rename, suspension and closure is recorded, but no endpoint returns those records yet."
+        }
+      },
+      "suspend": {
+        "title": "Suspend {{name}}?",
+        "message": "The organization can be resumed afterwards; nothing is deleted.",
+        "consequence": "Every store this organization owns stops being usable immediately, including its storefronts' console.",
+        "reasonLabel": "Reason",
+        "reasonHint": "Optional. Recorded in the audit trail beside your name.",
+        "busy": "Suspending…"
+      },
+      "resume": {
+        "title": "Resume {{name}}?",
+        "message": "The organization and every store it owns become usable again."
+      },
+      "close": {
+        "title": "Close {{name}}?",
+        "message": "Closing is final: there is no transition out of it. Every store the organization owns stops being usable and cannot be brought back from here.",
+        "confirmationLabel": "Type the organization's name to confirm:"
+      },
+      "ownerReset": {
+        "title": "Set the owner's password",
+        "message": "Sets a new password for the account that owns {{name}}.",
+        "password": "New password",
+        "repeatPassword": "Repeat password",
+        "hint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "handoverHint": "Nothing on the platform sends email, so you will need to pass this on yourself.",
+        "weak": "The password does not meet the rule above.",
+        "mismatch": "The two passwords do not match.",
+        "confirm": "Set password",
+        "busy": "Setting…"
+      },
+      "toast": {
+        "renamed": "Organization renamed to {{name}}.",
+        "suspended": "{{name}} suspended.",
+        "resumed": "{{name}} resumed.",
+        "closed": "{{name}} closed.",
+        "ownerPasswordReset": "Password set for {{name}}'s owner."
+      }
+    },
+    "pods": {
+      "heading": {
+        "title": "Pods",
+        "context": "The deployments that host every store"
+      },
+      "loading": "Loading pods…",
+      "totalLabel": "{{total}} {count, plural, =1 {pod} other {pods}}",
+      "subtitle": {
+        "none": "No pods to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {pod} other {pods}}"
+      },
+      "notice": {
+        "stateOnDetail": "Lifecycle, health and capacity are per pod — open one to see them."
+      },
+      "panel": {
+        "title": "The fleet"
+      },
+      "public": "Shared",
+      "unit": "pods",
+      "paginationLabel": "Pod pages",
+      "column": {
+        "pod": "Pod",
+        "endpoint": "Endpoint",
+        "owner": "Owner",
+        "shortId": "Identifier",
+        "actions": "Actions",
+        "stores": "Stores"
+      },
+      "action": {
+        "create": "Register a pod",
+        "open": "Open pod",
+        "openNamed": "Open {{name}}"
+      },
+      "empty": {
+        "title": "No pods registered",
+        "message": "A store cannot be provisioned until at least one pod exists."
+      },
+      "search": {
+        "label": "Search pods",
+        "placeholder": "Name or endpoint",
+        "clear": "Clear the search"
+      },
+      "noMatches": {
+        "title": "No pods matched",
+        "message": "No pod has that name or endpoint. Clear the search to see the whole fleet."
+      }
+    },
+    "pod": {
+      "heading": {
+        "new": "Register a pod",
+        "newContext": "Adds a deployment to the registry the gateway routes from",
+        "fallback": "Pod",
+        "context": "Identifier {{id}}"
+      },
+      "loading": "Loading pod…",
+      "neverProbed": "Never probed",
+      "action": {
+        "backToFleet": "The fleet",
+        "resume": "Resume",
+        "drain": "Drain",
+        "delete": "Delete pod"
+      },
+      "state": {
+        "title": "State",
+        "lifecycle": "Lifecycle",
+        "lifecycleNote": "Lifecycle decides placement only. A draining pod keeps its route and keeps serving the stores already on it.",
+        "health": "Health",
+        "lastProbed": "Last probed {{at}}",
+        "capacity": "Capacity",
+        "capacityDisagrees": "The registry counts {{registry}} here while tenancy has {{placed}}. Placement decisions use the registry's number."
+      },
+      "capacityUnlimited": "{{stores}} stores, no ceiling set",
+      "capacityOf": "{{stores}} of {{max}} stores",
+      "routing": {
+        "title": "Routing",
+        "endpoint": "Endpoint",
+        "endpointType": "Endpoint type",
+        "visibility": "Visibility",
+        "region": "Region",
+        "noRegion": "Not recorded",
+        "id": "Pod id"
+      },
+      "endpointType": {
+        "EXTERNAL": "External",
+        "INTERNAL": "Internal"
+      },
+      "form": {
+        "createTitle": "Pod details",
+        "editTitle": "Edit pod",
+        "edit": "Edit pod",
+        "editableFields": "Only the name and the endpoint can be changed after a pod is registered. Visibility, region and capacity are set by the registry.",
+        "name": "Name",
+        "nameHint": "Letters, digits and hyphens. Unique across the platform.",
+        "nameInvalid": "Use letters, digits and hyphens only.",
+        "endpoint": "Endpoint",
+        "endpointHint": "The absolute URL the gateway routes this pod's traffic to.",
+        "endpointInvalid": "Enter an absolute http or https URL.",
+        "endpointType": "Endpoint type",
+        "owner": "Owning organization",
+        "ownerHint": "Naming an organization makes the pod private to it. Leave it shared for a public pod.",
+        "ownerFixed": "The owner is set when a pod is registered and cannot be changed afterwards.",
+        "create": "Register pod",
+        "save": "Save changes",
+        "saving": "Saving…"
+      },
+      "drain": {
+        "title": "Drain {{name}}?",
+        "message": "No new store will be placed here. The stores already on it keep working and keep their route — this is the safe way to retire a pod."
+      },
+      "resume": {
+        "title": "Resume {{name}}?",
+        "message": "The pod becomes a candidate for new store placements again."
+      },
+      "delete": {
+        "title": "Delete {{name}}?",
+        "message": "Nothing checks whether stores are still on this pod, and there is no undo: every store placed here would be left pointing at a deployment the registry no longer knows. Drain is the safe operation.",
+        "confirmationLabel": "Type the pod's name to confirm:"
+      },
+      "toast": {
+        "created": "Pod {{name}} registered.",
+        "updated": "Pod {{name}} saved.",
+        "drained": "{{name}} is draining. No new stores will be placed on it.",
+        "resumed": "{{name}} is back in rotation.",
+        "deleted": "Pod {{name}} deleted."
+      },
+      "stores": {
+        "title": "Stores on this pod",
+        "subtitle": "From tenancy, which owns the placement. Read-only: a store is administered by its own organization.",
+        "loading": "Loading stores…",
+        "count": "{{stores}} {count, plural, =1 {store} other {stores}}",
+        "unit": "stores",
+        "paginationLabel": "Store pages",
+        "column": {
+          "store": "Store",
+          "organization": "Organization",
+          "status": "Status",
+          "provisioning": "Provisioning",
+          "billing": "Billing"
+        },
+        "empty": {
+          "title": "No stores here",
+          "message": "Nothing has been placed on this pod. Deleting it strands nobody."
+        },
+        "search": {
+          "label": "Search stores on this pod",
+          "placeholder": "Store name or id",
+          "clear": "Clear the search"
+        },
+        "noMatches": {
+          "title": "No stores matched",
+          "message": "No store on this pod has that name or id. Clear the search to see them all."
+        }
+      }
+    },
+    "users": {
+      "heading": {
+        "title": "Platform accounts",
+        "context": "Every account uaa holds"
+      },
+      "loading": "Loading accounts…",
+      "totalLabel": "{{total}} {count, plural, =1 {account} other {accounts}}",
+      "subtitle": {
+        "none": "No accounts to show",
+        "range": "Showing {{from}}–{{to}} of {{total}} {count, plural, =1 {account} other {accounts}}"
+      },
+      "notice": {
+        "noSearch": "Accounts can be narrowed by organization only — uaa's admin list has no search over names, usernames or addresses."
+      },
+      "panel": {
+        "title": "All accounts"
+      },
+      "unnamed": "No name recorded",
+      "noOrg": "No organization",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "unit": "accounts",
+      "paginationLabel": "Account pages",
+      "column": {
+        "user": "Account",
+        "roles": "Roles",
+        "scope": "Organization",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "filter": {
+        "label": "Filter by organization",
+        "allOrgs": "All organizations"
+      },
+      "action": {
+        "enable": "Enable account",
+        "enableNamed": "Enable {{name}}",
+        "disable": "Disable account",
+        "disableNamed": "Disable {{name}}",
+        "resetPassword": "Set password",
+        "resetPasswordNamed": "Set a password for {{name}}",
+        "editRoles": "Edit roles",
+        "editRolesNamed": "Edit roles for {{name}}",
+        "impersonateUnavailable": "Signing in as another account is not built yet",
+        "delete": "Delete account",
+        "deleteNamed": "Delete {{name}}"
+      },
+      "empty": {
+        "title": "No accounts",
+        "message": "uaa holds no account to show."
+      },
+      "noMatches": {
+        "title": "No accounts in this organization",
+        "message": "No account carries this organization's identifier. Clear the filter to see every account."
+      },
+      "reset": {
+        "title": "Set a password",
+        "message": "Sets a new password for {{name}}.",
+        "password": "New password",
+        "repeatPassword": "Repeat password",
+        "hint": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+        "handoverHint": "Nothing on the platform sends email, so you will need to pass this on yourself.",
+        "weak": "The password does not meet the rule above.",
+        "mismatch": "The two passwords do not match.",
+        "confirm": "Set password",
+        "busy": "Setting…"
+      },
+      "roles": {
+        "title": "Roles",
+        "message": "Which roles {{name}} holds. Changes take effect the next time they sign in.",
+        "empty": "uaa did not answer with a list of assignable roles, so there is nothing to choose from.",
+        "confirm": "Save roles",
+        "busy": "Saving…"
+      },
+      "delete": {
+        "title": "Delete this account?",
+        "message": "{{name}} will be removed from uaa. There is no undo, and anything that referenced them by id will no longer resolve.",
+        "confirmationLabel": "Type the username to confirm:"
+      },
+      "toast": {
+        "enabled": "{{name}} enabled.",
+        "disabled": "{{name}} disabled.",
+        "passwordReset": "Password set for {{name}}.",
+        "rolesChanged": "Roles saved for {{name}}.",
+        "deleted": "{{name}} deleted."
+      }
+    },
+    "plans": {
+      "heading": {
+        "title": "Plans",
+        "context": "What the platform sells, and what each plan grants"
+      },
+      "loading": "Loading the catalogue…",
+      "notice": {
+        "readOnly": "Read-only. The catalogue is mirrored from Stripe and no endpoint on the platform writes it."
+      },
+      "panel": {
+        "title": "Plan catalogue",
+        "subtitle": "Every plan, cheapest tier first."
+      },
+      "column": {
+        "plan": "Plan",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "trial": "{{days}}-day trial",
+      "empty": {
+        "title": "No plans",
+        "message": "Billing has no plan in its catalogue."
+      }
     }
   }
 }

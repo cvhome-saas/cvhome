@@ -159,12 +159,12 @@ export class MarketingFacade {
   /** One feature line — a ceiling with its number, an unlimited ceiling, or a plain capability. */
   private featureLabel(feature: PlanFeature): string {
     if (feature.unlimited) {
-      return this.transloco.translate(`marketing.entitlement.${feature.key}.unlimited`);
+      return this.transloco.translate(`shared.entitlement.${feature.key}.unlimited`);
     }
     if (feature.limit !== null) {
-      return this.transloco.translate(`marketing.entitlement.${feature.key}.limit`, {count: feature.limit});
+      return this.transloco.translate(`shared.entitlement.${feature.key}.limit`, {count: feature.limit});
     }
-    return this.transloco.translate(`marketing.entitlement.${feature.key}.granted`);
+    return this.transloco.translate(`shared.entitlement.${feature.key}.granted`);
   }
 
   private actionLabel(free: boolean, trialDays: number): string {

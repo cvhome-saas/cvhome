@@ -1,0 +1,58 @@
+:host {
+  display: contents;
+}
+
+/* The page owns its own rhythm, as the other platform tables do. */
+.plans-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cell-plan {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.cell-plan strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The code is what Stripe and the API speak, so it keeps its own direction under RTL. */
+.plan-code {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.latin {
+  unicode-bidi: plaintext;
+}
+
+.plan-trial {
+  color: var(--chart-2-foreground);
+  font-size: var(--text-2xs);
+}
+
+/* A price is a figure: tabular, so the column reads as a column. */
+.cell-price {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-allowance {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}

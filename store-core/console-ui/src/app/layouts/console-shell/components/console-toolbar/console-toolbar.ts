@@ -17,14 +17,19 @@ import {ConsoleShellFacade} from '../../facades/console-shell.facade';
       <nav class="breadcrumb" [attr.aria-label]="t('shell.toolbar.breadcrumbNav')">
         <app-icon name="home" />
         <!--
-          The root crumb is the dashboard, which does not exist for an account with no
-          store — naming it there would place the operator inside a section the guards
-          will not let them enter. In first run the page stands on its own.
+          The root crumb names the operator's home, which is not the same page for both halves of
+          this console — and for an account with no store it is neither. Naming a section the guards
+          will not let them enter is the failure being avoided in all three branches: in first run
+          the page stands on its own, and a platform operator's root is the platform, since the
+          merchant-only guard now turns them away from the dashboard.
+
+          No backticks in this comment: it sits inside an inline template literal, and one would
+          close it — failing as a run of "',' expected" errors pointing at the next declaration.
         -->
         @if (shell.firstRun()) {
           <strong aria-current="page">{{ shell.pageLabel() }}</strong>
         } @else {
-          <span>{{ t('shell.breadcrumb.dashboard') }}</span>
+          <span>{{ shell.isPlatformOperator ? t('shell.breadcrumb.platform') : t('shell.breadcrumb.dashboard') }}</span>
           @if (shell.pageLabel()) {
             <app-icon name="chevronRight" [flip]="true" />
             <strong aria-current="page">{{ shell.pageLabel() }}</strong>

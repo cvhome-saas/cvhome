@@ -41,4 +41,25 @@ describe('StatisticService', () => {
     service.productStatistic(RANGE).subscribe();
     http.expectOne(scoped(`${BASE}/product-statistic`)).flush({statistics: []} as never);
   });
+
+  /*
+   * The two platform counters live on **tenancy**, not checkout, and that is the whole point of
+   * asserting them: the merchant three are pod-side and these are store-core-side, so a copy-paste
+   * of the base path would have sent a super admin's request to the open store's pod.
+   *
+   * There is deliberately no third call here. `subscription-statistic` exists in no Java file on the
+   * platform — see lessons.md, "Platform — no subscription statistics".
+   */
+  it('posts the same range to tenancy for the two platform statistics', () => {
+    const TENANCY = '/tenancy/api/v2/private';
+
+    service.orgStatistic(RANGE).subscribe();
+    const orgs = http.expectOne(scoped(`${TENANCY}/org-statistic`));
+    expect(orgs.request.method).toBe('POST');
+    expect(orgs.request.body).toEqual(RANGE);
+    orgs.flush({entries: []});
+
+    service.storeStatistic(RANGE).subscribe();
+    http.expectOne(scoped(`${TENANCY}/store-statistic`)).flush({entries: []});
+  });
 });

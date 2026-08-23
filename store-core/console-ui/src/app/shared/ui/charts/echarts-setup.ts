@@ -9,12 +9,12 @@
  * `echarts/*` directly.
  */
 import * as echarts from 'echarts/core';
-import {BarChart, PieChart} from 'echarts/charts';
+import {BarChart, LineChart, PieChart} from 'echarts/charts';
 import {GridComponent, TooltipComponent} from 'echarts/components';
 import {LabelLayout} from 'echarts/features';
 import {CanvasRenderer} from 'echarts/renderers';
 
-echarts.use([BarChart, PieChart, GridComponent, TooltipComponent, LabelLayout, CanvasRenderer]);
+echarts.use([BarChart, LineChart, PieChart, GridComponent, TooltipComponent, LabelLayout, CanvasRenderer]);
 
 export {echarts};
 export type {EChartsCoreOption} from 'echarts/core';

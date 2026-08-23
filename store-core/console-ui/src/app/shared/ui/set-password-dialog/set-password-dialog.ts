@@ -9,6 +9,10 @@ const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 /**
  * Sets another user's password.
  *
+ * In `shared/ui/` because three screens set one: the store team (Module 8, where it was written),
+ * the platform account list, and an organization's owner. It was a page-local component on the
+ * argument that only one page set a password; that stopped being true.
+ *
  * **Why this is not `app-confirm-dialog`.** That component confirms; it has no content projection
  * and its typed mode asks the operator to repeat a phrase the console already knows. This *collects*
  * two values the console does not know and compares them. Confirming and collecting are different
@@ -32,7 +36,7 @@ const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
   selector: 'app-set-password-dialog',
   imports: [FormField, TextField],
   templateUrl: './set-password-dialog.html',
-  styleUrls: ['./set-password-dialog.css', '../../../../shared/styles/dialog-motion.css'],
+  styleUrls: ['./set-password-dialog.css', '../../styles/dialog-motion.css'],
 })
 export class SetPasswordDialog {
   readonly open = input(false);

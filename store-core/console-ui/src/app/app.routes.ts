@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
 
 import {canAccessSecuredPages} from '@core/auth/auth-guard.service';
-import {consoleContext, firstRunOnly, requiresStore} from '@layouts/console-shell/guards/first-run.guard';
+import {
+  consoleContext,
+  firstRunOnly,
+  merchantOnly,
+  platformOnly,
+  requiresStore,
+} from '@layouts/console-shell/guards/first-run.guard';
 
 export const routes: Routes = [
   {
@@ -94,9 +100,80 @@ export const routes: Routes = [
     ],
   },
   {
+    /*
+     * The platform console: the other product this application is.
+     *
+     * Inside the same shell rather than a second one — a platform operator switching between the two
+     * halves should not be switching applications — but with a different guard set. `requiresStore`
+     * is deliberately **absent**: none of these pages is a reading of one shop, and a super admin's
+     * store list is not their own anyway (see lessons.md, "Shell — a super admin's store rail is the
+     * whole platform, truncated").
+     *
+     * `platformOnly` redirects anyone else to the merchant dashboard, rather than rendering a page
+     * whose every request will 403.
+     */
+    path: 'platform',
+    loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
+    canActivate: [canAccessSecuredPages, consoleContext, platformOnly],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('@features/platform-dashboard/platform-dashboard').then((page) => page.PlatformDashboard),
+        data: {titleKey: 'route.platform.title', breadcrumbKey: 'shell.breadcrumb.platform'},
+      },
+      {
+        path: 'organizations',
+        loadComponent: () => import('@features/organizations/organizations').then((page) => page.Organizations),
+        data: {titleKey: 'route.organizations.title', breadcrumbKey: 'shell.breadcrumb.organizations'},
+      },
+      {
+        // The tab is part of the URL, so a tab is linkable and survives a reload — the shape store
+        // management and billing already use. An unknown tab settles in the page, not here.
+        path: 'organizations/:id',
+        redirectTo: 'organizations/:id/overview',
+        pathMatch: 'full',
+      },
+      {
+        path: 'organizations/:id/:section',
+        loadComponent: () =>
+          import('@features/organization-detail/organization-detail').then((page) => page.OrganizationDetail),
+        data: {titleKey: 'route.organization.title', breadcrumbKey: 'shell.breadcrumb.organization'},
+      },
+      {
+        path: 'pods',
+        loadComponent: () => import('@features/pods/pods').then((page) => page.Pods),
+        data: {titleKey: 'route.pods.title', breadcrumbKey: 'shell.breadcrumb.pods'},
+      },
+      // Static before the id param, so this is not read as a pod called "new".
+      {
+        path: 'pods/new',
+        loadComponent: () => import('@features/pod-detail/pod-detail').then((page) => page.PodDetail),
+        data: {titleKey: 'route.newPod.title', breadcrumbKey: 'shell.breadcrumb.newPod'},
+      },
+      {
+        path: 'pods/:id',
+        loadComponent: () => import('@features/pod-detail/pod-detail').then((page) => page.PodDetail),
+        data: {titleKey: 'route.pod.title', breadcrumbKey: 'shell.breadcrumb.pod'},
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('@features/platform-users/platform-users').then((page) => page.PlatformUsers),
+        data: {titleKey: 'route.platformUsers.title', breadcrumbKey: 'shell.breadcrumb.platformUsers'},
+      },
+      {
+        // The plan catalogue. Read-only, and the only platform-wide read billing offers — every
+        // other endpoint it has is store-scoped and refuses a super admin.
+        path: 'plans',
+        loadComponent: () => import('@features/platform-plans/platform-plans').then((page) => page.PlatformPlans),
+        data: {titleKey: 'route.plans.title', breadcrumbKey: 'shell.breadcrumb.plans'},
+      },
+    ],
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {
         path: '',
@@ -109,7 +186,7 @@ export const routes: Routes = [
   {
     path: 'orders',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {
         path: '',
@@ -134,7 +211,7 @@ export const routes: Routes = [
      */
     path: 'users',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {path: '', redirectTo: 'team', pathMatch: 'full'},
       {
@@ -197,7 +274,7 @@ export const routes: Routes = [
      */
     path: 'customers',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {
         path: '',
@@ -209,7 +286,7 @@ export const routes: Routes = [
   {
     path: 'payments',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {
         path: '',
@@ -231,7 +308,9 @@ export const routes: Routes = [
      */
     path: 'subscription',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext],
+    // `merchantOnly` on the parent rather than beside the child's `requiresStore`: a subscription
+    // belongs to a store, and a platform operator has none of their own to be billed for.
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly],
     children: [
       // The section is part of the URL, so a rail tab is linkable and survives a reload — the same
       // shape store management uses.
@@ -252,7 +331,7 @@ export const routes: Routes = [
      */
     path: 'catalogue',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {path: '', redirectTo: 'categories', pathMatch: 'full'},
       {
@@ -272,7 +351,7 @@ export const routes: Routes = [
      */
     path: 'products',
     loadComponent: () => import('@layouts/console-shell/console-shell').then((layout) => layout.ConsoleShell),
-    canActivate: [canAccessSecuredPages, consoleContext, requiresStore],
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly, requiresStore],
     children: [
       {
         path: '',
@@ -300,7 +379,11 @@ export const routes: Routes = [
     // Authentication and the store list for the whole branch; a *store* is not required, because
     // `create` below is the only way out of first run — but the rail still renders on it, so the list
     // has to load there too.
-    canActivate: [canAccessSecuredPages, consoleContext],
+    //
+    // `merchantOnly` sits here rather than beside the child's `requiresStore`, and that deliberately
+    // takes `create` with it: a platform operator is never in first run, and creating a store as one
+    // is broken anyway — `StoreManagerApi.create` scopes to the caller's org and they have none.
+    canActivate: [canAccessSecuredPages, consoleContext, merchantOnly],
     children: [
       // Static before the section param, so this does not get swallowed as a section name.
       {

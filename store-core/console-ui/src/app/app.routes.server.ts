@@ -45,6 +45,13 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    // The platform console. Client-only like the rest: `SelectedStoreRequestContext.params()` reads
+    // the store list synchronously and throws during SSR, and the guard reads token claims the
+    // server does not hold.
+    path: 'platform/**',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'orders/**',
     renderMode: RenderMode.Client,
   },

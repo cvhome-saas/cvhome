@@ -41,4 +41,21 @@ export class ConsolePermissions {
     const roles = this.auth.getRoles();
     return roles.isSuperAdmin || roles.isOrgAdmin;
   }
+
+  /**
+   * Mirrors the guard every platform endpoint carries — `hasAnyRole('ROLE_SUPER_ADMIN')` on
+   * `OrgManagerApi` and the two statistic controllers, `STORE-CORE.POD.MANAGE` on the pod registry's
+   * writes, and `SCOPE_super_admin or ROLE_SUPER_ADMIN` on uaa's admin API.
+   *
+   * **Not `isSupport`.** Support is a real role in `Roles` and it appears in none of those
+   * expressions, so offering the Platform group to it would be offering four pages that 403. The
+   * impersonation requirement is where support gets a way in; until then it is honest to show them
+   * nothing rather than something broken.
+   *
+   * This decides what is *offered*. `platformOnly` decides what is reachable, and the server decides
+   * what is permitted; hiding the rail changes none of the latter two.
+   */
+  canAdministerPlatform(): boolean {
+    return this.auth.getRoles().isSuperAdmin;
+  }
 }

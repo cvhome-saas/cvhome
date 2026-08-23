@@ -1,0 +1,185 @@
+/*
+ * Page-level layout only. The console frame belongs to ConsoleShell, the card chrome to Panel, and
+ * the field vocabulary to `@shared/styles/field.css`, which this component lists ahead of this
+ * sheet — `.field-hint` comes from there.
+ */
+
+:host {
+  display: contents;
+}
+
+/*
+ * The named container the page responds to.
+ *
+ * A container query rather than a viewport one, because what decides the layout is how much room
+ * this page has — and that changes when the shell's rail collapses, at no particular viewport
+ * width. The container is a wrapper rather than the grid itself: a container query styles
+ * descendants, never the container it measures. The same shape store management uses.
+ */
+.org-region {
+  container: org / inline-size;
+}
+
+.org-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.org-layout.rail-collapsed {
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+}
+
+.org-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/*
+ * The section animates, not the layout around it. `@switch` recreates the block each time a tab is
+ * picked, so the rule runs afresh; the rail and the tab track stay put. `prefers-reduced-motion` is
+ * handled globally in `styles.css`.
+ */
+.org-section > * {
+  --rise-from: 0.625rem;
+  animation: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * Below the swap width the rail would take a fifth of the page for four links, so the sections
+ * become a horizontal track above the card instead. Both are in the DOM and CSS picks — a container
+ * query is not readable from TypeScript.
+ */
+.org-tabs {
+  display: none;
+}
+
+@container org (max-width: 44rem) {
+  .org-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .org-rail {
+    display: none;
+  }
+
+  .org-tabs {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* ---- Overview -------------------------------------------------------------------- */
+
+.facts {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.fact {
+  display: grid;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+
+.fact dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fact dd {
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.fact-value {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+}
+
+/* A value the platform has never recorded reads as absent, not as blank. */
+.unset {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+/* Latin data inside a page that may be right-to-left. */
+.latin {
+  unicode-bidi: plaintext;
+}
+
+/* The rename field and its two buttons occupy the fact's cell without widening the grid. */
+.rename {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rename-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.panel-lede {
+  margin: 0 0 0.85rem;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* ---- Stores -------------------------------------------------------------------- */
+
+.cell-store {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.cell-store strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-id {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * A fact the console could not obtain, as opposed to one with a value. Quiet on purpose: a billing
+ * outage must not read as a merchant who has stopped paying.
+ */
+.unknown {
+  color: var(--muted-foreground);
+  cursor: help;
+}
+
+/* The pod's own refusal, verbatim: a diagnostic string, not a translated message. */
+.provisioning-error {
+  display: block;
+  margin-block-start: 0.25rem;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}

@@ -37,7 +37,30 @@ export class ConsoleShellFacade {
   private readonly route = inject(ActivatedRoute);
   private readonly selection = inject(SelectedStoreService);
 
-  readonly navigation = this.api.navigation;
+  /**
+   * Whether this account administers the platform rather than a shop.
+   *
+   * Read once, through `ConsoleApi`: the roles come from the principal `canAccessSecuredPages` has
+   * already fetched and cached before any console route renders, and a role does not change within a
+   * session.
+   */
+  readonly isPlatformOperator = this.api.canAdministerPlatform();
+
+  /**
+   * The rail, narrowed to the half of the console this operator can actually use.
+   *
+   * **It cuts both ways.** A merchant is not shown the platform group, whose four screens are
+   * super-admin only; and a platform operator is not shown the merchant groups, whose nine screens
+   * are each a reading of one store they do not have — see `NavigationAudience`. Rendering either
+   * set to the wrong operator is rendering pages that answer 403.
+   *
+   * Filtered here rather than in the sidebar component so there is one answer to "what is in the
+   * rail" — the component renders what it is given, and the shell spec can assert on the list
+   * without a fixture.
+   */
+  readonly navigation = this.api.navigation.filter(
+    (section) => !section.audience || section.audience === (this.isPlatformOperator ? 'platform' : 'merchant'),
+  );
 
   /**
    * The signed-in operator. Null until the request answers, which the toolbar renders as a neutral
@@ -88,12 +111,17 @@ export class ConsoleShellFacade {
   /**
    * True when the account owns no store yet.
    *
-   * Everything in the console is a reading of one store, so until one exists the rail
+   * Everything in the *merchant* console is a reading of one store, so until one exists the rail
    * leads nowhere and the guards hold the operator on the getting-started page. Gated on
    * `storesLoading` because an empty list mid-request is absence of an answer, not an
    * answer — without it the rail would flash disabled on every load.
+   *
+   * Never true for a platform operator. First run is a merchant's condition: the platform pages are
+   * not a reading of a store and disabling the rail would disable the only pages they came for.
    */
-  readonly firstRun = computed(() => !this.storesLoading() && this.stores().length === 0);
+  readonly firstRun = computed(
+    () => !this.isPlatformOperator && !this.storesLoading() && this.stores().length === 0,
+  );
 
   /**
    * Whether the plan strip occupies the top of the shell.
@@ -104,6 +132,18 @@ export class ConsoleShellFacade {
    * because the strip's visibility and the `--banner-h` it reserves must never disagree.
    */
   readonly bannerShown = computed(() => this.bannerVisible() && !this.firstRun());
+
+  /**
+   * Whether the store picker is shown at all.
+   *
+   * Hidden for a platform operator, and the reason is not tidiness. `InternalStoreServiceImpl.findAll`
+   * reads a null org claim as *platform-wide*, so a super admin's "your stores" is the first page of
+   * every tenant's stores, silently truncated by `visiblePage` to `DEFAULT_PAGE_SIZE` — a picker
+   * offering a stranger's shop as though it were theirs. Until there is a platform-wide store screen
+   * with real paging, showing nothing is the honest answer. See lessons.md, "Shell — a super admin's
+   * store rail is the whole platform, truncated".
+   */
+  readonly storeSwitcherShown = computed(() => !this.isPlatformOperator);
 
   readonly currentStore = computed(
     () => this.stores().find((store) => store.id === this.currentStoreId()) ?? null,

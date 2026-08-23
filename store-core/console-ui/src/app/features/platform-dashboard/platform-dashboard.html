@@ -1,0 +1,42 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context">
+    <app-date-range-picker [value]="facade.dateRange()" (valueChange)="facade.dateRange.set($event)" />
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.dashboard.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="platform-stack">
+        <!--
+          Said plainly rather than left to be inferred from two tiles: nothing on this platform
+          aggregates money, so this page counts and does not total.
+          TODO(lessons.md): see lessons.md, "Platform — no revenue or GMV figure anywhere".
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('platform.dashboard.notice.countsOnly')" />
+
+        <app-kpi-grid [label]="t('platform.dashboard.kpiLabel')" [data]="facade.kpis()" [columns]="2" />
+
+        <section class="panel-row">
+          <app-trend-chart
+            [title]="t('platform.dashboard.organizations.title')"
+            [data]="facade.organizations()"
+            [unit]="t('platform.dashboard.organizations.unit')"
+            [total]="facade.organizationsTotal()"
+            tone="green"
+          />
+
+          <app-trend-chart
+            [title]="t('platform.dashboard.stores.title')"
+            [data]="facade.stores()"
+            [unit]="t('platform.dashboard.stores.unit')"
+            [total]="facade.storesTotal()"
+            tone="cyan"
+          />
+        </section>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

@@ -23,7 +23,7 @@ import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
 import {InvitationLinkDialog} from './components/invitation-link-dialog/invitation-link-dialog';
 import {InviteDialog} from './components/invite-dialog/invite-dialog';
 import {UserDialog} from './components/user-dialog/user-dialog';
-import {SetPasswordDialog} from './components/set-password-dialog/set-password-dialog';
+import {SetPasswordDialog} from '@shared/ui/set-password-dialog/set-password-dialog';
 import {PAGE_SIZE, UsersFacade} from './facades/users.facade';
 
 /** The team table's columns. Widths are grid tracks, read straight into the row layout. */

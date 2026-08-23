@@ -79,7 +79,9 @@ import {StoreSwitcher} from '../store-switcher/store-switcher';
         }
       </nav>
 
-      <app-store-switcher />
+      @if (shell.storeSwitcherShown()) {
+        <app-store-switcher />
+      }
     </aside>
 
     <ng-template #navBody let-item>

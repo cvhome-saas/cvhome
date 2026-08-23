@@ -20,9 +20,11 @@ class TestPage {}
 
 describe('ConsoleShell', () => {
   let billing: FakeSubscriptionService;
+  let api: FakeConsoleApi;
 
   beforeEach(async () => {
     billing = new FakeSubscriptionService();
+    api = Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE});
     await TestBed.configureTestingModule({
       imports: [ConsoleShell, ...translocoTesting().imports],
       providers: [
@@ -30,7 +32,7 @@ describe('ConsoleShell', () => {
         {provide: SubscriptionService, useValue: billing},
         provideRouter([]),
         ...translocoTesting().providers,
-        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
+        {provide: ConsoleApi, useValue: api},
       ],
     }).compileComponents();
   });
@@ -124,7 +126,7 @@ describe('ConsoleShell', () => {
           },
         ]),
         ...translocoTesting().providers,
-        {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
+        {provide: ConsoleApi, useValue: api},
       ],
     }).compileComponents();
 
@@ -200,5 +202,84 @@ describe('ConsoleShell', () => {
     fixture.detectChanges();
 
     expect(facade.mobileNavOpen()).toBeFalse();
+  });
+
+  /*
+   * The two products this application is. The rail is the only place they meet, and what keeps them
+   * apart is each group's audience — see `.agents/plans/seller-ui-feature-inventory.md` §1.
+   *
+   * It has to cut **both** ways. The platform group is super-admin only, so a merchant seeing it
+   * would get four screens that 403; and the merchant groups are each a reading of one store, which
+   * a platform operator does not have — their store list is a truncated page of every tenant's and
+   * the switcher is hidden, so those pages 403 too. Showing either set to the wrong operator was
+   * showing pages that fail.
+   */
+  describe('the rail’s two audiences', () => {
+    /** The nav the shell is actually given, with the platform group added to the fake's merchant ones. */
+    function withPlatformGroup(): void {
+      api.navigation = [
+        ...api.navigation,
+        {
+          groupKey: 'shell.nav.group.platform',
+          audience: 'platform',
+          items: [{labelKey: 'shell.nav.item.organizations', icon: 'building', route: '/platform/organizations'}],
+        },
+      ];
+    }
+
+    it('keeps the platform group out of a merchant’s rail', () => {
+      withPlatformGroup();
+      const {element} = shell();
+
+      expect(element.querySelector('a[href="/platform/organizations"]')).toBeNull();
+    });
+
+    it('gives a platform operator the platform group', () => {
+      withPlatformGroup();
+      api.platformOperator = true;
+      const {element} = shell();
+
+      expect(element.querySelector('a[href="/platform/organizations"]')).not.toBeNull();
+    });
+
+    it('leaves a merchant their own groups', () => {
+      withPlatformGroup();
+      const {element} = shell();
+
+      expect(element.querySelector('a[href="/dashboard"]')).not.toBeNull();
+      expect(element.querySelector('a[href="/store-management"]')).not.toBeNull();
+    });
+
+    /*
+     * The half the user reported: a super admin's Home page was an access-denied banner, because
+     * every merchant page reads a store and the one they are handed belongs to someone else.
+     */
+    it('keeps the merchant groups out of a platform operator’s rail', () => {
+      withPlatformGroup();
+      api.platformOperator = true;
+      const {element} = shell();
+
+      expect(element.querySelector('a[href="/dashboard"]')).toBeNull();
+      expect(element.querySelector('a[href="/store-management"]')).toBeNull();
+    });
+
+    /*
+     * `InternalStoreServiceImpl.findAll` reads a null org claim as platform-wide, so a super admin's
+     * "your stores" is a truncated page of every tenant's. Offering it as a picker hands them a
+     * stranger's shop. See lessons.md, "Shell — a super admin's store rail is the whole platform,
+     * truncated".
+     */
+    it('shows the store switcher to a merchant', () => {
+      const {element} = shell();
+
+      expect(element.querySelector('app-store-switcher')).not.toBeNull();
+    });
+
+    it('hides the store switcher from a platform operator, whose store list is not their own', () => {
+      api.platformOperator = true;
+      const {element} = shell();
+
+      expect(element.querySelector('app-store-switcher')).toBeNull();
+    });
   });
 });

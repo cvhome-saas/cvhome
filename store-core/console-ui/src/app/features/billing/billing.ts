@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {map} from 'rxjs';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
+import {PlatformLabel} from '@shared/i18n/platform-label';
 import {Money} from '@shared/i18n/money';
 import {PlanDialog} from '@layouts/console-shell/billing/plan-dialog/plan-dialog';
 import {SectionNav, type NavSection} from '@shared/ui/section-nav/section-nav';
@@ -70,6 +71,7 @@ const STATUS_TONE: Record<SubscriptionStatus, Tone> = {
 export class Billing {
   protected readonly facade = inject(BillingPageFacade);
   private readonly transloco = inject(TranslocoService);
+  private readonly platformLabels = inject(PlatformLabel);
   private readonly money = inject(Money);
 
   private readonly route = inject(ActivatedRoute);
@@ -132,10 +134,17 @@ export class Billing {
     return status ? STATUS_TONE[status] : 'slate';
   });
 
+  /**
+   * The subscription's status, in the reader's language.
+   *
+   * Through the shared label rather than a `billing.status.*` key of its own: the platform console's
+   * organization detail renders the same enum for another tenant's stores, and one enum with two
+   * sets of words drifts into two different words for the same state. It also brings the known-set
+   * guard with it — a status added server-side no longer takes this page down.
+   */
   protected readonly statusLabel = computed(() => {
-    this.transloco.activeLang();
     const status = this.billing.status();
-    return status ? this.transloco.translate(`billing.status.${status}`) : '';
+    return status ? this.platformLabels.subscriptionStatus(status) : '';
   });
 
   /**

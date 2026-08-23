@@ -29,6 +29,42 @@ describe('ManagerStoreService', () => {
     request.flush([]);
   });
 
+  /*
+   * The pod goes in the **body**, wrapped — `ListManagerStoreQuery.pod` is a `PodId` record, so a bare string
+   * binds to nothing and the filter silently returns every store on the platform. That is the failure worth a
+   * spec: it looks like a working page showing the wrong rows.
+   */
+  it('filters the store list by pod, with the id wrapped and count paging', () => {
+    service.listByPod('507f1f77bcf86cd799439011', 1, 20).subscribe();
+    const request = http.expectOne((candidate) => candidate.url === `${BASE}/list`);
+    expect(request.request.method).toBe('POST');
+    // `name` is present and null rather than omitted: the server reads the whole query object, and
+    // an absent field and an explicitly-empty one should not be two shapes on the wire.
+    expect(request.request.body).toEqual({pod: {id: '507f1f77bcf86cd799439011'}, name: null});
+    expect(request.request.params.get('page')).toBe('1');
+    expect(request.request.params.get('count')).toBe('20');
+    expect(request.request.params.has('size')).toBeFalse();
+    request.flush({content: [], totalElements: 0, totalPages: 0, size: 20, number: 0});
+  });
+
+  /*
+   * The term goes in `name`, which the server matches as a case-insensitive substring of the store's
+   * name **or** its id. It used to be an equality on the name alone — a lookup, not a search.
+   */
+  it('sends a store search term as the name filter, trimmed', () => {
+    service.listByPod('507f1f77bcf86cd799439011', 0, 20, '  store1 ').subscribe();
+    const request = http.expectOne((candidate) => candidate.url === `${BASE}/list`);
+    expect(request.request.body).toEqual({pod: {id: '507f1f77bcf86cd799439011'}, name: 'store1'});
+    request.flush({content: [], totalElements: 0, totalPages: 0, size: 20, number: 0});
+  });
+
+  it('reads every pod’s store count in one request', () => {
+    service.storesPerPod().subscribe();
+    const request = http.expectOne(scoped(`${BASE}/stores-per-pod`));
+    expect(request.request.method).toBe('GET');
+    request.flush([]);
+  });
+
   it('re-reads one store’s row while it provisions', () => {
     service.storeInfo('ORG1-STORE2').subscribe();
     const request = http.expectOne((candidate) => candidate.url === `${BASE}/store-info`);

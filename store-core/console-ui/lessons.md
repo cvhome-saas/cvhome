@@ -2664,3 +2664,433 @@ understood.
 - **`tsc --noEmit` does not check templates.** `tone="info"` on a component whose tone is a closed
   union passed the typecheck and the lint and was caught by `ng build`. The template typecheck is
   part of the build; a change touching templates is not verified until it has run.
+
+## Platform — no subscription statistics
+
+- **Screen:** `/platform`, the dashboard. seller-ui's `/pages` admin home draws three ECharts panels
+  from one date range: subscriptions, new organizations, new stores.
+- **What the UI needs:** subscriptions started per day over a chosen period, so the operator can see
+  the business growing rather than only the tenant count.
+- **What is missing:** the endpoint. `grep -rn "subscription-statistic" --include="*.java"` over the
+  whole repository returns **nothing**. seller-ui's `statistic.api.service.ts` has called
+  `billing/api/v2/private/subscription-statistic` since it was written, so that panel has been a 404
+  for its entire life and renders as an empty plot rather than as an error.
+- **Why it is required:** organizations and stores are counts of *signups*. Whether any of them pay
+  is the question the platform actually turns on, and nothing on this screen can answer it.
+- **Expected contract:**
+  ```
+  POST /billing/api/v2/private/subscription-statistic
+  { "fromDate": "…", "toDate": "…" }        # commons StatisticRange
+  → { "entries": [ {"date": "2026-08-04", "name": "GROWTH", "value": 12}, … ] }
+  ```
+  Grouped by day **and by plan code**, so the console can stack the series — unlike the two tenancy
+  counters, whose `name` is null. `hasRole('ROLE_SUPER_ADMIN')`, matching `OrgStatisticApi`.
+- **Placeholder:** the panel is **absent**, not empty.
+  `features/platform-dashboard/services/platform-dashboard.api.service.ts` says so at the top. An
+  empty card is a claim that there is nothing to show; a missing card is the truth, which is that the
+  console cannot ask.
+
+## Platform — no revenue or GMV figure anywhere
+
+- **Screen:** `/platform`, the KPI row.
+- **What the UI needs:** one money figure for the platform — revenue, GMV, or subscription value —
+  over the chosen period.
+- **What is missing:** any aggregate at all. `OrgStatisticApi` and `StoreStatisticApi` count rows;
+  checkout's three statistics count orders, order lines and billing countries; payments has **no
+  aggregate endpoint of any kind** (Module 7's finding, unchanged). Nothing sums an amount anywhere
+  on this platform, in any service.
+- **Why it is required:** a platform console without a money figure is a signup dashboard. It is also
+  the one number that would justify the rest of the screen existing.
+- **Expected contract:** a `POST /billing/api/v2/private/revenue-statistic` alongside the
+  subscription one, answering `(date, currency, minor units)` per day — currency in the grouping key
+  rather than converted, because nothing on the platform holds an exchange rate and a total that
+  silently mixed currencies would be worse than no total.
+- **Confirmed by reading billing end to end.** Its entire HTTP surface is `plan`, `subscription`,
+  `invoice`, `entitlement` and `quota` — four of the five store-scoped, none of them aggregating
+  anything, and the fifth (`plan/public/plans`) a catalogue. There is no sum of money exposed to a
+  human caller anywhere in the service.
+- **What console-ui does meanwhile:** the KPI row is **two tiles**, both counts, both labelled "in
+  this period" so they cannot be read as the platform's size. Two real tiles beat four with two em
+  dashes in them. `/platform/plans` shows what the platform *charges*, which is the closest thing to
+  a commercial figure the backend will answer.
+
+## Platform — no impersonation
+
+Large enough to be its own service change, so it graduates out of this file:
+[`../../.agents/requirments/user-impersonation.md`](../../.agents/requirments/user-impersonation.md).
+
+- **Screen:** `/platform/users`, the row action; and an organization's Users tab, which renders the
+  same table.
+- **What the UI needs:** a support or platform admin acting as a merchant, to reproduce what that
+  merchant is reporting.
+- **What is missing:** everything. `grep -ril "impersonat|act_as|actAs|on-behalf|token-exchange"`
+  across `store-core`, `store-commons` and `store-pod` returns **zero files** — there is no partial
+  implementation to finish.
+- **Why it is not a screen.** The console never holds a token: the gateway is an `oauth2Login`
+  client with a session cookie and a `tokenRelay()` filter on every backend route. "Act as this user"
+  therefore means *swapping the authorized client held in the gateway's session*, not minting
+  something the browser can carry — an authorization-server and gateway change with an audit
+  obligation attached. The requirements document covers RFC 8693 token exchange, the `act` claim, the
+  gateway's session problem, the audit rows, the console's banner and the hard exclusions.
+- **Placeholder:** the row action is **rendered and disabled**, with a title saying it is not built
+  (`shared/ui/user-admin-table/`). Not hidden: the point of writing the requirement is that the
+  screen it belongs to already exists.
+
+## Organizations — the owner nobody recorded
+
+Recorded as a **fixed** defect rather than an outstanding gap, because Module 11 shipped the backend
+change with the screens — the same call Module 8 made for `STORE-CORE.USERS.RESET_PASSWORD`.
+
+- **What was broken, in three layers at once.** `OrgManagerApi.changePassword` called
+  `userAccountService.changePassword(id.toString(), …)` — passing the **organization's** 24-character
+  ObjectId where uaa wants a **user UUID**. uaa's `AdminUserController.resetPassword` declares
+  `@PathVariable UUID id`, so the request could not even bind. Behind that,
+  `ManagerOrgDto.ownerUserId` — the field that would carry the right id — was **written by nothing**:
+  `ManagerOrgEntity.createOrgFromUser` sets id, created date, email and status, and no other code
+  path assigned an owner, so the column was null for every organization on the platform. And
+  seller-ui posted `{password}` while `UserPassword.getChangePassword()` is what the server reads, so
+  the value would have been null even had it arrived. The endpoint had never once succeeded.
+- **What changed.** `SignupServiceImpl.createOrgUser` writes the created administrator's uaa id onto
+  the organization inside the same transaction; `OrgOwnerBackfill` resolves the historical rows once
+  at startup through uaa's `metadata[org]` filter, preferring the `ORG_ADMIN`;
+  `OrgManagerApi.changePassword` resolves `ownerUserId` and passes *that*; and
+  `InternalOrgServiceImpl.findOne`'s bare `.orElseThrow()` became `OrgNotFoundException`, so an
+  unknown id is a 404 rather than a 500.
+- **What is still missing:** an organization the backfill could not resolve — one uaa knows no
+  account for — stays null and answers `OrgOwnerUnknownException`, a 422 naming the missing fact.
+  There is also **no way to transfer ownership**: nothing reassigns the column once it is set.
+- **What console-ui does meanwhile:** the Overview tab renders the reset action **disabled with the
+  reason** when `ownerUserId` is null, rather than hiding it. "Nobody is recorded as owning this" is
+  a fact an operator needs.
+
+## Organizations — an org cannot be named at creation
+
+- **Screen:** `/platform/organizations`, the create dialog and the identity column.
+- **What the UI needs:** to create an organization with a name.
+- **What is missing:** a field. `CreateOrgRequest` is `(PersistableUser user)` and
+  `ManagerOrgEntity.createOrgFromUser(Email)` sets id, created date, email and status. `name` exists
+  on the entity and on the DTO, and `OrgLifecycleService.rename` is its **only** writer — so every
+  organization on the platform is nameless until someone renames it.
+- **Why it is required:** the identity column of the tenant registry is empty on every row without
+  it, and a rename is an audited operation that should not be how an organization gets its first
+  name.
+- **Expected contract:** `CreateOrgRequest` gains an optional `name`, written by
+  `createOrgFromUser`. The audit row for the rename then means what it says.
+- **What console-ui does meanwhile:** the list and the detail header fall back to the **contact
+  email** — computed once, in `toOrgRow`, so the two cannot disagree — and the create dialog says the
+  organization will be listed under that address until it is named.
+
+## Organizations — the list cannot be searched, filtered or sorted
+
+**Answered for search and filtering; still open for sorting.**
+
+- **What changed.** `POST /tenancy/api/v1/org-manager/list` takes a `ListOrgQuery(term, status)` —
+  the term matched case-insensitively as a substring of the **name and the contact email**, the
+  status an exact `OrgStatus`. One parameter for the two text fields rather than one each, because
+  almost every organization on the platform is unnamed and is therefore *listed* by its email: a box
+  that searched only the name would fail to find exactly the rows on screen. `find-all` is untouched
+  and still serves the callers that want no filter — the pod fleet's owner lookup and the pod form's
+  owner picker.
+- **The same shape as `store-manager/list`**, deliberately: the tenant registry and the store list
+  are the same table twice over, and two differently shaped filters over them would be a difference
+  with nothing behind it.
+- **What is still missing: sorting.** `Pageable` would accept a `sort`, and there is no whitelist of
+  sortable properties — so a column header that sorted would be feeding an unvalidated property name
+  into a query. The order is `created_date desc`, newest first, and is not a control. Contract: a
+  fixed set of sortable columns, the same decision the customers list is still waiting on.
+
+## Organizations — no store count, user count or plan on the row
+
+- **Screen:** `/platform/organizations`, the table.
+- **What the UI needs:** how big each tenant is, at a glance — stores, people, plan.
+- **What is missing:** all three as row data. Stores come from `org-manager/stores`, a paged call per
+  organization; accounts come from uaa's admin list, another paged call per organization; and a plan
+  belongs to a *store* now, so there is no organization-level answer at all.
+- **Why it is required:** without it the registry is a list of email addresses and dates, and the
+  operator has to open each row to learn anything.
+- **Expected contract:** `ManagerOrgDto` gains `storeCount` and `memberCount`, computed by tenancy in
+  the same query that pages the list.
+- **What console-ui does meanwhile:** the columns are **not drawn**. Twenty rows would be forty extra
+  requests, and a count that arrives per row also arrives at forty different moments.
+
+## Organizations — no audit read
+
+- **Screen:** `/platform/organizations/:id` → Activity.
+- **What the UI needs:** who renamed, suspended, resumed or closed this organization, and when.
+- **What is missing:** an endpoint. `tenancy.tenancy_audit` records `ORG`, `STORE`, `MEMBER` and
+  `INVITATION` rows with the entity id, the action, the from-state, the to-state, the actor, the
+  source (`API` or `JOB`) and a free-text detail — written by `TenancyAuditService` inside the same
+  transaction as the change it records. **Nothing reads that table.** The same is true of
+  `pod_registry.pod_audit`.
+- **Why it is required:** every lever on this page is destructive to a tenant's business, and the
+  first question after one is pulled is who pulled it. The rows already exist; only the read is
+  missing.
+- **Expected contract:**
+  ```
+  GET /tenancy/api/v1/org-manager/{id}/audit?page=&count=
+  → Page<TenancyAuditDto>  { entityType, entityId, action, fromState, toState, actor, source, detail, at }
+  ```
+  Super-admin only, newest first, with a store equivalent on `StoreManagerApi`.
+- **What console-ui does meanwhile:** the tab is **built and empty**, with a label saying the records
+  exist and cannot be read yet. Built rather than omitted because the rows are real and the endpoint
+  is a small, well-specified addition.
+
+## Organizations — another org's members cannot be listed from tenancy
+
+- **Screen:** `/platform/organizations/:id` → Users.
+- **What the UI needs:** the people who administer *this* organization, from a platform operator's
+  seat.
+- **What is missing:** an org-addressable membership read. `OrgMemberApi` takes the organization from
+  the **caller's own identity** on every method and never from a parameter — deliberately, so an org
+  admin cannot address another organization by editing a query string — which means a super admin
+  cannot use it to read anyone else's either. `org_member` is also not the team: its only writer is
+  `InvitationService.accept`, so the founder is absent and so is anyone created directly.
+- **Why it is required:** tenancy is where membership lives, and its view of a member (invited by
+  whom, accepted when) is richer than uaa's.
+- **Expected contract:** `GET /tenancy/api/v1/org-manager/{id}/members`, paged, super-admin only —
+  the same shape as `stores`, which already takes the organization by id for exactly this reason.
+- **What console-ui does meanwhile:** the tab reads **uaa's** admin list filtered on
+  `metadata[org]=<id>`, which is org-scoped by construction and is the only join between the two
+  services that exists. It works, and it means the tab shows uaa's view of a member rather than
+  tenancy's — no invitation history, no accepted-at.
+
+## Pods — the fleet could not be searched
+
+**Answered.** `PodApi.findAllPods` took a bare `Pageable`, so the fleet screen shipped with no search
+box at all.
+
+- **What changed.** It now takes `?q=`, matched case-insensitively as a substring of the pod's
+  **name and its endpoint**. Those are the two things an operator has in hand when they come looking
+  — a pod named in an alert, a host in a log line. The id is deliberately not in the predicate: it is
+  an ObjectId nobody reads out.
+- **It composes rather than replaces.** The org scoping moved into the same query, so an org admin
+  searching sees only their own private pods and a super admin sees all of them — which is why the
+  term needed no guard of its own.
+
+## Pods — the paged list returns the routing record, not the view
+
+- **Screen:** `/platform/pods`, the fleet table.
+- **What the UI needs:** lifecycle, health and capacity as columns, so an operator can see the state
+  of the fleet without opening every row.
+- **What is missing:** them, on the paged endpoint. `PodApi.findAllPods` answers `Page<Pod>` — the
+  minimal routing contract `{id, name, endpoint, orgId, domain}` that the gateway rebuilds its route
+  table from. `PodView`, which carries `visibility`, `lifecycleState`, `region`,
+  `capacityMaxStores`, `capacityStores`, `lastHealthStatus` and `lastHealthAt`, is returned only by
+  `GET /pod/{id}`.
+- **Why it is required:** "which pods are unhealthy" is the question a fleet screen exists to answer,
+  and today it takes one request per pod.
+- **Expected contract:** `GET /pod-registry/api/v1/pod` answers `Page<PodView>`. The unpaged
+  `list` stays `List<Pod>` — the gateway is its caller and must not start deserializing a wider type.
+- **What console-ui does meanwhile:** the table shows name, endpoint, owner and identifier, and a
+  notice says the operational state is per pod. A column costing one request per row is not a column.
+
+## Pods — visibility, region, capacity and owner cannot be edited
+
+- **Screen:** `/platform/pods/:id`, the edit form.
+- **What the UI needs:** to correct a pod's region, raise its store ceiling, or move it in or out of
+  public rotation.
+- **What is missing:** the write path. `PodServiceImpl.update` reads `name` and `endpoint` off the
+  body and **ignores every other field**. `visibility` is derived once, by
+  `PodEntity.newEntity`, from whether an organization was named; `region`, `capacityMaxStores` and
+  `capacityStores` are columns on `pod_registry.pod` that no endpoint writes at all.
+- **Why it is required:** capacity is the lever that makes draining unnecessary, and a pod held out
+  of public rotation without inventing an owner for it is exactly what `PodVisibility`'s own doc
+  comment says the column exists for.
+- **Expected contract:** `PUT /pod-registry/api/v1/pod/{id}` reads `visibility`, `region` and
+  `capacityMaxStores` as well, each optional and each audited into `pod_audit`. `capacityStores` stays
+  derived — it is a count, not a setting.
+- **What console-ui does meanwhile:** the four are rendered **disabled with the reason** in the
+  console's established treatment, and the owner control is disabled by the form service rather than
+  merely ignored, so `form.value` cannot carry a value the server would drop.
+
+## Pods — two lifecycle states are unreachable
+
+- **Screen:** `/platform/pods/:id`, the header's actions.
+- **What the UI needs:** to mark a newly registered pod ready, and to retire a drained one.
+- **What is missing:** two transitions. `PodLifecycleService` exposes `drain` and `resume` and
+  nothing else, and `PodEntity.newEntity` writes `ACTIVE` directly — so `PROVISIONING` is a state no
+  pod is ever in, and `DECOMMISSIONED` is a state no pod can ever reach.
+- **Why it is required:** registering a pod and declaring it ready are different acts, and today the
+  registry cannot tell them apart. A retired pod stays `DRAINING` forever, which reads as "in the
+  middle of something" rather than "done".
+- **Expected contract:** `POST …/pod/{id}/activate` and `POST …/pod/{id}/decommission`, both audited
+  like drain and resume, with `newEntity` writing `PROVISIONING` so activate has something to move
+  from.
+- **What console-ui does meanwhile:** the header offers drain and resume, gated on the current state,
+  and nothing else. The badge shows whatever the registry says, including the two states nothing can
+  produce.
+
+## Pods — health history and audit are written and never read
+
+- **Screen:** `/platform/pods/:id`, the health panel.
+- **What the UI needs:** whether this pod *has been* healthy, not merely whether it is now — and who
+  last drained or resumed it.
+- **What is missing:** both reads. `PodHealthProbe` sweeps every pod every minute and writes a row
+  into `pod_registry.pod_health_check` with the status, the latency and a detail, and stamps
+  `last_health_status` / `last_health_at` onto the pod — so the *current* verdict is real and is what
+  the badge shows. The table has a retention policy and its indexes, and **no endpoint returns a
+  single row of it**. `pod_registry.pod_audit` is the same story: written by `PodLifecycleService` on
+  every transition, read by nothing.
+- **A second, smaller gap.** The probe is a *reachability* check against the pod's own endpoint — any
+  HTTP answer, 404 included, counts GREEN, and only a connection failure or timeout is RED. So
+  `PodHealthStatus.AMBER` is a value nothing can produce, and "healthy" means "the edge answered"
+  rather than "the pod is well". Distinguishing them needs a real per-pod health endpoint behind the
+  pod gateway.
+- **Why it is required:** a single current verdict cannot distinguish a pod that has been green all
+  week from one that has flapped every four minutes, and the audit is how an incident is
+  reconstructed.
+- **Expected contract:** `GET …/pod/{id}/health?from=&to=` over `pod_health_check`, and
+  `GET …/pod/{id}/audit?page=&count=` over `pod_audit`. Both super-admin only.
+- **What console-ui does meanwhile:** the badge shows the recorded verdict, dated; a pod with no
+  verdict yet reads **"Never probed"** rather than a reassuring green. There is no history panel and
+  no audit tab, because there is nothing to put in either.
+
+## Pods — no way to see which stores are on a pod
+
+**Answered**, and by tenancy rather than by the registry — which is what the first version of this
+entry got wrong. It looked only at `pod_registry.pod_store_placement` and concluded the question was
+unanswerable; `manager_store.pod_id` is the authoritative link and always was, and it carries the
+names, organizations, statuses and billing standings the registry's copy does not have.
+
+- **What changed.** `ListManagerStoreQuery` gained a `pod`, and `findVisible` / `countVisible` a
+  predicate for it — the same shape as the three filters already there. It narrows what the caller
+  may already see rather than widening it, so an org admin asking about a pod gets only their own
+  stores on it and needs no new guard. `GET store-manager/stores-per-pod` answers every pod's count
+  in one request, super-admin only, because the fleet table wants a column and a column costing a
+  request per row is not a column.
+- **What console-ui does with it.** `/platform/pods` has a Stores column; `/platform/pods/:id` has a
+  Stores panel, paged, read-only.
+- **What is still missing.** The *registry's* own records remain unreadable: nothing returns
+  `pod_store_placement` or `pod_audit`. So the delete dialog still cannot say how many stores it
+  would strand **according to the service that would strand them** — it now knows tenancy's number,
+  which is the right one to show an operator, but the two can differ and the registry's is the one
+  its own delete ignores. Contract: `GET …/pod/{id}/stores` and `GET …/pod/{id}/audit`.
+
+## Pods — the registry's store count is a mirror, and mirrors drift
+
+- **Screen:** `/platform/pods/:id`, the capacity track — and, before it was noticed, the whole basis
+  of the fleet's store counts.
+- **What was happening.** `pod.capacity_stores` read **0** for a pod carrying two stores, and the
+  console rendered "0 stores, no ceiling set" underneath a list of them. The counter is not broken:
+  it is a mirror of a fact tenancy owns, and its only writer is `PodCapacityEventImpl`, the outbox
+  handler on `StoreCreatedEvent`. Every store created through the application is counted. Every
+  store that arrived another way — seed data, a direct insert, anything created before that pipeline
+  existed — is not.
+- **Why it matters beyond the screen.** `PodPlacementService` decides where new stores go using that
+  number, not tenancy's. An undercounted pod keeps accepting stores past its ceiling.
+- **What was done.** `StorePlacementReconciler` in **tenancy** replays every placed store to the
+  registry through a new bulk `POST /pod/private/placements-recorded`. It lives in tenancy and not in
+  pod-registry deliberately: the registry has no dependency on tenancy in either direction and should
+  not gain one — `PodStorePlacementEntity`'s own comment says the duplicated fact exists precisely so
+  it never reads tenancy's schema — while tenancy already owns the client. Idempotent on the registry
+  side, so a pass with nothing new writes nothing.
+- **And a lesson inside the lesson: `ApplicationReadyEvent` is the wrong hook for anything that talks
+  to another service.** It was written that way first, and the very next boot proved it: tenancy and
+  the registry start in parallel, tenancy became ready first, and the single reconciliation attempt
+  hit a registry that was not listening. "Ready" means *this* service is ready. It is now
+  `@Scheduled` on a fixed delay, which survives that, retries by construction, and — the part that
+  turns a workaround into a feature — also repairs drift appearing long *after* boot, which is what
+  the console's disagreement notice is really about. `OrgOwnerBackfill` has the same latent problem
+  and is left alone: it calls uaa, which the console has already authenticated against by the time
+  anyone reads an organization, so its window is much narrower.
+- **What is still missing.** A backfill is a workaround for a counter that should not need one.
+  Contract: `capacity_stores` derived at read time from the placement table, or the placement table
+  itself replaced by the registry asking tenancy — which is the dependency direction being avoided,
+  and therefore the harder half of the decision.
+- **What console-ui does meanwhile:** the Stores panel shows tenancy's count, the capacity track
+  shows the registry's, and a notice appears **only when they differ**, naming which one governs
+  placement. After the backfill that should be rare; when it fires, something has drifted since boot
+  and the operator is the one who can say why.
+
+## Platform users — no text search
+
+- **Screen:** `/platform/users`.
+- **What the UI needs:** to find one account among all of them by username, email or name.
+- **What is missing:** any such filter. `AdminService.getUsers` takes the `metadata[...]` map
+  `AdminUserController` extracts from the query string and matches on **equality**; there is no
+  predicate over `username`, `email`, `first_name` or `last_name` at all. This is the same gap
+  Module 8 recorded for the store-scoped list, one layer down and unchanged.
+- **Why it is required:** a platform-wide account list is the largest table in the console, and the
+  usual reason to open it is that someone named a person in a support ticket.
+- **Expected contract:** `GET /uaa/api/v1/admin/users?q=` matching a case-insensitive substring
+  across username, email and both name columns — one parameter, AND-ed with the metadata filters.
+- **What console-ui does meanwhile:** the page offers an **organization filter** — fed by the tenant
+  registry, and the one thing uaa's list can actually narrow on — and **no search box**, with a
+  notice saying why.
+
+## Shell — a super admin's store rail is the whole platform, truncated
+
+- **Screen:** the console shell's store switcher, for an account holding `ROLE_SUPER_ADMIN`.
+- **What was happening:** `InternalStoreServiceImpl.findAll` reads a null org claim as *platform-wide*
+  and returns **every store on the platform**; `visiblePage` then clamps an unpaged request to
+  `DEFAULT_PAGE_SIZE`. So a super admin signing into the console got a rail filled with the first
+  page of every tenant's stores, silently truncated, and worked "inside" whichever one sorted first.
+  Not a platform console — a merchant console pointed at a stranger's shop.
+- **Why it is required:** the two products share one shell, and the shell has to be able to tell them
+  apart. "Your stores" is a question a platform operator does not have an answer to.
+- **Expected contract:** either a platform-wide store screen with real paging and a filter — the
+  natural companion to `/platform/organizations` — or an explicit refusal from
+  `store-manager/list` for an identity carrying no org, so the rail's emptiness is the server's
+  answer rather than the console's guess.
+- **What console-ui does meanwhile:** the console is split in two along this line. The **switcher is
+  not rendered** for an account that can administer the platform, `firstRun` is never true for one,
+  and both first-run guards send them to `/platform` instead of `/getting-started`. Every nav group
+  declares an `audience`, so a platform operator is shown only the platform group and a merchant only
+  their own; and `merchantOnly` guards every store-scoped branch, so a merchant URL typed by a
+  platform operator redirects to `/platform` rather than rendering a page that 403s row by row. The
+  plan banner stops asking billing about a store that is not theirs.
+- **Why it stays open:** all of that is the console declining to ask. `store-manager/list` still
+  answers a platform operator with a truncated page of every tenant's stores rather than refusing,
+  and `SelectedStoreRequestContext` still resolves `?store=` from it — so the *server* still treats
+  "no org" as "every org", and the honest fix is on that side.
+
+## Platform — a store's subscription cannot be read by an operator
+
+- **Screen:** `/platform/organizations/:id` → Stores, and any per-store billing panel that would sit
+  behind it.
+- **What the UI needs:** for one tenant's store — the plan it is on, when it renews, whether the last
+  invoice was paid.
+- **What is missing:** an audience. `SubscriptionApi.current` and `InvoiceApi.list` are guarded by
+  `hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.READ')`, which resolves to
+  `PermissionAccessChecker.hasReadAccessOnStore` — and that admits an **org admin, a store admin, a
+  store moderator and a store-core service principal**, with *no super-admin branch*. A platform
+  operator is none of those for a store they do not own, so billing refuses them for every store on
+  the platform.
+- **Why it is required:** "this merchant says they paid" is the single most common support question a
+  platform console exists to answer, and today it can only be answered by reading the database.
+- **Expected contract:** add `ROLE_SUPER_ADMIN` to `hasReadAccessOnStore` — it is the same widening
+  the pod registry's read guard already makes, and its own comment explains why it admits a service
+  principal — or an org-scoped `GET /billing/api/v1/subscription/by-org/{id}` returning a page of
+  `SubscriptionView`, super-admin only.
+- **A second, smaller gap inside the one field that does arrive.** The Stores tab shows each store's
+  billing **standing**, second-hand and free: tenancy's `InternalStoreServiceImpl.withBillingStatus`
+  batch-fills `ManagerStoreDto.billingStatus` from `entitlement/private/snapshot/batch` as a
+  *service* principal, which does pass. But that batch answers `findAllByStoreIds` — a row only for a
+  store billing already has a subscription for, with no placeholder for the rest — so a store created
+  before billing existed, or one whose `StoreCreatedEvent` never landed, comes back **absent**. And
+  the read fails open on any billing failure. Null therefore means "billing has never seen this
+  store" *or* "billing was unreachable", and nothing on the wire distinguishes them. Contract: have
+  the batch return a snapshot for every store asked about, with a null status for the ones it does
+  not know.
+- **What console-ui does meanwhile:** the Stores tab shows that standing and nothing else, and
+  renders a null as "unknown" naming both causes — never as a lapse, and never as a red badge.
+
+## Platform — no view of stores billing has cut off
+
+- **Screen:** none, and that is the gap. It would be `/platform/billing` — every store the platform
+  has stopped serving for non-payment, in one list.
+- **What the UI needs:** exactly that list.
+- **What is missing:** an audience again, not an endpoint.
+  `ExternalEntitlementApi.blockedStores` — `GET /billing/api/v1/entitlement/private/blocked-stores` —
+  **already returns it**, and is guarded by `STORE-CORE.BILLING.QUOTA-CHECK`, which
+  `PermissionAccessChecker.hasAccessOnBillingQuotaCheck` grants to a store-core *service* principal
+  and to nobody else. A human super admin cannot call it. The same is true of
+  `entitlement/private/snapshot/batch`, which would give the ceilings for many stores in one request.
+- **Why it is required:** it is the one screen that would tell an operator which merchants are
+  losing service right now, and the data is already computed and already returned — only to machines.
+- **Expected contract:** widen both to `hasAccessOnBillingQuotaCheck(auth) || hasRole('ROLE_SUPER_ADMIN')`,
+  or expose a super-admin twin at `…/private/blocked-stores/admin`. The batch snapshot would also let
+  the organization detail show ceilings per store without one request per row.
+- **What console-ui does meanwhile:** nothing — the screen is not built, because there is no version
+  of it that is not a fixture. `/platform/plans` shows what the plans *are*; who is failing to pay
+  for them is unanswerable from the browser.

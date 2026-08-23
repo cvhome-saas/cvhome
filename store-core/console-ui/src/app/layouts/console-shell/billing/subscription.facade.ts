@@ -50,8 +50,16 @@ export class SubscriptionFacade {
   private readonly localeService = inject(TranslocoLocaleService);
   private readonly planLabels = inject(PlanLabel);
 
-  /** The store every call below is scoped to. Null before the store list has loaded, or on first run. */
-  readonly storeId = computed(() => this.shell.currentStoreId());
+  /**
+   * The store every call below is scoped to.
+   *
+   * Null before the store list has loaded, on first run, and **for a platform operator** — who has no
+   * store of their own to be billed for. That last case is not cosmetic: `currentStoreId()` resolves
+   * for them to whichever *tenant's* store sorts first, so without this the shell fired
+   * `GET subscription/current?store=<a stranger's shop>` on every platform page and got a 403 for it.
+   * See lessons.md, "Shell — a super admin's store rail is the whole platform, truncated".
+   */
+  readonly storeId = computed(() => (this.shell.isPlatformOperator ? null : this.shell.currentStoreId()));
 
   /**
    * The subscription, or `null` for a store billing has never seen.

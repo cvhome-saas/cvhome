@@ -19,6 +19,7 @@ import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {defaultLanguageIsSupported} from '@shared/validators/default-language-is-supported';
 import {phoneNumber} from '@shared/validators/phone-number';
+import {PlatformLabel} from '@shared/i18n/platform-label';
 import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '../create-store.content';
 import type {CreateStorePhase} from '@models/create-store';
 import type {Pod} from '@models/pod';
@@ -109,6 +110,7 @@ export type CreateStoreForm = FormGroup<{
 export class CreateStoreFacade {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly transloco = inject(TranslocoService);
+  private readonly platformLabels = inject(PlatformLabel);
   private readonly destroyRef = inject(DestroyRef);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly console = inject(ConsoleApi);
@@ -571,10 +573,17 @@ export class CreateStoreFacade {
     this.poll = null;
   }
 
+  /**
+   * The provisioning state, in the reader's language.
+   *
+   * Through the shared label rather than a `createStore.state.*` key of its own: Module 11's
+   * organization detail renders the same enum for another tenant's stores, and one enum with two
+   * sets of words drifts into two different words for the same state.
+   */
   private stateLabel(): string {
     const state = this.provisioningState();
     return state
-      ? this.transloco.translate(`createStore.state.${state}`)
+      ? this.platformLabels.provisioningState(state)
       : this.transloco.translate('createStore.progress.pending');
   }
 

@@ -1,4 +1,4 @@
-import type {BillingInterval, EntitlementKey, PlanPriceView, PlanView} from '@models/billing';
+import {ENTITLEMENT_ORDER, type BillingInterval, type PlanPriceView, type PlanView} from '@models/billing';
 import type {PlanFeature, PricingPlan} from '@models/marketing';
 
 /**
@@ -15,22 +15,6 @@ import type {PlanFeature, PricingPlan} from '@models/marketing';
  * dropped every ceiling's value on the floor. `EntitlementKey` is a fixed seven-key enum, so the console labels all of
  * them properly and shows the numbers — see `ENTITLEMENT_ORDER` below.
  */
-
-/**
- * The order features are listed in, and the reason this is a list rather than a walk of the response: an omitted key
- * means *unlimited*, so the keys a plan does not mention are exactly the ones worth shouting about. Walking the
- * response would silently drop them, which is how the old page ended up showing PRO as the plan with the fewest
- * features.
- */
-const ENTITLEMENT_ORDER: readonly EntitlementKey[] = [
-  'MAX_PRODUCTS',
-  'MAX_ORDERS_MONTH',
-  'MAX_ACCOUNTS',
-  'MAX_STORAGE_MB',
-  'CUSTOM_DOMAIN',
-  'ANALYTICS',
-  'PRIORITY_SUPPORT',
-];
 
 /**
  * The plans purchasable at one billing interval, as cards.

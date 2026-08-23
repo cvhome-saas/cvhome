@@ -1,0 +1,83 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="pod-form" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  @if (form(); as podForm) {
+    <form method="dialog" class="pod-form-body" [formGroup]="podForm" (submit)="onSubmit($event)">
+      <h2 class="pod-form-title">{{ title() }}</h2>
+
+      <!--
+        Named once rather than repeated on the disabled fields: `PodServiceImpl.update` reads only
+        `name` and `endpoint` off the body.
+        TODO(lessons.md): see lessons.md, "Pods — visibility, region, capacity and owner cannot be
+        edited".
+      -->
+      <app-notice-bar icon="info" tone="blue" [message]="editableFields()" />
+
+      <app-form-field
+        [label]="nameLabel()"
+        [hint]="nameHint()"
+        [control]="podForm.controls.name"
+        [fallback]="nameInvalid()"
+        required
+        wide
+      >
+        <app-text-field
+          formControlName="name"
+          latin
+          [invalid]="podForm.controls.name.touched && podForm.controls.name.invalid"
+          [ariaLabel]="nameLabel()"
+        />
+      </app-form-field>
+
+      <app-form-field
+        [label]="endpointLabel()"
+        [hint]="endpointHint()"
+        [control]="podForm.controls.endpoint"
+        [fallback]="endpointInvalid()"
+        required
+        wide
+      >
+        <app-text-field
+          formControlName="endpoint"
+          latin
+          [invalid]="podForm.controls.endpoint.touched && podForm.controls.endpoint.invalid"
+          [ariaLabel]="endpointLabel()"
+        />
+      </app-form-field>
+
+      <app-form-field [label]="endpointTypeLabel()" wide>
+        <app-select
+          formControlName="endpointType"
+          [options]="endpointTypes()"
+          [ariaLabel]="endpointTypeLabel()"
+        />
+      </app-form-field>
+
+      <!--
+        Settable exactly once, at registration: `PodEntity.newEntity` derives visibility from it and
+        nothing can change either afterwards. On an edit the form service disables the control, so
+        `form.value` cannot carry it even if this rendered it enabled.
+      -->
+      <app-form-field [label]="ownerLabel()" [hint]="ownerHint()" wide>
+        <app-select
+          formControlName="orgId"
+          [options]="ownerOptions()"
+          [disabled]="!creating()"
+          [ariaLabel]="ownerLabel()"
+        />
+      </app-form-field>
+
+      @if (podForm.controls.name.errors?.['server']) {
+        <app-field-error [control]="podForm.controls.name" />
+      }
+
+      <div class="pod-form-actions">
+        <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+          {{ cancelLabel() }}
+        </button>
+        <button class="primary-action" type="submit" [disabled]="busy()">
+          {{ busy() ? busyLabel() : confirmLabel() }}
+        </button>
+      </div>
+    </form>
+  }
+</dialog>

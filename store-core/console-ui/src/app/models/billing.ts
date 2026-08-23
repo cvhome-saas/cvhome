@@ -44,6 +44,27 @@ export interface EntitlementValue {
  */
 export type Entitlements = Partial<Record<EntitlementKey, EntitlementValue>>;
 
+/**
+ * The order entitlements are listed in, and the reason this is a list rather than a walk of the response.
+ *
+ * **An omitted key means unlimited**, so the keys a plan does not mention are exactly the ones worth shouting
+ * about — walking the response drops them silently, which is how the old pricing page ended up showing PRO as the
+ * plan with the fewest features.
+ *
+ * At the model tier because it is an ordering of a model enum, and because three surfaces walk it: the marketing
+ * pricing cards, the merchant billing page's allowances panel, and the platform's plan reference. It lived as a
+ * private const in `@shared/billing/pricing.mapper`, which is one of the three.
+ */
+export const ENTITLEMENT_ORDER: readonly EntitlementKey[] = [
+  'MAX_PRODUCTS',
+  'MAX_ORDERS_MONTH',
+  'MAX_ACCOUNTS',
+  'MAX_STORAGE_MB',
+  'CUSTOM_DOMAIN',
+  'ANALYTICS',
+  'PRIORITY_SUPPORT',
+];
+
 export type SubscriptionStatus =
   | 'PENDING'
   | 'TRIALING'

@@ -5,7 +5,7 @@ import {Observable, map} from 'rxjs';
 import {CrudService} from '@core/http/crud.service';
 import type {SpringPage} from '@core/table/table.types';
 import type {MerchantStore} from '@models/merchant';
-import type {CreateStoreRequest, EntityExists, ManagerStore} from '@models/tenancy';
+import type {CreateStoreRequest, EntityExists, ManagerStore, PodStoreCount} from '@models/tenancy';
 
 /**
  * Ported from seller-ui/projects/seller-core/{src/lib/store/store.service.ts, stores/src/lib/services/store.service.ts}.
@@ -38,6 +38,45 @@ export class ManagerStoreService {
     return this.crudService
       .post<SpringPage<ManagerStore>>(`${STORE_MANAGER_API_BASE}/list`, {})
       .pipe(map((page) => page.content ?? []));
+  }
+
+  /**
+   * A page of the stores placed on one pod.
+   *
+   * **Tenancy is the authority here, not the registry.** `manager_store.pod_id` is the fact the platform runs
+   * on; pod-registry's `pod_store_placement` is a copy it maintains from tenancy's outbox and knows only about
+   * stores placed through it. This also carries the names, orgs, statuses and billing standings the registry's
+   * copy does not have.
+   *
+   * Scoped by the caller's identity like every other listing — the pod filter narrows what they may already see,
+   * so an org admin gets only their own stores on the pod and a super admin gets all of them.
+   *
+   * The page envelope is kept, unlike `list` above, because this one pages.
+   *
+   * `term` searches the store's **name or its id**, case-insensitively and as a substring. That
+   * predicate used to be an equality on the name alone — a lookup rather than a search, and one no
+   * caller ever passed; the pod screen's search box is what made it worth being real. The id is in
+   * it because a store id here is a readable handle (`ORG1-STORE1`), not an opaque ObjectId.
+   */
+  listByPod(pod: string, page: number, count: number, term = ''): Observable<SpringPage<ManagerStore>> {
+    const search = term.trim();
+    return this.crudService.post(
+      `${STORE_MANAGER_API_BASE}/list`,
+      {pod: {id: pod}, name: search || null},
+      {page, count},
+    );
+  }
+
+  /**
+   * How many stores sit on each pod, platform-wide.
+   *
+   * Super-admin only, and one request rather than one per pod: the fleet table wants every count at once.
+   *
+   * **A pod with no stores is absent from the answer** rather than present as zero — the query groups, and there
+   * is nothing to group — so callers must read a missing pod as none placed rather than as unknown.
+   */
+  storesPerPod(): Observable<PodStoreCount[]> {
+    return this.crudService.get(`${STORE_MANAGER_API_BASE}/stores-per-pod`);
   }
 
   /**

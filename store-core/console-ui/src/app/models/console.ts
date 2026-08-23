@@ -17,9 +17,35 @@ export interface NavigationItem {
   readonly badgeTone?: Tone;
 }
 
+/**
+ * Which of the two products a nav group belongs to.
+ *
+ * The console is two applications sharing one shell — a platform admin console and a merchant one —
+ * and this is what keeps each operator's rail to the half they can use.
+ *
+ * **Both halves are exclusive, and the merchant half is the surprising one.** The platform pages are
+ * super-admin only, so a merchant seeing them would get four screens that 403. Less obviously, the
+ * *merchant* pages are unusable by a platform operator: every one is a reading of one store, the
+ * store list they are handed is a truncated page of every tenant's rather than their own, and the
+ * switcher is therefore hidden — so `?store=` resolves to a stranger's shop and the page 403s. See
+ * lessons.md, "Shell — a super admin's store rail is the whole platform, truncated".
+ *
+ * A group with no audience is shown to everyone. Nothing uses that today; it is the honest default
+ * for a section that genuinely belongs to both.
+ */
+export type NavigationAudience = 'platform' | 'merchant';
+
 export interface NavigationSection {
   readonly groupKey: string;
   readonly items: readonly NavigationItem[];
+  /**
+   * Who this group is for. Omitted means everyone.
+   *
+   * It hides a group; it does not protect one. Every endpoint behind these pages carries its own
+   * `@PreAuthorize`, and the `platformOnly` / `merchantOnly` route guards are what stop a typed URL
+   * rendering a page that would fail row by row.
+   */
+  readonly audience?: NavigationAudience;
 }
 
 export interface ConsoleStore {

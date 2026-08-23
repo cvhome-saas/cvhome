@@ -65,6 +65,66 @@ export interface ManagerStore {
   readonly provisioningError: string | null;
 }
 
+/**
+ * An email address as `commons/domain/Email` sends it — `{"email": "…"}`, not a bare string.
+ *
+ * A single-component Java record with no `@JsonValue`, so Jackson writes it as an object. seller-core
+ * typed it the same way; the shape is worth naming rather than inlining, because three DTOs carry it.
+ */
+export interface Email {
+  readonly email: string;
+}
+
+/**
+ * Whether an organization may be used. Mirrors tenancy `commons/dto/OrgStatus`.
+ *
+ * Only `ACTIVE` is operable, and the check is read at the *org* rather than fanned out to its stores:
+ * `InternalStoreService.requireOperable` reads both, so suspending an org takes every store it owns
+ * offline without writing to any of them.
+ */
+export type OrgStatus = 'ACTIVE' | 'SUSPENDED' | 'CLOSED';
+
+/**
+ * An organization, as tenancy describes it. Mirrors `manager/commons/dto/ManagerOrgDto` (record).
+ *
+ * **Wider than seller-core's `Org`,** which was `{id, email, createdDate}` and predates the lifecycle
+ * work. `name`, `status` and `ownerUserId` have been on the wire since; carrying them is what makes a
+ * status column and the lifecycle actions possible at all.
+ *
+ * `id` is a `ManagerOrgId`, so it arrives wrapped — `{"id": "65f0…"}` — while `ownerUserId` is a bare
+ * uaa UUID string.
+ *
+ * - `name` is null for every organization created before it existed, and for every one created since:
+ *   `ManagerOrgEntity.createOrgFromUser` sets no name and `rename` is the only writer. See
+ *   lessons.md, "Organizations — an org cannot be named at creation".
+ * - `ownerUserId` is null for every row on the platform until the backfill in this module runs, and
+ *   for none created after it — see lessons.md, "Organizations — the owner nobody recorded".
+ */
+export interface ManagerOrgDto {
+  readonly id: IdentityId;
+  readonly email: Email | null;
+  /** `Instant`, so an ISO-8601 timestamp. */
+  readonly createdDate: string;
+  readonly name: string | null;
+  readonly status: OrgStatus | null;
+  readonly ownerUserId: string | null;
+}
+
+/**
+ * How many stores sit on one pod. Mirrors tenancy `commons/dto/PodStoreCount` (record).
+ *
+ * Tenancy owns `manager_store.pod_id`, so this is the authoritative count. Pod-registry keeps its own
+ * `pod.capacity_stores`, but that is a mirror maintained from tenancy's outbox and knows only about stores placed
+ * through it — the two can disagree, which is why this exists.
+ *
+ * **A pod with no stores does not appear at all** rather than appearing as zero: the query groups and there is
+ * nothing to group. Callers read a missing pod as none placed, never as unknown.
+ */
+export interface PodStoreCount {
+  readonly podId: IdentityId;
+  readonly stores: number;
+}
+
 /** A pod reference as the create form sends it — `{"pod": {"id": "…"}}`. */
 export interface PodRef {
   readonly id: string;

@@ -199,23 +199,31 @@ export class BillingPageFacade {
     this.apiErrors.notify(error);
   }
 
+  /**
+   * One entitlement, as the allowances panel reads it.
+   *
+   * The labels and the three allowance words live in `shared.*` rather than under `billing.*` or
+   * `marketing.*`: three surfaces render this same catalogue — the pricing page, this panel, and the
+   * platform's plan reference — and this facade was already reaching into the *marketing* feature's
+   * namespace for its labels, which is the drift the shared namespace exists to stop.
+   */
   private allowanceRow(key: EntitlementKey, value: EntitlementValue | undefined): AllowanceRow {
-    const label = this.transloco.translate(`marketing.entitlement.${key}.granted`);
+    const label = this.transloco.translate(`shared.entitlement.${key}.granted`);
 
     // Absent means unlimited — the catalogue's rule, and the opposite of "not granted".
     if (value === undefined) {
-      return {key, label, value: this.transloco.translate('billing.allowance.unlimited'), withheld: false};
+      return {key, label, value: this.transloco.translate('shared.allowance.unlimited'), withheld: false};
     }
     if (value.flagValue !== null) {
       return {
         key,
         label,
-        value: this.transloco.translate(value.flagValue ? 'billing.allowance.included' : 'billing.allowance.notIncluded'),
+        value: this.transloco.translate(value.flagValue ? 'shared.allowance.included' : 'shared.allowance.notIncluded'),
         withheld: !value.flagValue,
       };
     }
     if (value.limitValue === null) {
-      return {key, label, value: this.transloco.translate('billing.allowance.unlimited'), withheld: false};
+      return {key, label, value: this.transloco.translate('shared.allowance.unlimited'), withheld: false};
     }
     return {
       key,

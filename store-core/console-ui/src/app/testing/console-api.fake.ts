@@ -12,6 +12,11 @@ import type {ProvisioningState} from '@models/tenancy';
  */
 export class FakeConsoleApi {
   stores: readonly ConsoleStore[] = [];
+  /**
+   * Whether the signed-in account administers the platform. A merchant unless a case says otherwise,
+   * which is what keeps the Platform group and the store switcher out of the default shell.
+   */
+  platformOperator = false;
   /** Shaped like what uaa actually yields today: a username, no email. */
   user: ConsoleUser = {name: 'org1-admin', initials: 'OR', email: null};
 
@@ -24,15 +29,24 @@ export class FakeConsoleApi {
    * item without one, which is how the shell marks a section that is not built yet.
    */
   navigation: readonly NavigationSection[] = [
-    {groupKey: 'shell.nav.group.seller', items: [{labelKey: 'shell.nav.item.home', icon: 'home', route: '/dashboard'}]},
+    {
+      groupKey: 'shell.nav.group.seller',
+      audience: 'merchant',
+      items: [{labelKey: 'shell.nav.item.home', icon: 'home', route: '/dashboard'}],
+    },
     {
       groupKey: 'shell.nav.group.organization',
+      audience: 'merchant',
       items: [
         {labelKey: 'shell.nav.item.storeManagement', icon: 'building', route: '/store-management'},
         {labelKey: 'shell.nav.item.userManagement', icon: 'users'},
       ],
     },
   ];
+
+  canAdministerPlatform(): boolean {
+    return this.platformOperator;
+  }
 
   loadUser(): Observable<ConsoleUser> {
     return of(this.user);
