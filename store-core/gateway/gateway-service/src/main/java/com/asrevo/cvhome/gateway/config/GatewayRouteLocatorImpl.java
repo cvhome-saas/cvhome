@@ -47,6 +47,21 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path("/pod-registry/**")
                         .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
                         .uri("lb://pod-registry"))
+                /*
+                 * uaa's admin API, reachable from the browser tier for the first time.
+                 *
+                 * "uaa" was already in backendServices above — the array that is *negated* to build the UI
+                 * catch-all — so /uaa/** was excluded from the console and forwarded nowhere: it matched no route
+                 * at all and 404'd. The console's platform user management is the first caller that needs it.
+                 *
+                 * Nothing else moves. uaa's own AppSecurityConfig gates /api/v1/admin/** on SCOPE_super_admin or
+                 * ROLE_SUPER_ADMIN at the filter chain and again with @PreAuthorize on every method, and it is
+                 * already a JWT resource server. This relays the operator's token unchanged; uaa's guard, not the
+                 * gateway's, is what keeps the admin API safe.
+                 */
+                .route(r -> r.path("/uaa/**")
+                        .filters(f -> f.stripPrefix(1).tokenRelay().preserveHostHeader())
+                        .uri("lb://uaa"))
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()
