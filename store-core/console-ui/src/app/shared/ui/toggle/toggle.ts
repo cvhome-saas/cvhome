@@ -1,4 +1,5 @@
-import {Component, input, model} from '@angular/core';
+import {Component, computed, forwardRef, input, model, signal} from '@angular/core';
+import {type ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 /**
  * The pill switch settings surfaces are built from.
@@ -7,7 +8,8 @@ import {Component, input, model} from '@angular/core';
  * reachable by keyboard and announces its state. With a `label` the whole row is the
  * control; without one it is just the switch, for card headers that name themselves.
  *
- * Two-way bound, so it composes with a signal or a reactive control:
+ * Two-way bound, so it composes with a signal — and a `ControlValueAccessor`, so
+ * `formControlName` binds it directly inside a reactive form:
  *
  * ```html
  * <app-toggle
@@ -26,7 +28,7 @@ import {Component, input, model} from '@angular/core';
       role="switch"
       [attr.aria-checked]="checked()"
       [attr.aria-label]="label() ? null : name()"
-      [disabled]="disabled()"
+      [disabled]="isDisabled()"
       (click)="flip()"
     >
       <span class="track" aria-hidden="true"><span class="knob"></span></span>
@@ -42,8 +44,9 @@ import {Component, input, model} from '@angular/core';
     </button>
   `,
   styleUrl: './toggle.css',
+  providers: [{provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Toggle), multi: true}],
 })
-export class Toggle {
+export class Toggle implements ControlValueAccessor {
   readonly checked = model(false);
   /** Names the switch beside it. Absent for switches inside a heading that already names them. */
   readonly label = input<string | null>(null);
@@ -52,7 +55,31 @@ export class Toggle {
   readonly name = input<string | null>(null);
   readonly disabled = input(false);
 
+  private readonly formDisabled = signal(false);
+  protected readonly isDisabled = computed(() => this.disabled() || this.formDisabled());
+  private onChange: (value: boolean) => void = () => undefined;
+  private onTouched: () => void = () => undefined;
+
   protected flip(): void {
-    this.checked.set(!this.checked());
+    const next = !this.checked();
+    this.checked.set(next);
+    this.onChange(next);
+    this.onTouched();
+  }
+
+  writeValue(value: unknown): void {
+    this.checked.set(value === true);
+  }
+
+  registerOnChange(fn: (value: boolean) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.formDisabled.set(isDisabled);
   }
 }

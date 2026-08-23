@@ -155,7 +155,7 @@ export class PageEditor {
       !!source &&
       source.controls.title.value.trim().length > 0 &&
       source.controls.body.value.trim().length > 0;
-    const slug = this.facade.common?.controls.slug.valid ?? false;
+    const slug = this.facade.slugOk();
     const meta = (source?.controls.metaDescription.value ?? '').length <= 160;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [

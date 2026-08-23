@@ -162,7 +162,7 @@ export class PostEditor {
       {
         key: 'slug',
         label: this.transloco.translate('content.checklist.slug'),
-        ok: this.facade.common?.controls.slug.valid ?? false,
+        ok: this.facade.slugOk(),
       },
       {
         key: 'hero',

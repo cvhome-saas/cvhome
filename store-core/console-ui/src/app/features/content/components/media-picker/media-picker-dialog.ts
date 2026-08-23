@@ -26,67 +26,63 @@ import {SearchBox} from '@shared/ui/search-box/search-box';
   selector: 'app-media-picker-dialog',
   imports: [FileDropZone, Icon, SearchBox, TranslocoDirective],
   template: `
-    <dialog
-      #dialog
-      class="picker"
-      (close)="closed.emit()"
-      (cancel)="closed.emit()"
-      *transloco="let t"
-    >
-      <div class="picker-head">
-        <h2>{{ t('content.mediaPicker.title') }}</h2>
-        <app-search-box
-          width="12rem"
-          [value]="search()"
-          (valueChange)="search.set($event)"
-          [label]="t('content.media.search')"
-          [placeholder]="t('content.media.searchPlaceholder')"
+    <dialog #dialog class="picker" (close)="closed.emit()" (cancel)="closed.emit()">
+      <ng-container *transloco="let t">
+        <div class="picker-head">
+          <h2>{{ t('content.mediaPicker.title') }}</h2>
+          <app-search-box
+            width="12rem"
+            [value]="search()"
+            (valueChange)="search.set($event)"
+            [label]="t('content.media.search')"
+            [placeholder]="t('content.media.searchPlaceholder')"
+          />
+          <button
+            class="icon-action"
+            type="button"
+            [attr.aria-label]="t('content.action.close')"
+            (click)="close()"
+          >
+            <app-icon name="x" [size]="14" />
+          </button>
+        </div>
+        <app-file-drop-zone
+          class="picker-upload"
+          [title]="t('content.mediaPicker.uploadTitle')"
+          [hint]="t('content.media.dropHint')"
+          [browseLabel]="t('content.media.browse')"
+          [accept]="accept()"
+          [busy]="uploading()"
+          [percent]="percent()"
+          (files)="upload($event)"
         />
-        <button
-          class="icon-action"
-          type="button"
-          [attr.aria-label]="t('content.action.close')"
-          (click)="close()"
-        >
-          <app-icon name="x" [size]="14" />
-        </button>
-      </div>
-      <app-file-drop-zone
-        class="picker-upload"
-        [title]="t('content.mediaPicker.uploadTitle')"
-        [hint]="t('content.media.dropHint')"
-        [browseLabel]="t('content.media.browse')"
-        [accept]="accept()"
-        [busy]="uploading()"
-        [percent]="percent()"
-        (files)="upload($event)"
-      />
-      <div class="picker-body">
-        @if (assets().length) {
-          <ul class="picker-grid">
-            @for (asset of assets(); track asset.id) {
-              <li>
-                <button
-                  class="asset"
-                  type="button"
-                  [class.current]="asset.id === currentId()"
-                  (click)="pick(asset)"
-                  [attr.aria-label]="asset.filename"
-                >
-                  @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
-                    <img [src]="asset.url" alt="" loading="lazy" />
-                  } @else {
-                    <app-icon name="file" [size]="28" />
-                  }
-                  <span dir="ltr">{{ asset.filename }}</span>
-                </button>
-              </li>
-            }
-          </ul>
-        } @else if (!resource.isLoading()) {
-          <p class="picker-empty">{{ t('content.mediaPicker.empty') }}</p>
-        }
-      </div>
+        <div class="picker-body">
+          @if (assets().length) {
+            <ul class="picker-grid">
+              @for (asset of assets(); track asset.id) {
+                <li>
+                  <button
+                    class="asset"
+                    type="button"
+                    [class.current]="asset.id === currentId()"
+                    (click)="pick(asset)"
+                    [attr.aria-label]="asset.filename"
+                  >
+                    @if (asset.kind === 'IMAGE' || asset.kind === 'VECTOR') {
+                      <img [src]="asset.url" alt="" loading="lazy" />
+                    } @else {
+                      <app-icon name="file" [size]="28" />
+                    }
+                    <span dir="ltr">{{ asset.filename }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else if (!resource.isLoading()) {
+            <p class="picker-empty">{{ t('content.mediaPicker.empty') }}</p>
+          }
+        </div>
+      </ng-container>
     </dialog>
   `,
   styleUrls: ['./media-picker-dialog.css', '../../../../shared/styles/dialog-motion.css'],

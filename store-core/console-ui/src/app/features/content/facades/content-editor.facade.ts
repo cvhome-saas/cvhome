@@ -189,6 +189,17 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     );
   });
 
+  /**
+   * Whether the slug is set and not known to be taken. A PENDING availability check counts as
+   * fine — the checklist should not flash red on every keystroke while the server is consulted.
+   */
+  readonly slugOk = computed(() => {
+    this.formValue();
+    this.formTick();
+    const slug = this.common?.controls.slug;
+    return !!slug && slug.value.trim().length > 0 && !slug.invalid;
+  });
+
   readonly invalid = computed(() => {
     this.formValue();
     this.formTick();
