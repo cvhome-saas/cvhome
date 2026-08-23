@@ -1,9 +1,10 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, forkJoin, map} from 'rxjs';
 
+import {PlatformBillingService} from '@api/billing/platform-billing.service';
 import {OrgService} from '@api/tenancy/org.service';
 import {AdminUserService, type AdminUserAction} from '@api/uaa/admin-user.service';
-import {optionalList} from '@core/http/optional';
+import {optionalList, optionalOne} from '@core/http/optional';
 import {
   toOrgRow,
   toPlatformStoreRow,
@@ -12,6 +13,13 @@ import {
   type PlatformStoreRow,
   type PlatformUserRow,
 } from '@models/platform';
+import {
+  toInvoiceRow,
+  toSubscriptionRow,
+  type InvoiceTotalDto,
+  type PlatformInvoiceRow,
+  type PlatformSubscriptionRow,
+} from '@models/platform-billing';
 
 /** One organization's stores, as the Stores tab reads them. */
 export interface OrgStoresSnapshot {
@@ -29,12 +37,22 @@ export interface OrgUsersSnapshot {
   readonly assignableRoles: readonly string[];
 }
 
+/** One organization's billing, as the Billing tab reads it. */
+export interface OrgBillingSnapshot {
+  readonly subscriptions: readonly PlatformSubscriptionRow[];
+  readonly subscriptionsTotal: number;
+  readonly invoices: readonly PlatformInvoiceRow[];
+  readonly invoicesTotal: number;
+  /** What this org has been billed and has paid, one figure per currency. Never summed across them. */
+  readonly totals: readonly InvoiceTotalDto[];
+}
+
 /**
- * One organization, and the three things that belong to it.
+ * One organization, and the four things that belong to it.
  *
- * Three independent loads rather than one, and the tabs are why: the identity is the page, the
- * stores and the accounts are each a tab's own paged question, and asking all three on arrival would
- * cost two requests nobody looked at.
+ * Four independent loads rather than one, and the tabs are why: the identity is the page, and the
+ * stores, the accounts and the billing are each a tab's own question. Asking all four on arrival
+ * would cost three requests nobody looked at.
  *
  * **The accounts come from uaa, not from tenancy.** `OrgMemberApi` is scoped to the *caller's* own
  * organization, so a platform operator cannot use it to read someone else's; uaa's
@@ -46,6 +64,7 @@ export interface OrgUsersSnapshot {
 export class OrganizationDetailApi {
   private readonly orgs = inject(OrgService);
   private readonly users = inject(AdminUserService);
+  private readonly platformBilling = inject(PlatformBillingService);
 
   loadOrg(id: string): Observable<OrgRow> {
     return this.orgs.findOne(id).pipe(map(toOrgRow));
@@ -57,6 +76,33 @@ export class OrganizationDetailApi {
         rows: (result.content ?? []).map(toPlatformStoreRow),
         totalElements: result.totalElements,
         totalPages: result.totalPages,
+      })),
+    );
+  }
+
+  /**
+   * One organization's billing: its subscriptions, its invoices and what it has spent.
+   *
+   * **Three legs, none of them required.** A billing outage should cost this tab rather than the
+   * organization page around it, and the tab renders each absence as its own empty state — which is
+   * also the honest answer for an org that has genuinely never been invoiced.
+   *
+   * Short lists rather than paged tables: this is a tab on an organization, not the ledger. The
+   * ledger is `/platform/billing`, filtered to this org, which the tab links to.
+   */
+  loadBilling(orgId: string, count: number): Observable<OrgBillingSnapshot> {
+    const filter = {org: orgId};
+    return forkJoin({
+      subscriptions: this.platformBilling.subscriptions(filter, 0, count).pipe(optionalOne()),
+      invoices: this.platformBilling.invoices(filter, 0, count).pipe(optionalOne()),
+      totals: this.platformBilling.invoiceTotals(filter).pipe(optionalList()),
+    }).pipe(
+      map(({subscriptions, invoices, totals}) => ({
+        subscriptions: (subscriptions?.content ?? []).map(toSubscriptionRow),
+        subscriptionsTotal: subscriptions?.totalElements ?? 0,
+        invoices: (invoices?.content ?? []).map(toInvoiceRow),
+        invoicesTotal: invoices?.totalElements ?? 0,
+        totals,
       })),
     );
   }

@@ -15,12 +15,16 @@ import type {StatisticList, StatisticRange} from '@models/statistics';
  * them the shape says nothing, and the console has already shipped one chart mislabelled because of
  * that (see `customerStatistic`).
  *
- * seller-core also has `store-statistic`, `org-statistic` and `subscription-statistic` on tenancy.
- * The first two feed the *platform admin* dashboard and Module 11 ported them — they are at the foot
- * of this class, on tenancy's base rather than checkout's. The third was never ported because
- * **it does not exist**: `subscription-statistic` appears in no Java file on the platform, and
- * seller-ui's admin home has been calling a 404 since it was written. See lessons.md, "Platform — no
- * subscription statistics".
+ * seller-core also has `store-statistic`, `org-statistic` and `subscription-statistic`. The first
+ * two feed the *platform admin* dashboard and Module 11 ported them — they are at the foot of this
+ * class, on tenancy's base rather than checkout's.
+ *
+ * **The third could not be ported, because for its entire life it did not exist.**
+ * `subscription-statistic` appeared in no Java file on the platform: seller-ui's admin home called
+ * `billing/api/v2/private/subscription-statistic` from the day it was written and got a 404 every
+ * time, rendering as an empty plot rather than as an error. It exists now, on
+ * {@link BILLING_STATISTIC_BASE}, along with the revenue figure the platform also had nowhere to
+ * ask for. The path seller-ui guessed at turned out to be the right one; nothing had ever served it.
  */
 const CHECKOUT_STATISTIC_BASE = '/spg/checkout/api/v2/private';
 
@@ -29,6 +33,14 @@ const CHECKOUT_STATISTIC_BASE = '/spg/checkout/api/v2/private';
  * not one merchant's, and both are `hasRole('ROLE_SUPER_ADMIN')`.
  */
 const TENANCY_STATISTIC_BASE = '/tenancy/api/v2/private';
+
+/**
+ * Billing's own aggregates, and the first money figures on this platform.
+ *
+ * Super-admin only, like tenancy's. A separate base because they are a different service behind the
+ * same gateway, not because they are a different kind of question — all four are the operator's.
+ */
+const BILLING_STATISTIC_BASE = '/billing/api/v2/private';
 
 @Injectable({providedIn: 'root'})
 export class StatisticService {
@@ -86,5 +98,40 @@ export class StatisticService {
    */
   storeStatistic(range: StatisticRange): Observable<StatisticList> {
     return this.crudService.post(`${TENANCY_STATISTIC_BASE}/store-statistic`, range);
+  }
+
+  /**
+   * **Money actually collected per day, per currency** — `SubscriptionInvoiceRepository
+   * .revenueStatistic`, `sum(amount_paid)` over settled invoices only.
+   *
+   * **`name` is the ISO currency code**, which makes these the first entries on the platform whose
+   * `name` is not null: the two tenancy counters group by nothing. Callers must read the triple and
+   * **must not sum across currencies** — nothing on the platform holds an exchange rate, so a merged
+   * total would be a wrong number rather than a missing one.
+   *
+   * **`value` is in minor units**, as everything in billing is. Divide by a hundred at the point of
+   * display, never here.
+   *
+   * Keyed on `paid_at` rather than `issued_at`, so a past day's figure changes only when money
+   * actually moved on that day — a late payment does not silently rewrite last month's chart.
+   */
+  revenueStatistic(range: StatisticRange): Observable<StatisticList> {
+    return this.crudService.post(`${BILLING_STATISTIC_BASE}/revenue-statistic`, range);
+  }
+
+  /**
+   * **Subscriptions started per day, by plan code** — read from `subscription_audit`, not from
+   * `store_subscription.created_date`.
+   *
+   * The distinction is the whole meaning of the number: a `store_subscription` row is written by
+   * provisioning the moment a store is created, so `created_date` counts every store that ever
+   * entered billing including the ones that never paid — which is already what {@link
+   * storeStatistic} answers. "Started" here means started paying or trialling.
+   *
+   * `name` is the plan code, so the console can stack the series. A store whose plan id no longer
+   * resolves comes back as `UNKNOWN` rather than being dropped.
+   */
+  subscriptionStatistic(range: StatisticRange): Observable<StatisticList> {
+    return this.crudService.post(`${BILLING_STATISTIC_BASE}/subscription-statistic`, range);
   }
 }

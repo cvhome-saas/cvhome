@@ -183,3 +183,95 @@
   font-size: var(--text-2xs);
   line-height: 1.5;
 }
+
+/* --------------------------------------------------------------------- billing tab ---- */
+
+.billing-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.spend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.9rem 1.25rem;
+  margin: 0;
+}
+
+.spend div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+
+.spend dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.spend dd {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Short lists rather than tables: this is a tab on an organization, not the ledger, and a five-row
+ * `app-data-table` inside a panel inside a rail is more chrome than content.
+ */
+.billing-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0.35rem 0.75rem 0.85rem;
+  list-style: none;
+}
+
+.billing-rows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+}
+
+.billing-rows li:nth-child(odd) {
+  background: var(--muted);
+}
+
+.billing-lead {
+  /* Leads and takes the slack, so the amounts line up down the list. */
+  flex: 1 1 8rem;
+  min-inline-size: 0;
+  color: var(--foreground-strong);
+  overflow-wrap: anywhere;
+}
+
+.billing-meta {
+  color: var(--muted-foreground);
+  unicode-bidi: plaintext;
+}
+
+.billing-value {
+  color: var(--foreground-strong);
+  font-variant-numeric: tabular-nums;
+  margin-inline-start: auto;
+}
+
+/* The badge is the affordance, so the link is just a hit area around it. */
+.billing-link {
+  display: inline-flex;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.billing-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

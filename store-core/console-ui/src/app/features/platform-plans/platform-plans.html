@@ -10,10 +10,7 @@
       <div class="plans-stack">
         <!--
           Said once, at the top. The catalogue is mirrored from Stripe into `billing.plan` and no
-          endpoint writes it, so this screen reads and cannot edit — and it is the only billing read
-          the platform console has at all.
-          TODO(lessons.md): see lessons.md, "Platform — a store's subscription cannot be read by an
-          operator".
+          endpoint writes it, so this screen reads and cannot edit.
         -->
         <app-notice-bar icon="info" tone="blue" [message]="t('platform.plans.notice.readOnly')" />
 
@@ -37,6 +34,22 @@
                   <!-- An em dash, not a zero: a plan sold monthly-only is not a plan that is free yearly. -->
                   <span class="cell-price" role="cell" [attr.data-label]="t('platform.plans.column.yearly')">
                     {{ row.yearly }}
+                  </span>
+
+                  <span
+                    class="cell-price"
+                    role="cell"
+                    [attr.data-label]="t('platform.plans.column.subscribers')"
+                  >
+                    {{ row.subscribers }}
+                  </span>
+
+                  <span
+                    class="cell-price"
+                    role="cell"
+                    [attr.data-label]="t('platform.plans.column.recurring')"
+                  >
+                    {{ row.recurring }}
                   </span>
 
                   @for (allowance of row.allowances; track $index) {

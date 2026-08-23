@@ -14,6 +14,8 @@ import {
   type PlatformUserRow,
 } from '@models/platform';
 import type {Tone} from '@models/ui';
+import {INVOICE_STATUS_TONE} from '@models/platform-billing';
+import {Money} from '@shared/i18n/money';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {RoleLabel} from '@shared/i18n/role-label';
 import {snapshot} from '@shared/state/snapshot';
@@ -24,15 +26,28 @@ import {OrganizationDetailApi} from '../services/organization-detail.api.service
 
 export const PAGE_SIZE = 20;
 
-/** The tabs, in the order the rail renders them. `activity` is last because it is empty. */
+/** How many rows the billing tab's two short lists show before deferring to the ledger. */
+const BILLING_ROWS = 8;
+
+/** Minor units to major, as everything billing sends is in minor units. */
+const MINOR_UNITS = 100;
+
+/**
+ * The tabs, in the order the rail renders them.
+ *
+ * `billing` sits after the accounts because it is the last thing an operator reaches for and the
+ * first one they arrive for during a dispute — either way it is a leaf, not a starting point.
+ * `activity` stays last because it is still empty: nothing reads `tenancy_audit`.
+ */
 export const ORG_SECTIONS: readonly NavSection[] = [
   {key: 'overview', labelKey: 'platform.organization.section.overview', icon: 'building'},
   {key: 'stores', labelKey: 'platform.organization.section.stores', icon: 'shoppingCart'},
   {key: 'users', labelKey: 'platform.organization.section.users', icon: 'users'},
+  {key: 'billing', labelKey: 'platform.organization.section.billing', icon: 'dollar'},
   {key: 'activity', labelKey: 'platform.organization.section.activity', icon: 'clock'},
 ];
 
-export type OrgSection = 'overview' | 'stores' | 'users' | 'activity';
+export type OrgSection = 'overview' | 'stores' | 'users' | 'billing' | 'activity';
 
 /** Which confirmation is open, if any. */
 export type OrgPrompt = 'suspend' | 'resume' | 'close' | null;
@@ -70,6 +85,7 @@ export class OrganizationDetailFacade {
   private readonly transloco = inject(TranslocoService);
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly labels = inject(PlatformLabel);
+  private readonly money = inject(Money);
   private readonly roleLabels = inject(RoleLabel);
 
   /** The organization being read, set by the page from the route. */
@@ -164,6 +180,71 @@ export class OrganizationDetailFacade {
     }));
   });
 
+  /* ------------------------------------------------------------------------ billing ---- */
+
+  /**
+   * How many rows each of the billing tab's two lists shows.
+   *
+   * A short list rather than a paged table: this is a tab on an organization, not the ledger. The
+   * ledger is `/platform/billing` filtered to this org, and the tab links there for the rest.
+   */
+  readonly billingRows = BILLING_ROWS;
+
+  private readonly billing = snapshot(
+    () => {
+      const id = this.orgId();
+      // Keyed on the tab, so billing is not asked about until the tab is opened.
+      return id && this.section() === 'billing' ? id : undefined;
+    },
+    (id) => this.api.loadBilling(id, BILLING_ROWS),
+  );
+
+  readonly billingLoading = this.billing.isLoading;
+  readonly billingError = this.billing.error;
+  readonly reloadBilling = () => this.billing.reload();
+
+  readonly billingSubscriptions = computed(() => this.billing.value()?.subscriptions ?? []);
+  readonly billingInvoices = computed(() => this.billing.value()?.invoices ?? []);
+  readonly billingSubscriptionsTotal = computed(() => this.billing.value()?.subscriptionsTotal ?? 0);
+  readonly billingInvoicesTotal = computed(() => this.billing.value()?.invoicesTotal ?? 0);
+
+  /**
+   * What this organization has paid and been billed, one figure per currency.
+   *
+   * A list rather than a total, everywhere money appears on this platform: nothing holds an exchange
+   * rate, so an org trading in two currencies gets two lines rather than one invented sum.
+   */
+  readonly billingTotals = computed<readonly {currency: string; paid: string; due: string}[]>(() => {
+    this.transloco.activeLang();
+    return (this.billing.value()?.totals ?? []).map((total) => ({
+      currency: total.currency.code,
+      paid: this.money.account((total.paid?.minorUnits ?? 0) / MINOR_UNITS, total.currency.code),
+      due: this.money.account((total.due?.minorUnits ?? 0) / MINOR_UNITS, total.currency.code),
+    }));
+  });
+
+  billingAmount(value: {currency: {code: string}; minorUnits: number} | null | undefined): string {
+    if (!value) {
+      return '—';
+    }
+    return this.money.account(value.minorUnits / MINOR_UNITS, value.currency.code);
+  }
+
+  invoiceStatusLabel(status: string | null): string {
+    return this.labels.invoiceStatus(status);
+  }
+
+  invoiceStatusTone(status: string | null): Tone {
+    return (status && INVOICE_STATUS_TONE[status]) || 'slate';
+  }
+
+  billingDate(value: string | null | undefined): string {
+    if (!value) {
+      return '—';
+    }
+    return this.localeFormat.localizeDate(value, undefined, {dateStyle: 'medium'});
+  }
+
   /* ---------------------------------------------------------------------- rendering ---- */
 
   readonly sections = ORG_SECTIONS;
@@ -229,11 +310,13 @@ export class OrganizationDetailFacade {
   }
 
   /**
-   * Whether a store is paid for.
+   * Whether a store is paid for, as tenancy reports it on the store row.
    *
-   * The only billing fact this console can see: billing's own endpoints refuse a platform operator,
-   * and this arrives on tenancy's store row instead. See lessons.md, "Platform — a store's
-   * subscription cannot be read by an operator".
+   * Free where it arrives — tenancy batch-fills it as a service principal — and coarse: it is a
+   * status and nothing else. The badge is a link into `/platform/billing`'s register filtered to that
+   * store, which is where the plan, the invoices, the history and the levers are. That reading was
+   * impossible until billing's read guard grew a super-admin branch; see lessons.md, "Platform — a
+   * store's subscription cannot be read by an operator *(answered)*".
    */
   billingLabel(status: string | null): string {
     return this.labels.subscriptionStatus(status);

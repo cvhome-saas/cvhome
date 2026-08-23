@@ -18,3 +18,21 @@
   grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
   gap: 1.5rem;
 }
+
+/*
+ * The link out to `/platform/billing`. A quiet line under the charts rather than a button: this page
+ * is the summary and that one is the reading, so the pointer should not compete with the figures.
+ */
+.deeper {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.deeper a {
+  color: var(--accent-foreground);
+}
+
+.deeper a:hover,
+.deeper a:focus-visible {
+  text-decoration: underline;
+}

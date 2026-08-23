@@ -3,6 +3,11 @@ import {TranslocoService} from '@jsverse/transloco';
 
 import {humanizeStatus} from '@models/orders';
 import {
+  AUDIT_EVENT_TYPES,
+  AUDIT_SOURCE_SET,
+  INVOICE_STATUS_SET,
+} from '@models/platform-billing';
+import {
   ORG_STATUSES,
   POD_HEALTH_STATUSES,
   POD_LIFECYCLE_STATES,
@@ -89,6 +94,34 @@ export class PlatformLabel {
    */
   subscriptionStatus(status: string | null | undefined): string {
     return this.lookup(SUBSCRIPTION_STATUSES, status, (value) => `shared.subscriptionStatus.${value}`);
+  }
+
+  /**
+   * Where an invoice stands. Mirrors billing's `InvoiceStatus`.
+   *
+   * Read by the platform's ledger and by an organization's billing tab, which is the two-reader rule
+   * that puts it here rather than beside either.
+   */
+  invoiceStatus(status: string | null | undefined): string {
+    return this.lookup(INVOICE_STATUS_SET, status, (value) => `platform.invoiceStatus.${value}`);
+  }
+
+  /**
+   * What happened to a subscription — one of `AuditEventType`'s sixteen.
+   *
+   * **All sixteen are translated even though the filter offers thirteen.** Three of them
+   * (`RESUMED`, `INVOICE_RECORDED`, `QUOTA_REFUSED`) are written by nothing today, so offering them
+   * as filter options would read as a broken filter — but a row of any of them could be written
+   * tomorrow, and the strict missing-key handler throws rather than falling back. Narrowing the
+   * dropdown is safe; narrowing the labels would be a page that dies on a new row.
+   */
+  auditEvent(eventType: string | null | undefined): string {
+    return this.lookup(AUDIT_EVENT_TYPES, eventType, (value) => `platform.auditEvent.${value}`);
+  }
+
+  /** Who drove a change: a person through the API, Stripe, one of our jobs, or provisioning. */
+  auditSource(source: string | null | undefined): string {
+    return this.lookup(AUDIT_SOURCE_SET, source, (value) => `platform.auditSource.${value}`);
   }
 
   /**

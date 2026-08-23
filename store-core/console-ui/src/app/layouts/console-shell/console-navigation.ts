@@ -28,6 +28,11 @@ export const CONSOLE_NAVIGATION: readonly NavigationSection[] = [
       {labelKey: 'shell.nav.item.organizations', icon: 'building', route: '/platform/organizations'},
       {labelKey: 'shell.nav.item.pods', icon: 'server', route: '/platform/pods'},
       {labelKey: 'shell.nav.item.platformUsers', icon: 'shield', route: '/platform/users'},
+      /*
+       * `dollar` rather than `creditCard`: the plans entry one row below already owns that glyph,
+       * and two identical icons adjacent in one rail is worse than either choice on its own.
+       */
+      {labelKey: 'shell.nav.item.platformBilling', icon: 'dollar', route: '/platform/billing'},
       {labelKey: 'shell.nav.item.plans', icon: 'creditCard', route: '/platform/plans'},
     ],
   },

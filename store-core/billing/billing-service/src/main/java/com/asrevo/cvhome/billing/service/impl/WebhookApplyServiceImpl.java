@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.asrevo.cvhome.billing.commons.AuditEventType;
 import com.asrevo.cvhome.billing.commons.InvoiceStatus;
 import com.asrevo.cvhome.billing.commons.Money;
+import com.asrevo.cvhome.billing.commons.PlanId;
 import com.asrevo.cvhome.billing.commons.StripeCustomerId;
 import com.asrevo.cvhome.billing.commons.StripeEventId;
 import com.asrevo.cvhome.billing.commons.StripeInvoiceId;
@@ -76,6 +77,8 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
         ProviderSubscriptionState state = ProviderSubscriptionState.from(StripeJson.parse(payload));
         StoreSubscriptionEntity entity = require(store);
         SubscriptionStatus before = entity.getStatus();
+        // Read before `applyPlanOf` moves it: the entity mutates in place, so afterwards this is the new plan.
+        PlanId fromPlan = entity.getPlanId();
 
         bindIdentifiers(entity, state);
         applyPlanOf(entity, state);
@@ -83,7 +86,7 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity);
         if (saved.getStatus() != before) {
-            auditService.recordFromWebhook(before, saved, auditTypeFor(saved.getStatus()),
+            auditService.recordFromWebhook(before, fromPlan, saved, auditTypeFor(saved.getStatus()),
                     new StripeEventId(eventId));
         }
         log.info("Reconciled store {} with Stripe: {} -> {}", store, before, saved.getStatus());
@@ -98,8 +101,9 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
         if (before == SubscriptionStatus.CANCELED) {
             return;
         }
+        PlanId fromPlan = entity.getPlanId();
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity.cancelNow(Instant.now()));
-        auditService.recordFromWebhook(before, saved, AuditEventType.CANCELED, new StripeEventId(eventId));
+        auditService.recordFromWebhook(before, fromPlan, saved, AuditEventType.CANCELED, new StripeEventId(eventId));
         log.info("Store {} cancelled by Stripe (was {})", store, before);
     }
 
@@ -113,12 +117,13 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
         recordInvoice(entity, invoice, InvoiceStatus.PAID);
 
+        PlanId fromPlan = entity.getPlanId();
         Instant periodStart = periodStartOf(invoice);
         Instant periodEnd = periodEndOf(invoice);
         PlanPriceEntity price = priceOf(invoice, entity);
         StoreSubscriptionEntity saved = subscriptionRepository.save(
                 entity.activate(price.getPlanId(), price.getId(), periodStart, periodEnd));
-        auditService.recordFromWebhook(before, saved,
+        auditService.recordFromWebhook(before, fromPlan, saved,
                 before == SubscriptionStatus.ACTIVE ? AuditEventType.RENEWED : AuditEventType.ACTIVATED,
                 new StripeEventId(eventId));
         log.info("Store {} paid: {} -> {}, next renewal {}", store, before, saved.getStatus(), periodEnd);
@@ -136,7 +141,8 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
 
         Instant graceUntil = Instant.now().plus(properties.pastDueGrace());
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity.markPastDue(graceUntil));
-        auditService.recordFromWebhook(before, saved, AuditEventType.PAYMENT_FAILED, new StripeEventId(eventId));
+        auditService.recordFromWebhook(before, entity.getPlanId(), saved, AuditEventType.PAYMENT_FAILED,
+                new StripeEventId(eventId));
         log.info("Store {} failed a renewal: {} -> {}, grace until {}", store, before, saved.getStatus(), graceUntil);
     }
 

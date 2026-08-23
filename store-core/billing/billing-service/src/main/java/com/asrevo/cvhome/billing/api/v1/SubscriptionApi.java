@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.billing.api.v1;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -132,10 +133,12 @@ public class SubscriptionApi {
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView changePlan(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                        @RequestParam("store") StoreMerchantId store,
-                                       @RequestBody PlanChangeRequest request)
+                                       @RequestBody PlanChangeRequest request,
+                                       Principal principal)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException {
-        return subscriptionService.changePlan(store, tenantScopeOf(identity), request.planPriceId());
+        return subscriptionService.changePlan(store, tenantScopeOf(identity), request.planPriceId(),
+                actorOf(principal));
     }
 
     /**
@@ -145,11 +148,12 @@ public class SubscriptionApi {
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView cancel(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                    @RequestParam("store") StoreMerchantId store,
-                                   @RequestBody CancelRequest request)
+                                   @RequestBody CancelRequest request,
+                                   Principal principal)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException {
         return subscriptionService.cancel(store, tenantScopeOf(identity), request.immediate(),
-                identity.isSuperAdmin());
+                identity.isSuperAdmin(), actorOf(principal));
     }
 
     /**
@@ -158,10 +162,29 @@ public class SubscriptionApi {
     @PostMapping("resume")
     @PreAuthorize("hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.MANAGE')")
     public SubscriptionView resume(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                   @RequestParam("store") StoreMerchantId store)
+                                   @RequestParam("store") StoreMerchantId store,
+                                   Principal principal)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException {
-        return subscriptionService.resume(store, tenantScopeOf(identity));
+        return subscriptionService.resume(store, tenantScopeOf(identity), actorOf(principal));
+    }
+
+    /**
+     * Who the audit trail names for this request.
+     *
+     * <p>
+     * {@link Principal} is resolved natively by Spring MVC, so this needs nothing from commons. It is threaded down
+     * to the service rather than read from {@code SecurityContextHolder} inside the audit writer: the writer is then
+     * testable with no security context, and a call site that forgot to say who is asking does not compile.
+     * </p>
+     *
+     * <p>
+     * Never null on these endpoints — every one of them is behind {@code @PreAuthorize} — but guarded anyway, since
+     * a null here would abort a change that Stripe has already made.
+     * </p>
+     */
+    private static String actorOf(Principal principal) {
+        return principal == null ? "unknown" : principal.getName();
     }
 
     /**

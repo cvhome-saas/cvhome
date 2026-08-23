@@ -226,9 +226,23 @@
                               [attr.data-label]="t('platform.organization.stores.column.billing')"
                             >
                               @if (row.billingStatus) {
-                                <app-badge [tone]="facade.billingTone(row.billingStatus)" shape="square">
-                                  {{ billingLabel(row.billingStatus) }}
-                                </app-badge>
+                                <!--
+                                  A link into the platform's subscription register, filtered to this
+                                  store, where the row opens the panel with its invoices, its history
+                                  and the three levers. A link rather than the panel itself because a
+                                  feature may not import another feature's component — and because the
+                                  filtered register is a URL an operator can send to someone.
+                                -->
+                                <a
+                                  class="billing-link"
+                                  [routerLink]="['/platform/billing', 'subscriptions']"
+                                  [queryParams]="{q: row.id}"
+                                  [attr.aria-label]="t('platform.organization.stores.openBilling')"
+                                >
+                                  <app-badge [tone]="facade.billingTone(row.billingStatus)" shape="square">
+                                    {{ billingLabel(row.billingStatus) }}
+                                  </app-badge>
+                                </a>
                               } @else {
                                 <!--
                                   Null is "not known", never "lapsed", and it has two causes the
@@ -318,6 +332,134 @@
                     }
                   </app-busy-overlay>
                 </app-panel>
+              }
+
+              @case ('billing') {
+                @if (facade.billingError(); as failure) {
+                  <app-load-error [message]="failure.message" (retry)="facade.reloadBilling()" />
+                }
+
+                <app-busy-overlay
+                  reserve="panel"
+                  [busy]="facade.billingLoading()"
+                  [label]="t('platform.organization.billing.loading')"
+                >
+                  <div class="billing-stack">
+                    <app-panel padded [title]="t('platform.organization.billing.spend')">
+                      @if (facade.billingTotals().length) {
+                        <!--
+                          One line per currency, never a sum across them: nothing on the platform
+                          holds an exchange rate, so a combined figure would have to invent one.
+                        -->
+                        <dl class="spend">
+                          @for (total of facade.billingTotals(); track total.currency) {
+                            <div>
+                              <dt>{{ t('platform.organization.billing.paidIn', {currency: total.currency}) }}</dt>
+                              <dd>{{ total.paid }}</dd>
+                            </div>
+                            <div>
+                              <dt>{{ t('platform.organization.billing.billedIn', {currency: total.currency}) }}</dt>
+                              <dd>{{ total.due }}</dd>
+                            </div>
+                          }
+                        </dl>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="dollar"
+                          [message]="t('platform.organization.billing.noSpend')"
+                        />
+                      }
+                    </app-panel>
+
+                    <app-panel
+                      [title]="t('platform.organization.billing.subscriptions')"
+                      [meta]="facade.billingSubscriptionsTotal().toString()"
+                    >
+                      <a
+                        panelAction
+                        class="ghost-action"
+                        [routerLink]="['/platform/billing', 'subscriptions']"
+                        [queryParams]="{org: facade.orgId()}"
+                      >
+                        {{ t('platform.organization.billing.openRegister') }}
+                      </a>
+
+                      @if (facade.billingSubscriptions().length) {
+                        <ul class="billing-rows">
+                          @for (row of facade.billingSubscriptions(); track row.store) {
+                            <li>
+                              <span class="billing-lead latin" dir="auto">{{ row.store }}</span>
+                              <span class="billing-meta">
+                                {{ row.planName || t('platform.billing.overview.noPlan') }}
+                              </span>
+                              <app-badge [tone]="facade.billingTone(row.status)" shape="square">
+                                {{ billingLabel(row.status) }}
+                              </app-badge>
+                              <span class="billing-value">{{ facade.billingAmount(row.amount) }}</span>
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="creditCard"
+                          [message]="t('platform.organization.billing.noSubscriptions')"
+                        />
+                      }
+                    </app-panel>
+
+                    <app-panel
+                      [title]="t('platform.organization.billing.invoices')"
+                      [meta]="facade.billingInvoicesTotal().toString()"
+                    >
+                      <a
+                        panelAction
+                        class="ghost-action"
+                        [routerLink]="['/platform/billing', 'invoices']"
+                        [queryParams]="{org: facade.orgId()}"
+                      >
+                        {{ t('platform.organization.billing.openLedger') }}
+                      </a>
+
+                      @if (facade.billingInvoices().length) {
+                        <ul class="billing-rows">
+                          @for (row of facade.billingInvoices(); track row.id) {
+                            <li>
+                              <span class="billing-lead latin" dir="auto">{{ row.number }}</span>
+                              <app-badge [tone]="facade.invoiceStatusTone(row.status)" shape="square">
+                                {{ facade.invoiceStatusLabel(row.status) }}
+                              </app-badge>
+                              <span class="billing-meta">{{ facade.billingDate(row.issuedAt) }}</span>
+                              <span class="billing-value">{{ facade.billingAmount(row.amountPaid) }}</span>
+                              <!--
+                                Stripe's own copy is the one that legally is the invoice; the console
+                                links to it rather than rendering figures it would have to keep correct.
+                              -->
+                              @if (row.hostedInvoiceUrl) {
+                                <a
+                                  class="icon-action"
+                                  [href]="row.hostedInvoiceUrl"
+                                  target="_blank"
+                                  rel="noopener"
+                                  [attr.aria-label]="t('platform.billing.invoices.openHosted')"
+                                >
+                                  <app-icon name="externalLink" />
+                                </a>
+                              }
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="receipt"
+                          [message]="t('platform.organization.billing.noInvoices')"
+                        />
+                      }
+                    </app-panel>
+                  </div>
+                </app-busy-overlay>
               }
 
               @case ('activity') {

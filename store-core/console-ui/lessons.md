@@ -2665,54 +2665,66 @@ understood.
   union passed the typecheck and the lint and was caught by `ng build`. The template typecheck is
   part of the build; a change touching templates is not verified until it has run.
 
-## Platform — no subscription statistics
+## Platform — no subscription statistics *(answered)*
 
-- **Screen:** `/platform`, the dashboard. seller-ui's `/pages` admin home draws three ECharts panels
-  from one date range: subscriptions, new organizations, new stores.
-- **What the UI needs:** subscriptions started per day over a chosen period, so the operator can see
-  the business growing rather than only the tenant count.
-- **What is missing:** the endpoint. `grep -rn "subscription-statistic" --include="*.java"` over the
-  whole repository returns **nothing**. seller-ui's `statistic.api.service.ts` has called
-  `billing/api/v2/private/subscription-statistic` since it was written, so that panel has been a 404
-  for its entire life and renders as an empty plot rather than as an error.
-- **Why it is required:** organizations and stores are counts of *signups*. Whether any of them pay
-  is the question the platform actually turns on, and nothing on this screen can answer it.
-- **Expected contract:**
-  ```
-  POST /billing/api/v2/private/subscription-statistic
-  { "fromDate": "…", "toDate": "…" }        # commons StatisticRange
-  → { "entries": [ {"date": "2026-08-04", "name": "GROWTH", "value": 12}, … ] }
-  ```
-  Grouped by day **and by plan code**, so the console can stack the series — unlike the two tenancy
-  counters, whose `name` is null. `hasRole('ROLE_SUPER_ADMIN')`, matching `OrgStatisticApi`.
-- **Placeholder:** the panel is **absent**, not empty.
-  `features/platform-dashboard/services/platform-dashboard.api.service.ts` says so at the top. An
-  empty card is a claim that there is nothing to show; a missing card is the truth, which is that the
-  console cannot ask.
+**Shipped.** `POST /billing/api/v2/private/subscription-statistic` exists, on the exact path
+seller-ui had been calling since it was written — nothing had ever served it, so that panel was a 404
+for its entire life and rendered as an empty plot rather than as an error.
 
-## Platform — no revenue or GMV figure anywhere
+- **Where it is drawn:** `/platform`, one trend plot per plan, and `/platform/billing` → Overview.
+- **What it counts, and why that is not obvious.** Subscriptions **started** per day, by plan code,
+  read from `billing.subscription_audit` rather than from `store_subscription.created_date`. A
+  `store_subscription` row is written by provisioning the moment a store is created, so
+  `created_date` counts every store that ever entered billing including the ones that never paid —
+  which is already what `store-statistic` answers. "Started" means started paying or trialling, and
+  the audit table is the only thing that records when that happened. Both tables begin at the same
+  moment in history, so the audit source costs nothing in coverage.
+- **`distinct on (store_id)`, because `ACTIVATED` fires more than once.** A suspended store that pays
+  and comes back activates again, and counting raw rows would book a returning customer as a new one.
+  The range filter sits **outside** the sub-select on purpose: pushing it in would pick the first row
+  *in the window* rather than the first ever, which is the same double count with extra steps.
+  `RevenueStatisticTest` asserts both, by reading the `@Query` text — the decision lives only in SQL
+  and a one-word edit would change what the published figure means without breaking anything a mock
+  could observe.
+- **`name` is the plan code**, so these are the first entries on the platform whose `name` is not
+  null; the two tenancy counters group by nothing. A dangling plan id comes back as `UNKNOWN` rather
+  than being dropped, so a catalogue change shows up as a visible bar and not as a total that quietly
+  shrank.
+- **What is still open:** `date()` resolves in the **database session's timezone**. The service runs
+  UTC, so a subscription started at 23:50 local lands on the previous day for an operator elsewhere.
+  Fixing it properly means an `AT TIME ZONE` parameter on this query and on the revenue one, which is
+  its own change; it is documented in both javadocs rather than half-fixed.
 
-- **Screen:** `/platform`, the KPI row.
-- **What the UI needs:** one money figure for the platform — revenue, GMV, or subscription value —
-  over the chosen period.
-- **What is missing:** any aggregate at all. `OrgStatisticApi` and `StoreStatisticApi` count rows;
-  checkout's three statistics count orders, order lines and billing countries; payments has **no
-  aggregate endpoint of any kind** (Module 7's finding, unchanged). Nothing sums an amount anywhere
-  on this platform, in any service.
-- **Why it is required:** a platform console without a money figure is a signup dashboard. It is also
-  the one number that would justify the rest of the screen existing.
-- **Expected contract:** a `POST /billing/api/v2/private/revenue-statistic` alongside the
-  subscription one, answering `(date, currency, minor units)` per day — currency in the grouping key
-  rather than converted, because nothing on the platform holds an exchange rate and a total that
-  silently mixed currencies would be worse than no total.
-- **Confirmed by reading billing end to end.** Its entire HTTP surface is `plan`, `subscription`,
-  `invoice`, `entitlement` and `quota` — four of the five store-scoped, none of them aggregating
-  anything, and the fifth (`plan/public/plans`) a catalogue. There is no sum of money exposed to a
-  human caller anywhere in the service.
-- **What console-ui does meanwhile:** the KPI row is **two tiles**, both counts, both labelled "in
-  this period" so they cannot be read as the platform's size. Two real tiles beat four with two em
-  dashes in them. `/platform/plans` shows what the platform *charges*, which is the closest thing to
-  a commercial figure the backend will answer.
+## Platform — no revenue or GMV figure anywhere *(partly answered)*
+
+**Subscription revenue shipped; GMV did not.** `POST /billing/api/v2/private/revenue-statistic`
+answers money actually collected, per day and per currency, and it is the first sum of money exposed
+to a human caller anywhere on this platform.
+
+- **Where it is drawn:** `/platform`'s KPI row (one tile per currency), and `/platform/billing` →
+  Overview, as KPIs and one trend plot per currency. `/platform/billing` → Invoices totals the
+  filtered ledger the same way.
+- **Keyed on `paid_at`, not `issued_at`, and the reason is specific to this table.**
+  `SubscriptionInvoiceEntity.settled(…)` writes `status`, `amount_paid` and `paid_at` and **does not
+  touch `issued_at`**. Key the sum on `issued_at` and a *past* day's bar moves when a late payment
+  lands — an operator reloads last month and the chart has changed under them. Keyed on `paid_at`, a
+  day's figure changes only when money actually moved on that day. `UNCOLLECTIBLE` and `VOID` fall
+  out of the same `status = 'PAID'` predicate, so nothing written off is counted as revenue.
+- **Minor units, and the currency is in the grouping key.** Never converted and never summed across
+  currencies, at any tier: the endpoint groups by it, the api service keeps one series per code, and
+  the console draws one tile and one chart per currency. Nothing on this platform holds an exchange
+  rate, and a mixed total is a wrong number rather than a missing one. That rule is why
+  `/platform/billing` has no single headline revenue figure and never will until something does hold
+  a rate.
+- **What is still missing: GMV.** This is *subscription* revenue — what merchants pay us — not what
+  their shoppers pay them. Payments still has **no aggregate endpoint of any kind** (Module 7's
+  finding, unchanged), and checkout's three statistics count orders, order lines and billing
+  countries rather than summing an amount. So the platform can say what it earns and still cannot say
+  what flows through it.
+- **Expected contract for the missing half:** a `POST /spg/checkout/api/v2/private/gmv-statistic`
+  answering `(date, currency, minor units)` per day across every store, super-admin only, with the
+  currency in the grouping key for the same reason as above. Until it exists, no screen claims a GMV
+  figure.
 
 ## Platform — no impersonation
 
@@ -3044,53 +3056,122 @@ names, organizations, statuses and billing standings the registry's copy does no
   and `SelectedStoreRequestContext` still resolves `?store=` from it — so the *server* still treats
   "no org" as "every org", and the honest fix is on that side.
 
-## Platform — a store's subscription cannot be read by an operator
+## Platform — a store's subscription cannot be read by an operator *(answered)*
 
-- **Screen:** `/platform/organizations/:id` → Stores, and any per-store billing panel that would sit
-  behind it.
-- **What the UI needs:** for one tenant's store — the plan it is on, when it renews, whether the last
-  invoice was paid.
-- **What is missing:** an audience. `SubscriptionApi.current` and `InvoiceApi.list` are guarded by
-  `hasPermission(#store,'StoreMerchantId','STORE-CORE.BILLING.READ')`, which resolves to
-  `PermissionAccessChecker.hasReadAccessOnStore` — and that admits an **org admin, a store admin, a
-  store moderator and a store-core service principal**, with *no super-admin branch*. A platform
-  operator is none of those for a store they do not own, so billing refuses them for every store on
-  the platform.
-- **Why it is required:** "this merchant says they paid" is the single most common support question a
-  platform console exists to answer, and today it can only be answered by reading the database.
-- **Expected contract:** add `ROLE_SUPER_ADMIN` to `hasReadAccessOnStore` — it is the same widening
-  the pod registry's read guard already makes, and its own comment explains why it admits a service
-  principal — or an org-scoped `GET /billing/api/v1/subscription/by-org/{id}` returning a page of
-  `SubscriptionView`, super-admin only.
-- **A second, smaller gap inside the one field that does arrive.** The Stores tab shows each store's
-  billing **standing**, second-hand and free: tenancy's `InternalStoreServiceImpl.withBillingStatus`
-  batch-fills `ManagerStoreDto.billingStatus` from `entitlement/private/snapshot/batch` as a
-  *service* principal, which does pass. But that batch answers `findAllByStoreIds` — a row only for a
-  store billing already has a subscription for, with no placeholder for the rest — so a store created
-  before billing existed, or one whose `StoreCreatedEvent` never landed, comes back **absent**. And
-  the read fails open on any billing failure. Null therefore means "billing has never seen this
-  store" *or* "billing was unreachable", and nothing on the wire distinguishes them. Contract: have
-  the batch return a snapshot for every store asked about, with a null status for the ones it does
-  not know.
-- **What console-ui does meanwhile:** the Stores tab shows that standing and nothing else, and
-  renders a null as "unknown" naming both causes — never as a lapse, and never as a red badge.
+**Shipped.** `PermissionAccessChecker.hasAccessOnBillingRead` and `hasAccessOnBillingManage` now
+begin `storeRoleAccessChecker.isSuperAdmin(a) ||`, which is the same widening `hasAccessOnPodRead`
+already made and the one billing never adopted.
 
-## Platform — no view of stores billing has cut off
+- **Where it is drawn:** `/platform/billing`'s store panel — one store's subscription, its invoices,
+  its audit trail and three levers — reached from a subscription row, an invoice row, and an
+  organization's Stores tab, which is where `lessons.md` said the question actually gets asked.
+- **The branch is on the two billing tokens and on nothing else, deliberately.** Widening the shared
+  private `hasReadAccessOnStore` instead would have handed a platform operator every store-scoped
+  screen in the console — the merchant pages the shell's `platformOnly` guard hides from them on the
+  assumption that they 403. `BillingSuperAdminAccessTest` asserts both halves: a super admin passes
+  both billing tokens on a store it does not own, and still fails `STORE-CORE.STORE-FIND-ONE` and
+  `STORE-CORE.USERS.RESET_PASSWORD`. It also asserts an org admin keeps both tokens, which is the
+  regression the change actually risked.
+- **Nothing else was needed on the query side.** `SubscriptionApi.tenantScopeOf` and `InvoiceApi`'s
+  twin already answered `null` for a super admin, so the org predicate drops away on its own — that
+  code had been unreachable since it was written.
+- **What the widening exposed, and what was fixed with it.** A platform operator can now cancel any
+  subscription on the platform, and every `ChangeSource.API` audit row was being written with
+  `actor = null`: the table recorded *that* a person changed a plan and never *which* person. The
+  principal is now threaded from `SubscriptionApi` through `SubscriptionService` to the audit writer
+  — explicit rather than reached for from `SecurityContextHolder`, so it is testable without a
+  security context and a call site that forgets it does not compile. Historic rows stay null and the
+  console renders that as "Not recorded" rather than attributing them to somebody.
+- **The second, smaller gap inside `billingStatus` is unchanged and still open.** Tenancy's
+  `InternalStoreServiceImpl.withBillingStatus` batch-fills `ManagerStoreDto.billingStatus` from
+  `entitlement/private/snapshot/batch`, which answers `findAllByStoreIds` — a row only for a store
+  billing already has a subscription for, with no placeholder for the rest — and fails open on any
+  billing failure. Null therefore still means "billing has never seen this store" *or* "billing was
+  unreachable", and nothing on the wire distinguishes them. Contract: have the batch return a
+  snapshot for every store asked about, with a null status for the ones it does not know. The Stores
+  tab still renders a null as "unknown" naming both causes, never as a lapse.
 
-- **Screen:** none, and that is the gap. It would be `/platform/billing` — every store the platform
-  has stopped serving for non-payment, in one list.
-- **What the UI needs:** exactly that list.
-- **What is missing:** an audience again, not an endpoint.
-  `ExternalEntitlementApi.blockedStores` — `GET /billing/api/v1/entitlement/private/blocked-stores` —
-  **already returns it**, and is guarded by `STORE-CORE.BILLING.QUOTA-CHECK`, which
-  `PermissionAccessChecker.hasAccessOnBillingQuotaCheck` grants to a store-core *service* principal
-  and to nobody else. A human super admin cannot call it. The same is true of
-  `entitlement/private/snapshot/batch`, which would give the ceilings for many stores in one request.
-- **Why it is required:** it is the one screen that would tell an operator which merchants are
-  losing service right now, and the data is already computed and already returned — only to machines.
-- **Expected contract:** widen both to `hasAccessOnBillingQuotaCheck(auth) || hasRole('ROLE_SUPER_ADMIN')`,
-  or expose a super-admin twin at `…/private/blocked-stores/admin`. The batch snapshot would also let
-  the organization detail show ceilings per store without one request per row.
-- **What console-ui does meanwhile:** nothing — the screen is not built, because there is no version
-  of it that is not a fixture. `/platform/plans` shows what the plans *are*; who is failing to pay
-  for them is unanswerable from the browser.
+## Platform — no view of stores billing has cut off *(answered — differently)*
+
+**Shipped, and the proposed contract was wrong.** `/platform/billing` → Subscriptions with
+`blockedOnly` answers it, and `/platform/billing` → Overview previews it. But this entry had asked
+for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
+`entitlement/private/blocked-stores`, and that would have been a mistake worth recording.
+
+- **Why the proposed widening was refused.** The same `STORE-CORE.BILLING.QUOTA-CHECK` token gates
+  `ExternalStoreQuotaApi.private/provision`, which **creates a subscription** and claims the org's one
+  trial through `org_trial_grant` — a primary key, so a trial consumed for a mistyped store id can
+  never be reclaimed. That is a one-way door reached through what reads like a widening for a report.
+  The entry proposed it without noticing the second endpoint behind the token.
+- **It was also unnecessary, and the alternative is strictly better.** `blockedStores` answers
+  `List<StoreMerchantId>` and nothing else — no why, no since-when — and it sits on the gateway's
+  once-a-minute hot path. `POST /billing/api/v1/platform/subscriptions` with `blockedOnly = true`
+  filters on the same three statuses `EntitlementServiceImpl.BLOCKED` enforces (`PENDING`,
+  `SUSPENDED`, `CANCELED`) and every row carries the reason (`status`), the date (`graceUntil`,
+  `trialEnd`, `suspendedAt`, `canceledAt`), the org and the plan. One call, paged, and gated on
+  `ROLE_SUPER_ADMIN` rather than on a token that also opens a write.
+- **`blockedOnly` is a named boolean rather than a status list**, because "blocked" is three statuses
+  and a nullable list cannot be written with the `cast(:x as varchar) is null` idiom the other
+  filters use. It is also the thing an operator actually asks for.
+- **The lesson worth keeping:** a contract written from the console's side named the endpoint that
+  already returned the data and not the endpoint that shared its guard. "Widen this token" is never a
+  read-only change until every method behind the token has been read.
+
+## Platform billing — no comp, credit note or trial extension
+
+- **Screen:** `/platform/billing`'s store panel, beside change-plan, cancel and resume.
+- **What an operator wants:** to put something right. Waive a month for an outage, credit an invoice
+  that was raised in error, extend a trial for a merchant still migrating.
+- **What is missing:** all three, and none of them is a read-path problem. Each needs a **real Stripe
+  call** — a credit note, a coupon, a `trial_end` update — and each needs an `AuditEventType` that
+  does not exist, which means a DDL edit to `subscription_audit`'s `CHECK` constraint in the same
+  change. There is no partial implementation to finish: grep `billing-service` for `creditNote`,
+  `coupon` or `trialEnd` and only the provisioning path's own trial appears.
+- **Why it is deliberately out of scope rather than half-built.** The three levers that did ship —
+  change plan, cancel, resume — reuse endpoints that already existed and were already exercised by
+  merchants; these three would be new money operations written from scratch, reachable only by a
+  platform operator, and therefore the least-tested write path on the platform pointing straight at a
+  customer's card.
+- **Expected contract:** `POST /billing/api/v1/platform/credit` and `…/trial-extension`, super-admin
+  only, each writing its own audit event type with the operator's name and a required reason. The
+  reason is not optional: an unexplained credit is the one row a finance review will stop at.
+- **What console-ui does meanwhile:** the panel offers the three levers it has and nothing else. No
+  disabled buttons for the other three — they are not built, and a disabled control implies a
+  permission problem rather than an absent feature.
+
+## Platform billing — no currency conversion, so there is no single revenue figure
+
+- **Screen:** `/platform`'s KPI row, and `/platform/billing` throughout.
+- **What the design would like:** one revenue number.
+- **What is missing:** an exchange rate, anywhere on the platform. Nothing holds one — not billing,
+  not payments, not tenancy — and Stripe's own rates are per-transaction rather than a table we can
+  query for a historical day.
+- **Why the console does not improvise one.** Summing minor units across currencies produces a figure
+  that is not wrong by a little; `2400 EUR + 5000 USD = 7400` of nothing. A rate fetched today and
+  applied to last quarter's payments would be a different wrong number that looks more plausible,
+  which is worse. So every money figure on the platform is per-currency, at every tier: the queries
+  group by it, the api services keep one series per code, and the console draws one tile, one chart
+  and one total per currency.
+- **What that costs, honestly:** a platform trading in five currencies gets five revenue tiles and no
+  headline. That is the accurate shape of the question until something holds a rate.
+- **Expected contract:** a rate source with a date — `GET /billing/api/v1/fx?on=2026-08-04` — and a
+  stated reporting currency per deployment, so a converted figure can say what it was converted at
+  and when. Anything less is a number nobody can reconcile.
+
+## Platform billing — a scheduled downgrade records the plan it is leaving
+
+- **Screen:** `/platform/billing` → Activity, and the store panel's activity list.
+- **What the row says:** for `PLAN_DOWNGRADE_SCHEDULED`, `to_plan_id` is the plan the store is
+  **leaving**, and the plan it is scheduled to move to appears nowhere on the row.
+- **Why:** the writer reads `after.getPlanId()`, and a scheduled downgrade has not moved the entity's
+  plan yet — that is the whole point of it being scheduled. The target sits in `pending_plan_price_id`
+  and the audit writer does not look there.
+- **Why it was not fixed alongside the two null columns.** `actor` and `from_plan_id` were columns
+  that existed and were passed a literal `null`; filling them changes nothing about what a row means.
+  This one would change what the event *records*, which is a different kind of edit and one that makes
+  historic rows and new rows mean different things under the same event type.
+- **Expected contract:** either a distinct `to_pending_plan_id` column, or `record` reading
+  `pendingPlanPriceId` for this event type alone and a backfill statement for the existing rows.
+- **What console-ui does meanwhile:** the Activity column renders `from → to` from what the row
+  carries and does not annotate it. `SubscriptionAuditView`'s javadoc names the trap for the next
+  reader.

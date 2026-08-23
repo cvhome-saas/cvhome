@@ -97,7 +97,8 @@ public class StoreQuotaServiceImpl implements StoreQuotaService {
                 : StoreSubscriptionEntity.pending(store, org);
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity);
         boolean trialing = saved.getStatus() == SubscriptionStatus.TRIALING;
-        auditService.record(null, saved,
+        // No from-plan and no actor: the row is being created, and provisioning is the platform rather than a person.
+        auditService.record(null, null, saved,
                 trialing ? AuditEventType.TRIAL_STARTED : AuditEventType.CREATED, ChangeSource.SYSTEM, null);
         log.info("Provisioned store {} of org {} as {}", store, org, saved.getStatus());
         return mappers.toView(saved);

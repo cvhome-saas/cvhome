@@ -2,6 +2,7 @@ import {Injectable, inject} from '@angular/core';
 import {Observable, forkJoin, map} from 'rxjs';
 
 import {StatisticService} from '@api/analytics/statistic.service';
+import {optionalOne} from '@core/http/optional';
 import type {TrendPoint} from '@models/platform';
 import type {StatisticList, StatisticRange} from '@models/statistics';
 
@@ -11,29 +12,53 @@ export interface CompleteRange {
   readonly to: Date;
 }
 
-/** The two series the platform can actually count, plus their totals over the range. */
+/** One stacked series of the subscription chart: a plan code and its daily count. */
+export interface PlanSeries {
+  readonly plan: string;
+  readonly points: readonly TrendPoint[];
+  readonly total: number;
+}
+
+/** A period's take in one currency, in minor units. Never summed with another currency's. */
+export interface CurrencyTotal {
+  readonly currency: string;
+  readonly minorUnits: number;
+}
+
+/** What the platform can count and, now, what it earned. */
 export interface PlatformSnapshot {
   readonly organizations: readonly TrendPoint[];
   readonly stores: readonly TrendPoint[];
   readonly organizationsTotal: number;
   readonly storesTotal: number;
+  /**
+   * Subscriptions started per day, by plan.
+   *
+   * Empty rather than absent when billing could not answer: the leg is optional, and losing it
+   * should cost this chart rather than the two tenant counts beside it.
+   */
+  readonly subscriptions: readonly PlanSeries[];
+  readonly subscriptionsTotal: number;
+  /** The period's revenue, one figure per currency. Empty when billing could not answer. */
+  readonly revenue: readonly CurrencyTotal[];
 }
 
 /**
  * The platform's own numbers.
  *
- * **Two requests, and there is no third.** seller-ui's admin home drew three charts;
- * `subscription-statistic` — the third — exists in **no Java file on the platform**, so that panel
- * has been a 404 since it was written. It is absent here rather than empty: an empty card is a claim
- * that there is nothing to show. See lessons.md, "Platform — no subscription statistics".
+ * **Four requests now, where there were two.** seller-ui's admin home drew three charts and the
+ * third — `subscription-statistic` — existed in no Java file on the platform, so it had been a 404
+ * for its entire life. It exists now, along with a revenue figure the platform previously had
+ * nowhere to ask for, so the third chart is drawn and the KPI row has money on it.
  *
- * **And there is no money on it.** Nothing on the platform aggregates revenue, GMV or subscription
- * value; payments has no aggregate endpoint of any kind. So the KPI row totals organizations and
- * stores and stops. See lessons.md, "Platform — no revenue or GMV figure anywhere".
+ * **The two tenant legs are the page and the two billing legs are not.** Organizations and stores
+ * are unwrapped: losing either makes this an error page with a retry, which is honest for a page
+ * that is fundamentally those two counts. The billing legs are wrapped in `optionalOne`, because a
+ * billing outage should cost a chart and two tiles rather than blanking the tenant curves — and
+ * because billing is the newer dependency of the two.
  *
- * Both legs are required — they *are* the page — so neither is wrapped in `optionalOne`. A tenancy
- * outage makes this an error page with a retry, which is the honest outcome for a page that is two
- * counts.
+ * The deeper reading of the money — per plan, per currency, per invoice — is `/platform/billing`.
+ * This page stays a summary and links there.
  */
 @Injectable({providedIn: 'root'})
 export class PlatformDashboardApi {
@@ -44,15 +69,31 @@ export class PlatformDashboardApi {
     return forkJoin({
       organizations: this.statistics.orgStatistic(window),
       stores: this.statistics.storeStatistic(window),
+      // Wrapped: this page is the tenant counts, and a billing outage should not blank them.
+      subscriptions: this.statistics.subscriptionStatistic(window).pipe(optionalOne()),
+      revenue: this.statistics.revenueStatistic(window).pipe(optionalOne()),
     }).pipe(
-      map(({organizations, stores}) => {
+      map(({organizations, stores, subscriptions, revenue}) => {
         const orgPoints = toDailySeries(organizations, range);
         const storePoints = toDailySeries(stores, range);
+        const planSeries = subscriptions ? toSeriesByName(subscriptions, range) : [];
         return {
           organizations: orgPoints,
           stores: storePoints,
           organizationsTotal: total(orgPoints),
           storesTotal: total(storePoints),
+          subscriptions: planSeries.map((series) => ({
+            plan: series.name,
+            points: series.points,
+            total: total(series.points),
+          })),
+          subscriptionsTotal: planSeries.reduce((sum, series) => sum + total(series.points), 0),
+          revenue: revenue
+            ? toSeriesByName(revenue, range).map((series) => ({
+                currency: series.name,
+                minorUnits: total(series.points),
+              }))
+            : [],
         };
       }),
     );
@@ -90,6 +131,31 @@ function toDailySeries(list: StatisticList, range: CompleteRange): readonly Tren
     points.push({date: key, value: counted.get(key) ?? 0});
   }
   return points;
+}
+
+/**
+ * The same, but keeping `name` rather than summing it away — one filled-out series per key.
+ *
+ * {@link toDailySeries} folds every entry of a day together, which is right for the two tenancy
+ * counters whose `name` is always null and wrong for both of billing's: the revenue entries are
+ * keyed by currency, and summing those would invent an exchange rate, while the subscription
+ * entries are keyed by plan and summing them loses the stack the chart is for.
+ */
+function toSeriesByName(
+  list: StatisticList,
+  range: CompleteRange,
+): readonly {name: string; points: readonly TrendPoint[]}[] {
+  const byName = new Map<string, StatisticList>();
+  for (const entry of list?.entries ?? []) {
+    // A null name would be a query grouping by nothing; neither of these does, but an entry that
+    // lost its key should still be visible rather than dropped.
+    const name = entry.name ?? '—';
+    const existing = byName.get(name);
+    byName.set(name, {entries: [...(existing?.entries ?? []), entry]});
+  }
+  return [...byName.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, entries]) => ({name, points: toDailySeries(entries, range)}));
 }
 
 /**

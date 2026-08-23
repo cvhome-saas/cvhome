@@ -11,13 +11,11 @@
     @if (!facade.isEmpty()) {
       <div class="platform-stack">
         <!--
-          Said plainly rather than left to be inferred from two tiles: nothing on this platform
-          aggregates money, so this page counts and does not total.
-          TODO(lessons.md): see lessons.md, "Platform — no revenue or GMV figure anywhere".
+          Three counts and a money figure per currency. The notice bar that used to stand here said
+          the platform aggregated no money at all; billing answers that now, so the bar is gone
+          rather than restated.
         -->
-        <app-notice-bar icon="info" tone="blue" [message]="t('platform.dashboard.notice.countsOnly')" />
-
-        <app-kpi-grid [label]="t('platform.dashboard.kpiLabel')" [data]="facade.kpis()" [columns]="2" />
+        <app-kpi-grid [label]="t('platform.dashboard.kpiLabel')" [data]="facade.kpis()" [columns]="3" />
 
         <section class="panel-row">
           <app-trend-chart
@@ -36,6 +34,32 @@
             tone="cyan"
           />
         </section>
+
+        <!--
+          The third chart seller-ui always drew and never had an endpoint for. One plot per plan
+          rather than one stack: the trend chart draws a single series, and a row of small multiples
+          reads better than a legend of plan codes.
+
+          Hidden rather than drawn empty when billing could not answer — its leg is optional, and an
+          empty plot is a claim that nobody subscribed.
+        -->
+        @if (facade.hasSubscriptionSeries()) {
+          <section class="panel-row">
+            @for (series of facade.subscriptionSeries(); track series.plan) {
+              <app-trend-chart
+                [title]="t('platform.dashboard.subscriptions.title', {plan: series.plan})"
+                [data]="series.points"
+                [unit]="t('platform.dashboard.subscriptions.unit')"
+                [total]="series.total"
+                tone="violet"
+              />
+            }
+          </section>
+        }
+
+        <p class="deeper">
+          <a routerLink="/platform/billing">{{ t('platform.dashboard.seeBilling') }}</a>
+        </p>
       </div>
     }
   </app-busy-overlay>

@@ -256,13 +256,14 @@ export interface PlatformStoreRow {
   readonly podId: string;
   readonly provisioningError: string | null;
   /**
-   * Whether the store is paid for, and the only billing fact the platform console can see.
+   * Whether the store is paid for — the one billing fact that rides along on a tenancy store row.
    *
    * It arrives free: tenancy's `InternalStoreServiceImpl.withBillingStatus` batch-fills it from
-   * billing on every store page it serves, as a service principal — which is the *only* way a
-   * platform operator learns anything about a store's billing, because billing's own endpoints check
-   * `hasReadAccessOnStore` and that has no super-admin branch. See lessons.md, "Platform — a store's
-   * subscription cannot be read by an operator".
+   * billing on every store page it serves, as a service principal. It was once the *only* way a
+   * platform operator learned anything about a store's billing, because billing's own endpoints
+   * checked `hasReadAccessOnStore` and that had no super-admin branch; `/platform/billing` reads the
+   * rest now. See lessons.md, "Platform — a store's subscription cannot be read by an operator
+   * *(answered)*".
    *
    * **Null is not a lapse**, and it has two causes the console cannot tell apart. Billing's batch
    * snapshot returns a row only for a store it *has* a subscription for — `findAllByStoreIds`, no

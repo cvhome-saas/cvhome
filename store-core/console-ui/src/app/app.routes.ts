@@ -162,8 +162,22 @@ export const routes: Routes = [
         data: {titleKey: 'route.platformUsers.title', breadcrumbKey: 'shell.breadcrumb.platformUsers'},
       },
       {
-        // The plan catalogue. Read-only, and the only platform-wide read billing offers — every
-        // other endpoint it has is store-scoped and refuses a super admin.
+        // The tab is part of the URL, so a filtered register is linkable and survives a reload —
+        // the shape the organization detail and store management already use.
+        path: 'billing',
+        redirectTo: 'billing/overview',
+        pathMatch: 'full',
+      },
+      {
+        path: 'billing/:section',
+        loadComponent: () =>
+          import('@features/platform-billing/platform-billing').then((page) => page.PlatformBilling),
+        data: {titleKey: 'route.platformBilling.title', breadcrumbKey: 'shell.breadcrumb.platformBilling'},
+      },
+      {
+        // The plan catalogue. Read-only: plans are created in Stripe and mirrored into `billing.plan`,
+        // and inventing a write here would be inventing a second source of truth for what a customer
+        // is charged. `/platform/billing` is where the money it describes is actually read.
         path: 'plans',
         loadComponent: () => import('@features/platform-plans/platform-plans').then((page) => page.PlatformPlans),
         data: {titleKey: 'route.plans.title', breadcrumbKey: 'shell.breadcrumb.plans'},

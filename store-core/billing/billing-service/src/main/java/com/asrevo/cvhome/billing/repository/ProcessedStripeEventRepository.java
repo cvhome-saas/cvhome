@@ -36,4 +36,18 @@ public interface ProcessedStripeEventRepository
               @Param("apiVersion") String apiVersion, @Param("outcome") String outcome,
               @Param("receivedAt") Instant receivedAt, @Param("processedAt") Instant processedAt);
 
+    /**
+     * Inbound events that failed, in a window.
+     *
+     * <p>
+     * Nothing has ever read this table. Together with {@code StripeRequestRepository.countStalledSince} it is the
+     * only "billing is broken right now" signal the platform has — a non-zero figure means webhooks are arriving and
+     * not being applied, which is invisible from every other screen because the subscriptions simply stop moving.
+     * </p>
+     */
+    @Query("""
+            select count(*) from billing.processed_stripe_event
+            where outcome = 'FAILED' and received_at >= :since""")
+    long countFailedSince(Instant since);
+
 }

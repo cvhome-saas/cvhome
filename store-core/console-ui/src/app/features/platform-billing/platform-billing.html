@@ -1,0 +1,492 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context" />
+
+  <div class="billing-layout" [class.rail-collapsed]="railCollapsed()">
+    <app-section-nav
+      class="billing-rail"
+      basePath="/platform/billing"
+      [sections]="facade.sections"
+      [active]="facade.section()"
+      [heading]="t('platform.billing.nav.heading')"
+      [label]="t('platform.billing.nav.ariaLabel')"
+      [(collapsed)]="railCollapsed"
+    />
+
+    <app-tab-switcher
+      class="billing-tabs"
+      [tabs]="tabs()"
+      [active]="facade.section()"
+      (activeChange)="pickSection($event)"
+      [label]="t('platform.billing.nav.ariaLabel')"
+      panelId="platform-billing-section"
+    />
+
+    <div class="billing-body" id="platform-billing-section">
+      <!-- ------------------------------------------------------------------ overview -- -->
+      @if (facade.section() === 'overview') {
+        @if (facade.error(); as failure) {
+          <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+        }
+
+        <div class="filters">
+          <app-date-range-picker
+            [value]="facade.dateRange()"
+            (valueChange)="facade.dateRange.set($event)"
+            [placeholder]="t('platform.billing.overview.period')"
+          />
+        </div>
+
+        <app-busy-overlay
+          reserve="page"
+          [busy]="facade.isLoading()"
+          [label]="t('platform.billing.overview.loading')"
+        >
+          @if (!facade.isEmpty()) {
+            <div class="overview">
+              <!--
+                One tile per currency, never a single headline figure: nothing on the platform holds
+                an exchange rate, so a combined total would have to invent one.
+              -->
+              <app-kpi-grid
+                [data]="facade.revenueKpis()"
+                [label]="t('platform.billing.overview.revenueKpis')"
+                [columns]="3"
+              />
+
+              @for (series of facade.revenueSeries(); track series.currency) {
+                <app-trend-chart
+                  [title]="t('platform.billing.overview.revenueTrend', {currency: series.currency})"
+                  [data]="series.points"
+                  [total]="series.total"
+                  [unit]="t('platform.billing.overview.collected')"
+                  tone="green"
+                />
+              }
+
+              <div class="overview-pair">
+                <app-donut-chart
+                  [title]="t('platform.billing.overview.planMix')"
+                  [data]="facade.planMix()"
+                />
+
+                <!--
+                  The legend stays on, and it is not decoration here: `app-bar-chart` hides its axis
+                  labels because the categories live in the DOM legend beside the plot, so switching
+                  it off leaves two bars labelled only by their value. A plan sold in two currencies
+                  draws two bars, and which is which is the whole question.
+                -->
+                <app-bar-chart
+                  [title]="t('platform.billing.overview.runRate')"
+                  [data]="facade.runRate()"
+                />
+              </div>
+
+              <app-panel padded [title]="t('platform.billing.overview.book')">
+                <dl class="book">
+                  <div>
+                    <dt>{{ t('platform.billing.overview.active') }}</dt>
+                    <dd>{{ facade.activeCount() }}</dd>
+                  </div>
+                  <div>
+                    <!--
+                      Kept apart from the committed run rate rather than folded into it: whether a
+                      trial counts as revenue is a judgement, and an endpoint or a screen that
+                      silently picks one is how a book gets overstated.
+                    -->
+                    <dt>{{ t('platform.billing.overview.trialing') }}</dt>
+                    <dd>{{ facade.trialingCount() }}</dd>
+                  </div>
+                  @for (total of facade.runRateTotals(); track total.label) {
+                    <div>
+                      <dt>{{ t('platform.billing.overview.annualised', {currency: total.label}) }}</dt>
+                      <dd>{{ total.annual }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ t('platform.billing.overview.monthly', {currency: total.label}) }}</dt>
+                      <dd>{{ total.monthly }}</dd>
+                    </div>
+                  }
+                </dl>
+              </app-panel>
+
+              <app-panel
+                [title]="t('platform.billing.overview.blocked')"
+                [meta]="facade.blockedTotalLabel()"
+                [subtitle]="t('platform.billing.overview.blockedSubtitle')"
+              >
+                <button
+                  panelAction
+                  type="button"
+                  class="ghost-action"
+                  (click)="openBlocked()"
+                >
+                  {{ t('platform.billing.overview.seeAll') }}
+                </button>
+
+                @if (facade.blockedRows().length) {
+                  <ul class="blocked-rows">
+                    @for (row of facade.blockedRows(); track row.store) {
+                      <li>
+                        <button type="button" class="blocked-row" (click)="openStore(row.store)">
+                          <span class="blocked-store" dir="auto">{{ row.store }}</span>
+                          <app-badge [tone]="statusTone(row.status)">{{ statusLabel(row.status) }}</app-badge>
+                          <span class="blocked-since">{{ facade.date(row.blockedSince) }}</span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <app-empty-state
+                    compact
+                    icon="checkCircle"
+                    [message]="t('platform.billing.overview.noneBlocked')"
+                  />
+                }
+              </app-panel>
+
+              <!--
+                Two counts from tables nothing else on the platform reads. Absent rather than zeroed
+                when the leg failed: "no failures" and "we could not ask" are different claims.
+              -->
+              @if (facade.health(); as health) {
+                <app-panel padded [title]="t('platform.billing.overview.health')">
+                  @if (facade.healthy()) {
+                    <p class="health-ok">
+                      <app-icon name="checkCircle" />
+                      {{ t('platform.billing.overview.healthOk') }}
+                    </p>
+                  } @else {
+                    <dl class="book">
+                      <div>
+                        <dt>{{ t('platform.billing.overview.failedEvents') }}</dt>
+                        <dd>{{ facade.count(health.failedEvents) }}</dd>
+                      </div>
+                      <div>
+                        <dt>
+                          {{ t('platform.billing.overview.stalledRequests', {minutes: health.staleAfterMinutes}) }}
+                        </dt>
+                        <dd>{{ facade.count(health.stalledRequests) }}</dd>
+                      </div>
+                    </dl>
+                  }
+                </app-panel>
+              }
+            </div>
+          }
+        </app-busy-overlay>
+      }
+
+      <!-- ------------------------------------------------------------- subscriptions -- -->
+      @if (facade.section() === 'subscriptions') {
+        @if (facade.subscriptionsError(); as failure) {
+          <app-load-error [message]="failure.message" (retry)="facade.reloadSubscriptions()" />
+        }
+
+        <div class="filters">
+          <app-search-box
+            [value]="facade.subscriptionSearch()"
+            (valueChange)="onSearch($event)"
+            [label]="t('platform.billing.subscriptions.search')"
+            [placeholder]="t('platform.billing.subscriptions.searchPlaceholder')"
+          />
+          <app-select
+            [value]="facade.subscriptionStatus()"
+            (valueChange)="onStatus($event)"
+            [options]="facade.statusOptions()"
+            [ariaLabel]="t('platform.billing.filter.status')"
+          />
+          <app-select
+            [value]="facade.subscriptionPlan()"
+            (valueChange)="onPlan($event)"
+            [options]="facade.planOptions()"
+            [ariaLabel]="t('platform.billing.filter.plan')"
+          />
+          <app-toggle
+            [checked]="facade.blockedOnly()"
+            (checkedChange)="onBlockedOnly($event)"
+            [label]="t('platform.billing.filter.blockedOnly')"
+          />
+        </div>
+
+        <app-panel
+          [title]="t('platform.billing.subscriptions.title')"
+          [meta]="facade.count(facade.subscriptionsTotal())"
+        >
+          <app-busy-overlay
+            reserve="panel"
+            [busy]="facade.subscriptionsLoading()"
+            [label]="t('platform.billing.subscriptions.loading')"
+          >
+            @if (facade.subscriptionRows().length) {
+              <app-data-table
+                [columns]="subscriptionColumns()"
+                [label]="t('platform.billing.subscriptions.title')"
+              >
+                @for (row of facade.subscriptionRows(); track row.store) {
+                  <app-table-row [interactive]="true" (click)="openSubscription(row)">
+                    <span class="cell-store" dir="auto">{{ row.store }}</span>
+                    <span>{{ row.planName || t('platform.billing.overview.noPlan') }}</span>
+                    <span>
+                      <app-badge [tone]="statusTone(row.status)">{{ statusLabel(row.status) }}</app-badge>
+                    </span>
+                    <span class="cell-number">{{ facade.amount(row.amount) }}</span>
+                    <span>
+                      <!--
+                        A blocked row's date is when service stopped, not when it renews — a
+                        cancelled subscription has no next renewal to show.
+                      -->
+                      {{ row.blocked ? facade.date(row.blockedSince) : facade.date(row.currentPeriodEnd) }}
+                    </span>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.subscriptionPage()"
+                [totalPages]="facade.subscriptionsPages()"
+                [totalElements]="facade.subscriptionsTotal()"
+                [pageSize]="pageSize"
+                [unit]="t('platform.billing.subscriptions.unit')"
+                (pageChange)="onPage($event)"
+              />
+            } @else if (facade.subscriptionsFiltered() && facade.subscriptionRowsMatchSearch()) {
+              <app-empty-state
+                icon="filter"
+                [title]="t('platform.billing.subscriptions.noMatch.title')"
+                [message]="t('platform.billing.subscriptions.noMatch.message')"
+              />
+            } @else if (!facade.subscriptionsLoading()) {
+              <app-empty-state
+                icon="creditCard"
+                [title]="t('platform.billing.subscriptions.empty.title')"
+                [message]="t('platform.billing.subscriptions.empty.message')"
+              />
+            }
+          </app-busy-overlay>
+        </app-panel>
+      }
+
+      <!-- ----------------------------------------------------------------- invoices -- -->
+      @if (facade.section() === 'invoices') {
+        @if (facade.invoicesError(); as failure) {
+          <app-load-error [message]="failure.message" (retry)="facade.reloadInvoices()" />
+        }
+
+        <div class="filters">
+          <app-search-box
+            [value]="facade.invoiceStore()"
+            (valueChange)="onSearch($event)"
+            [label]="t('platform.billing.invoices.search')"
+            [placeholder]="t('platform.billing.invoices.searchPlaceholder')"
+          />
+          <app-select
+            [value]="facade.invoiceStatus()"
+            (valueChange)="onStatus($event)"
+            [options]="facade.invoiceStatusOptions()"
+            [ariaLabel]="t('platform.billing.filter.status')"
+          />
+          <app-date-range-picker
+            [value]="facade.invoiceRange()"
+            (valueChange)="facade.invoiceRange.set($event)"
+            [placeholder]="t('platform.billing.invoices.period')"
+          />
+        </div>
+
+        <!--
+          The totals are a second call on the same filter, so the rows below render while the sums
+          are still being computed. One tile per currency, never a sum across them.
+        -->
+        @if (facade.invoiceTotals().length) {
+          <app-kpi-grid
+            [data]="facade.invoiceTotals()"
+            [label]="t('platform.billing.invoices.totalsLabel')"
+            [columns]="3"
+          />
+        }
+
+        <app-panel
+          [title]="t('platform.billing.invoices.title')"
+          [meta]="facade.count(facade.invoicesTotal())"
+        >
+          <app-busy-overlay
+            reserve="panel"
+            [busy]="facade.invoicesLoading()"
+            [label]="t('platform.billing.invoices.loading')"
+          >
+            @if (facade.invoiceRows().length) {
+              <app-data-table [columns]="invoiceColumns()" [label]="t('platform.billing.invoices.title')">
+                @for (row of facade.invoiceRows(); track row.id) {
+                  <app-table-row>
+                    <span class="cell-store" dir="auto">{{ row.number }}</span>
+                    <button type="button" class="cell-link" dir="auto" (click)="openInvoice(row)">
+                      {{ row.store }}
+                    </button>
+                    <span>
+                      <app-badge [tone]="invoiceStatusTone(row.status)">
+                        {{ invoiceStatusLabel(row.status) }}
+                      </app-badge>
+                    </span>
+                    <span class="cell-number">{{ facade.amount(row.amountPaid) }}</span>
+                    <span>{{ facade.date(row.issuedAt) }}</span>
+                    <span class="cell-links">
+                      <!--
+                        Stripe's own copies. The console links to them rather than rendering an
+                        invoice itself: the provider's document is the one that legally is the invoice.
+                      -->
+                      @if (row.hostedInvoiceUrl) {
+                        <a
+                          class="icon-action"
+                          [href]="row.hostedInvoiceUrl"
+                          target="_blank"
+                          rel="noopener"
+                          [attr.aria-label]="t('platform.billing.invoices.openHosted')"
+                        >
+                          <app-icon name="externalLink" />
+                        </a>
+                      }
+                      @if (row.invoicePdfUrl) {
+                        <a
+                          class="icon-action"
+                          [href]="row.invoicePdfUrl"
+                          target="_blank"
+                          rel="noopener"
+                          [attr.aria-label]="t('platform.billing.invoices.openPdf')"
+                        >
+                          <app-icon name="file" />
+                        </a>
+                      }
+                    </span>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.invoicePage()"
+                [totalPages]="facade.invoicesPages()"
+                [totalElements]="facade.invoicesTotal()"
+                [pageSize]="pageSize"
+                [unit]="t('platform.billing.invoices.unit')"
+                (pageChange)="onPage($event)"
+              />
+            } @else if (facade.invoicesFiltered() && facade.invoiceRowsMatchSearch()) {
+              <app-empty-state
+                icon="filter"
+                [title]="t('platform.billing.invoices.noMatch.title')"
+                [message]="t('platform.billing.invoices.noMatch.message')"
+              />
+            } @else if (!facade.invoicesLoading()) {
+              <app-empty-state
+                icon="receipt"
+                [title]="t('platform.billing.invoices.empty.title')"
+                [message]="t('platform.billing.invoices.empty.message')"
+              />
+            }
+          </app-busy-overlay>
+        </app-panel>
+      }
+
+      <!-- ----------------------------------------------------------------- activity -- -->
+      @if (facade.section() === 'activity') {
+        @if (facade.auditError(); as failure) {
+          <app-load-error [message]="failure.message" (retry)="facade.reloadAudit()" />
+        }
+
+        <div class="filters">
+          <app-search-box
+            [value]="facade.auditStore()"
+            (valueChange)="onSearch($event)"
+            [label]="t('platform.billing.activity.search')"
+            [placeholder]="t('platform.billing.activity.searchPlaceholder')"
+          />
+          <app-select
+            [value]="facade.auditEvent()"
+            (valueChange)="onStatus($event)"
+            [options]="facade.auditEventOptions()"
+            [ariaLabel]="t('platform.billing.filter.event')"
+          />
+          <app-select
+            [value]="facade.auditSource()"
+            (valueChange)="facade.auditSource.set($event)"
+            [options]="facade.auditSourceOptions()"
+            [ariaLabel]="t('platform.billing.filter.source')"
+          />
+          <app-date-range-picker
+            [value]="facade.auditRange()"
+            (valueChange)="facade.auditRange.set($event)"
+            [placeholder]="t('platform.billing.activity.period')"
+          />
+        </div>
+
+        <app-panel
+          [title]="t('platform.billing.activity.title')"
+          [subtitle]="t('platform.billing.activity.subtitle')"
+          [meta]="facade.count(facade.auditTotal())"
+        >
+          <app-busy-overlay
+            reserve="panel"
+            [busy]="facade.auditLoading()"
+            [label]="t('platform.billing.activity.loading')"
+          >
+            @if (facade.auditRows().length) {
+              <app-data-table [columns]="auditColumns()" [label]="t('platform.billing.activity.title')">
+                @for (row of facade.auditRows(); track row.id) {
+                  <app-table-row [interactive]="true" (click)="openAudit(row)">
+                    <span>
+                      <app-badge [tone]="eventTone(row.eventType)">{{ eventLabel(row.eventType) }}</app-badge>
+                    </span>
+                    <span class="cell-store" dir="auto">{{ row.store }}</span>
+                    <span class="cell-change">
+                      <!--
+                        Both plans, which is new: `from_plan_id` was a literal null at both writers,
+                        so every historic upgrade row says only where the store landed.
+                      -->
+                      @if (row.fromPlanCode || row.toPlanCode) {
+                        {{ (row.fromPlanCode || '—') + ' → ' + (row.toPlanCode || '—') }}
+                      } @else if (row.fromStatus || row.toStatus) {
+                        {{ statusLabel(row.fromStatus) + ' → ' + statusLabel(row.toStatus) }}
+                      } @else {
+                        —
+                      }
+                    </span>
+                    <span class="cell-actor" dir="auto">
+                      {{ facade.actorLabel(row) }}
+                      <small>{{ sourceLabel(row.source) }}</small>
+                    </span>
+                    <span>{{ facade.dateTime(row.occurredAt) }}</span>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.auditPage()"
+                [totalPages]="facade.auditPages()"
+                [totalElements]="facade.auditTotal()"
+                [pageSize]="pageSize"
+                [unit]="t('platform.billing.activity.unit')"
+                (pageChange)="onPage($event)"
+              />
+            } @else if (facade.auditFiltered() && facade.auditRowsMatchSearch()) {
+              <app-empty-state
+                icon="filter"
+                [title]="t('platform.billing.activity.noMatch.title')"
+                [message]="t('platform.billing.activity.noMatch.message')"
+              />
+            } @else if (!facade.auditLoading()) {
+              <app-empty-state
+                icon="clock"
+                [title]="t('platform.billing.activity.empty.title')"
+                [message]="t('platform.billing.activity.empty.message')"
+              />
+            }
+          </app-busy-overlay>
+        </app-panel>
+      }
+    </div>
+  </div>
+
+  <app-store-billing-panel
+    [store]="facade.openStore()"
+    (dismissed)="facade.closeStorePanel()"
+    (changed)="facade.refreshAfterWrite()"
+  />
+</ng-container>

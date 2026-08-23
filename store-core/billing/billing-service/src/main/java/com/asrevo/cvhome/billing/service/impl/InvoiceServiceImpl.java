@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.billing.commons.dto.InvoiceView;
 import com.asrevo.cvhome.billing.domain.SubscriptionInvoiceEntity;
+import com.asrevo.cvhome.billing.mappers.InvoiceMappers;
 import com.asrevo.cvhome.billing.repository.SubscriptionInvoiceRepository;
 import com.asrevo.cvhome.billing.service.InvoiceService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
@@ -20,19 +21,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final SubscriptionInvoiceRepository invoiceRepository;
 
+    private final InvoiceMappers mappers;
+
     @Override
     @Transactional(readOnly = true)
     public Page<InvoiceView> list(StoreMerchantId store, ManagerOrgId scopeOrg, Pageable pageable) {
         Page<SubscriptionInvoiceEntity> page = scopeOrg == null
                 ? invoiceRepository.findAllByStoreIdOrderByIssuedAtDesc(store, pageable)
                 : invoiceRepository.findAllByStoreIdAndOrgIdOrderByIssuedAtDesc(store, scopeOrg, pageable);
-        return page.map(this::toView);
-    }
-
-    private InvoiceView toView(SubscriptionInvoiceEntity entity) {
-        return new InvoiceView(entity.getId(), entity.getInvoiceNumber(), entity.getStatus(), entity.amountDue(),
-                entity.amountPaid(), entity.getPeriodStart(), entity.getPeriodEnd(), entity.getIssuedAt(),
-                entity.getPaidAt(), entity.getHostedInvoiceUrl(), entity.getInvoicePdfUrl());
+        return page.map(mappers::toView);
     }
 
 }

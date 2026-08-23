@@ -117,6 +117,9 @@ CREATE INDEX IF NOT EXISTS idx_store_subscription_status_grace
     ON billing.store_subscription (status, grace_until);
 CREATE INDEX IF NOT EXISTS idx_store_subscription_status_trial
     ON billing.store_subscription (status, trial_end);
+-- The plan mix and the run rate, both of which group by exactly this pair.
+CREATE INDEX IF NOT EXISTS idx_store_subscription_plan_status
+    ON billing.store_subscription (plan_id, status);
 CREATE INDEX IF NOT EXISTS idx_store_subscription_pending
     ON billing.store_subscription (pending_effective_at) where pending_plan_price_id is not null;
 
@@ -159,6 +162,14 @@ CREATE TABLE IF NOT EXISTS billing.subscription_invoice
 );
 CREATE INDEX IF NOT EXISTS idx_subscription_invoice_store
     ON billing.subscription_invoice (store_id, issued_at desc);
+-- The platform ledger filters by org and sweeps by date; the only index above is keyed on the store, so both were
+-- sequential scans over every invoice ever raised.
+CREATE INDEX IF NOT EXISTS idx_subscription_invoice_org_issued
+    ON billing.subscription_invoice (org_id, issued_at desc);
+-- Partial, because the revenue statistic only ever sums PAID rows and paid_at is null on every other one. A partial
+-- index over the settled rows is a fraction of the size of one over the whole table.
+CREATE INDEX IF NOT EXISTS idx_subscription_invoice_paid
+    ON billing.subscription_invoice (paid_at) where status = 'PAID';
 
 -- ------------------------------------------------------------------ audit
 
@@ -196,6 +207,14 @@ CREATE TABLE IF NOT EXISTS billing.subscription_audit
 );
 CREATE INDEX IF NOT EXISTS idx_subscription_audit_store ON billing.subscription_audit (store_id, occurred_at desc);
 CREATE INDEX IF NOT EXISTS idx_subscription_audit_event ON billing.subscription_audit (stripe_event_id);
+-- An org's whole trail, which is what an organization's Activity tab asks for.
+CREATE INDEX IF NOT EXISTS idx_subscription_audit_org
+    ON billing.subscription_audit (org_id, occurred_at desc);
+-- The unfiltered platform-wide listing, in exactly the order it pages by. `id` is part of the key rather than a
+-- tiebreak added later: two rows written in one transaction share occurred_at, and without a total order a row can
+-- appear on two pages or on neither.
+CREATE INDEX IF NOT EXISTS idx_subscription_audit_occurred
+    ON billing.subscription_audit (occurred_at desc, id desc);
 
 -- ------------------------------------------------------------------ idempotency
 

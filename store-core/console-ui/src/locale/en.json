@@ -96,6 +96,9 @@
     "platformUsers": {
       "title": "Platform accounts | cvhome"
     },
+    "platformBilling": {
+      "title": "Billing · Platform"
+    },
     "plans": {
       "title": "Plans | cvhome"
     }
@@ -1212,6 +1215,7 @@
       "newPod": "Register a pod",
       "pod": "Pod",
       "platformUsers": "Accounts",
+      "platformBilling": "Billing",
       "plans": "Plans"
     },
     "toolbar": {
@@ -1270,6 +1274,7 @@
         "organizations": "Organizations",
         "pods": "Pods",
         "platformUsers": "Accounts",
+        "platformBilling": "Billing",
         "plans": "Plans"
       }
     },
@@ -2254,6 +2259,37 @@
       "SUSPENDED": "Suspended",
       "CLOSED": "Closed"
     },
+    "invoiceStatus": {
+      "DRAFT": "Draft",
+      "OPEN": "Open",
+      "PAID": "Paid",
+      "UNCOLLECTIBLE": "Uncollectible",
+      "VOID": "Void"
+    },
+    "auditEvent": {
+      "CREATED": "Created",
+      "TRIAL_STARTED": "Trial started",
+      "ACTIVATED": "Activated",
+      "RENEWED": "Renewed",
+      "PAYMENT_FAILED": "Payment failed",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "RESUMED": "Resumed",
+      "PLAN_UPGRADED": "Plan upgraded",
+      "PLAN_DOWNGRADE_SCHEDULED": "Downgrade scheduled",
+      "PLAN_DOWNGRADE_APPLIED": "Downgrade applied",
+      "CANCEL_SCHEDULED": "Cancellation scheduled",
+      "CANCEL_REVOKED": "Cancellation revoked",
+      "CANCELED": "Cancelled",
+      "INVOICE_RECORDED": "Invoice recorded",
+      "QUOTA_REFUSED": "Quota refused"
+    },
+    "auditSource": {
+      "API": "Operator",
+      "WEBHOOK": "Stripe",
+      "JOB": "Scheduled job",
+      "SYSTEM": "Provisioning"
+    },
     "podLifecycle": {
       "PROVISIONING": "Provisioning",
       "ACTIVE": "Active",
@@ -2275,13 +2311,12 @@
         "context": "Organizations and stores created across the whole platform"
       },
       "loading": "Loading platform figures…",
-      "notice": {
-        "countsOnly": "These are counts, not money. Nothing on the platform aggregates revenue or subscription value yet."
-      },
       "kpiLabel": "Platform metrics",
       "kpi": {
         "organizations": "New organizations in this period",
-        "stores": "New stores in this period"
+        "stores": "New stores in this period",
+        "subscriptions": "Subscriptions started in this period",
+        "revenue": "Collected ({currency})"
       },
       "organizations": {
         "title": "Organizations created per day",
@@ -2290,7 +2325,12 @@
       "stores": {
         "title": "Stores created per day",
         "unit": "stores"
-      }
+      },
+      "subscriptions": {
+        "title": "Subscriptions started per day — {plan}",
+        "unit": "subscriptions"
+      },
+      "seeBilling": "See the full billing picture"
     },
     "organizations": {
       "heading": {
@@ -2372,7 +2412,8 @@
         "overview": "Overview",
         "stores": "Stores",
         "users": "Users",
-        "activity": "Activity"
+        "activity": "Activity",
+        "billing": "Billing"
       },
       "action": {
         "backToList": "All organizations",
@@ -2413,7 +2454,8 @@
           "message": "This organization has not created a store."
         },
         "billingUnknown": "Billing has no subscription recorded for this store, or could not be reached. Either way it does not mean the store has lapsed.",
-        "billingUnknownShort": "Unknown"
+        "billingUnknownShort": "Unknown",
+        "openBilling": "Open this store in the billing register"
       },
       "users": {
         "title": "Users",
@@ -2424,6 +2466,19 @@
           "title": "No accounts",
           "message": "uaa holds no account carrying this organization's identifier."
         }
+      },
+      "billing": {
+        "loading": "Loading this organization's billing…",
+        "spend": "Spend",
+        "paidIn": "Paid ({currency})",
+        "billedIn": "Billed ({currency})",
+        "noSpend": "This organization has never been invoiced.",
+        "subscriptions": "Subscriptions",
+        "invoices": "Invoices",
+        "openRegister": "Open the register",
+        "openLedger": "Open the ledger",
+        "noSubscriptions": "None of this organization’s stores has a subscription.",
+        "noInvoices": "No invoices for this organization yet."
       },
       "activity": {
         "title": "Activity",
@@ -2710,6 +2765,194 @@
         "deleted": "{{name}} deleted."
       }
     },
+    "billing": {
+      "heading": {
+        "title": "Billing",
+        "context": "Revenue, subscriptions, invoices and the subscription audit trail, across every tenant"
+      },
+      "nav": {
+        "heading": "Sections",
+        "ariaLabel": "Billing sections"
+      },
+      "section": {
+        "overview": "Overview",
+        "subscriptions": "Subscriptions",
+        "invoices": "Invoices",
+        "activity": "Activity"
+      },
+      "filter": {
+        "allStatuses": "Any status",
+        "allPlans": "Any plan",
+        "allEvents": "Any event",
+        "allSources": "Any source",
+        "status": "Filter by status",
+        "plan": "Filter by plan",
+        "event": "Filter by event",
+        "source": "Filter by source",
+        "blockedOnly": "Cut off only"
+      },
+      "kpi": {
+        "revenue": {
+          "inCurrency": "Collected ({currency})",
+          "none": "Collected in this period"
+        }
+      },
+      "overview": {
+        "loading": "Loading billing figures…",
+        "period": "Choose a period",
+        "revenueKpis": "Revenue in this period",
+        "revenueTrend": "Collected per day ({currency})",
+        "collected": "collected",
+        "planMix": "Who is on what",
+        "runRate": "Committed run rate, annualised",
+        "book": "The book",
+        "active": "Paying stores",
+        "trialing": "On trial",
+        "annualised": "Annualised ({currency})",
+        "monthly": "Monthly equivalent ({currency})",
+        "noPlan": "No plan",
+        "blocked": "Cut off for non-payment",
+        "blockedSubtitle": "Stores no enforcement layer is letting through",
+        "seeAll": "See all",
+        "noneBlocked": "Every store on the platform is being served.",
+        "health": "Billing health",
+        "healthOk": "No failed webhooks or stalled provider calls.",
+        "failedEvents": "Failed Stripe events (24h)",
+        "stalledRequests": "Stripe calls unfinished after {minutes} minutes"
+      },
+      "subscriptions": {
+        "title": "Subscriptions",
+        "loading": "Loading subscriptions…",
+        "search": "Search by store id",
+        "searchPlaceholder": "Part of a store id",
+        "unit": "subscriptions",
+        "column": {
+          "store": "Store",
+          "plan": "Plan",
+          "status": "Status",
+          "amount": "Amount",
+          "renews": "Renews / cut off"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No subscription matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "No subscriptions yet",
+          "message": "Billing has not recorded a subscription for any store on the platform."
+        }
+      },
+      "invoices": {
+        "title": "Invoices",
+        "loading": "Loading invoices…",
+        "search": "Search by store id",
+        "searchPlaceholder": "A store id",
+        "period": "Issued between",
+        "unit": "invoices",
+        "totalsLabel": "Totals for this filter",
+        "total": "Collected ({currency})",
+        "ofBilled": "of {billed} billed",
+        "openHosted": "Open the invoice at Stripe",
+        "openPdf": "Open the invoice PDF",
+        "column": {
+          "number": "Invoice",
+          "store": "Store",
+          "status": "Status",
+          "paid": "Paid",
+          "issued": "Issued"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No invoice matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "No invoices yet",
+          "message": "Stripe has not reported an invoice for any store on the platform."
+        }
+      },
+      "activity": {
+        "title": "Subscription activity",
+        "subtitle": "Every plan change, payment failure and cancellation, newest first",
+        "loading": "Loading activity…",
+        "search": "Search by store id",
+        "searchPlaceholder": "A store id",
+        "period": "Happened between",
+        "unit": "events",
+        "actorUnknown": "Not recorded",
+        "column": {
+          "event": "Event",
+          "store": "Store",
+          "change": "Change",
+          "actor": "Who",
+          "when": "When"
+        },
+        "noMatch": {
+          "title": "Nothing matched",
+          "message": "No event matches these filters. Clear one to widen the search."
+        },
+        "empty": {
+          "title": "Nothing has happened yet",
+          "message": "No subscription on the platform has changed state."
+        }
+      },
+      "store": {
+        "title": "Store billing",
+        "close": "Close store billing",
+        "loading": "Loading this store's billing…",
+        "plan": "Subscription",
+        "onPlan": "Plan",
+        "amount": "Amount",
+        "renews": "Renews",
+        "trialEnds": "Trial ends",
+        "graceUntil": "Grace until",
+        "pendingChange": "Moving to {plan} on {date}.",
+        "willNotRenew": "Renewal is off; access ends {date}.",
+        "noProvider": "This store has no payment provider subscription behind it, so its plan cannot be changed, cancelled or resumed here. It has to be bought through checkout first.",
+        "changePlan": "Change plan",
+        "pickPlan": "Choose a plan",
+        "applyPlan": "Apply",
+        "cancelPick": "Cancel",
+        "resume": "Resume renewal",
+        "cancelAtPeriodEnd": "Stop renewal",
+        "cancelNow": "End now",
+        "invoices": "Invoices",
+        "activity": "Activity",
+        "noInvoices": "No invoices for this store yet.",
+        "noActivity": "Nothing has happened to this subscription yet.",
+        "perMonth": "a month",
+        "perYear": "a year",
+        "priceOption": "{plan} — {amount} {interval}",
+        "noSubscription": {
+          "title": "No subscription",
+          "message": "Billing has never seen this store, or it could not be reached. A store created before billing existed, or one whose provisioning event never landed, looks the same from here."
+        },
+        "confirm": {
+          "cancelAtPeriodEnd": {
+            "title": "Stop renewal?",
+            "message": "The store keeps its plan until the paid period ends, and then stops. Renewal can be switched back on before then.",
+            "confirm": "Stop renewal"
+          },
+          "cancelNow": {
+            "title": "End this subscription now?",
+            "message": "This throws away time the customer has already paid for and cannot be undone. Only a platform operator can do it.",
+            "confirm": "End now",
+            "typeId": "Type the store id to confirm"
+          },
+          "resume": {
+            "title": "Resume renewal?",
+            "message": "Renewal is switched back on, and any scheduled downgrade is called off.",
+            "confirm": "Resume"
+          }
+        },
+        "toast": {
+          "planChanged": "The plan was changed.",
+          "downgradeScheduled": "The downgrade will apply on {date}.",
+          "cancelScheduled": "Renewal was switched off.",
+          "canceledNow": "The subscription was ended.",
+          "resumed": "Renewal was switched back on."
+        }
+      }
+    },
     "plans": {
       "heading": {
         "title": "Plans",
@@ -2726,7 +2969,9 @@
       "column": {
         "plan": "Plan",
         "monthly": "Monthly",
-        "yearly": "Yearly"
+        "yearly": "Yearly",
+        "subscribers": "Stores",
+        "recurring": "Annual value"
       },
       "trial": "{{days}}-day trial",
       "empty": {

@@ -96,6 +96,9 @@
     "platformUsers": {
       "title": "حسابات المنصّة | cvhome"
     },
+    "platformBilling": {
+      "title": "الفوترة · المنصة"
+    },
     "plans": {
       "title": "الخطط | cvhome"
     }
@@ -1212,6 +1215,7 @@
       "newPod": "تسجيل وحدة",
       "pod": "الوحدة",
       "platformUsers": "الحسابات",
+      "platformBilling": "الفوترة",
       "plans": "الخطط"
     },
     "toolbar": {
@@ -1270,6 +1274,7 @@
         "organizations": "المؤسسات",
         "pods": "الوحدات",
         "platformUsers": "الحسابات",
+        "platformBilling": "الفوترة",
         "plans": "الخطط"
       }
     },
@@ -2254,6 +2259,37 @@
       "SUSPENDED": "موقوفة",
       "CLOSED": "مغلقة"
     },
+    "invoiceStatus": {
+      "DRAFT": "مسودة",
+      "OPEN": "مستحقة",
+      "PAID": "مدفوعة",
+      "UNCOLLECTIBLE": "غير قابلة للتحصيل",
+      "VOID": "ملغاة"
+    },
+    "auditEvent": {
+      "CREATED": "أُنشئ",
+      "TRIAL_STARTED": "بدأت الفترة التجريبية",
+      "ACTIVATED": "فُعِّل",
+      "RENEWED": "جُدِّد",
+      "PAYMENT_FAILED": "فشل الدفع",
+      "PAST_DUE": "متأخر السداد",
+      "SUSPENDED": "أُوقف",
+      "RESUMED": "استُؤنف",
+      "PLAN_UPGRADED": "تمت ترقية الخطة",
+      "PLAN_DOWNGRADE_SCHEDULED": "جُدول خفض الخطة",
+      "PLAN_DOWNGRADE_APPLIED": "طُبِّق خفض الخطة",
+      "CANCEL_SCHEDULED": "جُدول الإلغاء",
+      "CANCEL_REVOKED": "تراجُع عن الإلغاء",
+      "CANCELED": "أُلغي",
+      "INVOICE_RECORDED": "سُجِّلت فاتورة",
+      "QUOTA_REFUSED": "رُفض تجاوز الحصة"
+    },
+    "auditSource": {
+      "API": "مشغّل المنصة",
+      "WEBHOOK": "Stripe",
+      "JOB": "مهمة مجدولة",
+      "SYSTEM": "التهيئة"
+    },
     "podLifecycle": {
       "PROVISIONING": "قيد التجهيز",
       "ACTIVE": "نشطة",
@@ -2275,13 +2311,12 @@
         "context": "المؤسسات والمتاجر المنشأة على مستوى المنصّة كلها"
       },
       "loading": "جارٍ تحميل أرقام المنصّة…",
-      "notice": {
-        "countsOnly": "هذه أعداد وليست مبالغ. لا شيء في المنصّة يجمع الإيرادات أو قيمة الاشتراكات بعد."
-      },
       "kpiLabel": "مؤشرات المنصّة",
       "kpi": {
         "organizations": "مؤسسات جديدة في هذه الفترة",
-        "stores": "متاجر جديدة في هذه الفترة"
+        "stores": "متاجر جديدة في هذه الفترة",
+        "subscriptions": "اشتراكات بدأت في هذه الفترة",
+        "revenue": "المُحصَّل ({currency})"
       },
       "organizations": {
         "title": "المؤسسات المنشأة يوميًا",
@@ -2290,7 +2325,12 @@
       "stores": {
         "title": "المتاجر المنشأة يوميًا",
         "unit": "متجر"
-      }
+      },
+      "subscriptions": {
+        "title": "الاشتراكات التي بدأت يوميًا — {plan}",
+        "unit": "اشتراك"
+      },
+      "seeBilling": "اعرض صورة الفوترة كاملة"
     },
     "organizations": {
       "heading": {
@@ -2372,7 +2412,8 @@
         "overview": "نظرة عامة",
         "stores": "المتاجر",
         "users": "المستخدمون",
-        "activity": "السجل"
+        "activity": "السجل",
+        "billing": "الفوترة"
       },
       "action": {
         "backToList": "كل المؤسسات",
@@ -2413,7 +2454,8 @@
           "message": "لم تنشئ هذه المؤسسة أي متجر."
         },
         "billingUnknown": "لا توجد لدى خدمة الفوترة أي اشتراك مسجّل لهذا المتجر، أو تعذّر الوصول إليها. في الحالتين هذا لا يعني أن اشتراكه منتهٍ.",
-        "billingUnknownShort": "غير معروفة"
+        "billingUnknownShort": "غير معروفة",
+        "openBilling": "افتح هذا المتجر في سجل الاشتراكات"
       },
       "users": {
         "title": "المستخدمون",
@@ -2424,6 +2466,19 @@
           "title": "لا توجد حسابات",
           "message": "لا تحتفظ uaa بأي حساب يحمل معرّف هذه المؤسسة."
         }
+      },
+      "billing": {
+        "loading": "جارٍ تحميل فوترة هذه المؤسسة…",
+        "spend": "الإنفاق",
+        "paidIn": "المدفوع ({currency})",
+        "billedIn": "المفوتر ({currency})",
+        "noSpend": "لم تُفوتر هذه المؤسسة قط.",
+        "subscriptions": "الاشتراكات",
+        "invoices": "الفواتير",
+        "openRegister": "افتح السجل",
+        "openLedger": "افتح دفتر الفواتير",
+        "noSubscriptions": "لا يوجد اشتراك لأي من متاجر هذه المؤسسة.",
+        "noInvoices": "لا فواتير لهذه المؤسسة بعد."
       },
       "activity": {
         "title": "السجل",
@@ -2710,6 +2765,194 @@
         "deleted": "حُذف {{name}}."
       }
     },
+    "billing": {
+      "heading": {
+        "title": "الفوترة",
+        "context": "الإيرادات والاشتراكات والفواتير وسجل تغيّرات الاشتراكات، عبر كل المستأجرين"
+      },
+      "nav": {
+        "heading": "الأقسام",
+        "ariaLabel": "أقسام الفوترة"
+      },
+      "section": {
+        "overview": "نظرة عامة",
+        "subscriptions": "الاشتراكات",
+        "invoices": "الفواتير",
+        "activity": "النشاط"
+      },
+      "filter": {
+        "allStatuses": "أي حالة",
+        "allPlans": "أي خطة",
+        "allEvents": "أي حدث",
+        "allSources": "أي مصدر",
+        "status": "تصفية حسب الحالة",
+        "plan": "تصفية حسب الخطة",
+        "event": "تصفية حسب الحدث",
+        "source": "تصفية حسب المصدر",
+        "blockedOnly": "الموقوفة فقط"
+      },
+      "kpi": {
+        "revenue": {
+          "inCurrency": "المُحصَّل ({currency})",
+          "none": "المُحصَّل في هذه الفترة"
+        }
+      },
+      "overview": {
+        "loading": "جارٍ تحميل أرقام الفوترة…",
+        "period": "اختر فترة",
+        "revenueKpis": "الإيرادات في هذه الفترة",
+        "revenueTrend": "المُحصَّل يوميًا ({currency})",
+        "collected": "محصَّل",
+        "planMix": "من على أي خطة",
+        "runRate": "الإيراد المتعاقد عليه سنويًا",
+        "book": "المحفظة",
+        "active": "متاجر تدفع",
+        "trialing": "في فترة تجريبية",
+        "annualised": "سنويًا ({currency})",
+        "monthly": "ما يعادله شهريًا ({currency})",
+        "noPlan": "بلا خطة",
+        "blocked": "موقوفة لعدم السداد",
+        "blockedSubtitle": "متاجر لا تسمح لها أي طبقة تحقق بالعمل",
+        "seeAll": "عرض الكل",
+        "noneBlocked": "كل متاجر المنصة تعمل.",
+        "health": "سلامة الفوترة",
+        "healthOk": "لا توجد أحداث فاشلة ولا طلبات معلّقة لدى المزوّد.",
+        "failedEvents": "أحداث Stripe الفاشلة (٢٤ ساعة)",
+        "stalledRequests": "طلبات Stripe لم تكتمل بعد {minutes} دقيقة"
+      },
+      "subscriptions": {
+        "title": "الاشتراكات",
+        "loading": "جارٍ تحميل الاشتراكات…",
+        "search": "ابحث بمعرّف المتجر",
+        "searchPlaceholder": "جزء من معرّف متجر",
+        "unit": "اشتراك",
+        "column": {
+          "store": "المتجر",
+          "plan": "الخطة",
+          "status": "الحالة",
+          "amount": "المبلغ",
+          "renews": "التجديد / الإيقاف"
+        },
+        "noMatch": {
+          "title": "لا توجد نتائج",
+          "message": "لا يطابق أي اشتراك هذه المرشِّحات. أزل أحدها لتوسيع البحث."
+        },
+        "empty": {
+          "title": "لا اشتراكات بعد",
+          "message": "لم تسجّل الفوترة اشتراكًا لأي متجر على المنصة."
+        }
+      },
+      "invoices": {
+        "title": "الفواتير",
+        "loading": "جارٍ تحميل الفواتير…",
+        "search": "ابحث بمعرّف المتجر",
+        "searchPlaceholder": "معرّف متجر",
+        "period": "صدرت بين",
+        "unit": "فاتورة",
+        "totalsLabel": "إجماليات هذه التصفية",
+        "total": "المُحصَّل ({currency})",
+        "ofBilled": "من أصل {billed} مفوترة",
+        "openHosted": "افتح الفاتورة لدى Stripe",
+        "openPdf": "افتح ملف الفاتورة PDF",
+        "column": {
+          "number": "الفاتورة",
+          "store": "المتجر",
+          "status": "الحالة",
+          "paid": "المدفوع",
+          "issued": "تاريخ الإصدار"
+        },
+        "noMatch": {
+          "title": "لا توجد نتائج",
+          "message": "لا تطابق أي فاتورة هذه المرشِّحات. أزل أحدها لتوسيع البحث."
+        },
+        "empty": {
+          "title": "لا فواتير بعد",
+          "message": "لم يُبلّغ Stripe عن أي فاتورة لأي متجر على المنصة."
+        }
+      },
+      "activity": {
+        "title": "نشاط الاشتراكات",
+        "subtitle": "كل تغيير خطة وكل فشل دفع وكل إلغاء، الأحدث أولًا",
+        "loading": "جارٍ تحميل النشاط…",
+        "search": "ابحث بمعرّف المتجر",
+        "searchPlaceholder": "معرّف متجر",
+        "period": "حدث بين",
+        "unit": "حدث",
+        "actorUnknown": "غير مسجَّل",
+        "column": {
+          "event": "الحدث",
+          "store": "المتجر",
+          "change": "التغيير",
+          "actor": "المنفِّذ",
+          "when": "الوقت"
+        },
+        "noMatch": {
+          "title": "لا توجد نتائج",
+          "message": "لا يطابق أي حدث هذه المرشِّحات. أزل أحدها لتوسيع البحث."
+        },
+        "empty": {
+          "title": "لم يحدث شيء بعد",
+          "message": "لم تتغيّر حالة أي اشتراك على المنصة."
+        }
+      },
+      "store": {
+        "title": "فوترة المتجر",
+        "close": "إغلاق فوترة المتجر",
+        "loading": "جارٍ تحميل فوترة هذا المتجر…",
+        "plan": "الاشتراك",
+        "onPlan": "الخطة",
+        "amount": "المبلغ",
+        "renews": "التجديد",
+        "trialEnds": "انتهاء التجربة",
+        "graceUntil": "مهلة حتى",
+        "pendingChange": "سينتقل إلى {plan} في {date}.",
+        "willNotRenew": "التجديد موقوف؛ ينتهي الوصول في {date}.",
+        "noProvider": "لا يوجد اشتراك لدى مزوّد الدفع خلف هذا المتجر، لذا لا يمكن تغيير خطته أو إلغاؤها أو استئنافها من هنا. يجب شراؤها عبر الدفع أولًا.",
+        "changePlan": "تغيير الخطة",
+        "pickPlan": "اختر خطة",
+        "applyPlan": "تطبيق",
+        "cancelPick": "إلغاء",
+        "resume": "استئناف التجديد",
+        "cancelAtPeriodEnd": "إيقاف التجديد",
+        "cancelNow": "إنهاء الآن",
+        "invoices": "الفواتير",
+        "activity": "النشاط",
+        "noInvoices": "لا فواتير لهذا المتجر بعد.",
+        "noActivity": "لم يحدث شيء لهذا الاشتراك بعد.",
+        "perMonth": "شهريًا",
+        "perYear": "سنويًا",
+        "priceOption": "{plan} — {amount} {interval}",
+        "noSubscription": {
+          "title": "لا يوجد اشتراك",
+          "message": "لم تر الفوترة هذا المتجر قط، أو تعذّر الوصول إليها. المتجر الذي أُنشئ قبل وجود الفوترة، والمتجر الذي لم تصل رسالة تهيئته، يبدوان متطابقين من هنا."
+        },
+        "confirm": {
+          "cancelAtPeriodEnd": {
+            "title": "إيقاف التجديد؟",
+            "message": "يحتفظ المتجر بخطته حتى نهاية الفترة المدفوعة ثم يتوقف. يمكن إعادة تشغيل التجديد قبل ذلك.",
+            "confirm": "إيقاف التجديد"
+          },
+          "cancelNow": {
+            "title": "إنهاء هذا الاشتراك الآن؟",
+            "message": "هذا يُهدر وقتًا دفعه العميل بالفعل ولا يمكن التراجع عنه. مشغّل المنصة وحده يستطيع ذلك.",
+            "confirm": "إنهاء الآن",
+            "typeId": "اكتب معرّف المتجر للتأكيد"
+          },
+          "resume": {
+            "title": "استئناف التجديد؟",
+            "message": "يُعاد تشغيل التجديد، ويُلغى أي خفض خطة مجدول.",
+            "confirm": "استئناف"
+          }
+        },
+        "toast": {
+          "planChanged": "تم تغيير الخطة.",
+          "downgradeScheduled": "سيُطبَّق خفض الخطة في {date}.",
+          "cancelScheduled": "تم إيقاف التجديد.",
+          "canceledNow": "تم إنهاء الاشتراك.",
+          "resumed": "تمت إعادة تشغيل التجديد."
+        }
+      }
+    },
     "plans": {
       "heading": {
         "title": "الخطط",
@@ -2726,7 +2969,9 @@
       "column": {
         "plan": "الخطة",
         "monthly": "شهريًا",
-        "yearly": "سنويًا"
+        "yearly": "سنويًا",
+        "subscribers": "المتاجر",
+        "recurring": "القيمة السنوية"
       },
       "trial": "تجربة {{days}} يومًا",
       "empty": {

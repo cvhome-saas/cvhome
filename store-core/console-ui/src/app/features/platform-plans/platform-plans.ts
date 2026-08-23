@@ -19,9 +19,10 @@ import {PlatformPlansFacade} from './facades/platform-plans.facade';
  * the numbers, so it is a table and it shows every plan at every interval rather than one interval
  * at a time.
  *
- * It is also the *only* billing screen the platform console can have. Every other endpoint billing
- * exposes is store-scoped and refuses a super admin — see lessons.md, "Platform — a store's
- * subscription cannot be read by an operator" and "Platform — no view of stores billing has cut off".
+ * **Two columns make it more than a reference.** The subscriber count and the committed annual value
+ * come from billing's plan statistics, so a row says not only what a plan costs but how many stores
+ * are on it and what that is contracted to bring in. It was a price list while billing exposed no
+ * aggregate at all; `/platform/billing` is where the rest of that money is read.
  */
 @Component({
   selector: 'app-platform-plans',
@@ -47,6 +48,21 @@ export class PlatformPlans {
       {key: 'plan', label: this.transloco.translate('platform.plans.column.plan'), width: 'minmax(11rem, 1.6fr)'},
       {key: 'monthly', label: this.transloco.translate('platform.plans.column.monthly'), width: 'minmax(6rem, 0.8fr)'},
       {key: 'yearly', label: this.transloco.translate('platform.plans.column.yearly'), width: 'minmax(6rem, 0.8fr)'},
+      /*
+       * The two commercial columns, between the prices and the allowances: what the platform charges,
+       * then how that is actually selling, then what it buys. They stay in place when the statistics
+       * leg fails — the cells read as em dashes, which says "not known" rather than "none".
+       */
+      {
+        key: 'subscribers',
+        label: this.transloco.translate('platform.plans.column.subscribers'),
+        width: 'minmax(5rem, 0.6fr)',
+      },
+      {
+        key: 'recurring',
+        label: this.transloco.translate('platform.plans.column.recurring'),
+        width: 'minmax(7rem, 0.9fr)',
+      },
       ...this.facade
         .entitlementRows()
         .map((row) => ({key: row.key, label: row.label, width: 'minmax(6rem, 0.9fr)'})),

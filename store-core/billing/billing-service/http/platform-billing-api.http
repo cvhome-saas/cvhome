@@ -1,0 +1,236 @@
+# PlatformBillingApi — com.asrevo.cvhome.billing.api.v1.PlatformBillingApi
+#   (@RequestMapping "/api/v1/platform")
+#
+# Billing across every tenant: every subscription, every invoice, and the audit trail that
+# SubscriptionAuditService wrote for its whole life without anything ever reading it.
+#
+# Super-admin only, on every method — not hasPermission(#store, ...) like the store-scoped
+# controllers beside it, because there is no store to check.
+#
+# Paging is `page` and `count`. NOT Spring's `size`: store-commons:autoconfigure's ServletWebConfig
+# renames the page-size parameter platform-wide, so a `size` is silently ignored and every page comes
+# back at the server's default.
+#
+# Run with a super-admin session in SESSION_ID and an org1-admin session in ORG_ADMIN_SESSION_ID.
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### every subscription on the platform
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/subscriptions?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": null,
+  "status": null,
+  "planCode": null,
+  "term": null,
+  "blockedOnly": false
+}
+
+> {%
+    client.test("200 with a page", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.content !== undefined, "not a page");
+    });
+    // Flat and joined: no entitlement map, no per-row catalogue reads. SubscriptionMappers.toView
+    // would cost two to four uncached queries per row, which is what this shape exists to avoid.
+    client.test("rows carry the dates a blocked row needs to mean anything", function () {
+        (response.body.content || []).forEach(s => {
+            client.assert(s.store, "row with no store");
+            client.assert(s.status, "row with no status");
+            client.assert(s.providerLinked !== undefined, "row with no providerLinked");
+            client.assert(s.entitlements === undefined, "the admin row must not carry entitlements");
+        });
+    });
+%}
+
+### the stores billing has cut off — what replaces entitlement/private/blocked-stores for a human
+#
+# That endpoint answers a bare list of ids with no reason and no since-when, and shares a token with
+# ExternalStoreQuotaApi.provision, which creates a subscription and spends the org's one trial through
+# a primary key that can never be reclaimed. This answers the same question strictly better.
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/subscriptions?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": null,
+  "status": null,
+  "planCode": null,
+  "term": null,
+  "blockedOnly": true
+}
+
+> {%
+    client.test("only the three statuses EntitlementServiceImpl.BLOCKED enforces", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        const blocked = ["PENDING", "SUSPENDED", "CANCELED"];
+        (response.body.content || []).forEach(s => {
+            client.assert(blocked.includes(s.status), "operable store in the blocked list: " + s.status);
+        });
+    });
+%}
+
+### one org's subscriptions — the org id is wrapped, because ManagerOrgId's component is `id`
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/subscriptions?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": {"id": "{{ORG_ID}}"},
+  "blockedOnly": false
+}
+
+> {%
+    // A bare string here binds the record to null, and a null org filter is *every* organization —
+    // a filtered read that silently answers with the whole platform.
+    client.test("narrowed to one org", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        (response.body.content || []).forEach(s => {
+            client.assert(s.org.id === "{{ORG_ID}}", "leaked another org's subscription");
+        });
+    });
+%}
+
+### the ledger — note the store is a BARE string, because StoreMerchantId carries @JsonValue
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/invoices?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": null,
+  "store": "{{STORE_ID}}",
+  "status": null,
+  "from": null,
+  "to": null
+}
+
+> {%
+    client.test("narrowed to one store", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        (response.body.content || []).forEach(i => {
+            client.assert(i.store === "{{STORE_ID}}", "leaked another store's invoice");
+        });
+    });
+%}
+
+### what the same filter comes to — a second call on the same body, never a field on the page
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/invoices/totals
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": null,
+  "store": null,
+  "status": null,
+  "from": null,
+  "to": null
+}
+
+> {%
+    client.test("one figure per currency", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        const codes = response.body.map(t => t.currency.code);
+        client.assert(new Set(codes).size === codes.length, "a currency was reported twice");
+    });
+    // Never summed across currencies at any tier — nothing on this platform holds an exchange rate.
+    client.test("paid never exceeds due", function () {
+        response.body.forEach(t => {
+            client.assert(t.paid.minorUnits <= t.due.minorUnits, "collected more than billed in " + t.currency.code);
+            client.assert(t.paid.currency.code === t.currency.code, "figure in the wrong currency");
+        });
+    });
+%}
+
+### the audit trail — "who moved this store onto the cheaper plan, and when"
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/audit?page=0&count=50
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "store": null,
+  "org": null,
+  "eventType": null,
+  "source": null,
+  "from": null,
+  "to": null
+}
+
+> {%
+    client.test("200 with a page, newest first", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        const rows = response.body.content || [];
+        for (let i = 1; i < rows.length; i += 1) {
+            client.assert(rows[i - 1].occurredAt >= rows[i].occurredAt, "not ordered newest first");
+        }
+    });
+    // Plans arrive as codes, resolved by two left joins in the query rather than by per-row catalogue
+    // reads — a page of fifty would otherwise be a hundred round trips to fill two columns.
+    client.test("plans are codes, not ids", function () {
+        (response.body.content || []).forEach(r => {
+            [r.fromPlanCode, r.toPlanCode].filter(Boolean).forEach(code => {
+                client.assert(code.length <= 30 && code === code.toUpperCase(),
+                    "looks like an id rather than a plan code: " + code);
+            });
+        });
+    });
+    // Every API row written since the actor was threaded through SubscriptionApi names a principal.
+    // Historic rows stay null and the console renders that honestly rather than guessing.
+    client.test("a webhook row names stripe and a job row names the job", function () {
+        (response.body.content || []).forEach(r => {
+            if (r.source === "WEBHOOK") { client.assert(r.actor === "stripe", "webhook actor: " + r.actor); }
+            if (r.source === "JOB") { client.assert(r.actor, "job row with no actor"); }
+        });
+    });
+%}
+
+### one store's trail
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/audit?page=0&count=50
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "store": "{{STORE_ID}}",
+  "eventType": null,
+  "source": null,
+  "from": null,
+  "to": null
+}
+
+> {%
+    client.test("narrowed to one store", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        (response.body.content || []).forEach(r => {
+            client.assert(r.store === "{{STORE_ID}}", "leaked another store's history");
+        });
+    });
+%}
+
+### an org admin must not read the platform's billing
+POST {{SELLER_UI_URL}}/billing/api/v1/platform/subscriptions?page=0&count=20
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "blockedOnly": false
+}
+
+> {%
+    client.test("403 for a merchant", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}
+
+### and a super admin CAN now read one store's own subscription — the widening this change made
+#
+# hasAccessOnBillingRead gained `isSuperAdmin(a) ||`. Before it, a platform operator was refused for
+# every store on the platform, and "this merchant says they paid" could only be answered from psql.
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SESSION_ID}}
+
+> {%
+    client.test("a store the operator does not own is readable", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status, "no subscription status");
+    });
+%}

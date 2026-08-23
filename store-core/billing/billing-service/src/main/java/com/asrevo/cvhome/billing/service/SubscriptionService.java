@@ -67,11 +67,13 @@ public interface SubscriptionService {
      * once, yearly to monthly is deferred.
      * </p>
      *
+     * @param actor the principal driving the change, recorded on the audit row — see {@link #cancel}
      * @throws SubscriptionChangeRejectedException the card was refused; nothing changed
      * @throws BillingProviderUnavailableException nothing was decided, so nothing local was written either
      * @throws IllegalSubscriptionTransitionException the subscription has no provider subscription to change
      */
-    SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
+    SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId,
+                                String actor)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException;
 
@@ -83,20 +85,31 @@ public interface SubscriptionService {
      * Ending it now throws that time away, so it is restricted to platform administrators.
      * </p>
      *
+     * <p>
+     * {@code actor} is threaded from the controller rather than read from {@code SecurityContextHolder} inside the
+     * audit writer. It is explicit, it is testable without a security context, and it is the column a billing
+     * dispute turns on: every {@code API} row on the platform was written with a null actor, so the trail recorded
+     * <em>that</em> a person changed a plan and never <em>which</em> person. That gets worse the moment a platform
+     * operator can cancel any subscription on the platform, which is what the widened billing guard now allows.
+     * </p>
+     *
      * @param immediate  end it now rather than at the period end
      * @param superAdmin whether the caller may do that
+     * @param actor      the principal driving the change, recorded on the audit row
      * @throws ImmediateCancelForbiddenException  an ordinary caller asked to end it immediately
      */
-    SubscriptionView cancel(StoreMerchantId store, ManagerOrgId scopeOrg, boolean immediate, boolean superAdmin)
+    SubscriptionView cancel(StoreMerchantId store, ManagerOrgId scopeOrg, boolean immediate, boolean superAdmin,
+                            String actor)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException;
 
     /**
      * Switches renewal back on, and calls off a scheduled downgrade if one is pending.
      *
+     * @param actor the principal driving the change, recorded on the audit row — see {@link #cancel}
      * @throws IllegalSubscriptionTransitionException renewal was never switched off
      */
-    SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg)
+    SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg, String actor)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException;
 
