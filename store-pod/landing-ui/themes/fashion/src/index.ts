@@ -1,5 +1,6 @@
 import {defineTheme, mix} from '@store-front/theme';
 import {fonts} from './fonts';
+import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
@@ -30,10 +31,11 @@ import {OrderSkeleton} from './states/skeletons/OrderSkeleton';
 export default defineTheme({
     id: 'fashion',
     name: 'Fashion',
-    version: '1.0.0',
+    version: '1.1.0',
     description: 'The wheatpaste wall for streetwear and drops: every product a pasted poster on a rendered wall, the merchant primary as day-glo paper, state as rubber stamps.',
     fonts,
     tokens: {
+        defaultColors: DEFAULT_COLORS,
         // Paper and ink come from the preset's background/foreground; the preset's PRIMARY is the day-glo
         // paper and owns every live state (ring included). Accent is demoted to a faint paper tint so hover
         // surfaces and skeletons never introduce a second hue; secondary is ink for stamps and chips.

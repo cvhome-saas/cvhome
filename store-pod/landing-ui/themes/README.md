@@ -1,8 +1,12 @@
 # Storefront themes — direction catalog
 
 A theme is a package under `themes/<id>/` implementing the `ThemeDefinition` contract (`libs/theme`). One
-storefront app serves all of them; the merchant's `Theme` enum picks one, the merchant's `ColorTheme` preset
-colours it. How to build one: `.agents/skills/project-structure/references/new-landing-ui-template.md`.
+storefront app serves all of them; the merchant's `Theme` enum picks one. Colours: every theme ships **its own
+default palette** (`src/colors.ts`, generated from the `THEME_DEFAULTS` seed in
+`libs/types/scripts/build-color-schemas.mjs`, wired as `tokens.defaultColors`) — that is what renders when the
+merchant's `ColorTheme` is `DEFAULT` or unset. Any fixed preset the merchant picks (`LIGHT`, `MIDNIGHT`, …)
+replaces it whole. QA: `?theme=<id>&color=<PRESET|default>` (dev/QA cookies). How to build one:
+`.agents/skills/project-structure/references/new-landing-ui-template.md`.
 
 ## Shipped
 
@@ -24,7 +28,9 @@ hairlines": those are the category defaults the roll exists to avoid.
 
 Rules every theme shares: behaviour from `@store-front/hooks`; primitives from `@store-front/ui`; every
 state rendered; RTL + mobile first-class; merchant colour roles respected (the theme may re-map them through
-`tokens.mapMerchantColors`, e.g. demote primary to an accent, but never paint over the preset).
+`tokens.mapMerchantColors`, e.g. demote primary to an accent, but never paint over the preset); the theme's
+default palette is the palette of its chosen visual world, seeded in the generator (never hand-written hex) so
+it passes the same contrast rules as the presets.
 
 ## Directions
 

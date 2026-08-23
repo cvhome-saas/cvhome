@@ -2,10 +2,12 @@
 name: Fashion — The Wheatpaste Wall
 description: A streetwear / drops store as a fly-posted wall — a rendered ground, every product and slider image a pasted paper sheet, the merchant's primary as day-glo paper, state as rubber stamps.
 colors:
-  # This theme owns NO palette. Every role below is injected per request from the merchant's ColorTheme
-  # preset through the contrast-guarded bridge (libs/theme/src/merchant-bridge.ts); the theme's only colour
-  # decisions are mapMerchantColors in src/index.ts and the material mixes in src/tokens.css. Values are
-  # the live CSS variables, never hex.
+  # This theme owns ONE palette: its default (src/colors.ts — poster paper, ink, day-glo pink — generated
+  # from THEME_DEFAULTS in libs/types/scripts/build-color-schemas.mjs), rendered when the merchant's
+  # ColorTheme is DEFAULT or unset. A fixed preset the merchant picks replaces it whole; either way every role
+  # below is injected per request through the contrast-guarded bridge (libs/theme/src/merchant-bridge.ts),
+  # and the theme's only other colour decisions are mapMerchantColors in src/index.ts and the material mixes
+  # in src/tokens.css. Values are the live CSS variables, never hex.
   background: "var(--background)"
   foreground: "var(--foreground)"
   primary: "var(--primary)"
@@ -205,8 +207,9 @@ anything that explains. There are no radii and no borders except pencil rules; d
 
 ## Colors
 
-The theme owns no hex. Colour roles arrive on `<html>` per request from the merchant's ColorTheme preset via
-the contrast-guarded bridge; the theme re-maps four roles (`ring` → primary, `accent` → background mixed 8%
+The theme hand-writes no hex. Its default palette (`src/colors.ts`, generated: poster paper `#F5F2E9`, ink `#121212`,
+day-glo pink `#FB40AD` with dark text, acid-green statement) renders when the merchant's ColorTheme is `DEFAULT`;
+a picked preset replaces it. Colour roles arrive on `<html>` per request via the contrast-guarded bridge; the theme re-maps four roles (`ring` → primary, `accent` → background mixed 8%
 toward foreground, `accentForeground` → foreground, `secondary` → foreground) and mixes its two materials
 (wall, rule) from background and foreground with `color-mix`.
 

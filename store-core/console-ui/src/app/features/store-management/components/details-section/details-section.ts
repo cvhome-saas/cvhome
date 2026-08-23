@@ -151,7 +151,7 @@ import type {DetailsForm} from '../../services/store-settings-form.service';
           </app-form-field>
 
           <app-form-field [label]="t('storeSettings.details.colorTheme')">
-            <app-select formControlName="colorTheme" [options]="colorThemeChoices()" />
+            <app-select formControlName="colorTheme" [options]="colorThemeChoices(t)" />
           </app-form-field>
 
           <app-form-field [label]="t('storeSettings.details.inBusinessSince')">
@@ -366,9 +366,13 @@ export class DetailsSection {
     this.choices().themes.map((name) => ({value: name, label: name})),
   );
 
-  protected readonly colorThemeChoices = computed<readonly SelectOption[]>(() =>
-    this.choices().colorThemes.map((name) => ({value: name, label: name})),
-  );
+  /** `DEFAULT` is not a palette but "the storefront theme's own colours", so it gets words. */
+  protected colorThemeChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.choices().colorThemes.map((name) => ({
+      value: name,
+      label: name === 'DEFAULT' ? t('storeSettings.details.colorThemeDefault') : name,
+    }));
+  }
 
   protected weightUnitChoices(t: (key: string) => string): readonly SelectOption[] {
     return this.weightUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));

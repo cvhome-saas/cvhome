@@ -22,6 +22,10 @@
  *
  * Key names are fixed (they are the public `ColorSchema` contract and the backend `ColorTheme` enum is the
  * preset list), so only values are produced here.
+ *
+ * The enum also carries `DEFAULT` — not a preset but "use the storefront theme's own palette". Those
+ * per-theme palettes are seeded in `THEME_DEFAULTS` below, built and verified by the same rules, and
+ * written to `themes/<id>/src/colors.ts` (`DEFAULT_COLORS`, wired as `tokens.defaultColors`).
  */
 import {writeFileSync, readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
@@ -204,6 +208,37 @@ const PRESETS = {
         background: o(0.975, 0.010, 340), foreground: o(0.28, 0.050, 340),
         primary: o(0.80, 0.09, 10), secondary: o(0.86, 0.06, 300), accent: o(0.92, 0.10, 95),
     },
+};
+
+/**
+ * Per-theme default palettes — what a theme looks like when the merchant's colour theme is `DEFAULT`
+ * (or unset). Each is the palette of the theme's own visual world (see `themes/<id>/DESIGN.md` and the
+ * decision record in `.impeccable/`), not a generic light preset. Same seed shape and rules as a preset.
+ * Keyed by theme id (`themes/<id>`); `scripts/new-theme.mjs` appends a starter copy for new themes.
+ */
+const THEME_DEFAULTS = {
+    // @theme-defaults:start
+    starter: {
+        note: 'Neutral reference (the LIGHT preset): warm white, soft-black ink and a black CTA; bone wash support; cherry-red statement.',
+        background: o(0.99, 0.004, 90), foreground: o(0.20, 0.010, 60),
+        primary: o(0.22, 0.010, 60), secondary: o(0.88, 0.012, 80), accent: o(0.48, 0.21, 25),
+    },
+    basic: {
+        note: 'The Catalogue Page: white stock, black ink, cobalt title fields and tabs; catalogue-grey wash; print-red price flash.',
+        background: o(1.0, 0, 0), foreground: o(0.21, 0, 0),
+        primary: o(0.50, 0.16, 257), secondary: o(0.90, 0, 0), accent: o(0.50, 0.19, 27),
+    },
+    beauty: {
+        note: 'Industrial Quote Grammar: white stockroom cotton, ink plates, the safety-orange zip-tie tag with dark text; hazard-yellow statement.',
+        background: o(1.0, 0, 0), foreground: o(0.17, 0, 0),
+        primary: o(0.70, 0.20, 45), secondary: o(0.93, 0.004, 90), accent: o(0.85, 0.17, 90),
+    },
+    fashion: {
+        note: 'The Wheatpaste Wall: poster paper, ink, day-glo pink paper with dark text on every primary action; acid-green statement.',
+        background: o(0.96, 0.012, 90), foreground: o(0.18, 0, 0),
+        primary: o(0.68, 0.24, 350), secondary: o(0.18, 0, 0), accent: o(0.90, 0.20, 115),
+    },
+    // @theme-defaults:end
 };
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -419,24 +454,56 @@ function emit(presets) {
         lines.push('};');
     }
     lines.push('');
-    lines.push('/** Preset ids — mirrors the backend `ColorTheme` enum; the merchant picks one in the seller console. */');
+    lines.push('/**');
+    lines.push(' * Colour theme ids — mirrors the backend `ColorTheme` enum; the merchant picks one in the seller console.');
+    lines.push(' * `DEFAULT` is not a preset: it means "the storefront theme\'s own palette" (`ThemeDefinition.tokens.defaultColors`).');
+    lines.push(' */');
     lines.push('export enum ColorTheme {');
+    lines.push('    DEFAULT = "DEFAULT",');
     for (const name of names) lines.push(`    ${name} = "${name}",`);
     lines.push('}');
     lines.push('');
-    lines.push('const colorThemeData: Record<ColorTheme, ColorSchema> = {');
+    lines.push('/** The fixed presets — every `ColorTheme` except `DEFAULT`. */');
+    lines.push('export type ColorPreset = Exclude<ColorTheme, ColorTheme.DEFAULT>;');
+    lines.push('');
+    lines.push('const colorThemeData: Record<ColorPreset, ColorSchema> = {');
     for (const name of names) lines.push(`    [ColorTheme.${name}]: ${name}_COLOR_SCHEMA,`);
     lines.push('};');
     lines.push('');
-    lines.push('/**');
-    lines.push(' * Retrieves the ColorSchema data for a given ColorTheme.');
-    lines.push(' * @param theme The ColorTheme enum member.');
-    lines.push(' * @returns The corresponding ColorSchema object (LIGHT for an unknown value).');
-    lines.push(' */');
-    lines.push('export function getThemeColors(theme: ColorTheme): ColorSchema {');
-    lines.push('    const colors = colorThemeData[theme];');
-    lines.push('    return colors ? colors : colorThemeData[ColorTheme.LIGHT];');
+    lines.push('/** Whether `value` is exactly a `ColorTheme` member name (`DEFAULT` included); normalise case first. */');
+    lines.push('export function isColorTheme(value: string | null | undefined): value is ColorTheme {');
+    lines.push('    return !!value && Object.hasOwn(ColorTheme, value);');
     lines.push('}');
+    lines.push('');
+    lines.push('/**');
+    lines.push(' * Retrieves the ColorSchema of a fixed preset.');
+    lines.push(' * @param theme The ColorTheme member or its name (any case).');
+    lines.push(' * @returns The preset, or `undefined` for `DEFAULT` and unknown values — the caller falls back to the');
+    lines.push(' *          storefront theme\'s `tokens.defaultColors`.');
+    lines.push(' */');
+    lines.push('export function getThemeColors(theme: ColorTheme | string | null | undefined): ColorSchema | undefined {');
+    lines.push('    const name = (theme ?? \'\').trim().toUpperCase();');
+    lines.push('    return name === ColorTheme.DEFAULT ? undefined : colorThemeData[name as ColorPreset];');
+    lines.push('}');
+    lines.push('');
+    return lines.join('\n');
+}
+
+function emitThemeDefault(id, p) {
+    const lines = [];
+    lines.push(`// GENERATED by libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS.${id}) — edit the seed there, then`);
+    lines.push('// `npm run gen:colors` in libs/types. Same rules as the merchant presets (see that file\'s header).');
+    lines.push("import type {ColorSchema} from '@store-front/types';");
+    lines.push('');
+    lines.push('/**');
+    lines.push(` * ${p.note} (${p.scheme})`);
+    lines.push(' *');
+    lines.push(" * The theme's own palette — what renders when the merchant's colour theme is `DEFAULT` or unset. Wired as");
+    lines.push(' * `tokens.defaultColors` in `./index.ts`; any fixed preset the merchant picks replaces it whole.');
+    lines.push(' */');
+    lines.push('export const DEFAULT_COLORS: ColorSchema = {');
+    for (const k of KEYS) lines.push(`    ${k}: "${p.colors[k]}",`);
+    lines.push('};');
     lines.push('');
     return lines.join('\n');
 }
@@ -446,22 +513,35 @@ function emit(presets) {
 /* ------------------------------------------------------------------------------------------------ */
 
 const built = Object.fromEntries(Object.entries(PRESETS).map(([name, seed]) => [name, buildPreset(name, seed)]));
-const problems = Object.entries(built).flatMap(([name, p]) => verify(name, p));
+const builtDefaults = Object.fromEntries(Object.entries(THEME_DEFAULTS).map(([id, seed]) => [id, buildPreset(id, seed)]));
+const problems = [
+    ...Object.entries(built).flatMap(([name, p]) => verify(name, p)),
+    ...Object.entries(builtDefaults).flatMap(([id, p]) => verify(`theme default ${id}`, p)),
+];
 if (problems.length) {
     console.error(`color presets: ${problems.length} rule violation(s)\n  ` + problems.join('\n  '));
     process.exit(1);
 }
 
-const target = resolve(dirname(fileURLToPath(import.meta.url)), '../src/color-schema.ts');
-const source = emit(built);
-if (process.argv.includes('--check')) {
-    const current = readFileSync(target, 'utf8');
-    if (current !== source) {
-        console.error('color presets: src/color-schema.ts is out of date — run `npm run gen:colors` in libs/types');
-        process.exit(1);
+const here = dirname(fileURLToPath(import.meta.url));
+const outputs = [
+    {target: resolve(here, '../src/color-schema.ts'), source: emit(built)},
+    ...Object.entries(builtDefaults).map(([id, p]) => ({target: resolve(here, `../../../themes/${id}/src/colors.ts`), source: emitThemeDefault(id, p)})),
+];
+const check = process.argv.includes('--check');
+let stale = 0;
+for (const {target, source} of outputs) {
+    if (check) {
+        let current = '';
+        try { current = readFileSync(target, 'utf8'); } catch { /* missing counts as stale */ }
+        if (current !== source) { console.error(`color presets: ${target} is out of date — run \`npm run gen:colors\` in libs/types`); stale++; }
+    } else {
+        writeFileSync(target, source);
     }
-    console.log(`color presets: ${Object.keys(built).length} presets verified, file up to date`);
+}
+if (check) {
+    if (stale) process.exit(1);
+    console.log(`color presets: ${Object.keys(built).length} presets + ${Object.keys(builtDefaults).length} theme defaults verified, files up to date`);
 } else {
-    writeFileSync(target, source);
-    console.log(`color presets: wrote ${Object.keys(built).length} presets to ${target}`);
+    console.log(`color presets: wrote ${Object.keys(built).length} presets to src/color-schema.ts and ${Object.keys(builtDefaults).length} theme defaults to themes/<id>/src/colors.ts`);
 }

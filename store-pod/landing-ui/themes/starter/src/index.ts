@@ -1,5 +1,6 @@
 import {defineTheme} from '@store-front/theme';
 import {fonts} from './fonts';
+import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
@@ -38,7 +39,7 @@ export default defineTheme({
     version: '0.1.0',
     description: 'Plain reference theme — copy source for new themes.',
     fonts,
-    tokens: {},
+    tokens: {defaultColors: DEFAULT_COLORS},
     layout: {config: layoutConfig, Root},
     pages: {Home, Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {

@@ -1011,8 +1011,12 @@ const PASTEL_COLOR_SCHEMA: ColorSchema = {
     focusNeutral: "#8C7F87",
 };
 
-/** Preset ids — mirrors the backend `ColorTheme` enum; the merchant picks one in the seller console. */
+/**
+ * Colour theme ids — mirrors the backend `ColorTheme` enum; the merchant picks one in the seller console.
+ * `DEFAULT` is not a preset: it means "the storefront theme's own palette" (`ThemeDefinition.tokens.defaultColors`).
+ */
 export enum ColorTheme {
+    DEFAULT = "DEFAULT",
     LIGHT = "LIGHT",
     DARK = "DARK",
     NATURE = "NATURE",
@@ -1045,7 +1049,10 @@ export enum ColorTheme {
     PASTEL = "PASTEL",
 }
 
-const colorThemeData: Record<ColorTheme, ColorSchema> = {
+/** The fixed presets — every `ColorTheme` except `DEFAULT`. */
+export type ColorPreset = Exclude<ColorTheme, ColorTheme.DEFAULT>;
+
+const colorThemeData: Record<ColorPreset, ColorSchema> = {
     [ColorTheme.LIGHT]: LIGHT_COLOR_SCHEMA,
     [ColorTheme.DARK]: DARK_COLOR_SCHEMA,
     [ColorTheme.NATURE]: NATURE_COLOR_SCHEMA,
@@ -1078,12 +1085,18 @@ const colorThemeData: Record<ColorTheme, ColorSchema> = {
     [ColorTheme.PASTEL]: PASTEL_COLOR_SCHEMA,
 };
 
+/** Whether `value` is exactly a `ColorTheme` member name (`DEFAULT` included); normalise case first. */
+export function isColorTheme(value: string | null | undefined): value is ColorTheme {
+    return !!value && Object.hasOwn(ColorTheme, value);
+}
+
 /**
- * Retrieves the ColorSchema data for a given ColorTheme.
- * @param theme The ColorTheme enum member.
- * @returns The corresponding ColorSchema object (LIGHT for an unknown value).
+ * Retrieves the ColorSchema of a fixed preset.
+ * @param theme The ColorTheme member or its name (any case).
+ * @returns The preset, or `undefined` for `DEFAULT` and unknown values — the caller falls back to the
+ *          storefront theme's `tokens.defaultColors`.
  */
-export function getThemeColors(theme: ColorTheme): ColorSchema {
-    const colors = colorThemeData[theme];
-    return colors ? colors : colorThemeData[ColorTheme.LIGHT];
+export function getThemeColors(theme: ColorTheme | string | null | undefined): ColorSchema | undefined {
+    const name = (theme ?? '').trim().toUpperCase();
+    return name === ColorTheme.DEFAULT ? undefined : colorThemeData[name as ColorPreset];
 }

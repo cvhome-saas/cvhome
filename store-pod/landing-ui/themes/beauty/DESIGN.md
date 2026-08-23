@@ -2,9 +2,12 @@
 name: Beauty — Industrial Quote Grammar
 description: A beauty + fashion boutique run like a stockroom — ink plates, hazard stripes, quoted labels, and the merchant's primary as the one zip-tie tag.
 colors:
-  # This theme owns NO palette. Every role below is injected per request from the merchant's ColorTheme
-  # preset through the contrast-guarded bridge (libs/theme/src/merchant-bridge.ts); the theme's only colour
-  # decision is mapMerchantColors in src/index.ts. Values are the live CSS variables, never hex.
+  # This theme owns ONE palette: its default (src/colors.ts — white stockroom cotton, ink, the safety-orange
+  # tag — generated from THEME_DEFAULTS in libs/types/scripts/build-color-schemas.mjs), rendered when the
+  # merchant's ColorTheme is DEFAULT or unset. A fixed preset the merchant picks replaces it whole; either way
+  # every role below is injected per request through the contrast-guarded bridge
+  # (libs/theme/src/merchant-bridge.ts), and the theme's only other colour decision is mapMerchantColors in
+  # src/index.ts. Values are the live CSS variables, never hex.
   background: "var(--background)"
   foreground: "var(--foreground)"
   primary: "var(--primary)"
@@ -155,8 +158,10 @@ register with Noto Kufi Arabic. There are no shadows below the overlay layer; de
 
 ## Colors
 
-The theme owns no hex. Colour roles arrive on `<html>` per request from the merchant's ColorTheme preset via
-the contrast-guarded bridge (AA enforced on every `*-foreground` pair); the theme only re-maps roles and then
+The theme hand-writes no hex. Its default palette (`src/colors.ts`, generated: white `#FFFFFF`, ink `#0F0F0F`, the
+safety-orange tag `#FE6A00` with dark text, hazard-yellow statement) renders when the merchant's ColorTheme is
+`DEFAULT`; a picked preset replaces it. Colour roles arrive on `<html>` per request via the contrast-guarded
+bridge (AA enforced on every `*-foreground` pair); the theme only re-maps roles and then
 uses them sparingly.
 
 ### Primary

@@ -8,7 +8,7 @@ INSERT INTO merchant.merchant_store (store_merchant_id, currency_format_national
                                      store_city, store_name, store_phone, store_postal_code, store_state_prov,
                                      use_cache, require_login_for_order_placement, weightunitcode, country_id,
                                      currency_id, language_code)
-VALUES ('65f023632bc46470c104b76f', false, '2024-03-31', '21f023932bc66470c104b76f', 'BASIS', 'LIGHT',
+VALUES ('65f023632bc46470c104b76f', false, '2024-03-31', '21f023932bc66470c104b76f', 'BASIS', 'DEFAULT',
         'CM', -- seizeunitcode for fashion
         'info@riyadhfashion.sa', 'logo.jpeg', 'banner.jpeg', '123 Olaya Street', 'Riyadh', 'Riyadh-Fashion-Hub',
         '+966 50 123 4567',

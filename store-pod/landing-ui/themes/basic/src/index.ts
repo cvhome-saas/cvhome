@@ -1,5 +1,6 @@
 import {defineTheme, mix} from '@store-front/theme';
 import {fonts} from './fonts';
+import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
@@ -30,10 +31,11 @@ import {OrderSkeleton} from './states/skeletons/OrderSkeleton';
 export default defineTheme({
     id: 'basic',
     name: 'Basic',
-    version: '1.0.0',
+    version: '1.1.0',
     description: 'The catalogue page for any store: one continuous ruled catalogue of entries with big condensed prices, a thumb-index of categories, and the merchant primary as flat fields on the cover, the active tab and the one action per view.',
     fonts,
     tokens: {
+        defaultColors: DEFAULT_COLORS,
         // Paper and ink are the preset's background/foreground. The preset's PRIMARY owns the cover title
         // block, the active index tab, every primary action and the focus ring. Accent and secondary are
         // demoted to faint tonal mixes so hover surfaces, chips and quiet badges never introduce a second

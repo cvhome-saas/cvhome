@@ -7,11 +7,10 @@ import {NextIntlClientProvider} from 'next-intl';
 import {getDirection} from '@store-front/i18n/direction';
 import {localSupported, redirectToSupportedLang} from '@store-front/services/locale-utils';
 import {isApiError} from '@store-front/types';
-import {getStoreHeaders} from '@/shell/request/headers';
 import {getStore, getStoreContext} from '@/shell/request/store-context';
 import {getTheme} from '@/shell/theme/get-theme';
 import {ThemeClientStates} from '@/shell/theme/theme-client-states';
-import {resolveMerchantTokens} from '@/shell/tokens/merchant-tokens';
+import {getColorThemeRequest, resolveMerchantTokens} from '@/shell/tokens/merchant-tokens';
 import {loadLayoutData} from '@/shell/loaders/layout';
 import {loadStoreMetadata} from '@/shell/seo/metadata';
 
@@ -21,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function StorefrontLayout({children, params}: { children: ReactNode; params: Promise<{ locale: string }> }) {
     const {locale} = await params;
-    const [theme, storeHeaders, storeContext] = await Promise.all([getTheme(), getStoreHeaders(), getStoreContext()]);
+    const [theme, storeContext] = await Promise.all([getTheme(), getStoreContext()]);
 
     let store;
     try {
@@ -37,7 +36,7 @@ export default async function StorefrontLayout({children, params}: { children: R
     }
 
     const data = await loadLayoutData();
-    const merchant = await resolveMerchantTokens(theme, storeHeaders, store);
+    const merchant = resolveMerchantTokens(theme, await getColorThemeRequest(store));
     const dir = getDirection(locale);
     const ctx = {store, storeContext, locale, dir, layout: theme.layout.config};
 
@@ -48,6 +47,7 @@ export default async function StorefrontLayout({children, params}: { children: R
             data-theme={theme.id}
             data-theme-version={theme.version}
             data-color-scheme={merchant.scheme}
+            data-color-theme={merchant.preset}
             className={theme.fonts.variables}
             style={merchant.style}
         >

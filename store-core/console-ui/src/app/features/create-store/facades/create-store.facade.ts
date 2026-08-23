@@ -1,4 +1,4 @@
-import {DestroyRef, computed, inject, Injectable, signal} from '@angular/core';
+import {DestroyRef, computed, effect, inject, Injectable, signal} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -169,9 +169,16 @@ export class CreateStoreFacade {
     this.choices().themes.map((name) => ({value: name, label: name})),
   );
 
-  readonly colorThemeChoices = computed<readonly SelectOption[]>(() =>
-    this.choices().colorThemes.map((name) => ({value: name, label: name})),
-  );
+  /**
+   * Colour themes are enum names too, except `DEFAULT`, which is not a palette but "the storefront
+   * theme's own colours" and deserves words.
+   */
+  colorThemeChoices(t: (key: string) => string): readonly SelectOption[] {
+    return this.choices().colorThemes.map((name) => ({
+      value: name,
+      label: name === 'DEFAULT' ? t('createStore.identity.colorThemeDefault') : name,
+    }));
+  }
 
   weightUnitChoices(t: (key: string) => string): readonly SelectOption[] {
     return this.weightUnits.map((unit) => ({value: unit, label: t('storeSettings.unit.' + unit)}));
@@ -251,6 +258,16 @@ export class CreateStoreFacade {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.poll?.unsubscribe());
+    // `DEFAULT` (the storefront theme's own colours) is the right answer for almost every new store, so
+    // it is preselected once the reference list confirms the server offers it; a merchant who already
+    // touched the control keeps their pick.
+    effect(() => {
+      const colorThemes = this.choices().colorThemes;
+      const control = this.form.controls.colorTheme;
+      if (colorThemes.includes('DEFAULT') && !control.value && control.pristine) {
+        control.setValue('DEFAULT');
+      }
+    });
   }
 
   readonly provisioningState = computed<ProvisioningState | null>(

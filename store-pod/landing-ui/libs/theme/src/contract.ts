@@ -21,6 +21,12 @@ export interface ThemeFonts {
 }
 
 export interface ThemeTokenPolicy {
+    /**
+     * The theme's own palette — rendered when the merchant's colour theme is `DEFAULT` (or unset/unknown).
+     * Generated into `src/colors.ts` by `libs/types/scripts/build-color-schemas.mjs` (`THEME_DEFAULTS`), so
+     * it obeys the same contrast rules as the fixed presets. A preset the merchant picks replaces it whole.
+     */
+    defaultColors: ColorSchema;
     /** Re-map the merchant preset into the theme's colour roles (e.g. force ink, mute primary). */
     mapMerchantColors?: (schema: ColorSchema, meta: { isDark: boolean }) => Partial<ColorRoleTokens>;
     /** Minimum contrast the bridge enforces for every `*-foreground` pair. Default 4.5. */

@@ -16,7 +16,7 @@ create table if not exists merchant.merchant_store
         check (theme in ('BASIS','MODERN','JEWELERY','BEAUTY','FURNITURE','SPORTS','ELECTRONICS','FOOD','GLASSES',
                          'COSMETICS','WATCHES','BABY','TOOLS')),
     color_theme                       varchar(25)  not null
-        check (color_theme in ('LIGHT','DARK','NATURE','OCEAN','MIDNIGHT','FOREST_WHISPER','DESERT_MIRAGE',
+        check (color_theme in ('DEFAULT','LIGHT','DARK','NATURE','OCEAN','MIDNIGHT','FOREST_WHISPER','DESERT_MIRAGE',
                                'MIDNIGHT_DUSK','ROSE','LAVENDER','AURORA_LIGHTS','CYBERPUNK','AUTUMN_HARVEST',
                                'CYBER_NEON','SUNSET','FOREST','DESERT','SKY','EARTH','FIRE','ICE','BLOSSOM','GOLDEN',
                                'GRAPE','PEACH','MINT','SAND','RAINBOW','NEON','PASTEL')),

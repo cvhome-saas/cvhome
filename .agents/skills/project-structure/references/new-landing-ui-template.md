@@ -14,13 +14,13 @@ app (`storefront/`) owns routes, data loading, i18n, auth and theme resolution; 
 
 ```
 storefront/                 THE Next.js app (shell) — never edited for a theme
-  src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= dev override
+  src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= / ?color= dev overrides
   src/app/(storefront)/[locale]/…   routes: loaders + metadata only; each renders theme.pages.X
   src/app/globals.css         the ONLY Tailwind entry + @theme inline token mapping
   src/app/themes.css          GENERATED: @source + tokens.css import per theme
   src/shell/theme/registry.ts GENERATED entries: static map of dynamic imports, one per theme
   src/shell/theme/legacy-theme-map.ts   Theme enum value → theme id (fallback for old values)
-  src/shell/tokens/merchant-tokens.ts   ColorTheme preset → colour-role tokens (inline style on <html>)
+  src/shell/tokens/merchant-tokens.ts   ColorTheme (DEFAULT → theme's own palette, else preset) → colour-role tokens (inline style on <html>)
 libs/theme                  @store-front/theme — ThemeDefinition, token schema, colour bridge, defineTheme()
 libs/ui                     @store-front/ui — shadcn primitives shared ONCE + Skeleton/EmptyState/ErrorState/
                             Price/QuantityStepper/Drawer/AspectBox. Themes never fork these.
@@ -32,7 +32,9 @@ locales/{en,ar,es,fr,ru}.json  SHARED translations — add keys to all five
 
 Request flow: spg/Caddy injects `Store-Id, Theme, Color-Theme, Default-Language, Supported-Languages` →
 `proxy.ts` → `getTheme()` (cookie override → `theme` header → `STOREFRONT_THEME` → legacy map → fallback)
-→ registry dynamic import → root layout sets `<html data-theme=<id> data-color-scheme style="--primary:…"
+→ registry dynamic import → `getColorThemeRequest()` (cookie override → `Color-Theme` header → store record) →
+`resolveColorScheme()` (a fixed preset wins; `DEFAULT` / unset / unknown → `theme.tokens.defaultColors`) → root
+layout sets `<html data-theme=<id> data-color-scheme data-color-theme=<DEFAULT|PRESET> style="--primary:…"
 class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
 
 **Who owns what**
@@ -40,7 +42,7 @@ class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
 | Concern | Owner |
 |---|---|
 | Routes, data fetching, `notFound()`/errors, metadata, Suspense | shell |
-| Colour roles (`--primary`, `--primary-foreground`, `--muted`, `--sale`, …) | merchant preset via the bridge; theme may re-map with `tokens.mapMerchantColors` |
+| Colour roles (`--primary`, `--primary-foreground`, `--muted`, `--sale`, …) | the theme's default palette (`src/colors.ts`, generated from `THEME_DEFAULTS` in `libs/types/scripts/build-color-schemas.mjs`, wired as `tokens.defaultColors`) or the merchant's preset, via the bridge; theme may re-map with `tokens.mapMerchantColors` |
 | Fonts, type scale, spacing/density, radius, shadows, containers, motion, header height, product aspect | **theme** (`tokens.css`) |
 | Header/nav/footer/cart drawer/mobile nav structure | **theme** (`layout/`) |
 | Page composition for Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order | **theme** (`pages/`) |
@@ -63,7 +65,7 @@ The script copies `themes/starter` → `themes/<id>`, renames ids/selectors, and
 
 Run it with the local stack (`./extra/scripts/run-lcl.sh start -d`) and open
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` — spg injects the store headers; `?theme=` is a dev-only
-override cookie (`STOREFRONT_THEME=<id>` also works). `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
+override cookie (`STOREFRONT_THEME=<id>` also works), `?color=<PRESET|default>` likewise previews a colour theme. `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
 fallback but browser-side API calls need spg (see `landing-ui.md`, "Local dev URLs").
 
 ---
@@ -154,15 +156,17 @@ exist. `white` / `black` / `transparent` remain.
 ```bash
 cd store-pod/landing-ui
 npm run lint && npm run typecheck && npm run build     # contract, lint (incl. RTL warnings), Tailwind
-npm test --workspace=libs/theme                         # colour bridge (30 presets × AA)
-npm run dev   # then http://localhost:8110/en?theme=<id>, /ar?theme=<id>
+npm test --workspace=libs/theme                         # colour bridge (30 presets + theme defaults × AA)
+npm run gen:colors --workspace=libs/types               # after editing a THEME_DEFAULTS seed (regenerates src/colors.ts)
+npm run dev   # then http://localhost:8110/en?theme=<id>&color=default, /ar?theme=<id>, ?color=MIDNIGHT
 
 # full stack: spg injects the headers for the demo store
 ./extra/scripts/run-lcl.sh start -d
 open http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>
 ```
-Browser QA at desktop, tablet and mobile widths; `Color-Theme: MIDNIGHT` (dark preset) through spg or by
-switching the store's colour theme in the seller console.
+Browser QA at desktop, tablet and mobile widths, first in the theme's own palette (`?color=default`, what a
+merchant on `DEFAULT` sees), then `?color=MIDNIGHT` (dark preset) and one light preset — or `Color-Theme: …`
+through spg / the store's colour theme in the seller console.
 
 ---
 

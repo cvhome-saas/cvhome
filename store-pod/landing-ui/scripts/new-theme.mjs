@@ -8,7 +8,8 @@
  *  1. copies themes/starter → themes/<id> (fresh DESIGN.md placeholder, README stub)
  *  2. renames package name / theme id / tokens.css selector
  *  3. registers the theme: storefront registry, themes.css import, next.config transpilePackages,
- *     legacy-theme-map entry, Theme enum value in libs/types (if absent)
+ *     legacy-theme-map entry, Theme enum value in libs/types (if absent), a default-palette seed in
+ *     libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS — regenerates themes/<id>/src/colors.ts)
  *  4. runs `npm install` so the workspace link exists
  */
 import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} from 'node:fs';
@@ -100,6 +101,20 @@ if (!new RegExp(`^\\s*${enumName}\\s*=`, 'm').test(enumSrc)) {
     writeFileSync(enumPath, enumSrc);
 }
 
+// Default palette: seed a copy of starter's under THEME_DEFAULTS, then regenerate themes/<id>/src/colors.ts.
+{
+    const genPath = path.join(root, 'libs', 'types', 'scripts', 'build-color-schemas.mjs');
+    const gen = readFileSync(genPath, 'utf8');
+    const keyRe = new RegExp(`^\\s*(['"]?)${id.replaceAll('-', '\\-')}\\1:\\s*\\{`, 'm');
+    if (!keyRe.test(gen)) {
+        const starterSeed = gen.match(/^    starter: \{\n([\s\S]*?)^    \},\n/m);
+        if (!starterSeed) throw new Error('build-color-schemas.mjs: THEME_DEFAULTS.starter seed not found');
+        const body = starterSeed[1].replace(/note: '[^']*'/, `note: 'TODO ${titleCase}: replace with the palette of the chosen visual world (copied from starter).'`);
+        insertBefore('libs/types/scripts/build-color-schemas.mjs', '    // @theme-defaults:end', `    '${id}': {\n${body}    },`);
+    }
+    execSync('node scripts/build-color-schemas.mjs', {cwd: path.join(root, 'libs', 'types'), stdio: 'inherit'});
+}
+
 // 4. install
 execSync('npm install', {cwd: root, stdio: 'inherit'});
 
@@ -114,7 +129,11 @@ Next steps
      new-work + concept-seed (the roll is mandatory), then build page by page, finish review,
      documenter writes themes/${id}/DESIGN.md.
   2. Edit themes/${id}/src/{tokens.css,fonts.ts,config.ts,layout,pages,sections,components,states}.
-  3. Run:  npm run dev   →  http://localhost:8110/en?theme=${id}   (or STOREFRONT_THEME=${id})
+     Its default palette (ColorTheme DEFAULT) is generated into themes/${id}/src/colors.ts — edit the
+     '${id}' seed in libs/types/scripts/build-color-schemas.mjs (THEME_DEFAULTS), then
+     \`npm run gen:colors -w libs/types\`; never hand-edit colors.ts.
+  3. Run:  npm run dev   →  http://localhost:8110/en?theme=${id}&color=default   (or STOREFRONT_THEME=${id};
+     \`?color=<PRESET>\` previews a merchant preset on top)
   4. Backend (out of scope here): add ${enumName} to the Java Theme enum with implemented=true so
      merchants can pick it; until then map existing enum values to '${id}' in
      storefront/src/shell/theme/legacy-theme-map.ts.
