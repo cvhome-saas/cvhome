@@ -62,7 +62,7 @@ const MENU_BY_STATUS: Readonly<Record<ContentStatus | 'NEW', readonly EditorComm
             <button
               class="primary-action"
               type="button"
-              [disabled]="saving() || invalid()"
+              [disabled]="saving()"
               (click)="commanded.emit(action.key)"
             >
               <app-icon name="checkCircle" />
@@ -94,7 +94,7 @@ const MENU_BY_STATUS: Readonly<Record<ContentStatus | 'NEW', readonly EditorComm
       <app-confirm-dialog
         [open]="deleteOpen()"
         [title]="t('content.delete.title', {title: title()})"
-        [message]="t('content.delete.message')"
+        [message]="deleteMessage() || t('content.delete.message')"
         [confirmLabel]="t('content.action.delete')"
         [cancelLabel]="t('shared.actions.cancel')"
         (confirmed)="deleted.emit()"
@@ -114,7 +114,8 @@ export class EditorShell {
   readonly loading = input(false);
   readonly saving = input(false);
   readonly canSave = input(false);
-  readonly invalid = input(false);
+  /** Overrides the delete dialog's body — pages say more, because a menu entry goes with them. */
+  readonly deleteMessage = input('');
   readonly canManage = input(true);
   readonly loadError = input<Error | null>(null);
   readonly deleteOpen = input(false);

@@ -3151,13 +3151,15 @@
     },
     "delete": {
       "title": "Delete {title}?",
-      "message": "This removes it from the storefront and cannot be undone. A page linked from a menu is removed from the menu too."
+      "message": "This removes it from the storefront and cannot be undone.",
+      "messagePage": "This removes the page from the storefront and cannot be undone. A page linked from a menu is removed from the menu too."
     },
     "editor": {
       "back": "Back to content",
       "saveDraft": "Save",
       "saving": "Saving…",
       "saved": "Saved.",
+      "checkFields": "Some fields still need attention — the first one is highlighted.",
       "loading": "Loading…",
       "moreActions": "More actions",
       "versionConflict": "Someone else changed this item since you opened it. It has been reloaded — apply your edits again.",

@@ -1,3 +1,4 @@
+import {DOCUMENT} from '@angular/common';
 import {Injectable, computed, inject, signal} from '@angular/core';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {FormGroup} from '@angular/forms';
@@ -37,6 +38,7 @@ import {ContentHubFacade} from './content-hub.facade';
 export class ContentEditorFacade<P extends PersistableContent, R extends P & ReadableContentMeta> {
   private readonly api = inject(ContentItemsService);
   private readonly forms = inject(ContentEditorFormService);
+  private readonly document = inject(DOCUMENT);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
@@ -69,6 +71,9 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
    * keep the 'en' placeholder even when the store writes its source copy in another language.
    */
   private languageChosen = false;
+
+  /** Guards against an older load's response overwriting a newer one. */
+  private loadSeq = 0;
 
   /** Bumped on every change of the common and extra forms, so `dirty`/`invalid` re-evaluate. */
   private readonly formTick = signal(0);
@@ -162,12 +167,21 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   load(id: number): void {
     this.loading.set(true);
     this.loadError.set(null);
+    const seq = ++this.loadSeq;
     this.api.get<R>(this.type, id).subscribe({
       next: (item) => {
+        // Publishing a new item loads twice — once after the create, once after the transition — and the
+        // first response can arrive last, which used to leave a published item wearing its DRAFT badge.
+        if (seq !== this.loadSeq) {
+          return;
+        }
         this.loading.set(false);
         this.apply(item);
       },
       error: (failure: unknown) => {
+        if (seq !== this.loadSeq) {
+          return;
+        }
         this.loading.set(false);
         this.loadError.set(failure instanceof Error ? failure : new Error(String(failure)));
       },
@@ -242,7 +256,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
    * to its own route so a reload finds it. `then` runs after a successful save with the id.
    */
   save(then?: (id: number) => void): void {
-    if (this.saving()) {
+    if (this.saving() || this.revealInvalid()) {
       return;
     }
     this.saving.set(true);
@@ -274,8 +288,36 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     });
   }
 
+  /**
+   * Shows what is stopping a save, and says whether anything is.
+   *
+   * A disabled Save button was a dead end: the field it waits on — a slug, usually — sits far below the fold,
+   * so the seller saw a button that did nothing and no reason why. Every control is marked touched (which is
+   * what makes `app-form-field` render its error), the first offending one is scrolled to and focused, and a
+   * toast names the situation.
+   */
+  private revealInvalid(): boolean {
+    if (!this.invalid()) {
+      return false;
+    }
+    for (const form of [this.common, this.extra, ...Object.values(this.translations())]) {
+      form?.markAllAsTouched();
+    }
+    this.formTick.update((v) => v + 1);
+    const field = this.document.querySelector<HTMLElement>(
+      '.ng-invalid[formControlName], .ng-invalid > input, .ng-invalid > textarea, input.ng-invalid, textarea.ng-invalid',
+    );
+    field?.scrollIntoView({block: 'center', behavior: 'smooth'});
+    field?.focus({preventScroll: true});
+    this.toast.warning(this.transloco.translate('content.editor.checkFields'));
+    return true;
+  }
+
   /** Saves first (the transition should apply to what is on screen), then moves the status. */
   transition(action: TransitionAction, publishAt: string | null = null): void {
+    if (this.revealInvalid()) {
+      return;
+    }
     const run = (id: number) => {
       this.saving.set(true);
       this.api.transition(this.type, id, action, publishAt ? {publishAt} : null).subscribe({
