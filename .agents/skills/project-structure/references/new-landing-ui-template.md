@@ -1,408 +1,188 @@
-# New Template Creation Guide
+# New Storefront Theme Guide
 
-## Context
+How to add a storefront theme to `store-pod/landing-ui`. A theme is **a package, not an app**: one Next.js
+app (`storefront/`) owns routes, data loading, i18n, auth and theme resolution; a theme under
+`themes/<id>/` supplies design tokens, fonts, the page layout and the page compositions that satisfy the
+`ThemeDefinition` contract in `libs/theme`.
 
-The project is a Next.js 16 e-commerce monorepo under `store-pod/landing-ui/`.
-Existing templates (`basis`, `modern`, `beauty`, `jewelery`) live in `templates/` and share all business logic
-via three workspace packages in `libs/` (`types`, `services`, `hooks`). A new template is a **full Next.js app**
-that reuses the shared libs and only differs in visual components.
-
-Use `basis` as the reference template to copy from.
-
----
-
-## Step-by-Step: Creating a New Template (e.g. `health`)
-
-### Step 1 — Scaffold the App
-
-```
-store-pod/landing-ui/templates/health/
-```
-
-Copy the folder structure of an existing template (e.g. `basis`). Every file below must exist.
+> The previous generation (one full Next app per theme under `templates/`) is deprecated and parked in
+> `templates-deprecated/`. Do not copy from it.
 
 ---
 
-### Step 2 — Configuration & Static Files
+## 1. Architecture you are plugging into
 
-| File                   | Action                                                                                 |
-|------------------------|----------------------------------------------------------------------------------------|
-| `package.json`         | Copy from `basis/package.json`. Change `name` to `health` (or keep blank).             |
-| `next.config.ts`       | Copy as-is — do not change.                                                            |
-| `tsconfig.json`        | Copy as-is — path aliases must point to `../../libs/*`.                                |
-| `postcss.config.mjs`   | Copy as-is.                                                                            |
-| `eslint.config.mjs`    | Copy as-is.                                                                            |
-| `components.json`      | Copy as-is (shadcn config).                                                            |
-| `public/`              | Copy entire directory. contains `placeholder.png` and SVG assets.                      |
-| `public/css/login.css` | **CUSTOMIZE** — Update with your new template's brand styles for the login/auth pages. |
+```
+storefront/                 THE Next.js app (shell) — never edited for a theme
+  src/proxy.ts                Store-Id gate, / → /{lang}, next-intl routing, ?theme= dev override
+  src/app/(storefront)/[locale]/…   routes: loaders + metadata only; each renders theme.pages.X
+  src/app/globals.css         the ONLY Tailwind entry + @theme inline token mapping
+  src/app/themes.css          GENERATED: @source + tokens.css import per theme
+  src/shell/theme/registry.ts GENERATED entries: static map of dynamic imports, one per theme
+  src/shell/theme/legacy-theme-map.ts   Theme enum value → theme id (fallback for old values)
+  src/shell/tokens/merchant-tokens.ts   ColorTheme preset → colour-role tokens (inline style on <html>)
+libs/theme                  @store-front/theme — ThemeDefinition, token schema, colour bridge, defineTheme()
+libs/ui                     @store-front/ui — shadcn primitives shared ONCE + Skeleton/EmptyState/ErrorState/
+                            Price/QuantityStepper/Drawer/AspectBox. Themes never fork these.
+libs/i18n                   @store-front/i18n — routing, Link/useRouter, direction, useDir()
+libs/{types,services,hooks} domain, API clients, behaviour hooks (useCart, useProductListing, useProductPurchase, …)
+themes/<id>/                YOUR theme (package @store-front/theme-<id>)
+locales/{en,ar,es,fr,ru}.json  SHARED translations — add keys to all five
+```
+
+Request flow: spg/Caddy injects `Store-Id, Theme, Color-Theme, Default-Language, Supported-Languages` →
+`proxy.ts` → `getTheme()` (cookie override → `theme` header → `STOREFRONT_THEME` → legacy map → fallback)
+→ registry dynamic import → root layout sets `<html data-theme=<id> data-color-scheme style="--primary:…"
+class="<font vars>">` → `theme.layout.Root` → page → `theme.pages.X`.
+
+**Who owns what**
+
+| Concern | Owner |
+|---|---|
+| Routes, data fetching, `notFound()`/errors, metadata, Suspense | shell |
+| Colour roles (`--primary`, `--primary-foreground`, `--muted`, `--sale`, …) | merchant preset via the bridge; theme may re-map with `tokens.mapMerchantColors` |
+| Fonts, type scale, spacing/density, radius, shadows, containers, motion, header height, product aspect | **theme** (`tokens.css`) |
+| Header/nav/footer/cart drawer/mobile nav structure | **theme** (`layout/`) |
+| Page composition for Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order | **theme** (`pages/`) |
+| Skeletons, error, not-found, empty, redirecting states | **theme** (`states/`) |
+| Behaviour (cart, listing sort/pagination/facets, variants, checkout form, auth) | `libs/hooks` — reuse, never re-implement |
+| Primitives (Button, Dialog, Select, …) | `libs/ui` — restyle through tokens/variants/className, or compose a wrapper |
 
 ---
 
-### Step 3 — i18n Setup (4 files copied, locales are shared)
-
-```
-src/i18n/routing.ts      ← locales list, do not change
-src/i18n/request.ts      ← imports from shared locales, do not change
-src/i18n/navigation.ts   ← do not change
-src/proxy.ts             ← middleware, do not change
-```
-
-**Locales are SHARED** across all templates. They live at `landing-ui/locales/` (the monorepo root), not inside your
-template folder. The `request.ts` file imports them via `../../../../locales/${locale}.json`.
-
-There are **5** locale files: `en.json`, `ar.json`, `es.json`, `fr.json`, `ru.json`.
-
-**IMPORTANT:** If you add any new literal text in your components (e.g., "Exclusive Offer", "Sign up now"), **DO NOT
-hardcode it**. Add the key/value pairs to `landing-ui/locales/*.json` (all 5 files) and use the `t('key')` function from
-`next-intl`.
-
----
-
-### Step 4 — Global Styles (1 file, design-only changes)
-
-```
-src/app/[locale]/globals.css
-```
-
-- Copy from `basis`.
-- Change the CSS variable default values in `:root` for your template's palette.
-- You can change fonts (`@import`), spacing tokens, or border-radius variables here.
-- The color variables injected at runtime from store config will **override** these defaults.
-
----
-
-### Step 5 — Pages (copy as-is, no visual logic here)
-
-All pages are **server components** — they fetch data and pass it as props. Do not change them.
-
-```
-src/app/[locale]/layout.tsx                ← copy, no changes
-src/app/[locale]/page.tsx                  ← copy, no changes
-src/app/[locale]/login/page.tsx            ← copy, no changes
-src/app/[locale]/login/login-client.tsx    ← copy, no changes
-src/app/[locale]/callback/page.tsx         ← copy, no changes
-src/app/[locale]/callback/callback-client.tsx  ← copy, no changes
-src/app/[locale]/product/[url]/page.tsx    ← copy, no changes
-src/app/[locale]/category/[url]/page.tsx   ← copy, no changes
-src/app/[locale]/checkout/page.tsx         ← copy, no changes
-src/app/[locale]/checkout/success/page.tsx ← copy, no changes
-src/app/[locale]/checkout/cancel/page.tsx  ← copy, no changes
-src/app/[locale]/content/[url]/page.tsx    ← copy, no changes
-src/app/[locale]/customer/page.tsx         ← copy, no changes
-src/app/[locale]/customer/order/[id]/page.tsx ← copy, no changes
-src/app/[locale]/favicon.ico              ← copy or replace with your own
-```
-
-> `layout.tsx` injects the store's runtime color template via `<style>` tag using `toRootStyle()` from
-`@store-front/services`. Do not change this.
-
-> `checkout/success/page.tsx` and `checkout/cancel/page.tsx` are reached after the payment gateway redirects the
-customer back to `{domain}/{locale}/checkout/success?code={cartCode}&orderId={id}` (or `.../cancel?...`) — these
-query params are set server-side by the checkout API's `successUrl`/`cancelUrl`. Both pages only extract
-`storeContext` and render `<CheckoutResult storeContext={...}/>` (same component for both routes — like
-`callback/callback-client.tsx`, `CheckoutResult` reads `code`/`orderId` itself via `useSearchParams()` and fetches
-the *actual* order status from the API rather than trusting which route the browser landed on).
-
----
-
-### Step 6 — shadcn UI Primitives (copy as-is or regenerate with shadcn CLI)
-
-These are low-level Radix UI wrappers. Copy from `basis/src/components/ui/`:
-
-```
-accordion.tsx, alert-dialog.tsx, badge.tsx, breadcrumb.tsx,
-button.tsx, card.tsx, checkbox.tsx, dialog.tsx, dropdown-menu.tsx,
-form.tsx, input.tsx, label.tsx, navigation-menu.tsx, radio-group.tsx,
-scroll-area.tsx, select.tsx, separator.tsx, sheet.tsx, textarea.tsx, 
-tooltip.tsx, tabs.tsx, table.tsx
-```
-
-You can regenerate any of these via `npx shadcn add <component>` if you want a different variant.
-
----
-
-### Step 7 — Shared Components (THE BRAND NEW DESIGN — 19 files)
-
-These are the files you actually design from scratch for your new template. This is NOT a copy-paste job; it should be a
-**completely brand new design** for this template. They all receive the same props as basis/modern — only the JSX and
-Tailwind classes differ.
-
-```
-src/shared/
-  Layout/
-    Header.tsx                  ← navbar, logo, language, cart icon, auth button
-    Footer.tsx                  ← footer links, social icons, copyright
-
-  SlideShow/
-    CoverFlow.tsx               ← homepage hero/banner carousel
-    swiper-custom.css           ← custom swiper CSS overrides
-
-  ProductGrid/
-    ProductGrid.tsx             ← static product grid layout
-    ProductSwiperGrid.tsx       ← swipeable product carousel
-
-  ProductItem/
-    ProductItem.tsx             ← single product card (image, name, price, add-to-cart)
-
-  ProductDetails/
-    ProductDetails.tsx          ← full product detail layout
-    ProductDetailedActionBox.tsx ← quantity selector + add-to-cart button
-    ProductDetailsImageGallery.tsx ← product image gallery/zoom
-
-  Category/
-    ProductCategoryFilter.tsx   ← sidebar/filter UI + product listing
-
-  Cart/
-    CartProductList.tsx         ← cart sidebar/sheet item list
-
-  Checkout/
-    CheckoutForm.tsx            ← checkout form (CheckoutForm) + cart summary sidebar (CheckoutCartBox)
-    CheckoutResult.tsx          ← post-payment success/cancel result screen (order status, redirect-to-pay CTA)
-
-  Customer/
-    CustomerDashboard.tsx       ← Tabs for Customer Info, Addresses, and Orders List
-    OrderDetails.tsx            ← Order products, total, status, and history timeline
-
-  Common/
-    Breadcrumb.tsx              ← page breadcrumb trail
-    SectionTitle.tsx            ← section heading component
-    Secured.tsx                 ← securing page filter component
-```
-
-#### Props Contract for each component (do not break these):
-
-Each component receives typed props from the page server components. The hooks used are:
-
-| Component                     | Hook / Service                |
-|-------------------------------|-------------------------------|
-| `Header`                      | `useCart`, `useUser`          |
-| `CartProductList`             | `useCart`                     |
-| `ProductCategoryFilter`       | `useProductCategoryFilter`    |
-| `CheckoutForm`                | `useCheckoutForm`             |
-| `CheckoutCartBox`             | `useCart`                     |
-| `CheckoutResult`              | `useOrderStatus`              |
-| `ProductDetailedActionBox`    | `useProductDetailedAddToCart` |
-| `CustomerDashboard`           | `useUser`, `useCustomer`      |
-| `OrderDetails`                | `useUser`, `useCustomer`      |
-| `ProductGrid` / `ProductItem` | Props only (no hooks)         |
-| `ProductSwiperGrid`           | Props only (Swiper.js)        |
-| `CoverFlow`                   | Props only (Swiper.js)        |
-
----
-
-### Step 8 — Secured pages
-
-all /customer, /customer/* should be secured access `useUser` and redirect to login if not authenticated.
-
-### Step 9 — Utilities (1 file, copy as-is)
-
-```
-src/lib/utils.ts    ← cn() classname helper, do not change
-```
-
----
-
-### Step 10 — Register the Theme Enum
-
-Add your new template name to the `Theme` enum in the shared types package:
-
-**File:** `store-pod/landing-ui/libs/types/src/store.ts`
-
-```typescript
-export enum Theme {
-    DEFAULT = 'DEFAULT',
-    // ...
-    HEALTH = 'HEALTH',
-    BEAUTY = 'BEAUTY',   // ← add your new theme here
-}
-```
-
-**How it works end-to-end:**
-
-1. Store admin assigns a `Theme` enum value (e.g., `BEAUTY`) to a store
-2. The Express server reads the `theme` HTTP header from each request
-3. `getTheme()` lowercases it → `"beauty"`
-4. `TemplateManager` looks for `templates/beauty/` folder and serves it
-
-**Your template folder name MUST be the lowercase version of the Theme enum value.**
-For example: `BEAUTY` → `templates/beauty/`, `HEALTH` → `templates/health/`.
-
-**No other registration is needed.** The npm workspace glob (`templates/*` in root `package.json`) auto-discovers new
-folders. The Express `TemplateManager` auto-discovers templates by folder existence. The Dockerfile copies the entire
-`templates/` directory. No env vars are needed per template.
-
----
-
-### Step 11 — Install Dependencies & Run
+## 2. Step 0 — scaffold
 
 ```bash
-# Option A: Run just your template in dev mode
-cd store-pod/landing-ui/templates/health
-npm install
-npm run dev          # starts Next.js on port 8110
-
-# Option B: Run via the Express server (serves all templates, uses theme header routing)
 cd store-pod/landing-ui
-npm install          # installs all workspaces
-npm run build        # builds libs → templates → app
-npm run dev          # starts Express server on port 8110
+npm run new-theme <id>          # kebab-case, e.g. atelier
 ```
+
+The script copies `themes/starter` → `themes/<id>`, renames ids/selectors, and registers the theme in
+`registry.ts`, `themes.css`, `next.config.ts` (`transpilePackages`), `legacy-theme-map.ts`,
+`storefront/package.json` and the TS `Theme` enum, then runs `npm install`. Commit that as one change.
+
+Run it with the local stack (`./extra/scripts/run-lcl.sh start -d`) and open
+`http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` — spg injects the store headers; `?theme=` is a dev-only
+override cookie (`STOREFRONT_THEME=<id>` also works). `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
+fallback but browser-side API calls need spg (see `landing-ui.md`, "Local dev URLs").
 
 ---
 
-## Summary Checklist
+## 3. Step 1 — design it with impeccable (mandatory for a real theme)
 
-```
-— Config (copy) —
-[ ] package.json (change name only)
-[ ] next.config.ts (copied)
-[ ] tsconfig.json (copied, verify lib paths)
-[ ] postcss.config.mjs (copied)
-[ ] eslint.config.mjs (copied)
-[ ] components.json (copied)
-[ ] public/ (copy entire directory — placeholder.png, SVGs)
-[ ] public/css/login.css (CUSTOMIZE brand styles)
+The storefront ships `store-pod/landing-ui/PRODUCT.md` (impeccable product truth) and each theme owns
+`themes/<id>/DESIGN.md`. `context.mjs` resolves PRODUCT.md from the landing-ui root and DESIGN.md from the
+theme folder when targeted.
 
-— i18n (copy) —
-[ ] src/proxy.ts (copied)
-[ ] src/i18n/routing.ts (copied)
-[ ] src/i18n/request.ts (copied)
-[ ] src/i18n/navigation.ts (copied)
-
-— Styles (customize) —
-[ ] src/app/[locale]/globals.css (customize palette, fonts)
-
-— Pages (copy, no changes) —
-[ ] src/app/[locale]/layout.tsx
-[ ] src/app/[locale]/page.tsx
-[ ] src/app/[locale]/login/page.tsx
-[ ] src/app/[locale]/callback/page.tsx
-[ ] src/app/[locale]/product/[url]/page.tsx
-[ ] src/app/[locale]/category/[url]/page.tsx
-[ ] src/app/[locale]/checkout/page.tsx
-[ ] src/app/[locale]/checkout/success/page.tsx
-[ ] src/app/[locale]/checkout/cancel/page.tsx
-[ ] src/app/[locale]/content/[url]/page.tsx
-[ ] src/app/[locale]/customer/page.tsx
-[ ] src/app/[locale]/customer/order/[id]/page.tsx
-
-— UI primitives (copy or regenerate) —
-[ ] src/components/ui/* (22 files)
-
-— Utilities (copy) —
-[ ] src/lib/utils.ts
-
-— Shared components (DESIGN from scratch) —
-[ ] src/shared/Layout/Header.tsx
-[ ] src/shared/Layout/Footer.tsx
-[ ] src/shared/SlideShow/CoverFlow.tsx
-[ ] src/shared/SlideShow/swiper-custom.css
-[ ] src/shared/ProductGrid/ProductGrid.tsx
-[ ] src/shared/ProductGrid/ProductSwiperGrid.tsx
-[ ] src/shared/ProductItem/ProductItem.tsx
-[ ] src/shared/ProductDetails/ProductDetails.tsx
-[ ] src/shared/ProductDetails/ProductDetailedActionBox.tsx
-[ ] src/shared/ProductDetails/ProductDetailsImageGallery.tsx
-[ ] src/shared/Category/ProductCategoryFilter.tsx
-[ ] src/shared/Cart/CartProductList.tsx
-[ ] src/shared/Checkout/CheckoutForm.tsx
-[ ] src/shared/Checkout/CheckoutResult.tsx
-[ ] src/shared/Customer/CustomerDashboard.tsx
-[ ] src/shared/Customer/OrderDetails.tsx
-[ ] src/shared/Common/Breadcrumb.tsx
-[ ] src/shared/Common/SectionTitle.tsx
-[ ] src/shared/Common/Secured.tsx
-
-— Shared types (one-line change) —
-[ ] libs/types/src/store.ts → add new value to Theme enum
-
-— Shared locales (add new keys if needed) —
-[ ] landing-ui/locales/en.json (+ ar, es, fr, ru) → add any new literal text
-```
+1. `node ~/.claude/skills/impeccable/scripts/context.mjs --target themes/<id>` (cwd `store-pod/landing-ui`).
+2. Pick the brief from `themes/README.md` (target merchant, structural thesis, colour strategy, density)
+   — or write a new one. **The catalog entry is the brief, not the visual world.**
+3. `new-work` flow: name the audience's world, list candidates, run
+   `concept-seed.mjs --scope direction` — **the roll is mandatory**, a catalog entry never skips it —
+   present the direction, commit the contract comment in `themes/<id>/src/layout/Root.tsx`.
+4. Build page-by-page in the order a shopper travels: Home → Category → Product → Cart drawer → Checkout →
+   CheckoutResult → Customer/Order → Content → states. Keep `starter`'s *behaviour* (hooks, states, RTL,
+   a11y); replace its *look and structure* completely — `starter` is evidence of the contract, not a style.
+5. Finish: batched desktop + mobile + `/ar/` screenshots, the finish reviewer, fix batch, verdict, then the
+   documenter writes `themes/<id>/DESIGN.md` from the built theme.
 
 ---
 
-## Key Shared Library Imports to Know
+## 4. Step 2 — what to edit (and what never)
 
-```typescript
-// Types
-import type { Store, Product, Category, Cart, User, StoreContext } from '@store-front/types'
-
-// Services (used in server components / pages)
-import { ProductService } from '@store-front/services/product-service'
-import { CategoryService } from '@store-front/services/category-service'
-import { StoreService } from '@store-front/services/store-service'
-import { ContentService } from '@store-front/services/content-service'
-import { OrderService } from '@store-front/services/order-service'
-import { AuthService } from '@store-front/services/auth-service'
-import { toRootStyle } from '@store-front/services/color-utils'
-import { getDirection } from '@store-front/services/direction-utils'
-
-// Hooks (used in client components only — 'use client')
-import { useCart } from '@store-front/hooks/use-cart'
-import { useUser } from '@store-front/hooks/use-user'
-import { useCustomer } from '@store-front/hooks/use-customer'
-import { useCheckoutForm } from '@store-front/hooks/use-checkout-form'
-import { useOrderStatus } from '@store-front/hooks/use-order-status'
-import { useProductCategoryFilter } from '@store-front/hooks/use-product-category-filter'
-import { useProductDetailedAddToCart } from '@store-front/hooks/use-product-detailed-add-to-cart'
 ```
+themes/<id>/
+├── package.json            name @store-front/theme-<id>; exports ".", "./tokens.css"
+├── DESIGN.md               written at finish by the documenter
+└── src/
+    ├── index.ts            defineTheme({id, name, version, fonts, tokens, layout, pages, states, loginCss?})
+    ├── fonts.ts            next/font (google or local) → fonts.variables; tokens.css maps --font-body onto it
+    ├── tokens.css          [data-theme="<id>"] { every THEME_OWNED_TOKENS entry }  ← the theme's voice
+    ├── config.ts           ThemeLayoutConfig (cart drawer/page, mobile nav kind, grid, aspect, container, search)
+    ├── layout/             Root, Header, Nav, MobileNav, HeaderActions, CartDrawer, Announcement, Footer
+    ├── pages/              Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order
+    ├── sections/           Hero, ProductRail, Listing, BuyBox, Gallery, SearchBox, CheckoutForm, OrderSummary, …
+    ├── components/         ProductCard, ProductGrid, ProductBadges, CartLineItem, Breadcrumbs, PageShell, …
+    └── states/             ErrorState*, NotFound, EmptyState*, Redirecting*, skeletons/*   (* = 'use client')
+```
+
+Never edit for a theme: `storefront/**` (except what the scaffold generated), `libs/**`, `locales/*` other
+than adding keys. A primitive that cannot be themed gets a new variant in `libs/ui` (benefits all themes).
+
+### Tokens (`tokens.css`) → utilities (`globals.css` `@theme inline`)
+
+| Token (theme sets) | Utility you get |
+|---|---|
+| `--font-body / --font-heading / --font-code` | `font-sans / font-display / font-mono` |
+| `--type-xs…--type-6xl`, `--line-*`, `--track-*` | `text-xs…text-6xl`, `leading-*`, `tracking-*` |
+| `--space-unit`, `--density`, `--section-y`, `--gutter`, `--header-h(-lg)` | spacing scale, `py-section`, `px-gutter`, `h-header`, `top-header` |
+| `--r-control/card/image/badge/overlay` | `rounded-control/card/image/badge/overlay` (+ `rounded-md` = control, `rounded-lg` = card) |
+| `--elev-sm/md/lg/overlay` | `shadow-sm/md/lg/overlay` |
+| `--width-narrow/content/wide` | `max-w-narrow/content/wide` |
+| `--motion-fast/base/slow`, `--easing-standard/emphasized` | `duration-(--motion-base)`, `ease-standard/emphasized` |
+| `--product-aspect` | `aspect-product` (and `AspectBox` default) |
+| merchant colour roles (bridge) | `bg-primary text-primary-foreground bg-muted text-muted-foreground bg-sale border-border ring-ring …` |
+
+The stock Tailwind palette is removed: `bg-blue-500` does not compile. Colour is role-based or it does not
+exist. `white` / `black` / `transparent` remain.
 
 ---
 
-## Design Guidelines
+## 5. Step 3 — contract checklist (before you call it done)
 
-When designing the 19 shared components for your new template, follow these rules:
+- [ ] `defineTheme()` accepts it (`npm run build` passes — it throws on a missing page/state)
+- [ ] Every `THEME_OWNED_TOKENS` entry set in `tokens.css`; no hard-coded colours anywhere
+- [ ] Fonts load (`<html class>` carries the next/font variable; CSS has the `@font-face`)
+- [ ] Every page and every state renders: home, category (sort/page/filter, empty, error), product (variants,
+      out of stock, sale), cart drawer (empty → add → qty → remove), checkout, success/cancel, customer
+      (login redirect), order, content, 404 product/category/page, thrown error, store-not-found
+- [ ] RTL: `/ar/` — logical utilities only (`ps/pe/ms/me/start/end/text-start/text-end`), Swiper gets `dir`,
+      drawers use `DrawerContent side="start|end"`, icons that imply direction get `rtl:rotate-180`
+- [ ] Mobile nav, tablet and desktop verified; header hamburger; grids adapt per `config.productGrid`
+- [ ] No literal UI text — every string through `t()`; new keys added to **all 5** locale files
+- [ ] No `@/` imports in the theme (ESLint enforces); only `@store-front/*` + relative
+- [ ] shadcn rules: `Dialog/Sheet` have a title, `SelectItem` inside `SelectGroup`, icons in buttons use
+      `data-icon`, `gap-*` not `space-*`, `size-*` for squares, `Empty/Error/Skeleton` primitives, `Badge` not spans
+- [ ] Accessibility: icon-only buttons labelled, `aria-live` on async regions, focus visible, skip link kept
+- [ ] `ProductCard`: placeholder image, sale + out-of-stock badges, 2-line clamp, price via `Price`
+- [ ] `loginCss` (optional) if the theme wants the cua auth pages to match
 
-### RTL Support
+---
 
-- Use logical properties: `start`/`end` instead of `left`/`right` in Tailwind (`ps-4`, `pe-4`, `ms-auto`, `me-2`,
-  `text-start`, `text-end`, `rounded-s-lg`, `rounded-e-lg`).
-- Use `gap-*` and flexbox instead of directional margins where possible.
-- Always test with Arabic locale (`/ar/`) to verify RTL layout flips correctly.
+## 6. Step 4 — verify end-to-end
 
-### Colors — Use CSS Variables Only
+```bash
+cd store-pod/landing-ui
+npm run lint && npm run typecheck && npm run build     # contract, lint (incl. RTL warnings), Tailwind
+npm test --workspace=libs/theme                         # colour bridge (30 presets × AA)
+npm run dev   # then http://localhost:8110/en?theme=<id>, /ar?theme=<id>
 
-- Always use Tailwind classes that reference CSS variables: `bg-primary`, `text-foreground`, `border-border`,
-  `bg-accent`, `text-muted-foreground`, etc.
-- **Never** hardcode colors like `bg-blue-500` or `text-red-600` — the store's color theme is injected at runtime via
-  `toRootStyle()` and will override CSS variables.
-- For hover/focus states use the corresponding variables: `hover:bg-primary-hover`, `focus:ring-ring`, etc.
+# full stack: spg injects the headers for the demo store
+./extra/scripts/run-lcl.sh start -d
+open http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>
+```
+Browser QA at desktop, tablet and mobile widths; `Color-Theme: MIDNIGHT` (dark preset) through spg or by
+switching the store's colour theme in the seller console.
 
-### Translations — No Hardcoded Text
+---
 
-- Use `useTranslations('NAMESPACE')` in client components and `getTranslations('NAMESPACE')` in server components.
-- Add new keys to **all 5** locale files in `landing-ui/locales/` (`en.json`, `ar.json`, `es.json`, `fr.json`,
-  `ru.json`).
-- Existing translation keys cover most common text (see `en.json` for full structure: `PAGE.*`, `COMPONENTS.*`).
+## 7. Step 5 — making it selectable by merchants
 
-### Responsive Design
+Backend work (out of this repo's storefront scope): add the enum value to the Java `Theme` enum
+(`store-commons/commons/.../Theme.java`) with `implemented = true`. Until then, point existing enum values
+at the new theme in `storefront/src/shell/theme/legacy-theme-map.ts` (e.g. `jewelery: 'atelier'`). The
+TS `Theme` enum is kept in step by the scaffold script.
 
-- Follow Tailwind's breakpoints: `sm` (640px) → `md` (768px) → `lg` (1024px) → `xl` (1280px).
-- Design mobile-first. Test: mobile viewport, tablet, and desktop.
-- Header must include a hamburger/drawer menu for mobile.
-- Product grids should adapt columns: 1 col on mobile, 2–3 on tablet, 3–4 on desktop.
+---
 
-### Product Data Edge Cases
+## Key imports
 
-- **Varying image ratios**: Use `object-cover` with a fixed aspect ratio container.
-- **Long product names**: Allow 2–3 lines with `line-clamp-2` or `truncate`.
-- **Missing images**: Fallback to `placeholder.png` from the `public/` directory.
-- **Zero stock**: Show "Out of Stock" badge, disable "Add to Cart" button.
-- **Currencies**: Prices come pre-formatted from the API — display as-is, don't format manually.
-
-### Libraries Available (already in dependencies)
-
-- **Icons**: `lucide-react` — use this for all icons. Don't import other icon libraries.
-- **Carousel/Slider**: `swiper` (Swiper.js) — used by CoverFlow and ProductSwiperGrid. Keep custom CSS in
-  `swiper-custom.css`.
-- **Toast/Notifications**: `nextjs-toast-notify` — for add-to-cart success, error messages, etc.
-- **Form validation**: `react-hook-form` + `yup` — used by CheckoutForm via `useCheckoutForm` hook.
-- **UI primitives**: shadcn/ui (Radix UI) — all available in `components/ui/`.
-
-### Accessibility
-
-- Use semantic HTML: `<nav>`, `<main>`, `<article>`, `<header>`, `<footer>`.
-- Add `aria-label` to icon-only buttons (e.g., cart icon, close button).
-- Ensure color contrast meets WCAG AA standards.
-
+```ts
+import {defineTheme, type ThemeDefinition, type PageProps, type HomeData} from '@store-front/theme';
+import {Button, Badge, Price, QuantityStepper, Drawer, DrawerContent, Skeleton, EmptyState, ErrorState} from '@store-front/ui';  // or deep: '@store-front/ui/button'
+import {Link, useRouter, usePathname} from '@store-front/i18n/navigation';
+import {useDir} from '@store-front/i18n/use-dir';
+import {useCart, useUser, useCustomer, useCheckoutForm, useOrderStatus, useProductListing, useProductPurchase, useSearch} from '@store-front/hooks';
+import {isOnSale, isOutOfStock, discountPercent, primaryImage, productHref} from '@store-front/services/product-presenter';
+import type {Product, Category, Store, StoreContext} from '@store-front/types';
+```

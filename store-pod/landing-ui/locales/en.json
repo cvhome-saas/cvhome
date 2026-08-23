@@ -5,7 +5,10 @@
       "FEATURED_ITEMS": "Featured Items",
       "NEWLY_ADDED": "Newly Added",
       "HOME_PRODUCT": "Home Product",
-      "RECOMMENDED": "Recommended"
+      "RECOMMENDED": "Recommended",
+      "SHOP_NOW": "Shop now",
+      "HERO_SLIDE": "Slide {index} of {total}",
+      "SINCE": "Since {year}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Product Details",
@@ -18,7 +21,22 @@
       "AVAILABLE": "available",
       "PRODUCT_ALREADY_EXIST_IN_CART": "Already in your cart.",
       "ADD_TO_SECURE_CHECKOUT": "Add to cart for secure checkout.",
-      "OUT_OF_STOCK": "Out of stock"
+      "OUT_OF_STOCK": "Out of stock",
+      "SELECT_OPTION": "Select {option}",
+      "OPTION_REQUIRED": "Please choose {option}",
+      "SALE": "Sale",
+      "SAVE_PERCENT": "Save {percent}%",
+      "LOW_STOCK": "Only {count} left",
+      "IN_STOCK": "In stock",
+      "SKU": "SKU",
+      "IN_CART": "{count, plural, =1 {1 in your cart} other {# in your cart}}",
+      "DECREASE_QUANTITY": "Decrease quantity",
+      "INCREASE_QUANTITY": "Increase quantity",
+      "ADDING": "Adding…",
+      "GALLERY_IMAGE": "Image {index} of {total}",
+      "UNAVAILABLE_COMBINATION": "Not available",
+      "DETAILS": "Details",
+      "SPECIFICATIONS": "Specifications"
     },
     "CHECKOUT": {
       "TITLE": "Checkout",
@@ -91,7 +109,24 @@
       "HOME_TITLE": "Category",
       "FILTER_BY_MANUFACTURER": "Filter by Manufacturer",
       "ALL": "All",
-      "NO_PRODUCTS_FOUND": "No products found."
+      "NO_PRODUCTS_FOUND": "No products found.",
+      "SORT_LABEL": "Sort by",
+      "SORT": {
+        "RELEVANCE": "Relevance",
+        "NEWEST": "Newest",
+        "OLDEST": "Oldest"
+      },
+      "RESULTS_COUNT": "{count, plural, =0 {No products} =1 {1 product} other {# products}}",
+      "PAGE_OF": "Page {page} of {total}",
+      "PREVIOUS": "Previous",
+      "NEXT": "Next",
+      "FILTERS": "Filters",
+      "CLEAR_FILTERS": "Clear filters",
+      "FILTER_BY_OPTION": "Filter by {option}",
+      "LISTING_ERROR": "We couldn't load the products.",
+      "SHOW_FILTERS": "Show filters",
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {No products} =1 {1 product} other {# products}}",
+      "SUBCATEGORIES": "Subcategories"
     },
     "CUSTOMER": {
       "TITLE": "My Account",
@@ -129,7 +164,10 @@
       "CANCELED": "Canceled",
       "CREATED": "Created",
       "CONFIRMED": "Confirmed",
-      "PENDING_PAYMENT": "Pending Payment"
+      "PENDING_PAYMENT": "Pending Payment",
+      "ORDER_NOT_FOUND": "We couldn't find this order.",
+      "ERROR_LOADING": "We couldn't load your account right now.",
+      "SIGNED_IN_AS": "Signed in as {name}"
     }
   },
   "COMPONENTS": {
@@ -141,7 +179,13 @@
       "OUT_OF_STOCK": "Out Of Stock",
       "ADD_TO_CART": "Add to Cart",
       "QUICK_VIEW": "Quick View",
-      "VIEW_DETAILS": "View Details"
+      "VIEW_DETAILS": "View Details",
+      "FAILED_TO_REMOVED_PRODUCT": "Failed to remove product.",
+      "FAILED_TO_UPDATE_QUANTITY": "Failed to update quantity.",
+      "SALE": "Sale",
+      "LOW_STOCK": "Low stock",
+      "ADDED": "Added",
+      "CATALOGUE_NO": "No."
     },
     "HEADER": {
       "HOME_TITLE": "Home",
@@ -159,7 +203,15 @@
       },
       "LOGIN": "Login",
       "LOGOUT": "Logout",
-      "PROFILE": "Profile"
+      "PROFILE": "Profile",
+      "ANNOUNCEMENT_DISMISS": "Dismiss announcement",
+      "ACCOUNT": "Account",
+      "MAIN_NAVIGATION": "Main navigation",
+      "SEARCH": "Search",
+      "CART_WITH_COUNT": "Cart, {count, plural, =0 {empty} =1 {1 item} other {# items}}",
+      "VIEW_ALL_IN": "All {name}",
+      "ANNOUNCEMENT": "Note",
+      "INDEX": "Categories"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -168,7 +220,11 @@
       "SOCIAL_INSTAGRAM": "Instagram",
       "SOCIAL_TIKTOK": "TikTok",
       "LEGAL": "Legal",
-      "RIGHT_RESERVED": "All Rights Reserved."
+      "RIGHT_RESERVED": "All Rights Reserved.",
+      "SHOP": "Shop",
+      "INFORMATION": "Information",
+      "CONTACT": "Contact",
+      "FOLLOW_US": "Follow us"
     },
     "CART": {
       "QTY": "Qty",
@@ -179,17 +235,29 @@
       "CHECKOUT": "Checkout",
       "CONTINUE_SHOPPING": "Continue Shopping",
       "OR": "or",
-      "CART_IS_EMPTY": "Your cart is empty."
+      "CART_IS_EMPTY": "Your cart is empty.",
+      "EMPTY_TITLE": "Your cart is empty",
+      "EMPTY_BODY": "Add something you love and it will show up here.",
+      "QUANTITY": "Quantity",
+      "VIEW_CART": "View cart",
+      "ITEMS_COUNT": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
+      "DECREASE_QUANTITY": "Decrease quantity",
+      "INCREASE_QUANTITY": "Increase quantity"
     },
     "CHECKOUT": {},
     "CONTENT": {},
-    "CATEGORY": {}
+    "CATEGORY": {},
+    "SEARCH": {
+      "LABEL": "Search",
+      "PLACEHOLDER": "Search categories and pages…",
+      "NOT_AVAILABLE": "Search isn't available in this store yet.",
+      "NO_RESULTS": "No matches.",
+      "CATEGORIES": "Categories",
+      "PAGES": "Pages",
+      "PRODUCTS": "Products",
+      "SUGGESTIONS_ONLY": "Showing categories and pages"
+    }
   },
-  "HOME": {},
-  "PRODUCT": {},
-  "CHECKOUT": {},
-  "CONTENT": {},
-  "CATEGORY": {},
   "ERRORS": {
     "CODE": {
       "CATALOG_PRODUCT_NOT_FOUND": "This product is no longer available.",
@@ -241,5 +309,43 @@
       "NOT_FOUND_TITLE": "Page not found",
       "NOT_FOUND_MESSAGE": "The page you're looking for doesn't exist or has moved."
     }
+  },
+  "COMMON": {
+    "LOADING": "Loading…",
+    "RETRY": "Try again",
+    "BACK_TO_HOME": "Back to home",
+    "CONTINUE_SHOPPING": "Continue shopping",
+    "CLOSE": "Close",
+    "MENU": "Menu",
+    "SKIP_TO_CONTENT": "Skip to content",
+    "VIEW_ALL": "View all",
+    "SEARCH": "Search",
+    "HOME": "Home",
+    "LANGUAGE_LABEL": "Language",
+    "CURRENCY": "Currency",
+    "ITEMS": "Items"
+  },
+  "STATES": {
+    "REDIRECTING_LOGIN": "Redirecting to sign in…",
+    "AUTHENTICATING": "Signing you in…",
+    "ERROR_TITLE": "Something went wrong",
+    "ERROR_BODY": "We couldn't load this page. Please try again.",
+    "ERROR_REFERENCE": "Reference: {digest}",
+    "NOT_FOUND_TITLE": "Page not found",
+    "NOT_FOUND_BODY": "The page you're looking for doesn't exist or has moved.",
+    "PRODUCT_NOT_FOUND_TITLE": "Product not found",
+    "PRODUCT_NOT_FOUND_BODY": "This product is no longer available.",
+    "CATEGORY_NOT_FOUND_TITLE": "Category not found",
+    "CATEGORY_NOT_FOUND_BODY": "This category doesn't exist or has moved.",
+    "CONTENT_NOT_FOUND_TITLE": "Page not found",
+    "CONTENT_NOT_FOUND_BODY": "This page doesn't exist or has moved.",
+    "EMPTY_CART_TITLE": "Your cart is empty",
+    "EMPTY_CART_BODY": "Add something you love and it will show up here.",
+    "EMPTY_LISTING_TITLE": "No products found",
+    "EMPTY_LISTING_BODY": "Try another category or clear your filters.",
+    "EMPTY_ORDERS_TITLE": "No orders yet",
+    "EMPTY_ORDERS_BODY": "Your orders will appear here once you've placed one.",
+    "EMPTY_SEARCH_TITLE": "No results",
+    "EMPTY_SEARCH_BODY": "Try a different word."
   }
 }

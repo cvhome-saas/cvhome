@@ -34,7 +34,7 @@ export function useUser(storeContext: StoreContext) {
 
         window.addEventListener('auth-change', handleAuthChange);
         return () => window.removeEventListener('auth-change', handleAuthChange);
-    }, [storeContext]);
+    }, [storeContext.store, storeContext.locale]);
 
     const login = () => AuthService.login(storeContext);
     const logout = () => AuthService.logout(storeContext);

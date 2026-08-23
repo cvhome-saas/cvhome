@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-22T00:00:00Z",
+  "title": "Design System: Fashion — The Wheatpaste Wall",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Day-Glo Paper",
+        "canonical": "var(--primary)",
+        "note": "Injected per request from the merchant's ColorTheme preset via libs/theme/src/merchant-bridge.ts; the theme owns no hex. Also the ring by mapMerchantColors. Ramp is live-bound via color-mix.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--primary), black 75%)",
+          "color-mix(in oklch, var(--primary), black 55%)",
+          "color-mix(in oklch, var(--primary), black 35%)",
+          "color-mix(in oklch, var(--primary), black 15%)",
+          "var(--primary)",
+          "color-mix(in oklch, var(--primary), white 25%)",
+          "color-mix(in oklch, var(--primary), white 50%)",
+          "color-mix(in oklch, var(--primary), white 80%)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Day-Glo Print",
+        "canonical": "var(--primary-foreground)",
+        "note": "Chosen white/near-black by contrast in the merchant bridge."
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Day-Glo Hover",
+        "canonical": "var(--primary-hover)",
+        "note": "The preset's hoverPrimary; only .glo uses it."
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "var(--background)",
+        "note": "Aliased as --paper; every sheet and strip.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--background), var(--foreground) 85%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 70%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 55%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 40%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 25%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 14%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 6%)",
+          "var(--background)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "var(--foreground)",
+        "note": "Aliased as --ink; also secondary and accentForeground by mapMerchantColors.",
+        "tonalRamp": [
+          "var(--foreground)",
+          "color-mix(in oklch, var(--foreground), var(--background) 14%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 28%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 42%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 56%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 70%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 84%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 94%)"
+        ]
+      },
+      "wall": {
+        "role": "neutral",
+        "displayName": "The Wall",
+        "canonical": "color-mix(in srgb, var(--background) 86%, var(--foreground))",
+        "note": "The page ground (with --grain and a 10% vignette), the header at 90% + blur, every drawer. --wall-deep (76/24) is declared but unused."
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Pencil",
+        "canonical": "color-mix(in srgb, var(--foreground) 18%, transparent)",
+        "note": "The only border colour: .rule on accordion items, table rows, the history spine, totals."
+      },
+      "input-stroke": {
+        "role": "neutral",
+        "displayName": "Pencil Stroke",
+        "canonical": "color-mix(in srgb, var(--foreground) 45%, transparent)",
+        "note": "Input / textarea / select box; the stepper at foreground/40."
+      },
+      "faint-print": {
+        "role": "neutral",
+        "displayName": "Faint Print",
+        "canonical": "color-mix(in srgb, var(--foreground) 26%, transparent)",
+        "note": ".typo-faint: the watermark-weight name on typographic posters (aria-hidden decoration)."
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Print Grey",
+        "canonical": "var(--muted-foreground)",
+        "note": "Facts, brand lines, SKU, del prices, in-stock text, table heads; AA-guarded by the bridge."
+      },
+      "sale": {
+        "role": "tertiary",
+        "displayName": "Sale Red",
+        "canonical": "var(--sale)",
+        "note": "The preset's error role via the bridge; the SALE stamp and the failed/error title stamp only.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--sale), black 75%)",
+          "color-mix(in oklch, var(--sale), black 55%)",
+          "color-mix(in oklch, var(--sale), black 35%)",
+          "color-mix(in oklch, var(--sale), black 15%)",
+          "var(--sale)",
+          "color-mix(in oklch, var(--sale), white 25%)",
+          "color-mix(in oklch, var(--sale), white 50%)",
+          "color-mix(in oklch, var(--sale), white 80%)"
+        ]
+      },
+      "destructive": {
+        "role": "tertiary",
+        "displayName": "Fault",
+        "canonical": "var(--destructive)",
+        "note": "Text-only: field errors, logout row."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The store's name on the headline sheet: Anton 400 caps 4.5rem → 6rem → clamp(3rem,5vw,5.25rem), line-height 0.88; the typographic poster at 13cqi."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Category / CMS titles on their sheets (3.25rem → 4.5rem, 0.9); the product name (2.5rem → 3.25rem) and footer name."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Product poster names (1.125rem, 0.95, 2-line clamp) and sheet headings."
+      },
+      "strip": {
+        "displayName": "Strip",
+        "purpose": "Nav, buttons, option values, tabs, breadcrumbs, drawer and dialog titles: Anton 0.8125rem +0.05em caps on a strip."
+      },
+      "stamp": {
+        "displayName": "Stamp",
+        "purpose": "Every state: Anton 0.8125rem +0.08em caps in a 3px border at −7°; -lg 1.75rem/4px, -xl 3.25rem/5px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, messages, inputs, prices (700), facts: Rubik 0.9375rem, line-height 1.5 (1.65 for prose), tabular-nums on numbers."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Brand lines, SKU, counts, field labels (Anton): 0.6875rem +0.08em caps."
+      }
+    },
+    "shadows": [
+      {
+        "name": "elev-sm",
+        "value": "0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16)",
+        "purpose": "Flat sheet: strips, .glo, cart lines, gallery thumbnails."
+      },
+      {
+        "name": "elev-md",
+        "value": "0 2px 4px rgb(0 0 0 / 0.14), 0 12px 28px -10px rgb(0 0 0 / 0.32)",
+        "purpose": "Every .sheet at rest — posters, name sheets, spec sheet, menus, dialogs."
+      },
+      {
+        "name": "elev-lg",
+        "value": "0 4px 8px rgb(0 0 0 / 0.16), 0 24px 48px -16px rgb(0 0 0 / 0.38)",
+        "purpose": ".sheet-lift on hover/focus-within (translate 0 −3px); toasts."
+      },
+      {
+        "name": "elev-overlay",
+        "value": "0 30px 60px -20px rgb(0 0 0 / 0.5)",
+        "purpose": "Declared for the shell's overlay layer; not referenced by a theme element (not canonized)."
+      },
+      {
+        "name": "peel-shadow",
+        "value": "drop-shadow(-2px -2px 2px rgb(0 0 0 / 0.22))",
+        "purpose": "The lifted corner on big posters (mirrored +2px in RTL)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "motion-fast",
+        "value": "100ms",
+        "purpose": "Colour / translate transitions on .glo and .strip."
+      },
+      {
+        "name": "motion-base",
+        "value": "180ms",
+        "purpose": ".sheet-lift translate + shadow; product image cross-fade."
+      },
+      {
+        "name": "motion-slow",
+        "value": "480ms",
+        "purpose": "The stamp slap and the cart-stub bump."
+      },
+      {
+        "name": "easing-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default easing for transitions."
+      },
+      {
+        "name": "easing-emphasized",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Both keyframes."
+      },
+      {
+        "name": "fashion-slap",
+        "value": "0% scale 2 / opacity 0 / −20°; 55% scale 0.94 / opacity 1 / −5°; 100% scale 1 / opacity 0.92 / −7° (none under prefers-reduced-motion, opacity 0.92)",
+        "purpose": "The ADDED stamp slaps onto the poster once the bag takes the add; cleared after 1.8s."
+      },
+      {
+        "name": "fashion-bump",
+        "value": "0% scale 1.9 / opacity 0; 60% scale 0.95 / opacity 1; 100% scale 1 (none under prefers-reduced-motion)",
+        "purpose": "The cart-stub count bumps once when it grows; never on hydration."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ],
+    "materials": [
+      {
+        "name": "wall",
+        "value": "background-color: color-mix(in srgb, var(--background) 86%, var(--foreground)); background-image: var(--grain), radial-gradient(120% 80% at 50% 0%, transparent 55%, color-mix(in srgb, var(--foreground) 10%, transparent) 100%); background-attachment: fixed (scroll under prefers-reduced-motion)",
+        "purpose": "The page ground; drawers repeat --grain on the same colour."
+      },
+      {
+        "name": "grain",
+        "value": "data:image/svg+xml feTurbulence fractalNoise baseFrequency 0.85, 2 octaves, 180×180, alpha 0.22",
+        "purpose": "The rendered-surface texture of the wall."
+      },
+      {
+        "name": "sheen",
+        "value": "linear-gradient(115deg, transparent 58%, rgb(0 0 0 / 0.045) 100%) as ::after",
+        "purpose": "The paste brush's wash on big posters and spec sheets."
+      },
+      {
+        "name": "peel",
+        "value": "2.5rem ::before at inset-inline-end/bottom: linear-gradient(135deg, paper 78% black 0%, paper 22%, paper 62% black 49.5%, wall 50.5%); 225deg in RTL; white mixes (70/88/55) on data-color-scheme=dark",
+        "purpose": "The peeling corner on hero, gallery, receipt, not-found and error posters."
+      },
+      {
+        "name": "tape",
+        "value": "repeating-linear-gradient(90deg, transparent 0 46px, rgb(255 255 255 / 0.08) 46px 48px) over var(--primary)",
+        "purpose": "The announcement."
+      },
+      {
+        "name": "typo-poster",
+        "value": "linear-gradient(180deg, transparent 60%, foreground 6%) + repeating-linear-gradient(-45deg, foreground 5% 0 2px, transparent 2px 14px)",
+        "purpose": "The designed no-image fallback behind a name in poster caps."
+      },
+      {
+        "name": "bleached",
+        "value": "filter: saturate(0.2) contrast(0.85) brightness(1.05); opacity: 0.7",
+        "purpose": "A sold-out poster's image box under its SOLD OUT stamp."
+      },
+      {
+        "name": "tilt-table",
+        "value": ".wall > :nth-child(6n+1..6): −1.1° / 0.8° / −0.5° / 1.2° / −0.9° / 0.6°; .wall-calm > :nth-child(3n+1/3n+3): −0.4° / 0.4°; × --tilt-sign (−1 in RTL)",
+        "purpose": "Deterministic tilts so no two neighbours are parallel."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Day-Glo Button",
+      "kind": "button",
+      "refersTo": "button-glo",
+      "description": "The merchant primary as day-glo paper: every primary action (SHOP NOW, ADD TO CART, CHECKOUT, PLACE ORDER). Hover darkens, press drops it onto the wall.",
+      "html": "<button class=\"ds-glo\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 10a4 4 0 0 1-8 0\"/><path d=\"M3.103 6.034h17.794\"/><path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\"/></svg>ADD TO CART</button>",
+      "css": ".ds-glo { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 3rem; padding: 0 1.5rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 0; box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.9375rem; font-weight: 400; line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background-color 100ms cubic-bezier(0.2,0,0,1), translate 100ms cubic-bezier(0.2,0,0,1), box-shadow 100ms cubic-bezier(0.2,0,0,1); } .ds-glo .ds-ico { width: 1.25rem; height: 1.25rem; } .ds-glo:hover:not(:disabled) { background: var(--primary-hover); } .ds-glo:active:not(:disabled) { translate: 0 1px; box-shadow: none; } .ds-glo:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-glo:disabled { opacity: 0.45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Strip",
+      "kind": "button",
+      "refersTo": "button-strip",
+      "description": "A strip of paper: nav items, secondary actions, option values, tabs. Hover, open and current invert to ink; the selected state is day-glo.",
+      "html": "<div class=\"ds-strips\"><button class=\"ds-strip\" style=\"--tilt:-0.6deg\">NEWLY ADDED</button><button class=\"ds-strip\" style=\"--tilt:0.7deg\" aria-current=\"page\">HOODIES</button><button class=\"ds-strip ds-strip-on\" style=\"--tilt:-0.5deg\">M</button></div>",
+      "css": ".ds-strips { display: inline-flex; gap: 0.5rem; padding: 0.5rem; background: color-mix(in srgb, var(--background) 86%, var(--foreground)); } .ds-strip { display: inline-flex; align-items: center; gap: 0.4rem; height: 2.25rem; padding: 0 0.75rem; background: var(--background); color: var(--foreground); border: 0; border-radius: 0; box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.8125rem; font-weight: 400; line-height: 1; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; rotate: var(--tilt, 0deg); cursor: pointer; transition: background-color 100ms cubic-bezier(0.2,0,0,1), color 100ms cubic-bezier(0.2,0,0,1); } .ds-strip:hover, .ds-strip[aria-current=\"page\"] { background: var(--foreground); color: var(--background); } .ds-strip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-strip-on, .ds-strip-on:hover { background: var(--primary); color: var(--primary-foreground); }"
+    },
+    {
+      "name": "Cart Stub",
+      "kind": "nav",
+      "refersTo": "cart-stub",
+      "description": "The day-glo stub in the header: bag icon and a tabular count that bumps once when it grows (never on hydration).",
+      "html": "<button class=\"ds-stub\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 10a4 4 0 0 1-8 0\"/><path d=\"M3.103 6.034h17.794\"/><path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\"/></svg><span class=\"ds-stub-n\">41</span></button>",
+      "css": ".ds-stub { display: inline-flex; align-items: center; gap: 0.375rem; height: 2.25rem; padding: 0 0.75rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 0; box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.8125rem; font-weight: 400; line-height: 1; letter-spacing: 0.06em; cursor: pointer; } .ds-stub .ds-ico { width: 1rem; height: 1rem; } .ds-stub-n { display: inline-block; min-width: 1.25ch; text-align: center; font-variant-numeric: tabular-nums; } .ds-stub:hover { background: var(--primary-hover); } .ds-stub:active .ds-stub-n { animation: ds-bump 480ms cubic-bezier(0.16,1,0.3,1) both; } @keyframes ds-bump { 0% { scale: 1.9; opacity: 0; } 60% { scale: 0.95; opacity: 1; } 100% { scale: 1; opacity: 1; } } @media (prefers-reduced-motion: reduce) { .ds-stub:active .ds-stub-n { animation: none; } }"
+    },
+    {
+      "name": "Pencil Field",
+      "kind": "input",
+      "refersTo": "input-pencil",
+      "description": "An input on paper: a pencil box with no radius, Anton label, day-glo focus ring.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-email\">EMAIL</label><input class=\"ds-input\" id=\"ds-email\" type=\"email\" placeholder=\"you@example.com\"></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.375rem; width: 18rem; } .ds-label { font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--foreground); } .ds-input { height: 2.25rem; padding: 0 0.75rem; background: var(--background); color: var(--foreground); border: 1px solid color-mix(in srgb, var(--foreground) 45%, transparent); border-radius: 0; box-shadow: none; font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; outline: none; } .ds-input::placeholder { color: var(--muted-foreground); } .ds-input:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent); } .ds-input[aria-invalid=\"true\"] { border-color: var(--destructive); }"
+    },
+    {
+      "name": "Search Strip",
+      "kind": "input",
+      "refersTo": "input-pencil",
+      "description": "The header search as a strip: icon at the start, Rubik input, suggestions drop as a sheet.",
+      "html": "<label class=\"ds-search\"><svg class=\"ds-ico ds-search-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"search\" placeholder=\"Search categories and pages…\" aria-label=\"Search\"></label>",
+      "css": ".ds-search { position: relative; display: block; width: 16rem; height: 2.25rem; background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); } .ds-search-ico { position: absolute; left: 0.625rem; top: 50%; width: 1rem; height: 1rem; translate: 0 -50%; color: var(--muted-foreground); pointer-events: none; } .ds-search input { width: 100%; height: 100%; padding: 0 2rem; background: transparent; border: 0; font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; color: inherit; outline: none; } .ds-search input::placeholder { color: var(--muted-foreground); } .ds-search:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }"
+    },
+    {
+      "name": "Stamps",
+      "kind": "chip",
+      "refersTo": "chip-stamp",
+      "description": "State as an overprint: SALE in the sale colour, SOLD OUT and ONLY N LEFT in ink, ADDED in day-glo; 3px border, −7°, multiplied into light paper.",
+      "html": "<div class=\"ds-paper\"><span class=\"ds-stamp ds-stamp-sale\">SAVE 20%</span><span class=\"ds-stamp\">SOLD OUT</span><span class=\"ds-stamp\">ONLY 4 LEFT</span><span class=\"ds-stamp ds-stamp-glo ds-stamp-lg\">ADDED</span></div>",
+      "css": ".ds-paper { display: inline-flex; align-items: center; gap: 1.25rem; padding: 1rem 1.5rem; background: var(--background); box-shadow: 0 2px 4px rgb(0 0 0 / 0.14), 0 12px 28px -10px rgb(0 0 0 / 0.32); } .ds-stamp { display: inline-flex; align-items: center; justify-content: center; padding: 0.28em 0.5em 0.22em; border: 3px solid currentColor; color: var(--foreground); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.8125rem; font-weight: 400; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; rotate: -7deg; opacity: 0.92; mix-blend-mode: multiply; pointer-events: none; } .ds-stamp-sale { color: var(--sale); } .ds-stamp-glo { color: var(--primary); } .ds-stamp-lg { font-size: 1.75rem; border-width: 4px; letter-spacing: 0.06em; }"
+    },
+    {
+      "name": "Product Poster",
+      "kind": "card",
+      "refersTo": "card-product-poster",
+      "description": "A pasted poster: 4:5 picture (typographic poster when there is none), stamps at the top-start, the name in poster caps, the price printed on the foot beside a day-glo add square. Lifts on hover.",
+      "html": "<article class=\"ds-poster\" style=\"--tilt:0.8deg\"><a class=\"ds-poster-img\" href=\"#\"><div class=\"ds-typo\"><p>GUCCI GG MARMONT SHOULDER BAG</p></div><span class=\"ds-stamp ds-stamp-badge\">ONLY 4 LEFT</span></a><div class=\"ds-poster-foot\"><h3 class=\"ds-poster-title\"><a href=\"#\">GUCCI GG MARMONT SHOULDER BAG</a></h3><p class=\"ds-poster-brand\">GUCCI</p><div class=\"ds-poster-row\"><p class=\"ds-poster-price\"><del>SAR 9,200.00</del><span>SAR 8,500.00</span></p><button class=\"ds-poster-add\" aria-label=\"Add to cart\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button></div></div></article>",
+      "css": ".ds-poster { position: relative; display: flex; flex-direction: column; width: 15rem; background: var(--background); color: var(--foreground); box-shadow: 0 2px 4px rgb(0 0 0 / 0.14), 0 12px 28px -10px rgb(0 0 0 / 0.32); rotate: var(--tilt, 0deg); transition: translate 180ms cubic-bezier(0.2,0,0,1), box-shadow 180ms cubic-bezier(0.2,0,0,1); } .ds-poster:hover, .ds-poster:focus-within { translate: 0 -3px; box-shadow: 0 4px 8px rgb(0 0 0 / 0.16), 0 24px 48px -16px rgb(0 0 0 / 0.38); } .ds-poster-img { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--background); } .ds-typo { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 8%; background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--foreground) 6%, transparent)), repeating-linear-gradient(-45deg, color-mix(in srgb, var(--foreground) 5%, transparent) 0 2px, transparent 2px 14px); } .ds-typo p { margin: 0; font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 1.9rem; line-height: 0.86; text-transform: uppercase; color: color-mix(in srgb, var(--foreground) 26%, transparent); overflow-wrap: anywhere; } .ds-stamp-badge { position: absolute; left: 0.5rem; top: 0.75rem; } .ds-poster-foot { display: flex; flex: 1; flex-direction: column; padding: 0.625rem 0.75rem 0.75rem; } .ds-poster-title { margin: 0; font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 1.125rem; font-weight: 400; line-height: 0.95; text-transform: uppercase; } .ds-poster-title a { color: inherit; text-decoration: none; } .ds-poster-title a:hover { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 3px; text-underline-offset: 4px; } .ds-poster-brand { margin: 0.25rem 0 0; font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); } .ds-poster-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.75rem; } .ds-poster-price { display: flex; flex-direction: column; margin: 0; font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; line-height: 1; font-variant-numeric: tabular-nums; } .ds-poster-price del { font-size: 0.6875rem; color: var(--muted-foreground); } .ds-poster-price span { font-size: 0.9375rem; font-weight: 700; } .ds-poster-add { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.25rem; height: 2.25rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 0; box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); cursor: pointer; transition: background-color 100ms cubic-bezier(0.2,0,0,1); } .ds-poster-add .ds-ico { width: 1rem; height: 1rem; } .ds-poster-add:hover { background: var(--primary-hover); } .ds-poster-add:active { translate: 0 1px; box-shadow: none; } .ds-poster-add:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "nav-strip",
+      "description": "The label strip at the start of a stretch of wall: title in poster caps at −0.6°, an ink count stub at +0.9°.",
+      "html": "<div class=\"ds-heading\"><h2 class=\"ds-heading-title\" style=\"--tilt:-0.6deg\">FEATURED ITEMS</h2><span class=\"ds-heading-count\" style=\"--tilt:0.9deg\" aria-hidden=\"true\">10</span></div>",
+      "css": ".ds-heading { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: color-mix(in srgb, var(--background) 86%, var(--foreground)); } .ds-heading-title { display: inline-flex; align-items: center; height: 2.75rem; margin: 0; padding: 0 0.75rem; background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 1.125rem; font-weight: 400; line-height: 1; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; rotate: var(--tilt, 0deg); } .ds-heading-count { display: inline-flex; align-items: center; height: 2rem; padding: 0 0.75rem; background: var(--foreground); color: var(--background); box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; font-size: 0.6875rem; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; rotate: var(--tilt, 0deg); }"
+    },
+    {
+      "name": "Headline Sheet",
+      "kind": "card",
+      "refersTo": "card-sheet",
+      "description": "The store's name sheet in the hero: city · year, the H1 in poster caps, SHOP NOW on day-glo with group strips, a peeling corner and the paste sheen.",
+      "html": "<div class=\"ds-sheet\" style=\"--tilt:-0.7deg\"><p class=\"ds-sheet-facts\">RIYADH · 2024</p><h1 class=\"ds-sheet-h1\">RIYADH-FASHION-HUB</h1><div class=\"ds-sheet-ctas\"><a class=\"ds-sheet-glo\" href=\"#\">SHOP NOW</a><a class=\"ds-sheet-strip\" style=\"--tilt:0.8deg\" href=\"#\">NEWLY ADDED</a></div><p class=\"ds-sheet-meta\">61 ITEMS · SAR</p></div>",
+      "css": ".ds-sheet { position: relative; display: flex; flex-direction: column; gap: 1.25rem; width: 22rem; padding: 1.75rem; background: var(--background); color: var(--foreground); box-shadow: 0 2px 4px rgb(0 0 0 / 0.14), 0 12px 28px -10px rgb(0 0 0 / 0.32); rotate: var(--tilt, 0deg); } .ds-sheet::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 58%, rgb(0 0 0 / 0.045) 100%); } .ds-sheet::before { content: ''; position: absolute; right: 0; bottom: 0; width: 2.5rem; height: 2.5rem; z-index: 2; background: linear-gradient(135deg, color-mix(in srgb, var(--background) 78%, black) 0%, var(--background) 22%, color-mix(in srgb, var(--background) 62%, black) 49.5%, color-mix(in srgb, var(--background) 86%, var(--foreground)) 50.5%); filter: drop-shadow(-2px -2px 2px rgb(0 0 0 / 0.22)); pointer-events: none; } .ds-sheet-facts { margin: 0; font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); } .ds-sheet-h1 { margin: 0; font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 3rem; font-weight: 400; line-height: 0.88; text-transform: uppercase; overflow-wrap: anywhere; } .ds-sheet-ctas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 0.5rem; } .ds-sheet-glo { display: inline-flex; align-items: center; height: 2.75rem; padding: 0 1.25rem; background: var(--primary); color: var(--primary-foreground); box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.9375rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; } .ds-sheet-glo:hover { background: var(--primary-hover); } .ds-sheet-strip { display: inline-flex; align-items: center; height: 2.75rem; padding: 0 0.75rem; background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16); font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.8125rem; letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none; rotate: var(--tilt, 0deg); } .ds-sheet-strip:hover { background: var(--foreground); color: var(--background); } .ds-sheet-meta { margin: 0; font-family: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Announcement Tape",
+      "kind": "nav",
+      "refersTo": "button-glo",
+      "description": "The merchant's header message as day-glo tape across the top of the wall, with a close square; dismissed per session.",
+      "html": "<div class=\"ds-tape\"><p>FREE SHIPPING OVER SAR 300 · <a href=\"#\">DETAILS</a></p><button aria-label=\"Dismiss\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/></svg></button></div>",
+      "css": ".ds-tape { display: flex; align-items: center; gap: 0.75rem; width: 28rem; padding: 0.375rem 1rem; background-color: var(--primary); background-image: repeating-linear-gradient(90deg, transparent 0 46px, rgb(255 255 255 / 0.08) 46px 48px); color: var(--primary-foreground); } .ds-tape p { flex: 1; margin: 0; text-align: center; font-family: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), 'Arial Narrow', sans-serif; font-size: 0.8125rem; letter-spacing: 0.05em; text-transform: uppercase; } .ds-tape a { color: inherit; text-decoration: underline; text-underline-offset: 2px; } .ds-tape button { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: transparent; color: inherit; border: 0; cursor: pointer; } .ds-tape button:hover { background: color-mix(in srgb, var(--primary-foreground) 15%, transparent); } .ds-tape .ds-ico { width: 1rem; height: 1rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Posters Stay Up",
+    "overview": "A streetwear / drops store as a fly-posted wall. The ground is a material, not a colour: the merchant's background mixed 14% toward its foreground, with a fixed fractal grain and a faint vignette from the top. Everything that matters is a sheet of paper pasted on that wall — the store's name sheet, every slider image as a big peeling poster, every product as a poster with its price printed on the foot, every label and nav item as a strip. Sheets take a small deterministic tilt (never more than 1.2°) and an offset soft shadow, so no two neighbours are parallel and the goods are the page; nothing is drawn around them. The world refuses the black-and-white streetwear brutalism of a full-bleed lookbook hero over a four-column grid, and it refuses carousels: each merchant image gets its own place on the wall.\n\nTwo things are not paper. The merchant's primary is the day-glo paper stock — SHOP NOW, the add square, the cart stub, checkout, the selected option, the active tab — and nothing else on the wall is that colour. State is a rubber stamp overprinted on the sheet (SALE / SAVE 20%, SOLD OUT, ONLY N LEFT, ADDED, order status, the receipt verdict), rotated −7°, multiplied into the paper on light presets; never a tint, never a background wash. Type is poster caps (Anton; Changa 800 in Arabic) for anything that names and Rubik for anything that explains. There are no radii and no borders except pencil rules; density is tight on the wall (posters butt at 0.75–1rem) and loose between stretches (2.5rem / 4rem of bare wall).",
+    "keyCharacteristics": [
+      "A rendered wall (`--wall`, grain, vignette) under paper sheets in the merchant's background colour; depth is paper on a wall (offset soft shadow), not a line.",
+      "Deterministic tilts ≤1.2° from the `.wall` nth-child table (±0.4° in `.wall-calm`), mirrored in RTL; the peel corner on big posters.",
+      "The merchant primary only as day-glo paper on primary actions and live states; the merchant `sale` role only on the SALE stamp and the failed verdict.",
+      "State is a stamp (3px border, −7°, `mix-blend-mode: multiply` on light), in stock is silence; sold-out sheets bleach under their stamp.",
+      "Poster caps (Anton 400 / Changa 800) for names, strips, stamps and labels; Rubik for facts, prices and prose; tabular numerals everywhere a count or price appears.",
+      "Exactly two authored motions: the stamp slap (480ms) and the cart-stub bump (480ms); everything else is a ≤180ms transition."
+    ],
+    "rules": [
+      {
+        "name": "The Day-Glo Rule",
+        "body": "The merchant primary appears only as day-glo paper on primary actions and live states (`.glo`, `.strip-on`, the ring, the ADDED/success stamp outline, link underlines on hover). No primary text, no primary rules, no primary surface wider than a control.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stamp Rule",
+        "body": "State is an overprint, never a tint: a stamp on the sheet (SALE, SOLD OUT, ONLY N LEFT, ADDED, status), a bleached sheet under SOLD OUT, a line-through on an unavailable option. No coloured backgrounds, badges or washes for state.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper Rule",
+        "body": "Sheets and strips are the only containers; they are the merchant background on the wall with an offset shadow. The only borders are pencil rules at 18% and the 45% input box.",
+        "section": "colors"
+      },
+      {
+        "name": "The Poster Caps Rule",
+        "body": "If it names, it is Anton (Changa in Arabic), uppercase, weight 400. Never request 500/600/700 of the display face, never set display in sentence case.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Fact Rule",
+        "body": "Prices, counts, SKUs, dates and prose are Rubik with `tabular-nums`; the slide counter is zero-padded `01 / 05` in LTR; long names get `overflow-wrap: anywhere` and `<bdi dir=\"auto\">`.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Thickness Rule",
+        "body": "Shadows only say \"this is paper on the wall\": rest = sheet, hover = lifted, pressed `.glo` = none (`translate: 0 1px`). No glows, no coloured shadows, no shadow as a border.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Layering Rule",
+        "body": "World classes (`.sheet`, `.strip`, `.glo`, `.stamp`, `.peel`, `.wall`, `.typo-poster`, `.typo-faint`) live in `@layer components`, so a Tailwind utility on the same element (`h-9`, `text-lg`, `bg-foreground`, `lg:sticky`, `[--tilt:0deg]`) always wins.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** build every container as a `.sheet` or `.strip` (merchant background on the wall, offset shadow, 0 radius) and put groups of them in a `.wall` (or `.wall-calm`) so the tilt table runs; override a single element with `[--tilt:…]`, never with `rotate-*`.",
+      "**Do** reserve the merchant primary for `.glo` / `.strip-on` / the ring / the ADDED-and-success stamp outline / hover underlines; keep `.glo` at 2.25 / 2.75 / 3rem heights.",
+      "**Do** show state as a `.stamp` (sale in `--sale`, everything else ink), bleach a sold-out sheet, and leave in-stock silent (print-grey caps in the buy box only).",
+      "**Do** set names, strips, stamps and labels in Anton uppercase at weight 400 (Changa 800 in Arabic) and facts, prices, prose and inputs in Rubik with `tabular-nums`; wrap merchant names in `<bdi dir=\"auto\">` with `overflow-wrap: anywhere`.",
+      "**Do** keep the grid at 2 / 3 / 4 / 6 with `gap-x-3 gap-y-5` (`sm:gap-x-4 sm:gap-y-6`), posters at 4:5, the hero at 5 / 5 / 2 on `lg`, and stretches 2.5rem / 4rem apart on bare wall.",
+      "**Do** let a missing or failed image fall back to `PosterImage`'s typographic poster (faint name when the foot names the product, ink when it does not); never a grey box or a broken image.",
+      "**Do** force shared primitives into the world: `rounded-none border-0` on drawers, dialogs, menus, selects, skeletons; drawers on `bg-(--wall)` with `[background-image:var(--grain)]`; dialogs and menus as 0° sheets.",
+      "**Do** mirror for RTL with logical properties, `rtl:rotate-180` on directional icons, and trust `--tilt-sign` / the peel's RTL gradient."
+    ],
+    "donts": [
+      "**Don't** hard-code hex; every colour is a role variable from the merchant bridge or a `color-mix` of `--background` / `--foreground` declared in `tokens.css`.",
+      "**Don't** tint state: no primary / sale / destructive / success backgrounds or badges, no coloured borders, no opacity fades beyond `.bleached` (70%), `.glo:disabled` (45%) and the listing's 60% while loading.",
+      "**Don't** tilt past the table (≤1.2° on sheets, ±0.4° in calm walls) or stamp at anything but −7° / −5° — bigger skews turn the wall into kitsch.",
+      "**Don't** add radii, borders or dividers: pencil `.rule` at 18% and the 45% input stroke are the only lines on the wall.",
+      "**Don't** add a third motion: the stamp slap (`fashion-slap`, 480ms emphasized) and the cart-stub bump (`fashion-bump`, 480ms emphasized) are the theme's only keyframes, both off under `prefers-reduced-motion` (the wall's fixed background also goes static); everything else is a ≤180ms colour / translate / opacity transition.",
+      "**Don't** put a carousel on the wall: each slider image is pasted once (hero, group lead, leftover stretch).",
+      "**Don't** \"fix\" the intentional exceptions: typographic posters are the designed no-image fallback (merchant images 404 locally); in-stock is silence / muted caps; `.typo-faint` watermark names on product posters are `aria-hidden` decoration.",
+      "**Don't** request display weights other than 400, set display in sentence case, or put a price / count in Anton."
+    ]
+  }
+}

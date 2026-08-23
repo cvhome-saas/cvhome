@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [{"name": "next"}],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@store-front/ui": ["../libs/ui/src/index.ts"],
+      "@store-front/ui/*": ["../libs/ui/src/*"],
+      "@store-front/i18n": ["../libs/i18n/src/index.ts"],
+      "@store-front/i18n/*": ["../libs/i18n/src/*"],
+      "@store-front/theme": ["../libs/theme/src/index.ts"],
+      "@store-front/theme/*": ["../libs/theme/src/*"],
+      "@store-front/theme-*": ["../themes/*/src/index.ts"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "../libs/ui/src/**/*",
+    "../libs/i18n/src/**/*",
+    "../libs/theme/src/**/*",
+    "../themes/*/src/**/*"
+  ],
+  "exclude": ["node_modules"]
+}

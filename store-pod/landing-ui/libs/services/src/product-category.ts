@@ -1,6 +1,30 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {Manufacturer, ProductGroupPage} from "@store-front/types/product-groups";
+import {Manufacturer, ProductVariant} from "@store-front/types/product-groups";
+import {ListingFacets, ListingQuery, ListingSort, ProductListingPage} from "@store-front/types/listing";
 import {apiFetch, get, orUndefined} from "./http-utils";
+
+/**
+ * `sort=` is forwarded verbatim to Spring's Pageable on the Product entity. Only direct columns are
+ * safe (`dateAvailable`, `id`, `sortOrder`); anything in a joined table (price, description.name) 500s.
+ * `relevance` = the backend's default ordering.
+ */
+export const SORT_MAP: Readonly<Record<ListingSort, string | undefined>> = {
+    relevance: undefined,
+    newest: 'dateAvailable,desc',
+    oldest: 'dateAvailable,asc',
+};
+
+export function listingQueryToParams(query: ListingQuery, categoryId?: number): string {
+    const p = new URLSearchParams();
+    if (categoryId) p.set('categoryIds', String(categoryId));
+    if (query.manufacturerId) p.set('manufacturerId', String(query.manufacturerId));
+    if (query.optionValueIds?.length) p.set('optionValueIds', query.optionValueIds.join(','));
+    p.set('page', String(Math.max(0, query.page)));
+    p.set('count', String(query.count));
+    const sort = SORT_MAP[query.sort];
+    if (sort) p.set('sort', sort);
+    return p.toString();
+}
 
 export class ProductCategory {
 
@@ -11,17 +35,29 @@ export class ProductCategory {
             get()));
     }
 
-    /**
-     * Degrades for now. Both callers are `useProductCategoryFilter`, a client hook with no error state,
-     * so throwing here would only produce an unhandled rejection and an empty grid. Once that hook
-     * surfaces an error this should become a must-fail call — the listing is the point of the page.
-     */
-    public static getProducts = async (storeContext: StoreContext, categoryId?: number, manufacturerId?: number): Promise<ProductGroupPage | undefined> => {
-        const categoryParam = categoryId ? `&categoryIds=${categoryId}` : '';
-        const manufacturerParam = manufacturerId ? `&manufacturerId=${manufacturerId}` : '';
-        return orUndefined(apiFetch<ProductGroupPage>(
-            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products?store=${storeContext.store}${categoryParam}${manufacturerParam}&page=0&count=15&lang=${storeContext.locale}`,
+    /** Degrades: option/variant facets across a category. */
+    public static getCategoryVariants = async (storeContext: StoreContext, categoryId: number): Promise<ProductVariant[] | undefined> => {
+        return orUndefined(apiFetch<ProductVariant[]>(
+            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/category/${categoryId}/variations?store=${storeContext.store}&lang=${storeContext.locale}`,
             get()));
     }
 
+    /** Both facets at once; each degrades independently. */
+    public static getFacets = async (storeContext: StoreContext, categoryId: number): Promise<ListingFacets> => {
+        const [manufacturers, variants] = await Promise.all([
+            ProductCategory.getManufacturers(storeContext, categoryId),
+            ProductCategory.getCategoryVariants(storeContext, categoryId),
+        ]);
+        return {manufacturers: manufacturers ?? [], variants: variants ?? []};
+    }
+
+    /**
+     * Must fail: the listing is the point of the category page. Callers (the server loader and
+     * `useProductListing`) surface the error as a state instead of an empty grid.
+     */
+    public static getProducts = async (storeContext: StoreContext, query: ListingQuery, categoryId?: number): Promise<ProductListingPage> => {
+        return apiFetch<ProductListingPage>(
+            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products?store=${storeContext.store}&lang=${storeContext.locale}&${listingQueryToParams(query, categoryId)}`,
+            get());
+    }
 }

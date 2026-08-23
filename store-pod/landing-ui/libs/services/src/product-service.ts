@@ -1,7 +1,8 @@
 import {Product} from "@store-front/types/product-groups";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
 import {apiFetch, get, orUndefined} from "./http-utils";
-import {ProductGroup} from "@store-front/types";
+import {ProductGroup, ProductPrice, SelectedVariantValue} from "@store-front/types";
+import {post} from "./http-utils";
 
 export class ProductService {
 
@@ -43,5 +44,16 @@ export class ProductService {
         return apiFetch<Product>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/product/name/${url}?store=${storeContext.store}&lang=${storeContext.locale}`,
             get());
+    }
+
+    /**
+     * Degrades. Recalculated price for a selection of option values. Today the catalog returns the base
+     * price regardless of the selection, so `useProductPurchase` only uses this opportunistically and
+     * derives variant pricing from the product payload itself.
+     */
+    public static getVariationPrice = async (storeContext: StoreContext, productId: number, selection: SelectedVariantValue[]): Promise<ProductPrice | undefined> => {
+        return orUndefined(apiFetch<ProductPrice>(
+            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/product/${productId}/variation?store=${storeContext.store}&lang=${storeContext.locale}`,
+            post({options: selection})));
     }
 }

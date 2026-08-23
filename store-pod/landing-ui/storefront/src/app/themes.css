@@ -1,0 +1,12 @@
+/* GENERATED — managed by scripts/new-theme.mjs. Per registered theme: a Tailwind @source (class scanning)
+   and the tokens.css import. Globs are not used on purpose: Tailwind v4 @source wants concrete paths. */
+/* @themes:start */
+@source "../../../themes/starter/src";
+@import "@store-front/theme-starter/tokens.css";
+@source "../../../themes/beauty/src";
+@import "@store-front/theme-beauty/tokens.css";
+@source "../../../themes/fashion/src";
+@import "@store-front/theme-fashion/tokens.css";
+@source "../../../themes/basic/src";
+@import "@store-front/theme-basic/tokens.css";
+/* @themes:end */
