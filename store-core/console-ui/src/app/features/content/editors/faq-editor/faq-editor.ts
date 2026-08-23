@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
@@ -15,13 +15,20 @@ import {TagInput} from '@shared/ui/tag-input/tag-input';
 import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
-import {PublishChecklist, type ChecklistItem} from '../../components/publish-checklist/publish-checklist';
+import {
+  PublishChecklist,
+  type ChecklistItem,
+} from '../../components/publish-checklist/publish-checklist';
 import {ScheduleSheet} from '../../components/schedule-sheet/schedule-sheet';
 import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
 import {EditorShell, type EditorCommand} from '../editor-shell/editor-shell';
 
-const COPY: CopyFields = {titleKey: 'content.copy.question', bodyKey: 'content.copy.answer', richBody: true};
+const COPY: CopyFields = {
+  titleKey: 'content.copy.question',
+  bodyKey: 'content.copy.answer',
+  richBody: true,
+};
 
 /**
  * `New FAQ Entry.dc.html`: question and answer per language, the group cards (with an inline "new
@@ -55,7 +62,8 @@ export class FaqEditor {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly hub = inject(ContentHubFacade);
-  protected readonly facade = inject<ContentEditorFacade<PersistableFaq, ReadableFaq>>(ContentEditorFacade);
+  protected readonly facade =
+    inject<ContentEditorFacade<PersistableFaq, ReadableFaq>>(ContentEditorFacade);
 
   readonly id = input<string>();
 
@@ -94,14 +102,18 @@ export class FaqEditor {
   );
 
   constructor() {
-    const raw = this.id();
-    this.facade.init('faq', raw ? Number(raw) : null, this.extra, (item) => {
-      this.extra.reset({
-        groupId: item.groupId ?? null,
-        position: item.position ?? null,
-        keywords: item.keywords ?? [],
-        showInCheckoutHelp: !!item.showInCheckoutHelp,
-      });
+    effect(() => {
+      const raw = this.id();
+      untracked(() =>
+        this.facade.init('faq', raw ? Number(raw) : null, this.extra, (item) => {
+          this.extra.reset({
+            groupId: item.groupId ?? null,
+            position: item.position ?? null,
+            keywords: item.keywords ?? [],
+            showInCheckoutHelp: !!item.showInCheckoutHelp,
+          });
+        }),
+      );
     });
     effect(() => {
       const locales = this.hub.locales();
@@ -110,7 +122,11 @@ export class FaqEditor {
     // a new entry defaults to the first group once the groups arrive
     effect(() => {
       const first = this.groups()[0];
-      if (first?.id !== undefined && this.facade.isNew() && this.extra.controls.groupId.value === null) {
+      if (
+        first?.id !== undefined &&
+        this.facade.isNew() &&
+        this.extra.controls.groupId.value === null
+      ) {
         this.extra.controls.groupId.setValue(first.id);
       }
     });
@@ -118,27 +134,45 @@ export class FaqEditor {
 
   protected readonly heading = computed(() => {
     this.transloco.activeLang();
-    return this.facade.isNew() ? this.transloco.translate('content.faq.newTitle') : this.facade.title() || this.transloco.translate('content.faq.editTitle');
+    return this.facade.isNew()
+      ? this.transloco.translate('content.faq.newTitle')
+      : this.facade.title() || this.transloco.translate('content.faq.editTitle');
   });
 
   protected readonly activeTranslation = computed(
-    () => this.facade.translationFor(this.facade.language()) ?? Object.values(this.facade.translations())[0],
+    () =>
+      this.facade.translationFor(this.facade.language()) ??
+      Object.values(this.facade.translations())[0],
   );
 
   protected readonly checklist = computed<readonly ChecklistItem[]>(() => {
     this.transloco.activeLang();
     this.facade.written();
-    const source = this.facade.translationFor(this.hub.locales().defaultCode);
-    const qa = !!source && source.controls.title.value.trim().length > 0 && source.controls.body.value.trim().length > 0;
+    const source = this.facade.sourceTranslation(this.hub.locales().defaultCode);
+    const qa =
+      !!source &&
+      source.controls.title.value.trim().length > 0 &&
+      source.controls.body.value.trim().length > 0;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [
       {key: 'qa', label: this.transloco.translate('content.checklist.questionAndAnswer'), ok: qa},
-      {key: 'group', label: this.transloco.translate('content.checklist.group'), ok: this.extra.controls.groupId.value !== null},
-      {key: 'keywords', label: this.transloco.translate('content.checklist.keywords'), ok: this.extra.controls.keywords.value.length > 0, soft: true},
+      {
+        key: 'group',
+        label: this.transloco.translate('content.checklist.group'),
+        ok: this.extra.controls.groupId.value !== null,
+      },
+      {
+        key: 'keywords',
+        label: this.transloco.translate('content.checklist.keywords'),
+        ok: this.extra.controls.keywords.value.length > 0,
+        soft: true,
+      },
       {
         key: 'translations',
         label: missing.length
-          ? this.transloco.translate('content.checklist.translationsMissing', {languages: missing.map((c) => c.toUpperCase()).join(', ')})
+          ? this.transloco.translate('content.checklist.translationsMissing', {
+              languages: missing.map((c) => c.toUpperCase()).join(', '),
+            })
           : this.transloco.translate('content.checklist.translationsDone'),
         ok: missing.length === 0,
         soft: true,
@@ -164,21 +198,28 @@ export class FaqEditor {
     if (!name) {
       return;
     }
-    const key = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || `group-${Date.now()}`;
-    this.faqApi.createGroup({key, names: {[this.transloco.getActiveLang()]: name}, position: this.groups().length}).subscribe({
-      next: (group) => {
-        this.newGroupName.set('');
-        this.newGroupOpen.set(false);
-        this.groupStamp.update((v) => v + 1);
-        if (group.id !== undefined) {
-          this.extra.controls.groupId.setValue(group.id);
-          this.extra.controls.groupId.markAsDirty();
-        }
-      },
-    });
+    const key =
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || `group-${Date.now()}`;
+    this.faqApi
+      .createGroup({
+        key,
+        names: {[this.transloco.getActiveLang()]: name},
+        position: this.groups().length,
+      })
+      .subscribe({
+        next: (group) => {
+          this.newGroupName.set('');
+          this.newGroupOpen.set(false);
+          this.groupStamp.update((v) => v + 1);
+          if (group.id !== undefined) {
+            this.extra.controls.groupId.setValue(group.id);
+            this.extra.controls.groupId.markAsDirty();
+          }
+        },
+      });
   }
 
   protected setKeywords(keywords: readonly string[]): void {

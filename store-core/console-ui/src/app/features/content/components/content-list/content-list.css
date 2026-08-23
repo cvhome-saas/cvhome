@@ -34,6 +34,9 @@
 .select-all {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
   padding: 0.35rem 1.25rem;
   border-block-end: 1px solid var(--border-soft);
 }

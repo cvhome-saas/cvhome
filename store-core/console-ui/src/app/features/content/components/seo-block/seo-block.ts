@@ -16,9 +16,22 @@ import type {CommonForm, TranslationForm} from '../../services/content-editor-fo
  */
 @Component({
   selector: 'app-seo-block',
-  imports: [FormField, Panel, ReactiveFormsModule, TextField, TextareaField, Toggle, TranslocoDirective],
+  imports: [
+    FormField,
+    Panel,
+    ReactiveFormsModule,
+    TextField,
+    TextareaField,
+    Toggle,
+    TranslocoDirective,
+  ],
   template: `
-    <app-panel [title]="t('content.seo.title')" [subtitle]="t('content.seo.subtitle')" padded *transloco="let t">
+    <app-panel
+      [title]="t('content.seo.title')"
+      [subtitle]="t('content.seo.subtitle')"
+      padded
+      *transloco="let t"
+    >
       <div class="field-grid">
         <app-form-field
           [label]="t('content.seo.slug')"
@@ -28,43 +41,99 @@ import type {CommonForm, TranslationForm} from '../../services/content-editor-fo
           controlId="seo-slug"
         >
           <div [formGroup]="common()">
-            <app-text-field id="seo-slug" formControlName="slug" latin mono [prefix]="pathPrefix()" [maxLength]="100"
-                            [check]="slugCheck()" [checkLabel]="slugCheckLabel()" />
+            <app-text-field
+              id="seo-slug"
+              formControlName="slug"
+              latin
+              mono
+              [prefix]="pathPrefix()"
+              [maxLength]="100"
+              [check]="slugCheck()"
+              [checkLabel]="slugCheckLabel()"
+            />
           </div>
         </app-form-field>
 
-        <app-form-field [label]="t('content.seo.metaTitle')" [hint]="t('content.seo.metaTitleHint')" [control]="translation().controls.metaTitle" controlId="seo-meta-title">
+        <app-form-field
+          [label]="t('content.seo.metaTitle')"
+          [hint]="t('content.seo.metaTitleHint')"
+          [control]="translation().controls.metaTitle"
+          controlId="seo-meta-title"
+        >
           <div [formGroup]="translation()">
             <app-text-field id="seo-meta-title" formControlName="metaTitle" [maxLength]="255" />
           </div>
         </app-form-field>
 
-        <app-form-field wide [label]="t('content.seo.metaDescription')" [hint]="t('content.seo.metaDescriptionHint')" [control]="translation().controls.metaDescription" controlId="seo-meta-description">
+        <app-form-field
+          wide
+          [label]="t('content.seo.metaDescription')"
+          [hint]="t('content.seo.metaDescriptionHint')"
+          [control]="translation().controls.metaDescription"
+          controlId="seo-meta-description"
+        >
           <div [formGroup]="translation()">
-            <app-textarea id="seo-meta-description" formControlName="metaDescription" [rows]="2" [recommendedMin]="50" [recommendedMax]="160" [maxLength]="255" />
+            <app-textarea
+              id="seo-meta-description"
+              formControlName="metaDescription"
+              [rows]="2"
+              [recommendedMin]="50"
+              [recommendedMax]="160"
+              [maxLength]="255"
+            />
           </div>
         </app-form-field>
 
-        <app-form-field [label]="t('content.seo.keywords')" [hint]="t('content.seo.keywordsHint')" [control]="translation().controls.keywords" controlId="seo-keywords">
+        <app-form-field
+          [label]="t('content.seo.keywords')"
+          [hint]="t('content.seo.keywordsHint')"
+          [control]="translation().controls.keywords"
+          controlId="seo-keywords"
+        >
           <div [formGroup]="translation()">
             <app-text-field id="seo-keywords" formControlName="keywords" [maxLength]="255" />
           </div>
         </app-form-field>
 
-        <app-form-field [label]="t('content.seo.canonical')" [hint]="t('content.seo.canonicalHint')" [control]="common().controls.canonicalUrl" controlId="seo-canonical">
+        <app-form-field
+          [label]="t('content.seo.canonical')"
+          [hint]="t('content.seo.canonicalHint')"
+          [control]="common().controls.canonicalUrl"
+          controlId="seo-canonical"
+        >
           <div [formGroup]="common()">
-            <app-text-field id="seo-canonical" formControlName="canonicalUrl" type="url" latin [maxLength]="500" />
+            <app-text-field
+              id="seo-canonical"
+              formControlName="canonicalUrl"
+              type="url"
+              latin
+              [maxLength]="500"
+            />
           </div>
         </app-form-field>
 
         <div class="field field-wide" [formGroup]="common()">
-          <app-toggle formControlName="noindex" [label]="t('content.seo.noindex')" [description]="t('content.seo.noindexHint')" />
+          <app-toggle
+            formControlName="noindex"
+            [label]="t('content.seo.noindex')"
+            [description]="t('content.seo.noindexHint')"
+          />
         </div>
 
         <div class="serp field-wide" aria-live="polite">
-          <span class="serp-url" dir="ltr">{{ t('content.seo.serpHost') }} › {{ pathPrefix() }}{{ common().controls.slug.value || '…' }}</span>
-          <span class="serp-title" dir="auto">{{ translation().controls.metaTitle.value || fallbackTitle() || t('content.seo.serpTitlePlaceholder') }}</span>
-          <span class="serp-desc" dir="auto">{{ translation().controls.metaDescription.value || t('content.seo.serpDescriptionPlaceholder') }}</span>
+          <span class="serp-url" dir="ltr"
+            >{{ t('content.seo.serpHost') }} › {{ pathPrefix()
+            }}{{ common().controls.slug.value || '…' }}</span
+          >
+          <span class="serp-title" dir="auto">{{
+            translation().controls.metaTitle.value ||
+              fallbackTitle() ||
+              t('content.seo.serpTitlePlaceholder')
+          }}</span>
+          <span class="serp-desc" dir="auto">{{
+            translation().controls.metaDescription.value ||
+              t('content.seo.serpDescriptionPlaceholder')
+          }}</span>
         </div>
       </div>
     </app-panel>

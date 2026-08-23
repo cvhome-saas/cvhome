@@ -3,7 +3,13 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import type {ReferenceOption} from '@core/reference/reference-data.service';
-import type {BulkAction, ContentListType, ContentRow, ContentStatus, TransitionAction} from '@models/content';
+import type {
+  BulkAction,
+  ContentListType,
+  ContentRow,
+  ContentStatus,
+  TransitionAction,
+} from '@models/content';
 import {ActionMenu, type MenuAction} from '@shared/ui/action-menu/action-menu';
 import {Badge} from '@shared/ui/badge/badge';
 import type {BadgeTone} from '@shared/ui/badge/badge';
@@ -21,7 +27,11 @@ import {Panel} from '@shared/ui/panel/panel';
 import {SearchBox} from '@shared/ui/search-box/search-box';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {TabSwitcher} from '@shared/ui/tab-switcher/tab-switcher';
-import {CONTENT_PAGE_SIZE, ContentListFacade, type StatusTab} from '../../facades/content-list.facade';
+import {
+  CONTENT_PAGE_SIZE,
+  ContentListFacade,
+  type StatusTab,
+} from '../../facades/content-list.facade';
 import {LocaleBadges} from '../locale-badges/locale-badges';
 
 export const STATUS_TONES: Readonly<Record<ContentStatus, BadgeTone>> = {
@@ -103,10 +113,22 @@ export class ContentList {
     const manage = this.canManage();
     return [
       ...(manage ? [{key: 'select', label: '', width: '2.25rem'}] : []),
-      {key: 'title', label: this.transloco.translate(`content.column.${this.type()}`), width: 'minmax(14rem, 2.4fr)'},
+      {
+        key: 'title',
+        label: this.transloco.translate(`content.column.${this.type()}`),
+        width: 'minmax(14rem, 2.4fr)',
+      },
       {key: 'status', label: this.transloco.translate('content.column.status'), width: '7.5rem'},
-      {key: 'languages', label: this.transloco.translate('content.column.languages'), width: 'minmax(7rem, 1.1fr)'},
-      {key: 'updated', label: this.transloco.translate('content.column.updated'), width: 'minmax(8rem, 1.1fr)'},
+      {
+        key: 'languages',
+        label: this.transloco.translate('content.column.languages'),
+        width: 'minmax(7rem, 1.1fr)',
+      },
+      {
+        key: 'updated',
+        label: this.transloco.translate('content.column.updated'),
+        width: 'minmax(8rem, 1.1fr)',
+      },
       {key: 'actions', label: '', width: '5.5rem'},
     ];
   });
@@ -117,7 +139,9 @@ export class ContentList {
       {value: '', label: this.transloco.translate('content.filter.allLanguages')},
       ...this.locales().map((locale) => ({
         value: locale.code,
-        label: this.transloco.translate('content.filter.missingLanguage', {language: locale.label}),
+        label: this.transloco.translate('content.filter.missingLanguage', {
+          language: locale.label,
+        }),
       })),
     ];
   });
@@ -138,24 +162,29 @@ export class ContentList {
   protected updatedLabel(row: ContentRow): string {
     this.transloco.activeLang();
     if (row.status === 'SCHEDULED' && row.publishAt) {
-      return this.transloco.translate('content.list.publishesOn', {date: this.date(row.publishAt)});
+      return this.transloco.translate('content.list.publishesOn', {
+        date: this.date(row.publishAt),
+      });
     }
     return row.updatedAt ? this.date(row.updatedAt) : '—';
   }
 
   protected menuFor(row: ContentRow): readonly MenuAction[] {
     this.transloco.activeLang();
-    const transitions = this.facade.transitionsFor(row).map(
-      (action): MenuAction => ({
-        key: action,
-        label: this.transloco.translate(`content.action.${action}`),
-        icon: TRANSITION_ICONS[action],
-      }),
-    );
+    const transitions = this.facade.transitionsFor(row).map((action): MenuAction => ({
+      key: action,
+      label: this.transloco.translate(`content.action.${action}`),
+      icon: TRANSITION_ICONS[action],
+    }));
     return [
       {key: 'edit', label: this.transloco.translate('content.action.edit'), icon: 'pencil'},
       ...transitions,
-      {key: 'delete', label: this.transloco.translate('content.action.delete'), icon: 'trash', danger: true},
+      {
+        key: 'delete',
+        label: this.transloco.translate('content.action.delete'),
+        icon: 'trash',
+        danger: true,
+      },
     ];
   }
 

@@ -21,10 +21,17 @@ describe('ContentItemsService', () => {
 
   it('lists a type with the filters as query params and `count` as the page size', () => {
     service
-      .list('pages', {status: 'PUBLISHED', locale: 'ar', state: 'MISSING', q: 'about'}, {page: 2, count: 25})
+      .list(
+        'pages',
+        {status: 'PUBLISHED', locale: 'ar', state: 'MISSING', q: 'about'},
+        {page: 2, count: 25},
+      )
       .subscribe();
     const request = http.expectOne(
-      (r) => r.url === `${BASE}/pages` && r.params.get('status') === 'PUBLISHED' && r.params.get('locale') === 'ar',
+      (r) =>
+        r.url === `${BASE}/pages` &&
+        r.params.get('status') === 'PUBLISHED' &&
+        r.params.get('locale') === 'ar',
     );
     expect(request.request.params.get('state')).toBe('MISSING');
     expect(request.request.params.get('q')).toBe('about');
@@ -62,7 +69,9 @@ describe('ContentItemsService', () => {
     request.flush({id: 3, status: 'SCHEDULED', version: 2});
 
     service.transition('pages', 3, 'unpublish').subscribe();
-    http.expectOne((r) => r.url === `${BASE}/pages/3/unpublish`).flush({id: 3, status: 'DRAFT', version: 3});
+    http
+      .expectOne((r) => r.url === `${BASE}/pages/3/unpublish`)
+      .flush({id: 3, status: 'DRAFT', version: 3});
   });
 
   it('asks whether a slug is free, excluding the item being edited', () => {

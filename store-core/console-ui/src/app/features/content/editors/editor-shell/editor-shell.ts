@@ -29,27 +29,53 @@ const MENU_BY_STATUS: Readonly<Record<ContentStatus | 'NEW', readonly EditorComm
  */
 @Component({
   selector: 'app-editor-shell',
-  imports: [ActionMenu, Badge, BusyOverlay, ConfirmDialog, Icon, LoadError, PageHeader, TranslocoDirective],
+  imports: [
+    ActionMenu,
+    Badge,
+    BusyOverlay,
+    ConfirmDialog,
+    Icon,
+    LoadError,
+    PageHeader,
+    TranslocoDirective,
+  ],
   template: `
     <ng-container *transloco="let t">
       <app-page-header [title]="title()" [context]="context()">
         @if (status(); as s) {
           <app-badge [tone]="tone(s)" shape="square">{{ t('content.status.' + s) }}</app-badge>
         }
-        <button class="secondary-action" type="button" (click)="cancelled.emit()">{{ t('content.editor.back') }}</button>
+        <button class="secondary-action" type="button" (click)="cancelled.emit()">
+          {{ t('content.editor.back') }}
+        </button>
         @if (canManage()) {
-          <button class="secondary-action" type="button" [disabled]="!canSave()" (click)="saved.emit()">
+          <button
+            class="secondary-action"
+            type="button"
+            [disabled]="!canSave()"
+            (click)="saved.emit()"
+          >
             <app-icon name="check" />
             {{ saving() ? t('content.editor.saving') : t('content.editor.saveDraft') }}
           </button>
           @if (primary(); as action) {
-            <button class="primary-action" type="button" [disabled]="saving() || invalid()" (click)="commanded.emit(action.key)">
+            <button
+              class="primary-action"
+              type="button"
+              [disabled]="saving() || invalid()"
+              (click)="commanded.emit(action.key)"
+            >
               <app-icon name="checkCircle" />
               {{ action.label }}
             </button>
           }
           @if (more().length) {
-            <app-action-menu [actions]="more()" [ariaLabel]="t('content.editor.moreActions')" [disabled]="saving()" (picked)="commanded.emit($event.key)" />
+            <app-action-menu
+              [actions]="more()"
+              [ariaLabel]="t('content.editor.moreActions')"
+              [disabled]="saving()"
+              (picked)="commanded.emit($event.key)"
+            />
           }
         }
       </app-page-header>
@@ -100,7 +126,9 @@ export class EditorShell {
   readonly deleted = output<void>();
   readonly deleteDismissed = output<void>();
 
-  private readonly commands = computed<readonly EditorCommand[]>(() => MENU_BY_STATUS[this.isNew() ? 'NEW' : (this.status() ?? 'DRAFT')]);
+  private readonly commands = computed<readonly EditorCommand[]>(
+    () => MENU_BY_STATUS[this.isNew() ? 'NEW' : (this.status() ?? 'DRAFT')],
+  );
 
   /** The filled button: Publish while unpublished, Unpublish once live, Restore when archived. */
   protected readonly primary = computed<MenuAction | null>(() => {
@@ -111,11 +139,13 @@ export class EditorShell {
 
   protected readonly more = computed<readonly MenuAction[]>(() => {
     this.transloco.activeLang();
-    return this.commands().slice(1).map((key) => ({
-      key,
-      label: this.transloco.translate(`content.action.${key}`),
-      danger: key === 'delete',
-    }));
+    return this.commands()
+      .slice(1)
+      .map((key) => ({
+        key,
+        label: this.transloco.translate(`content.action.${key}`),
+        danger: key === 'delete',
+      }));
   });
 
   protected tone(status: ContentStatus) {

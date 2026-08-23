@@ -238,7 +238,9 @@ export class ContentListFacade {
             }),
           );
         } else {
-          this.toast.success(this.transloco.translate('content.toast.bulkDone', {count: results.length}));
+          this.toast.success(
+            this.transloco.translate('content.toast.bulkDone', {count: results.length}),
+          );
         }
       },
       error: (failure: unknown) => {
@@ -276,7 +278,9 @@ export class ContentListFacade {
           return next;
         });
         this.cache.invalidate();
-        this.toast.success(this.transloco.translate('content.toast.deleted', {title: pending.title}));
+        this.toast.success(
+          this.transloco.translate('content.toast.deleted', {title: pending.title}),
+        );
       },
       error: (failure: unknown) => {
         this.saving.set(false);

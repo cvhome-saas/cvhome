@@ -96,7 +96,10 @@ export class MediaTab {
     this.transloco.activeLang();
     return [
       {value: '', label: this.transloco.translate('content.media.allTypes')},
-      ...MEDIA_KINDS.map((kind) => ({value: kind, label: this.transloco.translate(`content.media.kind.${kind}`)})),
+      ...MEDIA_KINDS.map((kind) => ({
+        value: kind,
+        label: this.transloco.translate(`content.media.kind.${kind}`),
+      })),
     ];
   });
 
@@ -112,9 +115,8 @@ export class MediaTab {
     this.locales().map((locale) => ({value: locale.code, label: locale.label})),
   );
 
-  protected readonly totalFiles = computed(() =>
-    this.facade.folders().reduce((sum, folder) => sum + (folder.fileCount ?? 0), 0),
-  );
+  /** The store's file count, from the hub summary (folder counts miss unfiled assets). */
+  readonly totalFiles = input(0);
 
   protected kindIcon(asset: MediaAsset): IconName {
     return KIND_ICONS[asset.kind];
@@ -133,7 +135,9 @@ export class MediaTab {
   }
 
   protected date(asset: MediaAsset): string {
-    return asset.uploadedAt ? this.localeFormat.localizeDate(asset.uploadedAt, undefined, {dateStyle: 'medium'}) : '';
+    return asset.uploadedAt
+      ? this.localeFormat.localizeDate(asset.uploadedAt, undefined, {dateStyle: 'medium'})
+      : '';
   }
 
   protected pickFolder(folder: MediaFolder | null): void {
@@ -148,7 +152,8 @@ export class MediaTab {
     this.facade.upload(files);
   }
 
-  protected tooLarge = (name: string): string => this.transloco.translate('content.media.tooLarge', {name});
+  protected tooLarge = (name: string): string =>
+    this.transloco.translate('content.media.tooLarge', {name});
 
   protected openAsset(asset: MediaAsset): void {
     this.facade.select(asset);
@@ -198,9 +203,12 @@ export class MediaTab {
     if (!pending) {
       return '';
     }
-    return this.transloco.translate(pending.force ? 'content.media.delete.forceTitle' : 'content.media.delete.title', {
-      name: pending.asset.filename,
-    });
+    return this.transloco.translate(
+      pending.force ? 'content.media.delete.forceTitle' : 'content.media.delete.title',
+      {
+        name: pending.asset.filename,
+      },
+    );
   }
 
   protected deleteMessage(): string {

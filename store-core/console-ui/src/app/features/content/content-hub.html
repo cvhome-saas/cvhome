@@ -55,7 +55,7 @@
         } @else {
           @switch (activeTab()) {
             @case ('media') {
-              <app-media-tab [locales]="facade.localeOptions()" [canManage]="canManage()" />
+              <app-media-tab [locales]="facade.localeOptions()" [canManage]="canManage()" [totalFiles]="facade.counts()['media'] ?? 0" />
             }
             @case ('menus') {
               <app-menus-tab [locales]="facade.localeOptions()" [defaultLocale]="facade.locales().defaultCode" [canManage]="canManage()" />

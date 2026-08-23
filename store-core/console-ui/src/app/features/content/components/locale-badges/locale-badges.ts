@@ -23,7 +23,8 @@ import type {LocaleState, TranslationState} from '@models/content';
           [title]="chip.title"
           [attr.aria-label]="chip.title"
           dir="ltr"
-        >{{ chip.code.toUpperCase() }}</span>
+          >{{ chip.code.toUpperCase() }}</span
+        >
       }
     </span>
   `,
@@ -43,7 +44,13 @@ export class LocaleBadges {
     const codes = [...new Set([...this.expected(), ...present.keys()])];
     return codes.map((code) => {
       const state: TranslationState = present.get(code) ?? 'MISSING';
-      return {code, state, title: this.transloco.translate(`content.translationState.${state}`, {code: code.toUpperCase()})};
+      return {
+        code,
+        state,
+        title: this.transloco.translate(`content.translationState.${state}`, {
+          code: code.toUpperCase(),
+        }),
+      };
     });
   });
 }

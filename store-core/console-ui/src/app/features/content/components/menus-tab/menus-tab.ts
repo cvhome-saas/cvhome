@@ -23,7 +23,17 @@ const HANDLES: readonly MenuHandle[] = ['MAIN', 'FOOTER'];
  */
 @Component({
   selector: 'app-menus-tab',
-  imports: [Badge, BusyOverlay, Icon, LoadError, LocaleSwitcher, Panel, Select, TextField, TranslocoDirective],
+  imports: [
+    Badge,
+    BusyOverlay,
+    Icon,
+    LoadError,
+    LocaleSwitcher,
+    Panel,
+    Select,
+    TextField,
+    TranslocoDirective,
+  ],
   templateUrl: './menus-tab.html',
   styleUrl: './menus-tab.css',
 })
@@ -42,7 +52,10 @@ export class MenusTab {
 
   protected readonly kindOptions = computed<readonly SelectOption[]>(() => {
     this.transloco.activeLang();
-    return MENU_TARGET_KINDS.map((kind) => ({value: kind, label: this.transloco.translate(`content.menus.kind.${kind}`)}));
+    return MENU_TARGET_KINDS.map((kind) => ({
+      value: kind,
+      label: this.transloco.translate(`content.menus.kind.${kind}`),
+    }));
   });
 
   protected readonly pageOptions = computed<readonly SelectOption[]>(() =>
@@ -81,7 +94,11 @@ export class MenusTab {
   }
 
   private clone(handle: MenuHandle): MenuDraftItem[] {
-    return this.items(handle).map((item) => ({...item, labels: {...item.labels}, children: item.children.map((c) => ({...c, labels: {...c.labels}, children: []}))}));
+    return this.items(handle).map((item) => ({
+      ...item,
+      labels: {...item.labels},
+      children: item.children.map((c) => ({...c, labels: {...c.labels}, children: []})),
+    }));
   }
 
   protected setLabel(handle: MenuHandle, item: MenuDraftItem, value: string): void {
@@ -173,7 +190,9 @@ export class MenusTab {
 
   protected outdent(handle: MenuHandle, item: MenuDraftItem): void {
     const items = this.clone(handle);
-    const parentIndex = items.findIndex((root) => root.children.some((child) => child.key === item.key));
+    const parentIndex = items.findIndex((root) =>
+      root.children.some((child) => child.key === item.key),
+    );
     if (parentIndex < 0) {
       return;
     }

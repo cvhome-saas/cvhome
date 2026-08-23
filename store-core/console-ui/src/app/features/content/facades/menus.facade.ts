@@ -53,7 +53,16 @@ function toWire(item: MenuDraftItem, position: number): MenuItem {
 }
 
 export function blankItem(): MenuDraftItem {
-  return {key: `k${nextKey++}`, labels: {}, kind: 'URL', value: '/', openInNewTab: false, visible: true, broken: false, children: []};
+  return {
+    key: `k${nextKey++}`,
+    labels: {},
+    kind: 'URL',
+    value: '/',
+    openInNewTab: false,
+    visible: true,
+    broken: false,
+    children: [],
+  };
 }
 
 /**
@@ -87,12 +96,18 @@ export class MenusFacade {
       return this.shell.currentStoreId() ?? undefined;
     },
     stream: () =>
-      this.items.list('pages', {status: 'PUBLISHED', locale: null, state: null, q: ''}, {page: 0, count: 100}).pipe(
-        map((page) => page.content),
-      ),
+      this.items
+        .list(
+          'pages',
+          {status: 'PUBLISHED', locale: null, state: null, q: ''},
+          {page: 0, count: 100},
+        )
+        .pipe(map((page) => page.content)),
   });
 
-  readonly pages = computed<readonly ContentRow[]>(() => (this.pagesResource.hasValue() ? this.pagesResource.value() : []));
+  readonly pages = computed<readonly ContentRow[]>(() =>
+    this.pagesResource.hasValue() ? this.pagesResource.value() : [],
+  );
 
   readonly isLoading = this.resource.isLoading;
   readonly error = computed(() => this.resource.error() as Error | undefined);
@@ -107,7 +122,10 @@ export class MenusFacade {
     effect(() => {
       const value = this.resource.hasValue() ? this.resource.value() : null;
       if (value) {
-        this.drafts.set({MAIN: value.main.items.map(toDraft), FOOTER: value.footer.items.map(toDraft)});
+        this.drafts.set({
+          MAIN: value.main.items.map(toDraft),
+          FOOTER: value.footer.items.map(toDraft),
+        });
         this.dirty.set({MAIN: false, FOOTER: false});
       }
     });
@@ -120,14 +138,21 @@ export class MenusFacade {
 
   save(handle: MenuHandle): void {
     this.saving.set(true);
-    const body: Menu = {handle, items: this.drafts()[handle].map((item, index) => toWire(item, index))};
+    const body: Menu = {
+      handle,
+      items: this.drafts()[handle].map((item, index) => toWire(item, index)),
+    };
     this.api.put(handle, body).subscribe({
       next: (saved) => {
         this.saving.set(false);
         this.drafts.update((current) => ({...current, [handle]: saved.items.map(toDraft)}));
         this.dirty.update((current) => ({...current, [handle]: false}));
         this.cache.invalidate();
-        this.toast.success(this.transloco.translate('content.menus.saved', {menu: this.transloco.translate(`content.menus.handle.${handle}`)}));
+        this.toast.success(
+          this.transloco.translate('content.menus.saved', {
+            menu: this.transloco.translate(`content.menus.handle.${handle}`),
+          }),
+        );
       },
       error: (failure: unknown) => {
         this.saving.set(false);

@@ -2,7 +2,12 @@ import {Component, computed, effect, inject, input, signal} from '@angular/core'
 import {Router} from '@angular/router';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
-import {CONTENT_TABS, type ContentListType, type ContentRow, type ContentTab} from '@models/content';
+import {
+  CONTENT_TABS,
+  type ContentListType,
+  type ContentRow,
+  type ContentTab,
+} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {Icon} from '@shared/ui/icon/icon';
 import {KpiGrid} from '@shared/ui/kpi-grid/kpi-grid';
@@ -30,7 +35,20 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
  */
 @Component({
   selector: 'app-content-hub',
-  imports: [ContentList, Icon, KpiGrid, LoadError, MediaTab, MenusTab, PageHeader, PoliciesTab, SectionNav, SnippetsCard, TabSwitcher, TranslocoDirective],
+  imports: [
+    ContentList,
+    Icon,
+    KpiGrid,
+    LoadError,
+    MediaTab,
+    MenusTab,
+    PageHeader,
+    PoliciesTab,
+    SectionNav,
+    SnippetsCard,
+    TabSwitcher,
+    TranslocoDirective,
+  ],
   templateUrl: './content-hub.html',
   styleUrl: './content-hub.css',
 })

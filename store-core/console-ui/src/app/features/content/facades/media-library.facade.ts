@@ -36,7 +36,13 @@ export class MediaLibraryFacade {
   readonly view = signal<MediaView>('grid');
 
   readonly pageIndex = linkedSignal<unknown, number>({
-    source: () => [this.folder(), this.kind(), this.search(), this.unusedOnly(), this.shell.currentStoreId()],
+    source: () => [
+      this.folder(),
+      this.kind(),
+      this.search(),
+      this.unusedOnly(),
+      this.shell.currentStoreId(),
+    ],
     computation: () => 0,
   });
 
@@ -76,7 +82,10 @@ export class MediaLibraryFacade {
     stream: ({params}) => this.api.list(params),
   });
 
-  private readonly loaded = linkedSignal<PageT<MediaAsset> | undefined, PageT<MediaAsset> | undefined>({
+  private readonly loaded = linkedSignal<
+    PageT<MediaAsset> | undefined,
+    PageT<MediaAsset> | undefined
+  >({
     source: () => (this.assetsResource.hasValue() ? this.assetsResource.value() : undefined),
     computation: (incoming, previous) => incoming ?? previous?.value,
   });
@@ -84,10 +93,16 @@ export class MediaLibraryFacade {
   readonly isLoading = this.assetsResource.isLoading;
   readonly error = computed(() => this.assetsResource.error() as Error | undefined);
   readonly isEmpty = computed(() => this.loaded() === undefined);
-  readonly page = computed<PageT<MediaAsset>>(() => this.loaded() ?? (EMPTY_PAGE as PageT<MediaAsset>));
+  readonly page = computed<PageT<MediaAsset>>(
+    () => this.loaded() ?? (EMPTY_PAGE as PageT<MediaAsset>),
+  );
   readonly assets = computed<readonly MediaAsset[]>(() => this.page().content);
   readonly filtered = computed(
-    () => this.folder() !== null || this.kind() !== null || this.search().trim() !== '' || this.unusedOnly(),
+    () =>
+      this.folder() !== null ||
+      this.kind() !== null ||
+      this.search().trim() !== '' ||
+      this.unusedOnly(),
   );
 
   readonly saving = signal(false);
@@ -111,7 +126,9 @@ export class MediaLibraryFacade {
           this.uploading.set(false);
           this.stamp.update((v) => v + 1);
           this.cache.invalidate();
-          this.toast.success(this.transloco.translate('content.media.uploaded', {count: event.assets.length}));
+          this.toast.success(
+            this.transloco.translate('content.media.uploaded', {count: event.assets.length}),
+          );
         }
       },
       error: (failure: unknown) => {
@@ -175,7 +192,9 @@ export class MediaLibraryFacade {
         }
         this.stamp.update((v) => v + 1);
         this.cache.invalidate();
-        this.toast.success(this.transloco.translate('content.media.deleted', {name: pending.asset.filename}));
+        this.toast.success(
+          this.transloco.translate('content.media.deleted', {name: pending.asset.filename}),
+        );
       },
       error: (failure: unknown) => {
         this.saving.set(false);

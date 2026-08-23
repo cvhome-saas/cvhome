@@ -76,8 +76,10 @@ public final class ContentMapper {
     private static void applyFields(Content entity, ContentDescription d, ContentTranslation t, String body) {
         d.setContent(entity);
         d.setLanguageCode(t.getLanguage());
+        // name = the short title; the legacy TITLE column is the page's <title>, i.e. the meta title when set
         d.setName(Strings.blank(t.getTitle()) ? entity.getCode() : Strings.abbreviate(t.getTitle().trim(), 120));
-        d.setTitle(Strings.abbreviate(Strings.trimToNull(t.getTitle()), 100));
+        String seoTitle = Strings.blank(t.getMetaTitle()) ? t.getTitle() : t.getMetaTitle();
+        d.setTitle(Strings.abbreviate(Strings.trimToNull(seoTitle), 100));
         d.setDescription(body);
         d.setExcerpt(Strings.trimToNull(t.getExcerpt()));
         d.setSeUrl(Strings.blank(t.getFriendlyUrl()) ? entity.getCode() : t.getFriendlyUrl().trim());
@@ -124,11 +126,16 @@ public final class ContentMapper {
         t.setId(d.getId());
         t.setLanguage(d.getLanguageCode());
         t.setState(d.getState());
-        t.setTitle(d.getTitle() != null ? d.getTitle() : d.getName());
+        t.setTitle(d.getName());
         t.setBody(d.getDescription());
         t.setExcerpt(d.getExcerpt());
         t.setFriendlyUrl(d.getSeUrl());
-        t.setMetaTitle(d.getMetatagTitle());
+        // legacy rows carry the <title> in TITLE and nothing in META_TITLE
+        String metaTitle = d.getMetatagTitle();
+        if (metaTitle == null && d.getTitle() != null && !d.getTitle().equals(d.getName())) {
+            metaTitle = d.getTitle();
+        }
+        t.setMetaTitle(metaTitle);
         t.setMetaDescription(d.getMetatagDescription());
         t.setKeywords(d.getMetatagKeywords());
         t.setAltText(d.getAltText());
@@ -162,10 +169,7 @@ public final class ContentMapper {
      */
     public static String title(Content entity, LanguageCode language) {
         ContentDescription d = entity.description(language).orElseGet(entity::getDescription);
-        if (d == null) {
-            return entity.getCode();
-        }
-        return d.getTitle() != null ? d.getTitle() : d.getName();
+        return d == null ? entity.getCode() : d.getName();
     }
 
     public static ReadableContentRow row(Content entity, LanguageCode language, String subtitle) {

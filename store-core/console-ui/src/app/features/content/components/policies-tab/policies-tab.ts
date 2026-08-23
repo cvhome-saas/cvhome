@@ -31,22 +31,46 @@ const ICONS: Readonly<Record<string, IconName>> = {
   selector: 'app-policies-tab',
   imports: [Badge, Icon, Panel, TranslocoDirective],
   template: `
-    <app-panel [title]="t('content.policies.title')" [subtitle]="t('content.policies.subtitle')" padded *transloco="let t">
+    <app-panel
+      [title]="t('content.policies.title')"
+      [subtitle]="t('content.policies.subtitle')"
+      padded
+      *transloco="let t"
+    >
       <ul class="compliance">
         @for (row of rows(); track row.type) {
-          <li [class.missing]="row.status === null && row.requiredBy.length" [class.clickable]="row.id !== null || canManage()">
-            <button class="row-button" type="button" (click)="pick(row)" [disabled]="row.id === null && !canManage()">
-              <span class="row-icon" [class.live]="row.status === 'PUBLISHED'" [class.warn]="row.status === null && row.requiredBy.length"><app-icon [name]="icon(row)" [size]="14" /></span>
+          <li
+            [class.missing]="row.status === null && row.requiredBy.length"
+            [class.clickable]="row.id !== null || canManage()"
+          >
+            <button
+              class="row-button"
+              type="button"
+              (click)="pick(row)"
+              [disabled]="row.id === null && !canManage()"
+            >
+              <span
+                class="row-icon"
+                [class.live]="row.status === 'PUBLISHED'"
+                [class.warn]="row.status === null && row.requiredBy.length"
+                ><app-icon [name]="icon(row)" [size]="14"
+              /></span>
               <span class="row-copy">
                 <strong>{{ t('content.policy.type.' + row.type + '.label') }}</strong>
                 <small>{{ meta(row) }}</small>
               </span>
               @if (row.status; as status) {
-                <app-badge [tone]="tone(status)" shape="square">{{ t('content.status.' + status) }}</app-badge>
+                <app-badge [tone]="tone(status)" shape="square">{{
+                  t('content.status.' + status)
+                }}</app-badge>
               } @else if (row.requiredBy.length) {
-                <app-badge tone="amber" shape="square">{{ t('content.policies.notWritten') }}</app-badge>
+                <app-badge tone="amber" shape="square">{{
+                  t('content.policies.notWritten')
+                }}</app-badge>
               } @else {
-                <app-badge tone="slate" shape="square">{{ t('content.policies.optional') }}</app-badge>
+                <app-badge tone="slate" shape="square">{{
+                  t('content.policies.optional')
+                }}</app-badge>
               }
               <app-icon name="chevronRight" [size]="14" [flip]="true" />
             </button>
@@ -75,7 +99,9 @@ export class PoliciesTab {
     stream: () => this.api.compliance(),
   });
 
-  protected readonly rows = computed<readonly PolicyCompliance[]>(() => (this.resource.hasValue() ? this.resource.value() : []));
+  protected readonly rows = computed<readonly PolicyCompliance[]>(() =>
+    this.resource.hasValue() ? this.resource.value() : [],
+  );
 
   protected icon(row: PolicyCompliance): IconName {
     return ICONS[row.type] ?? 'shield';
@@ -88,7 +114,9 @@ export class PoliciesTab {
   protected meta(row: PolicyCompliance): string {
     this.transloco.activeLang();
     if (row.requiredBy.length) {
-      return this.transloco.translate('content.policies.requiredIn', {regions: row.requiredBy.join(', ')});
+      return this.transloco.translate('content.policies.requiredIn', {
+        regions: row.requiredBy.join(', '),
+      });
     }
     return this.transloco.translate('content.policies.notRequired');
   }

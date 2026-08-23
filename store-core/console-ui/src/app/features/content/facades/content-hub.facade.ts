@@ -87,7 +87,9 @@ export class ContentHubFacade {
     stream: () =>
       this.storeApi.store().pipe(
         map((store): StoreLocales => {
-          const codes = [...new Set([...(store.supportedLanguages ?? []), store.defaultLanguage ?? 'en'])];
+          const codes = [
+            ...new Set([...(store.supportedLanguages ?? []), store.defaultLanguage ?? 'en']),
+          ];
           return {codes, defaultCode: store.defaultLanguage ?? codes[0] ?? 'en'};
         }),
         catchError(() => of<StoreLocales>({codes: ['en'], defaultCode: 'en'})),
@@ -95,7 +97,9 @@ export class ContentHubFacade {
   });
 
   readonly locales = computed<StoreLocales>(() =>
-    this.localesResource.hasValue() ? this.localesResource.value() : {codes: ['en'], defaultCode: 'en'},
+    this.localesResource.hasValue()
+      ? this.localesResource.value()
+      : {codes: ['en'], defaultCode: 'en'},
   );
 
   /** The languages as switcher options, named in the reader's language. */
@@ -107,7 +111,9 @@ export class ContentHubFacade {
 
   readonly context = computed(() => {
     this.transloco.activeLang();
-    return this.transloco.translate('content.hub.context', {store: this.shell.currentStore()?.name ?? ''});
+    return this.transloco.translate('content.hub.context', {
+      store: this.shell.currentStore()?.name ?? '',
+    });
   });
 
   readonly sections = computed<readonly NavSection[]>(() => {
@@ -132,7 +138,9 @@ export class ContentHubFacade {
       .join(' · ');
     const used = this.bytes(s.media.bytesUsed);
     const quota = this.bytes(s.media.bytesQuota);
-    const percent = s.media.bytesQuota ? Math.round((s.media.bytesUsed / s.media.bytesQuota) * 100) : 0;
+    const percent = s.media.bytesQuota
+      ? Math.round((s.media.bytesUsed / s.media.bytesQuota) * 100)
+      : 0;
     return [
       {
         label: this.transloco.translate('content.kpi.published'),
@@ -146,7 +154,9 @@ export class ContentHubFacade {
         value: this.digits(s.drafts.total),
         icon: 'pencil',
         tone: 'slate',
-        flag: this.transloco.translate('content.kpi.draftsMeta', {count: s.drafts.staleOver30Days}),
+        flag: this.transloco.translate('content.kpi.draftsMeta', {
+          count: s.drafts.staleOver30Days,
+        }),
       },
       {
         label: this.transloco.translate('content.kpi.awaitingTranslation'),
@@ -185,12 +195,22 @@ export class ContentHubFacade {
   private bytes(value: number): string {
     const gb = value / 1024 ** 3;
     if (gb >= 1) {
-      return this.transloco.translate('content.bytes.gb', {value: this.localeFormat.localizeNumber(gb, 'decimal', undefined, {maximumFractionDigits: 1})});
+      return this.transloco.translate('content.bytes.gb', {
+        value: this.localeFormat.localizeNumber(gb, 'decimal', undefined, {
+          maximumFractionDigits: 1,
+        }),
+      });
     }
     const mb = value / 1024 ** 2;
     if (mb >= 1) {
-      return this.transloco.translate('content.bytes.mb', {value: this.localeFormat.localizeNumber(mb, 'decimal', undefined, {maximumFractionDigits: 1})});
+      return this.transloco.translate('content.bytes.mb', {
+        value: this.localeFormat.localizeNumber(mb, 'decimal', undefined, {
+          maximumFractionDigits: 1,
+        }),
+      });
     }
-    return this.transloco.translate('content.bytes.kb', {value: this.digits(Math.round(value / 1024))});
+    return this.transloco.translate('content.bytes.kb', {
+      value: this.digits(Math.round(value / 1024)),
+    });
   }
 }

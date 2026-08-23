@@ -18,7 +18,9 @@ describe('MediaService', () => {
   const BASE = '/spg/content/api/v1/private/content/media';
 
   it('lists with the library filters', () => {
-    service.list({folder: 4, kind: 'IMAGE', q: 'hero', used: false, page: 0, count: 24}).subscribe();
+    service
+      .list({folder: 4, kind: 'IMAGE', q: 'hero', used: false, page: 0, count: 24})
+      .subscribe();
     const request = http.expectOne((r) => r.url === BASE);
     expect(request.request.params.get('folder')).toBe('4');
     expect(request.request.params.get('kind')).toBe('IMAGE');

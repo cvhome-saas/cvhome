@@ -31,13 +31,29 @@ import {Icon} from '@shared/ui/icon/icon';
       </span>
       <span class="zone-spacer"></span>
       @if (busy()) {
-        <span class="progress" role="progressbar" [attr.aria-valuenow]="percent()" aria-valuemin="0" aria-valuemax="100">
+        <span
+          class="progress"
+          role="progressbar"
+          [attr.aria-valuenow]="percent()"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
           <span class="bar" [style.inline-size.%]="percent()"></span>
         </span>
       } @else {
-        <button class="primary-action" type="button" (click)="fileInput.click()">{{ browseLabel() }}</button>
+        <button class="primary-action" type="button" (click)="fileInput.click()">
+          {{ browseLabel() }}
+        </button>
       }
-      <input #fileInput class="sr-only" type="file" multiple [accept]="accept()" [attr.aria-label]="browseLabel()" (change)="onPicked($event)" />
+      <input
+        #fileInput
+        class="sr-only"
+        type="file"
+        multiple
+        [accept]="accept()"
+        [attr.aria-label]="browseLabel()"
+        (change)="onPicked($event)"
+      />
     </div>
   `,
   styleUrl: './file-drop-zone.css',
@@ -59,7 +75,12 @@ export class FileDropZone {
   protected readonly dragging = signal(false);
   protected readonly rejected = signal<string | null>(null);
 
-  protected readonly acceptList = computed(() => this.accept().split(',').map((a) => a.trim()).filter(Boolean));
+  protected readonly acceptList = computed(() =>
+    this.accept()
+      .split(',')
+      .map((a) => a.trim())
+      .filter(Boolean),
+  );
 
   protected onDragOver(event: DragEvent): void {
     event.preventDefault();

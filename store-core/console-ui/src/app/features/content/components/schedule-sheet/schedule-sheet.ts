@@ -11,24 +11,57 @@ import {Panel} from '@shared/ui/panel/panel';
   imports: [DateTimeField, Icon, Panel, TranslocoDirective],
   template: `
     @if (open()) {
-      <div class="schedule-sheet" role="dialog" [attr.aria-label]="t('content.editor.scheduleTitle')" *transloco="let t">
-        <app-panel [title]="t('content.editor.scheduleTitle')" [subtitle]="t('content.editor.scheduleSubtitle')" padded>
+      <div
+        class="schedule-sheet"
+        role="dialog"
+        [attr.aria-label]="t('content.editor.scheduleTitle')"
+        *transloco="let t"
+      >
+        <app-panel
+          [title]="t('content.editor.scheduleTitle')"
+          [subtitle]="t('content.editor.scheduleSubtitle')"
+          padded
+        >
           <div class="schedule-row">
-            <app-date-time-field [value]="at()" (valueChange)="at.set($event)" [ariaLabel]="t('content.editor.publishAt')" />
-            <button class="primary-action" type="button" [disabled]="!at()" (click)="confirmed.emit(at()); open.set(false)">
+            <app-date-time-field
+              [value]="at()"
+              (valueChange)="at.set($event)"
+              [ariaLabel]="t('content.editor.publishAt')"
+            />
+            <button
+              class="primary-action"
+              type="button"
+              [disabled]="!at()"
+              (click)="confirmed.emit(at()); open.set(false)"
+            >
               <app-icon name="calendar" />{{ t('content.action.schedule') }}
             </button>
-            <button class="ghost-action" type="button" (click)="open.set(false)">{{ t('shared.actions.cancel') }}</button>
+            <button class="ghost-action" type="button" (click)="open.set(false)">
+              {{ t('shared.actions.cancel') }}
+            </button>
           </div>
         </app-panel>
       </div>
     }
   `,
   styles: `
-    .schedule-sheet { position: fixed; inset-block-end: 1.25rem; inset-inline-end: 1.25rem; z-index: 30;
-      inline-size: min(30rem, calc(100vw - 2.5rem)); box-shadow: var(--lift); }
-    .schedule-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-    .schedule-row app-date-time-field { flex: 1 1 12rem; }
+    .schedule-sheet {
+      position: fixed;
+      inset-block-end: 1.25rem;
+      inset-inline-end: 1.25rem;
+      z-index: 30;
+      inline-size: min(30rem, calc(100vw - 2.5rem));
+      box-shadow: var(--lift);
+    }
+    .schedule-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .schedule-row app-date-time-field {
+      flex: 1 1 12rem;
+    }
   `,
 })
 export class ScheduleSheet {

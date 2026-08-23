@@ -44,7 +44,7 @@ import {Icon} from '@shared/ui/icon/icon';
           <app-icon name="check" [size]="11" />
         }
       </span>
-      <span class="copy" dir="auto">{{ label() }}</span>
+      <span class="copy" [class.sr-only]="hideLabel()" dir="auto">{{ label() }}</span>
     </label>
   `,
   styleUrl: './checkbox.css',
@@ -55,6 +55,8 @@ export class Checkbox {
   readonly label = input.required<string>();
   readonly disabled = input(false, {transform: booleanAttribute});
   readonly describedBy = input<string | null>(null);
+  /** Keep the label for assistive tech but draw only the box — a table's row selector. */
+  readonly hideLabel = input(false, {transform: booleanAttribute});
   /**
    * How far the row is indented, in levels.
    *

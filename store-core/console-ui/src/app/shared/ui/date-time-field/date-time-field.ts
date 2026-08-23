@@ -26,7 +26,9 @@ import {NG_VALUE_ACCESSOR, type ControlValueAccessor} from '@angular/forms';
     />
   `,
   styleUrl: './date-time-field.css',
-  providers: [{provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeField), multi: true}],
+  providers: [
+    {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeField), multi: true},
+  ],
 })
 export class DateTimeField implements ControlValueAccessor {
   readonly value = model<string>('');

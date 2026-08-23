@@ -5,7 +5,13 @@ import {Observable, filter, map} from 'rxjs';
 
 import {CrudService} from '@core/http/crud.service';
 import type {PageT} from '@models/page';
-import type {MediaAsset, MediaFolder, MediaKind, MediaUsage, PersistableMediaAsset} from '@models/content';
+import type {
+  MediaAsset,
+  MediaFolder,
+  MediaKind,
+  MediaUsage,
+  PersistableMediaAsset,
+} from '@models/content';
 import {CONTENT_PRIVATE} from './content-api';
 
 export interface MediaQuery {
@@ -64,7 +70,10 @@ export class MediaService {
         map((event: HttpEvent<unknown>): UploadEvent | null => {
           if (event.type === HttpEventType.UploadProgress) {
             const total = event.total ?? 0;
-            return {kind: 'progress', percent: total ? Math.round((event.loaded / total) * 100) : 0};
+            return {
+              kind: 'progress',
+              percent: total ? Math.round((event.loaded / total) * 100) : 0,
+            };
           }
           if (event.type === HttpEventType.Response) {
             return {kind: 'done', assets: (event.body as MediaAsset[]) ?? []};

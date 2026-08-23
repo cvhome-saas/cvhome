@@ -1,5 +1,11 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
-import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {
@@ -20,7 +26,10 @@ import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {MediaPickerDialog} from '../../components/media-picker/media-picker-dialog';
-import {PublishChecklist, type ChecklistItem} from '../../components/publish-checklist/publish-checklist';
+import {
+  PublishChecklist,
+  type ChecklistItem,
+} from '../../components/publish-checklist/publish-checklist';
 import {ScheduleSheet} from '../../components/schedule-sheet/schedule-sheet';
 import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
@@ -77,7 +86,8 @@ export class BannerEditor {
   private readonly transloco = inject(TranslocoService);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly hub = inject(ContentHubFacade);
-  protected readonly facade = inject<ContentEditorFacade<PersistableBanner, ReadableBanner>>(ContentEditorFacade);
+  protected readonly facade =
+    inject<ContentEditorFacade<PersistableBanner, ReadableBanner>>(ContentEditorFacade);
 
   readonly id = input<string>();
 
@@ -114,21 +124,25 @@ export class BannerEditor {
   });
 
   constructor() {
-    const raw = this.id();
-    this.facade.init('banners', raw ? Number(raw) : null, this.extra, (item) => {
-      this.extra.reset({
-        placement: item.placement,
-        startsAt: item.startsAt ?? '',
-        endsAt: item.endsAt ?? '',
-        targetKind: item.target?.kind ?? 'URL',
-        targetValue: item.target?.value ?? '',
-        desktopMediaId: item.artwork?.desktopMediaId ?? null,
-        mobileMediaId: item.artwork?.mobileMediaId ?? null,
-        mobileCrop: item.artwork?.mobileCrop ?? 'center',
-        loggedInOnly: !!item.loggedInOnly,
-      });
-      this.desktopUrl.set(item.desktopUrl ?? null);
-      this.mobileUrl.set(item.mobileUrl ?? null);
+    effect(() => {
+      const raw = this.id();
+      untracked(() =>
+        this.facade.init('banners', raw ? Number(raw) : null, this.extra, (item) => {
+          this.extra.reset({
+            placement: item.placement,
+            startsAt: item.startsAt ?? '',
+            endsAt: item.endsAt ?? '',
+            targetKind: item.target?.kind ?? 'URL',
+            targetValue: item.target?.value ?? '',
+            desktopMediaId: item.artwork?.desktopMediaId ?? null,
+            mobileMediaId: item.artwork?.mobileMediaId ?? null,
+            mobileCrop: item.artwork?.mobileCrop ?? 'center',
+            loggedInOnly: !!item.loggedInOnly,
+          });
+          this.desktopUrl.set(item.desktopUrl ?? null);
+          this.mobileUrl.set(item.mobileUrl ?? null);
+        }),
+      );
     });
     this.facade.setBodyMapper(() => this.body());
     effect(() => {
@@ -145,14 +159,20 @@ export class BannerEditor {
       startsAt: v.startsAt || null,
       endsAt: v.endsAt || null,
       target: v.targetValue.trim() ? {kind: v.targetKind, value: v.targetValue.trim()} : null,
-      artwork: {desktopMediaId: v.desktopMediaId, mobileMediaId: v.mobileMediaId, mobileCrop: v.mobileCrop || null},
+      artwork: {
+        desktopMediaId: v.desktopMediaId,
+        mobileMediaId: v.mobileMediaId,
+        mobileCrop: v.mobileCrop || null,
+      },
       loggedInOnly: v.loggedInOnly,
     };
   }
 
   protected readonly heading = computed(() => {
     this.transloco.activeLang();
-    return this.facade.isNew() ? this.transloco.translate('content.banner.newTitle') : this.facade.title() || this.transloco.translate('content.banner.editTitle');
+    return this.facade.isNew()
+      ? this.transloco.translate('content.banner.newTitle')
+      : this.facade.title() || this.transloco.translate('content.banner.editTitle');
   });
 
   protected readonly sizeHint = computed(() => SIZE_HINTS[this.extra.controls.placement.value]);
@@ -167,27 +187,45 @@ export class BannerEditor {
   });
 
   protected readonly activeTranslation = computed(
-    () => this.facade.translationFor(this.facade.language()) ?? Object.values(this.facade.translations())[0],
+    () =>
+      this.facade.translationFor(this.facade.language()) ??
+      Object.values(this.facade.translations())[0],
   );
 
   protected readonly checklist = computed<readonly ChecklistItem[]>(() => {
     this.transloco.activeLang();
     this.facade.written();
-    const source = this.facade.translationFor(this.hub.locales().defaultCode);
+    const source = this.facade.sourceTranslation(this.hub.locales().defaultCode);
     const headline = !!source && source.controls.title.value.trim().length > 0;
     const target = this.extra.controls.targetValue.value.trim().length > 0;
     const artwork = this.isStrip() || this.extra.controls.desktopMediaId.value !== null;
-    const alt = this.isStrip() || !artwork || (source?.controls.altText.value.trim().length ?? 0) > 0;
+    const alt =
+      this.isStrip() || !artwork || (source?.controls.altText.value.trim().length ?? 0) > 0;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [
-      {key: 'placement', label: this.transloco.translate('content.checklist.placement'), ok: true},
-      {key: 'copy', label: this.transloco.translate('content.checklist.headlineAndTarget'), ok: headline && target},
-      {key: 'artwork', label: this.transloco.translate('content.checklist.artwork'), ok: artwork, soft: this.isStrip()},
+      {
+        key: 'placement',
+        label: this.transloco.translate('content.checklist.placement'),
+        ok: true,
+      },
+      {
+        key: 'copy',
+        label: this.transloco.translate('content.checklist.headlineAndTarget'),
+        ok: headline && target,
+      },
+      {
+        key: 'artwork',
+        label: this.transloco.translate('content.checklist.artwork'),
+        ok: artwork,
+        soft: this.isStrip(),
+      },
       {key: 'alt', label: this.transloco.translate('content.checklist.altText'), ok: alt},
       {
         key: 'translations',
         label: missing.length
-          ? this.transloco.translate('content.checklist.translationsMissing', {languages: missing.map((c) => c.toUpperCase()).join(', ')})
+          ? this.transloco.translate('content.checklist.translationsMissing', {
+              languages: missing.map((c) => c.toUpperCase()).join(', '),
+            })
           : this.transloco.translate('content.checklist.translationsDone'),
         ok: missing.length === 0,
         soft: true,
@@ -222,7 +260,8 @@ export class BannerEditor {
   }
 
   protected clearArtwork(which: 'desktop' | 'mobile'): void {
-    const control = which === 'desktop' ? this.extra.controls.desktopMediaId : this.extra.controls.mobileMediaId;
+    const control =
+      which === 'desktop' ? this.extra.controls.desktopMediaId : this.extra.controls.mobileMediaId;
     control.setValue(null);
     control.markAsDirty();
     (which === 'desktop' ? this.desktopUrl : this.mobileUrl).set(null);

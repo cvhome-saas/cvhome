@@ -9,30 +9,28 @@ import {uniqueAsync} from '@shared/forms/unique-async';
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** One locale's copy. Which controls a given editor shows is the editor's business; the group carries them all. */
-export interface TranslationForm
-  extends FormGroup<{
-    title: FormControl<string>;
-    body: FormControl<string>;
-    excerpt: FormControl<string>;
-    metaTitle: FormControl<string>;
-    metaDescription: FormControl<string>;
-    keywords: FormControl<string>;
-    altText: FormControl<string>;
-    ctaLabel: FormControl<string>;
-    subtitle: FormControl<string>;
-    friendlyUrl: FormControl<string>;
-  }> {}
+export interface TranslationForm extends FormGroup<{
+  title: FormControl<string>;
+  body: FormControl<string>;
+  excerpt: FormControl<string>;
+  metaTitle: FormControl<string>;
+  metaDescription: FormControl<string>;
+  keywords: FormControl<string>;
+  altText: FormControl<string>;
+  ctaLabel: FormControl<string>;
+  subtitle: FormControl<string>;
+  friendlyUrl: FormControl<string>;
+}> {}
 
 /** The fields every workflow item shares on write. */
-export interface CommonForm
-  extends FormGroup<{
-    slug: FormControl<string>;
-    publishAt: FormControl<string>;
-    unpublishAt: FormControl<string>;
-    noindex: FormControl<boolean>;
-    canonicalUrl: FormControl<string>;
-    ogMediaId: FormControl<number | null>;
-  }> {}
+export interface CommonForm extends FormGroup<{
+  slug: FormControl<string>;
+  publishAt: FormControl<string>;
+  unpublishAt: FormControl<string>;
+  noindex: FormControl<boolean>;
+  canonicalUrl: FormControl<string>;
+  ogMediaId: FormControl<number | null>;
+}> {}
 
 /**
  * Builds and maps the forms every content editor is made of: one `CommonForm`, one
@@ -46,10 +44,17 @@ export class ContentEditorFormService {
   common(type: ContentListType, currentId: () => number | null): CommonForm {
     return this.fb.group({
       slug: this.fb.control('', {
-        validators: [Validators.required, Validators.maxLength(100), Validators.pattern(SLUG_PATTERN)],
+        validators: [
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(SLUG_PATTERN),
+        ],
         asyncValidators: [
           uniqueAsync(
-            (slug) => this.api.slugAvailable(type, slug, currentId() ?? undefined).pipe(map((r) => !r.exists)),
+            (slug) =>
+              this.api
+                .slugAvailable(type, slug, currentId() ?? undefined)
+                .pipe(map((r) => !r.exists)),
             'slugTaken',
           ),
         ],
@@ -78,7 +83,10 @@ export class ContentEditorFormService {
   }
 
   /** One group per code, keeping the groups that already exist so typed copy survives a language list change. */
-  translations(codes: readonly string[], existing: Readonly<Record<string, TranslationForm>> = {}): Record<string, TranslationForm> {
+  translations(
+    codes: readonly string[],
+    existing: Readonly<Record<string, TranslationForm>> = {},
+  ): Record<string, TranslationForm> {
     const out: Record<string, TranslationForm> = {};
     for (const code of codes) {
       out[code] = existing[code] ?? this.translation();
@@ -97,7 +105,10 @@ export class ContentEditorFormService {
     });
   }
 
-  fillTranslations(forms: Readonly<Record<string, TranslationForm>>, translations: readonly ContentTranslation[]): void {
+  fillTranslations(
+    forms: Readonly<Record<string, TranslationForm>>,
+    translations: readonly ContentTranslation[],
+  ): void {
     const byCode = new Map(translations.map((t) => [t.language, t]));
     for (const [code, form] of Object.entries(forms)) {
       const t = byCode.get(code);

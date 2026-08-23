@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
@@ -15,7 +15,10 @@ import {Panel} from '@shared/ui/panel/panel';
 import {Select, type SelectOption} from '@shared/ui/select/select';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
-import {PublishChecklist, type ChecklistItem} from '../../components/publish-checklist/publish-checklist';
+import {
+  PublishChecklist,
+  type ChecklistItem,
+} from '../../components/publish-checklist/publish-checklist';
 import {SeoBlock} from '../../components/seo-block/seo-block';
 import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
@@ -23,7 +26,11 @@ import {EditorShell, type EditorCommand} from '../editor-shell/editor-shell';
 
 const TEMPLATES: readonly PageTemplate[] = ['STANDARD', 'LANDING', 'CONTACT', 'FAQ_PAGE'];
 
-const COPY: CopyFields = {titleKey: 'content.copy.pageTitle', bodyKey: 'content.copy.body', richBody: true};
+const COPY: CopyFields = {
+  titleKey: 'content.copy.pageTitle',
+  bodyKey: 'content.copy.body',
+  richBody: true,
+};
 
 /**
  * `New Page.dc.html`: template cards, the per-language title and body, URL & search, and a sidebar
@@ -61,7 +68,8 @@ export class PageEditor {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly hub = inject(ContentHubFacade);
-  protected readonly facade = inject<ContentEditorFacade<PersistablePage, ReadablePage>>(ContentEditorFacade);
+  protected readonly facade =
+    inject<ContentEditorFacade<PersistablePage, ReadablePage>>(ContentEditorFacade);
 
   /** The route's `:id`; absent on `new`. */
   readonly id = input<string>();
@@ -89,9 +97,9 @@ export class PageEditor {
   private readonly pages = rxResource({
     params: () => this.shell.currentStoreId() ?? undefined,
     stream: () =>
-      this.items.list('pages', {status: null, locale: null, state: null, q: ''}, {page: 0, count: 100}).pipe(
-        map((page) => page.content),
-      ),
+      this.items
+        .list('pages', {status: null, locale: null, state: null, q: ''}, {page: 0, count: 100})
+        .pipe(map((page) => page.content)),
   });
 
   protected readonly parentOptions = computed<readonly SelectOption[]>(() => {
@@ -100,19 +108,25 @@ export class PageEditor {
     const rows = this.pages.hasValue() ? this.pages.value() : [];
     return [
       {value: '', label: this.transloco.translate('content.page.noParent')},
-      ...rows.filter((row) => row.id !== self).map((row) => ({value: String(row.id), label: row.title})),
+      ...rows
+        .filter((row) => row.id !== self)
+        .map((row) => ({value: String(row.id), label: row.title})),
     ];
   });
 
   constructor() {
-    const raw = this.id();
-    this.facade.init('pages', raw ? Number(raw) : null, this.extra, (item) => {
-      this.extra.reset({
-        template: item.template ?? 'STANDARD',
-        parentId: item.parentId ?? null,
-        showInFooter: !!item.showInFooter,
-        linkToMenu: !!item.linkToMenu,
-      });
+    effect(() => {
+      const raw = this.id();
+      untracked(() =>
+        this.facade.init('pages', raw ? Number(raw) : null, this.extra, (item) => {
+          this.extra.reset({
+            template: item.template ?? 'STANDARD',
+            parentId: item.parentId ?? null,
+            showInFooter: !!item.showInFooter,
+            linkToMenu: !!item.linkToMenu,
+          });
+        }),
+      );
     });
     effect(() => {
       const locales = this.hub.locales();
@@ -122,30 +136,47 @@ export class PageEditor {
 
   protected readonly heading = computed(() => {
     this.transloco.activeLang();
-    return this.facade.isNew() ? this.transloco.translate('content.page.newTitle') : this.facade.title() || this.transloco.translate('content.page.editTitle');
+    return this.facade.isNew()
+      ? this.transloco.translate('content.page.newTitle')
+      : this.facade.title() || this.transloco.translate('content.page.editTitle');
   });
 
   protected readonly activeTranslation = computed(
-    () => this.facade.translationFor(this.facade.language()) ?? Object.values(this.facade.translations())[0],
+    () =>
+      this.facade.translationFor(this.facade.language()) ??
+      Object.values(this.facade.translations())[0],
   );
 
   protected readonly checklist = computed<readonly ChecklistItem[]>(() => {
     this.transloco.activeLang();
     this.facade.written();
-    const defaultCode = this.hub.locales().defaultCode;
-    const source = this.facade.translationFor(defaultCode);
-    const titleAndBody = !!source && source.controls.title.value.trim().length > 0 && source.controls.body.value.trim().length > 0;
+    const source = this.facade.sourceTranslation(this.hub.locales().defaultCode);
+    const titleAndBody =
+      !!source &&
+      source.controls.title.value.trim().length > 0 &&
+      source.controls.body.value.trim().length > 0;
     const slug = this.facade.common?.controls.slug.valid ?? false;
     const meta = (source?.controls.metaDescription.value ?? '').length <= 160;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [
-      {key: 'copy', label: this.transloco.translate('content.checklist.titleAndBody'), ok: titleAndBody},
+      {
+        key: 'copy',
+        label: this.transloco.translate('content.checklist.titleAndBody'),
+        ok: titleAndBody,
+      },
       {key: 'slug', label: this.transloco.translate('content.checklist.slug'), ok: slug},
-      {key: 'meta', label: this.transloco.translate('content.checklist.metaLength'), ok: meta, soft: true},
+      {
+        key: 'meta',
+        label: this.transloco.translate('content.checklist.metaLength'),
+        ok: meta,
+        soft: true,
+      },
       {
         key: 'translations',
         label: missing.length
-          ? this.transloco.translate('content.checklist.translationsMissing', {languages: missing.map((c) => c.toUpperCase()).join(', ')})
+          ? this.transloco.translate('content.checklist.translationsMissing', {
+              languages: missing.map((c) => c.toUpperCase()).join(', '),
+            })
           : this.transloco.translate('content.checklist.translationsDone'),
         ok: missing.length === 0,
         soft: true,

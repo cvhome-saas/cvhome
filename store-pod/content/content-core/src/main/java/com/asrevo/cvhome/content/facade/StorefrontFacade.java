@@ -475,7 +475,8 @@ public class StorefrontFacade {
 
     private StorefrontSeo seo(Content c, ContentDescription d, StoreMerchantId store) {
         StorefrontSeo seo = new StorefrontSeo();
-        seo.setMetaTitle(d.getMetatagTitle() != null ? d.getMetatagTitle() : title(d));
+        seo.setMetaTitle(d.getMetatagTitle() != null ? d.getMetatagTitle()
+                : (d.getTitle() != null ? d.getTitle() : title(d)));
         seo.setMetaDescription(d.getMetatagDescription());
         seo.setKeywords(d.getMetatagKeywords());
         seo.setCanonicalUrl(c.getCanonicalUrl());
@@ -519,7 +520,7 @@ public class StorefrontFacade {
     }
 
     static String title(ContentDescription d) {
-        return d.getTitle() != null ? d.getTitle() : d.getName();
+        return d.getName();
     }
 
     private static String bodyOrTitle(ContentDescription d) {

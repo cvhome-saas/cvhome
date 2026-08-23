@@ -1,4 +1,13 @@
-import {Component, ElementRef, HostListener, computed, inject, input, output, signal} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 
 import {Icon} from '@shared/ui/icon/icon';
 import type {IconName} from '@shared/ui/icon/icon-paths';
@@ -82,7 +91,9 @@ export class ActionMenu {
   readonly picked = output<MenuAction>();
 
   protected readonly open = signal(false);
-  protected readonly enabledCount = computed(() => this.actions().filter((a) => !a.disabled).length);
+  protected readonly enabledCount = computed(
+    () => this.actions().filter((a) => !a.disabled).length,
+  );
 
   toggle(): void {
     if (this.open()) {
@@ -108,7 +119,9 @@ export class ActionMenu {
       if (!this.open()) {
         this.open.set(true);
       }
-      queueMicrotask(() => this.focusItem(event.key === 'ArrowDown' ? 0 : this.actions().length - 1));
+      queueMicrotask(() =>
+        this.focusItem(event.key === 'ArrowDown' ? 0 : this.actions().length - 1),
+      );
     }
   }
 
@@ -144,7 +157,9 @@ export class ActionMenu {
   }
 
   private items(): HTMLButtonElement[] {
-    return Array.from(this.host.nativeElement.querySelectorAll('.menu-item:not(:disabled)')) as HTMLButtonElement[];
+    return Array.from(
+      this.host.nativeElement.querySelectorAll('.menu-item:not(:disabled)'),
+    ) as HTMLButtonElement[];
   }
 
   private trigger(): HTMLButtonElement | null {

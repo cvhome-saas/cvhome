@@ -50,7 +50,11 @@ export class ContentItemsService {
     return this.crudService.post(`${CONTENT_PRIVATE}/${type}`, body);
   }
 
-  update<B extends PersistableContent>(type: ContentListType, id: number, body: B): Observable<SavedContent> {
+  update<B extends PersistableContent>(
+    type: ContentListType,
+    id: number,
+    body: B,
+  ): Observable<SavedContent> {
     return this.crudService.put(`${CONTENT_PRIVATE}/${type}/${id}`, body);
   }
 
@@ -83,11 +87,18 @@ export class ContentItemsService {
   }
 
   restoreRevision(type: ContentListType, id: number, version: number): Observable<SavedContent> {
-    return this.crudService.post(`${CONTENT_PRIVATE}/${type}/${id}/revisions/${version}/restore`, null);
+    return this.crudService.post(
+      `${CONTENT_PRIVATE}/${type}/${id}/revisions/${version}/restore`,
+      null,
+    );
   }
 
   /** `{exists: true}` means the slug is free — the legacy "exists" pre-flight shape, kept on purpose. */
-  slugAvailable(type: ContentListType, slug: string, excludeId?: number): Observable<{exists: boolean}> {
+  slugAvailable(
+    type: ContentListType,
+    slug: string,
+    excludeId?: number,
+  ): Observable<{exists: boolean}> {
     return this.crudService.get(`${CONTENT_PRIVATE}/${type}/slug-available`, {slug, excludeId});
   }
 
@@ -96,7 +107,11 @@ export class ContentItemsService {
   }
 
   /** 207: one result per id, never a whole-batch failure. */
-  bulk(type: ContentListType, ids: readonly number[], action: BulkAction): Observable<readonly BulkResult[]> {
+  bulk(
+    type: ContentListType,
+    ids: readonly number[],
+    action: BulkAction,
+  ): Observable<readonly BulkResult[]> {
     return this.crudService.post(`${CONTENT_PRIVATE}/${type}/bulk`, {ids, action});
   }
 }

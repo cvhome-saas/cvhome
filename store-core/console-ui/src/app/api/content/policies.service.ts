@@ -44,6 +44,9 @@ export class PoliciesService {
 
   /** Copies an old version's text back onto the head as its draft text. */
   restoreText(id: number, version: number): Observable<SavedContent> {
-    return this.crudService.post(`${CONTENT_PRIVATE}/policies/${id}/versions/${version}/restore-text`, null);
+    return this.crudService.post(
+      `${CONTENT_PRIVATE}/policies/${id}/versions/${version}/restore-text`,
+      null,
+    );
   }
 }

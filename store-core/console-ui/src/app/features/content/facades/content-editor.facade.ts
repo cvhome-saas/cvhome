@@ -3,7 +3,7 @@ import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@jsverse/transloco';
-import {merge, of, startWith, switchMap} from 'rxjs';
+import {Subscription, merge, of, startWith, switchMap} from 'rxjs';
 
 import {ContentCache} from '@api/content/content-cache';
 import {ContentItemsService} from '@api/content/content-items.service';
@@ -63,6 +63,10 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   /** The language being edited. */
   readonly language = signal('en');
 
+  /** Bumped on every change of the common and extra forms, so `dirty`/`invalid` re-evaluate. */
+  private readonly formTick = signal(0);
+  private formSubscriptions = new Subscription();
+
   readonly isNew = computed(() => this.id() === null);
   readonly status = computed<ContentStatus | null>(() => this.item()?.status ?? null);
   readonly version = computed(() => this.item()?.version ?? null);
@@ -96,11 +100,26 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
    * Wires the facade to one editor: the type, the id from the route (null for `new`), the editor's
    * own form group and how to pour a loaded item into it.
    */
-  init(type: ContentListType, id: number | null, extra: FormGroup, populateExtra: (item: R) => void): void {
+  init(
+    type: ContentListType,
+    id: number | null,
+    extra: FormGroup,
+    populateExtra: (item: R) => void,
+  ): void {
     this.type = type;
     this.extra = extra;
     this.populateExtra = populateExtra;
     this.common = this.forms.common(type, () => this.id());
+    this.formSubscriptions.unsubscribe();
+    this.formSubscriptions = new Subscription();
+    for (const form of [this.common, extra]) {
+      this.formSubscriptions.add(
+        form.valueChanges.subscribe(() => this.formTick.update((v) => v + 1)),
+      );
+      this.formSubscriptions.add(
+        form.statusChanges.subscribe(() => this.formTick.update((v) => v + 1)),
+      );
+    }
     this.id.set(id);
     this.language.set(this.hub.locales().defaultCode);
     this.translations.set(this.forms.translations(this.hub.locales().codes));
@@ -156,19 +175,28 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     this.common.markAsPristine();
     Object.values(this.translations()).forEach((f) => f.markAsPristine());
     this.extra?.markAsPristine();
+    this.formTick.update((v) => v + 1);
   }
 
   readonly dirty = computed(() => {
     this.formValue();
+    this.formTick();
     return (
-      this.common?.dirty || this.extra?.dirty || Object.values(this.translations()).some((f) => f.dirty) || false
+      this.common?.dirty ||
+      this.extra?.dirty ||
+      Object.values(this.translations()).some((f) => f.dirty) ||
+      false
     );
   });
 
   readonly invalid = computed(() => {
     this.formValue();
+    this.formTick();
     return (
-      this.common?.invalid || this.extra?.invalid || Object.values(this.translations()).some((f) => f.invalid) || false
+      this.common?.invalid ||
+      this.extra?.invalid ||
+      Object.values(this.translations()).some((f) => f.invalid) ||
+      false
     );
   });
 
@@ -195,7 +223,8 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     this.saving.set(true);
     const body = this.body();
     const id = this.id();
-    const request = id === null ? this.api.create(this.type, body) : this.api.update(this.type, id, body);
+    const request =
+      id === null ? this.api.create(this.type, body) : this.api.update(this.type, id, body);
     request.subscribe({
       next: (saved) => {
         this.saving.set(false);
@@ -259,7 +288,9 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
       next: () => {
         this.saving.set(false);
         this.cache.invalidate();
-        this.toast.success(this.transloco.translate('content.toast.deleted', {title: this.title()}));
+        this.toast.success(
+          this.transloco.translate('content.toast.deleted', {title: this.title()}),
+        );
         this.router.navigate(['/content', this.type]);
       },
       error: (failure: unknown) => {
@@ -283,6 +314,25 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
       }
     }
     return this.common?.controls.slug.value ?? '';
+  }
+
+  /**
+   * The locale the publish gate will judge: the default one when it has a title, else the first
+   * written one — the same fallback the server applies.
+   */
+  sourceTranslation(defaultCode: string): TranslationForm | undefined {
+    const preferred = this.translations()[defaultCode];
+    if (preferred && preferred.controls.title.value.trim()) {
+      return preferred;
+    }
+    const written = this.written();
+    for (const code of written) {
+      const form = this.translations()[code];
+      if (form) {
+        return form;
+      }
+    }
+    return preferred;
   }
 
   translationFor(code: string): TranslationForm | undefined {

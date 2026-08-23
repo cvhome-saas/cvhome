@@ -1,6 +1,12 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import {PostCategoriesService} from '@api/content/post-categories.service';
@@ -17,7 +23,10 @@ import {TextField} from '@shared/ui/text-field/text-field';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
 import {MediaPickerDialog} from '../../components/media-picker/media-picker-dialog';
-import {PublishChecklist, type ChecklistItem} from '../../components/publish-checklist/publish-checklist';
+import {
+  PublishChecklist,
+  type ChecklistItem,
+} from '../../components/publish-checklist/publish-checklist';
 import {SeoBlock} from '../../components/seo-block/seo-block';
 import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
@@ -64,7 +73,8 @@ export class PostEditor {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly permissions = inject(ConsolePermissions);
   protected readonly hub = inject(ContentHubFacade);
-  protected readonly facade = inject<ContentEditorFacade<PersistablePost, ReadablePost>>(ContentEditorFacade);
+  protected readonly facade =
+    inject<ContentEditorFacade<PersistablePost, ReadablePost>>(ContentEditorFacade);
 
   readonly id = input<string>();
 
@@ -100,16 +110,20 @@ export class PostEditor {
   );
 
   constructor() {
-    const raw = this.id();
-    this.facade.init('posts', raw ? Number(raw) : null, this.extra, (item) => {
-      this.extra.reset({
-        heroMediaId: item.heroMediaId ?? null,
-        categoryIds: item.categoryIds ?? [],
-        tags: item.tags ?? [],
-        authorName: item.authorName ?? '',
-        featured: !!item.featured,
-      });
-      this.heroUrl.set(item.heroMediaUrl ?? null);
+    effect(() => {
+      const raw = this.id();
+      untracked(() =>
+        this.facade.init('posts', raw ? Number(raw) : null, this.extra, (item) => {
+          this.extra.reset({
+            heroMediaId: item.heroMediaId ?? null,
+            categoryIds: item.categoryIds ?? [],
+            tags: item.tags ?? [],
+            authorName: item.authorName ?? '',
+            featured: !!item.featured,
+          });
+          this.heroUrl.set(item.heroMediaUrl ?? null);
+        }),
+      );
     });
     effect(() => {
       const locales = this.hub.locales();
@@ -119,27 +133,49 @@ export class PostEditor {
 
   protected readonly heading = computed(() => {
     this.transloco.activeLang();
-    return this.facade.isNew() ? this.transloco.translate('content.post.newTitle') : this.facade.title() || this.transloco.translate('content.post.editTitle');
+    return this.facade.isNew()
+      ? this.transloco.translate('content.post.newTitle')
+      : this.facade.title() || this.transloco.translate('content.post.editTitle');
   });
 
   protected readonly activeTranslation = computed(
-    () => this.facade.translationFor(this.facade.language()) ?? Object.values(this.facade.translations())[0],
+    () =>
+      this.facade.translationFor(this.facade.language()) ??
+      Object.values(this.facade.translations())[0],
   );
 
   protected readonly checklist = computed<readonly ChecklistItem[]>(() => {
     this.transloco.activeLang();
     this.facade.written();
-    const source = this.facade.translationFor(this.hub.locales().defaultCode);
-    const titleAndBody = !!source && source.controls.title.value.trim().length > 0 && source.controls.body.value.trim().length > 0;
+    const source = this.facade.sourceTranslation(this.hub.locales().defaultCode);
+    const titleAndBody =
+      !!source &&
+      source.controls.title.value.trim().length > 0 &&
+      source.controls.body.value.trim().length > 0;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [
-      {key: 'copy', label: this.transloco.translate('content.checklist.titleAndBody'), ok: titleAndBody},
-      {key: 'slug', label: this.transloco.translate('content.checklist.slug'), ok: this.facade.common?.controls.slug.valid ?? false},
-      {key: 'hero', label: this.transloco.translate('content.checklist.hero'), ok: this.extra.controls.heroMediaId.value !== null, soft: true},
+      {
+        key: 'copy',
+        label: this.transloco.translate('content.checklist.titleAndBody'),
+        ok: titleAndBody,
+      },
+      {
+        key: 'slug',
+        label: this.transloco.translate('content.checklist.slug'),
+        ok: this.facade.common?.controls.slug.valid ?? false,
+      },
+      {
+        key: 'hero',
+        label: this.transloco.translate('content.checklist.hero'),
+        ok: this.extra.controls.heroMediaId.value !== null,
+        soft: true,
+      },
       {
         key: 'translations',
         label: missing.length
-          ? this.transloco.translate('content.checklist.translationsMissing', {languages: missing.map((c) => c.toUpperCase()).join(', ')})
+          ? this.transloco.translate('content.checklist.translationsMissing', {
+              languages: missing.map((c) => c.toUpperCase()).join(', '),
+            })
           : this.transloco.translate('content.checklist.translationsDone'),
         ok: missing.length === 0,
         soft: true,

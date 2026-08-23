@@ -31,9 +31,24 @@ export interface CopyFields {
  */
 @Component({
   selector: 'app-locale-copy',
-  imports: [FormField, LocaleSwitcher, NoticeBar, Panel, ReactiveFormsModule, RichText, TextField, TextareaField, TranslocoDirective],
+  imports: [
+    FormField,
+    LocaleSwitcher,
+    NoticeBar,
+    Panel,
+    ReactiveFormsModule,
+    RichText,
+    TextField,
+    TextareaField,
+    TranslocoDirective,
+  ],
   template: `
-    <app-panel [title]="t('content.copy.title')" [subtitle]="t('content.copy.subtitle')" padded *transloco="let t">
+    <app-panel
+      [title]="t('content.copy.title')"
+      [subtitle]="t('content.copy.subtitle')"
+      padded
+      *transloco="let t"
+    >
       <app-locale-switcher
         panelAction
         [languages]="locales()"
@@ -44,24 +59,52 @@ export interface CopyFields {
       />
 
       <div class="field-grid" [formGroup]="form()">
-        <app-form-field wide [label]="t(fields().titleKey)" [control]="form().controls.title" required [controlId]="id('title')">
+        <app-form-field
+          wide
+          [label]="t(fields().titleKey)"
+          [control]="form().controls.title"
+          required
+          [controlId]="id('title')"
+        >
           <app-text-field [id]="id('title')" formControlName="title" [maxLength]="120" />
         </app-form-field>
 
         @if (fields().subtitleKey; as key) {
-          <app-form-field wide [label]="t(key)" [control]="form().controls.subtitle" [controlId]="id('subtitle')">
+          <app-form-field
+            wide
+            [label]="t(key)"
+            [control]="form().controls.subtitle"
+            [controlId]="id('subtitle')"
+          >
             <app-text-field [id]="id('subtitle')" formControlName="subtitle" [maxLength]="300" />
           </app-form-field>
         }
 
         @if (fields().excerptKey; as key) {
-          <app-form-field wide [label]="t(key)" [hint]="t('content.copy.excerptHint')" [control]="form().controls.excerpt" [controlId]="id('excerpt')">
-            <app-textarea [id]="id('excerpt')" formControlName="excerpt" [rows]="2" [maxLength]="300" />
+          <app-form-field
+            wide
+            [label]="t(key)"
+            [hint]="t('content.copy.excerptHint')"
+            [control]="form().controls.excerpt"
+            [controlId]="id('excerpt')"
+          >
+            <app-textarea
+              [id]="id('excerpt')"
+              formControlName="excerpt"
+              [rows]="2"
+              [maxLength]="300"
+            />
           </app-form-field>
         }
 
         @if (fields().bodyKey; as key) {
-          <app-form-field wide [label]="t(key)" [control]="form().controls.body" [required]="!!fields().richBody" [controlId]="id('body')">
+          <app-form-field
+            wide
+            [label]="t(key)"
+            [control]="form().controls.body"
+            [required]="!!fields().richBody"
+            [controlId]="id('body')"
+          >
             @if (fields().richBody) {
               <app-rich-text [id]="id('body')" formControlName="body" [ariaLabel]="t(key)" />
             } @else {
@@ -71,18 +114,32 @@ export interface CopyFields {
         }
 
         @if (fields().ctaLabelKey; as key) {
-          <app-form-field [label]="t(key)" [control]="form().controls.ctaLabel" [controlId]="id('cta')">
+          <app-form-field
+            [label]="t(key)"
+            [control]="form().controls.ctaLabel"
+            [controlId]="id('cta')"
+          >
             <app-text-field [id]="id('cta')" formControlName="ctaLabel" [maxLength]="60" />
           </app-form-field>
         }
 
         @if (fields().altTextKey; as key) {
-          <app-form-field [label]="t(key)" [hint]="t('content.copy.altHint')" [control]="form().controls.altText" [controlId]="id('alt')">
+          <app-form-field
+            [label]="t(key)"
+            [hint]="t('content.copy.altHint')"
+            [control]="form().controls.altText"
+            [controlId]="id('alt')"
+          >
             <app-text-field [id]="id('alt')" formControlName="altText" [maxLength]="255" />
           </app-form-field>
         }
 
-        <app-notice-bar class="field-wide" tone="blue" icon="alertCircle" [message]="t('content.copy.fallbackNotice', {language: defaultName()})" />
+        <app-notice-bar
+          class="field-wide"
+          tone="blue"
+          icon="alertCircle"
+          [message]="t('content.copy.fallbackNotice', {language: defaultName()})"
+        />
       </div>
     </app-panel>
   `,
@@ -98,9 +155,12 @@ export class LocaleCopy {
   readonly fields = input.required<CopyFields>();
   readonly language = model.required<string>();
 
-  protected readonly form = computed(() => this.forms()[this.language()] ?? Object.values(this.forms())[0]);
+  protected readonly form = computed(
+    () => this.forms()[this.language()] ?? Object.values(this.forms())[0],
+  );
   protected readonly defaultName = computed(
-    () => this.locales().find((l) => l.code === this.defaultLocale())?.label ?? this.defaultLocale(),
+    () =>
+      this.locales().find((l) => l.code === this.defaultLocale())?.label ?? this.defaultLocale(),
   );
 
   protected id(field: string): string {

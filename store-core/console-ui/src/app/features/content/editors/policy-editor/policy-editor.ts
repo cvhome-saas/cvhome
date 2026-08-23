@@ -1,12 +1,24 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
 
 import {PoliciesService} from '@api/content/policies.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
-import {POLICY_TYPES, type PersistablePolicy, type PolicyType, type ReadablePolicy, type ReadablePolicyVersion} from '@models/content';
+import {
+  POLICY_TYPES,
+  type PersistablePolicy,
+  type PolicyType,
+  type ReadablePolicy,
+  type ReadablePolicyVersion,
+} from '@models/content';
 import {ConsolePermissions} from '@shared/auth/console-permissions';
 import {Badge} from '@shared/ui/badge/badge';
 import {DateTimeField} from '@shared/ui/date-time-field/date-time-field';
@@ -17,13 +29,20 @@ import {TextField} from '@shared/ui/text-field/text-field';
 import {ToastService} from '@shared/ui/toast/toast';
 import {Toggle} from '@shared/ui/toggle/toggle';
 import {LocaleCopy, type CopyFields} from '../../components/locale-copy/locale-copy';
-import {PublishChecklist, type ChecklistItem} from '../../components/publish-checklist/publish-checklist';
+import {
+  PublishChecklist,
+  type ChecklistItem,
+} from '../../components/publish-checklist/publish-checklist';
 import {ScheduleSheet} from '../../components/schedule-sheet/schedule-sheet';
 import {ContentEditorFacade} from '../../facades/content-editor.facade';
 import {ContentHubFacade} from '../../facades/content-hub.facade';
 import {EditorShell, type EditorCommand} from '../editor-shell/editor-shell';
 
-const COPY: CopyFields = {titleKey: 'content.copy.heading', bodyKey: 'content.copy.policyBody', richBody: true};
+const COPY: CopyFields = {
+  titleKey: 'content.copy.heading',
+  bodyKey: 'content.copy.policyBody',
+  richBody: true,
+};
 
 /**
  * `New Policy.dc.html`: type cards with "Insert template", heading and body per language, where it
@@ -62,7 +81,8 @@ export class PolicyEditor {
   private readonly permissions = inject(ConsolePermissions);
   private readonly route = inject(ActivatedRoute);
   protected readonly hub = inject(ContentHubFacade);
-  protected readonly facade = inject<ContentEditorFacade<PersistablePolicy, ReadablePolicy>>(ContentEditorFacade);
+  protected readonly facade =
+    inject<ContentEditorFacade<PersistablePolicy, ReadablePolicy>>(ContentEditorFacade);
 
   readonly id = input<string>();
 
@@ -95,26 +115,34 @@ export class PolicyEditor {
   });
 
   constructor() {
-    const raw = this.id();
-    this.facade.init('policies', raw ? Number(raw) : null, this.extra, (item) => {
-      this.extra.reset({
-        policyType: item.policyType,
-        jurisdiction: item.jurisdiction ?? '',
-        effectiveFrom: item.effectiveFrom ?? '',
-        requiresAcceptance: !!item.requiresAcceptance,
-        notifyCustomers: !!item.notifyCustomers,
-        showInFooter: item.showInFooter !== false,
-        showAtCheckout: !!item.showAtCheckout,
-        showAtSignup: !!item.showAtSignup,
-      });
+    effect(() => {
+      const raw = this.id();
+      untracked(() =>
+        this.facade.init('policies', raw ? Number(raw) : null, this.extra, (item) => {
+          this.extra.reset({
+            policyType: item.policyType,
+            jurisdiction: item.jurisdiction ?? '',
+            effectiveFrom: item.effectiveFrom ?? '',
+            requiresAcceptance: !!item.requiresAcceptance,
+            notifyCustomers: !!item.notifyCustomers,
+            showInFooter: item.showInFooter !== false,
+            showAtCheckout: !!item.showAtCheckout,
+            showAtSignup: !!item.showAtSignup,
+          });
+        }),
+      );
+      const wanted = this.route.snapshot.queryParamMap.get('type') as PolicyType | null;
+      if (!raw && wanted && (POLICY_TYPES as readonly string[]).includes(wanted)) {
+        this.pickType(wanted);
+      }
     });
-    const wanted = this.route.snapshot.queryParamMap.get('type') as PolicyType | null;
-    if (!raw && wanted && (POLICY_TYPES as readonly string[]).includes(wanted)) {
-      this.pickType(wanted);
-    }
     this.facade.setBodyMapper(() => {
       const v = this.extra.getRawValue();
-      return {...v, effectiveFrom: v.effectiveFrom || null, jurisdiction: v.jurisdiction.trim() || null};
+      return {
+        ...v,
+        effectiveFrom: v.effectiveFrom || null,
+        jurisdiction: v.jurisdiction.trim() || null,
+      };
     });
     effect(() => {
       const locales = this.hub.locales();
@@ -124,30 +152,50 @@ export class PolicyEditor {
 
   protected readonly heading = computed(() => {
     this.transloco.activeLang();
-    return this.facade.isNew() ? this.transloco.translate('content.policy.newTitle') : this.facade.title() || this.transloco.translate('content.policy.editTitle');
+    return this.facade.isNew()
+      ? this.transloco.translate('content.policy.newTitle')
+      : this.facade.title() || this.transloco.translate('content.policy.editTitle');
   });
 
-  protected readonly versions = computed<readonly ReadablePolicyVersion[]>(() => this.facade.item()?.versions ?? []);
+  protected readonly versions = computed<readonly ReadablePolicyVersion[]>(
+    () => this.facade.item()?.versions ?? [],
+  );
   protected readonly liveVersion = computed(() => this.facade.item()?.liveVersion ?? 0);
 
   protected readonly activeTranslation = computed(
-    () => this.facade.translationFor(this.facade.language()) ?? Object.values(this.facade.translations())[0],
+    () =>
+      this.facade.translationFor(this.facade.language()) ??
+      Object.values(this.facade.translations())[0],
   );
 
   protected readonly checklist = computed<readonly ChecklistItem[]>(() => {
     this.transloco.activeLang();
     this.facade.written();
-    const source = this.facade.translationFor(this.hub.locales().defaultCode);
-    const text = !!source && source.controls.title.value.trim().length > 0 && source.controls.body.value.trim().length > 0;
+    const source = this.facade.sourceTranslation(this.hub.locales().defaultCode);
+    const text =
+      !!source &&
+      source.controls.title.value.trim().length > 0 &&
+      source.controls.body.value.trim().length > 0;
     const missing = this.hub.locales().codes.filter((code) => !this.facade.written().has(code));
     return [
       {key: 'type', label: this.transloco.translate('content.checklist.policyType'), ok: true},
-      {key: 'text', label: this.transloco.translate('content.checklist.headingAndBody'), ok: text},
-      {key: 'effective', label: this.transloco.translate('content.checklist.effectiveDate'), ok: !!this.extra.controls.effectiveFrom.value, soft: true},
+      {
+        key: 'text',
+        label: this.transloco.translate('content.checklist.headingAndBody'),
+        ok: text,
+      },
+      {
+        key: 'effective',
+        label: this.transloco.translate('content.checklist.effectiveDate'),
+        ok: !!this.extra.controls.effectiveFrom.value,
+        soft: true,
+      },
       {
         key: 'translations',
         label: missing.length
-          ? this.transloco.translate('content.checklist.legalReview', {languages: missing.map((c) => c.toUpperCase()).join(', ')})
+          ? this.transloco.translate('content.checklist.legalReview', {
+              languages: missing.map((c) => c.toUpperCase()).join(', '),
+            })
           : this.transloco.translate('content.checklist.translationsDone'),
         ok: missing.length === 0,
         soft: true,
@@ -175,23 +223,28 @@ export class PolicyEditor {
   /** Starter text for the chosen type, poured into every language the template has. */
   protected insertTemplate(): void {
     this.templateBusy.set(true);
-    this.policiesApi.template(this.extra.controls.policyType.value, this.extra.controls.jurisdiction.value || null).subscribe({
-      next: (template) => {
-        this.templateBusy.set(false);
-        for (const t of template.translations) {
-          const form = this.facade.translationFor(t.language);
-          if (form) {
-            form.patchValue({title: t.title ?? '', body: t.body ?? ''});
-            form.markAsDirty();
+    this.policiesApi
+      .template(
+        this.extra.controls.policyType.value,
+        this.extra.controls.jurisdiction.value || null,
+      )
+      .subscribe({
+        next: (template) => {
+          this.templateBusy.set(false);
+          for (const t of template.translations) {
+            const form = this.facade.translationFor(t.language);
+            if (form) {
+              form.patchValue({title: t.title ?? '', body: t.body ?? ''});
+              form.markAsDirty();
+            }
           }
-        }
-        this.toast.success(this.transloco.translate('content.policy.templateInserted'));
-      },
-      error: (failure: unknown) => {
-        this.templateBusy.set(false);
-        this.apiErrors.notify(failure);
-      },
-    });
+          this.toast.success(this.transloco.translate('content.policy.templateInserted'));
+        },
+        error: (failure: unknown) => {
+          this.templateBusy.set(false);
+          this.apiErrors.notify(failure);
+        },
+      });
   }
 
   protected restoreVersion(version: ReadablePolicyVersion): void {
@@ -201,7 +254,9 @@ export class PolicyEditor {
     }
     this.policiesApi.restoreText(id, version.version).subscribe({
       next: () => {
-        this.toast.success(this.transloco.translate('content.policy.versionRestored', {version: version.version}));
+        this.toast.success(
+          this.transloco.translate('content.policy.versionRestored', {version: version.version}),
+        );
         this.facade.reload();
       },
       error: (failure: unknown) => this.apiErrors.notify(failure),
@@ -209,7 +264,9 @@ export class PolicyEditor {
   }
 
   protected versionDate(version: ReadablePolicyVersion): string {
-    return version.publishedAt ? this.localeFormat.localizeDate(version.publishedAt, undefined, {dateStyle: 'medium'}) : '';
+    return version.publishedAt
+      ? this.localeFormat.localizeDate(version.publishedAt, undefined, {dateStyle: 'medium'})
+      : '';
   }
 
   protected versionTone(version: ReadablePolicyVersion): 'green' | 'slate' | 'red' {
