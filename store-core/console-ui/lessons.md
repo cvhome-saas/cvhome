@@ -905,7 +905,8 @@ now being built per [`../../.agents/plans/console-ui-content.md`](../../.agents/
 
 > **Resolved (Module 12, phase 1).** The new `content` service reads and writes `meta_keywords` as
 > `ContentTranslation.keywords`, and the home card's keyword field is editable again. Kept for the
-> record; the old mappers live on only in `store-pod/content-deprecated`.
+> record; the old mappers lived on in `store-pod/content-deprecated` until Module 13 deleted it —
+> they are now git history only.
 
 - **Screen:** `/store-management/home`, the "Search keywords" field.
 - **What the UI needs:** the keywords a storefront's landing page is indexed on, per language.
@@ -3272,3 +3273,18 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
 - **Fix:** every write in the content service is `@Transactional(rollbackFor = Exception.class)`.
 - **Watch for it elsewhere:** every pod throws checked `BaseException` subclasses; a write path that
   mutates a managed entity before validating needs the same treatment.
+
+## Module 13 — seller-ui retired
+
+> **Resolved.** The migration this file has accompanied is finished: `store-core/seller-ui` and its
+> `seller-core` library are deleted, the gateway's apex catch-all (`gateway.com`, `www.`) serves
+> console-ui, and content Phase 7 went with it — `LegacyContentApi`, the Caddy `@legacy_content`
+> alias, `store-pod/content-deprecated` and landing-ui's legacy `Page`/`Box` shapes are all gone.
+
+- **Where the reference went:** every plan document that cites `seller-ui/projects/seller-core` as
+  "the reference ported from" resolves against the git tag `seller-ui-final`, the last commit that
+  carries the old console.
+- **What deliberately kept its name:** landing-ui's `CART_DATA_KEY` is still `seller-ui-cart-data` —
+  it is a shopper localStorage key, and renaming it would empty every live cart.
+- **What this file is now:** the record of what the platform could not do when the console was
+  built, entry by entry. The migration is over; the gaps are not. New entries keep the same format.

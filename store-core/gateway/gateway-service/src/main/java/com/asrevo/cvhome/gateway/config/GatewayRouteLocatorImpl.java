@@ -65,12 +65,8 @@ public class GatewayRouteLocatorImpl implements RouteLocator {
                 .route(r -> r.path(backendServicesPattern)
                         .negate()
                         .and()
-                        .host(String.format("console-ui.%s", storeCoreGatewayDomain))
-                        .uri("lb://console-ui"))
-                .route(r -> r.path(backendServicesPattern)
-                        .negate()
-                        .and()
-                        .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain))
+                        .host(storeCoreGatewayDomain, String.format("www.%s", storeCoreGatewayDomain),
+                                String.format("console-ui.%s", storeCoreGatewayDomain))
                         .uri("lb://console-ui"))
                 .build()
                 .getRoutes();
