@@ -1,8 +1,8 @@
 import type {ComponentType, ReactNode} from 'react';
 import type {
-    Banner, Box, BreadcrumbItem, Category, ColorSchema, FaqDocument, ImageFile, ListingFacets, ListingQuery, MenuNode,
-    Page, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage, SearchCapabilities, SliderImage,
-    Store, StoreContext, StorefrontLink, StorefrontSeo,
+    AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, ImageFile, ListingFacets,
+    ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage,
+    SearchCapabilities, SliderImage, Store, StoreContext, StorefrontLink, StorefrontSeo,
 } from '@store-front/types';
 import type {ColorRoleTokens} from './tokens';
 
@@ -60,12 +60,12 @@ export interface LayoutData {
     /** Category tree roots (children populated). */
     categories: Category[];
     /**
-     * CMS pages in the legacy shape; `linkToMenu` marks main-menu pages, the rest are footer pages.
+     * CMS page links; `inMenu` marks main-menu pages, the rest are footer pages.
      * Kept so themes that have not adopted `menus` keep rendering; derived from the site document.
      */
-    pages: Page[];
-    /** The announcement strip (live STRIP banner, else the `header-message` snippet), in the legacy Box shape. */
-    announcement?: Box;
+    pages: NavPage[];
+    /** The announcement strip (live STRIP banner, else the `header-message` snippet). */
+    announcement?: AnnouncementData;
     /** The merchant-managed menus, with resolved hrefs. Empty arrays when the store has not configured them. */
     menus: { main: MenuNode[]; footer: MenuNode[] };
     /** Live legal policies, for the footer and checkout. */
@@ -103,7 +103,7 @@ export interface ProductData {
 }
 
 export interface ContentData {
-    page: Page;
+    page: { slug: string; title: string };
     /** Decoded HTML of the page body — render with `dangerouslySetInnerHTML`. */
     html: string;
     breadcrumbs: BreadcrumbItem[];

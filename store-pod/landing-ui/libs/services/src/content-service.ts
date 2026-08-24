@@ -1,5 +1,5 @@
 import {
-    Box, ContentPage, FaqDocument, Page, Policy, PolicyType, PostList, PostSummary, SiteContent, SitemapEntry,
+    FaqDocument, Policy, PolicyType, PostList, PostSummary, SiteContent, SitemapEntry,
     StorefrontPage, Banner, BannerPlacement, MenuNode,
 } from "@store-front/types/content";
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
@@ -11,9 +11,6 @@ const sf = (ctx: StoreContext, path: string, query = '') =>
 /**
  * The content platform's public read API (`/api/v1/storefront/**`): one `site` document for the layout, and
  * pages, posts, banners, FAQ, menus, policies, sitemap and redirects.
- *
- * The three `get*` methods at the bottom are the legacy surface (`/api/v1/content/**`); they stay until the
- * last theme stops reading `Page`/`Box`, then go with the server's `LegacyContentApi`.
  */
 export class ContentService {
 
@@ -62,28 +59,5 @@ export class ContentService {
     /** `undefined` when the path never moved. */
     public static getRedirect = async (ctx: StoreContext, path: string): Promise<{ from: string; to: string } | undefined> => {
         return orUndefined(apiFetch<{ from: string; to: string }>(sf(ctx, 'redirects', `&path=${encodeURIComponent(path)}`), get()));
-    }
-
-    /* ---------------------------------------------------------------- legacy (compat) -------------------- */
-
-    /** @deprecated Degrades: the footer page list. Use `getSite().footerPages`. */
-    public static getContents = async (storeContext: StoreContext): Promise<ContentPage | undefined> => {
-        return orUndefined(apiFetch<ContentPage>(
-            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/pages?page=0&count=20&store=${storeContext.store}&lang=${storeContext.locale}`,
-            get()));
-    }
-
-    /** @deprecated Must fail. Use `getStorefrontPage`. */
-    public static getPage = async (storeContext: StoreContext, code: string): Promise<Page> => {
-        return apiFetch<Page>(
-            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/pages/name/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get());
-    }
-
-    /** @deprecated Degrades. Snippets come from `getSite().snippets`; the agreement from `getPolicy('TERMS')`. */
-    public static getBox = async (storeContext: StoreContext, code: string): Promise<Box | undefined> => {
-        return orUndefined(apiFetch<Box>(
-            `${storeBaseServiceUrl('content', storeContext)}/api/v1/content/boxes/${code}?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get()));
     }
 }

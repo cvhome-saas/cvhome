@@ -19,7 +19,7 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const open = openPath === pathname;
     const setOpen = (o: boolean) => setOpenPath(o ? pathname : null);
     const categories = data.categories.filter(c => c.description && c.visible !== false);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
     // Main-menu entries that are not pages (blog, help, categories, plain paths): the merchant's menu, resolved server-side.
     const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     const row = 'flex min-h-12 flex-1 items-center justify-between gap-3 px-4 py-3 text-base font-medium hover:bg-accent';
@@ -70,8 +70,8 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
                         })}
                     </Accordion>
                     {pages.map(page => (
-                        <Link key={page.code} prefetch={false} href={`/content/${page.description.friendlyUrl}`} className={`${row} border-b text-muted-foreground`}>
-                            <bdi dir="auto">{page.description.name}</bdi>
+                        <Link key={page.code} prefetch={false} href={page.href} className={`${row} border-b text-muted-foreground`}>
+                            <bdi dir="auto">{page.name}</bdi>
                         </Link>
                     ))}
                     {extras.map(page => (

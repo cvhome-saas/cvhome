@@ -17,7 +17,7 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const open = openPath === pathname;
     const setOpen = (o: boolean) => setOpenPath(o ? pathname : null);
     const categories = data.categories.filter(c => c.description);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
     const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     const link = 'strip strip-hover h-10 w-full justify-start text-base';
 
@@ -59,7 +59,7 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
                         })}
                     </Accordion>
                     {pages.map(page => (
-                        <Link key={page.code} prefetch={false} href={`/content/${page.description.friendlyUrl}`} className={link}>{page.description.name}</Link>
+                        <Link key={page.code} prefetch={false} href={page.href} className={link}>{page.name}</Link>
                     ))}
                     {extras.map(node => (
                         <Link key={node.href} prefetch={false} href={node.href} className={link}>{node.label}</Link>

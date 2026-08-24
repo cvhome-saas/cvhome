@@ -12,7 +12,7 @@ import {cn} from '@store-front/ui/lib/utils';
 export function Nav({data, className}: { ctx: PageContext; data: LayoutData; className?: string }) {
     const t = useTranslations('COMPONENTS.HEADER');
     const categories = data.categories.filter(c => c.description);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
     // Main-menu entries that are not pages (blog, help, categories, plain paths): the merchant's menu, resolved server-side.
     const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     return (
@@ -60,7 +60,7 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
                 {pages.map(page => (
                     <NavigationMenuItem key={page.code}>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link prefetch={false} href={`/content/${page.description.friendlyUrl}`}>{page.description.name}</Link>
+                            <Link prefetch={false} href={page.href}>{page.name}</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                 ))}

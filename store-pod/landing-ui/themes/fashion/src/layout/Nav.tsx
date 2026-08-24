@@ -14,7 +14,7 @@ const STRIP = 'strip strip-hover h-9 rounded-none bg-background px-3 text-sm hov
 export function Nav({data, className}: { ctx: PageContext; data: LayoutData; className?: string }) {
     const t = useTranslations('COMPONENTS.HEADER');
     const categories = data.categories.filter(c => c.description);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
     const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     let i = 0;
     return (
@@ -65,7 +65,7 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
                     return (
                         <NavigationMenuItem key={page.code}>
                             <NavigationMenuLink asChild className={cn(STRIP, tilt)}>
-                                <Link prefetch={false} href={`/content/${page.description.friendlyUrl}`}>{page.description.name}</Link>
+                                <Link prefetch={false} href={page.href}>{page.name}</Link>
                             </NavigationMenuLink>
                         </NavigationMenuItem>
                     );

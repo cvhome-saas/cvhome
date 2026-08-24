@@ -1,10 +1,9 @@
 'use client'
 import {useTranslations} from 'next-intl';
-import type {Box, Order, StoreContext} from '@store-front/types';
+import type {AgreementText, Order, StoreContext} from '@store-front/types';
 import {defaultCheckoutValue} from '@store-front/types';
 import {useCheckoutForm} from '@store-front/hooks/use-checkout-form';
 import {useRouter} from '@store-front/i18n/navigation';
-import {parseDescription} from '@store-front/services/description-view-util';
 import {Input} from '@store-front/ui/input';
 import {Label} from '@store-front/ui/label';
 import {Textarea} from '@store-front/ui/textarea';
@@ -124,14 +123,14 @@ function SuccessDialog({order, open, onOpenChange}: { order: Order | undefined; 
     );
 }
 
-function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: Box | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
+function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: AgreementText | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
     const t = useTranslations('PAGE.CHECKOUT');
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent className={SHEET_DIALOG}>
                 <AlertDialogHeader>
                     <AlertDialogTitle className={DIALOG_TITLE}>{t('TERMS_AND_CONDITIONS')}</AlertDialogTitle>
-                    {box && <AlertDialogDescription asChild><div className="max-h-64 overflow-y-auto text-start text-sm [&_a]:underline" dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/></AlertDialogDescription>}
+                    {box && <AlertDialogDescription asChild><div className="max-h-64 overflow-y-auto text-start text-sm [&_a]:underline" dangerouslySetInnerHTML={{__html: box.html}}/></AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel className="strip strip-hover h-11 rounded-none border-0 text-sm [--tilt:0deg]" onClick={() => setIsAgree(false)}>{t('REJECT')}</AlertDialogCancel>

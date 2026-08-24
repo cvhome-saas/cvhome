@@ -1,3 +1,5 @@
+// The historical localStorage key for shoppers' carts. seller-ui itself is retired, but renaming
+// the key would silently empty every live cart — it stays.
 export const CART_DATA_KEY: string = "seller-ui-cart-data";
 export const HOME_PAGE_PATH = "pages/page";
 export const PRODUCT_PAGE_PATH = "pages/product/[url]/page";

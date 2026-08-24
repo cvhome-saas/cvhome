@@ -3,10 +3,11 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import {useTranslations} from "next-intl";
-import {Box, defaultCheckoutValue, Order, PaymentType, ReadableCountryList, StoreContext} from "@store-front/types";
+import {AgreementText, defaultCheckoutValue, Order, PaymentType, ReadableCountryList, StoreContext} from "@store-front/types";
 import {CartService} from "@store-front/services/cart-service";
 import {ContentService} from "@store-front/services/content-service";
 import {getCartManager} from "@store-front/services/cart-manager";
+import {parseDescription} from "@store-front/services/description-view-util";
 import {showToast} from "nextjs-toast-notify";
 import {toastDirection} from "@store-front/services/direction-utils";
 import {useUser} from "./use-user";
@@ -16,7 +17,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
     const [loginRequiredDialogOpen, setLoginRequiredDialogOpen] = useState(false);
-    const [agreement, setAgreement] = useState<Box | undefined>();
+    const [agreement, setAgreement] = useState<AgreementText | undefined>();
     const [order, setOrder] = useState<Order | undefined>();
     const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
@@ -84,18 +85,13 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
 
         fetchCountries().then();
         fetchPaymentTypes().then();
-        // The checkout agreement: the live TERMS policy (content platform), falling back to the legacy
-        // `agreement` box; none at all means nothing to accept.
+        // The checkout agreement: the live TERMS policy; a store without one has nothing to accept.
         ContentService.getPolicy(storeContext, 'TERMS')
-            .then((policy): Box => ({
-                id: policy.id, code: 'agreement', visible: true, contentType: 'BOX',
-                description: {
-                    id: policy.id, language: policy.servedLocale, name: policy.heading, description: policy.body,
-                    friendlyUrl: policy.slug, keyWords: null, highlights: null, metaDescription: null,
-                    title: policy.heading, priceAppender: null,
-                },
+            .then((policy): AgreementText => ({
+                title: policy.heading,
+                html: parseDescription({description: policy.body} as never),
             }))
-            .catch(() => ContentService.getBox(storeContext, "agreement"))
+            .catch(() => undefined)
             .then(it => {
                 if (it == undefined) {
                     setIsAgree(true);

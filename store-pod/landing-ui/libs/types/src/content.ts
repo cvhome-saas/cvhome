@@ -1,28 +1,27 @@
-import {Description} from "./description";
-
-export interface ContentPage {
-    totalPages: number
-    number: number
-    recordsTotal: number
-    recordsFiltered: number
-    content: Page[] | undefined
+/** A CMS page link for navs and footers, derived from the site document. */
+export interface NavPage {
+    /** The page slug — a stable key. */
+    code: string
+    name: string
+    /** Locale-less storefront path (`/content/<slug>`). */
+    href: string
+    /** A main-menu page; the rest are footer pages. */
+    inMenu: boolean
 }
 
-export interface Page {
-    id: number
+/** The announcement strip's view model: a live STRIP banner, else the `header-message` snippet. */
+export interface AnnouncementData {
+    /** The per-session dismissal key. */
     code: string
-    visible: boolean
-    linkToMenu: boolean
-    contentType: string
-    description: Description
+    /** Decoded HTML. */
+    html: string
 }
 
-export interface Box {
-    id: number
-    code: string
-    visible: boolean
-    contentType: string
-    description: Description
+/** The checkout agreement (the live TERMS policy), decoded and ready to render. */
+export interface AgreementText {
+    title: string
+    /** Decoded HTML. */
+    html: string
 }
 
 /* ------------------------------------------------------------------------------------------------ */

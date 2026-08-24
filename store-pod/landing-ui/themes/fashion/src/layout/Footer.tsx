@@ -13,7 +13,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
     const t = await getTranslations('COMPONENTS.FOOTER');
     const {store} = data;
     const shop = data.categories.filter(c => c.description).slice(0, 8);
-    const info = data.pages.filter(p => p.description);
+    const info = data.pages;
     // Footer-menu entries that are not pages, then the live legal policies — all resolved server-side.
     const more = [
         ...data.menus.footer.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/')).map(n => ({key: n.href, href: n.href, label: n.label})),
@@ -42,7 +42,7 @@ export async function Footer({data}: { ctx: PageContext; data: LayoutData }) {
                 {(info.length > 0 || more.length > 0) && (
                     <nav aria-label={t('INFORMATION')} className="flex flex-col gap-2">
                         <h2 className={heading}>{t('INFORMATION')}</h2>
-                        {info.map(p => <Link key={p.code} prefetch={false} href={`/content/${p.description.friendlyUrl}`} className={link}>{p.description.name}</Link>)}
+                        {info.map(p => <Link key={p.code} prefetch={false} href={p.href} className={link}>{p.name}</Link>)}
                         {more.map(l => <Link key={l.key} prefetch={false} href={l.href} className={link}>{l.label}</Link>)}
                     </nav>
                 )}

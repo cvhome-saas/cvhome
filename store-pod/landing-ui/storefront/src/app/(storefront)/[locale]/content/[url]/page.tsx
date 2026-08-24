@@ -12,7 +12,7 @@ export async function generateMetadata({params, searchParams}: Props): Promise<M
     // instead of a 404. Let the page decide the status; metadata for a missing entity is irrelevant.
     try {
         const {page, seo} = await loadContent(url, preview);
-        return pageMetadata(page.description?.title || page.description?.name, page.description?.metaDescription, seo);
+        return pageMetadata(seo?.metaTitle || page.title, seo?.metaDescription ?? undefined, seo);
     } catch {
         return {};
     }

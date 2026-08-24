@@ -13,7 +13,7 @@ export async function Root({ctx, data, children}: RootLayoutProps) {
                className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:rounded-control focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">
                 {t('SKIP_TO_CONTENT')}
             </a>
-            {data.announcement && <Announcement box={data.announcement}/>}
+            {data.announcement && <Announcement announcement={data.announcement}/>}
             <Header ctx={ctx} data={data}/>
             <main id="main" className="flex-1">{children}</main>
             <Footer ctx={ctx} data={data}/>
