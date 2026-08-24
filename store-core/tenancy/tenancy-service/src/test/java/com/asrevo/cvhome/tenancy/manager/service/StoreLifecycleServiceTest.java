@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.when;
  * DELETED is terminal, and asking for the state a store is already in is tolerated but still audited.
  * </p>
  */
-@Tag("unit-test")
 class StoreLifecycleServiceTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");

@@ -1,9 +1,8 @@
 'use client'
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {useTranslations} from "next-intl";
-import {Image, Product, ProductOption, ProductOptionValue, ProductVariant, SelectedVariantValue, StoreContext} from "@store-front/types";
+import {Image, Product, ProductOption, ProductOptionValue, ProductVariant, StoreContext} from "@store-front/types";
 import {getCartManager} from "@store-front/services/cart-manager";
-import {ProductService} from "@store-front/services/product-service";
 import {sortedImages} from "@store-front/services/product-presenter";
 import {notify} from "./notify";
 
@@ -25,9 +24,9 @@ function variantMatches(v: ProductVariant, selection: Record<number, number>): b
 
 /**
  * Product purchase state: option selection → resolved variant (sku / price / images / stock) → quantity →
- * add to cart. Replaces `useProductDetailedAddToCart`. Variant pricing is resolved from the product
- * payload (the catalog's variation endpoint ignores the selection today); the endpoint is still asked
- * opportunistically so a future backend fix lights up without a storefront change.
+ * add to cart. Replaces `useProductDetailedAddToCart`. Stock, purchasability and the price arrive merged
+ * into the product payload by the service layer (the inventory service owns them since the
+ * catalog/inventory split); variant pricing is resolved from the payload itself.
  */
 export const useProductPurchase = (storeContext: StoreContext, product: Product) => {
     const t = useTranslations('PAGE.PRODUCT');
@@ -47,7 +46,6 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
     });
     const [quantity, setQuantity] = useState(1);
     const [status, setStatus] = useState<PurchaseStatus>('idle');
-    const [remotePrice, setRemotePrice] = useState<string | undefined>();
 
     const allSelected = options.every(o => selection[o.id] !== undefined);
     const variant = useMemo(() => allSelected && variants.length ? variants.find(v => variantMatches(v, selection)) : undefined, [allSelected, variants, selection]);
@@ -68,7 +66,7 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         return undefined;
     }, [options, selection, variant]);
 
-    const finalPrice = inventory?.price ?? remotePrice ?? selectedValuePrice ?? product.productPrice?.finalPrice ?? product.finalPrice;
+    const finalPrice = inventory?.price ?? selectedValuePrice ?? product.productPrice?.finalPrice ?? product.finalPrice;
     const originalPrice = product.productPrice?.originalPrice ?? product.originalPrice;
     const discounted = !!product.productPrice?.discounted && !inventory?.price && !selectedValuePrice;
 
@@ -76,21 +74,6 @@ export const useProductPurchase = (storeContext: StoreContext, product: Product)
         // clamp quantity to what is sellable for the current selection
         setQuantity(q => Math.min(Math.max(1, q), Math.max(1, maxQty)));
     }, [maxQty]);
-
-    useEffect(() => {
-        if (!allSelected || options.length === 0) {
-            setRemotePrice(undefined);
-            return;
-        }
-        const payload: SelectedVariantValue[] = options.map(o => ({option: o.id, value: selection[o.id]}));
-        let cancelled = false;
-        ProductService.getVariationPrice(storeContext, product.id, payload).then(price => {
-            if (!cancelled && price?.finalPrice && price.finalPrice !== product.productPrice?.finalPrice) {
-                setRemotePrice(price.finalPrice);
-            }
-        });
-        return () => { cancelled = true; };
-    }, [allSelected, options, selection, product.id, storeContext.store, storeContext.locale]);
 
     const select = useCallback((optionId: number, valueId: number) => {
         setSelection(prev => ({...prev, [optionId]: valueId}));

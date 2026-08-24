@@ -4,7 +4,6 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -41,7 +40,6 @@ import static org.mockito.Mockito.when;
  * what make the columns' emptiness a failure instead.
  * </p>
  */
-@Tag("unit-test")
 class SubscriptionAuditActorTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");

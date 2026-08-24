@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -51,7 +50,6 @@ import static org.mockito.Mockito.when;
  * reset with no owner to act on refuses in a way a caller can read.
  * </p>
  */
-@Tag("unit-test")
 class OrgOwnerTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("65f023632bc46470c104b76f");

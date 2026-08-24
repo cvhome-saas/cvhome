@@ -24,7 +24,8 @@ export type ProductListingPage = ProductGroupPage;
 
 export interface ListingFacets {
     manufacturers: Manufacturer[];
-    /** Variants across the category (`GET /api/v2/category/{id}/variations`), when the call succeeds. */
+    /** Always empty since the catalog/inventory split — variants are deprecated under the
+     *  single-product model. The field stays so themes keep compiling; they render no group for it. */
     variants: ProductVariant[];
 }
 

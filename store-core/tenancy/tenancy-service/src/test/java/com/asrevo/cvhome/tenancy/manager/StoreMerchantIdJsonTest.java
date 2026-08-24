@@ -2,7 +2,6 @@ package com.asrevo.cvhome.tenancy.manager;
 
 import java.util.Map;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -30,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * optional.
  * </p>
  */
-@Tag("unit-test")
 class StoreMerchantIdJsonTest {
 
     private static final String HEX = "65f023632bc46470c104b76f";

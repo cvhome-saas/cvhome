@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.EndpointType;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.when;
  * propagates — the opposite of the placement client, which must fail closed.
  * </p>
  */
-@Tag("unit-test")
 class CachingPodDirectoryTest {
 
     private static final PodId SEEDED = new PodId("507f1f77bcf86cd799439011");

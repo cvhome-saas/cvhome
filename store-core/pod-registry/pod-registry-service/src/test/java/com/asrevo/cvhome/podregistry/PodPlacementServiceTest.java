@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.EndpointType;
@@ -38,7 +37,6 @@ import static org.mockito.Mockito.when;
  * two halves of that being impossible now.
  * </p>
  */
-@Tag("unit-test")
 class PodPlacementServiceTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");

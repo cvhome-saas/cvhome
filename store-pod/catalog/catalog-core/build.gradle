@@ -3,13 +3,14 @@ plugins {
 }
 
 dependencies {
+    testImplementation libs.spring.data.commons
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:catalog:catalog-commons')
-    api project(':store-pod:checkout:checkout-external-api')
     api project(':store-pod:merchant:merchant-external-api')
     api project(':store-core:billing:billing-external-api')
     implementation project(':store-pod:commons:store-modules:store-cms-commons')
     compileOnly libs.spring.data.jpa
+    compileOnly libs.spring.web
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.annotations
     compileOnly libs.lombok

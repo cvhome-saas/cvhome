@@ -1,0 +1,72 @@
+/*
+ * Adds the src/integrationTest source set: Spring Boot context + Testcontainers tests named *IntegrationTest.
+ * Applied by java-application-conventions; a library module may apply it explicitly when it owns real
+ * infrastructure (a repository, an outbox).
+ *
+ *   ./gradlew integrationTest                 # needs Docker
+ *   ./gradlew check -x integrationTest        # laptop without Docker
+ */
+
+plugins {
+    id 'com.asrevo.java-common-conventions'
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    integrationTestImplementation libs.bundles.test.integration
+    integrationTestImplementation project(':store-commons:test-support')
+}
+
+def integrationTest = tasks.register('integrationTest', Test) {
+    group = 'verification'
+    description = 'Runs *IntegrationTest classes from src/integrationTest (Testcontainers, Docker required).'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    include '**/*IntegrationTest.class'
+    shouldRunAfter tasks.named('test')
+    finalizedBy 'jacocoIntegrationTestReport'
+}
+
+tasks.register('jacocoIntegrationTestReport', JacocoReport) {
+    group = 'verification'
+    description = 'Coverage of src/main by the integration tests.'
+    executionData integrationTest.get()
+    sourceSets sourceSets.main
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// One report per service, unit + integration merged. This is the number a service is judged on.
+tasks.register('jacocoMergedReport', JacocoReport) {
+    group = 'verification'
+    description = 'Merged unit + integration coverage report for this module.'
+    dependsOn tasks.named('test'), integrationTest
+    executionData fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
+    sourceSets sourceSets.main
+    reports {
+        xml.required = true
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/merged/html')
+        xml.outputLocation = layout.buildDirectory.file('reports/jacoco/merged/jacocoMergedReport.xml')
+    }
+}
+
+checkstyleReport('integrationTest')
+
+tasks.named('check') {
+    dependsOn integrationTest
+}

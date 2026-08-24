@@ -15,6 +15,8 @@ import type {
 } from '@models/catalog';
 import type {ReadableMerchantStore} from '@models/merchant';
 import {NO_FILTERS} from '@models/products';
+import {InventoryService} from '@api/inventory/inventory.service';
+import type {SkuInventory} from '@models/catalog';
 import {ProductsApi, type ProductsQuery} from './products.api.service';
 
 /** One product shaped as `GET /api/v2/private/base-products` actually sends it. */
@@ -24,8 +26,6 @@ function product(id: number, over: Partial<ReadableProduct> = {}): ReadableProdu
     sku: `ACM-${id}`,
     available: true,
     visible: true,
-    price: 129,
-    quantity: 12,
     productShipeable: true,
     description: {language: 'en', name: `Product ${id}`},
     manufacturer: {id: 1, code: 'northwind', descriptions: [{language: 'en', name: 'Northwind'}]},
@@ -40,11 +40,33 @@ function page<T>(content: T[]): PageT<T> {
   return {size: 20, totalElements: content.length, totalPages: 1, pageNumber: 0, content};
 }
 
+class FakeInventoryService {
+  readonly upserts: {sku: string; body: unknown}[] = [];
+  readonly deletes: number[] = [];
+  inventories: SkuInventory[] = [
+    {sku: 'ACM-1', available: true, canBePurchased: true, quantity: 12, price: {originalPrice: 129, finalPrice: 129, discounted: false, discountPercent: 0}},
+  ];
+
+  bySkus(): Observable<readonly SkuInventory[]> {
+    return of(this.inventories);
+  }
+
+  upsert(sku: string, body: unknown): Observable<unknown> {
+    this.upserts.push({sku, body});
+    return of({});
+  }
+
+  deleteByProduct(id: number): Observable<void> {
+    this.deletes.push(id);
+    return of(undefined);
+  }
+}
+
 class FakeProductService {
   readonly queries: ProductQuery[] = [];
   readonly searches: unknown[] = [];
   readonly patches: {id: number; body: LightPersistableProduct}[] = [];
-  products: ReadableProduct[] = [product(1), product(2, {available: false, price: undefined})];
+  products: ReadableProduct[] = [product(1), product(2, {available: false})];
 
   list(query: ProductQuery): Observable<PageT<ReadableProduct>> {
     this.queries.push(query);
@@ -124,12 +146,14 @@ const QUERY: ProductsQuery = {tab: 'all', filters: NO_FILTERS, page: {page: 0, c
 
 describe('ProductsApi', () => {
   let api: ProductsApi;
+  let inventory: FakeInventoryService;
   let products: FakeProductService;
   let categories: FakeCategoryService;
   let brands: FakeManufacturerService;
   let stores: FakeMerchantStoreService;
 
   beforeEach(() => {
+    inventory = new FakeInventoryService();
     products = new FakeProductService();
     categories = new FakeCategoryService();
     brands = new FakeManufacturerService();
@@ -139,6 +163,7 @@ describe('ProductsApi', () => {
       providers: [
         ProductsApi,
         {provide: ProductService, useValue: products},
+        {provide: InventoryService, useValue: inventory},
         {provide: CategoryService, useValue: categories},
         {provide: ManufacturerService, useValue: brands},
         {provide: ProductTypeService, useValue: {}},
@@ -237,7 +262,7 @@ describe('ProductsApi', () => {
     });
   });
 
-  it('sends all four fields on an inline edit, because every one is a Java primitive', (done) => {
+  it('splits an inline edit: visibility to catalog, price and quantity to inventory', (done) => {
     api.loadSnapshot(QUERY).subscribe(() => {
       api
         .applyInlineEdit({id: 1, price: 99.5, quantity: 4, available: false}, QUERY)
@@ -245,12 +270,17 @@ describe('ProductsApi', () => {
           expect(products.patches.length).toBe(1);
           expect(products.patches[0].id).toBe(1);
           expect(products.patches[0].body).toEqual({
-            // A string here and a number on the definition DTO — the two genuinely differ.
-            price: '99.5',
-            quantity: 4,
             available: false,
             // Not edited on this screen, carried from the last response so it is not zeroed.
             productShipeable: true,
+          });
+          expect(inventory.upserts.length).toBe(1);
+          expect(inventory.upserts[0].sku).toBe('ACM-1');
+          expect(inventory.upserts[0].body).toEqual({
+            productId: 1,
+            quantity: 4,
+            available: false,
+            price: {amount: 99.5},
           });
           done();
         });
@@ -260,7 +290,8 @@ describe('ProductsApi', () => {
   it('sends a zero price rather than omitting it when a product has none', (done) => {
     api.loadSnapshot(QUERY).subscribe(() => {
       api.applyInlineEdit({id: 2, price: null, quantity: 0, available: true}, QUERY).subscribe(() => {
-        expect(products.patches[0].body.price).toBe('0');
+        const body = inventory.upserts[0].body as {price: {amount: number}};
+        expect(body.price.amount).toBe(0);
         done();
       });
     });

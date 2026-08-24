@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +42,6 @@ import static org.mockito.Mockito.when;
  * owns {@code manager_store.org_id}, so these are the checks that actually hold.
  * </p>
  */
-@Tag("unit-test")
 class StoreTenantScopingTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");

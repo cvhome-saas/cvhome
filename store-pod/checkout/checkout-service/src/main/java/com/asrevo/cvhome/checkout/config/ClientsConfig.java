@@ -3,10 +3,11 @@ package com.asrevo.cvhome.checkout.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiErrors;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductReservationService;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.errors.remote.RemoteErrorCatalog;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiErrors;
+import com.asrevo.cvhome.inventory.services.ExternalInventoryService;
+import com.asrevo.cvhome.inventory.services.ExternalProductReservationService;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiErrors;
 import com.asrevo.cvhome.payment.services.payment.ExternalPaymentGatewayService;
@@ -16,6 +17,8 @@ import com.asrevo.cvhome.s2s.config.internal.RestClientBuilder;
 public class ClientsConfig {
 
     private static final String CATALOG_SERVICE_NAME = "catalog";
+
+    private static final String INVENTORY_SERVICE_NAME = "inventory";
 
     private static final String MERCHANT_SERVICE_NAME = "merchant";
 
@@ -36,18 +39,28 @@ public class ClientsConfig {
     }
 
     /**
-     * Built from {@code ExternalProductReservationService}, the caller-side half of catalog's reservation contract —
-     * never from {@code IProductReservationService}, whose {@code throws} clauses are catalog's own vocabulary.
+     * Built from {@code ExternalProductReservationService}, the caller-side half of inventory's reservation contract —
+     * never from {@code IProductReservationService}, whose {@code throws} clauses are inventory's own vocabulary.
      *
      * <p>
-     * {@code CatalogApiErrors.CATALOG} is what makes a refusal for lack of stock arrive as a different type from a
-     * catalog that could not be answered by, which is the distinction the order flow turns into "cancel the order" or
-     * "leave it recoverable".
+     * {@code InventoryApiErrors.INVENTORY} is what makes a refusal for lack of stock arrive as a different type from
+     * an inventory service that could not be answered by, which is the distinction the order flow turns into "cancel
+     * the order" or "leave it recoverable".
      * </p>
      */
     @Bean
     public ExternalProductReservationService externalProductReservationService(RestClientBuilder restClientBuilder) {
-        return restClientBuilder.buildClient(CATALOG_SERVICE_NAME, ExternalProductReservationService.class, CatalogApiErrors.CATALOG);
+        return restClientBuilder.buildClient(INVENTORY_SERVICE_NAME, ExternalProductReservationService.class,
+                InventoryApiErrors.INVENTORY);
+    }
+
+    /**
+     * Deliberately uncached, unlike the product client: stock and price are what a cart must not show stale.
+     */
+    @Bean
+    public ExternalInventoryService externalInventoryService(RestClientBuilder restClientBuilder) {
+        return restClientBuilder.buildClient(INVENTORY_SERVICE_NAME, ExternalInventoryService.class,
+                RemoteErrorCatalog.none());
     }
 
     /**

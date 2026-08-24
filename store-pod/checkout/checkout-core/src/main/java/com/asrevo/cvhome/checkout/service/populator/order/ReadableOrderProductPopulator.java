@@ -6,15 +6,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductAttribute;
 import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProductAttribute;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -36,7 +36,7 @@ import lombok.Getter;
 public class ReadableOrderProductPopulator
         extends AbstractDataPopulator<OrderProduct, StoreMerchantId, ReadableOrderProduct> {
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     private final ImageFilePath imageUtils;
 
@@ -80,7 +80,7 @@ public class ReadableOrderProductPopulator
             target.setAttributes(attributes);
         }
 
-        ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(), language);
+        ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, source.getSku(), language);
         ReadableMinimalProduct read = detailedProduct.product();
         target.setProduct(read);
 

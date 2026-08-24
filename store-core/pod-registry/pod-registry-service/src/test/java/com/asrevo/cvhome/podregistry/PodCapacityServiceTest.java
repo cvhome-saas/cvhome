@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.PodId;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.when;
  * that it does not.
  * </p>
  */
-@Tag("unit-test")
 class PodCapacityServiceTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");

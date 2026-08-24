@@ -2,7 +2,7 @@
 name: project-structure
 description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, tenancy, console-ui), store-pod (business pods - merchant, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with run-lcl.sh and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like console-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, run-lcl.sh, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
 metadata:
-  version: '3.2'
+  version: '3.3'
 ---
 
 # cvhome monorepo
@@ -51,7 +51,8 @@ catalog). See `references/build-system.md`.
 | `store-pod/spg` | **INFRA** | 80 | "SaaS Pod Gateway" — a **Caddy** reverse proxy (not Java). Terminates TLS with **on-demand certificates** for custom tenant domains, resolves the domain → store via `domain_lookup`, adds tracing headers, and path-routes `/merchant*`, `/catalog*`, `/checkout*`, `/cua*`, `/payment*` to the pod services; everything else falls through to `landing-ui`. Config: `Caddyfile`. |
 | `store-pod/merchant` | **BE** | 8120 | The **store/merchant** pod: store entity, settings, branding, domains. APIs: `MerchantStoreApi`, `ExternalMerchantStoreApi`. |
 | `store-pod/content` | **BE** | 8121 | The **content platform**: pages, blog posts, banners, FAQ, legal policies, navigation menus, media library and store snippets, with status workflow, scheduling, revisions and per-locale translation state. Private console API, public storefront API and a deprecated legacy-compat read API. `store-pod/content-deprecated` is the previous service, unregistered, reference only. |
-| `store-pod/catalog` | **BE** | 8122 | **Products & categories**: product CRUD, inventory, pricing, images, attributes/options, product types, groups, manufacturers, relationships, reservations. APIs: `ProductApi`, `CategoryApi`, `ProductInventoryApi`, `ProductPriceApi`, `ExternalProductApi`, `ExternalProductReservationApi`. |
+| `store-pod/catalog` | **BE** | 8122 | **Product catalog**: products, categories (materialised-path tree), brands, product types, product groups / related items, images. Rewritten 2026-08 as a small readable service: per domain `entity` + `repositories/<X>Repository` + `services/<domain>/{XService, XServiceImpl, XMapper}` (plain static/bean mappers, no facade/populator layers). Responses carry **no price or quantity** (inventory owns those, by sku). APIs (`api/v1`, `api/v2`): `CategoryApi`, `ManufacturerApi`, `ProductTypeApi`, `ProductGroupApi`, `ProductRelationshipApi`, `ProductImageApi`, `ProductApi` (small writes), `ProductApiV2` (definition + storefront listing/PDP), `ExternalProductApi` (s2s by sku). Variants and product options/attributes are parked in `store-pod/catalog-deprecated` (unregistered). |
+| `store-pod/inventory` | **BE** | 8126 | **Stock, pricing & reservations**, split out of catalog and keyed by **sku** (schema `inventory`; `product_id` is informational only, no FK to catalog). Deliberately tiny — one entity (`Inventory` + `InventoryPrice`), one service each for stock and reservations, no facade/mapper/populator layers. APIs: `InventoryApi` (sku-addressed upsert `PUT /private/inventory/{sku}`, `DELETE /private/inventory/by-product/{id}`), `ExternalInventoryApi` (public bulk `GET /availability?skus=` → `SkuInventory` with raw amounts), `ExternalProductReservationApi` (`STORE-POD.INVENTORY.RESERVE`). Consumers merge price/stock client-side (console-ui, landing-ui) or compose s2s (checkout's `ProductDetailsComposer`). One-off data migration: `inventory-service/init-sql/migrate-from-catalog.sql`. |
 | `store-pod/checkout` | **BE** | 8123 | **Cart, orders, customers**: shopping cart, order lifecycle + status history, customer records, order/product/customer statistics. APIs: `ShoppingCartApi`, `OrderApi`, `CustomerOrderApi`, `OrderStatusHistoryApi`, `CustomerApi`, `OrderStatisticApi`. |
 | `store-pod/payment` | **BE** | 8125 | **Payments**: gateway configuration per store, payment execution, provider webhooks. APIs: `PaymentConfigurationController`, `PrivatePaymentApi`, `PublicPaymentConfigurationController`, `PublicPaymentWebhookApi`, `ExternalPaymentGatewayApi`. Uses Stripe. |
 | `store-pod/cua` | **BE+FE** | 8124 | "Customer User Account" — a **second OAuth2 Authorization Server**, this one for *storefront shoppers* (separate identity realm from `uaa`, which is for staff). Self-registration, social login, Thymeleaf-rendered login/registration pages. Controllers: `LoginController`, `RegistrationController`, `SocialLoginConfigController`, `UserInfoController`. Standalone module (no commons/core split). |
@@ -261,6 +262,23 @@ your API.
 
 **Full procedure, per-shape skeletons and a checklist: `references/new-service.md`.**
 
+## Testing — unit, integration, coverage
+
+Two source sets, no `@Tag`: **`src/test`** holds `*Test` (unit + `*ArchitectureTest`, no Spring, no Docker) and
+**`src/integrationTest`** holds `*IntegrationTest` (full context + Testcontainers). `./gradlew test` is the fast
+build; `./gradlew integrationTest` needs Docker; `check` runs both plus checkstyle, `verifyTestNaming` and a
+per-module coverage gate. Test the code **in the module that owns it** — business logic lives in `-core`, so its
+unit tests do too.
+
+Integration tests never hand-roll infrastructure: `store-commons/test-support` provides `@ServiceIntegrationTest` /
+`@StorageIntegrationTest` / `@DatabaseIntegrationTest`, the Postgres/MinIO containers, `TestJwtSigner` + `Tokens`,
+`ApiClient` and `MutableClock`. Every store-scoped one owes a **tenant-isolation** case and a **permission-gate**
+case. Coverage: `./gradlew perServiceCoverage` writes one report per micro service under
+`build/reports/coverage/<service>/`; a module locks in a floor with `coverageMinimum = 0.6`.
+
+**Types, naming standard, the `test-support` catalogue, ArchUnit rules and the coverage ratchet:
+`references/testing.md`.**
+
 ## QA — proving a change works end to end
 
 Unit tests prove a unit; **QA proves the feature works through the path a user takes** — browser → gateway →
@@ -297,6 +315,9 @@ See `references/frontends.md`.
 | Find a REST endpoint | the `<domain>-service` module, in `**/api/**` or `**/controller/**` |
 | Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
 | Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
+| Write a unit test / an integration test / an architecture test | `references/testing.md` — `src/test` vs `src/integrationTest`, naming, `test-support` |
+| See coverage for a service | `./gradlew perServiceCoverage` → `build/reports/coverage/<service>/index.html` |
+| Share test infrastructure (containers, JWTs, HTTP helper) | `store-commons/test-support` — never copy it into a service |
 | QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `./extra/scripts/run-lcl.sh` |
 | Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`run-lcl.sh`, its flags, `SIGTERM` not `SIGINT`) |
 | Log in locally (seller or storefront) | `references/qa-testing.md` §2 — the `test-stores` demo accounts |
@@ -352,11 +373,16 @@ See `references/frontends.md`.
 - `references/uaa-client.md` — the UAA admin SDK: creating/reading users in `uaa`, tenant metadata, wiring.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
 
+**Testing**
+- `references/testing.md` — **the testing architecture**: the three test types and their source sets, the class/method
+  naming standard, where a test belongs, the shared `store-commons/test-support` library, the ArchUnit layering rules
+  and their declared deviations, and per-service / aggregate coverage with the soft ratcheted gate.
+
 **Running & QA**
 - `references/qa-testing.md` — **how QA is done here**: `run-lcl.sh` and its flags, the seeded demo logins and
   entry points, browser-driven QA with the Chrome tooling, API QA through the `.http` files, logs/traces/outbox
-  as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where `unitTest` /
-  `integrationTest` fit.
+  as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where the
+  automated suites fit.
 
 **Frontend & build**
 - `references/frontends.md` — console-ui, the embedded `uaa-fe` build flow, `ui-conventions`.

@@ -7,13 +7,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductAttribute;
 import com.asrevo.cvhome.checkout.errors.PriceNotFormattableException;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProduct;
 import com.asrevo.cvhome.checkout.model.order.ReadableOrderProductAttribute;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -24,13 +24,13 @@ import com.asrevo.cvhome.store.utils.PriceUtils;
 @Component
 public class ReadableOrderProductMapper implements Mapper<OrderProduct, ReadableOrderProduct> {
 
-    final ExternalProductService externalProductService;
+    final ProductDetailsComposer productDetailsComposer;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public ReadableOrderProductMapper(ExternalProductService externalProductService,
+    public ReadableOrderProductMapper(ProductDetailsComposer productDetailsComposer,
                                       ExternalMerchantStoreService externalMerchantStoreService) {
-        this.externalProductService = externalProductService;
+        this.productDetailsComposer = productDetailsComposer;
         this.externalMerchantStoreService = externalMerchantStoreService;
     }
 
@@ -84,7 +84,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
         }
 
         if (!StringUtils.isBlank(source.getSku())) {
-            ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(),
+            ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, source.getSku(),
                     language);
             target.setProduct(detailedProduct.product());
         }

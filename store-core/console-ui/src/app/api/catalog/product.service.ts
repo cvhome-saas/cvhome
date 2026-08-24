@@ -123,11 +123,11 @@ export class ProductService {
   }
 
   /**
-   * The table's inline edit: price, quantity and availability in one call.
+   * The table's inline edit — visibility only since the catalog/inventory split; price and quantity
+   * go to `InventoryService.upsert` instead.
    *
    * Every field on `LightPersistableProduct` is a Java primitive, so an omitted field is not "leave
-   * it alone" — it is `false` or `0`. The caller therefore always sends all four, filled from the
-   * row it is editing.
+   * it alone" — it is `false`. The caller therefore always sends both, filled from the row.
    */
   patch(id: number, product: LightPersistableProduct): Observable<void> {
     return this.crudService.patch(`${CATALOG_V1}/private/product/${id}`, product);

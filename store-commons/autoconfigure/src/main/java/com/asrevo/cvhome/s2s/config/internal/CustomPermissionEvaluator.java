@@ -27,6 +27,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private static final String CHECKOUT_ALL = "STORE-POD.CHECKOUT.*";
     private static final String CUA_ALL = "STORE-POD.CUA.*";
     private static final String PAYMENT_ALL = "STORE-POD.PAYMENT.*";
+    private static final String INVENTORY_ALL = "STORE-POD.INVENTORY.*";
+    private static final String INVENTORY_RESERVE = "STORE-POD.INVENTORY.RESERVE";
     private static final String CUSTOMER_ALL = "STORE-POD.CUSTOMER.*";
 
     private final PermissionAccessChecker checker = new PermissionAccessChecker();
@@ -47,8 +49,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                                  Object permission) {
         String action = (String) permission;
         return switch (action) {
-            case STORE_CREATE, CATALOG_RESERVE, MERCHANT_ALL, MERCHANT_READ, CONTENT_ALL, CONTENT_READ, CATALOG_ALL,
-                 CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL, CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
+            case STORE_CREATE, CATALOG_RESERVE, INVENTORY_RESERVE, MERCHANT_ALL, MERCHANT_READ, CONTENT_ALL,
+                 CONTENT_READ, CATALOG_ALL, CHECKOUT_ALL, CUA_ALL, PAYMENT_ALL, INVENTORY_ALL,
+                 CUSTOMER_ALL -> hasStorePodPermission(authentication, targetId, action);
             default -> hasStoreCorePermission(authentication, targetId, action);
         };
     }
@@ -57,13 +60,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return switch (action) {
             case STORE_CREATE -> checker.hasAccessOnStoreCreate(authentication, (String) targetId, this.pod);
 
-            case CATALOG_RESERVE -> checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
+            case CATALOG_RESERVE, INVENTORY_RESERVE -> checker.isSameStorePod(authentication, (StoreMerchantId) targetId, this.pod);
 
             case MERCHANT_READ, CONTENT_READ -> checker.hasReadAccessOnStore(authentication, (StoreMerchantId) targetId,
                     this.pod);
 
             case MERCHANT_ALL, CONTENT_ALL, CATALOG_ALL, CHECKOUT_ALL,
-                 CUA_ALL, PAYMENT_ALL -> checker.hasManageAccessOnStore(authentication,
+                 CUA_ALL, PAYMENT_ALL, INVENTORY_ALL -> checker.hasManageAccessOnStore(authentication,
                     (StoreMerchantId) targetId, this.pod);
 
             case CUSTOMER_ALL -> checker.isCustomerInSameStore(authentication, (StoreMerchantId) targetId);

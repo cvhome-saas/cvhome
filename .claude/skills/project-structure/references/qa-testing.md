@@ -1,6 +1,6 @@
 # QA testing — exercising the real stack
 
-Automated tests (`./gradlew unitTest` / `integrationTest`) prove a unit behaves; **QA proves the feature works
+Automated tests (`./gradlew test` / `integrationTest`) prove a unit behaves; **QA proves the feature works
 end to end through the same path a user takes** — browser → gateway → uaa → pod service → database. This file
 is the procedure for that: bring the stack up, drive it, read the evidence, tear it down.
 
@@ -208,13 +208,15 @@ plan nobody trusts.
 ## 9. Where automated tests fit
 
 ```bash
-./gradlew test                 # everything
-./gradlew unitTest             # only @Tag("unit-test")
-./gradlew integrationTest      # only @Tag("integration-test")
-./gradlew :store-pod:catalog:catalog-service:test --tests '*ProductApiTest*'
+./gradlew test                 # src/test — unit + architecture tests, no Docker
+./gradlew integrationTest      # src/integrationTest — Testcontainers, Docker required
+./gradlew perServiceCoverage   # coverage report per micro service
 ```
 
-Both tasks come from `com.asrevo.java-application-conventions`. Integration tests use **Testcontainers
-(Postgres, MinIO), so Docker must be running** — a `./gradlew test` failing at container startup is an
-environment problem, not a test failure. These gate the merge; the browser/`.http` pass above is what proves
-the feature.
+Unit and integration tests are separate **source sets** (`*Test` vs `*IntegrationTest`), not JUnit tags. Integration
+tests use **Testcontainers (Postgres, MinIO), so Docker must be running** — a failure at container startup is an
+environment problem, not a test failure. Every store-scoped integration test owes the same two cases this checklist
+demands: tenant isolation and the permission gate.
+
+These gate the merge; the browser/`.http` pass above is what proves the feature. **How to write them, the naming
+standard, the shared `test-support` helpers and the coverage ratchet: `references/testing.md`.**

@@ -237,8 +237,6 @@ export interface ReadableProduct {
   readonly sku?: string;
   readonly available?: boolean;
   readonly visible?: boolean;
-  readonly price?: number;
-  readonly quantity?: number;
   readonly sortOrder?: number;
   readonly productShipeable?: boolean;
   readonly canBePurchased?: boolean;
@@ -266,6 +264,7 @@ export interface ReadableProduct {
 export interface ReadableInventory {
   readonly id?: number;
   readonly sku?: string;
+  readonly productId?: number;
   readonly price?: string;
   readonly quantity?: number;
   readonly available?: boolean;
@@ -288,7 +287,6 @@ export interface ReadableProductDefinition {
   readonly visible?: boolean;
   readonly shipeable?: boolean;
   readonly virtual?: boolean;
-  readonly canBePurchased?: boolean;
   /** `Instant`, so an ISO-8601 timestamp — not the `YYYY-MM-DD` the date input wants. */
   readonly dateAvailable?: string;
   readonly identifier?: string;
@@ -300,7 +298,6 @@ export interface ReadableProductDefinition {
   readonly manufacturer?: ReadableManufacturer;
   readonly description?: ProductDescription;
   readonly images: readonly ReadableImage[];
-  readonly inventory?: ReadableInventory;
   readonly descriptions: readonly ProductDescription[];
 }
 
@@ -326,7 +323,6 @@ export interface PersistableProductDefinition {
   readonly visible?: boolean;
   readonly shipeable?: boolean;
   readonly virtual?: boolean;
-  readonly canBePurchased?: boolean;
   readonly dateAvailable?: string;
   readonly identifier?: string;
   readonly sku: string;
@@ -338,23 +334,63 @@ export interface PersistableProductDefinition {
   readonly type?: string;
   /** The brand's `code`. */
   readonly manufacturer?: string;
-  readonly price?: number;
-  readonly quantity?: number;
 }
 
 /**
  * `LightPersistableProduct` — the body of the v1 `PATCH` the list's inline edit uses.
  *
- * `price` is a **string** here while the definition writes a number, mirroring the two Java DTOs.
- * Every field is primitive on the Java side (`boolean`, `int`, `String`), so a body that omits one
- * sets it to that primitive's default rather than leaving it alone — `available` would become
- * `false` and `quantity` `0`. The api service therefore always sends all four.
+ * Visibility only since the catalog/inventory split: price and quantity go to the inventory
+ * service's sku-addressed upsert instead. Every field is a Java primitive, so a body that omits one
+ * sets it to `false` rather than leaving it alone — the api service always sends both.
  */
 export interface LightPersistableProduct {
-  readonly price: string;
   readonly available: boolean;
   readonly productShipeable: boolean;
+}
+
+/**
+ * `PersistableInventory` — the inventory service's sku-addressed upsert body.
+ *
+ * `productId` is informational (the row keeps it so cleanup after a product delete can find it);
+ * the SKU in the path is the key. The one price the single-product model uses is the default
+ * `base` price.
+ */
+export interface PersistableInventory {
+  readonly productId?: number;
   readonly quantity: number;
+  readonly available: boolean;
+  readonly quantityOrderMinimum?: number;
+  readonly quantityOrderMaximum?: number;
+  readonly price: {
+    readonly amount: number;
+    readonly specialAmount?: number | null;
+    readonly specialStartDate?: string | null;
+    readonly specialEndDate?: string | null;
+  };
+}
+
+/**
+ * `SkuInventory` — one SKU's stock and price from `GET /inventory/api/v1/availability`.
+ *
+ * `price` is the calculated final price; null when the SKU has no price configured yet. A SKU with
+ * no inventory record at all is absent from the response, not present with zeros.
+ */
+export interface SkuInventory {
+  readonly sku: string;
+  readonly available: boolean;
+  readonly canBePurchased: boolean;
+  readonly quantity: number;
+  readonly quantityOrderMinimum?: number;
+  readonly quantityOrderMaximum?: number;
+  readonly price?: {
+    readonly originalPrice: number;
+    readonly finalPrice: number;
+    readonly discounted: boolean;
+    readonly discountPercent: number;
+    readonly specialAmount?: number | null;
+    readonly specialStartDate?: string | null;
+    readonly specialEndDate?: string | null;
+  } | null;
 }
 
 /* ---------------------------------------------------------------------- product groups ---- */

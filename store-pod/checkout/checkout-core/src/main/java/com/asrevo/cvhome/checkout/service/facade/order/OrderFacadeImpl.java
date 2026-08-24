@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
@@ -55,6 +54,7 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.errors.CustomerNotFoundException;
 import com.asrevo.cvhome.customer.model.customer.ReadableCustomer;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
@@ -376,7 +376,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     public void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store)
-            throws OrderNotFoundException, CatalogApiUnavailableException {
+            throws OrderNotFoundException, InventoryApiUnavailableException {
         Order order = orderService.getOrder(id, store);
         if (order == null) {
             throw OrderNotFoundException.of(id, store);

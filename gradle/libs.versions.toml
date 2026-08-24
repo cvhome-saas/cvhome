@@ -29,6 +29,8 @@ commonsIo = "2.20.0"
 jsoup = "1.21.1"
 commonsValidator = "1.10.1"
 hamcrestRecord = "1.0.0"
+archunit = "1.4.1"
+jacoco = "0.8.14"
 commonsBeanutils = "1.10.1"
 nodeGradle = "7.0.2"
 namastack-outbox = "1.7.1"
@@ -112,6 +114,12 @@ testcontainers-minio = { module = "org.testcontainers:minio", version.ref = "tes
 
 reactor-test = { module = "io.projectreactor:reactor-test" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+assertj-core = { module = "org.assertj:assertj-core" }
+mockito-core = { module = "org.mockito:mockito-core" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter" }
+spring-test = { module = "org.springframework:spring-test" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
 
 mongodb-bson = { module = "org.mongodb:bson", version.ref = "mongodbBson" }
 dnsjava = { module = "dnsjava:dnsjava", version.ref = "dnsjava" }
@@ -133,6 +141,12 @@ commons-validator = { module = "commons-validator:commons-validator", version.re
 hamcrest-record = { module = "rocks.cleancode:hamcrest-record", version.ref = "hamcrestRecord" }
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commonsBeanutils" }
 
+[bundles]
+# Unit-test classpath: every Java module gets this from java-common-conventions. No Spring context, no Docker.
+test-unit = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter", "spring-test", "archunit-junit5"]
+# Integration-test classpath: src/integrationTest of every service, via java-integration-test-conventions.
+test-integration = ["spring-boot-starter-test", "spring-boot-testcontainers", "testcontainers-junit-jupiter", "testcontainers-postgresql", "spring-security-test"]
+
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
@@ -140,6 +154,8 @@ hibernate-orm = { id = "org.hibernate.orm", version.ref = "hibernate" }
 groovy-gradle-plugin = { id = "groovy-gradle-plugin" }
 java-library-conventions = { id = "com.asrevo.java-library-conventions" }
 java-application-conventions = { id = "com.asrevo.java-application-conventions" }
+java-integration-test-conventions = { id = "com.asrevo.java-integration-test-conventions" }
+jacoco-aggregate-conventions = { id = "com.asrevo.jacoco-aggregate-conventions" }
 node = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }
 docker-conventions = { id = "com.asrevo.docker-conventions" }
 ui-conventions = { id = "com.asrevo.ui-conventions" }

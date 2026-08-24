@@ -1,7 +1,8 @@
 import {storeBaseServiceUrl, StoreContext} from "@store-front/types/store-context";
-import {Manufacturer, ProductVariant} from "@store-front/types/product-groups";
+import {Manufacturer} from "@store-front/types/product-groups";
 import {ListingFacets, ListingQuery, ListingSort, ProductListingPage} from "@store-front/types/listing";
 import {apiFetch, get, orUndefined} from "./http-utils";
+import {InventoryService} from "./inventory-service";
 
 /**
  * `sort=` is forwarded verbatim to Spring's Pageable on the Product entity. Only direct columns are
@@ -35,20 +36,14 @@ export class ProductCategory {
             get()));
     }
 
-    /** Degrades: option/variant facets across a category. */
-    public static getCategoryVariants = async (storeContext: StoreContext, categoryId: number): Promise<ProductVariant[] | undefined> => {
-        return orUndefined(apiFetch<ProductVariant[]>(
-            `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/category/${categoryId}/variations?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get()));
-    }
-
-    /** Both facets at once; each degrades independently. */
+    /**
+     * The manufacturer facet. Variant facets left with the catalog/inventory split — variants are
+     * deprecated under the single-product model, so the list is always empty and the themes render
+     * no variant filter group.
+     */
     public static getFacets = async (storeContext: StoreContext, categoryId: number): Promise<ListingFacets> => {
-        const [manufacturers, variants] = await Promise.all([
-            ProductCategory.getManufacturers(storeContext, categoryId),
-            ProductCategory.getCategoryVariants(storeContext, categoryId),
-        ]);
-        return {manufacturers: manufacturers ?? [], variants: variants ?? []};
+        const manufacturers = await ProductCategory.getManufacturers(storeContext, categoryId);
+        return {manufacturers: manufacturers ?? [], variants: []};
     }
 
     /**
@@ -56,8 +51,12 @@ export class ProductCategory {
      * `useProductListing`) surface the error as a state instead of an empty grid.
      */
     public static getProducts = async (storeContext: StoreContext, query: ListingQuery, categoryId?: number): Promise<ProductListingPage> => {
-        return apiFetch<ProductListingPage>(
+        const page = await apiFetch<ProductListingPage>(
             `${storeBaseServiceUrl('catalog', storeContext)}/api/v2/products?store=${storeContext.store}&lang=${storeContext.locale}&${listingQueryToParams(query, categoryId)}`,
             get());
+        // Stock and price live in the inventory service since the split. The merge degrades — a
+        // listing without prices still lists — the page itself must not.
+        await InventoryService.enrichProducts(storeContext, page.content);
+        return page;
     }
 }

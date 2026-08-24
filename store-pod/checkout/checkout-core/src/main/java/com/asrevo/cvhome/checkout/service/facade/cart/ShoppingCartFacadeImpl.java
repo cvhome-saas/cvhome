@@ -17,20 +17,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
 import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.checkout.service.mapper.cart.ReadableShoppingCartMapper;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.model.SkuInventory;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,28 +48,25 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ReadableShoppingCartMapper readableShoppingCartMapper;
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
                                             StoreMerchantId store, LanguageCode language)
             throws ProductNotPurchasableException {
 
-        ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, shoppingCartItem.getProduct(),
-                language);
-        ReadableProductAvailability availability = detailedProduct.availability();
+        SkuInventory inventory = productDetailsComposer
+                .getDetailedProduct(store, shoppingCartItem.getProduct(), language).inventory();
 
-        if (!availability.isCanBePurchased()) {
-            throw ProductNotPurchasableException.of(availability.getSku());
+        if (!inventory.canBePurchased() || inventory.price() == null) {
+            throw ProductNotPurchasableException.of(inventory.sku());
         }
 
-        FinalPriceCalc price = detailedProduct.price();
-
-        ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(availability.getSku(),
-                price.getFinalPrice(), store);
+        ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(inventory.sku(),
+                inventory.price().finalPrice(), store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
-        item.setSku(availability.getSku());
+        item.setSku(inventory.sku());
 
         return item;
     }

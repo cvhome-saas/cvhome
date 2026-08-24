@@ -6,6 +6,7 @@ dependencies {
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:commons:reference:reference-commons')
     api project(':store-pod:catalog:catalog-commons')
+    api project(':store-pod:inventory:inventory-commons')
     compileOnly libs.spring.data.jpa
     compileOnly libs.jakarta.validation.api
     compileOnly libs.jackson.databind

@@ -1,0 +1,63 @@
+# InventoryApi + ExternalInventoryApi — com.asrevo.cvhome.inventory.api.v1
+#
+# Addressed through the gateway, not inventory's own port: a seller request crosses store-core-gateway (:8000)
+# then the pod's spg, so `{{SELLER_UI_URL}}/spg/inventory/...` is what production traffic looks like. Env vars
+# come from the repo-root http-client.env.json; the session id from http-client.private.env.json (gitignored).
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### upsert a sku's stock and price (the console's whole write path)
+PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "productId": 46,
+  "quantity": 12,
+  "available": true,
+  "price": {
+    "amount": 25.00,
+    "specialAmount": 19.90,
+    "specialEndDate": "2099-12-31"
+  }
+}
+
+> {%
+    client.test("upserted with the special amount applied", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.price.discounted === true, "not discounted");
+        client.assert(response.body.price.finalPrice === 19.9, "final " + response.body.price.finalPrice);
+    });
+%}
+
+### invalid body — 400 (negative quantity, missing price)
+PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "quantity": -1,
+  "available": true
+}
+
+### public bulk read — stock and price for a set of skus (storefront path, no auth); unknown skus are absent
+GET {{LANDING_UI_URL}}/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46,SKU-UNKNOWN&store={{STORE_ID}}&lang={{LANG}}
+Accept: application/json
+
+### tenant isolation — another store does not see this store's skus (empty list)
+GET {{LANDING_UI_URL}}/inventory/api/v1/availability?skus=SKU-YSL-MAKE-TEIPEN46&store={{STORE_ID_2}}&lang={{LANG}}
+Accept: application/json
+
+### no token on the private side — 401, not an empty 200
+PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{
+  "quantity": 1,
+  "available": true,
+  "price": { "amount": 1 }
+}
+
+### delete a product's inventory rows (orphan cleanup after a catalog delete)
+DELETE {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/by-product/46?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

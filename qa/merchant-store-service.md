@@ -15,6 +15,9 @@ that cannot identify its tenants.
   removed in PR #273 (`.agents/plans/split-merchant-content-services.md`); its console screens were rebuilt in
   Module 5 of `.claude/plans/agents-requirments-console-ui-go-live-m-woolly-candy.md`.
 - **Cases** — 59 (8 verified, 4 covered by tests only, 47 never run end to end)
+- **Still current on PR #282** — merchant itself is untouched by the catalog/inventory split and rewrites; what changed
+  is who reads it: catalog reads the store's units of measure, inventory no longer reads it at all. The sibling file is
+  [`qa/catalog-and-inventory.md`](catalog-and-inventory.md).
 - **Supersedes** — the six-case `MER` follow-up section at the foot of
   [`qa/split-merchant-content-services.md`](split-merchant-content-services.md). Those cases are folded in
   here (STR-03, STR-04, UPD-02, SEC-04, BRD-05, ARC-01); run this file, not that section.

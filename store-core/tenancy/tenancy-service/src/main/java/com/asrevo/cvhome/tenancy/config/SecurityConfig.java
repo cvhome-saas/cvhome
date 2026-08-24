@@ -27,8 +27,6 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/v1/*/public/**")
                         .permitAll()
-                        .requestMatchers("/api/v1/test/sign")
-                        .permitAll()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(it -> it.jwt(withDefaults()))

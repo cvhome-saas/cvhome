@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.when;
  * {@code StoreCreatedEvent}, so a stack seeded with two stores had a pod counting zero — and the console said so.
  * </p>
  */
-@Tag("unit-test")
 class StorePlacementReconcilerTest {
 
     private static final PodId POD = new PodId("507f1f77bcf86cd799439011");

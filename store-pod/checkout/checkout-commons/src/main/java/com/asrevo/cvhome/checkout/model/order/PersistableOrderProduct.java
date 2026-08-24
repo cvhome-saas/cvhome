@@ -3,9 +3,7 @@ package com.asrevo.cvhome.checkout.model.order;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
-import com.asrevo.cvhome.catalog.model.product.attribute.ProductAttribute;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +19,5 @@ public class PersistableOrderProduct extends OrderProductEntity implements Seria
     private static final long serialVersionUID = 1L;
 
     private BigDecimal price; // specify final price
-
-    private List<ProductAttribute> attributes; // may have attributes
 
 }

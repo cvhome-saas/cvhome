@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.when;
  * instead.
  * </p>
  */
-@Tag("unit-test")
 class RevenueStatisticTest {
 
     private static final String DAY = "2026-08-04";

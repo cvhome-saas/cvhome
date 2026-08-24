@@ -34,6 +34,7 @@ include(
         'store-commons:secret-crypto:secret-crypto-autoconfigure',
         'store-commons:secret-crypto:secret-crypto-caffeine',
         'store-commons:autoconfigure',
+        'store-commons:test-support',
 
         'store-pod:spg',
         'store-pod:commons:store-commons',
@@ -58,6 +59,10 @@ include(
         'store-pod:merchant:merchant-core',
         'store-pod:merchant:merchant-service',
         'store-pod:merchant:merchant-external-api',
+        'store-pod:inventory:inventory-commons',
+        'store-pod:inventory:inventory-external-api',
+        'store-pod:inventory:inventory-core',
+        'store-pod:inventory:inventory-service',
         'store-pod:payment:payment-commons',
         'store-pod:payment:payment-core',
         'store-pod:payment:payment-external-api',

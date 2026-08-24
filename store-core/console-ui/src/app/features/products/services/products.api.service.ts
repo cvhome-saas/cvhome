@@ -3,8 +3,9 @@ import {Observable, catchError, forkJoin, map, of, switchMap} from 'rxjs';
 
 import {CatalogReference} from '@api/catalog/catalog-reference.service';
 import {ProductService, type ProductQuery} from '@api/catalog/product.service';
+import {InventoryService} from '@api/inventory/inventory.service';
 import type {PageRequest} from '@core/table/table.types';
-import type {ReadableCategory, ReadableProduct} from '@models/catalog';
+import type {ReadableCategory, ReadableProduct, SkuInventory} from '@models/catalog';
 import type {
   InlineProductEdit,
   ProductFilterOption,
@@ -38,6 +39,7 @@ const NBSP = '\u00a0\u00a0';
 @Injectable({providedIn: 'root'})
 export class ProductsApi {
   private readonly products = inject(ProductService);
+  private readonly inventory = inject(InventoryService);
   private readonly reference = inject(CatalogReference);
 
   /** What the last response said each row held, so an inline edit can send the fields it is not changing. */
@@ -45,7 +47,20 @@ export class ProductsApi {
 
   loadSnapshot(query: ProductsQuery): Observable<ProductsSnapshot> {
     return forkJoin({
-      page: this.products.list(toProductQuery(query)),
+      /*
+       * Price and quantity live in the inventory service since the catalog/inventory split; the
+       * catalog rows carry neither. One bulk call for the page's SKUs, merged by SKU below. A page
+       * whose inventory read fails still renders — with empty price/stock cells, not an error.
+       */
+      pageWithStock: this.products.list(toProductQuery(query)).pipe(
+        switchMap((page) => {
+          const skus = page.content.map((product) => product.sku).filter((sku): sku is string => !!sku);
+          const stock: Observable<readonly SkuInventory[]> = skus.length
+            ? this.inventory.bySkus(skus).pipe(catchError(() => of<readonly SkuInventory[]>([])))
+            : of<readonly SkuInventory[]>([]);
+          return stock.pipe(map((inventories) => ({page, inventories})));
+        }),
+      ),
       /*
        * The shared reference cache, like the product form. These three do not change while an
        * operator pages through a table, and the list and the form ask for exactly the same ones —
@@ -59,13 +74,15 @@ export class ProductsApi {
         catchError(() => of(null)),
       ),
     }).pipe(
-      map(({page, categories, brands, currency}) => {
+      map(({pageWithStock, categories, brands, currency}) => {
+        const {page, inventories} = pageWithStock;
+        const bySku = new Map(inventories.map((inventory) => [inventory.sku, inventory]));
         this.loadedRows.clear();
         for (const product of page.content) {
           this.loadedRows.set(product.id, product);
         }
         return {
-          page: {...page, content: page.content.map(toRow)},
+          page: {...page, content: page.content.map((product) => toRow(product, bySku.get(product.sku ?? '')))},
           categories: flattenForSelect(categories?.content ?? [], 0),
           brands: (brands?.content ?? []).map((brand) => ({
             id: brand.id,
@@ -81,28 +98,37 @@ export class ProductsApi {
   /**
    * One row's price, quantity and availability.
    *
-   * All three go every time, because every field on `LightPersistableProduct` is a Java primitive:
-   * an omitted `available` is `false` and an omitted `quantity` is `0`, so a partial body is a
-   * silent data loss rather than a partial update. `productShipeable` is not edited here at all and
-   * is carried straight from the last response for the same reason.
-   *
-   * `price` is a string on this DTO and a number on the definition's. Converted here, in the one
-   * place that knows both.
+   * Two writes since the catalog/inventory split: the catalog `PATCH` carries the visibility flags
+   * (both, because every field on `LightPersistableProduct` is a Java primitive and an omitted one
+   * would become `false`), and the inventory upsert carries price and quantity. They run together;
+   * either failing fails the edit, and the reload afterwards shows what actually landed.
    */
   applyInlineEdit(edit: InlineProductEdit, query: ProductsQuery): Observable<ProductsSnapshot> {
     const loaded = this.loadedRows.get(edit.id);
-    return this.products
-      .patch(edit.id, {
-        price: String(edit.price ?? 0),
-        quantity: edit.quantity,
+    const sku = loaded?.sku ?? '';
+    return forkJoin([
+      this.products.patch(edit.id, {
         available: edit.available,
         productShipeable: loaded?.productShipeable ?? true,
-      })
-      .pipe(switchMap(() => this.loadSnapshot(query)));
+      }),
+      this.inventory.upsert(sku, {
+        productId: edit.id,
+        quantity: edit.quantity,
+        available: edit.available,
+        price: {amount: edit.price ?? 0},
+      }),
+    ]).pipe(switchMap(() => this.loadSnapshot(query)));
   }
 
   delete(id: number, query: ProductsQuery): Observable<ProductsSnapshot> {
-    return this.products.delete(id).pipe(switchMap(() => this.loadSnapshot(query)));
+    return this.products.delete(id).pipe(
+      /*
+       * Orphan cleanup in the inventory service, best-effort: the product is gone either way, and
+       * an inventory row without a product is invisible to every reader.
+       */
+      switchMap(() => this.inventory.deleteByProduct(id).pipe(catchError(() => of(null)))),
+      switchMap(() => this.loadSnapshot(query)),
+    );
   }
 
   private optional<T>(source: Observable<T>): Observable<T | null> {
@@ -147,7 +173,7 @@ function toProductQuery(query: ProductsQuery): ProductQuery {
  * language — the request context stamps `lang`. A product with no copy in that language falls back
  * to its SKU rather than to an empty cell, because a nameless row is a row that cannot be acted on.
  */
-function toRow(product: ReadableProduct): ProductRow {
+function toRow(product: ReadableProduct, inventory?: SkuInventory): ProductRow {
   return {
     id: product.id,
     name: product.description?.name ?? product.sku ?? String(product.id),
@@ -160,8 +186,8 @@ function toRow(product: ReadableProduct): ProductRow {
       product.manufacturer?.descriptions?.[0]?.name ??
       product.manufacturer?.code ??
       null,
-    price: product.price ?? null,
-    quantity: product.quantity ?? 0,
+    price: inventory?.price?.finalPrice ?? null,
+    quantity: inventory?.quantity ?? 0,
     available: product.available ?? false,
     shipeable: product.productShipeable ?? true,
     /*
