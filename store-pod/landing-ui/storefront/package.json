@@ -29,6 +29,7 @@
     "@store-front/theme-basic": "*",
     "@store-front/theme-beauty": "*",
     "@store-front/theme-fashion": "*",
+    "@store-front/theme-grocery": "*",
     "@store-front/theme-starter": "*",
     "@store-front/types": "0.0.0",
     "@store-front/ui": "0.0.0",

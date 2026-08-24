@@ -238,6 +238,11 @@ const THEME_DEFAULTS = {
         background: o(0.96, 0.012, 90), foreground: o(0.18, 0, 0),
         primary: o(0.68, 0.24, 350), secondary: o(0.18, 0, 0), accent: o(0.90, 0.20, 115),
     },
+    'grocery': {
+        note: 'Cash & Carry: concrete floor, near-black ink, safety-yellow price boards with dark text; crate-blue wash; signal-red statement.',
+        background: o(0.96, 0.005, 250), foreground: o(0.21, 0.015, 260),
+        primary: o(0.80, 0.16, 85), secondary: o(0.86, 0.055, 245), accent: o(0.49, 0.20, 28),
+    },
     // @theme-defaults:end
 };
 
