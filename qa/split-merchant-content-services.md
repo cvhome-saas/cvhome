@@ -140,6 +140,11 @@ blocks in `content-api.http` now send `pod={{POD_ID}}`; canonical and compatibil
 
 ## MER — Merchant modernization follow-up
 
+> **Superseded by [`qa/merchant-store-service.md`](merchant-store-service.md).** These six cases are folded
+> into that file — MER-01 → STR-04, MER-02 → STR-03, MER-03 → UPD-02, MER-04 → SEC-04, MER-05 → BRD-05,
+> MER-06 → ARC-01 — alongside the rest of the merchant surface (branding, domains and edge routing,
+> provisioning, the services that cache the store record). Run that file; this section is kept for history.
+
 ### MER-01 — Canonical and compatibility store reads agree · critical · [not verified]
 
 - **Steps** — run the first two requests in `merchant-store-api.http` through the platform gateway.
