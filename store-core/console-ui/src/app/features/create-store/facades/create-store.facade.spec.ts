@@ -303,7 +303,7 @@ describe('CreateStoreFacade', () => {
     tick();
 
     expect(facade.phase()).toBe('form');
-    expect(facade.submitting()).toBeFalse();
+    expect(facade.busy()).toBeFalse();
     expect(facade.store()).toBeNull();
   }));
 

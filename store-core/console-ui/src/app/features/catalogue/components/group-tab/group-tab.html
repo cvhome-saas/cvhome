@@ -75,7 +75,7 @@
                 <button
                   class="danger-action"
                   type="button"
-                  [disabled]="facade.saving()"
+                  [disabled]="facade.busy()"
                   (click)="facade.askDelete('groups', group.code, group.name)"
                 >
                   <app-icon name="trash" />
@@ -137,8 +137,8 @@
               <button
                 class="primary-action"
                 type="submit"
-                [disabled]="facade.saving()"
-                [attr.aria-busy]="facade.saving()"
+                [disabled]="facade.busy()"
+                [attr.aria-busy]="facade.busy()"
               >
                 {{ creating() ? t('catalogue.groups.create') : t('catalogue.groups.save') }}
               </button>
@@ -163,7 +163,7 @@
                 class="picker-search"
                 [options]="candidates()"
                 [loading]="facade.memberSearching()"
-                [disabled]="facade.saving()"
+                [disabled]="facade.busy()"
                 [label]="t('catalogue.groups.addMember')"
                 [placeholder]="t('catalogue.groups.searchProducts')"
                 (termChanged)="facade.searchProducts($event)"
@@ -188,7 +188,7 @@
                     <span class="picker-chip-sku" dir="ltr">{{ member.sku }}</span>
                     <button
                       type="button"
-                      [disabled]="facade.saving()"
+                      [disabled]="facade.busy()"
                       [attr.aria-label]="t('catalogue.groups.removeMember', {name: member.name})"
                       (click)="facade.removeMember(group.code, member.id)"
                     >

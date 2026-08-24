@@ -20,7 +20,7 @@ export type MediaView = 'grid' | 'list';
  * open in the detail drawer. Root-provided because the picker dialog (inside an editor) and the
  * media tab share it.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class MediaLibraryFacade {
   private readonly api = inject(MediaService);
   private readonly apiErrors = inject(ApiErrorService);

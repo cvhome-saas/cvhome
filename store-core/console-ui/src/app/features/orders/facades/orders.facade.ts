@@ -57,7 +57,7 @@ const TABS: readonly OrderTab[] = ['all', ...ORDER_STATUSES];
  * table re-renders from the response. Filtering and paging happen behind `OrdersApi`, not
  * here, so this reads the same whether the data is mocked or served.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class OrdersFacade {
   private readonly api = inject(OrdersApi);
   private readonly transloco = inject(TranslocoService);

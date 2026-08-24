@@ -9,7 +9,7 @@ import {uniqueAsync} from '@shared/forms/unique-async';
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** One locale's copy. Which controls a given editor shows is the editor's business; the group carries them all. */
-export interface TranslationForm extends FormGroup<{
+export type TranslationForm = FormGroup<{
   title: FormControl<string>;
   body: FormControl<string>;
   excerpt: FormControl<string>;
@@ -20,17 +20,17 @@ export interface TranslationForm extends FormGroup<{
   ctaLabel: FormControl<string>;
   subtitle: FormControl<string>;
   friendlyUrl: FormControl<string>;
-}> {}
+}>;
 
 /** The fields every workflow item shares on write. */
-export interface CommonForm extends FormGroup<{
+export type CommonForm = FormGroup<{
   slug: FormControl<string>;
   publishAt: FormControl<string>;
   unpublishAt: FormControl<string>;
   noindex: FormControl<boolean>;
   canonicalUrl: FormControl<string>;
   ogMediaId: FormControl<number | null>;
-}> {}
+}>;
 
 /**
  * Builds and maps the forms every content editor is made of: one `CommonForm`, one

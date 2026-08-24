@@ -6,7 +6,7 @@
   }
 
   <app-busy-overlay
-    [busy]="billing.isLoading() || facade.working()"
+    [busy]="billing.isLoading() || facade.busy()"
     reserve="page"
     [label]="t('billing.loading')"
   >
@@ -57,8 +57,8 @@
                 <button
                   type="button"
                   class="primary-action"
-                  [attr.aria-busy]="facade.working() ? 'true' : null"
-                  [disabled]="facade.working()"
+                  [attr.aria-busy]="facade.busy() ? 'true' : null"
+                  [disabled]="facade.busy()"
                   (click)="facade.plansOpen.set(true)"
                 >
                   {{ subscription.planCode ? t('billing.plan.change') : t('billing.plan.choose') }}
@@ -107,8 +107,8 @@
                   <button
                     type="button"
                     class="secondary-action"
-                    [attr.aria-busy]="facade.working() ? 'true' : null"
-                    [disabled]="facade.working()"
+                    [attr.aria-busy]="facade.busy() ? 'true' : null"
+                    [disabled]="facade.busy()"
                     (click)="facade.resume()"
                   >
                     <app-icon name="undo" />{{ t('billing.plan.resume') }}
@@ -118,7 +118,7 @@
                   <button
                     type="button"
                     class="danger-action"
-                    [disabled]="facade.working()"
+                    [disabled]="facade.busy()"
                     (click)="confirmingCancel.set(true)"
                   >
                     {{ t('billing.plan.cancel') }}

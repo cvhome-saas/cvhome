@@ -3,7 +3,7 @@
     <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="facade.isLoading() || facade.saving()" [label]="t('content.list.loading')" reserve="panel">
+  <app-busy-overlay [busy]="facade.isLoading() || facade.busy()" [label]="t('content.list.loading')" reserve="panel">
     <app-panel class="list-panel" [title]="t('content.tab.' + type())" [subtitle]="facade.subtitle()">
       <div panelAction class="panel-controls" role="search">
         <app-search-box

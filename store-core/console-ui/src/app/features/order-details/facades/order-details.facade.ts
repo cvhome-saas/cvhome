@@ -121,7 +121,7 @@ function stageIndexOf(status: OrderStatus | undefined): number {
 export class OrderDetailsFacade {
   private readonly api = inject(OrderDetailsApi);
   private readonly transloco = inject(TranslocoService);
-  private readonly toasts = inject(ToastService);
+  private readonly toast = inject(ToastService);
   private readonly apiErrors = inject(ApiErrorService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly statusLabels = inject(StatusLabel);
@@ -133,7 +133,7 @@ export class OrderDetailsFacade {
   readonly orderId = signal<number | null>(null);
 
   readonly statuses = ORDER_STATUSES;
-  readonly submitting = signal(false);
+  readonly busy = signal(false);
 
   private readonly detail = rxResource({
     // The store rides along because the invoice's letterhead is the selling store, and it is read by
@@ -389,22 +389,22 @@ export class OrderDetailsFacade {
    */
   addStatus(status: OrderStatus, comments: string): void {
     const id = this.orderId();
-    if (id === null || this.submitting()) {
+    if (id === null || this.busy()) {
       return;
     }
-    this.submitting.set(true);
+    this.busy.set(true);
 
     this.api
       .addStatus(id, status, comments)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.submitting.set(false);
-          this.toasts.success(this.transloco.translate('orderDetails.statusAdded'));
+          this.busy.set(false);
+          this.toast.success(this.transloco.translate('orderDetails.statusAdded'));
           this.detail.reload();
         },
         error: (error: unknown) => {
-          this.submitting.set(false);
+          this.busy.set(false);
           this.apiErrors.notify(error);
         },
       });

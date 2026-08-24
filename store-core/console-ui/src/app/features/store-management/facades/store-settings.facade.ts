@@ -47,7 +47,7 @@ const CHECK_MIN_VISIBLE_MS = 400;
 /** The same, for an upload — long enough that the well's spinner and its tick both register. */
 const UPLOAD_MIN_VISIBLE_MS = 600;
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class StoreSettingsFacade {
   private readonly api = inject(StoreSettingsApi);
   private readonly formService = inject(StoreSettingsFormService);

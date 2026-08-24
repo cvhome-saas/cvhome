@@ -86,15 +86,16 @@ interface Draft {
                     [disabled]="!canManage()"
                   />
                 </div>
-                <label class="field">
+                <div class="field">
                   <span class="field-label">{{ t('content.snippets.titleField') }}</span>
                   <app-text-field
                     [value]="d.translations[language()]?.title ?? ''"
                     (valueChange)="setTitle($event)"
                     [maxLength]="120"
                     [disabled]="!canManage()"
+                    [ariaLabel]="t('content.snippets.titleField')"
                   />
-                </label>
+                </div>
                 <div class="field">
                   <span class="field-label">{{ t('content.snippets.bodyField') }}</span>
                   <app-rich-text

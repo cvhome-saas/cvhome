@@ -1,23 +1,23 @@
 import {DestroyRef, computed, effect, inject, Injectable, signal} from '@angular/core';
 import {rxResource, takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {
-  AbstractControl,
   AsyncValidatorFn,
   FormControl,
   FormGroup,
   NonNullableFormBuilder,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import {TranslocoService} from '@jsverse/transloco';
-import {Observable, Subscription, first, map, of, switchMap, timer} from 'rxjs';
+import {Subscription, switchMap, timer} from 'rxjs';
 
 import {CreateStoreApi} from '../services/create-store.api.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
+import {clearServerErrorsOnChange} from '@core/errors/form-error.utils';
 import {ReferenceDataService, type ReferenceOption} from '@core/reference/reference-data.service';
 import {ConsoleApi} from '@layouts/console-shell/services/console.api.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import {defaultLanguageIsSupported} from '@shared/validators/default-language-is-supported';
+import {uniqueAsync} from '@shared/forms/unique-async';
 import {phoneNumber} from '@shared/validators/phone-number';
 import {PlatformLabel} from '@shared/i18n/platform-label';
 import {NEXT_STEPS, PROVISIONING_ARTIFACTS} from '../create-store.content';
@@ -105,6 +105,10 @@ export type CreateStoreForm = FormGroup<{
  * theme, country, currency and default language, `MerchantStoreDetails` is `@NotNull` on email and
  * phone, and `PersistableMerchantStorePopulator` dereferences the language fields unguarded. Every one
  * of those is collected here, and tenancy now validates them at the POST rather than at the pod.
+ *
+ * Root-provided on purpose: provisioning keeps running server-side after the POST answers, and the
+ * poll that watches it lives here. Page-provided, navigating away would destroy the facade and a
+ * return to `/create-store` would offer a blank form while the store is still building.
  */
 @Injectable({providedIn: 'root'})
 export class CreateStoreFacade {
@@ -246,7 +250,7 @@ export class CreateStoreFacade {
   });
 
   readonly phase = signal<CreateStorePhase>('form');
-  readonly submitting = signal(false);
+  readonly busy = signal(false);
 
   /** The store as the server last described it. Null until create answers. */
   readonly store = signal<ManagerStore | null>(null);
@@ -258,6 +262,9 @@ export class CreateStoreFacade {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.poll?.unsubscribe());
+    // Tenancy's field errors bind through `applyToForm` below, and a server error is not a
+    // validator — nothing else ever removes one once the operator edits the field.
+    clearServerErrorsOnChange(this.form, this.destroyRef);
     // `DEFAULT` (the storefront theme's own colours) is the right answer for almost every new store, so
     // it is preselected once the reference list confirms the server offers it; a merchant who already
     // touched the control keeps their pick.
@@ -479,11 +486,11 @@ export class CreateStoreFacade {
    * merchant's `PersistableBaseAddress` deserializes; `country` alone is required inside it.
    */
   start(): void {
-    if (this.form.invalid || this.submitting()) {
+    if (this.form.invalid || this.busy()) {
       this.form.markAllAsTouched();
       return;
     }
-    this.submitting.set(true);
+    this.busy.set(true);
     this.timedOut.set(false);
 
     this.console
@@ -491,7 +498,7 @@ export class CreateStoreFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (store) => {
-          this.submitting.set(false);
+          this.busy.set(false);
           this.store.set(store);
           this.phase.set('running');
           // The rail and the guards ask the same question this page just changed the answer to.
@@ -499,7 +506,7 @@ export class CreateStoreFacade {
           this.watch(store);
         },
         error: (error: unknown) => {
-          this.submitting.set(false);
+          this.busy.set(false);
           // Quota refusals and duplicate names arrive as field-less problems; a body tenancy validated
           // arrives with field errors that bind. applyToForm makes that split, which is why the create
           // endpoint being `@Valid` matters to this page and not only to the server.
@@ -610,20 +617,13 @@ export class CreateStoreFacade {
 
   /**
    * Store names are unique platform-wide, so the server is the only thing that can answer this.
-   * Debounced because it fires on every keystroke.
+   * One character is not worth a round trip — nothing real is one letter long.
    */
   private uniqueName(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      const name = String(control.value ?? '').trim();
-      if (name.length < 2) {
-        return of(null);
-      }
-      return timer(400).pipe(
-        switchMap(() => this.api.nameExists(name)),
-        map((exists) => (exists ? {nameTaken: true} : null)),
-        first(),
-      );
-    };
+    return uniqueAsync((name) => this.api.nameExists(name), 'nameTaken', {
+      debounceMs: 400,
+      when: (name) => name.length >= 2,
+    });
   }
 }
 

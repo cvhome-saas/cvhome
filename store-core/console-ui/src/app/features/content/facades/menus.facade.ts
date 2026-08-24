@@ -69,7 +69,7 @@ export function blankItem(): MenuDraftItem {
  * The two storefront menus as editable trees. Each menu is saved whole (`PUT /menus/{handle}`), which
  * is what the server expects; the draft lives here so switching tabs does not lose an unsaved order.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class MenusFacade {
   private readonly api = inject(MenusService);
   private readonly items = inject(ContentItemsService);
@@ -79,13 +79,8 @@ export class MenusFacade {
   private readonly shell = inject(ConsoleShellFacade);
   private readonly cache = inject(ContentCache);
 
-  private readonly stamp = signal(0);
-
   private readonly resource = rxResource({
-    params: () => {
-      this.stamp();
-      return this.shell.currentStoreId() ?? undefined;
-    },
+    params: () => this.shell.currentStoreId() ?? undefined,
     stream: () => forkJoin({main: this.api.get('MAIN'), footer: this.api.get('FOOTER')}),
   });
 
@@ -111,7 +106,7 @@ export class MenusFacade {
 
   readonly isLoading = this.resource.isLoading;
   readonly error = computed(() => this.resource.error() as Error | undefined);
-  readonly saving = signal(false);
+  readonly busy = signal(false);
 
   /** The editable trees. Reset from the server whenever it answers; edits mark `dirty`. */
   readonly drafts = signal<Record<MenuHandle, MenuDraftItem[]>>({MAIN: [], FOOTER: []});
@@ -137,14 +132,14 @@ export class MenusFacade {
   }
 
   save(handle: MenuHandle): void {
-    this.saving.set(true);
+    this.busy.set(true);
     const body: Menu = {
       handle,
       items: this.drafts()[handle].map((item, index) => toWire(item, index)),
     };
     this.api.put(handle, body).subscribe({
       next: (saved) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.drafts.update((current) => ({...current, [handle]: saved.items.map(toDraft)}));
         this.dirty.update((current) => ({...current, [handle]: false}));
         this.cache.invalidate();
@@ -155,14 +150,25 @@ export class MenusFacade {
         );
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });
   }
 
+  /**
+   * Back to what the server last answered — for this menu only. Reloading the resource instead
+   * would do the same job through the constructor effect, but that effect pours *both* trees,
+   * so discarding one menu's draft would silently throw away the other's unsaved edits.
+   */
   discard(handle: MenuHandle): void {
-    this.stamp.update((v) => v + 1);
+    if (!this.resource.hasValue()) {
+      return;
+    }
+    const value = this.resource.value();
+    const items = (handle === 'MAIN' ? value.main : value.footer).items.map(toDraft);
+    this.drafts.update((current) => ({...current, [handle]: items}));
+    this.dirty.update((current) => ({...current, [handle]: false}));
   }
 
   retry(): void {

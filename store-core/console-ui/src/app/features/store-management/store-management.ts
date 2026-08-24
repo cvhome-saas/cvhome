@@ -32,6 +32,7 @@ import {StoreSettingsFacade} from './facades/store-settings.facade';
  * arrives as an input.
  */
 @Component({
+  providers: [StoreSettingsFacade],
   selector: 'app-store-management',
   imports: [
     LoadError,

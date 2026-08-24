@@ -31,6 +31,7 @@ import {CatalogueFacade} from './facades/catalogue.facade';
  * behaviours.
  */
 @Component({
+  providers: [CatalogueFacade],
   selector: 'app-catalogue',
   imports: [
     LoadError,

@@ -12,6 +12,7 @@ import {ContactFormService} from './services/contact-form.service';
 import {MarketingFacade} from './facades/marketing.facade';
 
 @Component({
+  providers: [MarketingFacade],
   selector: 'app-marketing',
   imports: [
     FormField,

@@ -9,7 +9,6 @@ import {CONSOLE_STORES_FAKE, FakeConsoleApi} from '@testing/console-api.fake';
 import {TranslocoService} from '@jsverse/transloco';
 
 import {translocoTesting} from '@testing/transloco-testing';
-import {ProductsFacade} from './facades/products.facade';
 import {Products} from './products';
 import {PAGE_SIZE} from './facades/products.facade';
 import {ProductsApi, type ProductsQuery} from './services/products.api.service';
@@ -122,6 +121,8 @@ describe('Products', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
     return fixture.nativeElement as HTMLElement;
   }
 
@@ -139,13 +140,11 @@ describe('Products', () => {
 
   it('fetches nothing until the page that shows it is mounted', fakeAsync(() => {
     /*
-     * The facade is root-provided, so anything that injects it constructs it — and an `rxResource`
-     * starts the moment it exists. The product form injects this facade for one method, `invalidate`,
-     * and paid for a page of products it never displayed on every visit to `/products/:id`.
+     * The facade is page-provided, so nothing can construct it — and start its `rxResource` —
+     * before the page mounts. The product form once injected the root-provided version of this
+     * facade for one method, `invalidate`, and paid for a page of products it never displayed on
+     * every visit to `/products/:id`.
      */
-    TestBed.inject(ProductsFacade);
-    tick();
-
     expect(api.requests.length).toBe(0);
 
     load();
@@ -182,7 +181,10 @@ describe('Products', () => {
     sku.value = 'ACM-PPR';
     sku.dispatchEvent(new Event('input'));
     // The box debounces, so a filter does not reach the server per keystroke.
+    fixture.detectChanges();
     tick(300);
+    fixture.detectChanges();
+    tick();
     fixture.detectChanges();
 
     expect(names(element)).toEqual(['Copy paper']);
@@ -192,6 +194,7 @@ describe('Products', () => {
     // every control in the filter row now clears the one thing it filters on.
     const clear = element.querySelector('app-search-box .search-clear') as HTMLButtonElement;
     clear.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -211,6 +214,7 @@ describe('Products', () => {
     sku.value = 'NOTHING-AT-ALL';
     sku.dispatchEvent(new Event('input'));
     // The box debounces, so a filter does not reach the server per keystroke.
+    fixture.detectChanges();
     tick(300);
     fixture.detectChanges();
 
@@ -281,6 +285,7 @@ describe('Products', () => {
 
     const confirm = element.querySelector('.icon-action.confirm') as HTMLButtonElement;
     confirm.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -300,6 +305,7 @@ describe('Products', () => {
     fixture.detectChanges();
 
     (element.querySelector('.icon-action.confirm') as HTMLButtonElement).click();
+    fixture.detectChanges();
     tick();
 
     expect(api.edits[0].price).toBe(129);
@@ -310,6 +316,7 @@ describe('Products', () => {
 
     const toggle = element.querySelector('.availability') as HTMLButtonElement;
     toggle.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -328,6 +335,7 @@ describe('Products', () => {
     expect(dialog?.textContent).toContain('Delete Product 1?');
 
     fixture.componentInstance['facade'].confirmDelete();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 

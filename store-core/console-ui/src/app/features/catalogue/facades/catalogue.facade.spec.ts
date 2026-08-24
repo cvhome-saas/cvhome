@@ -106,6 +106,8 @@ describe('CatalogueFacade', () => {
       providers: [
         // `ConsoleShellFacade` reads the route for its breadcrumb, so the facade needs a router.
         provideRouter([]),
+        // Page-provided in production; the spec provides it directly to test the facade alone.
+        CatalogueFacade,
         {provide: CatalogueApi, useValue: api},
         {provide: ConsoleApi, useValue: Object.assign(new FakeConsoleApi(), {stores: CONSOLE_STORES_FAKE})},
         {provide: NOTIFICATION_PORT, useValue: {danger: () => undefined}},

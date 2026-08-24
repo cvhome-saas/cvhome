@@ -26,6 +26,7 @@ import {FirstRunFacade} from './facades/first-run.facade';
  * "Create store" stays disabled, and says why, until the trial is started.
  */
 @Component({
+  providers: [FirstRunFacade],
   selector: 'app-first-run',
   imports: [
     LoadError,

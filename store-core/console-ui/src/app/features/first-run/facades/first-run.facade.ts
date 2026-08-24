@@ -53,7 +53,7 @@ export interface LimitView {
  * nothing for "Create store" to do — the button stays disabled and the page says why.
  * That gate is the only decision this page makes; everything else is content.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class FirstRunFacade {
   private readonly api = inject(FirstRunApi);
   private readonly transloco = inject(TranslocoService);

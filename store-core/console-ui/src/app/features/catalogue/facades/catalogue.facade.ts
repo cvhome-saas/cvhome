@@ -52,7 +52,7 @@ interface PendingDelete {
  * day. The draft is cleared on save and on selecting a different record, and never on a language
  * change.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class CatalogueFacade {
   private readonly api = inject(CatalogueApi);
   private readonly search = inject(ProductSearch);
@@ -162,7 +162,7 @@ export class CatalogueFacade {
   readonly isEmpty = computed(() => this.loaded() === undefined);
 
   /** True while a write is in flight. Locks the tree and every Save on the page. */
-  readonly saving = signal(false);
+  readonly busy = signal(false);
 
   readonly categories = computed<readonly CategoryNode[]>(() => this.loaded()?.categories ?? []);
   readonly brands = computed<readonly BrandCard[]>(() => this.loaded()?.brands ?? []);
@@ -705,10 +705,10 @@ export class CatalogueFacade {
    * form that refuses to submit for no visible reason.
    */
   private run(call: Observable<CatalogueSnapshot>, messageKey: string, form?: AbstractControl): void {
-    this.saving.set(true);
+    this.busy.set(true);
     call.subscribe({
       next: (snapshot) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.loaded.set(snapshot);
         this.draft.set(new Map());
         this.mode.set('edit');
@@ -716,7 +716,7 @@ export class CatalogueFacade {
         this.toast.success(this.transloco.translate(messageKey));
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         if (form) {
           this.apiErrors.applyToForm(failure, form);
           return;

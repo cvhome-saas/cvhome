@@ -23,7 +23,7 @@
   }
 
   <app-busy-overlay
-    [busy]="facade.isLoading() || facade.saving()"
+    [busy]="facade.isLoading() || facade.busy()"
     [label]="t('products.loading')"
   >
     @if (!facade.isEmpty()) {
@@ -209,7 +209,7 @@
                   <button
                     class="availability"
                     type="button"
-                    [disabled]="facade.saving()"
+                    [disabled]="facade.busy()"
                     [attr.aria-pressed]="row.available"
                     [attr.aria-label]="t('products.toggleAvailableFor', {name: row.name})"
                     (click)="facade.toggleAvailable(row)"
@@ -225,7 +225,7 @@
                     <button
                       class="icon-action confirm"
                       type="button"
-                      [disabled]="facade.saving()"
+                      [disabled]="facade.busy()"
                       [attr.aria-label]="t('products.saveRowFor', {name: row.name})"
                       (click)="commitEdit(row)"
                     >

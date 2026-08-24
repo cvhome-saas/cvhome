@@ -22,6 +22,8 @@ import {PoliciesTab} from './components/policies-tab/policies-tab';
 import {SnippetsCard} from './components/snippets-card/snippets-card';
 import type {PolicyCompliance} from '@models/content';
 import {ContentHubFacade} from './facades/content-hub.facade';
+import {MediaLibraryFacade} from './facades/media-library.facade';
+import {MenusFacade} from './facades/menus.facade';
 
 const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq', 'policies'];
 
@@ -34,6 +36,7 @@ const LIST_TABS: readonly ContentListType[] = ['pages', 'posts', 'banners', 'faq
  * the store-management rail already carries the disabled entry with the reason.
  */
 @Component({
+  providers: [MediaLibraryFacade, MenusFacade],
   selector: 'app-content-hub',
   imports: [
     ContentList,

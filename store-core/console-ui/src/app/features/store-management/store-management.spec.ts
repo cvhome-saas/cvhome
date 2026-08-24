@@ -287,6 +287,10 @@ describe('StoreManagement', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    // A second round: the page-provided facade's resource is driven by a component effect, which
+    // only issues its request during change detection — one flush later than a root instance did.
+    tick();
+    fixture.detectChanges();
   }
 
   /** One social row's field, so an assertion reads that row's error rather than the first on screen. */
@@ -497,6 +501,7 @@ describe('StoreManagement', () => {
       'shop.example.com',
     );
 
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
     expect(saveButton(element).disabled).toBeFalse();
@@ -789,6 +794,7 @@ describe('StoreManagement', () => {
 
     type(element, 'customDomain', 'shop.acmesupply.co');
     settle(fixture);
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 
@@ -813,6 +819,7 @@ describe('StoreManagement', () => {
     api.nextVerify('failed');
     row().querySelector<HTMLButtonElement>('.ghost-action')!.click();
     settle(fixture);
+    fixture.detectChanges();
     tick(400);
     settle(fixture);
 
@@ -826,6 +833,7 @@ describe('StoreManagement', () => {
     api.verifyFailure = new Error('offline');
     row().querySelector<HTMLButtonElement>('.ghost-action')!.click();
     settle(fixture);
+    fixture.detectChanges();
     tick(400);
     settle(fixture);
 
@@ -855,6 +863,7 @@ describe('StoreManagement', () => {
 
     // The check is debounced, and Save stays out of reach while it is in flight.
     expect(saveButton(element).disabled).toBeTrue();
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 
@@ -877,6 +886,7 @@ describe('StoreManagement', () => {
     dns.outcome = 'points-elsewhere';
     type(element, 'customDomain', 'store.example.com');
     settle(fixture);
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 
@@ -889,6 +899,7 @@ describe('StoreManagement', () => {
     dns.outcome = 'points-here';
     checkButton(element).click();
     settle(fixture);
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 
@@ -901,6 +912,7 @@ describe('StoreManagement', () => {
     dns.outcome = 'no-record';
     type(element, 'customDomain', 'store.example.com');
     settle(fixture);
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 
@@ -918,6 +930,7 @@ describe('StoreManagement', () => {
     dns.failure = new Error('offline');
     type(element, 'customDomain', 'store.example.com');
     settle(fixture);
+    fixture.detectChanges();
     tick(600);
     settle(fixture);
 

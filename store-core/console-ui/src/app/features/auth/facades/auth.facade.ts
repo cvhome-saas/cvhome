@@ -22,18 +22,23 @@ import {ConsoleAuthApi} from '../services/auth.api.service';
  */
 export const SIGN_UP_REDIRECT_PATH = '/sign-in';
 
+/**
+ * Root-provided on purpose: sign-in and sign-up are separate routes sharing this one facade, and it
+ * holds no resource — nothing fetches on injection, so the page-provided rule's failure mode
+ * (an eager load paid by whoever injects) cannot happen here.
+ */
 @Injectable({providedIn: 'root'})
 export class AuthFacade {
   private readonly api = inject(ConsoleAuthApi);
   private readonly transloco = inject(TranslocoService);
   private readonly apiErrors = inject(ApiErrorService);
-  private readonly toasts = inject(ToastService);
+  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly passwordVisible = signal(false);
   /** True only while the request is in flight, so the button can say so and cannot be pressed twice. */
-  readonly submitting = signal(false);
+  readonly busy = signal(false);
   readonly submitted = signal(false);
 
   /**
@@ -74,20 +79,20 @@ export class AuthFacade {
    * duplicate email with a field error, and a toast saying "conflict" would leave the seller guessing which field.
    */
   createAccount(request: CreateOrgRequest, form: AbstractControl): void {
-    if (this.submitting()) {
+    if (this.busy()) {
       return;
     }
-    this.submitting.set(true);
+    this.busy.set(true);
 
     this.api.createAccount(request).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.submitting.set(false);
+        this.busy.set(false);
         this.submitted.set(true);
-        this.toasts.success(this.transloco.translate('auth.signUp.created'));
+        this.toast.success(this.transloco.translate('auth.signUp.created'));
         this.router.navigateByUrl(SIGN_UP_REDIRECT_PATH);
       },
       error: (error: unknown) => {
-        this.submitting.set(false);
+        this.busy.set(false);
         if (!this.bindTakenEmail(error, form)) {
           this.apiErrors.applyToForm(error, form);
         }

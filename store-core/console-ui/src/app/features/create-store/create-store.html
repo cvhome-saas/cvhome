@@ -265,10 +265,10 @@
           <button
             type="button"
             class="primary-action provision-btn"
-            [disabled]="facade.form.invalid || facade.form.pending || facade.submitting()"
+            [disabled]="facade.form.invalid || facade.form.pending || facade.busy()"
             (click)="submit()"
           >
-            <app-icon name="server" />{{ facade.submitting() ? t('createStore.summaryPanel.provisioning') : t('createStore.summaryPanel.provision') }}
+            <app-icon name="server" />{{ facade.busy() ? t('createStore.summaryPanel.provisioning') : t('createStore.summaryPanel.provision') }}
           </button>
           <p class="billing-note">{{ t('createStore.summaryPanel.billingNote') }}</p>
           </div>

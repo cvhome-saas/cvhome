@@ -202,8 +202,8 @@
                             [ariaLabel]="t('orderDetails.newStatus')"
                           />
                         </span>
-                        <button class="primary-action" type="button" [disabled]="facade.submitting()" (click)="submitStatus()">
-                          {{ facade.submitting() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
+                        <button class="primary-action" type="button" [disabled]="facade.busy()" (click)="submitStatus()">
+                          {{ facade.busy() ? t('orderDetails.recording') : t('orderDetails.recordStatus') }}
                         </button>
                       </div>
                     </div>

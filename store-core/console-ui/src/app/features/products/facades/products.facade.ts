@@ -49,7 +49,7 @@ interface PendingDelete {
  * offers `available`, which is a real boolean on the product, so that is what the strip filters on.
  * See lessons.md.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class ProductsFacade {
   private readonly api = inject(ProductsApi);
   private readonly apiErrors = inject(ApiErrorService);
@@ -116,7 +116,7 @@ export class ProductsFacade {
   readonly isLoading = this.snapshot.isLoading;
   readonly error = computed(() => this.snapshot.error() as Error | undefined);
   readonly isEmpty = computed(() => this.loaded() === undefined);
-  readonly saving = signal(false);
+  readonly busy = signal(false);
 
   readonly page = computed<PageT<ProductRow>>(() => this.loaded()?.page ?? EMPTY_PAGE);
   readonly products = computed<readonly ProductRow[]>(() => this.page().content);
@@ -218,16 +218,16 @@ export class ProductsFacade {
     if (!query) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.applyInlineEdit(edit, query).subscribe({
       next: (snapshot) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.editingId.set(null);
         this.loaded.set(snapshot);
         this.toast.success(this.transloco.translate('products.saved.row'));
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });
@@ -263,15 +263,15 @@ export class ProductsFacade {
     if (!pending || !query) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.delete(pending.id, query).subscribe({
       next: (snapshot) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.loaded.set(snapshot);
         this.toast.success(this.transloco.translate('products.saved.deleted', {name: pending.name}));
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });

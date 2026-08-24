@@ -194,10 +194,10 @@
           </a>
         </div>
         <div class="drawer-fields">
-          <label class="field">
+          <div class="field">
             <span class="field-label">{{ t('content.media.titleField') }}</span>
-            <app-text-field [value]="draftTitle()" (valueChange)="draftTitle.set($event)" [disabled]="!canManage()" [maxLength]="200" />
-          </label>
+            <app-text-field [value]="draftTitle()" (valueChange)="draftTitle.set($event)" [disabled]="!canManage()" [maxLength]="200" [ariaLabel]="t('content.media.titleField')" />
+          </div>
           <div class="field">
             <span class="field-label">{{ t('content.media.altText') }}</span>
             <div class="alt-row">
@@ -209,10 +209,10 @@
             <span class="field-label">{{ t('content.media.tags') }}</span>
             <app-tag-input [tags]="draftTags()" (tagsChange)="draftTags.set($event)" [disabled]="!canManage()" [label]="t('content.media.tags')" />
           </div>
-          <label class="field">
+          <div class="field">
             <span class="field-label">{{ t('content.media.folder') }}</span>
             <app-select [options]="folderOptions()" [value]="draftFolder()" (valueChange)="draftFolder.set($event)" [disabled]="!canManage()" [ariaLabel]="t('content.media.folder')" />
-          </label>
+          </div>
           @if (asset.usage?.length) {
             <div class="field">
               <span class="field-label">{{ t('content.media.usedIn') }}</span>

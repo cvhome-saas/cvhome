@@ -56,7 +56,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
   readonly id = signal<number | null>(null);
   readonly item = signal<R | null>(null);
   readonly loading = signal(false);
-  readonly saving = signal(false);
+  readonly busy = signal(false);
   readonly loadError = signal<Error | null>(null);
 
   common!: CommonForm;
@@ -256,17 +256,17 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
    * to its own route so a reload finds it. `then` runs after a successful save with the id.
    */
   save(then?: (id: number) => void): void {
-    if (this.saving() || this.revealInvalid()) {
+    if (this.busy() || this.revealInvalid()) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     const body = this.body();
     const id = this.id();
     const request =
       id === null ? this.api.create(this.type, body) : this.api.update(this.type, id, body);
     request.subscribe({
       next: (saved) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.cache.invalidate();
         this.toast.success(this.transloco.translate('content.editor.saved'));
         if (id === null) {
@@ -277,7 +277,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
         then?.(saved.id);
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         if (failure instanceof ApiError && failure.code === 'CONTENT.VERSION.CONFLICT') {
           this.toast.warning(this.transloco.translate('content.editor.versionConflict'));
           this.reload();
@@ -319,10 +319,10 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
       return;
     }
     const run = (id: number) => {
-      this.saving.set(true);
+      this.busy.set(true);
       this.api.transition(this.type, id, action, publishAt ? {publishAt} : null).subscribe({
         next: (saved) => {
-          this.saving.set(false);
+          this.busy.set(false);
           this.cache.invalidate();
           this.toast.success(
             this.transloco.translate(`content.toast.${action}`, {
@@ -333,7 +333,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
           this.load(id);
         },
         error: (failure: unknown) => {
-          this.saving.set(false);
+          this.busy.set(false);
           this.apiErrors.notify(failure);
         },
       });
@@ -350,10 +350,10 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
     if (id === null) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.delete(this.type, id, true).subscribe({
       next: () => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.cache.invalidate();
         this.toast.success(
           this.transloco.translate('content.toast.deleted', {title: this.title()}),
@@ -361,7 +361,7 @@ export class ContentEditorFacade<P extends PersistableContent, R extends P & Rea
         this.router.navigate(['/content', this.type]);
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });

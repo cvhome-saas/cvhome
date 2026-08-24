@@ -51,6 +51,7 @@ import {CatalogueFacade} from '../../facades/catalogue.facade';
    * interaction in two places, and they had already drifted apart once.
    */
   styleUrls: [
+    '../../../../shared/styles/field.css',
     '../editor-card.css',
     '../../../../shared/styles/product-picker.css',
     './group-tab.css',

@@ -100,7 +100,7 @@ export class ContentListFacade {
   readonly isLoading = this.resource.isLoading;
   readonly error = computed(() => this.resource.error() as Error | undefined);
   readonly isEmpty = computed(() => this.loaded() === undefined);
-  readonly saving = signal(false);
+  readonly busy = signal(false);
 
   readonly page = computed<ContentPage>(() => this.loaded() ?? (EMPTY_PAGE as ContentPage));
   readonly rows = computed<readonly ContentRow[]>(() => this.page().content);
@@ -165,10 +165,10 @@ export class ContentListFacade {
   }
 
   transition(row: ContentRow, action: TransitionAction): void {
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.transition(this.type(), row.id, action).subscribe({
       next: (saved) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.cache.invalidate();
         this.toast.success(
           this.transloco.translate(`content.toast.${action}`, {
@@ -178,7 +178,7 @@ export class ContentListFacade {
         );
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });
@@ -223,10 +223,10 @@ export class ContentListFacade {
     if (!ids.length) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.bulk(this.type(), ids, action).subscribe({
       next: (results) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.selected.set(new Set());
         this.cache.invalidate();
         const failed = results.filter((result) => !result.ok);
@@ -244,7 +244,7 @@ export class ContentListFacade {
         }
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });
@@ -268,10 +268,10 @@ export class ContentListFacade {
     if (!pending) {
       return;
     }
-    this.saving.set(true);
+    this.busy.set(true);
     this.api.delete(this.type(), pending.id, true).subscribe({
       next: () => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.selected.update((current) => {
           const next = new Set(current);
           next.delete(pending.id);
@@ -283,7 +283,7 @@ export class ContentListFacade {
         );
       },
       error: (failure: unknown) => {
-        this.saving.set(false);
+        this.busy.set(false);
         this.apiErrors.notify(failure);
       },
     });

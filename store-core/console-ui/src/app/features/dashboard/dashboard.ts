@@ -25,6 +25,7 @@ import {DashboardFacade} from './facades/dashboard.facade';
  * under a loading veil, and every figure comes back from the response.
  */
 @Component({
+  providers: [DashboardFacade],
   selector: 'app-dashboard',
   imports: [
     LoadError,

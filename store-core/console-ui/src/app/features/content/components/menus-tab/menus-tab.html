@@ -3,7 +3,7 @@
     <app-load-error [message]="failure.message" (retry)="facade.retry()" />
   }
 
-  <app-busy-overlay [busy]="facade.isLoading() || facade.saving()" [label]="t('content.menus.loading')" reserve="panel">
+  <app-busy-overlay [busy]="facade.isLoading() || facade.busy()" [label]="t('content.menus.loading')" reserve="panel">
     <app-panel [title]="t('content.menus.title')" [subtitle]="t('content.menus.subtitle')">
       <app-locale-switcher
         panelAction
@@ -26,7 +26,7 @@
                 @if (facade.dirty()[handle]) {
                   <button class="ghost-action" type="button" (click)="facade.discard(handle)">{{ t('content.menus.discard') }}</button>
                 }
-                <button class="primary-action" type="button" [disabled]="!facade.dirty()[handle] || facade.saving()" (click)="facade.save(handle)">
+                <button class="primary-action" type="button" [disabled]="!facade.dirty()[handle] || facade.busy()" (click)="facade.save(handle)">
                   <app-icon name="check" />{{ t('content.menus.save') }}
                 </button>
               }

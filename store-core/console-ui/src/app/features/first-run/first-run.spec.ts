@@ -102,6 +102,8 @@ describe('FirstRun', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
     return {fixture, element: fixture.nativeElement as HTMLElement};
   }
 
@@ -191,6 +193,9 @@ describe('FirstRun', () => {
          */
         {provide: SubscriptionService, useValue: {plans: () => of([])}},
         {provide: FirstRunApi, useValue: api},
+        // Page-provided in production; provided here directly because this test is about the
+        // *facade* surviving a reload, and a fresh injector-made instance is exactly a reload.
+        FirstRunFacade,
         ...translocoTesting().providers,
       ],
       });
@@ -211,6 +216,7 @@ describe('FirstRun', () => {
     expect(element.querySelector('.hero')).toBeNull();
 
     api.resolve();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 

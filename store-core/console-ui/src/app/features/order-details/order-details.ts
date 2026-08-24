@@ -50,7 +50,7 @@ export class OrderDetails {
   private readonly localeFormat = inject(TranslocoLocaleService);
   private readonly shell = inject(ConsoleShellFacade);
   private readonly pdf = inject(PdfExportService);
-  private readonly toasts = inject(ToastService);
+  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
   protected readonly facade = inject(OrderDetailsFacade);
@@ -149,7 +149,7 @@ export class OrderDetails {
         layout: 'document',
       });
     } catch {
-      this.toasts.danger(this.transloco.translate('orderDetails.invoiceFailed'));
+      this.toast.danger(this.transloco.translate('orderDetails.invoiceFailed'));
     } finally {
       this.exporting.set(false);
     }
@@ -175,7 +175,7 @@ export class OrderDetails {
    * send. See lessons.md, "Orders — no invoice service".
    */
   protected emailInvoice(): void {
-    this.toasts.info(this.transloco.translate('orderDetails.emailNotAvailable'));
+    this.toast.info(this.transloco.translate('orderDetails.emailNotAvailable'));
   }
 
   /**
@@ -193,7 +193,7 @@ export class OrderDetails {
   protected viewProfile(): void {
     const email = this.facade.customer().email;
     if (!email) {
-      this.toasts.info(this.transloco.translate('orderDetails.profileNeedsEmail'));
+      this.toast.info(this.transloco.translate('orderDetails.profileNeedsEmail'));
       return;
     }
     void this.router.navigate(['/customers'], {queryParams: {q: email}});

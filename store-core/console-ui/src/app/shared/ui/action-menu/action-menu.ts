@@ -54,7 +54,7 @@ export interface MenuAction {
         }
       </button>
       @if (open()) {
-        <div class="popover menu" role="menu" (keydown)="onMenuKey($event)">
+        <div class="popover menu" role="menu" tabindex="-1" (keydown)="onMenuKey($event)">
           @for (action of actions(); track action.key; let i = $index) {
             <button
               class="menu-item"

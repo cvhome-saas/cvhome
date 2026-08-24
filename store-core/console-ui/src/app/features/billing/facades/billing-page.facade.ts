@@ -48,7 +48,7 @@ export class BillingPageFacade {
   readonly plansOpen = signal(false);
 
   /** Set while any subscription-changing call is in flight; every control reads it. */
-  readonly working = signal(false);
+  readonly busy = signal(false);
 
   readonly subscription = this.billing.subscription;
   readonly invoices = this.billing.invoices;
@@ -114,11 +114,11 @@ export class BillingPageFacade {
    */
   choosePlan(planPriceId: string): void {
     const store = this.billing.storeId();
-    if (!store || this.working()) {
+    if (!store || this.busy()) {
       return;
     }
     this.plansOpen.set(false);
-    this.working.set(true);
+    this.busy.set(true);
 
     if (this.needsCheckout()) {
       this.api
@@ -126,7 +126,7 @@ export class BillingPageFacade {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (session) => {
-            this.working.set(false);
+            this.busy.set(false);
             // A full navigation, not the router: this URL belongs to the payment provider.
             window.location.assign(session.url);
           },
@@ -140,7 +140,7 @@ export class BillingPageFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (subscription) => {
-          this.working.set(false);
+          this.busy.set(false);
           this.billing.refresh();
           // A downgrade does not take effect now, and saying "plan changed" would be untrue.
           this.toast.success(
@@ -174,15 +174,15 @@ export class BillingPageFacade {
     successKey: string,
   ): void {
     const store = this.billing.storeId();
-    if (!store || this.working()) {
+    if (!store || this.busy()) {
       return;
     }
-    this.working.set(true);
+    this.busy.set(true);
     call(store)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.working.set(false);
+          this.busy.set(false);
           this.billing.refresh();
           this.toast.success(this.transloco.translate(successKey));
         },
@@ -195,7 +195,7 @@ export class BillingPageFacade {
    * bound. `ApiErrorService` already translates a known code; an unknown one shows the server's detail.
    */
   private fail(error: unknown): void {
-    this.working.set(false);
+    this.busy.set(false);
     this.apiErrors.notify(error);
   }
 

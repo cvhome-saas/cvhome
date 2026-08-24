@@ -5,8 +5,8 @@
     [status]="facade.status()"
     [isNew]="facade.isNew()"
     [loading]="facade.loading()"
-    [saving]="facade.saving()"
-    [canSave]="facade.dirty() && !facade.saving()"
+    [saving]="facade.busy()"
+    [canSave]="facade.dirty() && !facade.busy()"
     [canManage]="canManage()"
     [loadError]="facade.loadError()"
     [deleteOpen]="deleteOpen()"
@@ -144,7 +144,7 @@
           <ul class="version-list">
             @for (version of versions(); track version.version) {
               <li>
-                <strong>v{{ version.version }}</strong>
+                <strong>{{ t('content.policy.versionBadge', {version: version.version}) }}</strong>
                 <span class="version-note" dir="auto">{{ version.note || '—' }}</span>
                 <span class="version-date">{{ versionDate(version) }}</span>
                 <app-badge [tone]="versionTone(version)" shape="square">{{
@@ -165,7 +165,7 @@
     <ng-container sidebar>
       <app-panel [title]="t('content.policy.checkoutPreview')" padded>
         <div class="checkout-preview">
-          <app-badge tone="slate" shape="square">v{{ liveVersion() || '—' }}</app-badge>
+          <app-badge tone="slate" shape="square">{{ t('content.policy.versionBadge', {version: liveVersion() || '—'}) }}</app-badge>
           <strong dir="auto">{{
             activeTranslation()?.controls?.title?.value ||
               typeLabel(extra.controls.policyType.value)

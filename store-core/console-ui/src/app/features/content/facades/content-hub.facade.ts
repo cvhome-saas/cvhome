@@ -49,6 +49,10 @@ export interface StoreLocales {
 /**
  * What the Content management hub needs once: the summary for the KPI strip and the rail counts, the
  * store's languages for everything below, and which tab is open.
+ *
+ * Root-provided on purpose: the editors are sibling routes of the hub, not children rendered in its
+ * outlet, so a page-provided instance could not reach them, and providing it on the `content` route
+ * branch would statically import this facade — and the api tier behind it — into the main bundle.
  */
 @Injectable({providedIn: 'root'})
 export class ContentHubFacade {

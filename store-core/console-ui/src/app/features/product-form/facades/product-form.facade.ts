@@ -30,10 +30,10 @@ import {ProductDraftFormService} from '../services/product-draft-form.service';
 /**
  * The product wizard's data, its form and its writes.
  *
- * **Not `providedIn: 'root'`.** Unlike every other facade in this console, this one is provided by
- * the page component, so leaving `/products/new` and coming back gives a genuinely new form rather
- * than the last product's half-typed one. A root singleton here would carry an abandoned draft
- * across products, which is the kind of bug that only shows up as a support ticket.
+ * **Not `providedIn: 'root'`.** Provided by the page component — the console's convention — and it
+ * matters more here than anywhere: leaving `/products/new` and coming back gives a genuinely new
+ * form rather than the last product's half-typed one. A root singleton here would carry an
+ * abandoned draft across products, which is the kind of bug that only shows up as a support ticket.
  */
 @Injectable()
 export class ProductFormFacade {

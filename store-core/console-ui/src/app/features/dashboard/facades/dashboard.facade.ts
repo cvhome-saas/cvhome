@@ -38,7 +38,7 @@ function defaultRange(): DateRangeValue {
  * every widget re-renders from the response. The console chrome belongs to
  * `ConsoleShellFacade` and is none of this page's business.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class DashboardFacade {
   private readonly api = inject(DashboardApi);
   private readonly transloco = inject(TranslocoService);

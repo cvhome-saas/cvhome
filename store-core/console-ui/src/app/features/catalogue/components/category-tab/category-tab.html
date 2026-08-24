@@ -26,7 +26,7 @@
           [selectedId]="facade.selectedCategoryId()"
           [collapsed]="facade.collapsed()"
           [label]="t('catalogue.categories.treeLabel')"
-          [busy]="facade.saving()"
+          [busy]="facade.busy()"
           (selectedIdChange)="onSelect($event)"
           (toggleCollapsed)="facade.toggleCollapsed($event)"
           (visibilityToggled)="facade.toggleCategoryVisible($event)"
@@ -73,7 +73,7 @@
               <button
                 class="danger-action"
                 type="button"
-                [disabled]="facade.saving()"
+                [disabled]="facade.busy()"
                 (click)="facade.askDelete('categories', category.id, category.name)"
               >
                 <app-icon name="trash" />
@@ -164,8 +164,8 @@
             <button
               class="primary-action"
               type="submit"
-              [disabled]="facade.saving()"
-              [attr.aria-busy]="facade.saving()"
+              [disabled]="facade.busy()"
+              [attr.aria-busy]="facade.busy()"
             >
               {{ creating() ? t('catalogue.categories.create') : t('catalogue.categories.save') }}
             </button>

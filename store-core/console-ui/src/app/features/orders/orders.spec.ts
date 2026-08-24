@@ -109,6 +109,8 @@ describe('Orders', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
     return fixture.nativeElement as HTMLElement;
   }
 
@@ -145,6 +147,7 @@ describe('Orders', () => {
     search.value = 'nobody@example.com';
     search.dispatchEvent(new Event('input'));
     // The box debounces, so a filter does not reach the server per keystroke.
+    fixture.detectChanges();
     tick(300);
     fixture.detectChanges();
 
@@ -153,6 +156,7 @@ describe('Orders', () => {
     expect(clear).not.toBeNull();
 
     clear.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
     expect(search.value).toBe('');
@@ -177,6 +181,7 @@ describe('Orders', () => {
     ) as HTMLButtonElement;
 
     delivered.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -191,7 +196,10 @@ describe('Orders', () => {
     search.value = 'Tobias';
     search.dispatchEvent(new Event('input'));
     // The box debounces, so a filter does not reach the server per keystroke.
+    fixture.detectChanges();
     tick(300);
+    fixture.detectChanges();
+    tick();
     fixture.detectChanges();
 
     expect(api.requests[api.requests.length - 1].search).toBe('Tobias');
@@ -204,6 +212,7 @@ describe('Orders', () => {
 
     const steps = element.querySelectorAll('app-pagination .page-step');
     (steps[steps.length - 1] as HTMLButtonElement).click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
     expect(api.requests[api.requests.length - 1].page.page).toBe(1);
@@ -212,6 +221,7 @@ describe('Orders', () => {
       (b) => b.textContent!.trim() === 'Cancelled',
     ) as HTMLButtonElement;
     cancelled.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -224,6 +234,7 @@ describe('Orders', () => {
     expect(api.requests.length).toBe(1);
 
     TestBed.inject(ConsoleShellFacade).selectStore(CONSOLE_STORES_FAKE[1].id);
+    fixture.detectChanges();
     tick();
 
     // Orders belong to one store; the table must not outlive the store it was read for.
@@ -254,6 +265,7 @@ describe('Orders', () => {
     expect(element.querySelector('app-busy-overlay .busy-veil')).not.toBeNull();
 
     api.resolve();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
     expect(references(element)).toEqual(['#14']);
@@ -275,6 +287,7 @@ describe('Orders', () => {
 
     api.failure = false;
     (element.querySelector('app-load-error button') as HTMLButtonElement).click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 

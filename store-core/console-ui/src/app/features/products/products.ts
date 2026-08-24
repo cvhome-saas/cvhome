@@ -58,6 +58,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
  * pressing it turns three cells into inputs.
  */
 @Component({
+  providers: [ProductsFacade],
   selector: 'app-products',
   imports: [
     SearchBox,

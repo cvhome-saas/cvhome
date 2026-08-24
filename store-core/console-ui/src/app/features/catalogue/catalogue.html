@@ -12,7 +12,7 @@
 
   <app-busy-overlay
     reserve="panel"
-    [busy]="isLoading() || facade.saving()"
+    [busy]="isLoading() || facade.busy()"
     [label]="t('catalogue.loading')"
   >
     @if (!isEmpty()) {

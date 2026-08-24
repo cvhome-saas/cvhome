@@ -81,6 +81,8 @@ describe('Dashboard', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
     return {fixture, element: fixture.nativeElement as HTMLElement};
   }
 
@@ -131,6 +133,7 @@ describe('Dashboard', () => {
     expect(element.querySelector('app-kpi-grid')).toBeNull();
 
     api.resolve(snapshot(312));
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -140,11 +143,12 @@ describe('Dashboard', () => {
   }));
 
   it('refetches when the open store changes, so figures cannot outlive their store', fakeAsync(() => {
-    load();
+    const {fixture} = load();
     const shell = TestBed.inject(ConsoleShellFacade);
     expect(api.requests.length).toBe(1);
 
     shell.selectStore(CONSOLE_STORES_FAKE[1].id);
+    fixture.detectChanges();
     tick();
 
     // The store id never reaches the request body — the request context stamps it — but the page is
@@ -189,6 +193,7 @@ describe('Dashboard', () => {
     expect(element.querySelector('.kpi-value')?.textContent?.trim()).toBe('312');
 
     api.resolve(snapshot(450));
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -209,6 +214,8 @@ describe('Dashboard', () => {
   it('surfaces a failed request with a retry that refetches', fakeAsync(() => {
     api.failure = new Error('Unable to load dashboard metrics.');
     const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+    tick();
     fixture.detectChanges();
     tick();
     fixture.detectChanges();

@@ -172,6 +172,8 @@ describe('Catalogue', () => {
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
     return fixture.nativeElement as HTMLElement;
   }
 
@@ -219,6 +221,7 @@ describe('Catalogue', () => {
     const rows = [...element.querySelectorAll('.tree-row')];
     const nest = rows[2].querySelectorAll('.row-moves .icon-action')[0] as HTMLButtonElement;
     nest.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -248,6 +251,7 @@ describe('Catalogue', () => {
     const rows = [...element.querySelectorAll('.tree-row')];
     const out = rows[1].querySelectorAll('.row-moves .icon-action')[1] as HTMLButtonElement;
     out.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -259,6 +263,7 @@ describe('Catalogue', () => {
 
     const eye = element.querySelectorAll('.tree-row .icon-action')[0] as HTMLButtonElement;
     eye.click();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
@@ -282,6 +287,7 @@ describe('Catalogue', () => {
     expect(element.querySelector('app-confirm-dialog')?.textContent).toContain('Delete Electronics?');
 
     fixture.componentInstance['facade'].confirmDelete();
+    fixture.detectChanges();
     tick();
     fixture.detectChanges();
 

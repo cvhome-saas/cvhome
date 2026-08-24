@@ -20,7 +20,7 @@ import {MarketingApi} from '../services/marketing.api.service';
 /** The five slots of a review card's rating row, so the template can draw filled and empty stars. */
 export const RATING_SLOTS: readonly number[] = [1, 2, 3, 4, 5];
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class MarketingFacade {
   private readonly api = inject(MarketingApi);
   private readonly transloco = inject(TranslocoService);

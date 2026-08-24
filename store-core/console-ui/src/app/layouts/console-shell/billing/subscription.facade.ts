@@ -1,4 +1,4 @@
-import {Injectable, computed, inject, signal} from '@angular/core';
+import {Injectable, computed, inject} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TranslocoService} from '@jsverse/transloco';
 import {TranslocoLocaleService} from '@jsverse/transloco-locale';
@@ -184,9 +184,6 @@ export class SubscriptionFacade {
   readonly invoicesLoading = this.invoiceResource.isLoading;
 
   /* ---- Actions -------------------------------------------------------------------------------- */
-
-  /** Set while a subscription-changing call is in flight, so the page can disable its controls. */
-  readonly working = signal(false);
 
   /** Re-reads the subscription and its invoices. Called after anything that changes either. */
   refresh(): void {

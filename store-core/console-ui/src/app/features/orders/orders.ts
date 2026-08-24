@@ -47,6 +47,7 @@ const COLUMN_KEYS: readonly {key: string; labelKey: string; width: string; align
  * veil, keeping the previous rows visible underneath.
  */
 @Component({
+  providers: [OrdersFacade],
   selector: 'app-orders',
   imports: [
     SearchBox,

@@ -68,7 +68,7 @@
               <button
                 class="danger-action"
                 type="button"
-                [disabled]="facade.saving()"
+                [disabled]="facade.busy()"
                 (click)="facade.askDelete('types', type.id, type.name)"
               >
                 <app-icon name="trash" />
@@ -146,8 +146,8 @@
             <button
               class="primary-action"
               type="submit"
-              [disabled]="facade.saving()"
-              [attr.aria-busy]="facade.saving()"
+              [disabled]="facade.busy()"
+              [attr.aria-busy]="facade.busy()"
             >
               {{ creating() ? t('catalogue.types.create') : t('catalogue.types.save') }}
             </button>
