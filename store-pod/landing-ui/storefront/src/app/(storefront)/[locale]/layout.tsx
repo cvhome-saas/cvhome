@@ -37,7 +37,7 @@ export default async function StorefrontLayout({children, params}: { children: R
     }
 
     const data = await loadLayoutData();
-    const merchant = resolveMerchantTokens(theme, storeHeaders, store);
+    const merchant = await resolveMerchantTokens(theme, storeHeaders, store);
     const dir = getDirection(locale);
     const ctx = {store, storeContext, locale, dir, layout: theme.layout.config};
 

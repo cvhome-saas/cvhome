@@ -63,7 +63,30 @@ npm test --workspace=libs/theme     # colour bridge tests
 npm run new-theme <id>
 ```
 `./extra/scripts/run-lcl.sh` starts it as before (prep builds the libs, then `npm run dev`). Docker: the
-image copies `storefront/.next/standalone` (build on host/CI first — see `docker.sh`).
+image copies `storefront/.next/standalone` (build on host/CI first — see `docker.sh`); the container starts via
+`storefront/start.mjs` (not the generated `server.js`).
+
+### Static assets via CDN (optional)
+
+Every production build bakes a sentinel `assetPrefix` (`https://storefront-static.invalid`, `next.config.ts`);
+`storefront/start.mjs` substitutes it at container start, so one env-agnostic image serves any environment.
+With no env set (or sync ≠ `true`) the prefix becomes `''` and Next serves `/_next/static` itself — today's
+behavior. With:
+
+| env | meaning |
+|---|---|
+| `STATIC_ASSETS_SYNC_ENABLED=true` | on start, upload `.next/static` + `public/` to S3 and serve assets from the CDN |
+| `STATIC_ASSETS_S3_BUCKET` | target bucket |
+| `STATIC_ASSETS_S3_PREFIX` | key prefix (e.g. `storefront`) |
+| `STATIC_ASSETS_BASE_URL` | CDN URL in front of bucket/prefix (e.g. `https://dxxx.cloudfront.net`) |
+| `AWS_REGION` | region; credentials via the default chain (task role, env keys) |
+| `STATIC_ASSETS_S3_ENDPOINT`, `STATIC_ASSETS_S3_FORCE_PATH_STYLE=true` | local MinIO QA only |
+
+the upload is skipped when the per-build marker `${PREFIX}/_builds/${BUILD_ID}` already exists in the bucket;
+old builds are never deleted (rolling deploys). Any sync failure logs and falls back to origin serving.
+Implementation: `storefront/scripts/static-assets/` (constants, apply-prefix, sync-s3) + `storefront/start.mjs`;
+`@aws-sdk/client-s3` reaches the image via `outputFileTracingIncludes`. Never run `storefront/server.js`
+directly against a fresh build — it would serve the un-substituted sentinel.
 
 **Local dev URLs.** The storefront needs the store headers spg injects, so the supported dev URL is through spg:
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `run-lcl.sh`). Hitting `http://localhost:8110/en`
