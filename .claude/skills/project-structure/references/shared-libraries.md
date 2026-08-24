@@ -99,3 +99,17 @@ counterpart and the whole `lb://` resolution story: `service-discovery.md`.
 
 **Rule of thumb:** cross-cutting infrastructure (auth, secrets, discovery, primitives) → root `store-commons`.
 Pod business domain reused across pods → `store-pod/commons/store-commons`.
+
+## `test-support` — shared test infrastructure
+
+`store-commons/test-support` (`com.asrevo.cvhome.testsupport`) is the one library that never reaches production: it is
+on the `integrationTest` classpath of every service (and on `testImplementation` where a service runs ArchUnit), and an
+architecture rule fails the build if any main class depends on it.
+
+It holds the Testcontainers configurations (`PostgresTestConfiguration`, `MinioTestConfiguration`), the test JWT
+decoder + signer (`ServletTestSecurityConfiguration`, `ReactiveTestSecurityConfiguration`, `TestJwtSigner`, `Tokens`),
+the non-throwing HTTP client (`ApiClient`), `MutableClock`, the `@ServiceIntegrationTest` /
+`@StorageIntegrationTest` / `@DatabaseIntegrationTest` meta-annotations, and `CvhomeArchitectureRules`.
+
+Before this module these were copy-pasted per service, and the JWT signer shipped inside `autoconfigure`'s production
+jar behind the `signer` profile — it no longer exists there. Details: `references/testing.md`.

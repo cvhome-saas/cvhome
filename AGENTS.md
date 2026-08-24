@@ -47,15 +47,18 @@ Gradle wrapper (9.2.0) drives Java *and* the npm apps. All commands from the rep
 ```bash
 ./gradlew build -x test -x check                 # full build, what CI's build job runs
 ./gradlew :store-pod:catalog:catalog-service:build
-./gradlew test                                    # all tests
-./gradlew :store-pod:catalog:catalog-service:test --tests '*ProductApiTest*'   # single test
-./gradlew unitTest            # only @Tag("unit-test")
-./gradlew integrationTest     # only @Tag("integration-test")
-./gradlew checkstyleMain checkstyleTest           # CI quality job; maxWarnings = 0
+./gradlew test                # src/test: unit + architecture tests, no Docker
+./gradlew integrationTest     # src/integrationTest: Testcontainers, Docker required
+./gradlew check               # both + checkstyle + verifyTestNaming + coverage gate
+./gradlew perServiceCoverage  # build/reports/coverage/<service>/ — a report per micro service
+./gradlew :store-pod:catalog:catalog-service:test --tests '*PagesTest*'   # single test
+./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest   # CI quality job; maxWarnings = 0
 ./gradlew :store-core:console-ui:bootBuildImage   # docker image (Spring apps and -ui apps alike)
 ```
 
-Toolchain, the checkstyle rule set and the test-tag split: `references/build-system.md` in the skill. What
+Toolchain and the checkstyle rule set: `references/build-system.md` in the skill. Test types, the naming standard
+(`*Test` in `src/test`, `*IntegrationTest` in `src/integrationTest`), the shared `store-commons/test-support` library
+and coverage: `references/testing.md`. What
 binds every change:
 
 - **Checkstyle failures block CI** — warnings = errors, and a `TODO` comment fails the build.
@@ -192,9 +195,11 @@ the change does not touch, and treat a section you keep as mandatory. The `proje
 
 **Verification gates — all mandatory before saying done:**
 
-- [ ] `./gradlew checkstyleMain checkstyleTest` clean (warnings = errors)
+- [ ] `./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest` clean (warnings = errors)
 - [ ] `./gradlew build -x test -x check` clean
-- [ ] `./gradlew test` (or the touched module's `:test`) clean, Docker running for Testcontainers
+- [ ] `./gradlew test` (or the touched module's `:test`) clean — no Docker needed
+- [ ] `./gradlew integrationTest` clean with Docker running, if the change touches wiring, SQL, HTTP or security
+- [ ] New test in the module that owns the code (`-core` logic → `-core/src/test`), named `*Test` / `*IntegrationTest`
 - [ ] Touched frontend builds: `npm run build` in that `-ui` module
 - [ ] User-visible change exercised against a running stack, not just unit-tested
 

@@ -1,0 +1,59 @@
+/*
+ * Root-only plugin: coverage reporting across modules.
+ *
+ *   ./gradlew coverageReport        # one whole-monorepo report: build/reports/jacoco/aggregate/
+ *   ./gradlew perServiceCoverage    # one report per micro service: build/reports/coverage/<service>/
+ *
+ * Both read the .exec files the modules' own test / integrationTest tasks produce, so they never resolve another
+ * module's dependencies — a service's BOM-managed versions are only visible inside that service.
+ */
+
+plugins {
+    id 'base'
+    id 'jacoco'
+}
+
+// The root is evaluated first, but the plugin lists below need every module's plugins applied already.
+subprojects.each { evaluationDependsOn(it.path) }
+
+def javaProjects = subprojects.findAll { it.plugins.hasPlugin('com.asrevo.java-common-conventions') }
+def serviceProjects = subprojects.findAll { it.plugins.hasPlugin('com.asrevo.java-application-conventions') }
+
+def coverageTasks = { Project p ->
+    def names = ['test']
+    if (p.plugins.hasPlugin('com.asrevo.java-integration-test-conventions')) {
+        names << 'integrationTest'
+    }
+    names.collect { p.tasks.named(it) }
+}
+
+tasks.register('coverageReport', JacocoReport) {
+    group = 'verification'
+    description = 'Unit + integration coverage of every Java module, in one report.'
+    javaProjects.each { p ->
+        dependsOn coverageTasks(p)
+        sourceDirectories.from p.sourceSets.main.allSource.srcDirs
+        classDirectories.from p.sourceSets.main.output
+    }
+    executionData.from files(javaProjects.collect { fileTree(it.layout.buildDirectory.dir('jacoco')).include('*.exec') })
+    reports {
+        xml.required = true
+        html.required = true
+        xml.outputLocation = layout.buildDirectory.file('reports/jacoco/aggregate/coverage.xml')
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/aggregate/html')
+    }
+}
+
+tasks.register('perServiceCoverage', Copy) {
+    group = 'verification'
+    description = 'Collects each service\'s merged jacoco report under build/reports/coverage/<service>/.'
+    serviceProjects.each { svc ->
+        dependsOn svc.tasks.named('jacocoMergedReport')
+        from(svc.layout.buildDirectory.dir('reports/jacoco/merged/html')) { into svc.name }
+        from(svc.layout.buildDirectory.file('reports/jacoco/merged/jacocoMergedReport.xml')) {
+            into svc.name
+            rename { 'coverage.xml' }
+        }
+    }
+    into layout.buildDirectory.dir('reports/coverage')
+}

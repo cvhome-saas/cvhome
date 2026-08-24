@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.Page;
@@ -56,7 +55,6 @@ import static org.mockito.Mockito.when;
  * row count would report the platform as fifty subscriptions wide forever.
  * </p>
  */
-@Tag("unit-test")
 class PlatformBillingScopingTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");

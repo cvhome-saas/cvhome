@@ -1,0 +1,21 @@
+/*
+ * Shared test infrastructure for src/integrationTest of every service. Consumed only from the integration-test
+ * classpath (java-integration-test-conventions adds it), never from main or src/test.
+ */
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
+    api project(":store-commons:commons")
+    api libs.bundles.test.integration
+    api libs.testcontainers.minio
+    api libs.junit.platform.launcher
+    api libs.archunit.junit5
+
+    compileOnly libs.spring.boot.starter.security.oauth2.resource.server
+    compileOnly libs.spring.webmvc
+    compileOnly libs.spring.webflux
+    compileOnly libs.jackson.databind
+}

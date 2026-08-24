@@ -10,4 +10,7 @@ dependencies {
     compileOnly libs.hibernate.core
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    // The entity under test extends AbstractAggregateRoot, which is compileOnly for main.
+    testImplementation libs.spring.data.jpa
 }

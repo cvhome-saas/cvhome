@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -31,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * refused one. These tests exist so that the next one fails here rather than in a QA pass.
  * </p>
  */
-@Tag("unit-test")
 class CustomPermissionEvaluatorUsersTest {
 
     private static final String TARGET_TYPE = "StoreMerchantId";

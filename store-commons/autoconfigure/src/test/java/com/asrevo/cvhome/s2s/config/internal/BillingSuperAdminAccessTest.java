@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -39,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * on the assumption that they 403. The last two tests are what keeps that assumption true.
  * </p>
  */
-@Tag("unit-test")
 class BillingSuperAdminAccessTest {
 
     private static final String TARGET_TYPE = "StoreMerchantId";

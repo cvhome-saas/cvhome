@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.when;
  * and swallowed errors into an empty result, one registry restart emptied the gateway's whole pod route table and
  * every {@code /spg/**} storefront request 404'd within a refresh period.
  */
-@Tag("unit-test")
 class PodRouteResilienceTest {
 
     private static final String POD_A_ROUTE_ID = "pod-507f1f77";

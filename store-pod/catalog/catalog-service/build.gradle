@@ -30,6 +30,7 @@ bootBuildImage {
 }
 
 dependencies {
+    testImplementation project(':store-commons:test-support')
     implementation libs.spring.cloud.starter.loadbalancer
     implementation libs.spring.boot.starter.web
     implementation libs.spring.boot.starter.validation
@@ -70,15 +71,6 @@ dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
     annotationProcessor libs.lombok.mapstruct.binding
-    testImplementation libs.spring.boot.starter.test
-    testImplementation libs.spring.security.test
-    implementation libs.spring.boot.starter.restclient.test
-    testImplementation libs.spring.boot.testcontainers
-    testImplementation libs.testcontainers.junit.jupiter
-    testImplementation libs.testcontainers.postgresql
-    testImplementation libs.testcontainers.minio
-    testImplementation libs.hamcrest.record
-    testRuntimeOnly libs.junit.platform.launcher
 }
 
 dependencyManagement {

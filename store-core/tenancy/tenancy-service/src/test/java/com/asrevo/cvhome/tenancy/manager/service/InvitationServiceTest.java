@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
@@ -31,7 +30,6 @@ import static org.mockito.Mockito.when;
 /**
  * Invitations, and specifically the properties that make the token safe to hand out.
  */
-@Tag("unit-test")
 class InvitationServiceTest {
 
     private static final ManagerOrgId ORG = new ManagerOrgId("21f023932bc66470c104b76f");

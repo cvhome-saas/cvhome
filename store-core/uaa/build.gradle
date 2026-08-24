@@ -7,7 +7,6 @@ plugins {
 }
 group = 'com.asrevo.cvhome'
 
-
 springBoot {
     buildInfo()
 }
@@ -58,21 +57,15 @@ dependencies {
     implementation libs.spring.boot.starter.opentelemetry
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
-
     annotationProcessor libs.lombok
-    testImplementation libs.spring.boot.starter.test
-    testImplementation libs.spring.boot.starter.actuator.test
-    testImplementation libs.spring.boot.starter.data.jpa.test
-    testImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test
-    testImplementation libs.spring.boot.starter.security.oauth2.resource.server.test
-    testImplementation libs.spring.boot.starter.session.jdbc.test
-    testImplementation libs.spring.boot.starter.thymeleaf.test
-    testImplementation libs.spring.boot.starter.validation.test
-    testImplementation libs.spring.boot.starter.webmvc.test
-    testImplementation libs.spring.boot.testcontainers
-    testImplementation libs.testcontainers.junit.jupiter
-    testImplementation libs.testcontainers.postgresql
-    testRuntimeOnly libs.junit.platform.launcher
+    integrationTestImplementation libs.spring.boot.starter.actuator.test
+    integrationTestImplementation libs.spring.boot.starter.data.jpa.test
+    integrationTestImplementation libs.spring.boot.starter.security.oauth2.authorization.server.test
+    integrationTestImplementation libs.spring.boot.starter.security.oauth2.resource.server.test
+    integrationTestImplementation libs.spring.boot.starter.session.jdbc.test
+    integrationTestImplementation libs.spring.boot.starter.thymeleaf.test
+    integrationTestImplementation libs.spring.boot.starter.validation.test
+    integrationTestImplementation libs.spring.boot.starter.webmvc.test
 }
 
 dependencyManagement {
@@ -80,10 +73,6 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
         mavenBom "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.27.0"
     }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
 
 node {

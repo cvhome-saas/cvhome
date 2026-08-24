@@ -32,7 +32,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run Check with Gradle
-        run: ./gradlew checkstyleMain checkstyleTest
+        run: ./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest
 
       - name: Upload Checkstyle reports
         if: always()

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -39,7 +38,6 @@ import static org.mockito.Mockito.when;
  * the store twice, and a pod that never answered must not be recorded as having refused.
  * </p>
  */
-@Tag("unit-test")
 class StoreProvisioningServiceTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");

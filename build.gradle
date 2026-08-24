@@ -1,0 +1,14 @@
+// Root build: intentionally minimal. Everything about a module lives in its own build.gradle and the
+// convention plugins in build-logic/. This file only aggregates coverage across modules.
+plugins {
+    alias(libs.plugins.jacoco.aggregate.conventions)
+}
+
+// The aggregation resolves every module's runtime classpath, so the root needs the same repositories the
+// convention plugins give the modules.
+repositories {
+    mavenLocal()
+    maven { url = 'https://repo.spring.io/milestone' }
+    mavenCentral()
+    gradlePluginPortal()
+}
