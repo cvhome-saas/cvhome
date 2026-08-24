@@ -23,7 +23,7 @@ A tier may use anything below it and nothing above it. Enforced by `no-restricte
 | `features/` | One folder per route: the page, its facade, its api service, its form service, its components. | Import another feature. |
 | `layouts/` | Chrome every feature sits inside: the console shell, the auth shell, the marketing shell. | Import a feature. |
 | `shared/` | Anything two features need: `ui/` components, `forms/` helpers, `validators/`, `state/`, `i18n/`, `styles/`. | Import `api/`, `layouts/` or `features/`. |
-| `api/` | The HTTP tier, ported from seller-core. One directory per bounded context. | Import any UI tier. |
+| `api/` | The HTTP tier (originally ported from seller-core, retired at tag `seller-ui-final`). One directory per bounded context. | Import any UI tier. |
 | `core/` | Infrastructure: the HTTP client, the error stack, auth, theming, i18n, routing helpers, the export service. | Import `shared/` or above. |
 | `models/` | Wire DTOs and view models. The floor. | Import **anything**. |
 
@@ -66,6 +66,12 @@ collaborator from `@api/` (a cache stamp, the selected store) but not make a req
 A root-provided facade with an `rxResource` starts fetching the moment anything injects it. The
 product form held `ProductsFacade` purely to call `invalidate()` after a save and paid for a page of
 the products list on every visit. Inject the smallest thing that does the job.
+
+Five facades are root-provided anyway, each with a comment saying why: `ConsoleShellFacade` and
+`SubscriptionFacade` are the shell's; `AuthFacade` spans sign-in and sign-up and holds no resource;
+`CreateStoreFacade` owns a provisioning poll that must outlive its page; `ContentHubFacade` is
+shared by the hub and its sibling editor routes, which no page-level injector reaches. A new root
+facade needs a reason of that kind, written down at the declaration.
 
 **Naming, across every facade:**
 
@@ -185,7 +191,8 @@ view), `.secondary-action`, `.ghost-action`, `.danger-action` (the hue in the te
   page that keeps its own box does not get them.
 - `app-page-header` is the first element, fed from the facade's `heading()`.
 - `.page-body` / `.split` (`@shared/styles/field.css`) for the stack and the two-pane layout.
-- One entry animation: `animate.enter="rise"`, with `--rise-from` for the distance. Seven keyframes
+- One entry animation: the shared `rise` keyframe (`styles.css`), applied in the page's stylesheet
+  with `--rise-from` for the distance. Seven keyframes
   said this before, from 8px to 20px.
 - Tab and filter state belongs in the URL, so a filtered list can be linked and survives a reload.
 - A route param is validated *before* it reaches a facade — `positiveIntParam`, `enumParam`

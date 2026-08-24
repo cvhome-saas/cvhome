@@ -1557,7 +1557,7 @@ pass.
 
 ---
 
-## Module 8 — Users & profile
+## Module 8 — Users & profile — **done**
 
 ### Context
 
@@ -2036,3 +2036,12 @@ Planned and built under `.agents/plans/console-ui-content.md`: a new `store-pod/
 (pages, posts, banners, FAQ, media, menus, policies) and the storefront adoption in landing-ui
 (site document, blog, help, policies, banners, sitemap). Phase 7 of that plan — retiring the
 legacy compat API, `store-pod/content-deprecated` and the `Page/Box` types — rides with Module 13.
+
+## Modules 9–11 and 13 — **done**
+
+Shipped without headings of their own in this document: Module 9 (customers), Module 10 (billing,
+as the `/subscription` page), Module 11 (the platform console: dashboard, organizations, pods,
+plans, platform users and billing). Module 13 — retire seller-ui — was planned as
+`.agents/plans/console-ui-retire-seller-ui.md` and landed 2026-08-24: `store-core/seller-ui` is
+deleted (last commit tagged `seller-ui-final`), the gateway apex serves console-ui, and content
+Phase 7 (the legacy compat surface) went with it. The migration this document tracked is complete.
