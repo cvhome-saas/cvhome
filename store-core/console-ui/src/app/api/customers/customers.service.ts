@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/customers/src/lib/services/customer.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -28,8 +27,6 @@ export interface CustomerQuery {
 export const CUSTOMER_API_BASE = '/spg/checkout/api/v1';
 
 /**
- * Ported from seller-ui/projects/seller-core/customers/src/lib/services/customer.service.ts.
- *
  * Customers, as the seller console reads them. **One endpoint, and it is read-only.**
  *
  * TODO(lessons.md): reading one customer by id — no backend endpoint. See lessons.md, "Customers —

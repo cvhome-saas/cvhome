@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
@@ -10,9 +9,6 @@ import type {
 } from '@models/merchant';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts, verified
- * method by method against `merchant-service/api/v1/MerchantStoreApi.java`.
- *
  * The store as the merchant pod owns it — its identity, its marketing images, its social links.
  * Distinct from `@api/tenancy/manager-store.service.ts`, which is tenancy's row about the store
  * (pod placement, provisioning, the store list) and cannot edit any of this.

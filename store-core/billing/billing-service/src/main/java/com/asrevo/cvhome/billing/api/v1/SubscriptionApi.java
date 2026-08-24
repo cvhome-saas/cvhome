@@ -63,7 +63,7 @@ public class SubscriptionApi {
      * The console a paying customer is returned to.
      *
      * <p>
-     * {@code console-ui}, not {@code seller-ui}: the console is the seller-facing app now, and it already serves
+     * {@code console-ui}, not the retired {@code seller-ui}: the console is the seller-facing app, and it serves
      * both outcome routes. While this named the old app, an operator who upgraded from the console was handed back
      * to a different application after paying — the subscription was correct, the landing page was somebody else's.
      * </p>
@@ -71,7 +71,7 @@ public class SubscriptionApi {
      * <p>
      * A constant rather than a property, deliberately. There is exactly one seller console per deployment, and a
      * configurable return URL in a payment flow is a knob whose only wrong setting is an open redirect out of a
-     * checkout. When seller-ui is retired this line is already right.
+     * checkout. seller-ui is retired, and this line was already right.
      * </p>
      */
     private static final String SELLER_CONSOLE = "console-ui";

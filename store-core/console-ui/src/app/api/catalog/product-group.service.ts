@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/products-groups/services/product-groups.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -13,9 +12,7 @@ import type {
 const CATALOG_API_BASE = '/spg/catalog/api/v1';
 
 /**
- * Ported from
- * seller-ui/projects/seller-core/catalog/src/lib/products-groups/services/product-groups.service.ts,
- * verified against `catalog-service/api/v1/product/ProductGroupApi.java`.
+ * Verified against `catalog-service/api/v1/product/ProductGroupApi.java`.
  *
  * Product groups: a named, code-addressed membership set. **Not tags** — there is no free-form
  * labelling anywhere on a product; see lessons.md, "Catalogue — no product tags and no collections".

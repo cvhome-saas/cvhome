@@ -11,7 +11,7 @@ never share an identity realm.
 | Reached via | `store-core-gateway` (:8000) | `spg` at `/cua` |
 | Front end | Thymeleaf login + embedded Angular admin SPA (`uaa-fe`) | Thymeleaf login/registration/social-login pages |
 | Self-registration | No — admin-provisioned (`AdminUserController`) | **Yes** — `RegistrationController`, social login |
-| Serves tokens to | seller-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
+| Serves tokens to | console-ui, tenancy, gateway, all `-service` s2s clients | landing-ui storefront sessions |
 | Deployment | One shared instance for the whole SaaS | One per pod |
 
 Both use `spring-boot-starter-oauth2-authorization-server` with JDBC sessions, so they look nearly identical in
@@ -96,7 +96,7 @@ manage users and clients programmatically.
 
 **Seller/admin (store-core):** the browser hits `store-core-gateway`, which is an OAuth2 **client**. It runs the
 authorization-code flow against `uaa`, holds the session, and forwards authenticated requests onward. That is
-why `seller-ui`'s `environment.ts` sets `LOGIN_URL: "/oauth2/authorization/uaa"` and `apiUrl: ''` — the Angular
+why `console-ui`'s `environment.ts` sets `loginUrl: '/oauth2/authorization/uaa'` and `apiUrl: ''` — the Angular
 app holds no tokens and makes same-origin relative calls. Relevant gateway classes: `SecurityConfig`,
 `CapturingServerOAuth2AuthorizationRequestResolver`, `RedirectingServerAuthenticationSuccessHandler`,
 `AuthController`, `LogoutController`, plus `security/UaaLogoutSuccessHandler` and

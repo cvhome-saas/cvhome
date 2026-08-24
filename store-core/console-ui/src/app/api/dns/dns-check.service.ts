@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/dns-check.service.ts. */
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
@@ -27,8 +26,6 @@ interface DohResponse {
 export type CnameOutcome = 'points-here' | 'points-elsewhere' | 'no-record' | 'no-such-domain';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/dns-check.service.ts.
- *
  * Whether a custom domain's CNAME points at this store's pod.
  *
  * **This is not a platform check.** It is a query against Google's public DNS-over-HTTPS resolver, made

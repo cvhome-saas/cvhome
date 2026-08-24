@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/{src/lib/store/store.service.ts, stores/src/lib/services/store.service.ts}. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
@@ -8,8 +7,6 @@ import type {MerchantStore} from '@models/merchant';
 import type {CreateStoreRequest, EntityExists, ManagerStore, PodStoreCount} from '@models/tenancy';
 
 /**
- * Ported from seller-ui/projects/seller-core/{src/lib/store/store.service.ts, stores/src/lib/services/store.service.ts}.
- *
  * The stores an operator can reach, and how one is made.
  *
  * The two seller-core services this merges were split for historical reasons — `ManagerStoreService` held

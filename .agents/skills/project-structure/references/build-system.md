@@ -61,7 +61,7 @@ itself in the `include(...)` list. Plugins in
 | `com.asrevo.java-library-conventions` | every `-commons`, `-core`, `-external-api`, `-events` | `java-common-conventions` + `java-library` |
 | `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | application/Spring Boot service setup |
 | `com.asrevo.docker-conventions` | services and UIs | `bootBuildImage` helpers `createImageName()` / `createImageTags()`, ECR publish wiring |
-| `com.asrevo.ui-conventions` | `seller-ui`, `landing-ui` | node plugin + npm build/dev/clean wiring (see `frontends.md`) |
+| `com.asrevo.ui-conventions` | `console-ui`, `landing-ui` | node plugin + npm build/dev/clean wiring (see `frontends.md`) |
 
 A typical `-service` `build.gradle` therefore reads:
 
@@ -126,7 +126,7 @@ is in `configuration.md`.
 ```bash
 ./gradlew clean build -x test          # build everything, skip tests
 ./gradlew :store-pod:catalog:catalog-service:bootRun    # run one service
-./gradlew :store-core:seller-ui:bootRun                 # npm run dev, via ui-conventions
+./gradlew :store-core:console-ui:bootRun                 # npm run dev, via ui-conventions
 ./gradlew :store-core:uaa:build                         # also builds + embeds uaa-fe
 docker compose -f docker-compose-lcl.yml up             # postgres, spg, otel-collector, loki, tempo, prometheus, grafana
 sudo ./extra/scripts/configure-domain.sh                # one-off: /etc/hosts entries for *.gateway.com

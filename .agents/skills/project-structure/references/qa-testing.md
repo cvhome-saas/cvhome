@@ -18,7 +18,7 @@ sudo ./extra/scripts/configure-domain.sh   # once per machine — /etc/hosts for
 
 `run-lcl.sh` is *the* way to start it. It starts the compose infra (postgres, MinIO at `:9000`, `spg`,
 monitoring), then each Java service under `--spring.profiles.active=lcl,test-stores` in dependency order
-(**uaa first — it issues the tokens**), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building
+(**uaa first — it issues the tokens**), then `console-ui` (:8011) and `landing-ui` (:8110), pre-building
 landing-ui's workspace libs. Java services run **on the host**, not in Docker; `spg`'s `extra_hosts` map
 service hostnames back to the host. A no-argument `./extra/scripts/run-lcl.sh` still means `start`.
 
@@ -61,7 +61,7 @@ continues writing startup output to `build/lcl-stack.log`.
 
 Iterating on one frontend against an already-running backend? Don't restart everything — leave the stack up
 and run `npm start` in that `-ui` module, or start a narrowed set
-(`run-lcl.sh start --no-infra seller-ui`). One service by hand:
+(`run-lcl.sh start --no-infra console-ui`). One service by hand:
 `./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl,test-stores'`.
 
 ---
@@ -206,11 +206,11 @@ plan nobody trusts.
       `org2-store1`) and confirm it cannot see or mutate the first store's data
 - [ ] **Permission actually gates**: a principal without the token gets 403, not a 200 with empty data
 - [ ] Failure modes hit on purpose — the typed error surfaces the right status and `code`, no root-cause leak
-- [ ] i18n: switched locale; the new keys resolve in **all five** (`en,ar,es,fr,ru`), no raw key on screen
+- [ ] i18n: switched locale; the new keys resolve in **every locale the app ships** (console-ui `en,ar`; landing-ui and cua `en,ar,es,fr,ru`), no raw key on screen
 - [ ] **AR checked as RTL** — layout and icon direction, not just the strings
 - [ ] Console clean and no failed requests in the network panel for the flow
 - [ ] For a new service/route: it resolves via `lb://`, and the edge (Caddyfile / `GatewayRouteLocatorImpl`)
-      returns your API rather than seller-ui's HTML
+      returns your API rather than console-ui's HTML
 
 ---
 

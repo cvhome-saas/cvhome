@@ -1,6 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/src/lib/models/commons.ts, corrected against the server.
- *
  * Tenancy's store shapes. Corrections against the seller-core original, all verified against
  * `tenancy-commons/dto/ManagerStoreDto.java` and the enums beside it:
  *

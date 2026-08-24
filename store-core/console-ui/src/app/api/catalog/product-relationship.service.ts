@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/products/product-related/services/product-relationship.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -8,9 +7,7 @@ import type {ReadableProductGroup} from '@models/catalog';
 const CATALOG_API_BASE = '/spg/catalog/api/v1';
 
 /**
- * Ported from
- * seller-ui/projects/seller-core/catalog/src/lib/products/product-related/services/product-relationship.service.ts,
- * verified against `catalog-service/api/v1/product/ProductRelationshipApi.java`.
+ * Verified against `catalog-service/api/v1/product/ProductRelationshipApi.java`.
  *
  * "Customers also bought" — the set of products related to one product.
  *

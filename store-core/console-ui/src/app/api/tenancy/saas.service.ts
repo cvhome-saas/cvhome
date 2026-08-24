@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -7,9 +6,6 @@ import type {SaasProperties} from '@models/merchant';
 import type {Pod} from '@models/pod';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts
- * (`saasProperties`, `storePodByStoreId`), verified against tenancy's `SaasApi` and `RouterApi`.
- *
  * Where a store physically is, and what the platform's apex is called — the two halves of the
  * hostname a custom domain has to CNAME to.
  *
@@ -43,7 +39,7 @@ export class SaasService {
 /**
  * The hostname a custom domain must CNAME to: `{alis}-{shortenPodId}.{domain}`.
  *
- * Ported from seller-ui's `StoreDomainFacade.podServerDomain()`. It is assembled on the client because
+ * It is assembled on the client because
  * no endpoint answers it — the two halves come from two services on two different tiers, and neither
  * knows about the other. Returns `null` rather than a half-built hostname when either leg is missing,
  * so the console can say "we could not work out your CNAME target" instead of printing `undefined-.`.

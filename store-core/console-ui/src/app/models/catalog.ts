@@ -1,8 +1,7 @@
 /**
  * The catalog pod's wire shapes — products, categories, brands, product types and product groups.
  *
- * Ported from `seller-ui/projects/seller-core/catalog/src/lib`'s four `models` folders, verified
- * field by field against the Java DTOs under
+ * Verified field by field against the Java DTOs under
  * `store-pod/catalog/catalog-commons/src/main/java/com/asrevo/cvhome/catalog/model/`.
  *
  * **Hardened against seller-core.** Every field there is optional, because `seller-ui`'s tsconfig

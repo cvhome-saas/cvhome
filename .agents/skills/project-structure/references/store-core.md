@@ -12,7 +12,7 @@ store-core/
 │   ├── tenancy-commons/              lib           org/store DTOs
 │   ├── tenancy-events/               lib           org/store domain events
 │   └── pod-external-api/             lib           client for talking to a tenant pod
-└── seller-ui/                        FE     :8010  Angular 20 SSR admin console
+└── console-ui/                        FE     :8011  Angular 20 SSR admin console
 ```
 
 ## `uaa` — identity for staff/admins
@@ -34,7 +34,7 @@ platform staff and merchants; `cua` authenticates storefront shoppers.
 
 Reactive Spring Cloud Gateway (`spring-cloud-starter-gateway-server-webflux`). It is the browser-facing entry
 point for the admin/seller experience: it runs the OAuth2 **client** login flow against `uaa`, holds the
-session, and forwards authenticated requests to `tenancy` and `seller-ui`.
+session, and forwards authenticated requests to `tenancy` and `console-ui`.
 
 - Main class: `com.asrevo.cvhome.gateway.StoreCoreGatewayApplication`
 - `config/GatewayRouteLocatorImpl` — programmatic route definitions
@@ -71,14 +71,16 @@ consume.
 The `-events` suffix is unique to tenancy: it marks **messaging/event contract** modules, published
 through the `io.namastack:namastack-outbox` starter.
 
-## `seller-ui` — Angular 20 admin console
+## `console-ui` — Angular 20 admin console
 
-Standalone-component Angular app with SSR (`app.config.server.ts`, `app.routes.server.ts`), Nebular +
-ng-bootstrap. Authenticates by redirecting to `/oauth2/authorization/uaa` (see
-`src/environments/environment.ts`), so it relies on the gateway's session rather than holding tokens itself.
+Standalone-component Angular app with SSR (`app.config.server.ts`, `app.routes.server.ts`), Tailwind v4
+over a three-theme token layer, Transloco (en/ar, RTL). Authenticates by redirecting to
+`/oauth2/authorization/uaa` (see `src/environments/environment.ts`), so it relies on the gateway's session
+rather than holding tokens itself.
 
-Feature areas under `src/app/pages/`: `catalogue`, `orders`, `customer`, `payment`, `content`,
-`store-management`, `org-management`, `pod-management`, `subscription-and-usage`, `user-management`, plus
-`shared`, `theme`, `facades`, `common`.
+Feature areas under `src/app/features/` (dashboard, orders, catalogue, products, payments, customers,
+users, profile, store-management, content, billing, plus the platform-admin set), tiered as
+`features → layouts → shared → api → core → models` — the module's own `ARCHITECTURE.md` is the contract,
+and `lessons.md` records the backend gaps.
 
 Build/run detail in `frontends.md`.

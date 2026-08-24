@@ -1,8 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/src/lib/models/user.ts, verified against
- * `store-commons/uaa-client`'s `UserEntity`/`ReadableUser`/`PersistableUser`/`UserPassword` and
- * tenancy's `OrgMemberDto`/`InvitationDto`/`CreatedInvitationDto`.
- *
  * Two services own what a console calls "a user":
  *
  * - **uaa** owns the account — `uaa.users` is `{id, username, email, first_name, last_name,

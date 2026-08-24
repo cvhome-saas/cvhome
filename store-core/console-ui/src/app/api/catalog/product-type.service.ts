@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/types/services/types.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -14,9 +13,6 @@ import type {
 const CATALOG_API_BASE = '/spg/catalog/api/v1';
 
 /**
- * Ported from seller-ui/projects/seller-core/catalog/src/lib/types/services/types.service.ts,
- * verified against `catalog-service/api/v1/product/ProductTypeApi.java`.
- *
  * Product types. Note the paths are not symmetric — the list is plural (`/product/types`) and every
  * single-record operation is singular (`/product/type/{id}`). That is the controller's shape, not a
  * transcription slip.

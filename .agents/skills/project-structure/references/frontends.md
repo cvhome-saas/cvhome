@@ -5,7 +5,7 @@ Three different ways UI is delivered in this repo. Know which one you're in befo
 
 ## 1. `-ui` modules — Gradle-wrapped npm apps
 
-`store-core/seller-ui` (Angular) and `store-pod/landing-ui` (Next.js). Different frameworks, identical build
+`store-core/console-ui` (Angular) and `store-pod/landing-ui` (Next.js). Different frameworks, identical build
 contract, because both apply the shared convention plugin
 `build-logic/src/main/groovy/com.asrevo.ui-conventions.gradle`:
 
@@ -27,24 +27,25 @@ each declares its own `bootBuildImage { imageGroup = ... }` (`store-core` vs `st
 
 Each `-ui` module's own `build.gradle` is therefore tiny — just the two plugin aliases and an image group.
 
-### `seller-ui` specifics
+### `console-ui` specifics
 
 Angular 20, standalone components, SSR (`app.config.server.ts`, `app.routes.server.ts`,
-`serve:ssr:seller-ui` → `node dist/seller-ui/server/server.mjs`), Nebular + ng-bootstrap. Scripts: `ng serve`
+`serve:ssr:console-ui` → `node dist/console-ui/server/server.mjs`), Tailwind v4 over a three-theme token
+layer, Transloco (en/ar with RTL). Scripts: `ng serve`
 for dev, `ng build --watch --configuration development` for watch.
 
-Auth is delegated: `src/environments/environment.ts` sets `LOGIN_URL: "/oauth2/authorization/uaa"` and
+Auth is delegated: `src/environments/environment.ts` sets `loginUrl: '/oauth2/authorization/uaa'` and
 `apiUrl: ''` — the app is served behind the platform gateway, which owns the session, so it makes same-origin
 relative API calls rather than holding tokens.
 
-Feature areas live under `src/app/pages/`. Note this module also carries its own `ARCHITECTURE.md` and
-`ANGULAR_MODERNIZATION_PLAN.md`.
+Feature areas live under `src/app/features/`. Note this module also carries its own `ARCHITECTURE.md`
+(the tiering contract) and `lessons.md` (backend gaps the console works around).
 
 **SSR vs. hot reload is already solved in `angular.json`.** The two needs are separated by build configuration:
 
 | configuration | used by | shape |
 |---|---|---|
-| `production` | `ng build` (its default), the container image | SSR — `server`, `outputMode: server`, `ssr.entry`; emits `dist/seller-ui/server/` |
+| `production` | `ng build` (its default), the container image | SSR — `server`, `outputMode: server`, `ssr.entry`; emits `dist/console-ui/server/` |
 | `development` | `ng serve` / `npm start` / `run-lcl.sh` | plain CSR, so HMR works |
 
 ### `landing-ui` specifics

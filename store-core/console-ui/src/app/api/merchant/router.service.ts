@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -6,10 +5,6 @@ import {CrudService} from '@core/http/crud.service';
 import type {ManagerStoreDomain} from '@models/merchant';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts
- * (`getAllocations`, `allocateDomain`, `removeDomain`), verified against
- * `merchant-service/api/v1/RouterController.java`.
- *
  * The hostnames a storefront answers on.
  *
  * The merchant pod owns this, not tenancy: `MerchantRoutingService` keeps the domain → store map that

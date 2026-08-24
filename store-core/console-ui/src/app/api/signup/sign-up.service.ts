@@ -1,11 +1,9 @@
-/** Ported from seller-ui/projects/seller-core/signup/src/lib/service/sign-up.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
 import {CrudService} from '@core/http/crud.service';
 import type {CreateOrgRequest, ReadableUser} from '@models/signup';
 
-/** Ported from seller-ui/projects/seller-core/signup/src/lib/service/sign-up.service.ts. */
 export const SIGNUP_API_BASE = '/tenancy/api/v1/signup/public';
 
 @Injectable({providedIn: 'root'})

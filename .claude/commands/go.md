@@ -19,7 +19,7 @@ Ship the current working tree: commit → push → PR into `develop`.
 
 2. **Branch.** If HEAD is `develop` or `main`, cut a fresh branch first — `git fetch && git switch -c <type>/<short-name>` — where `<type>` is one of `feat`/`fix`/`docs`/`chore`/`refactor`/`test`, and `<short-name>` is a kebab-case summary of the change. Never commit onto `develop` or `main`. If already on a topic branch, keep it.
 
-3. **Review before staging.** Read the actual diff (`git diff`, `git diff --cached`) so the commit message describes what changed, not what the file names suggest. Flag anything that shouldn't be committed — secrets, `.env`, build output, a stray `store-core/seller-ui/angular.json` diff (revert that one: `git checkout -- store-core/seller-ui/angular.json`), debug leftovers, `TODO` comments (checkstyle fails the build on those). Ask before committing anything suspicious.
+3. **Review before staging.** Read the actual diff (`git diff`, `git diff --cached`) so the commit message describes what changed, not what the file names suggest. Flag anything that shouldn't be committed — secrets, `.env`, build output, debug leftovers, `TODO` comments (checkstyle fails the build on those). Ask before committing anything suspicious.
 
 4. **Commit.** Stage the intended files (`git add` by path — avoid blanket `git add -A` when untracked noise is present) and commit with a `<type|area>: <what changed>` subject, imperative, no trailing period, plus a short body when the change isn't self-evident. End the message with:
 

@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/orders/src/lib/services/orders.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -33,8 +32,6 @@ export interface OrderQuery extends PageRequest {
 const CHECKOUT_API_BASE = '/spg/checkout/api/v1';
 
 /**
- * Ported from seller-ui/projects/seller-core/orders/src/lib/services/orders.service.ts.
- *
  * Orders, as the seller console reads them.
  *
  * **Three of seller-core's methods are deliberately not ported**, because the endpoints they call do

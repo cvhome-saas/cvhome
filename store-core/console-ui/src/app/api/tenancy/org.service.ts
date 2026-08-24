@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/orgs/src/lib/services/org.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -8,9 +7,6 @@ import type {ManagerOrgDto, ManagerStore} from '@models/tenancy';
 import type {ReadableUser} from '@models/users';
 
 /**
- * Ported from seller-ui/projects/seller-core/orgs/src/lib/services/org.service.ts, verified against
- * tenancy's `OrgManagerApi`.
- *
  * The tenant registry: every organization on the platform, and the levers over one.
  *
  * **Super-admin only, on every method** — `OrgManagerApi` carries

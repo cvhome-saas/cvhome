@@ -1,7 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/pod.service.ts (the inline types),
- * extended in Module 11 with the registry's own view.
- *
  * Pods are the physical per-region deployments a store is placed into.
  *
  * **Two records, deliberately.** `Pod` is the minimal *routing* contract — it is on every service's

@@ -1,6 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/orders/src/lib/models/order.model.ts.
- *
  * Checkout's order shapes. Almost everything is optional because the Java DTOs populate what the
  * order actually has: a digital order carries no delivery address, an unpaid one carries no payment
  * status. That optionality is real, not defensive typing, and the screens narrow rather than assert.

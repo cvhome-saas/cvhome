@@ -1,6 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/subscriptions/src/lib/models/billing.model.ts.
- *
  * The billing service's wire shapes.
  *
  * Identifiers arrive wrapped — `{"id": "..."}` — because the server models them as value objects rather than bare

@@ -1,6 +1,6 @@
 <!--
 Title: `<type>: <what changed>` or `<area>: <what changed>` — e.g. `fix: duplicate SKU 500s`,
-`seller-ui: typed error handling, steps 1-2`. Imperative, no ticket prefix, no trailing period.
+`console-ui: typed error handling, steps 1-2`. Imperative, no ticket prefix, no trailing period.
 
 Label the PR before merge — `.github/release.yml` builds the changelog from labels, and an
 unlabelled PR lands in ":question: Other Changes":
@@ -92,11 +92,10 @@ section you keep is mandatory.** Every row here has a repo mechanism behind it t
 - [ ] Dependency versions in `gradle/libs.versions.toml`, referenced as `libs.*`
 
 **Frontend**
-- [ ] i18n keys in **all five locales**, no orphans — seller-ui `public/assets/i18n/{en,ar,es,fr,ru}.json`, landing-ui `locales/{en,ar,es,fr,ru}.json`, cua `messages_{en,ar,es,fr,ru}.properties` (+ default `messages.properties`)
+- [ ] i18n keys in **every locale the app ships**, no orphans — console-ui `src/locale/{en,ar}.json`, landing-ui `locales/{en,ar,es,fr,ru}.json`, cua `messages_{en,ar,es,fr,ru}.properties` (+ default `messages.properties`)
 - [ ] Angular: standalone components, `OnPush`, `inject()`, signals, HTTP in a service never in a component
 - [ ] landing-ui: `libs/*` or `templates/*` changes built through the root `npm run build` chain; a new theme follows `references/new-landing-ui-template.md`
 - [ ] AR checked as RTL — layout, not only the strings
-- [ ] No hand-edit to `store-core/seller-ui/angular.json` (SSR lives in the `production` configuration by design)
 
 **Always**
 - [ ] No `TODO` comment (checkstyle `TodoComment` fails the build), no star import, no 140+ char line

@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -9,10 +8,6 @@ import type {
 } from '@models/payment';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts
- * (`getSupportedPaymentTypes`, `getPaymentConfigs`, `savePaymentConfig`, `updatePaymentConfig`),
- * verified against `PaymentConfigurationController`.
- *
  * Which gateways the storefront can take money through, and what they are configured with.
  * Distinct from `@api/payment/payment.service.ts`, which reads *transactions* — this one is the
  * settings behind them.

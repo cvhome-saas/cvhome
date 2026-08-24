@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/analytics/src/lib/services/statistic.api.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -6,8 +5,6 @@ import {CrudService} from '@core/http/crud.service';
 import type {StatisticList, StatisticRange} from '@models/statistics';
 
 /**
- * Ported from seller-ui/projects/seller-core/analytics/src/lib/services/statistic.api.service.ts.
- *
  * The merchant statistics, all served by checkout through the pod gateway.
  *
  * Each returns the same `(date, name, value)` triple and each means something different by it. The

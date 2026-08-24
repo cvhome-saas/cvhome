@@ -53,7 +53,7 @@ features/orders/
 ```
 
 **page → facade → api service → `@api/*`.** The api service is where a wire DTO becomes a view
-model, and it is the seam the whole seller-ui migration turns over; keeping it means facades, pages
+model, and it is the seam the whole seller-ui migration turned over; keeping it means facades, pages
 and specs do not move when an endpoint does. HTTP goes through it — a facade may inject a non-HTTP
 collaborator from `@api/` (a cache stamp, the selected store) but not make a request itself.
 

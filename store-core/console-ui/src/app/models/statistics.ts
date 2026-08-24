@@ -1,7 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/analytics/src/lib/services/statistic.api.service.ts
- * (the inline types).
- *
  * One shape serves every statistic on the platform: `commons/domain/StatisticEntry`, a record of
  * `(date, name, value)`. What each column *means* depends entirely on the query behind the endpoint,
  * which is why the service that returns them documents each one.

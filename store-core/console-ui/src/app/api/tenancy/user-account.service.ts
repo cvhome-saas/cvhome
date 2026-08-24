@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/src/lib/auth/user.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -7,9 +6,6 @@ import type {SpringPage} from '@core/table/table.types';
 import type {PersistableUser, ReadableUser, UserPassword} from '@models/users';
 
 /**
- * Ported from seller-ui/projects/seller-core/src/lib/auth/user.service.ts, verified against
- * tenancy's `UserAccountApi`.
- *
  * Staff accounts: uaa is the store of record, tenancy is the tenant guard in front of it. uaa
  * enforces no tenancy of its own, so `ManagedUserAccountServiceImpl.validateUserAccess` deciding
  * "is this user yours" on every call is the only thing standing between one organization and

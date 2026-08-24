@@ -1,7 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/models/store.ts, narrowed and corrected
- * against `merchant-commons/model/merchant/ReadableMerchantStore.java` and its parents.
- *
  * The merchant store as the pod describes it — the seller's own identity: what it is called, where
  * it trades from, how it is reached. Distinct from `@models/tenancy`'s `ManagerStore`, which is
  * tenancy's row about the store (its pod, its provisioning state, its billing status) and carries

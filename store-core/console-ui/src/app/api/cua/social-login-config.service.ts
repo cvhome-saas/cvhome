@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -6,10 +5,6 @@ import {CrudService} from '@core/http/crud.service';
 import type {PersistableSocialLoginConfig, ReadableSocialLoginConfig} from '@models/cua';
 
 /**
- * Ported from seller-ui/projects/seller-core/stores/src/lib/services/store.service.ts
- * (`getSupportedSocialLoginProviders`, `getSocialLoginConfigs`, `updateSocialLoginConfigs`),
- * verified against cua's `SocialLoginConfigController`.
- *
  * How a **shopper** signs in to this store's storefront. Nothing to do with `@api/…` staff auth:
  * cua is the customer authorization server, uaa is the staff one, and each has its own
  * `SocialProvider` enum with different members.

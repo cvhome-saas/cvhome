@@ -1,8 +1,3 @@
-/**
- * Ported from seller-ui/projects/seller-core/payments/src/lib/models/payment-transaction.model.ts,
- * with the status enum added from `payment-core`'s `PaymentStatus`.
- */
-
 /** Mirrors payment's `PaymentStatus`. */
 export type PaymentStatus =
   | 'PENDING'

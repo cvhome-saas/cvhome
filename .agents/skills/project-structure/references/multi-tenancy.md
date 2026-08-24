@@ -159,7 +159,7 @@ public Flux<RouteDefinition> getRouteDefinitions() {
   in its `issuer-uri-set` (`authentication.md`).
 - Routes refresh every minute, so **a newly created pod becomes reachable without redeploying the gateway.**
 
-So seller-ui edits a product in any pod through one origin, and pod selection is just a query parameter.
+So console-ui edits a product in any pod through one origin, and pod selection is just a query parameter.
 
 ### Shopper path — through the pod's own `spg`
 

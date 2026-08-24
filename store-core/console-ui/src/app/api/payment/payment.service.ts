@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/payments/src/lib/services/payment.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
@@ -14,9 +13,6 @@ import {
 } from '@models/payment';
 
 /**
- * Ported from seller-ui/projects/seller-core/payments/src/lib/services/payment.service.ts, verified
- * against `PrivatePaymentApi`.
- *
  * The whole seller-facing transaction surface, and it is three endpoints: a filtered paged list,
  * approve, reject. There is no detail endpoint — `GET …/transactions/{internalRef}` does not exist,
  * so the row the list returns is all there is. See lessons.md, "Payments — no transaction detail

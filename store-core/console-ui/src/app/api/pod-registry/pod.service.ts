@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/pod.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -6,7 +5,6 @@ import {CrudService} from '@core/http/crud.service';
 import type {SpringPage} from '@core/table/table.types';
 import type {Endpoint, Pod, PodView} from '@models/pod';
 
-/** Ported from seller-ui/projects/seller-core/stores/src/lib/services/pod.service.ts (the `listPods` half). */
 export const POD_API_BASE = '/pod-registry/api/v1/pod';
 
 @Injectable({providedIn: 'root'})

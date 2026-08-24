@@ -1,6 +1,4 @@
 /**
- * Ported from seller-ui/projects/seller-core/signup/src/lib/domain/types.ts, corrected against the server.
- *
  * Public signup: creates an organization and its first administrator in one call
  * (`tenancy` → `SignUpApi#create` → `SignupServiceImpl#createOrgUser`).
  *

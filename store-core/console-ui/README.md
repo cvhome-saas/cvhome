@@ -3,8 +3,9 @@
 The seller console for cvhome — the application a merchant signs into to run their stores.
 
 Angular 20 (standalone, SSR), Tailwind v4 over a three-theme token layer, Transloco for English and
-Arabic with full right-to-left support. It is replacing `store-core/seller-ui`, module by module;
-`lessons.md` records what the platform cannot do yet and what the console does instead.
+Arabic with full right-to-left support. It replaced `store-core/seller-ui` module by module (the old
+console's last commit is tagged `seller-ui-final`); `lessons.md` records what the platform cannot do
+yet and what the console does instead.
 
 ## Running it
 

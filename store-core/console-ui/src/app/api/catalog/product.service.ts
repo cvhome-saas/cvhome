@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/products/services/product.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -42,10 +41,6 @@ const CATALOG_V1 = '/spg/catalog/api/v1';
 const CATALOG_V2 = '/spg/catalog/api/v2';
 
 /**
- * Ported from seller-ui/projects/seller-core/catalog/src/lib/products/services/product.service.ts,
- * verified method by method against `catalog-service/api/v1/product/ProductApi.java` and
- * `api/v2/product/ProductApiV2.java`.
- *
  * Products. The version split is real and is not tidiable: **v2 owns the product definition**
  * (create, read, update, and the two list endpoints) while **v1 owns everything else** (the inline
  * `PATCH`, delete, the uniqueness check and category membership). Both are current; v2 is not a

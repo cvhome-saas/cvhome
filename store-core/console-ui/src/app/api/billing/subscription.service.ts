@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/subscriptions/src/lib/services/subscription.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable, map} from 'rxjs';
 
@@ -11,8 +10,6 @@ const SUBSCRIPTION_API_BASE = '/billing/api/v1/subscription';
 const INVOICE_API_BASE = '/billing/api/v1/invoice';
 
 /**
- * Ported from seller-ui/projects/seller-core/subscriptions/src/lib/services/subscription.service.ts.
- *
  * The billing service, as the console sees it. Addressed at `/billing/...` through the gateway, which strips the
  * prefix and relays the session.
  *

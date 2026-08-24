@@ -1,5 +1,5 @@
-# curl '{{SELLER-UI_URL}}/manager/api/v2/private/subscription-statistic'
-POST {{SELLER-UI_URL}}/manager/api/v2/private/subscription-statistic
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/subscription-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/subscription-statistic
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
@@ -12,8 +12,8 @@ Content-Type: application/json
 
 ###
 
-# curl '{{SELLER-UI_URL}}/manager/api/v2/private/org-statistic'
-POST {{SELLER-UI_URL}}/manager/api/v2/private/org-statistic
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/org-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/org-statistic
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
@@ -26,8 +26,8 @@ Content-Type: application/json
 
 ###
 
-# curl '{{SELLER-UI_URL}}/manager/api/v2/private/store-statistic'
-POST {{SELLER-UI_URL}}/manager/api/v2/private/store-statistic
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/store-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/store-statistic
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
 Content-Type: application/json
 

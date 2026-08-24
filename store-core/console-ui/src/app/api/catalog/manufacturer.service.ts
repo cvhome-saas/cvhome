@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/brands/services/brand.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -13,9 +12,6 @@ import type {
 const CATALOG_API_BASE = '/spg/catalog/api/v1';
 
 /**
- * Ported from seller-ui/projects/seller-core/catalog/src/lib/brands/services/brand.service.ts,
- * verified against `catalog-service/api/v1/product/ProductManufacturerApi.java`.
- *
  * Brands. The backend calls them manufacturers and the storefront calls them brands; the console
  * says "brand" to the operator and "manufacturer" on the wire, and this file is the boundary.
  *

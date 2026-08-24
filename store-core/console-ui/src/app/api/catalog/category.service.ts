@@ -1,4 +1,3 @@
-/** Ported from seller-ui/projects/seller-core/catalog/src/lib/categories/services/category.service.ts. */
 import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -21,9 +20,6 @@ const CATALOG_API_BASE = '/spg/catalog/api/v1';
 export const ROOT_PARENT = -1;
 
 /**
- * Ported from seller-ui/projects/seller-core/catalog/src/lib/categories/services/category.service.ts,
- * verified method by method against `catalog-service/api/v1/category/CategoryApi.java`.
- *
  * Categories, and the tree they form. `?store=` is stamped by `CrudService` from the request
  * context — no caller passes it.
  *

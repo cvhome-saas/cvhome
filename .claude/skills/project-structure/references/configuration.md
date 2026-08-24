@@ -79,7 +79,7 @@ The single source of truth for **every service's name, domain, port, namespace, 
 com.asrevo.cvhome:
   app:
     domain: gateway.com
-    sub: [www, seller-ui, uaa]
+    sub: [www, console-ui, uaa]
   pod:
     domain: spg-507f1f77.gateway.com
   services:
@@ -87,7 +87,7 @@ com.asrevo.cvhome:
                   namespace: store-core.cvhome.lcl,          gateway-service-name: store-core-gateway }
     store-core-gateway: { ..., port: 8000, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
     tenancy:      { ..., port: 8020, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
-    seller-ui:          { ..., port: 8010, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
+    console-ui:          { ..., port: 8011, namespace: store-core.cvhome.lcl, gateway-service-name: store-core-gateway }
     spg:        { ..., port: 80,   namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
     merchant:   { ..., port: 8120, namespace: store-pod-507f1f77.cvhome.lcl, gateway-service-name: spg }
     catalog:    { ..., port: 8122, ... }
