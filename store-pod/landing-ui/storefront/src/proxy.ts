@@ -2,7 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
 import {routing} from '@store-front/i18n/routing';
 import {FALLBACK_STORE_ID} from '@store-front/types/constant';
-import {THEME_OVERRIDE_COOKIE} from '@/shell/theme/override';
+import {COLOR_OVERRIDE_COOKIE, THEME_OVERRIDE_COOKIE} from '@/shell/theme/override';
 
 /**
  * Edge logic that used to live in the Express server (`templates-deprecated/express-app`):
@@ -10,7 +10,8 @@ import {THEME_OVERRIDE_COOKIE} from '@/shell/theme/override';
  *  2. `/` → `/{lang}` using the NEXT_LOCALE cookie, then the `Default-Language` header, constrained by
  *     `Supported-Languages`.
  *  3. Everything else → next-intl locale routing.
- *  4. Dev/QA only: `?theme=<id>` persists a theme override cookie read by `getTheme()`.
+ *  4. Dev/QA only: `?theme=<id>` / `?color=<preset>` persist override cookies read by
+ *     `getTheme()` / `resolveMerchantTokens()`.
  */
 const intlMiddleware = createMiddleware(routing);
 
@@ -42,10 +43,13 @@ export default function proxy(req: NextRequest) {
         res = intlMiddleware(req);
     }
 
-    if (overrideEnabled && searchParams.has('theme')) {
-        const value = searchParams.get('theme') ?? '';
-        if (value) res.cookies.set(THEME_OVERRIDE_COOKIE, value, {path: '/', sameSite: 'lax'});
-        else res.cookies.delete(THEME_OVERRIDE_COOKIE);
+    if (overrideEnabled) {
+        for (const [param, cookie] of [['theme', THEME_OVERRIDE_COOKIE], ['color', COLOR_OVERRIDE_COOKIE]] as const) {
+            if (!searchParams.has(param)) continue;
+            const value = searchParams.get(param) ?? '';
+            if (value) res.cookies.set(cookie, value, {path: '/', sameSite: 'lax'});
+            else res.cookies.delete(cookie);
+        }
     }
     return res;
 }

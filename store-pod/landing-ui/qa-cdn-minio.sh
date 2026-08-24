@@ -15,6 +15,8 @@
 #      every CDN asset URL referenced by the page returns 200 from MinIO
 #
 # Run it twice: the second run must log "already synced … skipping upload".
+# STOREFRONT_THEME_OVERRIDE=true keeps the ?theme= / ?color= QA overrides working in
+# this production build (they are off by default outside dev).
 # Inspect the bucket at http://localhost:9001 (minioadmin/minioadmin)
 # or: docker exec cvhome-minio-1 mc ls -r lcl/storefront-assets/storefront | head
 ###############################################################################
@@ -28,6 +30,7 @@ PORT="${PORT:-8110}"
 BASE_URL="http://localhost:9000/${BUCKET}/${PREFIX}"
 
 [ -f storefront/.next/standalone/storefront/server.js ] || { echo "no build output — run: npm ci && npm run build"; exit 1; }
+! lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1 || { echo "port ${PORT} already in use (dev server?) — stop it or re-run with PORT=<free port>"; exit 1; }
 curl -sf http://localhost:9000/minio/health/live >/dev/null || { echo "MinIO not reachable on :9000 — start docker-compose-lcl minio"; exit 1; }
 
 echo "==> 1/4 bucket ${BUCKET} (public read)"
@@ -47,6 +50,7 @@ echo "==> 3/4 starting on :${PORT} with sync enabled (dir: $RUN_DIR)"
 LOG="$RUN_DIR/server.log"
 (
   cd "$RUN_DIR"
+  STOREFRONT_THEME_OVERRIDE=true \
   STATIC_ASSETS_SYNC_ENABLED=true \
   STATIC_ASSETS_S3_BUCKET="$BUCKET" \
   STATIC_ASSETS_S3_PREFIX="$PREFIX" \
