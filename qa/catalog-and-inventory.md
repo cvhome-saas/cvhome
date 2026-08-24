@@ -58,7 +58,7 @@ this document assume.
 | Brands | `ADIDAS`, `CHANEL`, `GUCCI`, `H&M`, `NIKE`, `ZARA` |
 | Product types | `CLOTHING`, `SHOES`, `ACCESSORIES`, `BAGS` |
 | Groups | `HOME_PAGE` (24), `RECOMMENDED` (12), `NEWLY_ADDED` (15), `FEATURED_ITEMS` (10) — the four strips the home page renders. No `RELATED_ITEM` groups are seeded |
-| Inventory | one `product_availability` row + one `base` price per product (`SKU-NK-RUN-001`: 25 in stock, 750.00; note the PR's QA left it at **23 / 760.00 with a 608 special** — see [00 → state](#state-the-prs-qa-left-behind)) |
+| Inventory | one `product_availability` row + one `base` price per product (`SKU-NK-RUN-001`: 25 in stock, 750.00; note the PR's QA left it at **23** — see [00 → state](#state-the-prs-qa-left-behind)) |
 
 org1-store2 (`65f023632bc46470c104b75f`) is the **same org, other store** — use it for "another store" cases;
 org2-store1 (`65f020632bc46470c104b76f`) for "another org".
@@ -107,15 +107,13 @@ Logs: `build/lcl-logs/catalog.log`, `build/lcl-logs/inventory.log`, `build/lcl-l
 
 ### State the PR's QA left behind
 
-The PR's smoke tests wrote to org1-store1's inventory: `SKU-NK-RUN-001` is at **23** units (two reserved and
-released under refs `smoke-1`/`smoke-2`, one committed by an earlier run) with price **760.00** and a special
-of **608.00** open-ended. Reset before the INV cases if you want the seeded numbers:
+The PR's smoke tests reserved stock on org1-store1: `SKU-NK-RUN-001` is at **23** units (a reservation under
+ref `smoke-1` was committed; `smoke-2` was refused), price still 750.00 with no special. The upsert with a
+special was refused (403 — a service token cannot manage stock, INV-04), so no price was changed. Reset before
+the INV cases if you want the seeded number:
 
 ```sql
 update inventory.product_availability set quantity=25 where sku='SKU-NK-RUN-001';
-update inventory.product_price set product_price_amount=750, product_price_special_amount=null,
-       product_price_special_end_date=null where product_avail_id=(select product_avail_id from
-       inventory.product_availability where sku='SKU-NK-RUN-001');
 ```
 
 or `docker compose down -v` + a fresh `run-lcl.sh start -d`, which reseeds everything.
