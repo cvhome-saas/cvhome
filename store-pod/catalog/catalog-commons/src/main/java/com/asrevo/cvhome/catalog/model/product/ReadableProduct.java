@@ -11,7 +11,6 @@ import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductAttribut
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductOption;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductProperty;
 import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
-import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 
 import lombok.Getter;
@@ -29,12 +28,6 @@ public class ReadableProduct extends ProductEntity implements Serializable {
 
     private ProductDescription description;
 
-    private ReadableProductPrice productPrice;
-
-    private String finalPrice = "0";
-
-    private String originalPrice = null;
-
     private boolean discounted = false;
 
     private ReadableImage image;
@@ -46,8 +39,6 @@ public class ReadableProduct extends ProductEntity implements Serializable {
     private List<ReadableProductAttribute> attributes = new ArrayList<>();
 
     private List<ReadableProductOption> options = new ArrayList<>();
-
-    private List<ReadableProductVariant> variants = new ArrayList<>();
 
     private List<ReadableProductProperty> properties = new ArrayList<>();
 

@@ -45,6 +45,17 @@
         reverse_proxy http://merchant.{$NAMESPACE}:8120
     }
 
+    handle_path /inventory* {
+        tracing {
+            span inventory
+        }
+        header {
+            response X-Trace-Id {http.vars.trace_id}
+            response X-Span-Id {http.vars.span_id}
+        }
+        reverse_proxy http://inventory.{$NAMESPACE}:8126
+    }
+
     handle_path /catalog* {
         tracing {
             span catalog

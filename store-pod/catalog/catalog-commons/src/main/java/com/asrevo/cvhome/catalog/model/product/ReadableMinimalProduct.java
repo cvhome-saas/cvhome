@@ -22,12 +22,6 @@ public class ReadableMinimalProduct extends ProductEntity implements Serializabl
 
     private ReadableDescription description;
 
-    private ReadableProductPrice productPrice;
-
-    private String finalPrice = "0";
-
-    private String originalPrice = null;
-
     private ReadableImage image;
 
     private List<ReadableImage> images;

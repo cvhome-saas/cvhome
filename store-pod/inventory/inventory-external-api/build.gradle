@@ -1,0 +1,15 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    compileOnly libs.spring.web
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:inventory:inventory-commons')
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
+}

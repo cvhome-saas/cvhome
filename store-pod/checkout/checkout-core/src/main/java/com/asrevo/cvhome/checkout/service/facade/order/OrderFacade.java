@@ -2,7 +2,6 @@ package com.asrevo.cvhome.checkout.service.facade.order;
 
 import java.util.List;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
@@ -21,6 +20,7 @@ import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderConfirmation;
 import com.asrevo.cvhome.checkout.model.order.v1.ReadableOrderStatus;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
@@ -66,11 +66,11 @@ public interface OrderFacade {
     /**
      * Records a status change, committing or releasing the order's reservation when the new status calls for it.
      *
-     * @throws CatalogApiUnavailableException catalog never answered, so the reservation's fate is unknown; the status
+     * @throws InventoryApiUnavailableException catalog never answered, so the reservation's fate is unknown; the status
      *                                        change itself is already recorded
      */
     void createOrderStatus(PersistableOrderStatusHistory status, Long id, StoreMerchantId store)
-            throws OrderNotFoundException, CatalogApiUnavailableException;
+            throws OrderNotFoundException, InventoryApiUnavailableException;
 
     void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus);
 

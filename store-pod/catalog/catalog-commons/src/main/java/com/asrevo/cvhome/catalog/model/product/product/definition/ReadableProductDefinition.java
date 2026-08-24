@@ -9,7 +9,6 @@ import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ProductDescription;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.attribute.PersistableProductAttribute;
-import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 
 import lombok.Getter;
@@ -36,8 +35,6 @@ public class ReadableProductDefinition extends ProductDefinition {
     private List<PersistableProductAttribute> properties = new ArrayList<>();
 
     private List<ReadableImage> images = new ArrayList<>();
-
-    private ReadableInventory inventory;
 
     private List<ProductDescription> descriptions = new ArrayList<>();
 

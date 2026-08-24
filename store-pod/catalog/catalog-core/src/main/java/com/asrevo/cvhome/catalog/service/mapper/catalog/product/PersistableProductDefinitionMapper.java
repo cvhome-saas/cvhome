@@ -1,10 +1,7 @@
 package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,11 +12,8 @@ import org.springframework.stereotype.Component;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
-import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
-import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
@@ -39,7 +33,6 @@ import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.ConversionException;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 @Component
@@ -112,9 +105,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 
             destination.setStore(store);
 
-            List<LanguageCode> languages = applyDescriptions(source, destination);
-
-            applyAvailabilityAndPrice(source, destination, store, languages);
+            applyDescriptions(source, destination);
 
             applySpecifications(source, destination, store);
 
@@ -160,8 +151,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
         destination.setType(type);
     }
 
-    private List<LanguageCode> applyDescriptions(PersistableProductDefinition source, Product destination) {
-        List<LanguageCode> languages = new ArrayList<>();
+    private void applyDescriptions(PersistableProductDefinition source, Product destination) {
         Set<ProductDescription> descriptions = new HashSet<>();
         if (!CollectionUtils.isEmpty(source.getDescriptions())) {
             for (com.asrevo.cvhome.catalog.model.product.ProductDescription description : source.getDescriptions()) {
@@ -178,7 +168,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
                 productDescription.setMetatagDescription(description.getMetaDescription());
                 productDescription.setTitle(description.getTitle());
 
-                languages.add(description.getLanguage());
                 productDescription.setLanguageCode(description.getLanguage());
                 descriptions.add(productDescription);
             }
@@ -187,7 +176,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
         if (!descriptions.isEmpty()) {
             destination.setDescriptions(descriptions);
         }
-        return languages;
     }
 
     private ProductDescription resolveProductDescription(Product destination,
@@ -201,69 +189,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
             }
         }
         return new ProductDescription();
-    }
-
-    private void applyAvailabilityAndPrice(PersistableProductDefinition source, Product destination, StoreMerchantId store,
-                                           List<LanguageCode> languages) {
-        AvailabilityAndPrice resolved = resolveExistingAvailabilityAndPrice(destination, source);
-        ProductAvailability productAvailability = resolved.availability();
-        ProductPrice defaultPrice = resolved.price();
-
-        if (productAvailability == null) { // create with default values
-            productAvailability = new ProductAvailability(destination, store);
-            destination.getAvailabilities().add(productAvailability);
-
-            productAvailability.setProductQuantity(source.getQuantity());
-            productAvailability.setProductQuantityOrderMin(1);
-            productAvailability.setProductQuantityOrderMax(1);
-            productAvailability.setRegion(Constants.ALL_REGIONS);
-            productAvailability.setAvailable(destination.isAvailable());
-            productAvailability.setProductStatus(source.isCanBePurchased());
-        }
-
-        if (defaultPrice == null) {
-            createDefaultPrice(source, productAvailability, languages);
-        }
-    }
-
-    private AvailabilityAndPrice resolveExistingAvailabilityAndPrice(Product destination,
-                                                                     PersistableProductDefinition source) {
-        if (CollectionUtils.isEmpty(destination.getAvailabilities())) {
-            return new AvailabilityAndPrice(null, null);
-        }
-        for (ProductAvailability avail : destination.getAvailabilities()) {
-            for (ProductPrice p : avail.getPrices()) {
-                if (p.isDefaultPrice()) {
-                    avail.setProductQuantity(source.getQuantity());
-                    avail.setProductStatus(source.isCanBePurchased());
-                    p.setProductPriceAmount(source.getPrice());
-                    return new AvailabilityAndPrice(avail, p);
-                }
-            }
-        }
-        return new AvailabilityAndPrice(null, null);
-    }
-
-    private void createDefaultPrice(PersistableProductDefinition source, ProductAvailability productAvailability,
-                                    List<LanguageCode> languages) {
-        BigDecimal defaultPriceAmount = new BigDecimal(0);
-        if (source.getPrice() != null) {
-            defaultPriceAmount = source.getPrice();
-        }
-
-        ProductPrice defaultPrice = new ProductPrice();
-        defaultPrice.setDefaultPrice(true);
-        defaultPrice.setProductPriceAmount(defaultPriceAmount);
-        defaultPrice.setCode(Constants.DEFAULT_PRICE_CODE);
-        defaultPrice.setProductAvailability(productAvailability);
-        productAvailability.getPrices().add(defaultPrice);
-        for (LanguageCode lang : languages) {
-            ProductPriceDescription ppd = new ProductPriceDescription();
-            ppd.setProductPrice(defaultPrice);
-            ppd.setLanguageCode(lang);
-            ppd.setName(Constants.DEFAULT_PRICE_DESCRIPTION);
-            defaultPrice.getDescriptions().add(ppd);
-        }
     }
 
     private void applySpecifications(PersistableProductDefinition source, Product destination, StoreMerchantId store)
@@ -331,9 +256,6 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
             return c;
         }
         throw CategoryReferenceUnresolvableException.of(hasCode ? categ.getCode() : categ.getId(), store);
-    }
-
-    private record AvailabilityAndPrice(ProductAvailability availability, ProductPrice price) {
     }
 
 }

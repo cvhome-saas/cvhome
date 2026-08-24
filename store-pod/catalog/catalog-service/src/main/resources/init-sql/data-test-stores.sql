@@ -44,15 +44,6 @@ INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_TYPE_DESCRIPTION_SEQ_NEXT_VAL', 0)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_VARIANT_GROUP_SEQ_NEXT_VAL', 0)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_VAR_IMAGE_SEQ_NEXT_VAL', 0)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_VARIATION_SEQ_NEXT_VAL', 0)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_SEQ_NEXT_VAL', 180)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
@@ -74,26 +65,8 @@ INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_IMAGE_DESCRIPTION_SEQ_NEXT_VAL', 0)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_VAR_IMAGE_DESCRIPTION_SEQ_NEXT_VAL', 0)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_VARIANT_SEQ_NEXT_VAL', 0)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_AVAILABILITY_SEQ_NEXT_VAL', 180)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 181)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_PRICE_DESCRIPTION_SEQ_NEXT_VAL', 360)
-on conflict do nothing;
-INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_GROUP_SEQ_NEXT_VAL', 17)
 on conflict do nothing;
 INSERT INTO catalog.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_GROUP_DESC_SEQ_NEXT_VAL', 33)
 on conflict do nothing;
-insert into sm_sequencer (seq_name, seq_count)
-values ('PRODUCT_RESERVATION_SEQ_NEXT_VAL', 0)
-on conflict (seq_name) do nothing;

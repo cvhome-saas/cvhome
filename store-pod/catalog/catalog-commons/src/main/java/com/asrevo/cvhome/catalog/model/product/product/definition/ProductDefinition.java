@@ -30,8 +30,6 @@ public class ProductDefinition extends Entity {
 
     private boolean virtual = false;
 
-    private boolean canBePurchased = true;
-
     private Instant dateAvailable;
 
     private String identifier;

@@ -51,6 +51,7 @@ JAVA_SERVICES=(
     "catalog|:store-pod:catalog:catalog-service|8122"
     "checkout|:store-pod:checkout:checkout-service|8123"
     "payment|:store-pod:payment:payment-service|8125"
+    "inventory|:store-pod:inventory:inventory-service|8126"
     "cua|:store-pod:cua|8124"
 )
 

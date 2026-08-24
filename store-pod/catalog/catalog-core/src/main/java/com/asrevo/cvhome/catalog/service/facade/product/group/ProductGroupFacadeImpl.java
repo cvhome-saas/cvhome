@@ -18,7 +18,6 @@ import com.asrevo.cvhome.catalog.model.product.group.ReadableProductGroupListV2;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableMinimalProductPopulator;
 import com.asrevo.cvhome.catalog.service.populator.catalog.product.PersistableProductGroupPopulator;
 import com.asrevo.cvhome.catalog.service.populator.catalog.product.ReadableProductGroupPopulator;
-import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.catalog.services.product.group.ProductGroupService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -42,12 +41,12 @@ public class ProductGroupFacadeImpl implements ProductGroupFacade {
     private final PersistableProductGroupPopulator persistableProductGroupPopulator;
 
     public ProductGroupFacadeImpl(ProductGroupService productGroupService, ProductService productService,
-                                  PersistableProductGroupPopulator persistableProductGroupPopulator, PricingService pricingService,
+                                  PersistableProductGroupPopulator persistableProductGroupPopulator,
                                   ImageFilePath imageUtils) {
         this.productGroupService = productGroupService;
         this.productService = productService;
         this.readableProductGroupPopulator = new ReadableProductGroupPopulator(
-                new ReadableMinimalProductPopulator(pricingService, imageUtils));
+                new ReadableMinimalProductPopulator(imageUtils));
         this.persistableProductGroupPopulator = persistableProductGroupPopulator;
     }
 

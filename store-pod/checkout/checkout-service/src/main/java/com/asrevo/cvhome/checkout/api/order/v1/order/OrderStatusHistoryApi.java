@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.history.PersistableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.history.ReadableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.store.core.constants.Constants;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,7 +63,7 @@ public class OrderStatusHistoryApi {
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
                        StoreMerchantId merchantStore)
-            throws OrderNotFoundException, CatalogApiUnavailableException {
+            throws OrderNotFoundException, InventoryApiUnavailableException {
         orderFacade.createOrderStatus(history, id, merchantStore);
     }
 

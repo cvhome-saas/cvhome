@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.errors.ForeignStoreTokenException;
@@ -47,6 +46,7 @@ import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.customer.errors.UnsupportedCountryCodeException;
 import com.asrevo.cvhome.customer.errors.UnsupportedZoneCodeException;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
@@ -103,7 +103,7 @@ public class OrderApi {
                                               @Valid @RequestBody PersistableAnonymousOrder order, JwtAuthenticationToken auth,
                                               StoreMerchantId merchantStore, LanguageCode language, HttpServletRequest request)
             throws PaymentApiUnavailableException, UnsupportedCountryCodeException,
-            UnsupportedZoneCodeException, CatalogApiUnavailableException, OrderLoginRequiredException,
+            UnsupportedZoneCodeException, InventoryApiUnavailableException, OrderLoginRequiredException,
             ForeignStoreTokenException, ShoppingCartNotFoundException, OrderCustomerUnresolvedException,
             OrderNotConvertibleException, OrderProductNotConvertibleException,
             OrderProductPriceMissingException, PriceNotFormattableException {

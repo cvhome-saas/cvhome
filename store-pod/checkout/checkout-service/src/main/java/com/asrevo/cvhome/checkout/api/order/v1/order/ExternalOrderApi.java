@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrator;
@@ -14,6 +13,7 @@ import com.asrevo.cvhome.checkout.services.order.ExternalOrderService;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.UncheckedBaseException;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
 
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * <p>
  * {@link ExternalOrderService} is a single interface: the controller implements it and callers proxy it, so its
- * {@code throws} clauses cannot name {@link CatalogApiUnavailableException} without putting catalog's vocabulary into
+ * {@code throws} clauses cannot name {@link InventoryApiUnavailableException} without putting catalog's vocabulary into
  * a signature payment reads — payment called checkout, not catalog. The failure travels in
  * {@link UncheckedBaseException} instead, the carrier the shared advice unwraps before rendering. Callers still see
  * the truth: a 502 naming catalog as the remote, which is a retryable answer their outbox already handles.
@@ -75,7 +75,7 @@ public class ExternalOrderApi implements ExternalOrderService {
             } else {
                 orderFacade.updateOrderStatus(orderId, null, null, status);
             }
-        } catch (CatalogApiUnavailableException e) {
+        } catch (InventoryApiUnavailableException e) {
             throw new UncheckedBaseException(e);
         }
     }
@@ -88,7 +88,7 @@ public class ExternalOrderApi implements ExternalOrderService {
         try {
             orderInventoryOrchestrator.updateOrderStatusWithReservationRelease(orderId, store, OrderStatus.CANCELLED,
                     PaymentStatus.EXPIRED);
-        } catch (CatalogApiUnavailableException e) {
+        } catch (InventoryApiUnavailableException e) {
             throw new UncheckedBaseException(e);
         }
     }

@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartItemRepository;
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartRepository;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
@@ -27,17 +27,17 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     private final ShoppingCartRepository shoppingCartRepository;
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     @Autowired
     public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository,
-                                   ExternalProductService externalProductService, ShoppingCartItemRepository shoppingCartItemRepository) {
+                                   ProductDetailsComposer productDetailsComposer, ShoppingCartItemRepository shoppingCartItemRepository) {
         super(shoppingCartRepository);
         this.shoppingCartRepository = shoppingCartRepository;
 
-        this.externalProductService = externalProductService;
+        this.productDetailsComposer = productDetailsComposer;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
@@ -111,7 +111,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
             for (ShoppingCartItem item : items) {
                 log.debug("Populate item {}", item.getId());
-                ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
+                ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(),
                         language);
                 item.setItemPrice(detailedProduct.price().getFinalPrice());
 

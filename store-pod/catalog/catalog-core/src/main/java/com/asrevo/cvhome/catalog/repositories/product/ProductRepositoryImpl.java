@@ -69,16 +69,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     public Product getByFriendlyUrl(StoreMerchantId store, String seUrl, Locale locale) {
 
-        List<String> regionList = new ArrayList<>();
-        regionList.add("*");
-        regionList.add(locale.getCountry());
-
         String hql = """
                 select distinct p from Product as p
-                join fetch p.availabilities pa
                 join fetch p.descriptions pd
-                left join fetch pa.prices pap
-                left join fetch pap.descriptions papd
                 left join fetch p.categories categs
                 left join fetch categs.descriptions categsd
                 left join fetch p.images images
@@ -91,14 +84,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 left join fetch manuf.descriptions manufd
                 left join fetch p.type type
                 where p.store=:store
-                and pa.region in (:lid)
                 and pd.seUrl=:seUrl
                 and p.available=true
                 order by pattr.productOptionSortOrder""";
         Query q = this.em.createQuery(hql);
 
         q.setParameter("store", store);
-        q.setParameter("lid", regionList);
         q.setParameter("seUrl", seUrl);
 
         Product p = null;
@@ -123,11 +114,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         String hql = """
                 select distinct p from Product as p
-                join fetch p.availabilities pa
-                left join fetch pa.prices pap
                 join fetch p.descriptions pd
                 join fetch p.categories categs
-                left join fetch pap.descriptions papd
                 left join fetch p.images images
                 left join fetch p.attributes pattr
                 left join fetch pattr.productOption po
@@ -152,11 +140,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         String hql = """
                 select p from Product as p
-                join fetch p.availabilities pa
-                left join fetch pa.prices pap
                 join fetch p.descriptions pd
                 left join fetch p.categories categs
-                left join fetch pap.descriptions papd
                 left join fetch p.images images
                 left join fetch p.attributes pattr
                 left join fetch pattr.productOption po
@@ -182,11 +167,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         String qs = """
                 select distinct p from Product as p
                 join fetch p.descriptions pd
-                left join fetch p.availabilities pavail
                 left join fetch p.type type
                 left join fetch p.images images
-                left join fetch pavail.prices pavailpr
-                left join fetch pavailpr.descriptions pavailprdesc
                 left join fetch p.categories categs
                 left join fetch categs.descriptions categsd
                 left join fetch p.attributes pattr
@@ -196,22 +178,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 left join fetch pov.descriptions povd
                 left join fetch p.manufacturer manuf
                 left join fetch manuf.descriptions manufd
-                left join fetch p.variants pinst
-                left join fetch pinst.variation pv
-                left join fetch pv.productOption pvpo
-                left join fetch pv.productOptionValue pvpov
-                left join fetch pvpo.descriptions pvpod
-                left join fetch pvpov.descriptions pvpovd
-                left join fetch pinst.variationValue pvv
-                left join fetch pvv.productOption pvvpo
-                left join fetch pvv.productOptionValue pvvpov
-                left join fetch pvvpo.descriptions povvpod
-                left join fetch pinst.availabilities pinsta
-                left join fetch pinsta.prices pinstap
-                left join fetch pinstap.descriptions pinstapdesc
-                left join fetch pinst.productVariantGroup pinstg
-                left join fetch pinstg.images pinstgimg
-                left join fetch pinstgimg.descriptions
                 """;
 
         return qs;
@@ -225,10 +191,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             String hql = """
                     select distinct p from Product as p
                     join fetch p.descriptions pd
-                    left join fetch p.availabilities pavail
                     left join fetch p.type type
-                    left join fetch pavail.prices pavailpr
-                    left join fetch pavailpr.descriptions pavailprdesc
                     left join fetch p.categories categs
                     left join fetch categs.descriptions categsd
                     left join fetch p.attributes pattr
@@ -238,22 +201,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     left join fetch pov.descriptions povd
                     left join fetch p.manufacturer manuf
                     left join fetch manuf.descriptions manufd
-                    left join fetch p.variants pinst
-                    left join fetch pinst.variation pv
-                    left join fetch pv.productOption pvpo
-                    left join fetch pv.productOptionValue pvpov
-                    left join fetch pvpo.descriptions pvpod
-                    left join fetch pvpov.descriptions pvpovd
-                    left join fetch pinst.variationValue pvv
-                    left join fetch pvv.productOption pvvpo
-                    left join fetch pvv.productOptionValue pvvpov
-                    left join fetch pvvpo.descriptions povvpod
-                    left join fetch pinst.availabilities pinsta
-                    left join fetch pinsta.prices pinstap
-                    left join fetch pinstap.descriptions pinstapdesc
-                    left join fetch pinst.productVariantGroup pinstg
-                    left join fetch pinstg.images pinstgimg
-                    left join fetch pinstgimg.descriptions
                     where p.id=:productId and p.store=:id""";
             Query q = this.em.createQuery(hql);
 
@@ -274,14 +221,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     select distinct p from Product as p
                     join fetch p.descriptions pd
                     left join fetch p.images images
-                    left join fetch p.availabilities pavail
-                    left join fetch pavail.prices pavailpr
-                    left join fetch pavailpr.descriptions pavailprdesc
-                    left join fetch p.variants pinst
-                    left join fetch pinst.variation pv
-                    left join fetch pinst.availabilities pinsta
-                    left join fetch pinsta.prices pinstap
-                    left join fetch pinstap.descriptions pinstapdesc
                     where p.id=:productId and p.store=:id and pd.languageCode=:language""";
             Query q = this.em.createQuery(hql);
 

@@ -1,0 +1,50 @@
+# ProductPriceApi — com.asrevo.cvhome.inventory.api.v1.ProductPriceApi (@RequestMapping "/api/v1")
+#
+# Addressed through the gateway; see inventory-api.http for the env-var conventions.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### create a price for a sku
+# @name createPrice
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/product/SKU-YSL-MAKE-TEIPEN46/price?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "promo",
+  "defaultPrice": false,
+  "price": 19.99,
+  "discountedPrice": 14.99
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201 || response.status === 200, "status " + response.status);
+    });
+    client.global.set("PRICE_ID", response.body.id);
+%}
+
+### list all prices for the sku
+GET {{SELLER_UI_URL}}/spg/inventory/api/v1/private/product/SKU-YSL-MAKE-TEIPEN46/prices?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### fetch the created price
+GET {{SELLER_UI_URL}}/spg/inventory/api/v1/private/product/SKU-YSL-MAKE-TEIPEN46/price/{{PRICE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### price for an unknown sku — 400 INVENTORY.SKU.REFERENCE_UNRESOLVABLE, not a 500
+POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/product/NO-SUCH-SKU/price?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "base",
+  "defaultPrice": true,
+  "price": 10.00
+}
+
+### delete the created price
+DELETE {{SELLER_UI_URL}}/spg/inventory/api/v1/private/product/SKU-YSL-MAKE-TEIPEN46/price/{{PRICE_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

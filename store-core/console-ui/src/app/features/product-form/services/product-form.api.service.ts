@@ -6,11 +6,13 @@ import {CategoryService} from '@api/catalog/category.service';
 import {ProductImageService} from '@api/catalog/product-image.service';
 import {ProductRelationshipService} from '@api/catalog/product-relationship.service';
 import {ProductService} from '@api/catalog/product.service';
+import {InventoryService} from '@api/inventory/inventory.service';
 import type {
   PersistableProductDefinition,
   ProductDescription,
   ReadableCategory,
   ReadableProductDefinition,
+  SkuInventory,
 } from '@models/catalog';
 import type {ProductDraft, ProductImageItem, RelatedProduct} from '@models/products';
 import {emptyDraft} from '@models/products';
@@ -26,12 +28,15 @@ import type {LocalisedCopy} from '@models/taxonomy';
 export interface CreateOutcome {
   readonly id: number;
   readonly categoriesApplied: boolean;
+  /** Whether the price/quantity write to the inventory service landed. */
+  readonly inventoryApplied: boolean;
 }
 
-/** The same distinction for a save: the definition landed, the category diff may not have. */
+/** The same distinction for a save: the definition landed, the category diff or stock write may not have. */
 export interface UpdateOutcome {
   readonly snapshot: ProductFormSnapshot;
   readonly categoriesApplied: boolean;
+  readonly inventoryApplied: boolean;
 }
 
 /** Everything the form needs to render, whether the product exists yet or not. */
@@ -85,6 +90,7 @@ export interface ProductTypeOption {
 @Injectable({providedIn: 'root'})
 export class ProductFormApi {
   private readonly products = inject(ProductService);
+  private readonly inventory = inject(InventoryService);
   private readonly images = inject(ProductImageService);
   private readonly relationships = inject(ProductRelationshipService);
   private readonly categories = inject(CategoryService);
@@ -102,7 +108,21 @@ export class ProductFormApi {
    */
   load(productId: number | null): Observable<ProductFormSnapshot> {
     return forkJoin({
-      definition: productId === null ? of(null) : this.products.definition(productId),
+      /*
+       * Price, quantity and purchasability come from the inventory service since the split, keyed
+       * by the definition's SKU — so the two reads are chained, not parallel. Optional in the same
+       * sense as the reference lists: a form without stock numbers beats no form.
+       */
+      definition:
+        productId === null
+          ? of(null)
+          : this.products.definition(productId).pipe(
+              switchMap((definition) =>
+                this.optional(this.inventory.bySkus([definition.sku ?? ''])).pipe(
+                  map((inventories) => ({definition, stock: inventories?.[0] ?? null})),
+                ),
+              ),
+            ),
       related: productId === null ? of(null) : this.optional(this.relationships.related(productId)),
       /*
        * Through the shared reference cache, not straight to the endpoints. These four are the same
@@ -115,7 +135,9 @@ export class ProductFormApi {
       types: this.optional(this.reference.typeList()),
       store: this.optional(this.reference.store()),
     }).pipe(
-      map(({definition, related, categories, brands, types, store}) => {
+      map(({definition: loadedDefinition, related, categories, brands, types, store}) => {
+        const definition = loadedDefinition?.definition ?? null;
+        const stock = loadedDefinition?.stock ?? null;
         this.loaded = definition;
         const languages = store?.supportedLanguages?.length
           ? [...store.supportedLanguages]
@@ -127,6 +149,7 @@ export class ProductFormApi {
               ? emptyDraft(languages)
               : toDraft(
                   definition,
+                  stock,
                   languages,
                   (related?.products ?? []).map(
                     (product): RelatedProduct => ({
@@ -174,6 +197,16 @@ export class ProductFormApi {
           catchError(() => of({id: created.id, categoriesApplied: false})),
         ),
       ),
+      /*
+       * Stock and price are the inventory service's since the split, so a create is two writes.
+       * Same stance as the categories: the product exists, so a failed stock write is reported as
+       * a warning, not as a failed create.
+       */
+      switchMap((outcome) =>
+        this.applyInventory(draft, outcome.id).pipe(
+          map((inventoryApplied) => ({...outcome, inventoryApplied})),
+        ),
+      ),
     );
   }
 
@@ -196,9 +229,40 @@ export class ProductFormApi {
         ),
       ),
       switchMap((categoriesApplied) =>
-        this.load(productId).pipe(map((snapshot) => ({snapshot, categoriesApplied}))),
+        this.applyInventory(draft, productId).pipe(
+          map((inventoryApplied) => ({categoriesApplied, inventoryApplied})),
+        ),
+      ),
+      switchMap(({categoriesApplied, inventoryApplied}) =>
+        this.load(productId).pipe(
+          map((snapshot) => ({snapshot, categoriesApplied, inventoryApplied})),
+        ),
       ),
     );
+  }
+
+  /**
+   * The stock-and-price half of a save: the sku-addressed upsert in the inventory service.
+   *
+   * `canBePurchased` maps onto the inventory record's `available` flag — the catalog's own
+   * `visible` stays the merchandising switch. Best-effort like the category diff, and for the same
+   * reason: the definition already landed.
+   */
+  private applyInventory(draft: ProductDraft, productId: number): Observable<boolean> {
+    if (!draft.sku) {
+      return of(false);
+    }
+    return this.inventory
+      .upsert(draft.sku, {
+        productId,
+        quantity: draft.quantity,
+        available: draft.canBePurchased,
+        prices: [{code: 'base', defaultPrice: true, price: draft.price ?? 0}],
+      })
+      .pipe(
+        map(() => true),
+        catchError(() => of(false)),
+      );
   }
 
   /**
@@ -369,29 +433,26 @@ export class ProductFormApi {
 
 function toDraft(
   definition: ReadableProductDefinition,
+  stock: SkuInventory | null,
   languages: readonly string[],
   related: readonly RelatedProduct[],
 ): ProductDraft {
   const specification = definition.productSpecifications;
-  /*
-   * `inventory.price` is a string on the read and a number on the write — the one place the two
-   * DTOs disagree about a type. Parsed here rather than at four call sites.
-   */
-  const price = definition.inventory?.price;
-  const parsed = price === undefined || price === '' ? null : Number(price);
 
   return {
     id: definition.id,
     sku: definition.sku ?? '',
     visible: definition.visible ?? false,
-    canBePurchased: definition.canBePurchased ?? true,
+    // The inventory record's `available` flag; a product that has never been stocked can be bought
+    // once it is, so the blank default stays `true`.
+    canBePurchased: stock?.available ?? true,
     shipeable: definition.shipeable ?? true,
     virtual: definition.virtual ?? false,
     // `Instant` on the wire; `<input type="date">` wants `YYYY-MM-DD`.
     dateAvailable: (definition.dateAvailable ?? '').slice(0, 10),
     sortOrder: definition.sortOrder ?? 0,
-    price: parsed !== null && Number.isFinite(parsed) ? parsed : null,
-    quantity: definition.inventory?.quantity ?? 0,
+    price: stock?.price?.originalPrice ?? stock?.price?.finalPrice ?? null,
+    quantity: stock?.quantity ?? 0,
     weight: specification?.weight ?? null,
     height: specification?.height ?? null,
     width: specification?.width ?? null,
@@ -477,13 +538,10 @@ function toPersistable(draft: ProductDraft): PersistableProductDefinition {
     ...(draft.id !== null ? {id: draft.id} : {}),
     sku: draft.sku,
     visible: draft.visible,
-    canBePurchased: draft.canBePurchased,
     shipeable: draft.shipeable,
     virtual: draft.virtual,
     sortOrder: draft.sortOrder,
     ...(draft.dateAvailable ? {dateAvailable: `${draft.dateAvailable}T00:00:00Z`} : {}),
-    price: draft.price ?? 0,
-    quantity: draft.quantity,
     productSpecifications: {
       ...(draft.weight !== null ? {weight: draft.weight} : {}),
       ...(draft.height !== null ? {height: draft.height} : {}),

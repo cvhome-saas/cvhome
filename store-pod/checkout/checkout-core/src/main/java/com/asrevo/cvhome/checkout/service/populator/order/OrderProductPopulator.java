@@ -6,17 +6,17 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
-import com.asrevo.cvhome.catalog.model.product.product.price.SimpleProductPrice;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProductPrice;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.errors.OrderProductNotConvertibleException;
 import com.asrevo.cvhome.checkout.errors.OrderProductPriceMissingException;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.model.price.FinalPriceCalc;
+import com.asrevo.cvhome.inventory.model.price.SimpleProductPrice;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     @Override
     public OrderProduct populate(ShoppingCartItem source, OrderProduct target, StoreMerchantId store,
@@ -43,7 +43,7 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
             target.setProductQuantity(source.getQuantity());
             target.setSku(source.getSku());
 
-            ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, source.getSku(),
+            ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, source.getSku(),
                     language);
             FinalPriceCalc finalPrice = detailedProduct.price();
             if (finalPrice == null) {

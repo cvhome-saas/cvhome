@@ -27,16 +27,11 @@ import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
 import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ForeignStoreProductAccessException;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
-import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
@@ -108,9 +103,7 @@ public class ProductApi {
                          LanguageCode language)
             throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
             ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
-            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException, ProductNotPersistedException, EntitlementExceededException {
+            ProductNotPersistedException, EntitlementExceededException {
 
         Long id = productCommonFacade.saveProduct(merchantStore, product, language);
         Entity returnEntity = new Entity();

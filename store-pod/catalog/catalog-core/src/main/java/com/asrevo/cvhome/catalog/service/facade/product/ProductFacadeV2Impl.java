@@ -11,22 +11,14 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
-import com.asrevo.cvhome.catalog.model.product.product.variant.ReadableProductVariant;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableBaseProductMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductMapper;
-import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductVariantMapper;
 import com.asrevo.cvhome.catalog.services.category.CategoryServiceImpl;
-import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
-import com.asrevo.cvhome.catalog.services.product.variant.ProductVariantService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.ConversionException;
@@ -41,23 +33,13 @@ public class ProductFacadeV2Impl implements ProductFacade {
 
     private final ReadableProductMapper readableProductMapper;
 
-    private final ProductVariantService productVariantService;
-
-    private final ReadableProductVariantMapper readableProductVariantMapper;
-
     private final CategoryServiceImpl categoryService;
 
-    private final PricingServiceImpl pricingService;
-
     public ProductFacadeV2Impl(ProductService productService, ReadableProductMapper readableProductMapper,
-                               ProductVariantService productVariantService, ReadableProductVariantMapper readableProductVariantMapper,
-                               CategoryServiceImpl categoryService, PricingServiceImpl pricingService) {
+                               CategoryServiceImpl categoryService) {
         this.productService = productService;
         this.readableProductMapper = readableProductMapper;
-        this.productVariantService = productVariantService;
-        this.readableProductVariantMapper = readableProductVariantMapper;
         this.categoryService = categoryService;
-        this.pricingService = pricingService;
     }
 
     @Override
@@ -68,8 +50,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
 
     @Override
     public ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
-            throws ProductNotFoundException, ProductPriceNotConvertibleException, ProductVariantParentMissingException,
-            InventoryNotConvertibleException {
+            throws ProductNotFoundException {
 
         Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
@@ -77,20 +58,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
             throw ProductNotFoundException.of(friendlyUrl, store);
         }
 
-        ReadableProduct readableProduct = readableProductMapper.convert(product, store, language);
-
-        // get all instances for this product group by option
-        // limit to 15 searches
-        List<ProductVariant> instances = productVariantService.getByProductId(store, product, language);
-
-        // A plain loop rather than stream().map(...): the variant mapper declares checked failures now.
-        List<ReadableProductVariant> readableInstances = new ArrayList<>();
-        for (ProductVariant instance : instances) {
-            readableInstances.add(readableProductVariantMapper.convert(instance, store, language));
-        }
-        readableProduct.setVariants(readableInstances);
-
-        return readableProduct;
+        return readableProductMapper.convert(product, store, language);
     }
 
     /**
@@ -107,7 +75,7 @@ public class ProductFacadeV2Impl implements ProductFacade {
     public ReadableProductList getBaseProductListsByCriteria(StoreMerchantId merchantStore,
                                                              ProductCriteria searchCriteria)
             throws ProductNotConvertibleException {
-        return listProducts(new ReadableBaseProductMapper(pricingService), merchantStore, searchCriteria);
+        return listProducts(new ReadableBaseProductMapper(), merchantStore, searchCriteria);
     }
 
     /**

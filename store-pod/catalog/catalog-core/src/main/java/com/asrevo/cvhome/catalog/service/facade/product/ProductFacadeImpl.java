@@ -8,7 +8,6 @@ import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.catalog.service.populator.catalog.ReadableProductPopulator;
-import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -22,16 +21,13 @@ public class ProductFacadeImpl implements ProductFacade {
 
     private final ProductService productService;
 
-    private final PricingService pricingService;
-
     private final ImageFilePath imageUtils;
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    public ProductFacadeImpl(ProductService productService, PricingService pricingService, ImageFilePath imageUtils,
+    public ProductFacadeImpl(ProductService productService, ImageFilePath imageUtils,
                              ExternalMerchantStoreService externalStoreMerchantIdService) {
         this.productService = productService;
-        this.pricingService = pricingService;
         this.imageUtils = imageUtils;
         this.externalMerchantStoreService = externalStoreMerchantIdService;
     }
@@ -59,7 +55,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
         ReadableProduct readableProduct = new ReadableProduct();
 
-        ReadableProductPopulator populator = new ReadableProductPopulator(pricingService, imageUtils,
+        ReadableProductPopulator populator = new ReadableProductPopulator(imageUtils,
                 externalMerchantStoreService);
         populator.populate(product, readableProduct, store, language);
 

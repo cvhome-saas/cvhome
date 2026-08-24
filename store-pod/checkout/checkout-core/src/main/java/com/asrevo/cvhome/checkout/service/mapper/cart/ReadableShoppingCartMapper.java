@@ -16,17 +16,17 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.order.OrderSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableOrderTotal;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCartItem;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.checkout.services.order.OrderService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -46,13 +46,13 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 
     private final ExternalMerchantStoreService externalMerchantStoreService;
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     public ReadableShoppingCartMapper(
             ExternalMerchantStoreService externalMerchantStoreService,
-            ExternalProductService externalProductService, OrderService orderService) {
+            ProductDetailsComposer productDetailsComposer, OrderService orderService) {
         this.externalMerchantStoreService = externalMerchantStoreService;
-        this.externalProductService = externalProductService;
+        this.productDetailsComposer = productDetailsComposer;
         this.orderService = orderService;
     }
 
@@ -108,7 +108,7 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
         Set<ShoppingCartItem> items = Optional.ofNullable(source.getLineItems()).orElse(Set.of());
 
         for (ShoppingCartItem item : items) {
-            ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(), language);
+            ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(), language);
             ReadableMinimalProduct minimalProduct = detailedProduct.product();
             if (minimalProduct == null) {
                 continue;

@@ -33,12 +33,10 @@ import org.hibernate.annotations.ParamDef;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
-import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditListener;
@@ -79,12 +77,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     private Set<ProductDescription> descriptions = new HashSet<>();
 
     /**
-     * Inventory
-     */
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductAvailability> availabilities = new HashSet<>();
-
-    /**
      * Attributes of a product Decorates the product with additional properties
      */
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
@@ -111,12 +103,6 @@ public class Product extends SalesManagerEntity<Long, Product> implements Audita
     @JoinTable(name = "PRODUCT_CATEGORY", joinColumns = {@JoinColumn(name = "PRODUCT_ID")},
             inverseJoinColumns = {@JoinColumn(name = "CATEGORY_ID")})
     private Set<Category> categories = new HashSet<>();
-
-    /**
-     * Product variants Decorates the product with variants
-     */
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
-    private Set<ProductVariant> variants = new HashSet<>();
 
     @Column(name = "DATE_AVAILABLE")
     private Instant dateAvailable = Instant.now();

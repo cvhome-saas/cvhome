@@ -19,14 +19,9 @@ import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
 import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
-import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductAvailabilityMapper;
-import com.asrevo.cvhome.catalog.services.pricing.PricingServiceImpl;
 import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
@@ -49,22 +44,15 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     private final ProductImageService productImageService;
 
-    private final PricingServiceImpl pricingService;
-
     private final ReadableMinimalProductMapper readableMinimalProductMapper;
-
-    private final ReadableProductAvailabilityMapper readableProductAvailabilityMapper;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
-                              PricingServiceImpl pricingService, ReadableMinimalProductMapper readableMinimalProductMapper,
-                              ReadableProductAvailabilityMapper readableProductAvailabilityMapper) {
+                              ReadableMinimalProductMapper readableMinimalProductMapper) {
         super(productRepository);
         this.productRepository = productRepository;
         this.productImageService = productImageService;
-        this.pricingService = pricingService;
         this.readableMinimalProductMapper = readableMinimalProductMapper;
-        this.readableProductAvailabilityMapper = readableProductAvailabilityMapper;
     }
 
     @Override
@@ -199,12 +187,9 @@ public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Prod
 
     @SneakyThrows
     @Override
-    public ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
+    public ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
         Product p = getMinimalProductBySku(sku, store, language);
-        ReadableMinimalProduct product = readableMinimalProductMapper.convert(p, store, language);
-        FinalPriceCalc price = pricingService.calculateProductPrice(p);
-        ReadableProductAvailability availability = readableProductAvailabilityMapper.convert(p, store, null);
-        return new ProductDetails(product, price, availability);
+        return readableMinimalProductMapper.convert(p, store, language);
     }
 
     @Override

@@ -8,6 +8,7 @@ export * from './customer-service';
 export * from './description-view-util';
 export * from './direction-utils';
 export * from './http-utils';
+export * from './inventory-service';
 export * from './locale-utils';
 export * from './order-service';
 export * from './pkce-utils';

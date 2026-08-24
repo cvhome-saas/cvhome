@@ -4,27 +4,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
-import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
-import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductFull;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
-import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
@@ -36,8 +27,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Product, StoreMerchantId, ReadableProduct> {
-
-    private PricingService pricingService;
 
     private ImageFilePath imageUtils;
 
@@ -93,11 +82,7 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
 
             populateImages(source, target, store);
 
-            ProductAvailability availability = populateAvailability(source, target);
-
             target.setSku(source.getSku());
-
-            populatePrice(source, target, store, availability);
 
             if (target instanceof ReadableProductFull it) {
                 it.setDescriptions(fulldescriptions);
@@ -181,63 +166,6 @@ public class ReadableMinimalProductPopulator extends AbstractDataPopulator<Produ
         }
 
         return prdImage;
-    }
-
-    private ProductAvailability populateAvailability(Product source, ReadableProduct target) {
-        ProductAvailability availability = null;
-        for (ProductAvailability a : source.getAvailabilities()) {
-            availability = a;
-            target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
-            target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
-                    : availability.getProductQuantityOrderMax());
-            target.setQuantityOrderMinimum(availability.getProductQuantityOrderMin() == null ? 1
-                    : availability.getProductQuantityOrderMin());
-            if (availability.getProductQuantity() > 0 && target.isAvailable()) {
-                target.setCanBePurchased(true);
-            }
-        }
-        return availability;
-    }
-
-    private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability)
-            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
-        FinalPriceCalc price = pricingService.calculateProductPrice(source);
-        if (price == null) {
-            return;
-        }
-
-        target.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
-        target.setPrice(price.getFinalPrice());
-        target.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
-
-        if (price.isDiscounted()) {
-            target.setDiscounted(true);
-        }
-
-        // price appender
-        appendProductPrice(target, availability);
-    }
-
-    private void appendProductPrice(ReadableProduct target, ProductAvailability availability) {
-        if (availability == null) {
-            return;
-        }
-        Set<ProductPrice> prices = availability.getPrices();
-        if (CollectionUtils.isEmpty(prices)) {
-            return;
-        }
-        ReadableProductPrice readableProductPrice = new ReadableProductPrice();
-        readableProductPrice.setDiscounted(target.isDiscounted());
-        readableProductPrice.setFinalPrice(target.getFinalPrice());
-        readableProductPrice.setOriginalPrice(target.getOriginalPrice());
-
-        Optional<ProductPrice> pr = prices.stream()
-                .filter(p -> p.getCode().equals(ProductPrice.DEFAULT_PRICE_CODE))
-                .findFirst();
-
-        target.setProductPrice(readableProductPrice);
-
-        pr.ifPresent(productPrice -> readableProductPrice.setId(productPrice.getId()));
     }
 
     com.asrevo.cvhome.catalog.model.product.ProductDescription populateDescription(ProductDescription description) {

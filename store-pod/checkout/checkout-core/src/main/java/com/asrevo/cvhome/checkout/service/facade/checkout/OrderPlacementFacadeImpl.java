@@ -4,9 +4,6 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.api.errors.CatalogApiUnavailableException;
-import com.asrevo.cvhome.catalog.api.errors.ProductReservationRejectedException;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationReserveResult;
 import com.asrevo.cvhome.checkout.entity.customer.Customer;
 import com.asrevo.cvhome.checkout.entity.order.Order;
 import com.asrevo.cvhome.checkout.errors.OrderNotConvertibleException;
@@ -19,6 +16,9 @@ import com.asrevo.cvhome.checkout.service.facade.order.OrderInventoryOrchestrato
 import com.asrevo.cvhome.checkout.service.facade.order.model.OrderProcessingResult;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
+import com.asrevo.cvhome.inventory.api.errors.ProductReservationRejectedException;
+import com.asrevo.cvhome.inventory.model.reservation.ProductReservationReserveResult;
 import com.asrevo.cvhome.payment.api.errors.PaymentApiUnavailableException;
 import com.asrevo.cvhome.payment.api.errors.PaymentGatewayRejectedException;
 import com.asrevo.cvhome.payment.model.payment.PaymentInitiateResult;
@@ -51,7 +51,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
     @Override
     public OrderProcessingResult placeOrder(PersistableOrder order, Customer customer, StoreMerchantId store, LanguageCode language,
                                             Locale locale, String successUrl, String cancelUrl)
-            throws PaymentApiUnavailableException, CatalogApiUnavailableException,
+            throws PaymentApiUnavailableException, InventoryApiUnavailableException,
             ShoppingCartNotFoundException, OrderNotConvertibleException, OrderProductNotConvertibleException,
             OrderProductPriceMissingException {
 
@@ -87,7 +87,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CONFIRMED);
                     modelOrder.setInventoryStatus(InventoryStatus.COMMITTED);
                     modelOrder.setPaymentStatus(PaymentStatus.PAID);
-                } catch (CatalogApiUnavailableException e) {
+                } catch (InventoryApiUnavailableException e) {
                     log.error("Failed to commit reservation for PAID order {}. Manual intervention required.", modelOrder.getId(), e);
                     // Ensure local status reflects payment even if catalog commit failed
                     updateOrderStatus(modelOrder, OrderStatus.PENDING_PAYMENT, InventoryStatus.RESERVED, PaymentStatus.PAID);
@@ -108,7 +108,7 @@ public class OrderPlacementFacadeImpl implements OrderPlacementFacade {
                     modelOrder.setStatus(OrderStatus.CANCELLED);
                     modelOrder.setInventoryStatus(InventoryStatus.RELEASED);
                     modelOrder.setPaymentStatus(PaymentStatus.FAILED);
-                } catch (CatalogApiUnavailableException e) {
+                } catch (InventoryApiUnavailableException e) {
                     log.error("Failed to release reservation for FAILED order {}.", modelOrder.getId(), e);
                     updateOrderStatus(modelOrder, OrderStatus.CANCELLED, InventoryStatus.RESERVATION_FAILED, PaymentStatus.FAILED);
                 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
@@ -24,7 +23,6 @@ import com.asrevo.cvhome.catalog.service.mapper.catalog.product.ReadableProductD
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 @Service("productDefinitionFacade")
 // @Profile({"default", "cloud", "gcp", "aws", "mysql", "local"})
@@ -38,9 +36,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
     public ProductDefinitionFacadeImpl(ProductService productService,
                                        PersistableProductDefinitionMapper persistableProductDefinitionMapper,
-                                       ReadableProductDefinitionMapper readableProductDefinitionMapper,
-                                       ProductVariantFacade productVariantFacade,
-                                       ImageFilePath imageUtils) {
+                                       ReadableProductDefinitionMapper readableProductDefinitionMapper) {
         this.productService = productService;
         this.persistableProductDefinitionMapper = persistableProductDefinitionMapper;
         this.readableProductDefinitionMapper = readableProductDefinitionMapper;
@@ -88,8 +84,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
     }
 
     @Override
-    public ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language)
-            throws InventoryNotConvertibleException {
+    public ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language) {
         Product product = productService.findOne(id, store);
         return readableProductDefinitionMapper.convert(product, store, language);
     }

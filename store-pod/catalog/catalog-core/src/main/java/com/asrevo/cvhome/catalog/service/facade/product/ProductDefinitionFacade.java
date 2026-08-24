@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.service.facade.product;
 
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
@@ -44,7 +43,6 @@ public interface ProductDefinitionFacade {
     /**
      *
      */
-    ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language)
-            throws InventoryNotConvertibleException;
+    ReadableProductDefinition getProduct(StoreMerchantId store, Long id, LanguageCode language);
 
 }

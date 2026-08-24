@@ -8,9 +8,9 @@ import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductAttributeEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionEntity;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValue;
-import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 import com.asrevo.cvhome.store.utils.PriceUtils;
 
@@ -21,14 +21,14 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
 
     private final ReadableProductOptionValueMapper readableProductOptionValueMapper;
 
-    private final PricingService pricingService;
+    private final ExternalMerchantStoreService externalMerchantStoreService;
 
     public ReadableProductAttributeMapper(ReadableProductOptionMapper readableProductOptionMapper,
                                           ReadableProductOptionValueMapper readableProductOptionValueMapper,
-                                          PricingService pricingService) {
+                                          ExternalMerchantStoreService externalMerchantStoreService) {
         this.readableProductOptionMapper = readableProductOptionMapper;
         this.readableProductOptionValueMapper = readableProductOptionValueMapper;
-        this.pricingService = pricingService;
+        this.externalMerchantStoreService = externalMerchantStoreService;
     }
 
     @Override
@@ -52,7 +52,8 @@ public class ReadableProductAttributeMapper implements Mapper<ProductAttribute, 
 
             if (source.getProductAttributePrice() != null && source.getProductAttributePrice().doubleValue() > 0) {
                 String formatedPrice;
-                formatedPrice = pricingService.getDisplayAmount(source.getProductAttributePrice(), store);
+                formatedPrice = PriceUtils.getStoreFormatedAmountWithCurrency(
+                        externalMerchantStoreService.getStore(store), source.getProductAttributePrice());
                 attr.setProductAttributePrice(formatedPrice);
                 attr.setProductAttributeUnformattedPrice(PriceUtils.getStringAmount(source.getProductAttributePrice()));
             }

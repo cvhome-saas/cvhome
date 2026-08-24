@@ -18,37 +18,30 @@ import com.asrevo.cvhome.catalog.entity.product.attribute.ProductAttribute;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionDescription;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValue;
 import com.asrevo.cvhome.catalog.entity.product.attribute.ProductOptionValueDescription;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.ManufacturerDescription;
-import com.asrevo.cvhome.catalog.entity.product.price.ProductPrice;
-import com.asrevo.cvhome.catalog.entity.product.price.ProductPriceDescription;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
-import com.asrevo.cvhome.catalog.errors.NoApplicableInventoryException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductFull;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductPrice;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductOption;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductProperty;
 import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductPropertyValue;
 import com.asrevo.cvhome.catalog.model.product.attribute.api.ReadableProductOptionValue;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
 import com.asrevo.cvhome.catalog.model.product.type.ProductTypeDescription;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
-import com.asrevo.cvhome.catalog.services.pricing.PricingService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.utils.ImageFilePath;
+import com.asrevo.cvhome.store.utils.PriceUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,8 +49,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ReadableProductPopulator extends AbstractDataPopulator<Product, StoreMerchantId, ReadableProduct> {
-
-    private PricingService pricingService;
 
     private ImageFilePath imageUtils;
 
@@ -80,8 +71,6 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
                 language = baseStore.getDefaultLanguage();
             }
 
-            final LanguageCode lang = language;
-
             applyBasicFields(source, target, language);
             applyDescription(description, target);
 
@@ -90,11 +79,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
             populateCategories(source, target, store, language);
             populateAttributes(source, target, store, language);
 
-            ProductAvailability availability = populateAvailability(source, target);
-
             target.setSku(source.getSku());
-
-            populatePrice(source, target, store, availability, lang);
 
             applyFullDescriptions(target, fulldescriptions);
 
@@ -261,8 +246,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
         target.setCategories(categoryList);
     }
 
-    private void populateAttributes(Product source, ReadableProduct target, StoreMerchantId store, LanguageCode language)
-            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
+    private void populateAttributes(Product source, ReadableProduct target, StoreMerchantId store, LanguageCode language) {
         if (CollectionUtils.isEmpty(source.getAttributes())) {
             return;
         }
@@ -330,8 +314,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
 
     private Map<Long, ReadableProductOption> applySelectableAttribute(ProductAttribute attribute,
                                                                       Map<Long, ReadableProductOption> selectableOptions,
-                                                                      StoreMerchantId store, LanguageCode language)
-            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
+                                                                      StoreMerchantId store, LanguageCode language) {
         Map<Long, ReadableProductOption> options = selectableOptions;
         if (options == null) {
             options = new TreeMap<>();
@@ -352,8 +335,7 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
         return options;
     }
 
-    private ReadableProductOptionValue buildOptionValue(ProductAttribute attribute, StoreMerchantId store, LanguageCode language)
-            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
+    private ReadableProductOptionValue buildOptionValue(ProductAttribute attribute, StoreMerchantId store, LanguageCode language) {
         ReadableProductOptionValue optValue = new ReadableProductOptionValue();
         ProductOptionValue optionValue = attribute.getProductOptionValue();
 
@@ -382,12 +364,12 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
         return optValue;
     }
 
-    private void applyAttributePrice(ProductAttribute attribute, StoreMerchantId store, ReadableProductOptionValue optValue)
-            throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
+    private void applyAttributePrice(ProductAttribute attribute, StoreMerchantId store, ReadableProductOptionValue optValue) {
         if (attribute.getProductAttributePrice() == null || attribute.getProductAttributePrice().doubleValue() <= 0) {
             return;
         }
-        String formatedPrice = pricingService.getDisplayAmount(attribute.getProductAttributePrice(), store);
+        String formatedPrice = PriceUtils.getStoreFormatedAmountWithCurrency(
+                externalMerchantStoreService.getStore(store), attribute.getProductAttributePrice());
         optValue.setPrice(formatedPrice);
     }
 
@@ -414,79 +396,6 @@ public class ReadableProductPopulator extends AbstractDataPopulator<Product, Sto
             }
         }
         return podescription;
-    }
-
-    private ProductAvailability populateAvailability(Product source, ReadableProduct target) {
-        ProductAvailability availability = null;
-        for (ProductAvailability a : source.getAvailabilities()) {
-            availability = a;
-            target.setQuantity(availability.getProductQuantity() == null ? 1 : availability.getProductQuantity());
-            target.setQuantityOrderMaximum(availability.getProductQuantityOrderMax() == null ? 1
-                    : availability.getProductQuantityOrderMax());
-            target.setQuantityOrderMinimum(availability.getProductQuantityOrderMin() == null ? 1
-                    : availability.getProductQuantityOrderMin());
-            if (availability.getProductQuantity() > 0 && target.isAvailable()) {
-                target.setCanBePurchased(true);
-            }
-        }
-        return availability;
-    }
-
-    private void populatePrice(Product source, ReadableProduct target, StoreMerchantId store, ProductAvailability availability,
-                               LanguageCode lang) throws NoApplicableInventoryException, ProductPriceNotConvertibleException {
-        FinalPriceCalc price = pricingService.calculateProductPrice(source);
-        if (price == null) {
-            return;
-        }
-
-        target.setFinalPrice(pricingService.getDisplayAmount(price.getFinalPrice(), store));
-        target.setPrice(price.getFinalPrice());
-        target.setOriginalPrice(pricingService.getDisplayAmount(price.getOriginalPrice(), store));
-
-        if (price.isDiscounted()) {
-            target.setDiscounted(true);
-        }
-
-        // price appender
-        appendProductPrice(target, availability, lang);
-    }
-
-    private void appendProductPrice(ReadableProduct target, ProductAvailability availability, LanguageCode lang) {
-        if (availability == null) {
-            return;
-        }
-        Set<ProductPrice> prices = availability.getPrices();
-        if (CollectionUtils.isEmpty(prices)) {
-            return;
-        }
-        ReadableProductPrice readableProductPrice = new ReadableProductPrice();
-        readableProductPrice.setDiscounted(target.isDiscounted());
-        readableProductPrice.setFinalPrice(target.getFinalPrice());
-        readableProductPrice.setOriginalPrice(target.getOriginalPrice());
-
-        Optional<ProductPrice> pr = prices.stream()
-                .filter(p -> p.getCode().equals(ProductPrice.DEFAULT_PRICE_CODE))
-                .findFirst();
-
-        target.setProductPrice(readableProductPrice);
-
-        pr.ifPresent(productPrice -> applyPriceDescription(productPrice, readableProductPrice, lang));
-    }
-
-    private void applyPriceDescription(ProductPrice productPrice, ReadableProductPrice readableProductPrice, LanguageCode lang) {
-        readableProductPrice.setId(productPrice.getId());
-        Optional<ProductPriceDescription> d = productPrice.getDescriptions()
-                .stream()
-                .filter(desc -> desc.getLanguageCode().equals(lang))
-                .findFirst();
-        d.ifPresent(desc -> {
-            com.asrevo.cvhome.catalog.model.product.ProductPriceDescription priceDescription =
-                    new com.asrevo.cvhome.catalog.model.product.ProductPriceDescription();
-            priceDescription.setLanguage(lang);
-            priceDescription.setId(desc.getId());
-            priceDescription.setPriceAppender(desc.getPriceAppender());
-            readableProductPrice.setDescription(priceDescription);
-        });
     }
 
     private ReadableProductOption createOption(ProductAttribute productAttribute, LanguageCode language) {

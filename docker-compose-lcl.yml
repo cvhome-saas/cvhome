@@ -32,6 +32,7 @@ services:
       - "checkout.gateway.com:host-gateway"
       - "cua.gateway.com:host-gateway"
       - "payment.gateway.com:host-gateway"
+      - "inventory.gateway.com:host-gateway"
       - "landing-ui.gateway.com:host-gateway"
       - "spg-507f1f77.gateway.com:host-gateway"
     environment:

@@ -5,8 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
 import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.catalog.services.product.ProductService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -35,8 +34,9 @@ public class ExternalProductApi implements ExternalProductService {
     private final ProductService productService;
 
     @GetMapping(value = "/detailed-product")
-    @Operation(method = "GET", description = "Get Full Product Details",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ReadableProduct.class))))
+    @Operation(method = "GET", description = "Get product data for a sku (price and stock come from inventory)",
+            responses = @ApiResponse(
+                    content = @Content(schema = @Schema(implementation = ReadableMinimalProduct.class))))
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "sku", schema = @Schema(name = "sku", type = "string"))
@@ -44,7 +44,8 @@ public class ExternalProductApi implements ExternalProductService {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     @Override
-    public ProductDetails getDetailedProduct(StoreMerchantId store, @RequestParam String sku, LanguageCode lang) {
+    public ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, @RequestParam String sku,
+                                                     LanguageCode lang) {
         return productService.getDetailedProduct(store, sku, lang);
     }
 

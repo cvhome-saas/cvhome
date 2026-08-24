@@ -11,21 +11,17 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.model.category.ReadableCategory;
 import com.asrevo.cvhome.catalog.model.manufacturer.ReadableManufacturer;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
-import com.asrevo.cvhome.catalog.model.product.inventory.ReadableInventory;
 import com.asrevo.cvhome.catalog.model.product.product.ProductSpecification;
 import com.asrevo.cvhome.catalog.model.product.product.definition.ReadableProductDefinition;
 import com.asrevo.cvhome.catalog.model.product.type.ReadableProductType;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableCategoryMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableManufacturerMapper;
 import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableProductTypeMapper;
-import com.asrevo.cvhome.catalog.service.mapper.inventory.ReadableInventoryMapper;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
@@ -44,7 +40,6 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
 
     private final ReadableManufacturerMapper readableManufacturerMapper;
 
-    private final ReadableInventoryMapper readableInventoryMapper;
 
     private final ImageFilePath imageUtils;
 
@@ -53,26 +48,24 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
     public ReadableProductDefinitionMapper(ReadableCategoryMapper readableCategoryMapper,
                                            ReadableProductTypeMapper readableProductTypeMapper,
                                            ReadableManufacturerMapper readableManufacturerMapper,
-                                           ReadableInventoryMapper readableInventoryMapper, ImageFilePath imageUtils,
+                                           ImageFilePath imageUtils,
                                            ExternalMerchantStoreService externalMerchantStoreService) {
         this.readableCategoryMapper = readableCategoryMapper;
         this.readableProductTypeMapper = readableProductTypeMapper;
         this.readableManufacturerMapper = readableManufacturerMapper;
-        this.readableInventoryMapper = readableInventoryMapper;
         this.imageUtils = imageUtils;
         this.externalMerchantStoreService = externalMerchantStoreService;
     }
 
     @Override
-    public ReadableProductDefinition convert(Product source, StoreMerchantId store, LanguageCode language)
-            throws InventoryNotConvertibleException {
+    public ReadableProductDefinition convert(Product source, StoreMerchantId store, LanguageCode language) {
         ReadableProductDefinition target = new ReadableProductDefinition();
         return this.merge(source, target, store, language);
     }
 
     @Override
     public ReadableProductDefinition merge(Product source, ReadableProductDefinition target, StoreMerchantId store,
-                                           LanguageCode language) throws InventoryNotConvertibleException {
+                                           LanguageCode language) {
         target.setIdentifier(source.getSku());
         target.setId(source.getId());
         target.setVisible(source.isAvailable());
@@ -135,18 +128,6 @@ public class ReadableProductDefinitionMapper implements Mapper<Product, Readable
                     .map(i -> this.convertImage(source, i, store))
                     .toList();
             target.setImages(imageList);
-        }
-
-        // quantity
-        ProductAvailability availability = null;
-        for (ProductAvailability a : source.getAvailabilities()) {
-            availability = a;
-        }
-
-        if (availability != null) {
-            target.setCanBePurchased(availability.isProductStatus());
-            ReadableInventory inventory = readableInventoryMapper.convert(availability, store, language);
-            target.setInventory(inventory);
         }
 
         return target;

@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -31,11 +30,10 @@ public interface ProductRepository
             CASE WHEN COUNT(*) > 0 THEN true ELSE false END
             FROM
             Product p
-            LEFT JOIN ProductVariant pv ON pv.product.id = p.id
-            WHERE (pv.sku = ?1 OR p.sku = ?1) and p.store = ?2""")
+            WHERE p.sku = ?1 and p.store = ?2""")
     boolean existsBySku(String sku, StoreMerchantId storeMerchantId);
 
-    @Query(value = "select p.id from Product p left join p.variants pv where (p.sku=?1 or pv.sku=?1) and p.store=?2")
+    @Query(value = "select p.id from Product p where p.sku=?1 and p.store=?2")
     List<Long> findBySku(String sku, StoreMerchantId merchantStoreId);
 
     /**
@@ -75,9 +73,7 @@ public interface ProductRepository
         return findAll(spec, pageable);
     }
 
-    @EntityGraph(attributePaths = {"availabilities"})
     @Query("SELECT p FROM Product p WHERE p.sku = :sku AND p.store = :store")
-    Product getByProductSkuFetchAvailabilities(@Param("sku") String sku,
-                                               @Param("store") StoreMerchantId storeMerchantId);
+    Product getByProductSku(@Param("sku") String sku, @Param("store") StoreMerchantId storeMerchantId);
 
 }

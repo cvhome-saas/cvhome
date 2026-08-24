@@ -3,9 +3,7 @@ package com.asrevo.cvhome.catalog.service.mapper.catalog.product;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,45 +13,32 @@ import org.springframework.stereotype.Component;
 
 import com.asrevo.cvhome.catalog.entity.category.Category;
 import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.availability.ProductAvailability;
 import com.asrevo.cvhome.catalog.entity.product.description.ProductDescription;
 import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
 import com.asrevo.cvhome.catalog.entity.product.manufacturer.Manufacturer;
 import com.asrevo.cvhome.catalog.entity.product.type.ProductType;
-import com.asrevo.cvhome.catalog.entity.product.variant.ProductVariant;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.ProductVariantSkuConflictException;
-import com.asrevo.cvhome.catalog.errors.ProductVariationReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.model.product.PersistableImage;
 import com.asrevo.cvhome.catalog.model.product.product.PersistableProduct;
-import com.asrevo.cvhome.catalog.model.product.product.variant.PersistableProductVariant;
 import com.asrevo.cvhome.catalog.services.category.CategoryService;
 import com.asrevo.cvhome.catalog.services.product.manufacturer.ManufacturerService;
 import com.asrevo.cvhome.catalog.services.product.type.ProductTypeService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.errors.ConversionException;
-import com.asrevo.cvhome.store.core.constants.Constants;
 import com.asrevo.cvhome.store.core.mapper.Mapper;
 
 /**
- * Transforms a fully configured PersistableProduct to a Product with inventory and
- * Variants if any
+ * Transforms a fully configured PersistableProduct to a Product. Inventory and variants left with the
+ * catalog/inventory split.
  *
  * @author carlsamson
  */
 @Component
 public class PersistableProductMapper implements Mapper<PersistableProduct, Product> {
-
-    private final PersistableProductAvailabilityMapper persistableProductAvailabilityMapper;
-
-    private final PersistableProductVariantMapper persistableProductVariantMapper;
 
     private final CategoryService categoryService;
 
@@ -61,11 +46,8 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
     private final ProductTypeService productTypeService;
 
-    public PersistableProductMapper(PersistableProductAvailabilityMapper persistableProductAvailabilityMapper,
-                                    PersistableProductVariantMapper persistableProductVariantMapper, CategoryService categoryService,
+    public PersistableProductMapper(CategoryService categoryService,
                                     ManufacturerService manufacturerService, ProductTypeService productTypeService) {
-        this.persistableProductAvailabilityMapper = persistableProductAvailabilityMapper;
-        this.persistableProductVariantMapper = persistableProductVariantMapper;
         this.categoryService = categoryService;
         this.manufacturerService = manufacturerService;
         this.productTypeService = productTypeService;
@@ -74,10 +56,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     @Override
     public Product convert(PersistableProduct source, StoreMerchantId store, LanguageCode language)
             throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
-            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
-            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException {
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException {
         Product product = new Product();
         return this.merge(source, product, store, language);
     }
@@ -85,10 +64,7 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
     @Override
     public Product merge(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
             throws ProductNotConvertibleException, ManufacturerReferenceUnresolvableException,
-            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException,
-            ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException {
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException {
         try {
 
             // core properties
@@ -125,8 +101,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
             destination.setProductReviewCount(source.getRatingCount());
 
             applyCategories(source, destination, store);
-            applyVariants(source, destination, store, language);
-            applyInventory(source, destination, store, language);
             applyImages(source, destination);
 
             return destination;
@@ -239,48 +213,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
         throw CategoryReferenceUnresolvableException.of(hasCode ? categ.getCode() : categ.getId(), store);
     }
 
-    private void applyVariants(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
-            throws ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException {
-        if (CollectionUtils.isEmpty(source.getVariants())) {
-            return;
-        }
-        // A plain loop rather than stream().map(...): the variant mapper declares checked failures, and a lambda
-        // cannot carry them.
-        Set<ProductVariant> variants = new HashSet<>();
-        for (PersistableProductVariant persistableVariant : source.getVariants()) {
-            variants.add(this.variant(destination, persistableVariant, store, language));
-        }
-
-        destination.setVariants(variants);
-    }
-
-    private void applyInventory(PersistableProduct source, Product destination, StoreMerchantId store, LanguageCode language)
-            throws InventoryNotConvertibleException {
-        if (source.getInventory() != null) {
-            ProductAvailability productAvailability = persistableProductAvailabilityMapper
-                    .convert(source.getInventory(), store, language);
-            productAvailability.setProduct(destination);
-            destination.getAvailabilities().add(productAvailability);
-            return;
-        }
-
-        // need an inventory to create a Product
-        if (CollectionUtils.isEmpty(destination.getVariants())) {
-            return;
-        }
-        ProductAvailability defaultAvailability = null;
-        for (ProductVariant variant : destination.getVariants()) {
-            defaultAvailability = this.defaultAvailability(new ArrayList<>(variant.getAvailabilities()));
-        }
-
-        if (defaultAvailability != null) {
-            defaultAvailability.setProduct(destination);
-        }
-        destination.getAvailabilities().add(defaultAvailability);
-    }
-
     private void applyImages(PersistableProduct source, Product destination) {
         if (CollectionUtils.isEmpty(source.getImages())) {
             return;
@@ -301,22 +233,6 @@ public class PersistableProductMapper implements Mapper<PersistableProduct, Prod
 
             destination.getImages().add(productImage);
         }
-    }
-
-    private ProductVariant variant(Product product, PersistableProductVariant variant, StoreMerchantId store,
-                                   LanguageCode language)
-            throws ProductVariationReferenceUnresolvableException, ProductReferenceUnresolvableException,
-            ProductVariantSkuConflictException, ProductPriceNotConvertibleException,
-            InventoryNotConvertibleException {
-        ProductVariant productVariant = persistableProductVariantMapper.convert(variant, store, language);
-        productVariant.setProduct(product);
-        return productVariant;
-    }
-
-    private ProductAvailability defaultAvailability(List<ProductAvailability> availabilityList) {
-        return availabilityList.stream()
-                .filter(a -> a.getRegion() != null && a.getRegion().equals(Constants.ALL_REGIONS))
-                .findFirst().orElse(null);
     }
 
 }

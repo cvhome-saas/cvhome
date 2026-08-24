@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
 import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductAttributeNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
@@ -146,8 +145,7 @@ public class ProductApiV2 {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CATALOG.*')")
     public ReadableProductDefinition getV2(@PathVariable Long id, StoreMerchantId merchantStore,
-                                           LanguageCode language)
-            throws InventoryNotConvertibleException {
+                                           LanguageCode language) {
 
         return productDefinitionFacade.getProduct(merchantStore, id, LanguageCode.allLanguage());
     }

@@ -19,6 +19,8 @@ import type {
 } from '@models/catalog';
 import type {ReadableMerchantStore} from '@models/merchant';
 import {emptyDraft, type ProductDraft} from '@models/products';
+import {InventoryService} from '@api/inventory/inventory.service';
+import type {SkuInventory} from '@models/catalog';
 import {ProductFormApi} from './product-form.api.service';
 
 function page<T>(content: T[]): PageT<T> {
@@ -34,7 +36,6 @@ const DEFINITION: ReadableProductDefinition = {
   id: 7,
   sku: 'ACM-7',
   visible: true,
-  canBePurchased: true,
   shipeable: true,
   virtual: false,
   dateAvailable: '2026-03-04T00:00:00Z',
@@ -47,11 +48,32 @@ const DEFINITION: ReadableProductDefinition = {
     {id: 5, imageName: 'b.jpg', order: 1, defaultImage: false},
     {id: 4, imageName: 'a.jpg', order: 0, defaultImage: true},
   ],
-  inventory: {sku: 'ACM-7', price: '750.00', quantity: 25},
   descriptions: [
     {language: 'en', name: 'Runner', description: '<p>Fast</p>', friendlyUrl: 'runner'},
   ],
 };
+
+class FakeInventoryService {
+  readonly upserts: {sku: string; body: unknown}[] = [];
+  inventories: SkuInventory[] = [
+    {
+      sku: 'ACM-7',
+      available: true,
+      canBePurchased: true,
+      quantity: 25,
+      price: {finalPrice: 750, originalPrice: 750},
+    },
+  ];
+
+  bySkus(): Observable<readonly SkuInventory[]> {
+    return of(this.inventories);
+  }
+
+  upsert(sku: string, body: unknown): Observable<unknown> {
+    this.upserts.push({sku, body});
+    return of({});
+  }
+}
 
 class FakeProductService {
   readonly created: PersistableProductDefinition[] = [];
@@ -164,10 +186,12 @@ class FakeStoreService {
 
 describe('ProductFormApi', () => {
   let api: ProductFormApi;
+  let inventory: FakeInventoryService;
   let products: FakeProductService;
   let images: FakeImageService;
 
   beforeEach(() => {
+    inventory = new FakeInventoryService();
     products = new FakeProductService();
     images = new FakeImageService();
 
@@ -175,6 +199,7 @@ describe('ProductFormApi', () => {
       providers: [
         ProductFormApi,
         {provide: ProductService, useValue: products},
+        {provide: InventoryService, useValue: inventory},
         {provide: ProductImageService, useValue: images},
         {provide: ProductRelationshipService, useValue: new FakeRelationshipService()},
         {provide: CategoryService, useValue: new FakeCategoryService()},
@@ -193,7 +218,7 @@ describe('ProductFormApi', () => {
       expect(draft.sku).toBe('ACM-7');
       // `Instant` on the wire, `YYYY-MM-DD` in a date field.
       expect(draft.dateAvailable).toBe('2026-03-04');
-      // A string on the read and a number on the write — the one place the two DTOs disagree.
+      // Price and quantity come from the inventory service since the split.
       expect(draft.price).toBe(750);
       expect(draft.quantity).toBe(25);
       expect(draft.brandCode).toBe('NIKE');

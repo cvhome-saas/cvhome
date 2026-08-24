@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.catalog.model.product.product.definition;
 
 import java.io.Serial;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +31,5 @@ public class PersistableProductDefinition extends ProductDefinition {
 
     private String manufacturer;
 
-    private BigDecimal price;
-
-    private int quantity;
 
 }

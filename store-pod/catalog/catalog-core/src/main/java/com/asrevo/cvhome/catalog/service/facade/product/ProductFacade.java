@@ -2,11 +2,8 @@ package com.asrevo.cvhome.catalog.service.facade.product;
 
 import com.asrevo.cvhome.catalog.entity.product.Product;
 import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.errors.InventoryNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotConvertibleException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
-import com.asrevo.cvhome.catalog.errors.ProductPriceNotConvertibleException;
-import com.asrevo.cvhome.catalog.errors.ProductVariantParentMissingException;
 import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
 import com.asrevo.cvhome.catalog.model.product.ReadableProductList;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
@@ -23,8 +20,7 @@ public interface ProductFacade {
      * Get a Product by friendlyUrl (slug), store and language
      */
     ReadableProduct getProductBySeUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
-            throws ProductNotFoundException, ProductNotConvertibleException, ProductPriceNotConvertibleException,
-            ProductVariantParentMissingException, InventoryNotConvertibleException;
+            throws ProductNotFoundException, ProductNotConvertibleException;
 
     /**
      * Filters a list of product based on criteria
