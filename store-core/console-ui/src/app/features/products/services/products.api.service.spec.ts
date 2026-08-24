@@ -44,7 +44,7 @@ class FakeInventoryService {
   readonly upserts: {sku: string; body: unknown}[] = [];
   readonly deletes: number[] = [];
   inventories: SkuInventory[] = [
-    {sku: 'ACM-1', available: true, canBePurchased: true, quantity: 12, price: {finalPrice: 129}},
+    {sku: 'ACM-1', available: true, canBePurchased: true, quantity: 12, price: {originalPrice: 129, finalPrice: 129, discounted: false, discountPercent: 0}},
   ];
 
   bySkus(): Observable<readonly SkuInventory[]> {
@@ -280,7 +280,7 @@ describe('ProductsApi', () => {
             productId: 1,
             quantity: 4,
             available: false,
-            prices: [{code: 'base', defaultPrice: true, price: 99.5}],
+            price: {amount: 99.5},
           });
           done();
         });
@@ -290,8 +290,8 @@ describe('ProductsApi', () => {
   it('sends a zero price rather than omitting it when a product has none', (done) => {
     api.loadSnapshot(QUERY).subscribe(() => {
       api.applyInlineEdit({id: 2, price: null, quantity: 0, available: true}, QUERY).subscribe(() => {
-        const body = inventory.upserts[0].body as {prices: {price: number}[]};
-        expect(body.prices[0].price).toBe(0);
+        const body = inventory.upserts[0].body as {price: {amount: number}};
+        expect(body.price.amount).toBe(0);
         done();
       });
     });

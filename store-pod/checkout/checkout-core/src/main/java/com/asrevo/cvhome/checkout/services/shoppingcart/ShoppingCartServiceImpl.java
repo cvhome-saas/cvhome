@@ -16,6 +16,7 @@ import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartReposito
 import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.model.SkuPrice;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -113,7 +114,14 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
                 log.debug("Populate item {}", item.getId());
                 ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(),
                         language);
-                item.setItemPrice(detailedProduct.price().getFinalPrice());
+                SkuPrice price = detailedProduct.inventory().price();
+                if (price == null) {
+                    // Priced nowhere any more: the line cannot be sold, and the cart is rebuilt without it.
+                    item.setObsolete(true);
+                    cartIsObsolete = true;
+                    continue;
+                }
+                item.setItemPrice(price.finalPrice());
 
                 BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
                 item.setSubTotal(subTotal);

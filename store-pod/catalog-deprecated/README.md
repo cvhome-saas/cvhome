@@ -27,3 +27,5 @@ compiles.** Same pattern as `store-pod/content-deprecated`: reference only.
 2. The old catalog tables still exist in deployed databases until the manual drop script
    (`extra/scripts/drop-catalog-inventory-tables.sql`) has been run — after that, only `deprecated-ddl.sql`
    documents their shape.
+3. The `CATALOG.PRODUCT_VARIANT.*` / `CATALOG.PRODUCT_VARIATION.*` error codes were pruned from `CatalogErrors`
+   with the code; the exception classes here still name them, so re-add the constants when re-registering.

@@ -257,7 +257,7 @@ export class ProductFormApi {
         productId,
         quantity: draft.quantity,
         available: draft.canBePurchased,
-        prices: [{code: 'base', defaultPrice: true, price: draft.price ?? 0}],
+        price: {amount: draft.price ?? 0},
       })
       .pipe(
         map(() => true),

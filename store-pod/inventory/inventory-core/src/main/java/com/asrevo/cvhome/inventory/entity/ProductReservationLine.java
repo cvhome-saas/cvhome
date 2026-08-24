@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.inventory.entity;
 
+import java.io.Serial;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,11 +19,17 @@ import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * One sku's share of a {@link ProductReservation}: the quantity taken and the inventory row it came from.
+ */
 @Entity
 @Table(name = "PRODUCT_RESERVATION_LINE")
 @Getter
 @Setter
 public class ProductReservationLine extends SalesManagerEntity<Long, ProductReservationLine> {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TABLE_GEN")
@@ -33,15 +41,25 @@ public class ProductReservationLine extends SalesManagerEntity<Long, ProductRese
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_RESERVATION_ID", nullable = false)
-    private ProductReservation productReservation;
+    private ProductReservation reservation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_AVAIL_ID")
+    private Inventory inventory;
 
     @Column(name = "SKU", nullable = false)
     private String sku;
 
     @Column(name = "QUANTITY", nullable = false)
-    private Integer quantity;
+    private int quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_AVAIL_ID")
-    private ProductAvailability productAvailability;
+    public ProductReservationLine() {
+    }
+
+    public ProductReservationLine(ProductReservation reservation, Inventory inventory, int quantity) {
+        this.reservation = reservation;
+        this.inventory = inventory;
+        this.sku = inventory.getSku();
+        this.quantity = quantity;
+    }
 }

@@ -5,8 +5,10 @@ create table if not exists inventory.sm_sequencer
     seq_count bigint
 );
 
--- Moved from the catalog schema. The former foreign keys to catalog.product and catalog.product_variant are gone:
--- product_id and product_variant survive as plain informational columns, and sku is the cross-service key.
+-- Moved from the catalog schema as-is, so migrate-from-catalog.sql can copy rows column for column. The former
+-- foreign keys to catalog.product / catalog.product_variant are gone; sku is the cross-service key.
+-- The service maps only: product_avail_id, audit, store_merchant_id, sku, product_id, quantity, available,
+-- quantity_ord_min, quantity_ord_max. Everything else is dormant until variants return.
 create table if not exists inventory.product_availability
 (
     product_avail_id  bigint  not null primary key,
@@ -37,11 +39,12 @@ create table if not exists inventory.product_availability
         )
 );
 create index if not exists prd_avail_store_prd_idx on inventory.product_availability (product_id, store_merchant_id);
-create index if not exists prd_avail_prd_idx on inventory.product_availability (product_id);
 create index if not exists prd_avail_store_sku_idx on inventory.product_availability (store_merchant_id, sku);
 
 -- store_merchant_id is new here: the catalog schema inherited tenancy through the availability FK, a standalone
--- price row carries it directly (backfilled by migrate-from-catalog.sql).
+-- price row carries it directly (backfilled by migrate-from-catalog.sql). The service maps: product_price_id,
+-- store_merchant_id, product_avail_id, product_price_code, default_price, product_price_amount and the three
+-- special_* columns.
 create table if not exists inventory.product_price
 (
     product_price_id               bigint       not null primary key,
@@ -64,22 +67,6 @@ create table if not exists inventory.product_price
             ),
     product_avail_id               bigint       not null
         constraint fk_prd_price_avail references inventory.product_availability
-);
-
-create table if not exists inventory.product_price_description
-(
-    description_id   bigint       not null primary key,
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    description      text,
-    name             varchar(120) not null,
-    title            varchar(100),
-    price_appender   varchar(255),
-    language_code    varchar(6)   not null,
-    product_price_id bigint       not null
-        constraint fk_prd_price_desc_price references inventory.product_price,
-    constraint UKc84xdnuwluljfaeor1cax423p unique (product_price_id, language_code)
 );
 
 create table if not exists inventory.product_reservation
@@ -109,6 +96,5 @@ create table if not exists inventory.product_reservation_line
     constraint fk_prd_res_line_avail foreign key (product_avail_id) references inventory.product_availability (product_avail_id)
 );
 
-create index if not exists idx_prd_res_ref on inventory.product_reservation (ref);
 create index if not exists idx_prd_res_expire_at on inventory.product_reservation (expire_at);
 create index if not exists idx_prd_res_line_res_id on inventory.product_reservation_line (product_reservation_id);

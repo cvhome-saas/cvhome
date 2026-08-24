@@ -359,11 +359,14 @@ export interface PersistableInventory {
   readonly productId?: number;
   readonly quantity: number;
   readonly available: boolean;
-  readonly prices: readonly {
-    readonly code: string;
-    readonly defaultPrice: boolean;
-    readonly price: number;
-  }[];
+  readonly quantityOrderMinimum?: number;
+  readonly quantityOrderMaximum?: number;
+  readonly price: {
+    readonly amount: number;
+    readonly specialAmount?: number | null;
+    readonly specialStartDate?: string | null;
+    readonly specialEndDate?: string | null;
+  };
 }
 
 /**
@@ -380,10 +383,13 @@ export interface SkuInventory {
   readonly quantityOrderMinimum?: number;
   readonly quantityOrderMaximum?: number;
   readonly price?: {
-    readonly finalPrice?: number;
-    readonly originalPrice?: number;
-    readonly discounted?: boolean;
-    readonly stringPrice?: string;
+    readonly originalPrice: number;
+    readonly finalPrice: number;
+    readonly discounted: boolean;
+    readonly discountPercent: number;
+    readonly specialAmount?: number | null;
+    readonly specialStartDate?: string | null;
+    readonly specialEndDate?: string | null;
   } | null;
 }
 

@@ -18,20 +18,6 @@ import com.asrevo.cvhome.errors.ErrorCode;
  */
 public enum CatalogErrors implements ErrorCode {
 
-    /**
-     * The stock on hand does not cover what was asked for, or the sku has no availability record at all.
-     *
-     * <p>
-     * A decision about the data, not a malformed request, hence 422 — and the one legacy {@code exceptionType}
-     * ({@code ServiceException.EXCEPTION_INVENTORY_MISMATCH}) that carried real meaning.
-     * </p>
-     */
-    RESERVATION_INSUFFICIENT_INVENTORY("CATALOG.RESERVATION.INSUFFICIENT_INVENTORY", ErrorCategory.UNPROCESSABLE),
-
-    /**
-     * A reservation was requested with no lines on it — the caller's bug, so 400.
-     */
-    RESERVATION_EMPTY("CATALOG.RESERVATION.EMPTY", ErrorCategory.VALIDATION),
 
     /**
      * No product with that id or sku exists in this store.
@@ -60,11 +46,6 @@ public enum CatalogErrors implements ErrorCode {
     PRODUCT_NOT_PERSISTED("CATALOG.PRODUCT.NOT_PERSISTED", ErrorCategory.STORAGE),
 
     /**
-     * Reading a product back out of the database failed.
-     */
-    PRODUCT_NOT_READABLE("CATALOG.PRODUCT.NOT_READABLE", ErrorCategory.STORAGE),
-
-    /**
      * The caller is authenticated but the product belongs to another store.
      *
      * <p>
@@ -74,53 +55,6 @@ public enum CatalogErrors implements ErrorCode {
      * </p>
      */
     PRODUCT_FOREIGN_STORE("CATALOG.PRODUCT.FOREIGN_STORE", ErrorCategory.FORBIDDEN),
-
-    /**
-     * No product variant with that id exists in this store.
-     */
-    PRODUCT_VARIANT_NOT_FOUND("CATALOG.PRODUCT_VARIANT.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * A submitted payload references a product variant that does not resolve in this store.
-     */
-    PRODUCT_VARIANT_REFERENCE_UNRESOLVABLE("CATALOG.PRODUCT_VARIANT.REFERENCE_UNRESOLVABLE", ErrorCategory.CONVERSION),
-
-    /**
-     * A product variant could not be converted.
-     */
-    PRODUCT_VARIANT_NOT_CONVERTIBLE("CATALOG.PRODUCT_VARIANT.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * A variant has no parent product to render against.
-     *
-     * <p>
-     * Categorised as a conversion failure rather than a business rule because that is where it surfaces — inside a
-     * mapper, which {@code Mapper} restricts to {@code ConversionException}. It usually means the row is corrupt
-     * rather than that the caller did anything wrong, which is what the {@code traceId} in the response is for.
-     * </p>
-     */
-    PRODUCT_VARIANT_PARENT_MISSING("CATALOG.PRODUCT_VARIANT.PARENT_MISSING", ErrorCategory.CONVERSION),
-
-    /**
-     * No product variant group with that id exists in this store.
-     */
-    PRODUCT_VARIANT_GROUP_NOT_FOUND("CATALOG.PRODUCT_VARIANT_GROUP.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * No product variation with that id exists in this store.
-     */
-    PRODUCT_VARIATION_NOT_FOUND("CATALOG.PRODUCT_VARIATION.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * A submitted payload references a product variation that does not resolve in this store.
-     */
-    PRODUCT_VARIATION_REFERENCE_UNRESOLVABLE("CATALOG.PRODUCT_VARIATION.REFERENCE_UNRESOLVABLE",
-            ErrorCategory.CONVERSION),
-
-    /**
-     * A variation's option and option value must differ, and did not.
-     */
-    PRODUCT_VARIATION_OPTIONS_IDENTICAL("CATALOG.PRODUCT_VARIATION.OPTIONS_IDENTICAL", ErrorCategory.UNPROCESSABLE),
 
     /**
      * No product option with that id exists in this store.
@@ -189,36 +123,6 @@ public enum CatalogErrors implements ErrorCode {
     PRODUCT_IMAGE_NOT_PERSISTED("CATALOG.PRODUCT_IMAGE.NOT_PERSISTED", ErrorCategory.STORAGE),
 
     /**
-     * No inventory (product availability) with that id exists in this store.
-     */
-    INVENTORY_NOT_FOUND("CATALOG.INVENTORY.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * A submitted payload references an inventory record that does not resolve in this store.
-     */
-    INVENTORY_REFERENCE_UNRESOLVABLE("CATALOG.INVENTORY.REFERENCE_UNRESOLVABLE", ErrorCategory.CONVERSION),
-
-    /**
-     * An inventory record could not be converted.
-     */
-    INVENTORY_NOT_CONVERTIBLE("CATALOG.INVENTORY.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * No price with that id exists for the product in this store.
-     */
-    PRODUCT_PRICE_NOT_FOUND("CATALOG.PRODUCT_PRICE.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * A price could not be converted, or its final amount could not be calculated.
-     */
-    PRODUCT_PRICE_NOT_CONVERTIBLE("CATALOG.PRODUCT_PRICE.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * The product has no inventory a price can be calculated from.
-     */
-    PRICING_NO_APPLICABLE_INVENTORY("CATALOG.PRICING.NO_APPLICABLE_INVENTORY", ErrorCategory.UNPROCESSABLE),
-
-    /**
      * The category is already attached to that product.
      */
     CATEGORY_ALREADY_ATTACHED("CATALOG.CATEGORY.ALREADY_ATTACHED", ErrorCategory.CONFLICT),
@@ -242,16 +146,6 @@ public enum CatalogErrors implements ErrorCode {
      * A category could not be converted.
      */
     CATEGORY_NOT_CONVERTIBLE("CATALOG.CATEGORY.NOT_CONVERTIBLE", ErrorCategory.CONVERSION),
-
-    /**
-     * Persisting a category, or a change to one, failed.
-     */
-    CATEGORY_NOT_PERSISTED("CATALOG.CATEGORY.NOT_PERSISTED", ErrorCategory.STORAGE),
-
-    /**
-     * Reading categories back out of the database failed.
-     */
-    CATEGORY_NOT_READABLE("CATALOG.CATEGORY.NOT_READABLE", ErrorCategory.STORAGE),
 
     /**
      * No manufacturer with that id exists in this store.
@@ -279,31 +173,6 @@ public enum CatalogErrors implements ErrorCode {
     PRODUCT_OPTION_SET_DUPLICATE("CATALOG.PRODUCT_OPTION_SET.DUPLICATE", ErrorCategory.CONFLICT),
 
     /**
-     * A product variation with that code already exists in this store.
-     */
-    PRODUCT_VARIATION_DUPLICATE("CATALOG.PRODUCT_VARIATION.DUPLICATE", ErrorCategory.CONFLICT),
-
-    /**
-     * A product variant's sku must differ from its parent product's, and does not.
-     *
-     * <p>
-     * Categorised as a conversion failure because it is detected inside a mapper, which {@code Mapper} restricts to
-     * {@code ConversionException} — and it is a statement about the submitted body, so 400 fits.
-     * </p>
-     */
-    PRODUCT_VARIANT_SKU_CONFLICT("CATALOG.PRODUCT_VARIANT.SKU_CONFLICT", ErrorCategory.CONVERSION),
-
-    /**
-     * The product cannot be edited — it is not this store's to change.
-     */
-    PRODUCT_NOT_EDITABLE("CATALOG.PRODUCT.NOT_EDITABLE", ErrorCategory.UNPROCESSABLE),
-
-    /**
-     * The product image cannot be edited or deleted — it belongs to another store's product.
-     */
-    PRODUCT_IMAGE_NOT_EDITABLE("CATALOG.PRODUCT_IMAGE.NOT_EDITABLE", ErrorCategory.UNPROCESSABLE),
-
-    /**
      * A category was addressed by a friendly URL that matches nothing in this store.
      */
     CATEGORY_FRIENDLY_URL_NOT_FOUND("CATALOG.CATEGORY.FRIENDLY_URL_NOT_FOUND", ErrorCategory.NOT_FOUND),
@@ -311,27 +180,7 @@ public enum CatalogErrors implements ErrorCode {
     /**
      * A category's id and code identify two different categories, so the reference is self-contradictory.
      */
-    CATEGORY_IDENTIFIERS_INCONSISTENT("CATALOG.CATEGORY.IDENTIFIERS_INCONSISTENT", ErrorCategory.UNPROCESSABLE),
-
-    /**
-     * A required request parameter naming the product was absent.
-     */
-    PRODUCT_ID_PARAMETER_MISSING("CATALOG.PRODUCT.ID_PARAMETER_MISSING", ErrorCategory.VALIDATION),
-
-    /**
-     * Persisting an inventory record, a product option, a variant or a group failed.
-     */
-    CATALOG_WRITE_FAILED("CATALOG.WRITE.FAILED", ErrorCategory.STORAGE),
-
-    /**
-     * Reading catalog data back out of the database failed.
-     */
-    CATALOG_READ_FAILED("CATALOG.READ.FAILED", ErrorCategory.STORAGE),
-
-    /**
-     * Persisting a manufacturer, or reading one back, failed.
-     */
-    MANUFACTURER_NOT_PERSISTED("CATALOG.MANUFACTURER.NOT_PERSISTED", ErrorCategory.STORAGE);
+    CATEGORY_IDENTIFIERS_INCONSISTENT("CATALOG.CATEGORY.IDENTIFIERS_INCONSISTENT", ErrorCategory.UNPROCESSABLE);
 
     private final String code;
 

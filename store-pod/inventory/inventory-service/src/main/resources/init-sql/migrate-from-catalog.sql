@@ -66,22 +66,6 @@ $$
                      JOIN catalog.product_availability a ON a.product_avail_id = pp.product_avail_id
             ON CONFLICT (product_price_id) DO NOTHING;
 
-            INSERT INTO inventory.product_price_description (description_id, date_created, date_modified, updt_id,
-                                                             description, name, title, price_appender, language_code,
-                                                             product_price_id)
-            SELECT d.description_id,
-                   d.date_created,
-                   d.date_modified,
-                   d.updt_id,
-                   d.description,
-                   d.name,
-                   d.title,
-                   d.price_appender,
-                   d.language_code,
-                   d.product_price_id
-            FROM catalog.product_price_description d
-            ON CONFLICT (description_id) DO NOTHING;
-
             INSERT INTO inventory.product_reservation (id, date_created, date_modified, updt_id, ref, expire_at,
                                                        status, store_merchant_id)
             SELECT r.id, r.date_created, r.date_modified, r.updt_id, r.ref, r.expire_at, r.status, r.store_merchant_id
@@ -101,8 +85,6 @@ $$
                     (SELECT COALESCE(MAX(product_avail_id), 0) FROM inventory.product_availability)),
                    ('PRODUCT_PRICE_SEQ_NEXT_VAL',
                     (SELECT COALESCE(MAX(product_price_id), 0) FROM inventory.product_price)),
-                   ('PRODUCT_PRICE_DESCRIPTION_SEQ_NEXT_VAL',
-                    (SELECT COALESCE(MAX(description_id), 0) FROM inventory.product_price_description)),
                    ('PRODUCT_RESERVATION_SEQ_NEXT_VAL',
                     (SELECT COALESCE(MAX(id), 0) FROM inventory.product_reservation)),
                    ('PRODUCT_RESERVATION_LINE_SEQ_NEXT_VAL',

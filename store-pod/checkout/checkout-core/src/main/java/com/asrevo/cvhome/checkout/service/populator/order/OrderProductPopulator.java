@@ -1,7 +1,6 @@
 package com.asrevo.cvhome.checkout.service.populator.order;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -15,8 +14,7 @@ import com.asrevo.cvhome.checkout.model.product.ProductDetails;
 import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.inventory.model.price.FinalPriceCalc;
-import com.asrevo.cvhome.inventory.model.price.SimpleProductPrice;
+import com.asrevo.cvhome.inventory.model.SkuPrice;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +26,11 @@ import lombok.Setter;
 @Component
 @AllArgsConstructor
 public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartItem, StoreMerchantId, OrderProduct> {
+
+    /**
+     * Inventory's single price code; the order keeps it so historic orders read like pre-split ones.
+     */
+    private static final String DEFAULT_PRICE_CODE = "base";
 
     private final ProductDetailsComposer productDetailsComposer;
 
@@ -45,27 +48,15 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
 
             ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, source.getSku(),
                     language);
-            FinalPriceCalc finalPrice = detailedProduct.price();
-            if (finalPrice == null) {
+            SkuPrice price = detailedProduct.inventory().price();
+            if (price == null) {
                 throw OrderProductPriceMissingException.of(source.getSku());
             }
-            // Default price
-            OrderProductPrice orderProductPrice = orderProductPrice(finalPrice);
+            OrderProductPrice orderProductPrice = orderProductPrice(price);
             orderProductPrice.setOrderProduct(target);
 
             Set<OrderProductPrice> prices = new HashSet<>();
             prices.add(orderProductPrice);
-
-            // Other prices
-            List<FinalPriceCalc> otherPrices = finalPrice.getAdditionalPrices();
-            if (otherPrices != null) {
-                for (FinalPriceCalc otherPrice : otherPrices) {
-                    OrderProductPrice other = orderProductPrice(otherPrice);
-                    other.setOrderProduct(target);
-                    prices.add(other);
-                }
-            }
-
             target.setPrices(prices);
 
         } catch (OrderProductPriceMissingException e) {
@@ -83,22 +74,19 @@ public class OrderProductPopulator extends AbstractDataPopulator<ShoppingCartIte
         return null;
     }
 
-    private OrderProductPrice orderProductPrice(FinalPriceCalc price) {
-
+    /**
+     * The one price the single-product model sells at, recorded as the order line's default price.
+     */
+    private OrderProductPrice orderProductPrice(SkuPrice price) {
         OrderProductPrice orderProductPrice = new OrderProductPrice();
-
-        SimpleProductPrice productPrice = price.getProductPrice();
-
-        orderProductPrice.setDefaultPrice(productPrice.isDefaultPrice());
-
-        orderProductPrice.setProductPrice(price.getFinalPrice());
-        orderProductPrice.setProductPriceCode(productPrice.getCode());
-        if (price.isDiscounted()) {
-            orderProductPrice.setProductPriceSpecial(productPrice.getProductPriceSpecialAmount());
-            orderProductPrice.setProductPriceSpecialStartDate(productPrice.getProductPriceSpecialStartDate());
-            orderProductPrice.setProductPriceSpecialEndDate(productPrice.getProductPriceSpecialEndDate());
+        orderProductPrice.setDefaultPrice(true);
+        orderProductPrice.setProductPriceCode(DEFAULT_PRICE_CODE);
+        orderProductPrice.setProductPrice(price.finalPrice());
+        if (price.discounted()) {
+            orderProductPrice.setProductPriceSpecial(price.specialAmount());
+            orderProductPrice.setProductPriceSpecialStartDate(price.specialStartDate());
+            orderProductPrice.setProductPriceSpecialEndDate(price.specialEndDate());
         }
-
         return orderProductPrice;
     }
 

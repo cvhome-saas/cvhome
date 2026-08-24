@@ -1,18 +1,12 @@
 package com.asrevo.cvhome.checkout.model.product;
 
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.inventory.model.availability.ReadableProductAvailability;
-import com.asrevo.cvhome.inventory.model.price.FinalPriceCalc;
+import com.asrevo.cvhome.inventory.model.SkuInventory;
 
 /**
- * Product, price and stock in one value — the shape checkout's cart and order code works against.
- *
- * <p>
- * Before the catalog/inventory split this record came back from one catalog call; now checkout composes it itself
- * (see {@code ProductDetailsComposer}) from catalog's product data and inventory's price/availability. The shape
- * survived the split so the mappers and populators downstream did not have to change.
- * </p>
+ * A sku as checkout sees it: the catalog's product data next to the inventory service's stock and price. Composed by
+ * {@code ProductDetailsComposer}; {@code inventory} is never null — a sku inventory knows nothing about arrives as
+ * "not stocked" so a cart line can still render.
  */
-public record ProductDetails(ReadableMinimalProduct product, FinalPriceCalc price,
-                             ReadableProductAvailability availability) {
+public record ProductDetails(ReadableMinimalProduct product, SkuInventory inventory) {
 }

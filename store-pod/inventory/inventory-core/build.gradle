@@ -6,12 +6,8 @@ dependencies {
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:inventory:inventory-commons')
     api project(':store-pod:checkout:checkout-external-api')
-    api project(':store-pod:merchant:merchant-external-api')
     compileOnly libs.spring.data.jpa
-    compileOnly libs.jakarta.validation.api
-    compileOnly libs.jackson.annotations
-    compileOnly libs.lombok
-    compileOnly libs.apache.commons.lang3
     compileOnly libs.hibernate.core
+    compileOnly libs.lombok
     annotationProcessor libs.lombok
 }

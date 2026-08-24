@@ -35,14 +35,12 @@ dependencies {
     implementation libs.spring.boot.starter.security
     implementation libs.spring.boot.starter.oauth2.client
     implementation libs.spring.boot.starter.security.oauth2.resource.server
-    implementation libs.spring.boot.starter.cache
     implementation libs.spring.boot.starter.data.jpa
     runtimeOnly libs.postgresql
 
     implementation libs.spring.boot.starter.opentelemetry
     implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
 
-    implementation project(':store-pod:merchant:merchant-external-api')
     implementation project(':store-pod:inventory:inventory-core')
     implementation project(':store-pod:inventory:inventory-external-api')
     implementation project(':store-commons:ecs-commons:fargate-task-info')

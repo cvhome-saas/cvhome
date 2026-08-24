@@ -61,7 +61,7 @@ class FakeInventoryService {
       available: true,
       canBePurchased: true,
       quantity: 25,
-      price: {finalPrice: 750, originalPrice: 750},
+      price: {originalPrice: 750, finalPrice: 750, discounted: false, discountPercent: 0},
     },
   ];
 

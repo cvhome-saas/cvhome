@@ -10,18 +10,18 @@ import {StoreService} from "./store-service";
  */
 export interface SkuInventory {
     sku: string;
+    productId?: number | null;
     available: boolean;
     canBePurchased: boolean;
     quantity: number;
     quantityOrderMinimum?: number;
     quantityOrderMaximum?: number;
+    /** Raw amounts; formatting is this side's job. Null when the sku has no price configured. */
     price?: {
-        finalPrice?: number;
-        originalPrice?: number;
-        discounted?: boolean;
-        discountPercent?: number;
-        stringPrice?: string;
-        stringDiscountedPrice?: string;
+        originalPrice: number;
+        finalPrice: number;
+        discounted: boolean;
+        discountPercent: number;
     } | null;
 }
 

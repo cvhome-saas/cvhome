@@ -6,9 +6,6 @@ INSERT INTO inventory.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_PRICE_SEQ_NEXT_VAL', 181)
 on conflict do nothing;
 INSERT INTO inventory.sm_sequencer (seq_name, seq_count)
-VALUES ('PRODUCT_PRICE_DESCRIPTION_SEQ_NEXT_VAL', 360)
-on conflict do nothing;
-INSERT INTO inventory.sm_sequencer (seq_name, seq_count)
 VALUES ('PRODUCT_RESERVATION_SEQ_NEXT_VAL', 0)
 on conflict do nothing;
 INSERT INTO inventory.sm_sequencer (seq_name, seq_count)

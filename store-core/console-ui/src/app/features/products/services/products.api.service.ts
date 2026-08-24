@@ -115,7 +115,7 @@ export class ProductsApi {
         productId: edit.id,
         quantity: edit.quantity,
         available: edit.available,
-        prices: [{code: 'base', defaultPrice: true, price: edit.price ?? 0}],
+        price: {amount: edit.price ?? 0},
       }),
     ]).pipe(switchMap(() => this.loadSnapshot(query)));
   }
