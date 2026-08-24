@@ -168,6 +168,28 @@
       "ORDER_NOT_FOUND": "Commande introuvable.",
       "ERROR_LOADING": "Impossible de charger votre compte pour le moment.",
       "SIGNED_IN_AS": "Connecté en tant que {name}"
+    },
+    "BLOG": {
+      "TITLE": "Blog",
+      "SUBTITLE": "Actualités, guides et histoires de la boutique.",
+      "READ_MORE": "Lire la suite",
+      "MIN_READ": "{minutes} min de lecture",
+      "BY": "Par {author}",
+      "RELATED": "Articles liés",
+      "EMPTY": "Aucun article pour le moment.",
+      "FILTERED_BY": "Filtré par {value}",
+      "ALL_POSTS": "Tous les articles",
+      "PREVIOUS": "Plus récents",
+      "NEXT": "Plus anciens"
+    },
+    "FAQ": {
+      "TITLE": "Aide et FAQ",
+      "SUBTITLE": "Réponses aux questions les plus fréquentes.",
+      "EMPTY": "Aucune question publiée pour le moment."
+    },
+    "POLICY": {
+      "VERSION": "Version {version}",
+      "EFFECTIVE": "En vigueur à partir du {date}"
     }
   },
   "COMPONENTS": {

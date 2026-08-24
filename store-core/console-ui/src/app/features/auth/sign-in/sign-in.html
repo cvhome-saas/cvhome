@@ -1,0 +1,21 @@
+<main class="auth-shell" *transloco="let t">
+  <app-auth-story [story]="facade.signInStory()" />
+
+  <section class="auth-entry" [attr.aria-label]="t('auth.accountAccess')">
+    <form method="get" [action]="config.loginUrl">
+      <div class="auth-tabs" role="group" [attr.aria-label]="t('auth.accountAction')">
+        <a routerLink="/sign-up">{{ t('auth.createAccount') }}</a>
+        <a routerLink="/sign-in" class="active" aria-current="page">{{ t('auth.signIn') }}</a>
+      </div>
+
+      <div class="auth-fields">
+        <p class="oauth-copy">{{ t('auth.signIn.oauthCopy') }}</p>
+        <button class="auth-submit" type="submit">
+          {{ t('auth.signIn.continueWithUaa') }}
+          <span aria-hidden="true">→</span>
+        </button>
+        <p class="legal">{{ t('auth.signIn.twoFactorNote') }}</p>
+      </div>
+    </form>
+  </section>
+</main>

@@ -1,11 +1,10 @@
 'use client'
 import {useTranslations} from 'next-intl';
 import {CheckCircle2Icon, HelpCircleIcon} from 'lucide-react';
-import type {Box, Order, StoreContext} from '@store-front/types';
+import type {AgreementText, Order, StoreContext} from '@store-front/types';
 import {defaultCheckoutValue} from '@store-front/types';
 import {useCheckoutForm} from '@store-front/hooks/use-checkout-form';
 import {useRouter} from '@store-front/i18n/navigation';
-import {parseDescription} from '@store-front/services/description-view-util';
 import {TagButton} from '../components/TagButton';
 import {Input} from '@store-front/ui/input';
 import {Label} from '@store-front/ui/label';
@@ -133,7 +132,7 @@ function SuccessDialog({order, open, onOpenChange}: { order: Order | undefined; 
     );
 }
 
-function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: Box | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
+function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: AgreementText | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
     const t = useTranslations('PAGE.CHECKOUT');
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -141,7 +140,7 @@ function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: Box | und
                 <div className="hazard h-3 border-b border-foreground" aria-hidden/>
                 <AlertDialogHeader className="gap-3 p-6 text-start">
                     <AlertDialogTitle className={dialogTitle}><span className="q">{t('TERMS_AND_CONDITIONS')}</span></AlertDialogTitle>
-                    {box && <AlertDialogDescription asChild><div className="plate max-h-64 overflow-y-auto p-3 font-mono text-sm leading-relaxed text-foreground [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/></AlertDialogDescription>}
+                    {box && <AlertDialogDescription asChild><div className="plate max-h-64 overflow-y-auto p-3 font-mono text-sm leading-relaxed text-foreground [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{__html: box.html}}/></AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter className="gap-2 border-t border-foreground p-4">
                     <AlertDialogCancel asChild><button type="button" className={plateButton} onClick={() => setIsAgree(false)}><span className="q">{t('REJECT')}</span></button></AlertDialogCancel>

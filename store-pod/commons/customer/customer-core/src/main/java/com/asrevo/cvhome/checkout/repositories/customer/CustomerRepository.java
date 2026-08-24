@@ -39,9 +39,15 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
             Path<Object> billing = root.get("billing");
             Path<String> firstName = billing.get("firstName");
             Path<String> lastName = billing.get("lastName");
+            Path<String> emailAddress = root.get("emailAddress");
+            // The one query a single search box sends. It spans the email as well as the two name parts
+            // because the predicates below are AND-ed: a box sending `name` and `email` together would
+            // match nothing. The result used to be computed and dropped rather than added, so a name
+            // filter narrowed nothing at all.
             if (!StringUtils.isBlank(criteria.getName())) {
-                cb.or(cb.like(firstName, PERCENT_SYMBOL + criteria.getName() + PERCENT_SYMBOL),
-                        cb.like(lastName, PERCENT_SYMBOL + criteria.getName() + PERCENT_SYMBOL));
+                String likeValue = PERCENT_SYMBOL + criteria.getName() + PERCENT_SYMBOL;
+                predicates.add(cb.or(cb.like(firstName, likeValue), cb.like(lastName, likeValue),
+                        cb.like(emailAddress, likeValue)));
             }
             if (!StringUtils.isBlank(criteria.getFirstName())) {
                 predicates.add(cb.like(firstName, PERCENT_SYMBOL + criteria.getFirstName() + PERCENT_SYMBOL));
@@ -50,7 +56,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
                 predicates.add(cb.like(lastName, PERCENT_SYMBOL + criteria.getLastName() + PERCENT_SYMBOL));
             }
             if (!StringUtils.isBlank(criteria.getEmail())) {
-                predicates.add(cb.like(root.get("emailAddress"), PERCENT_SYMBOL + criteria.getEmail() + PERCENT_SYMBOL));
+                predicates.add(cb.like(emailAddress, PERCENT_SYMBOL + criteria.getEmail() + PERCENT_SYMBOL));
             }
             if (!StringUtils.isBlank(criteria.getCountry())) {
                 predicates

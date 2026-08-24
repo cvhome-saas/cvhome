@@ -5,7 +5,7 @@ Three shapes exist in this repo, and the first decision is which one you are bui
 | Shape | Example | What you create |
 |---|---|---|
 | **BE** — backend only | `catalog`, `payment`, `tenancy` | Gradle Java modules + a Spring Boot `-service` |
-| **FE** — frontend only | `seller-ui`, `landing-ui` | One Gradle module wrapping an npm app (`ui-conventions`) |
+| **FE** — frontend only | `console-ui`, `landing-ui` | One Gradle module wrapping an npm app (`ui-conventions`) |
 | **BE+FE** — one deployable serving both | `uaa`, `cua` | A Java module whose npm app lives *inside* its resources, **not** a Gradle module |
 
 The second decision is which tree: `store-core/` (one shared platform instance — identity, tenants, billing,
@@ -13,7 +13,7 @@ admin UI) or `store-pod/` (deployed once per pod, per-tenant business runtime). 
 config slice, the fronting gateway, and the s2s client id — get it right before writing anything.
 
 Everything below is derived from what the existing services actually do. Copy the nearest neighbour
-(`payment` for a pod BE, `tenancy` for a core BE, `seller-ui` for an FE, `uaa` for BE+FE) rather than
+(`payment` for a pod BE, `tenancy` for a core BE, `console-ui` for an FE, `uaa` for BE+FE) rather than
 inventing a layout.
 
 ---
@@ -40,7 +40,7 @@ gateway 503s.**
      gateway-service-name: spg                         # store-core-gateway for core
    ```
 
-   Ports in use: 80 spg · 8000 gateway · 8001 uaa · 8010 seller-ui · 8020 tenancy · 8110 landing-ui ·
+   Ports in use: 80 spg · 8000 gateway · 8001 uaa · 8011 console-ui · 8020 tenancy · 8110 landing-ui ·
    8120 merchant · 8122 catalog · 8123 checkout · 8124 cua · 8125 payment. Pick the next free one in the
    right band (`81xx` pod, `80xx` core) and **never hardcode it anywhere else.**
 
@@ -181,7 +181,7 @@ Persistence in core is **Spring Data JDBC**, not JPA: `spring.boot.starter.data.
 (+ `data.sql`), no `hibernate.orm` plugin, no `default_schema` property.
 
 **Routing — mandatory for every `store-core/` service.** See the section below; skipping it is the usual cause
-of "the service is up, `lb://` resolves, but the browser gets seller-ui's HTML back".
+of "the service is up, `lb://` resolves, but the browser gets console-ui's HTML back".
 
 ### Routing a store-core service: `GatewayRouteLocatorImpl`
 
@@ -203,8 +203,8 @@ return routeLocatorBuilder.routes()
         .route(r -> r.path(backendServicesPattern)          // ← everything NOT a backend path
                 .negate()
                 .and()
-                .host(storeCoreGatewayDomain, "www." + ..., "seller-ui." + ...)
-                .uri("lb://seller-ui"))                     // ← falls through to the UI
+                .host(storeCoreGatewayDomain, "www." + ...)
+                .uri("lb://console-ui"))                     // ← falls through to the UI
         .build().getRoutes();
 ```
 
@@ -222,13 +222,13 @@ return routeLocatorBuilder.routes()
    ```
 
 2. **Add `"reporting"` to the `backendServices` array.** That array is turned into `/<name>/**` patterns and
-   `negate()`d to build the seller-ui catch-all, so any path *not* listed there is claimed by seller-ui —
+   `negate()`d to build the console-ui catch-all, so any path *not* listed there is claimed by console-ui —
    which is declared last but matches first for your prefix. A route added in step 1 without step 2 is
-   shadowed: requests reach seller-ui, which returns its shell HTML, and the failure looks like a frontend
+   shadowed: requests reach console-ui, which returns its shell HTML, and the failure looks like a frontend
    bug rather than a routing one.
 
 A **UI** service in `store-core` is routed by host, not path: add its hostname to the `.host(...)` list on the
-seller-ui route (it is served by whichever `lb://` that route names), or give it its own
+console-ui route (it is served by whichever `lb://` that route names), or give it its own
 `.route(...).host("reporting-ui." + storeCoreGatewayDomain).uri("lb://reporting-ui")` **before** the catch-all.
 Either way the hostname also needs `configure-domain.sh` and `com.asrevo.cvhome.app.sub`.
 
@@ -265,15 +265,15 @@ bootBuildImage { imageGroup = "store-core" }        // "store-pod" under store-p
 
 `ui-conventions` wires `gradle build` → `npm run build`, `gradle bootRun` → `npm run dev`, pins Node/npm
 (downloaded, so no local install needed), and pulls in `docker-conventions`, whose `bootBuildImage` runs a
-plain `docker build .`. So the module **must contain a `Dockerfile`** — seller-ui's is four lines: copy
-`dist/`, `CMD node server/server.mjs`, `EXPOSE 8010`.
+plain `docker build .`. So the module **must contain a `Dockerfile`** — console-ui's is four lines: copy
+`dist/`, `CMD node server/server.mjs`, `EXPOSE 8011`.
 
 Requirements the plugin imposes on `package.json`: a `build` script, and a `dev` script if you want
-`gradle bootRun` (seller-ui only has `start`, which is why `run-lcl.sh` names the script per row —
-`seller-ui|store-core/seller-ui|start|8010|`).
+`gradle bootRun` (console-ui only has `start`, which is why `run-lcl.sh` names the script per row —
+`console-ui|store-core/console-ui|start|8011|`).
 
 Register it in the four config files exactly like a backend — a UI service is discovered via `lb://` too
-(`GatewayRouteLocatorImpl` routes to `lb://seller-ui`), so it needs the `common-config` block, the
+(`GatewayRouteLocatorImpl` routes to `lb://console-ui`), so it needs the `common-config` block, the
 `lcl-config` instance, and the `fargate-config` entries.
 
 Browser-facing extras:
@@ -284,11 +284,11 @@ Browser-facing extras:
   `invalid_redirect_uri`.
 - **`configure-domain.sh`** — `127.0.0.1 reporting-ui.gateway.com`.
 - **Gateway route** — a UI under `store-core/` still goes in `GatewayRouteLocatorImpl`: extend the host list on
-  the seller-ui catch-all, or add an explicit host route to `lb://reporting-ui`; if you route it by path
+  the console-ui catch-all, or add an explicit host route to `lb://reporting-ui`; if you route it by path
   instead, `backendServices` needs the name too. Details and the shadowing trap: *Routing a store-core
   service* above.
-- **Don't hold tokens.** Follow seller-ui: `environment.ts` sets `apiUrl: ''` and
-  `LOGIN_URL: '/oauth2/authorization/uaa'`, and the app makes same-origin relative calls — the gateway owns
+- **Don't hold tokens.** Follow console-ui: `environment.ts` sets `apiUrl: ''` and
+  `loginUrl: '/oauth2/authorization/uaa'`, and the app makes same-origin relative calls — the gateway owns
   the session and relays the token.
 
 For a storefront *theme* rather than a new UI service, stop here and use `new-landing-ui-template.md`.
@@ -339,7 +339,7 @@ that service's own data). Anything a user navigates to as a product surface belo
     + the hostname in spg's extra_hosts in docker-compose-lcl.yml
 [ ] Routing, core (BE, FE or both): GatewayRouteLocatorImpl route with
     stripPrefix(1).tokenRelay().preserveHostHeader() AND the name in backendServices
-    (omit it and seller-ui's catch-all swallows the path)
+    (omit it and console-ui's catch-all swallows the path)
 [ ] configure-domain.sh: new local hostname, if any
 [ ] BE: application.yml + -lcl + -fargate (+ -test-stores), layer-correct s2s client and slices
 [ ] BE: schema.sql / init-sql/schema.sql written by hand, schema named after the app

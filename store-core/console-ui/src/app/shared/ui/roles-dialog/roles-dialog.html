@@ -1,0 +1,33 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="roles" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <form method="dialog" class="roles-body" (submit)="onSubmit($event)">
+    <h2 class="roles-title">{{ title() }}</h2>
+    <p class="roles-message">{{ message() }}</p>
+
+    @if (options().length) {
+      <ul class="roles-list">
+        @for (option of options(); track option.value) {
+          <li>
+            <app-checkbox
+              [checked]="holds(option.value)"
+              [label]="option.label"
+              [disabled]="busy()"
+              (checkedChange)="toggle(option.value)"
+            />
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="roles-empty">{{ emptyMessage() }}</p>
+    }
+
+    <div class="roles-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+        {{ cancelLabel() }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="busy() || unchanged()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </form>
+</dialog>

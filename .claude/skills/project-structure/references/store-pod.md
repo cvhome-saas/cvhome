@@ -11,7 +11,9 @@ store-pod/
 ├── spg/                          INFRA :80    Caddy edge proxy (Caddyfile, compose.yml)
 ├── landing-ui/                   FE    :8110  Next.js storefront + template system
 ├── cua/                          BE+FE :8124  shopper OAuth2 auth server (standalone)
-├── merchant/                     BE    :8120  store + CMS content
+├── merchant/                     BE    :8120  store entity, branding, domains
+├── content/                      BE    :8121  content platform (pages, posts, banners, FAQ, policies, menus, media)
+├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
 ├── checkout/                     BE    :8123  cart, orders, customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
@@ -76,17 +78,37 @@ Evidence: `MerchantApplication`, `MerchantStoreApi`, `ContentApi`, `ExternalMerc
 
 ## Per-pod breakdown
 
-### `merchant` — two sub-domains, one service
+### `merchant` — the store entity
 
-The only pod with a second domain prefix. `merchant-*` covers the store entity itself; `content-*` covers
-CMS-style pages/boxes attached to a store. Each gets its own commons+core pair, both wired into the single
-`merchant-service`, which exposes `MerchantStoreApi` and `ContentApi`.
+`merchant-commons` / `merchant-core` / `merchant-external-api` / `merchant-service`, exposing `MerchantStoreApi`
+and `ExternalMerchantStoreApi`. CMS content used to live here as a second sub-domain; it moved to its own
+service (below). The Caddy `/merchant*` handler still forwards the legacy `/api/v1/content*` and
+`/api/v1/private/files` paths to `content`.
+
+### `content` — the content platform (port 8121)
+
+`content-commons` / `content-core` / `content-service`, package root `com.asrevo.cvhome.content`, JPA, schema
+`content`. One `content` + `content_description` table pair (the legacy CMS tables, extended in place with
+`status`, `publish_at`, `version`, `placement`, `policy_type`, `template`, `meta jsonb`, translation `state` …)
+holds every content type (`ContentType`: BOX = store "snippets", PAGE, POST, BANNER, FAQ, POLICY); new tables for
+revisions, status audit, redirects, menus, media, policy versions, FAQ groups. `init-sql/schema.sql` is both the
+DDL and the in-place migration (`add column if not exists … default`).
+
+APIs under `api/v1/`:
+- private console API `/api/v1/private/content/{pages|posts|banners|faq|policies}` — one `WorkflowContentApi`
+  base (list/get/create/update/delete/publish/unpublish/submit-review/archive/restore/revisions/translations/
+  slug-available/bulk) per type, plus `ContentAdminApi` (`summary`, `snippets`, `redirects`), media and menus.
+  Writes need `STORE-POD.CONTENT.*`, reads `STORE-POD.CONTENT.READ` (moderators).
+- public storefront API `/api/v1/storefront/**` (cache-friendly, locale fallback).
+- `LegacyContentApi` `/api/v1/content/pages`, `/pages/name/{name}`, `/boxes/{code}` — the reads landing-ui makes
+  today, kept in their original shapes until the storefront moves; `@Deprecated`.
+
+`ScheduledPublishJob` promotes `SCHEDULED` rows once a minute. Plan: `.agents/plans/console-ui-content.md`.
 
 ```
-'store-pod:merchant:merchant-commons'      'store-pod:merchant:content-commons'
-'store-pod:merchant:merchant-core'         'store-pod:merchant:content-core'
-'store-pod:merchant:merchant-external-api'
-'store-pod:merchant:merchant-service'
+'store-pod:content:content-commons'
+'store-pod:content:content-core'
+'store-pod:content:content-service'
 ```
 
 ### `catalog` — products & categories
@@ -155,6 +177,6 @@ hand; `gateways-and-local-domains.md` has both edges' routing tables and the loc
 | Module | Role |
 |---|---|
 | `store-commons` (`:store-pod:commons:store-commons`) | Pod-scoped shared domain — consumed by essentially every pod module. **Not** the root `store-commons/`; see `shared-libraries.md`. |
-| `store-modules/store-cms-commons` | CMS primitives shared by content/catalog (`api project(':store-pod:commons:store-commons')`). |
+| `store-modules/store-cms-commons` | S3/MinIO asset primitives shared by content/catalog/merchant (`api project(':store-pod:commons:store-commons')`). |
 | `reference/{reference-commons, reference-core}` | Reference data: countries, zones, currencies, languages. |
 | `customer/{customer-commons, customer-core}` | Customer domain shared between checkout and cua. |

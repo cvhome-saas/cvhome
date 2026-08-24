@@ -1,0 +1,100 @@
+<div class="dp" *transloco="let t">
+  <button
+    #trigger
+    class="date-range-trigger group"
+    type="button"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [disabled]="disabled()"
+    (click)="open() ? cancel() : openPicker()"
+  >
+    <app-icon class="date-range-trigger-icon" name="calendar" />
+    <span class="date-range-trigger-label">{{ label() }}</span>
+    <app-icon
+      class="date-range-trigger-chevron transition group-aria-expanded:rotate-180"
+      name="chevronDown"
+    />
+  </button>
+
+  @if (open()) {
+    <section
+      class="dp-panel"
+      animate.enter="dp-panel-in"
+      animate.leave="dp-panel-out"
+      role="dialog"
+      [attr.aria-label]="t('shared.dateRangePicker.dialogLabel')"
+    >
+      <header class="dp-head">
+        <button
+          class="dp-nav"
+          type="button"
+          [attr.aria-label]="t('shared.dateRangePicker.previousMonth')"
+          (click)="previousMonth()"
+        >
+          <app-icon name="chevronLeft" />
+        </button>
+
+        <p class="dp-hint">
+          @if (draftFrom() && !draftTo()) {
+            <span class="dp-hint-strong">{{ formatDay(draftFrom()!) }}</span>
+            <span class="dp-hint-quiet">— {{ t('shared.dateRangePicker.pickEndDate') }}</span>
+          } @else if (draftFrom() && draftTo()) {
+            <span class="dp-hint-strong">{{ formatDay(draftFrom()!) }} – {{ formatDay(draftTo()!) }}</span>
+          } @else {
+            <span class="dp-hint-quiet">{{ t('shared.dateRangePicker.pickStartDate') }}</span>
+          }
+        </p>
+
+        <button class="dp-nav" type="button" [attr.aria-label]="t('shared.dateRangePicker.nextMonth')" (click)="nextMonth()">
+          <app-icon name="chevronRight" />
+        </button>
+      </header>
+
+      <div class="dp-months">
+        @for (month of months(); track month.key; let first = $first) {
+          <article class="dp-month" [class.dp-month-secondary]="!first">
+            <h3 class="dp-month-label">{{ month.label }}</h3>
+            <div class="dp-weekdays" aria-hidden="true">
+              @for (weekday of weekdays(); track weekday) {
+                <span>{{ weekday }}</span>
+              }
+            </div>
+            <div class="dp-grid" role="grid">
+              @for (day of month.days; track day.key) {
+                @if (day.date) {
+                  <button
+                    class="dp-day"
+                    type="button"
+                    [class.in-bar]="day.inBar"
+                    [class.bar-start]="day.barStart"
+                    [class.bar-end]="day.barEnd"
+                    [class.selected]="day.selected"
+                    [class.today]="day.today"
+                    [attr.data-date]="day.key"
+                    [attr.aria-current]="day.today ? 'date' : null"
+                    [attr.aria-pressed]="day.selected"
+                    [attr.aria-label]="day.fullLabel"
+                    [attr.tabindex]="day.focused ? 0 : -1"
+                    [disabled]="day.disabled"
+                    (click)="selectDate(day)"
+                    (mouseenter)="hoverDate.set(day.date)"
+                    (mouseleave)="hoverDate.set(null)"
+                    (keydown)="onDayKeydown($event, day)"
+                  >
+                    <span class="dp-day-inner">{{ day.label }}</span>
+                  </button>
+                } @else {
+                  <span class="dp-day dp-day-empty" aria-hidden="true"></span>
+                }
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Announces the committed range to assistive tech, since selecting the end date
+       applies and closes the panel without a confirmation step. -->
+  <p class="sr-only" role="status" aria-live="polite">{{ announcement() }}</p>
+</div>

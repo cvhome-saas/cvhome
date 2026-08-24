@@ -1,0 +1,35 @@
+### Banners & promos
+
+### Create a hero banner (artwork = media asset ids)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "slug": "back-to-work-sale",
+  "placement": "HERO",
+  "startsAt": "2026-08-15T09:00:00Z",
+  "endsAt": "2026-09-01T23:59:00Z",
+  "target": {"kind": "COLLECTION", "value": "back-to-work"},
+  "artwork": {"desktopMediaId": 1, "mobileMediaId": null, "mobileCrop": "center-4-3"},
+  "theme": {"textColor": "#ffffff", "overlayOpacity": 40, "alignment": "left"},
+  "loggedInOnly": false,
+  "translations": [
+    {"language": "en", "title": "Back to work sale — 20% off", "subtitle": "Desks, chairs and storage", "ctaLabel": "Shop the sale", "altText": "Office desk with a laptop"}
+  ]
+}
+
+### Publish (422 CONTENT.BANNER.CAPACITY_EXCEEDED when HERO already has a live banner overlapping)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/banners/1/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Announcement strip (text only)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/banners?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"slug": "free-delivery", "placement": "STRIP", "target": {"kind": "URL", "value": "/category/all"}, "translations": [{"language": "en", "title": "Free delivery over $250"}]}
+
+### What wins each placement right now
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/banners/effective?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&placement=HERO
+Cookie: SESSION={{SESSION_ID}}

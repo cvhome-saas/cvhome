@@ -4,41 +4,36 @@ import com.asrevo.cvhome.errors.ErrorCategory;
 import com.asrevo.cvhome.errors.ErrorCode;
 
 /**
- * Error codes owned by the content (CMS) context.
- *
- * <p>
- * The facade this replaces raised four different legacy runtime types and then caught {@code Exception} around them,
- * so a duplicate page code, a missing page and a database failure all left the same method as one
- * {@code LEGACY.BAD_REQUEST}. The duplicate check in particular was unreachable as a distinct outcome, which is why
- * seller-ui could never say "that code is taken".
- * </p>
+ * Error codes owned by the content platform (pages, posts, banners, FAQ, policies, menus, media).
  */
 public enum ContentErrors implements ErrorCode {
 
-    /**
-     * No content page or box exists for that code, id or SEO url in this store.
-     */
     CONTENT_NOT_FOUND("CONTENT.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
+    SLUG_DUPLICATE("CONTENT.SLUG.DUPLICATE", ErrorCategory.CONFLICT),
     /**
-     * A content page or box already uses that code in this store.
+     * Kept for the legacy compat surface — the same condition as {@link #SLUG_DUPLICATE}.
      */
     DUPLICATE_CODE("CONTENT.CODE.DUPLICATE", ErrorCategory.CONFLICT),
-
-    /**
-     * The named file does not exist in this store's CMS folder.
-     */
-    FILE_NOT_FOUND("CONTENT.FILE.NOT_FOUND", ErrorCategory.NOT_FOUND),
-
-    /**
-     * An uploaded file's bytes could not be read off the request.
-     */
-    FILE_UNREADABLE("CONTENT.FILE.UNREADABLE", ErrorCategory.STORAGE),
-
-    /**
-     * The requested folder path is not a valid directory path.
-     */
-    FOLDER_PATH_INVALID("CONTENT.FOLDER.PATH_INVALID", ErrorCategory.VALIDATION);
+    VERSION_CONFLICT("CONTENT.VERSION.CONFLICT", ErrorCategory.CONFLICT),
+    TRANSITION_NOT_ALLOWED("CONTENT.STATUS.TRANSITION_NOT_ALLOWED", ErrorCategory.UNPROCESSABLE),
+    PUBLISH_INCOMPLETE("CONTENT.PUBLISH.INCOMPLETE", ErrorCategory.UNPROCESSABLE),
+    SCHEDULE_INVALID("CONTENT.SCHEDULE.INVALID", ErrorCategory.VALIDATION),
+    PAGE_REFERENCED("CONTENT.PAGE.REFERENCED", ErrorCategory.CONFLICT),
+    BANNER_CAPACITY_EXCEEDED("CONTENT.BANNER.CAPACITY_EXCEEDED", ErrorCategory.UNPROCESSABLE),
+    MENU_DEPTH_EXCEEDED("CONTENT.MENU.DEPTH_EXCEEDED", ErrorCategory.UNPROCESSABLE),
+    MENU_TARGET_INVALID("CONTENT.MENU.TARGET_INVALID", ErrorCategory.VALIDATION),
+    POLICY_VERSION_IMMUTABLE("CONTENT.POLICY.VERSION_IMMUTABLE", ErrorCategory.UNPROCESSABLE),
+    POLICY_TYPE_ACTIVE_EXISTS("CONTENT.POLICY.TYPE_ACTIVE_EXISTS", ErrorCategory.CONFLICT),
+    FAQ_GROUP_NOT_FOUND("CONTENT.FAQ.GROUP_NOT_FOUND", ErrorCategory.NOT_FOUND),
+    BULK_TOO_LARGE("CONTENT.BULK.TOO_LARGE", ErrorCategory.VALIDATION),
+    MEDIA_NOT_FOUND("MEDIA.NOT_FOUND", ErrorCategory.NOT_FOUND),
+    MEDIA_TYPE_NOT_ALLOWED("MEDIA.TYPE_NOT_ALLOWED", ErrorCategory.VALIDATION),
+    MEDIA_TOO_LARGE("MEDIA.TOO_LARGE", ErrorCategory.PAYLOAD_TOO_LARGE),
+    MEDIA_QUOTA_EXCEEDED("MEDIA.QUOTA_EXCEEDED", ErrorCategory.PAYLOAD_TOO_LARGE),
+    MEDIA_REFERENCED("MEDIA.REFERENCED", ErrorCategory.CONFLICT),
+    MEDIA_FOLDER_NOT_EMPTY("MEDIA.FOLDER.NOT_EMPTY", ErrorCategory.CONFLICT),
+    MEDIA_UNREADABLE("MEDIA.UNREADABLE", ErrorCategory.VALIDATION),
+    MEDIA_STORAGE_FAILED("MEDIA.STORAGE_FAILED", ErrorCategory.STORAGE);
 
     private final String code;
 

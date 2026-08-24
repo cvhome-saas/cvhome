@@ -1,11 +1,16 @@
 import {defineTheme} from '@store-front/theme';
 import {fonts} from './fonts';
+import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
 import {Category} from './pages/Category';
 import {Product} from './pages/Product';
 import {Content} from './pages/Content';
+import {BlogIndex} from './pages/BlogIndex';
+import {BlogPost} from './pages/BlogPost';
+import {Faq} from './pages/Faq';
+import {Policy} from './pages/Policy';
 import {Checkout} from './pages/Checkout';
 import {CheckoutResult} from './pages/CheckoutResult';
 import {Customer} from './pages/Customer';
@@ -34,9 +39,9 @@ export default defineTheme({
     version: '0.1.0',
     description: 'Plain reference theme — copy source for new themes.',
     fonts,
-    tokens: {},
+    tokens: {defaultColors: DEFAULT_COLORS},
     layout: {config: layoutConfig, Root},
-    pages: {Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order},
+    pages: {Home, Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {
         PageSkeleton: {
             home: HomeSkeleton,

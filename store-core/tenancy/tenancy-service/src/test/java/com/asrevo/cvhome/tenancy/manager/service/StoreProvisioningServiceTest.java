@@ -6,10 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.errors.FieldError;
 import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 import com.asrevo.cvhome.errors.UnmappedRemoteFailureException;
 import com.asrevo.cvhome.merchant.api.MerchantStorePodClient;
@@ -19,9 +21,11 @@ import com.asrevo.cvhome.tenancy.commons.dto.ProvisioningState;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -48,6 +52,14 @@ class StoreProvisioningServiceTest {
 
     private static final String STORE_NAME = "a-store";
 
+    private static final String REFUSAL_DETAIL = "refused";
+
+    private static final String REFUSAL_CODE = "MERCHANT.STORE.INVALID";
+
+    private static final String FIELD = "email";
+
+    private static final String FIELD_MESSAGE = "must not be null";
+
     private InternalStoreService storeService;
 
     private MerchantStorePodClient podClient;
@@ -61,7 +73,7 @@ class StoreProvisioningServiceTest {
     }
 
     private static ManagerStoreDto storeIn(ProvisioningState state) {
-        return new ManagerStoreDto(STORE, STORE_NAME, ORG, POD, state, StoreStatus.ACTIVE, null);
+        return new ManagerStoreDto(STORE, STORE_NAME, ORG, POD, state, StoreStatus.ACTIVE, null, null);
     }
 
     @BeforeEach
@@ -107,7 +119,7 @@ class StoreProvisioningServiceTest {
                 .isInstanceOf(RemoteServiceUnavailableException.class);
 
         // Marking it FAILED would record a verdict nobody reached; the outbox retry is what resolves it.
-        verify(storeService, never()).failProvisioning(any());
+        verify(storeService, never()).failProvisioning(any(), any());
     }
 
     @Test
@@ -116,11 +128,31 @@ class StoreProvisioningServiceTest {
         when(storeService.findStore(STORE)).thenReturn(storeIn(ProvisioningState.NOT_STARTED_PROVISIONING));
         when(podClient.create(any())).thenThrow(
                 UnmappedRemoteFailureException.of(com.asrevo.cvhome.errors.CommonErrors.REMOTE_UNAVAILABLE,
-                        "refused", Map.of(), java.util.List.of(), MERCHANT, "MERCHANT.STORE.INVALID", 422));
+                        REFUSAL_DETAIL, Map.of(), java.util.List.of(), MERCHANT, REFUSAL_CODE, 422));
 
         assertThatCode(() -> service.provisioning(ORG, STORE, POD, request())).doesNotThrowAnyException();
 
-        verify(storeService).failProvisioning(STORE);
+        // The reason the pod gave is what the row records; without it the console can only say "failed".
+        ArgumentCaptor<String> reason = ArgumentCaptor.forClass(String.class);
+        verify(storeService).failProvisioning(eq(STORE), reason.capture());
+        assertThat(reason.getValue()).contains(REFUSAL_CODE).contains(REFUSAL_DETAIL);
+    }
+
+    @Test
+    @DisplayName("the fields the pod objected to are carried into the recorded reason")
+    void refusalCarriesFieldErrors() throws Exception {
+        when(storeService.findStore(STORE)).thenReturn(storeIn(ProvisioningState.NOT_STARTED_PROVISIONING));
+        when(podClient.create(any())).thenThrow(
+                UnmappedRemoteFailureException.of(com.asrevo.cvhome.errors.CommonErrors.REMOTE_UNAVAILABLE,
+                        "Request validation failed.", Map.of(),
+                        java.util.List.of(FieldError.of(FIELD, "VALIDATION.REQUIRED", FIELD_MESSAGE)),
+                        MERCHANT, "COMMON.VALIDATION_FAILED", 400));
+
+        service.provisioning(ORG, STORE, POD, request());
+
+        ArgumentCaptor<String> reason = ArgumentCaptor.forClass(String.class);
+        verify(storeService).failProvisioning(eq(STORE), reason.capture());
+        assertThat(reason.getValue()).contains(FIELD).contains(FIELD_MESSAGE);
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
 import com.asrevo.cvhome.tenancy.commons.dto.OrgStatus;
+import com.asrevo.cvhome.tenancy.commons.dto.PodStoreCount;
 import com.asrevo.cvhome.tenancy.commons.dto.StoreStatus;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
@@ -77,8 +78,8 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Transactional
     @Override
-    public void failProvisioning(StoreMerchantId store) {
-        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning()));
+    public void failProvisioning(StoreMerchantId store, String reason) {
+        storeRepository.findById(store).ifPresent(it -> storeRepository.save(it.failProvisioning(reason)));
     }
 
     @Transactional
@@ -112,18 +113,40 @@ public class InternalStoreServiceImpl implements InternalStoreService {
             storeId = identityInfo.store().storeMerchantId();
         }
         String name = listManagerStoreQuery == null ? null : listManagerStoreQuery.name();
-        return visiblePage(orgId, storeId, name, pageable);
+        /*
+         * The pod filter narrows; it never widens. It is applied on top of the org and store scoping above, so an
+         * org admin asking about a pod sees only their own stores on it and a super admin sees all of them — which
+         * is why it needs no guard of its own.
+         */
+        String podId = listManagerStoreQuery == null || listManagerStoreQuery.pod() == null
+                ? null
+                : listManagerStoreQuery.pod().getId().toString();
+        return visiblePage(orgId, storeId, name, podId, pageable);
+    }
+
+    /**
+     * How many stores sit on each pod, platform-wide.
+     *
+     * <p>
+     * Unscoped by design, and therefore super-admin only at the controller: it is an aggregate over every
+     * organization, not a reading of the caller's own stores.
+     * </p>
+     */
+    @Override
+    public List<PodStoreCount> storesPerPod() {
+        return storeRepository.storesPerPod();
     }
 
     /**
      * One page of visible stores. The count is a separate query because Spring Data JDBC's {@code @Query} has no
      * {@code countQuery} attribute — that is JPA's — so the page has to be assembled here.
      */
-    private Page<ManagerStoreDto> visiblePage(String orgId, String storeId, String name, Pageable pageable) {
+    private Page<ManagerStoreDto> visiblePage(String orgId, String storeId, String name, String podId,
+                                              Pageable pageable) {
         Pageable page = pageable == null || pageable.isUnpaged() ? Pageable.ofSize(DEFAULT_PAGE_SIZE) : pageable;
         List<ManagerStoreEntity> rows =
-                storeRepository.findVisible(orgId, storeId, name, page.getPageSize(), page.getOffset());
-        long total = storeRepository.countVisible(orgId, storeId, name);
+                storeRepository.findVisible(orgId, storeId, name, podId, page.getPageSize(), page.getOffset());
+        long total = storeRepository.countVisible(orgId, storeId, name, podId);
         return new PageImpl<>(withBillingStatus(rows.stream().map(storeMappers::toDto).toList()), page, total);
     }
 
@@ -137,7 +160,7 @@ public class InternalStoreServiceImpl implements InternalStoreService {
 
     @Override
     public Page<ManagerStoreDto> findAll(ManagerOrgId id, Pageable pageable) {
-        return visiblePage(id.id().toString(), null, null, pageable);
+        return visiblePage(id.id().toString(), null, null, null, pageable);
     }
 
     /**

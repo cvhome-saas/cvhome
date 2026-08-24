@@ -35,8 +35,8 @@ Starting sort_order: 1
 
 -- Page: about-us
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (31, 'about-us', 'PAGE', true, 1, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (31, 'about-us', 'PAGE', true, 1, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -64,8 +64,8 @@ on conflict (description_id) do nothing;
 
 -- Page: contact-us
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (32, 'contact-us', 'PAGE', true, 2, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (32, 'contact-us', 'PAGE', true, 2, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -93,8 +93,8 @@ on conflict (description_id) do nothing;
 
 -- Page: terms
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (33, 'terms', 'PAGE', false, 3, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (33, 'terms', 'PAGE', false, 3, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -122,8 +122,8 @@ on conflict (description_id) do nothing;
 
 -- Page: privacy
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (34, 'privacy', 'PAGE', false, 4, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (34, 'privacy', 'PAGE', false, 4, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -151,8 +151,8 @@ on conflict (description_id) do nothing;
 
 -- Page: location
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (35, 'location', 'PAGE', false, 5, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (35, 'location', 'PAGE', false, 5, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -180,8 +180,8 @@ on conflict (description_id) do nothing;
 
 -- Page: faq
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (36, 'faq', 'PAGE', false, 6, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (36, 'faq', 'PAGE', false, 6, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -209,8 +209,8 @@ on conflict (description_id) do nothing;
 
 -- Box: header-message
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (37, 'header-message', 'BOX', false, 7, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (37, 'header-message', 'BOX', false, 7, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -232,8 +232,8 @@ on conflict (description_id) do nothing;
 
 -- Box: agreement
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (38, 'agreement', 'BOX', false, 8, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (38, 'agreement', 'BOX', false, 8, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -255,8 +255,8 @@ on conflict (description_id) do nothing;
 
 -- Box: meta-title
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (39, 'meta-title', 'BOX', false, 9, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (39, 'meta-title', 'BOX', false, 9, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,
@@ -276,8 +276,8 @@ on conflict (description_id) do nothing;
 
 -- Box: meta-description
 INSERT INTO content.content (content_id, code, content_type,
-                              link_to_menu, sort_order, visible, store_merchant_id)
-VALUES (40, 'meta-description', 'BOX', false, 10, true, '65f023632bc46470c104b75f')
+                              link_to_menu, sort_order, visible, store_merchant_id, status, version)
+VALUES (40, 'meta-description', 'BOX', false, 10, true, '65f023632bc46470c104b75f', 'PUBLISHED', 1)
 on conflict (content_id) do nothing;
 
 INSERT INTO content.content_description (description_id, date_created, date_modified, description, name, title,

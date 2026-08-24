@@ -22,6 +22,10 @@ CREATE TABLE IF NOT EXISTS tenancy.manager_store
     pod_id             varchar(24) not null,
     provisioning_state varchar(30) not null,
     status             varchar(20) not null default 'ACTIVE',
+    -- Why provisioning failed, in the pod's own words. Nullable, and null for every state other than
+    -- FAILED_PROVISIONING. Without it the console could only ever say "failed": the pod answers a bad create with a
+    -- problem body naming the offending fields, and StoreProvisioningService had nowhere to put it but the log.
+    provisioning_error varchar(500),
     version            int,
     constraint manager_store_pk primary key (id),
     constraint manager_store_manager_fk foreign key (org_id) references tenancy.manager_org (id),
@@ -36,6 +40,13 @@ CREATE TABLE IF NOT EXISTS tenancy.manager_store
     -- used, and it is the operator's lever rather than the machine's.
     constraint manager_store_status_ck check (status in ('ACTIVE', 'SUSPENDED', 'ARCHIVED', 'DELETED'))
 );
+
+-- `CREATE TABLE IF NOT EXISTS` above does nothing to a database that already has the table, so a column added
+-- later has to be stated twice or it only ever reaches a freshly created schema. Every existing environment —
+-- including every developer's running stack — would otherwise start against a table without this column and fail
+-- on the first read. Idempotent, so it is a no-op everywhere it has already run.
+ALTER TABLE tenancy.manager_store
+    ADD COLUMN IF NOT EXISTS provisioning_error varchar(500);
 
 -- Every store list is filtered by org (see InternalStoreServiceImpl.findAll), and the console's main screen is
 -- that query.

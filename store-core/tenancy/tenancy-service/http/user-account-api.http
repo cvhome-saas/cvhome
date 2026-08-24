@@ -45,3 +45,50 @@ Cookie: SESSION={{SESSION_ID}}
         client.assert(response.status === 200 || response.status === 404, "status " + response.status);
     });
 %}
+
+### assignable-roles — note it still offers SUPER_ADMIN to an org admin
+GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/assignable-roles?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("answered", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### reset a user's password
+# Was 403 for every caller — including a super admin — until STORE-CORE.USERS.RESET_PASSWORD was given a case
+# in CustomPermissionEvaluator. An unmapped token falls through every switch to `default -> false`, which is
+# indistinguishable from a refusal, so nothing ever reported it.
+#
+# USER_ID is uaa's UUID for the user, taken from a `list` row. It is NOT the username: the JWT `sub` is the
+# username, and this path ends at uaa's by-UUID lookup.
+POST {{SELLER_UI_URL}}/tenancy/api/v1/user-account/reset?store={{STORE_ID}}&userId={{USER_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "changePassword": "Passw0rd1"
+}
+
+> {%
+    client.test("no longer refused by an unmapped permission token", function () {
+        client.assert(response.status !== 403, "still 403 — the permission case is missing again");
+        client.assert(response.status === 200 || response.status === 404, "status " + response.status);
+    });
+%}
+
+### reset on another org's store — the permission gate still holds
+POST {{SELLER_UI_URL}}/tenancy/api/v1/user-account/reset?store=65f020632bc46470c104b76f&userId={{USER_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "changePassword": "Passw0rd1"
+}
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status === 403 || response.status === 404, "status " + response.status);
+    });
+%}

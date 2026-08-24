@@ -168,6 +168,28 @@
       "ORDER_NOT_FOUND": "No encontramos este pedido.",
       "ERROR_LOADING": "No pudimos cargar tu cuenta ahora mismo.",
       "SIGNED_IN_AS": "Sesión iniciada como {name}"
+    },
+    "BLOG": {
+      "TITLE": "Blog",
+      "SUBTITLE": "Noticias, guías e historias de la tienda.",
+      "READ_MORE": "Leer más",
+      "MIN_READ": "{minutes} min de lectura",
+      "BY": "Por {author}",
+      "RELATED": "Artículos relacionados",
+      "EMPTY": "Aún no hay artículos.",
+      "FILTERED_BY": "Filtrado por {value}",
+      "ALL_POSTS": "Todos los artículos",
+      "PREVIOUS": "Más recientes",
+      "NEXT": "Más antiguos"
+    },
+    "FAQ": {
+      "TITLE": "Ayuda y preguntas frecuentes",
+      "SUBTITLE": "Respuestas a las preguntas más habituales.",
+      "EMPTY": "Aún no hay preguntas publicadas."
+    },
+    "POLICY": {
+      "VERSION": "Versión {version}",
+      "EFFECTIVE": "En vigor desde el {date}"
     }
   },
   "COMPONENTS": {

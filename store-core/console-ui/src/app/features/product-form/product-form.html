@@ -1,0 +1,157 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="title()" [context]="context()">
+    <button class="secondary-action" type="button" (click)="cancel()">{{ t('shared.actions.cancel') }}</button>
+    <!--
+      Save draft is not a lesser Publish: on a new product it is the only way through, because
+      images and related products both need an id. The step rail says so before anything is clicked.
+    -->
+    <button
+      class="secondary-action"
+      type="button"
+      [disabled]="facade.saving()"
+      [attr.aria-busy]="facade.saving()"
+      (click)="facade.saveDraft()"
+    >
+      {{ t('productForm.saveDraft') }}
+    </button>
+    <button
+      class="primary-action"
+      type="button"
+      [disabled]="facade.saving()"
+      [attr.aria-busy]="facade.saving()"
+      (click)="facade.publish()"
+    >
+      <app-icon name="check" />
+      {{ t('productForm.publish') }}
+    </button>
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay
+    reserve="panel"
+    [busy]="facade.isLoading() || facade.saving()"
+    [label]="t('productForm.loading')"
+  >
+    @if (!facade.isEmpty()) {
+      <div class="wizard">
+        <aside class="rail">
+          <app-stepper
+            [steps]="facade.steps()"
+            [active]="facade.activeStep()"
+            [label]="t('productForm.stepsLabel')"
+            [completeLabel]="t('shared.stepper.complete')"
+            (stepSelected)="onStep($event)"
+          />
+        </aside>
+
+        <!--
+          `animate.enter` on a keyed wrapper rather than on `main`: Angular plays the animation when
+          it inserts the node, and the node has to change for that to happen. `@switch` swaps the
+          step component inside a stable `main`, so without this the four steps replaced each other
+          with no transition at all — the rail moved and the body simply repainted.
+        -->
+        <main class="step-body">
+          @switch (facade.activeStep()) {
+            @case ('essentials') {
+              <app-essentials-step
+                animate.enter="step-in"
+                [form]="facade.form"
+                [languages]="facade.languages()"
+                [saved]="!isNew()"
+              />
+            }
+            @case ('media') {
+              <app-media-step
+                animate.enter="step-in"
+                [saved]="!isNew()"
+              />
+            }
+            @case ('pricing') {
+              <app-pricing-step
+                animate.enter="step-in"
+                [form]="facade.form"
+                [currency]="facade.currency()"
+              />
+            }
+            @case ('organize') {
+              <app-organize-step
+                animate.enter="step-in"
+                [form]="facade.form"
+                [saved]="!isNew()"
+              />
+            }
+          }
+        </main>
+
+        <aside class="side">
+          <app-panel
+            [title]="t('productForm.readiness.title')"
+            [subtitle]="t('productForm.readiness.subtitle', {percent: facade.readyPercent()})"
+          >
+            <div class="side-body">
+              <app-progress-track
+                [value]="facade.readyPercent()"
+                [label]="t('productForm.readiness.subtitle', {percent: facade.readyPercent()})"
+              />
+
+              <!--
+                Computed from the form's own fields rather than fetched: it costs no endpoint and
+                cannot disagree with what is on screen.
+              -->
+              <ul class="checklist">
+                @for (item of facade.readiness(); track item.key) {
+                  <li class="check" [class.done]="item.done">
+                    <app-icon
+                      [name]="item.done ? 'checkCircle' : 'alertCircle'"
+                      [size]="14"
+                      [label]="item.done ? t('productForm.readiness.done') : t('productForm.readiness.todo')"
+                    />
+                    <span>{{ t('productForm.readiness.item.' + item.key) }}</span>
+                    @if (item.required) {
+                      <b class="req">{{ t('productForm.readiness.required') }}</b>
+                    }
+                  </li>
+                }
+              </ul>
+
+              @if (!facade.canPublish()) {
+                <p class="publish-note">{{ t('productForm.readiness.blocked') }}</p>
+              }
+            </div>
+          </app-panel>
+
+          <app-panel
+            class="stacked"
+            [title]="t('productForm.translations.title')"
+            [subtitle]="t('productForm.translations.subtitle')"
+          >
+            <div class="side-body">
+              <!--
+                Which locales this product is missing — invisible in seller-ui, and free here:
+                `descriptions[]` is already in hand and the count is client-side.
+              -->
+              <ul class="locales">
+                @for (row of facade.translations(); track row.language) {
+                  <li class="locale">
+                    <span class="locale-code" dir="ltr">{{ row.language }}</span>
+                    <span class="locale-name">{{ row.name }}</span>
+                    <span class="locale-state" [class.empty]="row.filled === 0">
+                      {{
+                        row.filled === 0
+                          ? t('productForm.translations.missing')
+                          : t('productForm.translations.filled', {filled: row.filled, total: row.total})
+                      }}
+                    </span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </app-panel>
+        </aside>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

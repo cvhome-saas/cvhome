@@ -13,6 +13,10 @@ spring:
             client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
             authorization-grant-type: client_credentials
             scope: store_pod
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 250MB
   sql:
     init:
       schema-locations: classpath:init-sql/schema.sql

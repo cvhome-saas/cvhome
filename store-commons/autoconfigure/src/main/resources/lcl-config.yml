@@ -35,12 +35,12 @@ spring:
                 metadata:
                   service-name: pod-registry
                   instance: pod-registry-1
-            seller-ui:
-              - uri: "http://localhost:8010"
-                instance-id: seller-ui-1
+            console-ui:
+              - uri: "http://localhost:8011"
+                instance-id: console-ui-1
                 metadata:
-                  service-name: seller-ui
-                  instance: seller-ui-1
+                  service-name: console-ui
+                  instance: console-ui-1
             store-core-gateway:
               - uri: "http://localhost:8000"
                 instance-id: store-core-gateway-1

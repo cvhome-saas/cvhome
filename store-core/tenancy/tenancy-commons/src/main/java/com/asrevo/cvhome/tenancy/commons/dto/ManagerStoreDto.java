@@ -18,10 +18,14 @@ import com.asrevo.cvhome.commons.domain.StoreMerchantId;
  * @param provisioningState how far the store got in being built, which is unrelated to whether it is paid for
  * @param status            whether it may be used at all — an operator's lever, unlike provisioningState
  * @param billingStatus     the standing of its subscription, or {@code null} if unknown
+ * @param provisioningError why the build failed, in the pod's words; {@code null} for every state but
+ *                          {@code FAILED_PROVISIONING}, and null there too for a row that failed before this field
+ *                          existed. A client shows it beside the failure rather than instead of it — it is a
+ *                          diagnostic, not a translated message
  */
 public record ManagerStoreDto(StoreMerchantId id, String name, ManagerOrgId orgId, PodId podId,
                               ProvisioningState provisioningState, StoreStatus status,
-                              SubscriptionStatus billingStatus) {
+                              SubscriptionStatus billingStatus, String provisioningError) {
 
     /**
      * The same store with its billing standing filled in.
@@ -34,7 +38,7 @@ public record ManagerStoreDto(StoreMerchantId id, String name, ManagerOrgId orgI
      */
     public static ManagerStoreDto billed(ManagerStoreDto store, SubscriptionStatus status) {
         return new ManagerStoreDto(store.id(), store.name(), store.orgId(), store.podId(),
-                store.provisioningState(), store.status(), status);
+                store.provisioningState(), store.status(), status, store.provisioningError());
     }
 
 }

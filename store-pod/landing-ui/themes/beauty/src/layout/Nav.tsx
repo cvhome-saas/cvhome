@@ -15,7 +15,9 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
     const pathname = usePathname();
     const active = (href: string) => pathname === href || pathname.startsWith(href + '/');
     const categories = data.categories.filter(c => c.description);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
+    // Main-menu entries that are not pages (blog, help, categories, plain paths): the merchant's menu, resolved server-side.
+    const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     return (
         <NavigationMenu aria-label={t('MAIN_NAVIGATION')} viewport={false} className={cn('max-w-none justify-start', className)}>
             <NavigationMenuList className="h-full gap-0 divide-x divide-foreground rtl:divide-x-reverse">
@@ -60,7 +62,14 @@ export function Nav({data, className}: { ctx: PageContext; data: LayoutData; cla
                 {pages.map(page => (
                     <NavigationMenuItem key={page.code} className="h-full">
                         <NavigationMenuLink asChild className={cn(item, 'rounded-none bg-transparent')}>
-                            <Link prefetch={false} href={`/content/${page.description.friendlyUrl}`}><span className="q">{page.description.name}</span></Link>
+                            <Link prefetch={false} href={page.href}><span className="q">{page.name}</span></Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                ))}
+                {extras.map(page => (
+                    <NavigationMenuItem key={page.href} className="h-full">
+                        <NavigationMenuLink asChild className={cn(item, 'rounded-none bg-transparent')}>
+                            <Link prefetch={false} href={page.href}><span className="q">{page.label}</span></Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                 ))}

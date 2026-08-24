@@ -1,0 +1,590 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context">
+    <a class="secondary-action" [routerLink]="['/platform/organizations']">
+      <app-icon name="arrowLeft" />{{ t('platform.organization.action.backToList') }}
+    </a>
+
+    <!--
+      The lifecycle levers, offered by what the current status makes sensible. The server holds the
+      transition table and refuses the rest — the console does not reproduce it.
+    -->
+    @if (facade.canResume()) {
+      <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('resume')">
+        <app-icon name="play" />{{ t('platform.organization.action.resume') }}
+      </button>
+    }
+    @if (facade.canSuspend()) {
+      <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('suspend')">
+        <app-icon name="minus" />{{ t('platform.organization.action.suspend') }}
+      </button>
+    }
+    @if (facade.canClose()) {
+      <button class="danger-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('close')">
+        <app-icon name="xCircle" />{{ t('platform.organization.action.close') }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.organization.loading')">
+    @if (facade.row(); as org) {
+      <!--
+        The region owns the container; the grid inside it is what the container query restyles.
+        They cannot be the same element — a container query never matches its own container.
+      -->
+      <div class="org-region">
+        <div class="org-layout" [class.rail-collapsed]="railCollapsed()">
+          <app-section-nav
+            class="org-rail"
+            [basePath]="'/platform/organizations/' + org.id"
+            [sections]="facade.sections"
+            [active]="facade.section()"
+            [heading]="t('platform.organization.nav.heading')"
+            [label]="t('platform.organization.nav.ariaLabel')"
+            [(collapsed)]="railCollapsed"
+          />
+
+          <app-tab-switcher
+            class="org-tabs"
+            [tabs]="tabs()"
+            [active]="facade.section()"
+            (activeChange)="pickSection($event)"
+            [label]="t('platform.organization.nav.ariaLabel')"
+            panelId="org-section"
+          />
+
+          <div class="org-section" id="org-section">
+            @switch (facade.section()) {
+              @case ('overview') {
+                <app-panel [title]="t('platform.organization.overview.identity')" padded>
+                  <dl class="facts">
+                    <div class="fact">
+                      <dt>{{ t('platform.organization.overview.id') }}</dt>
+                      <dd><app-copy-field [value]="org.id" [label]="t('platform.organization.overview.id')" /></dd>
+                    </div>
+
+                    <div class="fact">
+                      <dt>{{ t('platform.organization.overview.name') }}</dt>
+                      <dd>
+                        @if (facade.renaming()) {
+                          <div class="rename">
+                            <!--
+                              A bare control rather than `app-form-field`: the fact's own `<dt>` is
+                              already the label, and wrapping it printed "NAME" above "Name".
+                            -->
+                            <app-text-field
+                              [value]="facade.draftName()"
+                              (valueChange)="facade.draftName.set($event)"
+                              [disabled]="facade.busy()"
+                              [ariaLabel]="t('platform.organization.overview.name')"
+                            />
+                            <div class="rename-actions">
+                              <button
+                                class="secondary-action"
+                                type="button"
+                                [disabled]="facade.busy()"
+                                (click)="facade.cancelRename()"
+                              >
+                                {{ t('shared.actions.cancel') }}
+                              </button>
+                              <button
+                                class="primary-action"
+                                type="button"
+                                [disabled]="facade.busy() || !facade.draftName().trim()"
+                                (click)="facade.saveName()"
+                              >
+                                {{ t('platform.organization.overview.saveName') }}
+                              </button>
+                            </div>
+                          </div>
+                        } @else {
+                          <span class="fact-value">
+                            @if (org.name) {
+                              {{ org.name }}
+                            } @else {
+                              <!-- Nothing sets a name at creation, so this is every organization today. -->
+                              <em class="unset">{{ t('platform.organization.overview.unnamed') }}</em>
+                            }
+                            <button
+                              class="icon-action"
+                              type="button"
+                              [title]="t('platform.organization.overview.rename')"
+                              [attr.aria-label]="t('platform.organization.overview.rename')"
+                              (click)="facade.startRename()"
+                            >
+                              <app-icon name="pencil" />
+                            </button>
+                          </span>
+                        }
+                      </dd>
+                    </div>
+
+                    <div class="fact">
+                      <dt>{{ t('platform.organization.overview.email') }}</dt>
+                      <dd class="fact-value latin" dir="auto">{{ org.email || '—' }}</dd>
+                    </div>
+
+                    <div class="fact">
+                      <dt>{{ t('platform.organization.overview.created') }}</dt>
+                      <dd class="fact-value">{{ org.createdDate | translocoDate: {dateStyle: 'long'} }}</dd>
+                    </div>
+
+                    <div class="fact">
+                      <dt>{{ t('platform.organization.overview.status') }}</dt>
+                      <dd>
+                        <app-badge [tone]="facade.statusTone()" shape="square">{{ facade.statusLabel() }}</app-badge>
+                      </dd>
+                    </div>
+                  </dl>
+                </app-panel>
+
+                <app-panel [title]="t('platform.organization.overview.owner')" padded>
+                  <p class="panel-lede">{{ t('platform.organization.overview.ownerLede') }}</p>
+
+                  @if (facade.hasOwner()) {
+                    <button
+                      class="secondary-action"
+                      type="button"
+                      [disabled]="facade.busy()"
+                      (click)="facade.startOwnerReset()"
+                    >
+                      <app-icon name="lock" />{{ t('platform.organization.overview.resetOwnerPassword') }}
+                    </button>
+                  } @else {
+                    <!--
+                      Disabled with the reason rather than hidden: "nobody is recorded as owning this"
+                      is a fact an operator needs, and the backfill is what fills it in.
+                      TODO(lessons.md): see lessons.md, "Organizations — the owner nobody recorded".
+                    -->
+                    <button
+                      class="secondary-action"
+                      type="button"
+                      disabled
+                      [title]="t('platform.organization.overview.noOwnerReason')"
+                    >
+                      <app-icon name="lock" />{{ t('platform.organization.overview.resetOwnerPassword') }}
+                    </button>
+                    <p class="field-hint">{{ t('platform.organization.overview.noOwnerReason') }}</p>
+                  }
+                </app-panel>
+              }
+
+              @case ('stores') {
+                <app-panel
+                  [title]="t('platform.organization.stores.title')"
+                  [subtitle]="t('platform.organization.stores.readOnly')"
+                >
+                  @if (facade.storesError(); as failure) {
+                    <app-load-error [message]="failure.message" (retry)="facade.reloadStores()" />
+                  }
+
+                  <app-busy-overlay
+                    reserve="panel"
+                    [busy]="facade.storesLoading()"
+                    [label]="t('platform.organization.stores.loading')"
+                  >
+                    @if (facade.storeRows().length) {
+                      <app-data-table [columns]="storeColumns()" [label]="t('platform.organization.stores.title')">
+                        @for (row of facade.storeRows(); track row.id) {
+                          <app-table-row>
+                            <div
+                              class="cell-store"
+                              role="cell"
+                              [attr.data-label]="t('platform.organization.stores.column.store')"
+                            >
+                              <strong>{{ row.name }}</strong>
+                              <span class="cell-id latin">{{ row.id }}</span>
+                            </div>
+
+                            <span
+                              role="cell"
+                              [attr.data-label]="t('platform.organization.stores.column.status')"
+                            >
+                              <app-badge [tone]="facade.storeStatusTone(row.status)" shape="square">
+                                {{ storeStatusLabel(row.status) }}
+                              </app-badge>
+                            </span>
+
+                            <span
+                              role="cell"
+                              [attr.data-label]="t('platform.organization.stores.column.provisioning')"
+                            >
+                              <app-badge [tone]="facade.provisioningTone(row.provisioningState)" shape="square">
+                                {{ provisioningLabel(row.provisioningState) }}
+                              </app-badge>
+                              @if (row.provisioningError) {
+                                <!-- The pod's own words, shown beside the state rather than in place of it. -->
+                                <span class="provisioning-error latin" dir="auto">{{ row.provisioningError }}</span>
+                              }
+                            </span>
+
+                            <span
+                              role="cell"
+                              [attr.data-label]="t('platform.organization.stores.column.billing')"
+                            >
+                              @if (row.billingStatus) {
+                                <!--
+                                  A link into the platform's subscription register, filtered to this
+                                  store, where the row opens the panel with its invoices, its history
+                                  and the three levers. A link rather than the panel itself because a
+                                  feature may not import another feature's component — and because the
+                                  filtered register is a URL an operator can send to someone.
+                                -->
+                                <a
+                                  class="billing-link"
+                                  [routerLink]="['/platform/billing', 'subscriptions']"
+                                  [queryParams]="{q: row.id}"
+                                  [attr.aria-label]="t('platform.organization.stores.openBilling')"
+                                >
+                                  <app-badge [tone]="facade.billingTone(row.billingStatus)" shape="square">
+                                    {{ billingLabel(row.billingStatus) }}
+                                  </app-badge>
+                                </a>
+                              } @else {
+                                <!--
+                                  Null is "not known", never "lapsed", and it has two causes the
+                                  console cannot separate: billing has no subscription row for this
+                                  store, or billing could not be reached. The title names both.
+                                -->
+                                <span class="unknown" [title]="t('platform.organization.stores.billingUnknown')">
+                                  {{ t('platform.organization.stores.billingUnknownShort') }}
+                                </span>
+                              }
+                            </span>
+
+                            <span
+                              class="cell-id latin"
+                              role="cell"
+                              [attr.data-label]="t('platform.organization.stores.column.pod')"
+                            >
+                              {{ row.podId || '—' }}
+                            </span>
+                          </app-table-row>
+                        }
+                      </app-data-table>
+
+                      <app-pagination
+                        [page]="facade.storesPage()"
+                        [totalPages]="facade.storesTotalPages()"
+                        [totalElements]="facade.storesTotal()"
+                        [pageSize]="pageSize"
+                        [unit]="t('platform.organization.stores.unit')"
+                        [label]="t('platform.organization.stores.paginationLabel')"
+                        (pageChange)="onStoresPage($event)"
+                      />
+                    } @else if (!facade.storesLoading()) {
+                      <app-empty-state
+                        icon="shoppingCart"
+                        [title]="t('platform.organization.stores.empty.title')"
+                        [message]="t('platform.organization.stores.empty.message')"
+                      />
+                    }
+                  </app-busy-overlay>
+                </app-panel>
+              }
+
+              @case ('users') {
+                <app-panel
+                  [title]="t('platform.organization.users.title')"
+                  [subtitle]="t('platform.organization.users.lede')"
+                >
+                  @if (facade.usersError(); as failure) {
+                    <app-load-error [message]="failure.message" (retry)="facade.reloadUsers()" />
+                  }
+
+                  <app-busy-overlay
+                    reserve="panel"
+                    [busy]="facade.usersLoading()"
+                    [label]="t('platform.organization.users.loading')"
+                  >
+                    @if (facade.userRows().length) {
+                      <!--
+                        The same table the platform-wide account list renders, asking uaa a narrower
+                        question. The organization column is dropped: every row here is in this one.
+                      -->
+                      <app-user-admin-table
+                        [rows]="facade.userRows()"
+                        [label]="t('platform.organization.users.title')"
+                        [busy]="facade.busy()"
+                        [roleList]="roleList"
+                        [showScope]="showScope"
+                        (act)="onUserAction($event)"
+                      />
+
+                      <app-pagination
+                        [page]="facade.usersPage()"
+                        [totalPages]="facade.usersTotalPages()"
+                        [totalElements]="facade.usersTotal()"
+                        [pageSize]="pageSize"
+                        [unit]="t('platform.users.unit')"
+                        [label]="t('platform.organization.users.paginationLabel')"
+                        (pageChange)="onUsersPage($event)"
+                      />
+                    } @else if (!facade.usersLoading()) {
+                      <app-empty-state
+                        icon="users"
+                        [title]="t('platform.organization.users.empty.title')"
+                        [message]="t('platform.organization.users.empty.message')"
+                      />
+                    }
+                  </app-busy-overlay>
+                </app-panel>
+              }
+
+              @case ('billing') {
+                @if (facade.billingError(); as failure) {
+                  <app-load-error [message]="failure.message" (retry)="facade.reloadBilling()" />
+                }
+
+                <app-busy-overlay
+                  reserve="panel"
+                  [busy]="facade.billingLoading()"
+                  [label]="t('platform.organization.billing.loading')"
+                >
+                  <div class="billing-stack">
+                    <app-panel padded [title]="t('platform.organization.billing.spend')">
+                      @if (facade.billingTotals().length) {
+                        <!--
+                          One line per currency, never a sum across them: nothing on the platform
+                          holds an exchange rate, so a combined figure would have to invent one.
+                        -->
+                        <dl class="spend">
+                          @for (total of facade.billingTotals(); track total.currency) {
+                            <div>
+                              <dt>{{ t('platform.organization.billing.paidIn', {currency: total.currency}) }}</dt>
+                              <dd>{{ total.paid }}</dd>
+                            </div>
+                            <div>
+                              <dt>{{ t('platform.organization.billing.billedIn', {currency: total.currency}) }}</dt>
+                              <dd>{{ total.due }}</dd>
+                            </div>
+                          }
+                        </dl>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="dollar"
+                          [message]="t('platform.organization.billing.noSpend')"
+                        />
+                      }
+                    </app-panel>
+
+                    <app-panel
+                      [title]="t('platform.organization.billing.subscriptions')"
+                      [meta]="facade.billingSubscriptionsTotal().toString()"
+                    >
+                      <a
+                        panelAction
+                        class="ghost-action"
+                        [routerLink]="['/platform/billing', 'subscriptions']"
+                        [queryParams]="{org: facade.orgId()}"
+                      >
+                        {{ t('platform.organization.billing.openRegister') }}
+                      </a>
+
+                      @if (facade.billingSubscriptions().length) {
+                        <ul class="billing-rows">
+                          @for (row of facade.billingSubscriptions(); track row.store) {
+                            <li>
+                              <span class="billing-lead latin" dir="auto">{{ row.store }}</span>
+                              <span class="billing-meta">
+                                {{ row.planName || t('platform.billing.overview.noPlan') }}
+                              </span>
+                              <app-badge [tone]="facade.billingTone(row.status)" shape="square">
+                                {{ billingLabel(row.status) }}
+                              </app-badge>
+                              <span class="billing-value">{{ facade.billingAmount(row.amount) }}</span>
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="creditCard"
+                          [message]="t('platform.organization.billing.noSubscriptions')"
+                        />
+                      }
+                    </app-panel>
+
+                    <app-panel
+                      [title]="t('platform.organization.billing.invoices')"
+                      [meta]="facade.billingInvoicesTotal().toString()"
+                    >
+                      <a
+                        panelAction
+                        class="ghost-action"
+                        [routerLink]="['/platform/billing', 'invoices']"
+                        [queryParams]="{org: facade.orgId()}"
+                      >
+                        {{ t('platform.organization.billing.openLedger') }}
+                      </a>
+
+                      @if (facade.billingInvoices().length) {
+                        <ul class="billing-rows">
+                          @for (row of facade.billingInvoices(); track row.id) {
+                            <li>
+                              <span class="billing-lead latin" dir="auto">{{ row.number }}</span>
+                              <app-badge [tone]="facade.invoiceStatusTone(row.status)" shape="square">
+                                {{ facade.invoiceStatusLabel(row.status) }}
+                              </app-badge>
+                              <span class="billing-meta">{{ facade.billingDate(row.issuedAt) }}</span>
+                              <span class="billing-value">{{ facade.billingAmount(row.amountPaid) }}</span>
+                              <!--
+                                Stripe's own copy is the one that legally is the invoice; the console
+                                links to it rather than rendering figures it would have to keep correct.
+                              -->
+                              @if (row.hostedInvoiceUrl) {
+                                <a
+                                  class="icon-action"
+                                  [href]="row.hostedInvoiceUrl"
+                                  target="_blank"
+                                  rel="noopener"
+                                  [attr.aria-label]="t('platform.billing.invoices.openHosted')"
+                                >
+                                  <app-icon name="externalLink" />
+                                </a>
+                              }
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <app-empty-state
+                          compact
+                          icon="receipt"
+                          [message]="t('platform.organization.billing.noInvoices')"
+                        />
+                      }
+                    </app-panel>
+                  </div>
+                </app-busy-overlay>
+              }
+
+              @case ('activity') {
+                <app-panel [title]="t('platform.organization.activity.title')">
+                  <!--
+                    Built and empty on purpose. `tenancy_audit` records ORG / STORE / MEMBER /
+                    INVITATION rows with an actor, a from-state, a to-state, a source and a detail,
+                    and no endpoint returns any of them.
+                    TODO(lessons.md): see lessons.md, "Organizations — no audit read".
+                  -->
+                  <app-empty-state
+                    icon="clock"
+                    [title]="t('platform.organization.activity.empty.title')"
+                    [message]="t('platform.organization.activity.empty.message')"
+                  />
+                </app-panel>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <app-suspend-org-dialog
+    [open]="facade.prompt() === 'suspend'"
+    [busy]="facade.busy()"
+    [title]="t('platform.organization.suspend.title', {name: facade.heading().title})"
+    [message]="t('platform.organization.suspend.message')"
+    [consequence]="t('platform.organization.suspend.consequence')"
+    [reasonLabel]="t('platform.organization.suspend.reasonLabel')"
+    [reasonHint]="t('platform.organization.suspend.reasonHint')"
+    [confirmLabel]="t('platform.organization.action.suspend')"
+    [busyLabel]="t('platform.organization.suspend.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.suspendReason.set($event); facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+
+  <app-confirm-dialog
+    [open]="facade.prompt() === 'resume'"
+    [title]="t('platform.organization.resume.title', {name: facade.heading().title})"
+    [message]="t('platform.organization.resume.message')"
+    [confirmLabel]="t('platform.organization.action.resume')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+
+  <!--
+    Terminal: `OrgLifecycleService` allows no transition out of CLOSED. The operator types the
+    organization's own name, because clicking through a dialog is muscle memory and typing is not.
+  -->
+  <app-confirm-dialog
+    [open]="facade.prompt() === 'close'"
+    [title]="t('platform.organization.close.title', {name: facade.heading().title})"
+    [message]="t('platform.organization.close.message')"
+    [confirmationText]="facade.heading().title"
+    [confirmationLabel]="t('platform.organization.close.confirmationLabel')"
+    [confirmLabel]="t('platform.organization.action.close')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+
+  <app-set-password-dialog
+    [open]="facade.resettingOwner()"
+    [busy]="facade.busy()"
+    [title]="t('platform.organization.ownerReset.title')"
+    [message]="t('platform.organization.ownerReset.message', {name: facade.heading().title})"
+    [passwordLabel]="t('platform.organization.ownerReset.password')"
+    [repeatLabel]="t('platform.organization.ownerReset.repeatPassword')"
+    [hint]="t('platform.organization.ownerReset.hint')"
+    [handoverHint]="t('platform.organization.ownerReset.handoverHint')"
+    [weakMessage]="t('platform.organization.ownerReset.weak')"
+    [mismatchMessage]="t('platform.organization.ownerReset.mismatch')"
+    [confirmLabel]="t('platform.organization.ownerReset.confirm')"
+    [busyLabel]="t('platform.organization.ownerReset.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.confirmOwnerReset($event)"
+    (dismissed)="facade.dismissOwnerReset()"
+  />
+
+  <app-set-password-dialog
+    [open]="!!facade.resettingUser()"
+    [busy]="facade.busy()"
+    [title]="t('platform.users.reset.title')"
+    [message]="t('platform.users.reset.message', {name: userName(facade.resettingUser())})"
+    [passwordLabel]="t('platform.users.reset.password')"
+    [repeatLabel]="t('platform.users.reset.repeatPassword')"
+    [hint]="t('platform.users.reset.hint')"
+    [handoverHint]="t('platform.users.reset.handoverHint')"
+    [weakMessage]="t('platform.users.reset.weak')"
+    [mismatchMessage]="t('platform.users.reset.mismatch')"
+    [confirmLabel]="t('platform.users.reset.confirm')"
+    [busyLabel]="t('platform.users.reset.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.confirmUserReset($event)"
+    (dismissed)="facade.dismissUserDialogs()"
+  />
+
+  @if (facade.editingRoles(); as target) {
+    <app-roles-dialog
+      [open]="true"
+      [busy]="facade.busy()"
+      [title]="t('platform.users.roles.title')"
+      [message]="t('platform.users.roles.message', {name: userName(target)})"
+      [options]="facade.roleOptions()"
+      [held]="target.roles"
+      [emptyMessage]="t('platform.users.roles.empty')"
+      [confirmLabel]="t('platform.users.roles.confirm')"
+      [busyLabel]="t('platform.users.roles.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (submitted)="facade.confirmRoles($event)"
+      (dismissed)="facade.dismissUserDialogs()"
+    />
+  }
+
+  <app-confirm-dialog
+    [open]="!!facade.deletingUser()"
+    [title]="t('platform.users.delete.title')"
+    [message]="t('platform.users.delete.message', {name: userName(facade.deletingUser())})"
+    [confirmLabel]="t('platform.users.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDeleteUser()"
+    (dismissed)="facade.dismissUserDialogs()"
+  />
+</ng-container>

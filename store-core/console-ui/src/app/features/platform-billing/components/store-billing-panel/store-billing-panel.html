@@ -1,0 +1,273 @@
+<dialog #dialog class="store-billing" (cancel)="onDismiss()">
+  <ng-container *transloco="let t">
+    <div class="store-billing-body">
+      <header class="store-billing-head">
+        <div class="who">
+          <h2>{{ t('platform.billing.store.title') }}</h2>
+          <!-- A store id is Latin data in a line that may be right-to-left. -->
+          <span class="store-id" dir="auto">{{ store() }}</span>
+        </div>
+        @if (facade.statusLabel()) {
+          <app-badge [tone]="facade.statusTone()">{{ facade.statusLabel() }}</app-badge>
+        }
+        <button
+          class="icon-action"
+          type="button"
+          [attr.aria-label]="t('platform.billing.store.close')"
+          (click)="close()"
+        >
+          <app-icon name="x" />
+        </button>
+      </header>
+
+      @if (facade.error(); as failure) {
+        <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+      }
+
+      <app-busy-overlay
+        reserve="panel"
+        [busy]="facade.isLoading() || facade.busy()"
+        [label]="t('platform.billing.store.loading')"
+      >
+        @if (!facade.isEmpty()) {
+          <div class="store-billing-scroll">
+            @if (facade.subscription(); as subscription) {
+              <section class="store-section">
+                <h3>{{ t('platform.billing.store.plan') }}</h3>
+                <dl class="facts">
+                  <div>
+                    <dt>{{ t('platform.billing.store.onPlan') }}</dt>
+                    <dd>{{ subscription.planDisplayName || subscription.planCode || t('platform.billing.overview.noPlan') }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ t('platform.billing.store.amount') }}</dt>
+                    <dd>{{ facade.amount(subscription.amount?.minorUnits, subscription.amount?.currency?.code) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ t('platform.billing.store.renews') }}</dt>
+                    <dd>{{ facade.date(subscription.currentPeriodEnd) }}</dd>
+                  </div>
+                  @if (subscription.trialEnd) {
+                    <div>
+                      <dt>{{ t('platform.billing.store.trialEnds') }}</dt>
+                      <dd>{{ facade.date(subscription.trialEnd) }}</dd>
+                    </div>
+                  }
+                  @if (subscription.graceUntil) {
+                    <div>
+                      <!-- A PAST_DUE row means nothing without this: it is how long the store has left. -->
+                      <dt>{{ t('platform.billing.store.graceUntil') }}</dt>
+                      <dd>{{ facade.date(subscription.graceUntil) }}</dd>
+                    </div>
+                  }
+                </dl>
+
+                @if (subscription.pendingPlanChange; as pending) {
+                  <p class="pending">
+                    <app-icon name="clock" />
+                    {{ t('platform.billing.store.pendingChange', {plan: pending.planCode, date: facade.date(pending.effectiveAt)}) }}
+                  </p>
+                }
+                @if (subscription.cancelAtPeriodEnd) {
+                  <p class="pending">
+                    <app-icon name="alertCircle" />
+                    {{ t('platform.billing.store.willNotRenew', {date: facade.date(subscription.currentPeriodEnd)}) }}
+                  </p>
+                }
+
+                <!--
+                  The levers are gated on `providerLinked`, not on status: `cancel` and `resume` both
+                  call `requireProviderSubscription`, so a trial we granted ourselves cannot be
+                  cancelled or resumed at all. The bar says why rather than offering buttons that throw.
+                -->
+                @if (!facade.canAct()) {
+                  <app-notice-bar
+                    icon="info"
+                    tone="slate"
+                    [message]="t('platform.billing.store.noProvider')"
+                  />
+                } @else {
+                  <div class="levers">
+                    @if (facade.changingPlan()) {
+                      <div class="plan-picker">
+                        <app-select
+                          [value]="facade.draftPriceId()"
+                          (valueChange)="facade.draftPriceId.set($event)"
+                          [options]="facade.planOptions()"
+                          [ariaLabel]="t('platform.billing.store.pickPlan')"
+                          [placeholder]="t('platform.billing.store.pickPlan')"
+                        />
+                        <button
+                          type="button"
+                          class="primary-action"
+                          [disabled]="facade.busy() || !facade.draftPriceId()"
+                          (click)="facade.changePlan(notifyChanged)"
+                        >
+                          {{ t('platform.billing.store.applyPlan') }}
+                        </button>
+                        <button
+                          type="button"
+                          class="ghost-action"
+                          [disabled]="facade.busy()"
+                          (click)="facade.changingPlan.set(false)"
+                        >
+                          {{ t('platform.billing.store.cancelPick') }}
+                        </button>
+                      </div>
+                    } @else {
+                      <button
+                        type="button"
+                        class="secondary-action"
+                        [disabled]="facade.busy()"
+                        (click)="facade.changingPlan.set(true)"
+                      >
+                        {{ t('platform.billing.store.changePlan') }}
+                      </button>
+                      @if (facade.canResume()) {
+                        <button
+                          type="button"
+                          class="secondary-action"
+                          [disabled]="facade.busy()"
+                          (click)="facade.prompt.set('resume')"
+                        >
+                          {{ t('platform.billing.store.resume') }}
+                        </button>
+                      }
+                      @if (facade.canCancel()) {
+                        <button
+                          type="button"
+                          class="ghost-action"
+                          [disabled]="facade.busy()"
+                          (click)="facade.prompt.set('cancelAtPeriodEnd')"
+                        >
+                          {{ t('platform.billing.store.cancelAtPeriodEnd') }}
+                        </button>
+                        <!--
+                          The super-admin-only branch. It throws away time the customer has paid for,
+                          so it is a separate, quieter, red action rather than a checkbox on the one above.
+                        -->
+                        <button
+                          type="button"
+                          class="danger-action"
+                          [disabled]="facade.busy()"
+                          (click)="facade.prompt.set('cancelNow')"
+                        >
+                          {{ t('platform.billing.store.cancelNow') }}
+                        </button>
+                      }
+                    }
+                  </div>
+                }
+              </section>
+            } @else {
+              <app-empty-state
+                icon="creditCard"
+                [title]="t('platform.billing.store.noSubscription.title')"
+                [message]="t('platform.billing.store.noSubscription.message')"
+              />
+            }
+
+            <section class="store-section">
+              <h3>{{ t('platform.billing.store.invoices') }}</h3>
+              @if (facade.invoices().length) {
+                <ul class="rows">
+                  @for (invoice of facade.invoices(); track invoice.id) {
+                    <li>
+                      <span class="row-lead" dir="auto">{{ invoice.number || '—' }}</span>
+                      <span class="row-meta">{{ facade.invoiceStatusLabel(invoice.status) }}</span>
+                      <span class="row-meta">{{ facade.date(invoice.issuedAt) }}</span>
+                      <span class="row-value">
+                        {{ facade.amount(invoice.amountPaid?.minorUnits, invoice.amountPaid?.currency?.code) }}
+                      </span>
+                      <!--
+                        Stripe's own copy is the one that is legally the invoice; the console links
+                        to it rather than rendering figures it would then have to keep correct.
+                      -->
+                      @if (invoice.hostedInvoiceUrl) {
+                        <a
+                          class="icon-action"
+                          [href]="invoice.hostedInvoiceUrl"
+                          target="_blank"
+                          rel="noopener"
+                          [attr.aria-label]="t('platform.billing.invoices.openHosted')"
+                        >
+                          <app-icon name="externalLink" />
+                        </a>
+                      }
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <app-empty-state
+                  compact
+                  icon="receipt"
+                  [message]="t('platform.billing.store.noInvoices')"
+                />
+              }
+            </section>
+
+            <section class="store-section">
+              <h3>{{ t('platform.billing.store.activity') }}</h3>
+              @if (facade.activity().length) {
+                <ul class="rows">
+                  @for (row of facade.activity(); track row.id) {
+                    <li>
+                      <span class="row-lead">{{ facade.eventLabel(row.eventType) }}</span>
+                      @if (row.fromPlanCode || row.toPlanCode) {
+                        <span class="row-meta">{{ (row.fromPlanCode || '—') + ' → ' + (row.toPlanCode || '—') }}</span>
+                      }
+                      <span class="row-meta" dir="auto">{{ facade.actorLabel(row) }}</span>
+                      <span class="row-value">{{ facade.dateTime(row.occurredAt) }}</span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <app-empty-state
+                  compact
+                  icon="clock"
+                  [message]="t('platform.billing.store.noActivity')"
+                />
+              }
+            </section>
+          </div>
+        }
+      </app-busy-overlay>
+    </div>
+
+    <app-confirm-dialog
+      [open]="facade.prompt() === 'cancelAtPeriodEnd'"
+      [title]="t('platform.billing.store.confirm.cancelAtPeriodEnd.title')"
+      [message]="t('platform.billing.store.confirm.cancelAtPeriodEnd.message')"
+      [confirmLabel]="t('platform.billing.store.confirm.cancelAtPeriodEnd.confirm')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (confirmed)="facade.cancel(false, notifyChanged)"
+      (dismissed)="facade.prompt.set(null)"
+    />
+
+    <!--
+      Immediate cancellation asks the operator to type the store id. It is irreversible, it throws
+      away paid time, and it is the one operation on this screen that no merchant can perform.
+    -->
+    <app-confirm-dialog
+      [open]="facade.prompt() === 'cancelNow'"
+      [title]="t('platform.billing.store.confirm.cancelNow.title')"
+      [message]="t('platform.billing.store.confirm.cancelNow.message')"
+      [confirmLabel]="t('platform.billing.store.confirm.cancelNow.confirm')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      [confirmationText]="store()"
+      [confirmationLabel]="t('platform.billing.store.confirm.cancelNow.typeId')"
+      (confirmed)="facade.cancel(true, notifyChanged)"
+      (dismissed)="facade.prompt.set(null)"
+    />
+
+    <app-confirm-dialog
+      [open]="facade.prompt() === 'resume'"
+      [title]="t('platform.billing.store.confirm.resume.title')"
+      [message]="t('platform.billing.store.confirm.resume.message')"
+      [confirmLabel]="t('platform.billing.store.confirm.resume.confirm')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (confirmed)="facade.resume(notifyChanged)"
+      (dismissed)="facade.prompt.set(null)"
+    />
+  </ng-container>
+</dialog>

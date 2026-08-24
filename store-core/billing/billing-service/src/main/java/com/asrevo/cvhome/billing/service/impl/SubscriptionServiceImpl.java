@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.asrevo.cvhome.billing.commons.AuditEventType;
 import com.asrevo.cvhome.billing.commons.ChangeSource;
+import com.asrevo.cvhome.billing.commons.PlanId;
 import com.asrevo.cvhome.billing.commons.PlanPriceId;
 import com.asrevo.cvhome.billing.commons.StripeCustomerId;
 import com.asrevo.cvhome.billing.commons.StripeScheduleId;
@@ -104,7 +105,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      */
     @Override
     @Transactional
-    public SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId)
+    public SubscriptionView changePlan(StoreMerchantId store, ManagerOrgId scopeOrg, PlanPriceId targetPriceId,
+                                       String actor)
             throws SubscriptionNotFoundException, PlanPriceNotFoundException, SubscriptionChangeRejectedException,
             BillingProviderUnavailableException, IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
@@ -116,16 +118,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (target.getId().equals(current.getId())) {
             return mappers.toView(entity);
         }
-        SubscriptionStatus before = entity.getStatus();
+        // Both captured before anything mutates: the entity is changed in place, so by the time the audit row is
+        // written `entity.getPlanId()` is already the plan the store moved *to*.
+        Transition from = Transition.of(entity, actor);
         return upgrades(current, target)
-                ? applyUpgrade(entity, subscription, target, before)
-                : applyDowngrade(entity, subscription, target, before);
+                ? applyUpgrade(entity, subscription, target, from)
+                : applyDowngrade(entity, subscription, target, from);
     }
 
     @Override
     @Transactional
     public SubscriptionView cancel(StoreMerchantId store, ManagerOrgId scopeOrg, boolean immediate,
-                                   boolean superAdmin)
+                                   boolean superAdmin, String actor)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException, ImmediateCancelForbiddenException {
         StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
@@ -133,11 +137,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             throw ImmediateCancelForbiddenException.forStore(store);
         }
         StripeSubscriptionId subscription = requireProviderSubscription(entity);
-        SubscriptionStatus before = entity.getStatus();
+        Transition from = Transition.of(entity, actor);
         if (immediate) {
             subscriptionGateway.cancelNow(store, subscription);
             StoreSubscriptionEntity saved = subscriptionRepository.save(reload(entity).cancelNow(Instant.now()));
-            auditService.record(before, saved, AuditEventType.CANCELED, ChangeSource.API, null);
+            from.record(auditService, saved, AuditEventType.CANCELED);
             return mappers.toView(saved);
         }
         // A scheduled subscription will not accept cancellation behaviour directly — Stripe refuses it and says to
@@ -146,14 +150,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         releaseAnySchedule(entity);
         subscriptionGateway.setRenewal(store, subscription, false);
         StoreSubscriptionEntity saved = subscriptionRepository.save(reload(entity).scheduleCancel());
-        auditService.record(before, saved, AuditEventType.CANCEL_SCHEDULED, ChangeSource.API, null);
+        from.record(auditService, saved, AuditEventType.CANCEL_SCHEDULED);
         log.info("Store {} will not renew after {}", store, saved.getCurrentPeriodEnd());
         return mappers.toView(saved);
     }
 
     @Override
     @Transactional
-    public SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg)
+    public SubscriptionView resume(StoreMerchantId store, ManagerOrgId scopeOrg, String actor)
             throws SubscriptionNotFoundException, BillingProviderUnavailableException,
             IllegalSubscriptionTransitionException {
         StoreSubscriptionEntity entity = requireInOrg(store, scopeOrg);
@@ -164,14 +168,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (!entity.isCancelAtPeriodEnd() && entity.getPendingPlanPriceId() == null) {
             throw IllegalSubscriptionTransitionException.of(store, entity.getStatus(), "RESUMED");
         }
-        SubscriptionStatus before = entity.getStatus();
+        Transition from = Transition.of(entity, actor);
 
         // A pending downgrade is called off too. Resuming means "carry on as I am", and leaving a scheduled drop in
         // place would surprise the customer at the period boundary with a change they thought they had undone.
         releaseAnySchedule(entity);
         subscriptionGateway.setRenewal(store, subscription, true);
         StoreSubscriptionEntity saved = subscriptionRepository.save(reload(entity).revokeScheduledCancel());
-        auditService.record(before, saved, AuditEventType.CANCEL_REVOKED, ChangeSource.API, null);
+        from.record(auditService, saved, AuditEventType.CANCEL_REVOKED);
         return mappers.toView(saved);
     }
 
@@ -186,9 +190,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
         PlanPriceEntity target = planCatalogService.requirePrice(entity.getPendingPlanPriceId());
         SubscriptionStatus before = entity.getStatus();
+        PlanId fromPlan = entity.getPlanId();
         StoreSubscriptionEntity saved = subscriptionRepository.save(
                 entity.applyPendingChange(target.getPlanId(), target.getId()));
-        auditService.record(before, saved, AuditEventType.PLAN_DOWNGRADE_APPLIED, ChangeSource.JOB, JOB_ACTOR);
+        auditService.record(before, fromPlan, saved, AuditEventType.PLAN_DOWNGRADE_APPLIED, ChangeSource.JOB,
+                JOB_ACTOR);
         log.info("Applied the deferred plan change on store {}", store);
     }
 
@@ -227,9 +233,36 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private void suspend(StoreSubscriptionEntity entity, AuditEventType eventType)
             throws IllegalSubscriptionTransitionException {
         SubscriptionStatus before = entity.getStatus();
+        PlanId fromPlan = entity.getPlanId();
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity.suspend(Instant.now()));
-        auditService.record(before, saved, eventType, ChangeSource.JOB, JOB_ACTOR);
+        auditService.record(before, fromPlan, saved, eventType, ChangeSource.JOB, JOB_ACTOR);
         log.info("Suspended store {} (was {})", saved.getId(), before);
+    }
+
+    /**
+     * Where a human-driven change started from, and who asked for it.
+     *
+     * <p>
+     * Three values that must all be read <em>before</em> the entity is touched, carried together so they cannot be
+     * captured at three different moments. {@code StoreSubscriptionEntity} mutates in place, so a
+     * {@code getPlanId()} read after the save answers the plan the store moved <em>to</em> — which is how
+     * {@code from_plan_id} came to be a literal {@code null} on every row on the platform.
+     * </p>
+     *
+     * <p>
+     * The actor is threaded rather than pulled from {@code SecurityContextHolder} inside the writer: explicit,
+     * testable without a security context, and impossible to forget silently, because the compiler asks for it.
+     * </p>
+     */
+    private record Transition(SubscriptionStatus status, PlanId plan, String actor) {
+
+        static Transition of(StoreSubscriptionEntity entity, String actor) {
+            return new Transition(entity.getStatus(), entity.getPlanId(), actor);
+        }
+
+        void record(SubscriptionAuditService auditService, StoreSubscriptionEntity saved, AuditEventType eventType) {
+            auditService.record(status, plan, saved, eventType, ChangeSource.API, actor);
+        }
     }
 
     /**
@@ -250,14 +283,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private SubscriptionView applyUpgrade(StoreSubscriptionEntity stale, StripeSubscriptionId subscription,
-                                          PlanPriceEntity target, SubscriptionStatus before)
+                                          PlanPriceEntity target, Transition from)
             throws SubscriptionChangeRejectedException, BillingProviderUnavailableException,
             SubscriptionNotFoundException {
         subscriptionGateway.upgradeNow(stale.getId(), subscription, target);
         StoreSubscriptionEntity entity = reload(stale);
         StoreSubscriptionEntity saved = subscriptionRepository.save(entity.upgradeTo(target.getPlanId(),
                 target.getId(), entity.getCurrentPeriodStart(), entity.getCurrentPeriodEnd()));
-        auditService.record(before, saved, AuditEventType.PLAN_UPGRADED, ChangeSource.API, null);
+        from.record(auditService, saved, AuditEventType.PLAN_UPGRADED);
         log.info("Store {} upgraded to {}", entity.getId(), target.getId());
         return mappers.toView(saved);
     }
@@ -271,7 +304,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
      * </p>
      */
     private SubscriptionView applyDowngrade(StoreSubscriptionEntity stale, StripeSubscriptionId subscription,
-                                            PlanPriceEntity target, SubscriptionStatus before)
+                                            PlanPriceEntity target, Transition from)
             throws BillingProviderUnavailableException, SubscriptionNotFoundException {
         Instant effectiveAt = stale.getCurrentPeriodEnd();
         StripeScheduleId schedule = subscriptionGateway.scheduleDowngrade(stale.getId(), subscription, target,
@@ -279,7 +312,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         StoreSubscriptionEntity entity = reload(stale);
         StoreSubscriptionEntity saved = subscriptionRepository.save(
                 entity.scheduleDowngradeTo(target.getId(), effectiveAt).bindSchedule(schedule));
-        auditService.record(before, saved, AuditEventType.PLAN_DOWNGRADE_SCHEDULED, ChangeSource.API, null);
+        from.record(auditService, saved, AuditEventType.PLAN_DOWNGRADE_SCHEDULED);
         log.info("Store {} will move to {} at {}", entity.getId(), target.getId(), effectiveAt);
         return mappers.toView(saved);
     }

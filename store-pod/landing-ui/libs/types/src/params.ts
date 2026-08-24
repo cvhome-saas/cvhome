@@ -1,7 +1,6 @@
 import {Store} from "./store";
 import {Cart} from "./cart";
 import {CategoryPage} from "./category";
-import {ContentPage} from "./content";
 import {StoreContext} from "./store-context";
 import {Product} from "./product-groups";
 
@@ -25,10 +24,6 @@ export interface CategoriesParams extends LocaleParam {
     categories: CategoryPage | undefined;
 }
 
-export interface ContentsParams extends LocaleParam {
-    contents: ContentPage | undefined;
-}
-
 export interface CartParams extends LocaleParam {
     cart: Cart | undefined;
 }
@@ -39,13 +34,12 @@ export type Params =
     | StoreContextParam
     | ProductPageParams
     | CategoriesParams
-    | ContentsParams
     | CartPageParams;
 
 export interface DefaultParams extends LocaleParam, StoreParams, StoreContextParam {
 }
 
-export interface LayoutParams extends DefaultParams, CategoriesParams, ContentsParams, CartParams {
+export interface LayoutParams extends DefaultParams, CategoriesParams, CartParams {
 }
 
 export interface DefaultPageParams {

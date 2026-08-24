@@ -5,7 +5,7 @@ com:
         domain: gateway.com
         sub:
           - www
-          - seller-ui
+          - console-ui
           - uaa
         handlers:
           - schema: http
@@ -48,10 +48,10 @@ com:
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway
-        seller-ui:
-          name: seller-ui
-          domain: seller-ui.${com.asrevo.cvhome.app.domain}
-          port: 8010
+        console-ui:
+          name: console-ui
+          domain: console-ui.${com.asrevo.cvhome.app.domain}
+          port: 8011
           schema: http
           namespace: store-core.cvhome.lcl
           gateway-service-name: store-core-gateway

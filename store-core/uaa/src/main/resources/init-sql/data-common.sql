@@ -69,8 +69,8 @@ insert into uaa.oauth2_registered_client (id, client_id, client_id_issued_at, cl
 values ('b6d8f3d1-8f8f-9060-d3e3-8f8f9060d3e3',
         'web-app', now(), '{bcrypt}$2a$10$KEyYNPGHPotegD5Ui8/yX.WzIv75INVsEzgjkD2GqQdmcBG0qke8i', 'Web App',
         'client_secret_basic', 'authorization_code,refresh_token',
-        'http://localhost:8000/login/oauth2/code/uaa,http://gateway.com:8000/login/oauth2/code/uaa,http://seller-ui.gateway.com:8000/login/oauth2/code/uaa',
-        'http://localhost:8000,http://gateway.com:8000,http://seller-ui.gateway.com:8000',
+        'http://localhost:8000/login/oauth2/code/uaa,http://gateway.com:8000/login/oauth2/code/uaa,http://console-ui.gateway.com:8000/login/oauth2/code/uaa',
+        'http://localhost:8000,http://gateway.com:8000,http://console-ui.gateway.com:8000',
         'openid',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}',
         '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":false,"settings.token.x509-certificate-bound-access-tokens":false,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",86400.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}')

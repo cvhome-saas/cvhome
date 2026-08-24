@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>cvhome Console</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!--
+    Applies the stored theme before the first paint. Angular cannot do this — the app
+    boots after the document renders, so setting [data-theme] there would show a frame of
+    Forest first and flash. Kept inline and tiny for the same reason: an external file
+    would be another round trip in front of the paint.
+
+    Deliberately does NOT consult prefers-color-scheme. Forest is the brand's default
+    surface and the marketing and auth pages are built on it; Daylight is a choice an
+    operator makes, not one the operating system makes for them.
+  -->
+  <script>
+    (function () {
+      var themes = ['forest', 'midnight', 'daylight'];
+      var chosen = 'forest';
+      try {
+        var stored = localStorage.getItem('cvhome.console.theme');
+        if (themes.indexOf(stored) !== -1) chosen = stored;
+      } catch (e) {
+        /* Storage can throw when cookies are blocked; the default already stands. */
+      }
+      document.documentElement.dataset.theme = chosen;
+    })();
+  </script>
+  <!--
+    Same reasoning as the theme script above, for language: Angular boots after the
+    document renders, so setting `dir` from a service would show one frame of LTR before
+    an Arabic layout snaps into place. The cookie name and shape must match
+    core/i18n/lang-storage.ts's LANG_COOKIE.
+  -->
+  <script>
+    (function () {
+      var lang = 'en';
+      try {
+        var match = document.cookie.match(/(?:^|;\s*)cvhome\.console\.lang=(en|ar)/);
+        if (match) lang = match[1];
+      } catch (e) {
+        /* Storage can throw when cookies are blocked; the default already stands. */
+      }
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    })();
+  </script>
+</head>
+<body>
+  <!--
+  THESIS: cvhome turns multi-market commerce into one controlled territory, not another generic storefront.
+  OWN-WORLD: deep forest surfaces, precise emerald signals, restrained typography, and map-like breadth.
+  COMPOSITION: a commanding first viewport opens into proof, merchants, testimony, pricing, and direct contact.
+  BEHAVIOR: one calm atmospheric drift, tactile controls, and a responsive navigation drawer.
+  RISK: the dark palette is protected with high-contrast type, generous spacing, and visible focus states.
+  -->
+  <app-root></app-root>
+</body>
+</html>

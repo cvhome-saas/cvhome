@@ -11,6 +11,7 @@ Plain, complete reference implementation of `ThemeDefinition` (`@store-front/the
 | `src/fonts.ts` | `next/font` wiring from a theme package (variable class on `<html>`) |
 | `src/tokens.css` | token scoping under `[data-theme="starter"]`; every `THEME_OWNED_TOKENS` entry set |
 | `src/config.ts` | `ThemeLayoutConfig` consumed by the shell (`ctx.layout`) |
+| `src/colors.ts` | generated default palette (`tokens.defaultColors`) — the LIGHT seed; edit `THEME_DEFAULTS.<id>` in `libs/types/scripts/build-color-schemas.mjs`, then `npm run gen:colors -w libs/types` |
 | `src/layout/Root.tsx` | skip link, announcement, header, `<main id="main">`, footer |
 | `src/layout/Header*.tsx`, `Nav.tsx`, `MobileNav.tsx` | category tree nav (mega-menu + drawer), `start/end` logical props, `Drawer` side by `dir` |
 | `src/layout/HeaderActions.tsx` | locale switcher, account (login/logout), cart button + cart drawer (qty stepper, remove, empty state, checkout CTA) |
@@ -29,6 +30,6 @@ Plain, complete reference implementation of `ThemeDefinition` (`@store-front/the
 
 ```
 npm run dev                         # storefront on :8110
-open http://localhost:8110/en?theme=starter   # override cookie (dev only)
+open http://localhost:8110/en?theme=starter   # override cookie (dev only); &color=<PRESET|default> previews a colour theme
 STOREFRONT_THEME=starter npm run dev          # env override
 ```

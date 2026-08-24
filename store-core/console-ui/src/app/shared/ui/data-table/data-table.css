@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  /* Rows size against the table's own column, not the viewport. */
+  container: data-table / inline-size;
+}
+
+/*
+ * The grid needs its full track list to stay readable, so it keeps a minimum width and the
+ * table scrolls sideways rather than crushing nine columns into a phone. Consumers set
+ * `--table-min-width` to whatever their narrowest legible layout is.
+ */
+.table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.table-grid {
+  min-inline-size: var(--table-min-width, 60rem);
+}
+
+.table-head {
+  display: grid;
+  grid-template-columns: var(--table-columns);
+  gap: 1rem;
+  padding: 0.7rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--input);
+}
+
+.table-heading {
+  min-width: 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.table-heading.end {
+  text-align: end;
+}
+
+/*
+ * Below this the grid cannot hold its shape, so rows become stacked cards and the header —
+ * whose labels each row now repeats inline — has nothing left to label.
+ */
+@container data-table (max-width: 45rem) {
+  .table-grid {
+    min-inline-size: 0;
+  }
+
+  .table-head {
+    display: none;
+  }
+}

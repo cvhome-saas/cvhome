@@ -3,6 +3,8 @@ package com.asrevo.cvhome.tenancy.manager.controller;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +29,7 @@ import com.asrevo.cvhome.podregistry.api.errors.PodRegistryUnavailableException;
 import com.asrevo.cvhome.tenancy.commons.dto.CreateStoreRequest;
 import com.asrevo.cvhome.tenancy.commons.dto.ListManagerStoreQuery;
 import com.asrevo.cvhome.tenancy.commons.dto.ManagerStoreDto;
+import com.asrevo.cvhome.tenancy.commons.dto.PodStoreCount;
 import com.asrevo.cvhome.tenancy.errors.DuplicateStoreNameException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotFoundException;
 import com.asrevo.cvhome.tenancy.errors.StoreNotOperableException;
@@ -71,6 +74,27 @@ public class StoreManagerApi {
     }
 
     /**
+     * How many stores sit on each pod, across every organization.
+     *
+     * <p>
+     * Super-admin only, and deliberately narrower than {@link #STORE_VIEWER_ROLES} above: those endpoints answer a
+     * caller about their own stores and scope the rows to prove it, while this is a platform-wide aggregate that
+     * cannot be scoped to anything. It exists because the fleet screen wants one number per pod in one request —
+     * a column costing a request per row is not a column.
+     * </p>
+     *
+     * <p>
+     * Tenancy owns {@code manager_store.pod_id}, which is why this is the authoritative count and pod-registry's
+     * {@code capacity_stores} is not: that one is a mirror maintained from this service's outbox.
+     * </p>
+     */
+    @GetMapping("stores-per-pod")
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    public List<PodStoreCount> storesPerPod() {
+        return internalStoreService.storesPerPod();
+    }
+
+    /**
      * @throws StoreQuotaRefusedException      billing will not let this org have another store — 422 with the reason
      * @throws BillingApiUnavailableException  billing could not be reached, so the store is not created; the caller
      *                                         should retry rather than assume it exists
@@ -78,11 +102,18 @@ public class StoreManagerApi {
      *                                         something the merchant can resolve: someone has to drain, resize or
      *                                         add a pod
      * @throws PodRegistryUnavailableException the registry could not be reached, so the store is not created
+     *
+     * <p>
+     * {@code @Valid} is what keeps a create that cannot succeed from being accepted. Provisioning is asynchronous —
+     * this answers before the pod has seen the body — so a field the pod requires and this endpoint does not check
+     * surfaces as a {@code FAILED_PROVISIONING} row minutes later with no reason attached, rather than as a 400 the
+     * form can bind. See {@link CreateStoreRequest} for which of merchant's fields are checked here and why.
+     * </p>
      */
     @PostMapping("private/store")
     @PreAuthorize("hasAnyRole('ROLE_SUPER_ADMIN','ROLE_ORG_ADMIN')")
     public ManagerStoreDto create(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
-                                  @RequestBody CreateStoreRequest request)
+                                  @Valid @RequestBody CreateStoreRequest request)
             throws StoreQuotaRefusedException, BillingApiUnavailableException, PodPlacementRefusedException,
             PodRegistryUnavailableException, DuplicateStoreNameException {
         return this.managerService.createStore(identity.org(), request);
@@ -104,7 +135,7 @@ public class StoreManagerApi {
     @PreAuthorize(STORE_VIEWER_ROLES)
     public Page<ManagerStoreDto> findAllStoresDetailed(@OrgStorePrincipalInfo UserOrgStoreIdentity identity,
                                                        Pageable pageable) {
-        return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null), pageable);
+        return internalStoreService.findAll(identity, new ListManagerStoreQuery(null, null, null, null), pageable);
     }
 
     @GetMapping("private/store/{code}")

@@ -35,8 +35,8 @@ spring.cloud.discovery.client.simple.instances:
       ...
 ```
 
-Every service is listed with its hardcoded localhost URI (`uaa` 8001, `store-core-gateway` 8000, `seller-ui`
-8010, `tenancy` 8020, `landing-ui` 8110, `merchant` 8120, `catalog` 8122, `checkout` 8123, `cua` 8124,
+Every service is listed with its hardcoded localhost URI (`uaa` 8001, `store-core-gateway` 8000, `console-ui`
+8011, `tenancy` 8020, `landing-ui` 8110, `merchant` 8120, `catalog` 8122, `checkout` 8123, `cua` 8124,
 `payment` 8125). Spring Cloud Commons auto-configures the matching client from those properties:
 
 | App type | Bean | Where |
@@ -84,7 +84,7 @@ spring.cloud.ecs.discovery:
   namespace-id: "ns-je7qri6wn7fbsrpn"
   enabled: true
   default-port: 8080
-  service-ports: { uaa: 8001, store-core-gateway: 8000, seller-ui: 8010, tenancy: 8020,
+  service-ports: { uaa: 8001, store-core-gateway: 8000, console-ui: 8011, tenancy: 8020,
                    landing-ui: 8110, merchant: 8120, catalog: 8122, checkout: 8123, cua: 8124, payment: 8125 }
 ```
 

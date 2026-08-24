@@ -1,0 +1,28 @@
+<span class="textarea-shell">
+  <textarea
+    #area
+    class="textarea-input"
+    [class.latin]="latin()"
+    [class.auto-grow]="autoGrow()"
+    [id]="id()"
+    [value]="value()"
+    [rows]="rows()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [attr.maxlength]="maxLength()"
+    [attr.dir]="latin() ? 'ltr' : 'auto'"
+    (input)="onInput(area)"
+    (blur)="onBlur()"
+  ></textarea>
+
+  @if (counter(); as text) {
+    <span
+      class="textarea-counter"
+      [class.off-recommendation]="offRecommendation()"
+      aria-hidden="true"
+    ><span>{{ text }}</span></span>
+  }
+</span>

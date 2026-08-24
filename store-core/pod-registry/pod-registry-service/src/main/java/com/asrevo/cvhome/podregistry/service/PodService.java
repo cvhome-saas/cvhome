@@ -22,6 +22,16 @@ public interface PodService {
     Page<Pod> listAllPods(ManagerOrgId orgId, Pageable pageable);
 
     /**
+     * One page of pods, narrowed by a search term over the name and the endpoint.
+     *
+     * <p>
+     * {@code orgId} null means platform-wide, exactly as it does for the two overloads above — the term narrows
+     * what the caller may already see rather than widening it, so it needs no guard of its own.
+     * </p>
+     */
+    Page<Pod> searchPods(ManagerOrgId orgId, String term, Pageable pageable);
+
+    /**
      * Pods a store may be placed on when its organization owns none. Never returns another organization's private
      * pod — see {@code PodRepository.findPlaceablePublicPods}.
      */

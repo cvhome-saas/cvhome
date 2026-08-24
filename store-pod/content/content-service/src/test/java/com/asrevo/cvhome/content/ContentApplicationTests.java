@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
+@ActiveProfiles({"signer", "test-stores"})
 @Tag("integration-test")
 class ContentApplicationTests {
 
@@ -33,13 +35,27 @@ class ContentApplicationTests {
                  where table_schema = 'content'
                  order by table_name
                 """, String.class);
-        assertThat(tables).containsExactly("content", "content_description", "sm_sequencer");
+        assertThat(tables).contains("content", "content_description", "content_revision", "content_status_audit",
+                "redirect", "sm_sequencer");
         Integer merchantSchemaCount = jdbcTemplate.queryForObject("""
                 select count(*)
                   from information_schema.schemata
                  where schema_name = 'merchant'
                 """, Integer.class);
         assertThat(merchantSchemaCount).isZero();
+    }
+
+    @Test
+    void legacySeedRowsArePublishedByTheMigration() {
+        Integer drafts = jdbcTemplate.queryForObject("""
+                select count(*) from content.content where visible = true and status <> 'PUBLISHED'
+                """, Integer.class);
+        assertThat(drafts).isZero();
+        Integer pages = jdbcTemplate.queryForObject("""
+                select count(*) from content.content
+                 where store_merchant_id = '65f023632bc26470c104b75f' and content_type = 'PAGE' and status = 'PUBLISHED'
+                """, Integer.class);
+        assertThat(pages).isEqualTo(6);
     }
 
 }

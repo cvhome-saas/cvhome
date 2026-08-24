@@ -1,11 +1,16 @@
 import {defineTheme, mix} from '@store-front/theme';
 import {fonts} from './fonts';
+import {DEFAULT_COLORS} from './colors';
 import {layoutConfig} from './config';
 import {Root} from './layout/Root';
 import {Home} from './pages/Home';
 import {Category} from './pages/Category';
 import {Product} from './pages/Product';
 import {Content} from './pages/Content';
+import {BlogIndex} from './pages/BlogIndex';
+import {BlogPost} from './pages/BlogPost';
+import {Faq} from './pages/Faq';
+import {Policy} from './pages/Policy';
 import {Checkout} from './pages/Checkout';
 import {CheckoutResult} from './pages/CheckoutResult';
 import {Customer} from './pages/Customer';
@@ -26,10 +31,11 @@ import {OrderSkeleton} from './states/skeletons/OrderSkeleton';
 export default defineTheme({
     id: 'fashion',
     name: 'Fashion',
-    version: '1.0.0',
+    version: '1.1.0',
     description: 'The wheatpaste wall for streetwear and drops: every product a pasted poster on a rendered wall, the merchant primary as day-glo paper, state as rubber stamps.',
     fonts,
     tokens: {
+        defaultColors: DEFAULT_COLORS,
         // Paper and ink come from the preset's background/foreground; the preset's PRIMARY is the day-glo
         // paper and owns every live state (ring included). Accent is demoted to a faint paper tint so hover
         // surfaces and skeletons never introduce a second hue; secondary is ink for stamps and chips.
@@ -41,7 +47,7 @@ export default defineTheme({
         }),
     },
     layout: {config: layoutConfig, Root},
-    pages: {Home, Category, Product, Content, Checkout, CheckoutResult, Customer, Order},
+    pages: {Home, Category, Product, Content, BlogIndex, BlogPost, Faq, Policy, Checkout, CheckoutResult, Customer, Order},
     states: {
         PageSkeleton: {
             home: HomeSkeleton,

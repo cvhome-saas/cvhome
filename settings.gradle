@@ -76,5 +76,5 @@ include(
         'store-core:pod-registry:pod-registry-commons',
         'store-core:pod-registry:pod-registry-external-api',
         'store-core:pod-registry:pod-registry-service',
-        'store-core:seller-ui',
+        'store-core:console-ui',
 )

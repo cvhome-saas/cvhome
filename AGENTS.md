@@ -52,7 +52,7 @@ Gradle wrapper (9.2.0) drives Java *and* the npm apps. All commands from the rep
 ./gradlew unitTest            # only @Tag("unit-test")
 ./gradlew integrationTest     # only @Tag("integration-test")
 ./gradlew checkstyleMain checkstyleTest           # CI quality job; maxWarnings = 0
-./gradlew :store-core:seller-ui:bootBuildImage    # docker image (Spring apps and -ui apps alike)
+./gradlew :store-core:console-ui:bootBuildImage   # docker image (Spring apps and -ui apps alike)
 ```
 
 Toolchain, the checkstyle rule set and the test-tag split: `references/build-system.md` in the skill. What
@@ -69,7 +69,7 @@ The three delivery patterns (`-ui` npm modules, uaa's embedded SPA, Thymeleaf) a
 `references/frontends.md`; landing-ui's workspace and themes: `references/landing-ui.md`.
 
 ```bash
-cd store-core/seller-ui  && npm start          # Angular 20, ng serve
+cd store-core/console-ui && npm start          # Angular 20, ng serve (SSR)
 cd store-pod/landing-ui  && npm run dev        # Next.js 16, npm workspaces (app, libs/*, templates/*)
 ```
 

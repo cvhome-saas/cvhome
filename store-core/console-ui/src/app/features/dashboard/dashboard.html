@@ -1,0 +1,51 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="heading().context">
+    <app-date-range-picker [value]="dateRange()" (valueChange)="dateRange.set($event)" />
+    <app-export-button
+      [target]="widgets()"
+      fileName="dashboard"
+      [title]="heading().title"
+      [subtitle]="exportSubtitle()"
+      [disabled]="isLoading() || isEmpty()"
+    />
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay
+    reserve="page"
+    [busy]="isLoading()"
+    [label]="t('dashboard.loadingMetrics')"
+  >
+    @if (!isEmpty()) {
+      <div class="widgets" #widgets>
+        <app-kpi-grid [label]="t('dashboard.storeMetrics')" [data]="kpis()" />
+
+        <section class="panel-row">
+          <app-action-list [title]="t('dashboard.needsAttention')" [data]="attention()">
+            <button panelAction type="button" class="link">{{ t('dashboard.viewAll') }}</button>
+          </app-action-list>
+
+          <app-donut-chart [title]="t('dashboard.customerSplitTitle')" [data]="customerSplit()" />
+        </section>
+
+        <section class="panel-row">
+          <app-bar-chart [title]="t('dashboard.orderStatusBreakdown')" [data]="orderStatuses()" [unit]="t('dashboard.ordersUnit')" />
+
+          <app-ranked-list [title]="t('dashboard.topSellingProducts')" [data]="topProducts()">
+            <button
+              panelAction
+              class="icon-action"
+              type="button"
+              [attr.aria-label]="t('dashboard.productReportOptions')"
+            >
+              <app-icon name="ellipsisV" />
+            </button>
+          </app-ranked-list>
+        </section>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

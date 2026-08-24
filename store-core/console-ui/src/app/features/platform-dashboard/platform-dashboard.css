@@ -1,0 +1,38 @@
+:host {
+  display: contents;
+}
+
+.platform-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*
+ * Two panels side by side, stacking when there is not room for both — the same shape the merchant
+ * dashboard's `.panel-row` uses, declared here because a page cannot style another component's
+ * template and this one is the page's own grid.
+ */
+.panel-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 1.5rem;
+}
+
+/*
+ * The link out to `/platform/billing`. A quiet line under the charts rather than a button: this page
+ * is the summary and that one is the reading, so the pointer should not compete with the figures.
+ */
+.deeper {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.deeper a {
+  color: var(--accent-foreground);
+}
+
+.deeper a:hover,
+.deeper a:focus-visible {
+  text-decoration: underline;
+}

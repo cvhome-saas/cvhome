@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.trend-body {
+  padding: 1.5rem;
+}
+
+/*
+ * A time series needs more height than a categorical bar chart: the shape of the line is the
+ * information, and at the bar chart's 11rem a month of small counts flattens into a straight line.
+ */
+app-echart {
+  display: block;
+  block-size: var(--trend-chart-height, 15rem);
+}

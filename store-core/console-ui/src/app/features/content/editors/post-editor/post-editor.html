@@ -1,0 +1,170 @@
+<ng-container *transloco="let t">
+  <app-editor-shell
+    [title]="heading()"
+    [context]="t('content.post.context')"
+    [status]="facade.status()"
+    [isNew]="facade.isNew()"
+    [loading]="facade.loading()"
+    [saving]="facade.busy()"
+    [canSave]="facade.dirty() && !facade.busy()"
+    [canManage]="canManage()"
+    [loadError]="facade.loadError()"
+    [deleteOpen]="deleteOpen()"
+    (saved)="facade.save()"
+    (cancelled)="facade.back()"
+    (retried)="facade.reload()"
+    (commanded)="onCommand($event)"
+    (deleted)="deleteOpen.set(false); facade.delete()"
+    (deleteDismissed)="deleteOpen.set(false)"
+  >
+    <ng-container main>
+      @if (activeTranslation(); as form) {
+        <app-locale-copy
+          [forms]="facade.translations()"
+          [locales]="hub.localeOptions()"
+          [defaultLocale]="hub.locales().defaultCode"
+          [written]="facade.written()"
+          [fields]="copyFields"
+          [language]="facade.language()"
+          (languageChange)="facade.chooseLanguage($event)"
+        />
+        <app-seo-block
+          [common]="facade.common"
+          [translation]="form"
+          pathPrefix="/blog/"
+          [fallbackTitle]="facade.title()"
+        />
+      }
+    </ng-container>
+
+    <ng-container sidebar>
+      <app-panel [title]="t('content.post.hero')" [subtitle]="t('content.post.heroHint')" padded>
+        @if (heroUrl(); as url) {
+          <img class="hero-preview" [src]="url" alt="" />
+        } @else {
+          <div class="hero-empty"><app-icon name="images" [size]="24" /></div>
+        }
+        @if (canManage()) {
+          <div class="hero-actions">
+            <button class="secondary-action" type="button" (click)="pickerOpen.set(true)">
+              <app-icon name="images" />{{ t('content.post.chooseHero') }}
+            </button>
+            @if (heroUrl()) {
+              <button class="ghost-action" type="button" (click)="clearHero()">
+                {{ t('content.post.removeHero') }}
+              </button>
+            }
+          </div>
+        }
+      </app-panel>
+
+      <app-panel [title]="t('content.post.organise')" padded>
+        <div class="field-grid side-grid" [formGroup]="extra">
+          <div class="field field-wide">
+            <p class="field-label">{{ t('content.post.categories') }}</p>
+            @if (categoryOptions().length) {
+              <div class="category-list">
+                @for (category of categoryOptions(); track category.id) {
+                  <app-checkbox
+                    [checked]="categoryChecked(category)"
+                    (checkedChange)="toggleCategory(category)"
+                    [label]="categoryName(category)"
+                    [disabled]="!canManage()"
+                  />
+                }
+              </div>
+            } @else {
+              <p class="field-hint">{{ t('content.post.noCategories') }}</p>
+            }
+          </div>
+          <div class="field field-wide">
+            <p class="field-label">{{ t('content.post.tags') }}</p>
+            <app-tag-input
+              [tags]="extra.controls.tags.value"
+              (tagsChange)="setTags($event)"
+              [label]="t('content.post.tags')"
+              [disabled]="!canManage()"
+            />
+          </div>
+          <app-form-field
+            wide
+            [label]="t('content.post.author')"
+            [control]="extra.controls.authorName"
+            controlId="post-author"
+          >
+            <app-text-field id="post-author" formControlName="authorName" [maxLength]="120" />
+          </app-form-field>
+          <div class="field field-wide">
+            <app-toggle
+              formControlName="featured"
+              [label]="t('content.post.featured')"
+              [description]="t('content.post.featuredHint')"
+            />
+          </div>
+        </div>
+      </app-panel>
+
+      <app-panel [title]="t('content.editor.schedule')" padded>
+        <div class="field-grid side-grid" [formGroup]="facade.common">
+          <app-form-field
+            wide
+            [label]="t('content.editor.publishAt')"
+            [hint]="t('content.editor.publishAtHint')"
+            [control]="facade.common.controls.publishAt"
+            controlId="post-publish-at"
+          >
+            <app-date-time-field id="post-publish-at" formControlName="publishAt" />
+          </app-form-field>
+          <app-form-field
+            wide
+            [label]="t('content.editor.unpublishAt')"
+            [hint]="t('content.editor.unpublishAtHint')"
+            [control]="facade.common.controls.unpublishAt"
+            controlId="post-unpublish-at"
+          >
+            <app-date-time-field id="post-unpublish-at" formControlName="unpublishAt" />
+          </app-form-field>
+        </div>
+      </app-panel>
+
+      <app-publish-checklist [title]="t('content.checklist.title')" [items]="checklist()" />
+    </ng-container>
+  </app-editor-shell>
+
+  <app-media-picker-dialog
+    [open]="pickerOpen()"
+    kind="IMAGE"
+    [currentId]="extra.controls.heroMediaId.value"
+    (picked)="onHero($event)"
+    (closed)="pickerOpen.set(false)"
+  />
+
+  @if (scheduleOpen()) {
+    <div class="schedule-sheet" role="dialog" [attr.aria-label]="t('content.editor.scheduleTitle')">
+      <app-panel
+        [title]="t('content.editor.scheduleTitle')"
+        [subtitle]="t('content.editor.scheduleSubtitle')"
+        padded
+      >
+        <div class="schedule-row">
+          <app-date-time-field
+            [value]="scheduleAt()"
+            (valueChange)="scheduleAt.set($event)"
+            [ariaLabel]="t('content.editor.publishAt')"
+          />
+          <button
+            class="primary-action"
+            type="button"
+            [disabled]="!scheduleAt()"
+            (click)="confirmSchedule()"
+          >
+            <app-icon name="calendar" />{{ t('content.action.schedule') }}
+          </button>
+          <button class="ghost-action" type="button" (click)="scheduleOpen.set(false)">
+            {{ t('shared.actions.cancel') }}
+          </button>
+        </div>
+      </app-panel>
+    </div>
+  }
+</ng-container>

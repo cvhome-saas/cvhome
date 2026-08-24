@@ -67,6 +67,7 @@ export enum Theme {
     BABY = 'BABY',
     TOOLS = 'TOOLS',
     BASIC = 'BASIC',
+    GROCERY = 'GROCERY',
 }
 
 export interface SliderImage {

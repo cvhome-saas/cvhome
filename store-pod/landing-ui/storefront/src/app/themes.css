@@ -9,4 +9,6 @@
 @import "@store-front/theme-fashion/tokens.css";
 @source "../../../themes/basic/src";
 @import "@store-front/theme-basic/tokens.css";
+@source "../../../themes/grocery/src";
+@import "@store-front/theme-grocery/tokens.css";
 /* @themes:end */

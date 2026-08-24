@@ -1,0 +1,34 @@
+{
+  "//": [
+    "Two rules, both enforcing things DESIGN.md already states and nothing checked.",
+    "",
+    "The Token Rule — 'a literal hex value in a stylesheet is a defect'. order-details.css held 26 of",
+    "them and passed every gate for months. src/styles/ is exempt because that is where a colour is",
+    "allowed to be a colour: the three theme files are the only place a token is assigned a value.",
+    "",
+    "Logical properties — marketing.css had 16 physical direction declarations and auth.css 7, so the",
+    "two surfaces a visitor sees first were the two that did not mirror in Arabic. Every console",
+    "feature was already clean; this is what keeps it that way.",
+    "",
+    "Only genuinely direction-dependent properties are listed. `width` and `height` read the same in",
+    "both directions, so banning them in favour of `inline-size`/`block-size` would have produced 180",
+    "findings that fix nothing — a rule that noisy gets switched off rather than obeyed."
+  ],
+  "rules": {
+    "color-no-hex": true,
+    "declaration-property-value-disallowed-list": {
+      "/^(text-align)$/": ["left", "right"],
+      "/^(float|clear)$/": ["left", "right"]
+    },
+    "property-disallowed-list": [
+      "margin-left", "margin-right",
+      "padding-left", "padding-right",
+      "border-left", "border-right",
+      "border-left-width", "border-right-width",
+      "border-left-color", "border-right-color",
+      "border-left-style", "border-right-style",
+      "left", "right"
+    ]
+  },
+  "ignoreFiles": ["src/styles/**", "dist/**", "node_modules/**", ".angular/**"]
+}

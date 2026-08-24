@@ -1,0 +1,25 @@
+.serp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+.serp-url {
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
+}
+
+.serp-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--chart-2-foreground);
+}
+
+.serp-desc {
+  font-size: var(--text-xs);
+  color: var(--foreground);
+}

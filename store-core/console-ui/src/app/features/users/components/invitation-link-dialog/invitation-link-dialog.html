@@ -1,0 +1,18 @@
+<dialog #dialog class="invite-link" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <div class="invite-link-body">
+    <h2 class="invite-link-title">{{ title() }}</h2>
+    <p class="invite-link-message">{{ message() }}</p>
+
+    <app-copy-field [value]="link()" [label]="linkLabel()" />
+
+    <!--
+      Stated as a warning rather than a hint: closing this dialog without copying the link loses it
+      for good, and the only recourse is a new invitation.
+    -->
+    <p class="invite-link-warning" role="alert">{{ warning() }}</p>
+
+    <div class="invite-link-actions">
+      <button class="primary-action" type="button" (click)="close()">{{ doneLabel() }}</button>
+    </div>
+  </div>
+</dialog>

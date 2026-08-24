@@ -1,0 +1,139 @@
+:host {
+  display: contents;
+}
+
+.toast-stack {
+  position: fixed;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-inline-size: min(24rem, calc(100vw - 2rem));
+}
+
+.toast {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.85rem 0.75rem 0.95rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--lift);
+  --toast-ink: var(--foreground);
+}
+
+.toast-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+  color: var(--muted-foreground);
+  --icon-size: 1.05rem;
+}
+
+.toast.success .toast-icon { background: var(--chart-1-wash); color: var(--chart-1-foreground); }
+.toast.info .toast-icon { background: var(--chart-2-wash); color: var(--chart-2-foreground); }
+.toast.warning .toast-icon { background: var(--chart-4-wash); color: var(--chart-4-foreground); }
+.toast.danger .toast-icon { background: var(--chart-5-wash); color: var(--chart-5-foreground); }
+
+.toast-text {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0.35rem 0;
+  padding-inline-end: 0.25rem;
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.toast-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  margin-block-start: 0.15rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.8rem;
+}
+
+.toast-close:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.toast-progress {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  block-size: 3px;
+  background: currentcolor;
+  color: var(--muted-foreground);
+  animation: toast-progress-shrink linear forwards;
+}
+
+.toast.success .toast-progress { color: var(--chart-1-foreground); }
+.toast.info .toast-progress { color: var(--chart-2-foreground); }
+.toast.warning .toast-progress { color: var(--chart-4-foreground); }
+
+.toast:hover .toast-progress {
+  animation-play-state: paused;
+}
+
+@keyframes toast-progress-shrink {
+  from {
+    inline-size: 100%;
+  }
+  to {
+    inline-size: 0%;
+  }
+}
+
+/* ---- Enter / leave -------------------------------------------------------------------- */
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--toast-slide-x, 16px)) scale(0.96);
+  }
+}
+
+.toast-in {
+  animation: toast-in 0.24s var(--ease-emphasis) both;
+}
+
+.toast-out {
+  animation: toast-in 0.18s ease-in reverse both;
+}
+
+:host-context([dir='rtl']) {
+  --toast-slide-x: -16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-in,
+  .toast-out {
+    animation-duration: 0.01ms;
+  }
+
+  .toast-progress {
+    animation: none;
+  }
+}

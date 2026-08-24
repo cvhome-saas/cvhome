@@ -18,7 +18,8 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
     const open = openPath === pathname;
     const setOpen = (o: boolean) => setOpenPath(o ? pathname : null);
     const categories = data.categories.filter(c => c.description);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
+    const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     const row = 'flex items-center border-b border-foreground px-4 py-3 font-display text-lg font-semibold uppercase tracking-wide hover:bg-foreground hover:text-background';
 
     return (
@@ -54,7 +55,8 @@ export function MobileNav({ctx, data}: { ctx: PageContext; data: LayoutData }) {
                             );
                         })}
                     </Accordion>
-                    {pages.map(page => <Link key={page.code} prefetch={false} href={`/content/${page.description.friendlyUrl}`} className={row}><span className="q">{page.description.name}</span></Link>)}
+                    {pages.map(page => <Link key={page.code} prefetch={false} href={page.href} className={row}><span className="q">{page.name}</span></Link>)}
+                    {extras.map(node => <Link key={node.href} prefetch={false} href={node.href} className={row}><span className="q">{node.label}</span></Link>)}
                     <div className="hazard h-3 border-b border-foreground" aria-hidden/>
                 </nav>
             </DrawerContent>

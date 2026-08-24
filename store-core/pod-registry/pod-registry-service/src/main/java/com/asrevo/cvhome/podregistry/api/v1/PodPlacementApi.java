@@ -1,5 +1,7 @@
 package com.asrevo.cvhome.podregistry.api.v1;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -79,6 +81,27 @@ public class PodPlacementApi implements IPodPlacementService {
     @PreAuthorize("hasPermission(null,'PodId','STORE-CORE.POD.PLACEMENT')")
     public void recordPlacement(@RequestBody RecordPlacementRequest request) {
         capacityService.recordPlacement(request);
+    }
+
+    /**
+     * The same thing for many stores at once, which is what reconciliation needs.
+     *
+     * <p>
+     * {@code capacity_stores} is a mirror of a fact tenancy owns, and it is only ever written by the outbox handler
+     * above — so anything that landed on a pod by another route is uncounted. Seed data is the obvious case, and a
+     * store created before this pipeline existed is another. Tenancy replays every store it has placed at startup,
+     * and doing that one request per store would be one HTTP round trip per store on every boot.
+     * </p>
+     *
+     * <p>
+     * Idempotent like its single-store sibling, and for the same reasons, which is what makes replaying the whole
+     * set safe rather than merely tolerable.
+     * </p>
+     */
+    @PostMapping("placements-recorded")
+    @PreAuthorize("hasPermission(null,'PodId','STORE-CORE.POD.PLACEMENT')")
+    public void recordPlacements(@RequestBody List<RecordPlacementRequest> requests) {
+        capacityService.recordPlacements(requests);
     }
 
 }

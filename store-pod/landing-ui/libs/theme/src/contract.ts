@@ -1,7 +1,8 @@
 import type {ComponentType, ReactNode} from 'react';
 import type {
-    Box, BreadcrumbItem, Category, ColorSchema, ImageFile, ListingFacets, ListingQuery, Page, Product,
-    ProductGroupCode, ProductListingPage, SearchCapabilities, SliderImage, Store, StoreContext,
+    AnnouncementData, Banner, BreadcrumbItem, Category, ColorSchema, FaqDocument, ImageFile, ListingFacets,
+    ListingQuery, MenuNode, NavPage, Policy, PostList, PostSummary, Product, ProductGroupCode, ProductListingPage,
+    SearchCapabilities, SliderImage, Store, StoreContext, StorefrontLink, StorefrontSeo,
 } from '@store-front/types';
 import type {ColorRoleTokens} from './tokens';
 
@@ -20,6 +21,12 @@ export interface ThemeFonts {
 }
 
 export interface ThemeTokenPolicy {
+    /**
+     * The theme's own palette — rendered when the merchant's colour theme is `DEFAULT` (or unset/unknown).
+     * Generated into `src/colors.ts` by `libs/types/scripts/build-color-schemas.mjs` (`THEME_DEFAULTS`), so
+     * it obeys the same contrast rules as the fixed presets. A preset the merchant picks replaces it whole.
+     */
+    defaultColors: ColorSchema;
     /** Re-map the merchant preset into the theme's colour roles (e.g. force ink, mute primary). */
     mapMerchantColors?: (schema: ColorSchema, meta: { isDark: boolean }) => Partial<ColorRoleTokens>;
     /** Minimum contrast the bridge enforces for every `*-foreground` pair. Default 4.5. */
@@ -52,10 +59,17 @@ export interface LayoutData {
     store: Store;
     /** Category tree roots (children populated). */
     categories: Category[];
-    /** CMS pages; filter on `linkToMenu` / `visible` for the menu vs footer. */
-    pages: Page[];
-    /** The `header-message` box, if the merchant configured one. */
-    announcement?: Box;
+    /**
+     * CMS page links; `inMenu` marks main-menu pages, the rest are footer pages.
+     * Kept so themes that have not adopted `menus` keep rendering; derived from the site document.
+     */
+    pages: NavPage[];
+    /** The announcement strip (live STRIP banner, else the `header-message` snippet). */
+    announcement?: AnnouncementData;
+    /** The merchant-managed menus, with resolved hrefs. Empty arrays when the store has not configured them. */
+    menus: { main: MenuNode[]; footer: MenuNode[] };
+    /** Live legal policies, for the footer and checkout. */
+    policies: StorefrontLink[];
     search: SearchCapabilities;
 }
 
@@ -67,6 +81,8 @@ export interface RootLayoutProps {
 
 export interface HomeData {
     hero: { slides: SliderImage[]; banner?: ImageFile };
+    /** CMS banners that win each placement right now; empty when the merchant uses only slider images. */
+    banners: { hero: Banner[]; carousel: Banner[]; strip?: Banner };
     groups: { code: ProductGroupCode; title: string; products: Product[] }[];
 }
 
@@ -87,8 +103,39 @@ export interface ProductData {
 }
 
 export interface ContentData {
-    page: Page;
+    page: { slug: string; title: string };
     /** Decoded HTML of the page body — render with `dangerouslySetInnerHTML`. */
+    html: string;
+    breadcrumbs: BreadcrumbItem[];
+    seo?: StorefrontSeo;
+    template?: 'STANDARD' | 'LANDING' | 'CONTACT' | 'FAQ_PAGE' | null;
+    /** Reserved for the page builder; always empty today. */
+    blocks?: unknown[];
+}
+
+export interface BlogIndexData {
+    posts: PostList;
+    categories: StorefrontLink[];
+    /** Active filters, for the heading and the pager links. */
+    category?: string;
+    tag?: string;
+    breadcrumbs: BreadcrumbItem[];
+}
+
+export interface BlogPostData {
+    post: PostSummary;
+    /** Decoded HTML of the body. */
+    html: string;
+    breadcrumbs: BreadcrumbItem[];
+}
+
+export interface FaqData {
+    faq: FaqDocument;
+    breadcrumbs: BreadcrumbItem[];
+}
+
+export interface PolicyData {
+    policy: Policy;
     html: string;
     breadcrumbs: BreadcrumbItem[];
 }
@@ -123,6 +170,10 @@ export interface ThemePages {
     Category: ComponentType<PageProps<CategoryData>>;
     Product: ComponentType<PageProps<ProductData>>;
     Content: ComponentType<PageProps<ContentData>>;
+    BlogIndex: ComponentType<PageProps<BlogIndexData>>;
+    BlogPost: ComponentType<PageProps<BlogPostData>>;
+    Faq: ComponentType<PageProps<FaqData>>;
+    Policy: ComponentType<PageProps<PolicyData>>;
     Checkout: ComponentType<PageProps<CheckoutData>>;
     CheckoutResult: ComponentType<PageProps<CheckoutResultData>>;
     Customer: ComponentType<PageProps<CustomerData>>;

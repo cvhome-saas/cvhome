@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,15 @@ public class CustomerApi {
     }
 
     /**
-     * Get all customers
+     * Get all customers, optionally filtered.
+     *
+     * <p>{@code name} is the single "name or email" query a console search box needs: it matches the billing
+     * first name, the billing last name or the email address. The remaining four narrow one field each, and
+     * are AND-ed with it and with each other — which is why a caller with one search box sends {@code name}
+     * alone rather than {@code name} and {@code email} together.
+     *
+     * <p>Every one of these was already implemented by {@code CustomerRepository.findByStoreMerchantId} and
+     * reachable from nowhere: this handler used to build an empty criteria and set only the pageable.
      */
     @GetMapping("/private/customers")
     @Parameter(name = "store",
@@ -46,9 +55,21 @@ public class CustomerApi {
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
-    public ReadableCustomerList list(StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
+    public ReadableCustomerList list(@RequestParam(value = "name", required = false) String name,
+                                     @RequestParam(value = "firstName", required = false) String firstName,
+                                     @RequestParam(value = "lastName", required = false) String lastName,
+                                     @RequestParam(value = "email", required = false) String email,
+                                     @RequestParam(value = "country", required = false) String country,
+                                     StoreMerchantId merchantStore, LanguageCode language, Pageable pageable) {
         CustomerCriteria customerCriteria = new CustomerCriteria();
         customerCriteria.setPageable(pageable);
+
+        customerCriteria.setName(name);
+        customerCriteria.setFirstName(firstName);
+        customerCriteria.setLastName(lastName);
+        customerCriteria.setEmail(email);
+        customerCriteria.setCountry(country);
+
         return customerFacade.getListByStore(merchantStore, customerCriteria, LanguageCode.nonLanguage());
     }
 

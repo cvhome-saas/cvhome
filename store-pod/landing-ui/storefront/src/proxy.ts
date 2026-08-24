@@ -2,7 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
 import {routing} from '@store-front/i18n/routing';
 import {FALLBACK_STORE_ID} from '@store-front/types/constant';
-import {COLOR_OVERRIDE_COOKIE, THEME_OVERRIDE_COOKIE} from '@/shell/theme/override';
+import {COLOR_OVERRIDE_COOKIE, THEME_OVERRIDE_COOKIE, themeOverrideEnabled} from '@/shell/theme/override';
 
 /**
  * Edge logic that used to live in the Express server (`templates-deprecated/express-app`):
@@ -10,13 +10,12 @@ import {COLOR_OVERRIDE_COOKIE, THEME_OVERRIDE_COOKIE} from '@/shell/theme/overri
  *  2. `/` → `/{lang}` using the NEXT_LOCALE cookie, then the `Default-Language` header, constrained by
  *     `Supported-Languages`.
  *  3. Everything else → next-intl locale routing.
- *  4. Dev/QA only: `?theme=<id>` / `?color=<preset>` persist override cookies read by
- *     `getTheme()` / `resolveMerchantTokens()`.
+ *  4. Dev/QA only: `?theme=<id>` and `?color=<ColorTheme|default>` persist override cookies read by
+ *     `getTheme()` / `getColorThemeRequest()`; an empty value clears the cookie.
  */
 const intlMiddleware = createMiddleware(routing);
 
-
-const overrideEnabled = process.env.NODE_ENV !== 'production' || process.env.STOREFRONT_THEME_OVERRIDE === 'true';
+const OVERRIDE_PARAMS: readonly (readonly [param: string, cookie: string])[] = [['theme', THEME_OVERRIDE_COOKIE], ['color', COLOR_OVERRIDE_COOKIE]];
 
 export default function proxy(req: NextRequest) {
     const h = req.headers;
@@ -43,8 +42,8 @@ export default function proxy(req: NextRequest) {
         res = intlMiddleware(req);
     }
 
-    if (overrideEnabled) {
-        for (const [param, cookie] of [['theme', THEME_OVERRIDE_COOKIE], ['color', COLOR_OVERRIDE_COOKIE]] as const) {
+    if (themeOverrideEnabled()) {
+        for (const [param, cookie] of OVERRIDE_PARAMS) {
             if (!searchParams.has(param)) continue;
             const value = searchParams.get(param) ?? '';
             if (value) res.cookies.set(cookie, value, {path: '/', sameSite: 'lax'});

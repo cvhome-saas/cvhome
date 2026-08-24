@@ -41,6 +41,9 @@ public enum TenancyErrors implements ErrorCode {
     /** No organization with the requested id is visible to the caller. */
     ORG_NOT_FOUND("CONTROL_PLANE.ORG.NOT_FOUND", ErrorCategory.NOT_FOUND),
 
+    /** The organization exists but no uaa account is recorded as its owner, so there is nobody to act on. */
+    ORG_OWNER_UNKNOWN("CONTROL_PLANE.ORG.OWNER_UNKNOWN", ErrorCategory.UNPROCESSABLE),
+
     /** No invitation matches that token, or it is no longer usable. */
     INVITATION_NOT_USABLE("CONTROL_PLANE.INVITATION.NOT_USABLE", ErrorCategory.UNPROCESSABLE),
 

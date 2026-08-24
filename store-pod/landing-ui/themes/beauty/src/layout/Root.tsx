@@ -28,7 +28,7 @@ export async function Root({ctx, data, children}: RootLayoutProps) {
             <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:font-mono focus:text-sm focus:uppercase focus:text-primary-foreground">
                 <span className="q">{t('SKIP_TO_CONTENT')}</span>
             </a>
-            {data.announcement && <Announcement box={data.announcement}/>}
+            {data.announcement && <Announcement announcement={data.announcement}/>}
             <Header ctx={ctx} data={data}/>
             <main id="main" className="flex-1">{children}</main>
             <Footer ctx={ctx} data={data}/>

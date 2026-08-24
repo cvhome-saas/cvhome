@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.asrevo.cvhome.billing.services.entitlement.ExternalEntitlementService;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.asrevo.cvhome.commons.domain.PodId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
@@ -51,6 +52,8 @@ class StoreTenantScopingTest {
 
     private static final StoreMerchantId STORE = new StoreMerchantId("507f1f77bcf86cd799439011");
 
+    private static final PodId POD = new PodId("607f1f77bcf86cd799439022");
+
     private ManagerStoreRepository repository;
 
     private InternalStoreServiceImpl service;
@@ -69,7 +72,7 @@ class StoreTenantScopingTest {
     /** The org id the list query was actually given — null means "every org". */
     private String capturedQueryOrg() {
         ArgumentCaptor<String> org = ArgumentCaptor.forClass(String.class);
-        verify(repository).findVisible(org.capture(), any(), any(), anyInt(), anyLong());
+        verify(repository).findVisible(org.capture(), any(), any(), any(), anyInt(), anyLong());
         return org.getValue();
     }
 
@@ -82,8 +85,8 @@ class StoreTenantScopingTest {
     }
 
     private void givenNoRows() {
-        when(repository.findVisible(any(), any(), any(), anyInt(), anyLong())).thenReturn(List.of());
-        when(repository.countVisible(any(), any(), any())).thenReturn(0L);
+        when(repository.findVisible(any(), any(), any(), any(), anyInt(), anyLong())).thenReturn(List.of());
+        when(repository.countVisible(any(), any(), any(), any())).thenReturn(0L);
     }
 
     @Test
@@ -93,7 +96,7 @@ class StoreTenantScopingTest {
 
         // ROLE_CUSTOMER matches none of the org/store-admin branches the old code keyed off, so it fell through
         // and was handed every store on the platform.
-        service.findAll(identity(ORG, Roles.ROLE_CUSTOMER), new ListManagerStoreQuery(null, null, null),
+        service.findAll(identity(ORG, Roles.ROLE_CUSTOMER), new ListManagerStoreQuery(null, null, null, null),
                 Pageable.ofSize(10));
 
         assertThat(capturedQueryOrg()).isEqualTo(ORG.id().toString());
@@ -104,7 +107,7 @@ class StoreTenantScopingTest {
     void orgAdminIsScoped() {
         givenNoRows();
 
-        service.findAll(identity(ORG, Roles.ROLE_ORG_ADMIN), new ListManagerStoreQuery(null, null, null),
+        service.findAll(identity(ORG, Roles.ROLE_ORG_ADMIN), new ListManagerStoreQuery(null, null, null, null),
                 Pageable.ofSize(10));
 
         assertThat(capturedQueryOrg()).isEqualTo(ORG.id().toString());
@@ -116,10 +119,58 @@ class StoreTenantScopingTest {
         givenNoRows();
 
         // getOrgStoreIdentity reports both a super admin and a store_core service token with a null org.
-        service.findAll(identity(null, Roles.ROLE_SUPER_ADMIN), new ListManagerStoreQuery(null, null, null),
+        service.findAll(identity(null, Roles.ROLE_SUPER_ADMIN), new ListManagerStoreQuery(null, null, null, null),
                 Pageable.ofSize(10));
 
         assertThat(capturedQueryOrg()).isNull();
+    }
+
+    /** The pod id the list query was given — null means "every pod". */
+    private String capturedQueryPod() {
+        ArgumentCaptor<String> pod = ArgumentCaptor.forClass(String.class);
+        verify(repository).findVisible(any(), any(), any(), pod.capture(), anyInt(), anyLong());
+        return pod.getValue();
+    }
+
+    @Test
+    @DisplayName("a pod filter reaches the query as the pod's id")
+    void podFilterIsApplied() {
+        givenNoRows();
+
+        service.findAll(identity(null, Roles.ROLE_SUPER_ADMIN), new ListManagerStoreQuery(null, null, null, POD),
+                Pageable.ofSize(10));
+
+        assertThat(capturedQueryPod()).isEqualTo(POD.getId().toString());
+    }
+
+    @Test
+    @DisplayName("no pod filter leaves the query unfiltered by pod")
+    void withoutAPodTheQueryIsUnfiltered() {
+        givenNoRows();
+
+        service.findAll(identity(null, Roles.ROLE_SUPER_ADMIN), new ListManagerStoreQuery(null, null, null, null),
+                Pageable.ofSize(10));
+
+        assertThat(capturedQueryPod()).isNull();
+    }
+
+    /*
+     * The property that matters: a pod filter narrows what the caller may already see. If it replaced the org
+     * scoping instead of composing with it, an org admin could read every tenant's stores by naming a pod.
+     */
+    @Test
+    @DisplayName("a pod filter composes with org scoping rather than replacing it")
+    void podFilterDoesNotWidenScope() {
+        givenNoRows();
+
+        service.findAll(identity(ORG, Roles.ROLE_ORG_ADMIN), new ListManagerStoreQuery(null, null, null, POD),
+                Pageable.ofSize(10));
+
+        ArgumentCaptor<String> org = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> pod = ArgumentCaptor.forClass(String.class);
+        verify(repository).findVisible(org.capture(), any(), any(), pod.capture(), anyInt(), anyLong());
+        assertThat(org.getValue()).isEqualTo(ORG.id().toString());
+        assertThat(pod.getValue()).isEqualTo(POD.getId().toString());
     }
 
     @Test

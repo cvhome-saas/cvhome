@@ -1,0 +1,47 @@
+### Media library
+
+### Folders (defaults created on first read)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/folders?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Upload (multipart; repeat "files"; optional folderId)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&folderId=1
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: SESSION={{SESSION_ID}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="hero.jpg"
+Content-Type: image/jpeg
+
+< ./hero.jpg
+--WebAppBoundary--
+
+### List (folder, kind, q, used filters; count = page size)
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&kind=IMAGE&used=false&page=0&count=24
+Cookie: SESSION={{SESSION_ID}}
+
+### One asset with its usage
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Edit metadata
+PATCH {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"folderId": 2, "altTexts": {"en": "Office desk"}, "title": "Hero", "tags": ["hero", "sale"]}
+
+### Delete (409 MEDIA.REFERENCED unless force=true)
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/1?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&force=false
+Cookie: SESSION={{SESSION_ID}}
+
+### Folders: create / rename / delete (moveTo required when not empty)
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/folders?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"name": "Campaigns"}
+
+###
+DELETE {{SELLER_UI_URL}}/spg/content/api/v1/private/content/media/folders/6?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&moveTo=1
+Cookie: SESSION={{SESSION_ID}}

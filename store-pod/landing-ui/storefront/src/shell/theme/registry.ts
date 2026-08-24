@@ -11,6 +11,7 @@ export const themeLoaders = {
     'beauty': () => import('@store-front/theme-beauty'),
     'fashion': () => import('@store-front/theme-fashion'),
     'basic': () => import('@store-front/theme-basic'),
+    'grocery': () => import('@store-front/theme-grocery'),
     // @themes:end
 } satisfies Record<string, () => Promise<{ default: ThemeDefinition }>>;
 

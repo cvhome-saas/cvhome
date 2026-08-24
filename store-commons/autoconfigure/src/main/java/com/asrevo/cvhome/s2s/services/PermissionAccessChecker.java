@@ -41,6 +41,14 @@ public class PermissionAccessChecker {
         return hasMaintainAccessOnUsers(authentication, requestedStoreId);
     }
 
+    /**
+     * Setting another user's password. Deliberately the maintain audience rather than the read one: a moderator can
+     * see who has access to a store without being able to take it over.
+     */
+    public boolean hasAccessOnStoreUsersResetPassword(Authentication authentication, StoreMerchantId requestedStoreId) {
+        return hasMaintainAccessOnUsers(authentication, requestedStoreId);
+    }
+
     public boolean hasAccessOnStoreFindOne(Authentication authentication, StoreMerchantId requestedStoreId) {
         return hasReadAccessOnStore(authentication, requestedStoreId);
     }
@@ -144,17 +152,36 @@ public class PermissionAccessChecker {
     /**
      * Reading a store's own billing — what it is on, when it renews, its invoices. Same audience as any other read of
      * the store, so a moderator can see the plan they are working under without being able to change what it costs.
+     *
+     * <p>
+     * <strong>Plus the platform operator.</strong> "This merchant says they paid" is the support question a platform
+     * console exists to answer, and billing refused a super admin for every store on the platform because
+     * {@link #hasReadAccessOnStore} has no super-admin branch — it admits an org admin, a store admin, a store
+     * moderator and a store-core service principal, and stops. The branch goes here rather than in that method so
+     * that <em>only</em> billing widens: the merchant screens a platform operator has no business in stay 403,
+     * which is what the console's {@code platformOnly} guard already assumes. Same shape as
+     * {@link #hasAccessOnPodRead}, which billing simply never adopted.
+     * </p>
      */
     public boolean hasAccessOnBillingRead(Authentication authentication, StoreMerchantId requestedStoreId) {
-        return hasReadAccessOnStore(authentication, requestedStoreId);
+        return storeRoleAccessChecker.isSuperAdmin(authentication) || hasReadAccessOnStore(authentication,
+                requestedStoreId);
     }
 
     /**
      * Buying, upgrading, downgrading or cancelling. Restricted to the org admin: spending money is an org-level act,
      * and a store admin is not the person who owns the card.
+     *
+     * <p>
+     * And to the platform operator, who is the only caller {@code SubscriptionService.cancel} will accept an
+     * immediate cancellation from — a branch that has existed since it was written and that no client could reach.
+     * Every act through this token writes a {@code subscription_audit} row naming the principal, which is the reason
+     * the actor is threaded through {@code SubscriptionApi} rather than left null.
+     * </p>
      */
     public boolean hasAccessOnBillingManage(Authentication authentication, StoreMerchantId requestedStoreId) {
-        return hasMaintainAccessOnStore(authentication, requestedStoreId);
+        return storeRoleAccessChecker.isSuperAdmin(authentication) || hasMaintainAccessOnStore(authentication,
+                requestedStoreId);
     }
 
     /**

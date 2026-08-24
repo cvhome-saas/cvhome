@@ -13,7 +13,9 @@ export function IndexStrip({data}: { data: LayoutData }) {
     const tc = useTranslations('COMMON');
     const pathname = usePathname();
     const categories = data.categories.filter(c => c.description && c.visible !== false);
-    const pages = data.pages.filter(p => p.linkToMenu && p.description);
+    const pages = data.pages.filter(p => p.inMenu);
+    // Main-menu entries that are not pages (blog, help, categories, plain paths): the merchant's menu, resolved server-side.
+    const extras = data.menus.main.filter(n => n.kind !== 'PAGE' && n.href.startsWith('/'));
     if (categories.length === 0 && pages.length === 0) return null;
     // the tree endpoint counts only a node's own products; a parent with none of its own shows its children's sum
     const countOf = (c: LayoutData['categories'][number]): number => c.productCount || (c.children ?? []).reduce((n, ch) => n + countOf(ch), 0);
@@ -33,7 +35,10 @@ export function IndexStrip({data}: { data: LayoutData }) {
                         <li key={c.code} className="flex shrink-0">{tab(`/category/${c.description.friendlyUrl}`, c.description.name, countOf(c))}</li>
                     ))}
                     {pages.map((p, i) => (
-                        <li key={p.code} className={i === 0 ? 'ms-auto flex shrink-0 border-s' : 'flex shrink-0'}>{tab(`/content/${p.description.friendlyUrl}`, p.description.name)}</li>
+                        <li key={p.code} className={i === 0 ? 'ms-auto flex shrink-0 border-s' : 'flex shrink-0'}>{tab(p.href, p.name)}</li>
+                    ))}
+                    {extras.map((p, i) => (
+                        <li key={p.href} className={i === 0 && pages.length === 0 ? 'ms-auto flex shrink-0 border-s' : 'flex shrink-0'}>{tab(p.href, p.label)}</li>
                     ))}
                 </ul>
             </div>

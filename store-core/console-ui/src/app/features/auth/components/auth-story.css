@@ -1,0 +1,34 @@
+/* The story column renders inside this component, so its rules live here — emulated
+   encapsulation keeps the sign-in/sign-up stylesheet from reaching these elements. */
+:host { display: contents; }
+
+.auth-story { position: relative; display: flex; flex-direction: column; min-height: 100svh; padding: 2.5rem 3.5rem; overflow: hidden; border-inline-end: 1px solid var(--border-soft); }
+.auth-glow { position: absolute; top: -220px; inset-inline-start: -160px; width: 720px; height: 560px; border-radius: 50%; background: radial-gradient(circle, var(--glow-color), transparent var(--glow-stop)); filter: blur(var(--glow-blur)); animation: drift 14s ease-in-out infinite; }
+.auth-brand { position: relative; display: inline-flex; align-items: center; gap: .6rem; width: fit-content; color: var(--foreground-strong); font-weight: 700; letter-spacing: -.02em; }
+.auth-brand svg { width: 14px; fill: none; stroke: var(--muted-foreground); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+
+.auth-message { position: relative; max-width: 32rem; margin: auto 0; animation: rise .55s ease both; }
+.auth-message > p.eyebrow { display: inline-flex; margin: 0; align-items: center; gap: .6rem; padding: .4rem .9rem; border: 1px solid var(--edge); border-radius: var(--radius-full); color: var(--primary-soft); font-size: .75rem; font-weight: 500; letter-spacing: .08em; line-height: 1.2; text-transform: uppercase; }
+.auth-message h1 { margin: 1.75rem 0 0; color: var(--foreground-strong); font-size: clamp(2.6rem, 4vw, 3rem); font-weight: 300; line-height: 1.12; letter-spacing: -.035em; }
+.auth-message > p { max-width: 34ch; margin: 1.5rem 0 0; color: var(--muted-foreground); font-size: 1.0625rem; font-weight: 350; line-height: 1.75; text-wrap: pretty; }
+.auth-message ul { display: grid; gap: 1rem; margin: 3rem 0 0; padding: 0; list-style: none; }
+.auth-message li { display: flex; align-items: flex-start; gap: .75rem; color: var(--secondary-foreground); font-size: .9375rem; font-weight: 350; line-height: 1.6; }
+.auth-message li svg { flex: none; width: 15px; margin-top: .28rem; fill: none; stroke: var(--primary-emphasis); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+
+.trust { position: relative; margin: 0; color: var(--foreground-quiet); font-size: .8125rem; font-weight: 350; }
+
+@media (max-width: 800px) {
+  .auth-story { min-height: auto; padding: 1.5rem; border-inline-end: 0; }
+  .auth-message { margin: 4.5rem 0 3rem; }
+  .auth-message ul { margin-top: 2rem; }
+  .trust { display: none; }
+}
+
+@media (max-width: 480px) {
+  .auth-message { margin: 3.5rem 0 2.5rem; }
+  .auth-message ul { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-glow, .auth-message { animation: none; }
+}

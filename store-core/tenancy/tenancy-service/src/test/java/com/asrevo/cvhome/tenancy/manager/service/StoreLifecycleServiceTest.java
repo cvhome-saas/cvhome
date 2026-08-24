@@ -58,7 +58,7 @@ class StoreLifecycleServiceTest {
 
     private static ManagerStoreDto storeIn(StoreStatus status) {
         return new ManagerStoreDto(STORE, "a-store", ORG, POD, ProvisioningState.SUCCESSFULLY_PROVISIONING, status,
-                null);
+                null, null);
     }
 
     @BeforeEach

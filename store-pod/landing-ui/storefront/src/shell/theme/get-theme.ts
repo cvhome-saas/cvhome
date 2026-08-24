@@ -5,9 +5,7 @@ import type {ThemeDefinition} from '@store-front/theme';
 import {getStoreHeaders} from '@/shell/request/headers';
 import {isRegisteredTheme, type RegisteredThemeId, themeLoaders} from './registry';
 import {FALLBACK_THEME_ID, LEGACY_THEME_MAP} from './legacy-theme-map';
-import {THEME_OVERRIDE_COOKIE} from './override';
-
-const overrideEnabled = process.env.NODE_ENV !== 'production' || process.env.STOREFRONT_THEME_OVERRIDE === 'true';
+import {THEME_OVERRIDE_COOKIE, themeOverrideEnabled} from './override';
 
 export function resolveThemeId(requested: string | undefined | null): RegisteredThemeId {
     const id = (requested ?? '').trim().toLowerCase();
@@ -21,7 +19,7 @@ export function resolveThemeId(requested: string | undefined | null): Registered
 /** Which theme id this request resolves to: override cookie (dev) → `theme` header → env → fallback. */
 export const getThemeId = cache(async (): Promise<RegisteredThemeId> => {
     const [h, c] = await Promise.all([getStoreHeaders(), cookies()]);
-    const override = overrideEnabled ? c.get(THEME_OVERRIDE_COOKIE)?.value : undefined;
+    const override = themeOverrideEnabled() ? c.get(THEME_OVERRIDE_COOKIE)?.value : undefined;
     return resolveThemeId(override || h.theme || process.env.STOREFRONT_THEME);
 });
 

@@ -32,7 +32,7 @@ export async function Root({ctx, data, children}: RootLayoutProps) {
             <a href="#main" className="glo sr-only px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50">
                 {t('SKIP_TO_CONTENT')}
             </a>
-            {data.announcement && <Announcement box={data.announcement}/>}
+            {data.announcement && <Announcement announcement={data.announcement}/>}
             <Header ctx={ctx} data={data}/>
             <main id="main" className="flex-1">{children}</main>
             <Footer ctx={ctx} data={data}/>

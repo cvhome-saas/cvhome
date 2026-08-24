@@ -1,0 +1,31 @@
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&count=25&page=0'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&count=25&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&page=0'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category/1?store=65f023632bc46470c104b76f&lang=_all'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category/1?store=65f023632bc46470c104b76f&lang=_all
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&count=100&page=0'
+GET {{GATEWAY_URL}}/spg/catalog/api/v1/private/category?lang=en&store=65f023632bc46470c104b76f&count=100&page=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+
+# curl 'GET {{GATEWAY_URL}}/spg/catalog/api/v1/store/languages?store=65f023632bc46470c104b76f'
+GET {{GATEWAY_URL}}/spg/merchant/api/v1/store/languages?store=65f023632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}};Store-Id=65f023632bc46470c104b76f
+
+###
+

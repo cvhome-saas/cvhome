@@ -1,0 +1,238 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/*
+ * The frame is the asset's own shape.
+ *
+ * `aspect-ratio` from a custom property rather than a fixed height, so a logo well and a banner
+ * well are the same component holding different proportions — and so a 4:1 banner never renders in
+ * a square box where a wrongly-shaped upload would look correct.
+ */
+/* Holds the well and the controls that sit over it. */
+.frame {
+  position: relative;
+}
+
+.well {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: var(--frame-aspect, 1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  cursor: pointer;
+  transition:
+    border-color var(--default-transition-duration),
+    background-color var(--default-transition-duration);
+}
+
+/* Dashed is the invitation, so only an empty well wears it. */
+.well:not(.filled) {
+  border-style: dashed;
+  border-width: 2px;
+}
+
+.well:hover,
+.well.over {
+  border-color: var(--primary);
+  background: var(--accent);
+}
+
+/* The whole well is the control, so the ring goes on it rather than on the hidden input. */
+.well:focus-within {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.well.busy {
+  cursor: progress;
+}
+
+/* ---- Filled --------------------------------------------------------------------------------- */
+
+/*
+ * `cover`, deliberately: it previews what the storefront will actually crop to. Showing the whole
+ * file letterboxed would be kinder to a wrongly-shaped upload, and the shape check refuses those
+ * before they get here — so the preview can be about the result instead of about the file.
+ */
+.asset {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  animation: asset-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes asset-in {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+}
+
+/*
+ * A picture does not announce that it is a button, so the intent is named on approach. Held off the
+ * resting state on purpose: a permanent "Replace" caption would compete with the asset it covers.
+ */
+.veil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.4rem;
+  background: var(--scrim);
+  color: var(--foreground-strong);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity var(--default-transition-duration);
+  --icon-size: 1.1rem;
+}
+
+.well.filled:hover .veil,
+.well.filled:focus-within .veil,
+.well.filled.over .veil {
+  opacity: 1;
+}
+
+/* Both of these are about the request, not the pointer, so neither waits for hover. */
+.busy-veil,
+.well.busy .busy-veil,
+.saved-veil {
+  opacity: 1;
+}
+
+/*
+ * The confirmation arrives and leaves on its own. It fades rather than cutting, so the asset
+ * underneath is what the eye lands on last — the point of the whole exchange.
+ */
+.saved-veil {
+  color: var(--primary-soft);
+  animation: saved-out 1.6s ease-in both;
+  --icon-size: 1.3rem;
+}
+
+@keyframes saved-out {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.spinner {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  border: 2px solid currentColor;
+  border-block-start-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ---- Empty ---------------------------------------------------------------------------------- */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  text-align: center;
+  --icon-size: 1.4rem;
+}
+
+.empty > app-icon {
+  color: var(--foreground-subtle);
+  transition: color var(--default-transition-duration);
+}
+
+.well:hover .empty > app-icon,
+.well.over .empty > app-icon {
+  color: var(--primary-emphasis);
+}
+
+.empty-label {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.empty-hint {
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+/* ---- The line under the frame ---------------------------------------------------------------- */
+
+.foot {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+  --icon-size: 0.75rem;
+}
+
+.foot > app-icon {
+  flex: none;
+  margin-block-start: 0.15rem;
+}
+
+/* A stored filename is data the server chose: laid out by its own direction, breakable anywhere. */
+.foot.stored {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+
+.foot.error {
+  color: var(--chart-5-foreground);
+  font-weight: 500;
+}
+
+
+/* ---- Look closer ----------------------------------------------------------------------------- */
+
+/*
+ * The eye rides the corner of the frame rather than the middle, so it never covers the part of the
+ * asset an operator is trying to judge. It shares the veil's timing on hover and ignores it
+ * entirely on focus, because a keyboard has no hover to offer.
+ */
+.peek {
+  position: absolute;
+  inset-block-start: 0.45rem;
+  inset-inline-end: 0.45rem;
+  display: grid;
+  place-items: center;
+  inline-size: 1.85rem;
+  block-size: 1.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--scrim);
+  color: var(--foreground-strong);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--default-transition-duration),
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.85rem;
+}
+
+.frame:hover .peek,
+.peek:focus-visible {
+  opacity: 1;
+}
+
+.peek:hover {
+  border-color: var(--primary);
+  color: var(--primary-emphasis);
+}

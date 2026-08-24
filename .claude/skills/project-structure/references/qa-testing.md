@@ -18,7 +18,7 @@ sudo ./extra/scripts/configure-domain.sh   # once per machine — /etc/hosts for
 
 `run-lcl.sh` is *the* way to start it. It starts the compose infra (postgres, `spg`, monitoring), then each
 Java service under `--spring.profiles.active=lcl,test-stores` in dependency order (**uaa first — it issues the
-tokens**), then `seller-ui` (:8010) and `landing-ui` (:8110), pre-building landing-ui's workspace libs. Java
+tokens**), then `console-ui` (:8011) and `landing-ui` (:8110), pre-building landing-ui's workspace libs. Java
 services run **on the host**, not in Docker; `spg`'s `extra_hosts` map service hostnames back to the host.
 
 | flag | effect |
@@ -35,7 +35,7 @@ Ports come from `common-config.yml` — change one there and change it in the sc
 **Check whether it is already running before starting it again.** The script skips any service whose port is
 already bound, so a second run against a live stack starts nothing useful — and when *it* exits it tears the
 containers down under the stack you were using. Cheap check: `run-lcl.sh --list` plus a port probe
-(`lsof -i :8000`, `:8010`, `:8110`).
+(`lsof -i :8000`, `:8011`, `:8110`).
 
 It **blocks in the foreground** tailing `build/lcl-logs/*.log`, and brings everything down if any one service
 dies. So run it in the background (`run_in_background`) and watch `build/lcl-logs/`.
@@ -51,7 +51,7 @@ Ctrl-C / `kill -INT` is silently a no-op there. Ctrl-C only works in the foregro
 and `docker compose -f docker-compose-lcl.yml ps` empty.
 
 Iterating on one frontend against an already-running backend? Don't restart everything — leave the stack up
-and run `npm start` in that `-ui` module, or start a narrowed set (`run-lcl.sh --no-infra seller-ui`). One
+and run `npm start` in that `-ui` module, or start a narrowed set (`run-lcl.sh --no-infra console-ui`). One
 service by hand:
 `./gradlew :store-pod:catalog:catalog-service:bootRun --args='--spring.profiles.active=lcl,test-stores'`.
 
@@ -197,11 +197,11 @@ plan nobody trusts.
       `org2-store1`) and confirm it cannot see or mutate the first store's data
 - [ ] **Permission actually gates**: a principal without the token gets 403, not a 200 with empty data
 - [ ] Failure modes hit on purpose — the typed error surfaces the right status and `code`, no root-cause leak
-- [ ] i18n: switched locale; the new keys resolve in **all five** (`en,ar,es,fr,ru`), no raw key on screen
+- [ ] i18n: switched locale; the new keys resolve in **every locale the app ships** (console-ui `en,ar`; landing-ui and cua `en,ar,es,fr,ru`), no raw key on screen
 - [ ] **AR checked as RTL** — layout and icon direction, not just the strings
 - [ ] Console clean and no failed requests in the network panel for the flow
 - [ ] For a new service/route: it resolves via `lb://`, and the edge (Caddyfile / `GatewayRouteLocatorImpl`)
-      returns your API rather than seller-ui's HTML
+      returns your API rather than console-ui's HTML
 
 ---
 

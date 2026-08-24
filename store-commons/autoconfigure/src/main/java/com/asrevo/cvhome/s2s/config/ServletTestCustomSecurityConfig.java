@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -27,14 +28,14 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Profile("signer")
 public final class ServletTestCustomSecurityConfig {
     private ServletTestCustomSecurityConfig() {
     }
 
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @Profile("signer")
     public static class SignerConfig {
 
@@ -44,6 +45,7 @@ public final class ServletTestCustomSecurityConfig {
         }
 
         @Bean
+        @Primary
         public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
             return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
         }

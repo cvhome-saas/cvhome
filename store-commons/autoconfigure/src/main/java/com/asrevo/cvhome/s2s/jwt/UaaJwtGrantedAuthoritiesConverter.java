@@ -33,21 +33,25 @@ public final class UaaJwtGrantedAuthoritiesConverter implements Converter<Jwt, C
     public static @NonNull Set<GrantedAuthority> getGrantedAuthorities(Map<String, Object> claims) {
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for (String authority : getClaimAsList(claims.get("scope"))) {
-            String prefix = "";
-            if (!authority.toUpperCase().startsWith(DEFAULT_SCOPE_AUTHORITY_PREFIX)) {
-                prefix = DEFAULT_SCOPE_AUTHORITY_PREFIX;
-            }
-            grantedAuthorities.add(new SimpleGrantedAuthority(prefix + authority.toUpperCase()));
+            addBothCases(grantedAuthorities, DEFAULT_SCOPE_AUTHORITY_PREFIX, authority);
         }
         for (String authority : getClaimAsList(claims.get("roles"))) {
-            String prefix = "";
-            if (!authority.toUpperCase().startsWith(DEFAULT_ROLE_AUTHORITY_PREFIX)) {
-                prefix = DEFAULT_ROLE_AUTHORITY_PREFIX;
-            }
-            grantedAuthorities.add(new SimpleGrantedAuthority(prefix + authority.toUpperCase()));
-
+            addBothCases(grantedAuthorities, DEFAULT_ROLE_AUTHORITY_PREFIX, authority);
         }
         return grantedAuthorities;
+    }
+
+    /**
+     * Grants both the exact-case authority ({@code SCOPE_super_admin}, what Spring's default converter produces and
+     * what uaa's own checks expect) and the uppercased one ({@code SCOPE_SUPER_ADMIN}, what services checking
+     * {@code SCOPE_STORE_CORE} against the {@code store_core} scope rely on). Emitting only the uppercase form is
+     * what silently locked the admin SDK out of uaa: this converter must never remove an authority the default
+     * mapping would have granted.
+     */
+    private static void addBothCases(Set<GrantedAuthority> target, String defaultPrefix, String authority) {
+        String prefix = authority.toUpperCase().startsWith(defaultPrefix) ? "" : defaultPrefix;
+        target.add(new SimpleGrantedAuthority(prefix + authority));
+        target.add(new SimpleGrantedAuthority(prefix + authority.toUpperCase()));
     }
 
     private static Collection<String> getClaimAsList(Object claim) {

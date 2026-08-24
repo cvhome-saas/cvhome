@@ -2,10 +2,12 @@
 name: Basic — The Catalogue Page
 description: The platform's multi-purpose default — one continuous ruled catalogue of entries with big condensed prices, a thumb-index of categories, and the merchant primary as flat fields on the cover, the active tab and the one action per view.
 colors:
-  # This theme owns NO palette. Every role below is injected per request from the merchant's ColorTheme
-  # preset through the contrast-guarded bridge (libs/theme/src/merchant-bridge.ts); the theme's only colour
-  # decisions are mapMerchantColors in src/index.ts and the material mixes in src/tokens.css. Values are
-  # the live CSS variables, never hex.
+  # This theme owns ONE palette: its default (src/colors.ts, generated from THEME_DEFAULTS in
+  # libs/types/scripts/build-color-schemas.mjs), rendered when the merchant's ColorTheme is DEFAULT or unset.
+  # A fixed preset the merchant picks replaces it whole; either way every role below is injected per request
+  # through the contrast-guarded bridge (libs/theme/src/merchant-bridge.ts), and the theme's only other colour
+  # decisions are mapMerchantColors in src/index.ts and the material mixes in src/tokens.css. Values are the live CSS
+  # variables, never hex.
   background: "var(--background)"
   foreground: "var(--foreground)"
   card: "var(--card)"
@@ -253,8 +255,9 @@ motion: the price cell floods success-green from the start edge and prints ADDED
 
 ## Colors
 
-The theme owns no hex. Colour roles arrive on `<html>` per request from the merchant's ColorTheme preset via
-the contrast-guarded bridge; the theme re-maps `ring` → primary and demotes `accent` / `secondary` to faint
+The theme hand-writes no hex. Its default palette (`src/colors.ts`, generated: white stock `#FFFFFF`, ink `#181818`,
+cobalt `#1860BC` fields, catalogue-grey wash, print-red flash) renders when the merchant's ColorTheme is `DEFAULT`;
+a picked preset replaces it. Colour roles arrive on `<html>` per request via the contrast-guarded bridge; the theme re-maps `ring` → primary and demotes `accent` / `secondary` to faint
 tonal mixes of background toward foreground (6% / 10%, both with foreground text) so hover surfaces, chips and
 quiet badges never introduce a second hue, and mixes one material of its own (`--faint`, foreground at 8%).
 

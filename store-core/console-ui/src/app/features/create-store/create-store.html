@@ -1,0 +1,391 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading()" [context]="facade.liveSubtitle()">
+    <!-- Nothing to cancel back to on a first run: store management needs a store. -->
+    @if (facade.phase() === 'form' && !shell.firstRun()) {
+      <a routerLink="/store-management" class="secondary-action">{{ t('createStore.cancel') }}</a>
+    }
+  </app-page-header>
+
+  @if (facade.phase() === 'form') {
+    <div class="create-store-grid">
+      <div class="column-main">
+        <app-panel [title]="t('createStore.identity.title')" [subtitle]="t('createStore.identity.subtitle')">
+          <form class="panel-pad identity-grid" [formGroup]="facade.form">
+            <app-form-field
+              [label]="t('createStore.identity.storeName')"
+              [control]="facade.form.controls.name"
+              required
+              controlId="store-name"
+              [hint]="nameHint(t)"
+            >
+              <!--
+                One uniqueness affordance, the same one the catalogue's codes and the product SKU
+                use. This field used to draw its own: a spinning clock and a tick, with no mark at
+                all for a name already taken — that was a line of hint text instead, so the answer
+                appeared in two different places depending on what it was.
+              -->
+              <app-text-field
+                id="store-name"
+                formControlName="name"
+                [placeholder]="t('createStore.identity.storeNamePlaceholder')"
+                [check]="nameCheck()"
+                [checkLabel]="nameHint(t)"
+                [invalid]="facade.form.controls.name.hasError('nameTaken')"
+              />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.email')"
+              [control]="facade.form.controls.email"
+              required
+              [fallback]="t('createStore.identity.emailFallback')"
+            >
+              <app-text-field type="email" formControlName="email" icon="envelope" latin autocomplete="email" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.phone')"
+              [control]="facade.form.controls.phone"
+              required
+              [fallback]="t('createStore.identity.phoneFallback')"
+            >
+              <app-text-field type="tel" formControlName="phone" icon="phone" latin autocomplete="tel" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.country')"
+              [control]="facade.form.controls.country"
+              required
+              [fallback]="t('createStore.identity.countryFallback')"
+            >
+              <app-select
+                formControlName="country"
+                [options]="facade.countryChoices()"
+                [placeholder]="t('createStore.identity.choose')"
+              />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.currency')"
+              [control]="facade.form.controls.currency"
+              required
+              [fallback]="t('createStore.identity.currencyFallback')"
+            >
+              <app-select
+                formControlName="currency"
+                [options]="facade.currencyChoices()"
+                [placeholder]="t('createStore.identity.choose')"
+              />
+            </app-form-field>
+
+            <app-form-field
+              wide
+              [label]="t('createStore.identity.supportedLanguages')"
+              [control]="facade.form.controls.supportedLanguages"
+              required
+              [fallback]="t('createStore.identity.supportedLanguagesFallback')"
+            >
+              <div class="check-grid" role="group" [attr.aria-label]="t('createStore.identity.supportedLanguages')">
+                @for (language of facade.languageOptions(); track language.code) {
+                  <app-checkbox
+                    [label]="language.label"
+                    [checked]="facade.isSupported(language.code)"
+                    (checkedChange)="facade.toggleLanguage(language.code)"
+                  />
+                }
+              </div>
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.language')" required>
+              <app-select formControlName="language" [options]="facade.languageChoices()" />
+            </app-form-field>
+
+            @if (facade.form.hasError('defaultLanguageNotSupported')) {
+              <p class="cross-field-error" role="alert">{{ t('createStore.identity.languageNotSupported') }}</p>
+            }
+
+            <app-form-field
+              [label]="t('createStore.identity.theme')"
+              [control]="facade.form.controls.theme"
+              required
+              [fallback]="t('createStore.identity.themeFallback')"
+            >
+              <app-select
+                formControlName="theme"
+                [options]="facade.themeChoices()"
+                [placeholder]="t('createStore.identity.choose')"
+              />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.colorTheme')"
+              [control]="facade.form.controls.colorTheme"
+              required
+              [fallback]="t('createStore.identity.colorThemeFallback')"
+            >
+              <app-select
+                formControlName="colorTheme"
+                [options]="facade.colorThemeChoices(t)"
+                [placeholder]="t('createStore.identity.choose')"
+              />
+            </app-form-field>
+
+            <app-form-field wide [label]="t('createStore.identity.address')">
+              <app-text-field formControlName="addressLine" icon="mapPin" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.city')"
+              [control]="facade.form.controls.city"
+              required
+              [fallback]="t('createStore.identity.cityFallback')"
+            >
+              <app-text-field formControlName="city" />
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.stateProvince')">
+              <app-text-field formControlName="stateProvince" />
+            </app-form-field>
+
+            <app-form-field
+              [label]="t('createStore.identity.postalCode')"
+              [control]="facade.form.controls.postalCode"
+              required
+              [fallback]="t('createStore.identity.postalCodeFallback')"
+            >
+              <app-text-field formControlName="postalCode" latin />
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.inBusinessSince')">
+              <!-- The console's own picker: a native date input is the one control on this form that
+                   ignores the app's tokens, theme and language. See DatePicker. -->
+              <app-date-picker
+                formControlName="inBusinessSince"
+                [max]="today"
+                [placeholder]="t('createStore.identity.inBusinessSincePlaceholder')"
+              />
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.weightUnit')">
+              <app-select formControlName="weightUnit" [options]="facade.weightUnitChoices(t)" />
+            </app-form-field>
+
+            <app-form-field [label]="t('createStore.identity.dimensionUnit')">
+              <app-select formControlName="dimensionUnit" [options]="facade.dimensionUnitChoices(t)" />
+            </app-form-field>
+
+            <!-- The same switch, with the same wording and description, as the identical setting in
+                 store management. A bare checkbox here made one setting look like two controls. -->
+            <div class="field field-wide switch-row">
+              <app-toggle
+                [label]="t('createStore.identity.requireLogin')"
+                [description]="t('createStore.identity.requireLoginDescription')"
+                [checked]="facade.form.controls.requireLoginForOrderPlacement.value"
+                (checkedChange)="facade.setRequireLogin($event)"
+              />
+            </div>
+
+            <!--
+              TODO(lessons.md): the storefront subdomain. Tenancy mints the store id and the pod owns
+              routing; nothing in the create response names a URL, and the custom domain is configured
+              afterwards in store management. The invented "<code>.myshop.io" line is gone.
+            -->
+          </form>
+        </app-panel>
+
+        @if (facade.podChoiceAvailable()) {
+          <app-panel [title]="t('createStore.region.title')" [subtitle]="t('createStore.region.subtitle')">
+            <app-badge panelAction tone="amber" shape="square">
+              <app-icon name="lock" />{{ t('createStore.region.permanent') }}
+            </app-badge>
+
+            <div class="panel-pad panel-stack">
+              <div class="region-list" [formGroup]="facade.form">
+                <label class="region-card" [class.selected]="!facade.form.controls.podId.value">
+                  <input type="radio" formControlName="podId" value="" class="sr-only" />
+                  <span class="radio" aria-hidden="true"></span>
+                  <span class="region-copy">
+                    <span class="region-name"><strong>{{ t('createStore.region.automatic') }}</strong></span>
+                    <span class="region-meta">{{ t('createStore.region.automaticMeta') }}</span>
+                  </span>
+                </label>
+                @for (pod of facade.pods$(); track pod.id?.id) {
+                  <label class="region-card" [class.selected]="facade.form.controls.podId.value === pod.id?.id">
+                    <input type="radio" formControlName="podId" [value]="pod.id?.id" class="sr-only" />
+                    <span class="radio" aria-hidden="true"></span>
+                    <span class="region-copy">
+                      <span class="region-name">
+                        <strong>{{ pod.name }}</strong>
+                        <code>{{ pod.shortenPodId }}</code>
+                      </span>
+                      <span class="region-meta">{{ pod.endpoint.endpoint }}</span>
+                    </span>
+                  </label>
+                }
+              </div>
+
+              <div class="residency-note">
+                <app-icon name="shield" />
+                <span>{{ t('createStore.region.preferenceNote') }}</span>
+              </div>
+            </div>
+          </app-panel>
+        }
+        <!--
+          TODO(lessons.md): when the operator has no pods of their own — the normal case — there is no
+          list to choose from. `pod/list` returns only an org's own private pods and the placeable shared
+          pods are matched internally by an unexposed method, so the panel is omitted and the registry
+          places the store. Latency and data-residency cards cannot be built at all: `Pod` carries no
+          region. See lessons.md, "Shell — no merchant-readable list of placeable pods".
+        -->
+
+        <!--
+          TODO(lessons.md): plan selection. Creating a store asks billing for a *quota decision*, not a
+          plan — a subscription belongs to a store, so there is nothing to subscribe until this one
+          exists. See lessons.md, "Shell — no plan selection at store creation".
+        -->
+
+      </div>
+
+      <div class="column-side">
+        <app-panel [title]="t('createStore.summaryPanel.title')">
+          <div class="panel-pad panel-stack">
+          <div class="summary-rows">
+            @for (row of facade.summary(); track row.label) {
+              <div class="summary-row">
+                <span class="summary-label">{{ row.label }}</span>
+                <span class="summary-value" [class.accent]="row.tone === 'accent'">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+          <div class="summary-note">
+            <app-icon name="clock" />
+            <span>{{ t('createStore.summaryPanel.note') }}</span>
+          </div>
+          <button
+            type="button"
+            class="primary-action provision-btn"
+            [disabled]="facade.form.invalid || facade.form.pending || facade.busy()"
+            (click)="submit()"
+          >
+            <app-icon name="server" />{{ facade.busy() ? t('createStore.summaryPanel.provisioning') : t('createStore.summaryPanel.provision') }}
+          </button>
+          <p class="billing-note">{{ t('createStore.summaryPanel.billingNote') }}</p>
+          </div>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.artifactsPanel.title')">
+          <div class="panel-pad artifact-list">
+            @for (artifact of facade.artifacts(); track artifact.id) {
+              <div class="artifact-row">
+                <app-icon [name]="artifact.icon" />
+                <span>
+                  <strong>{{ artifact.label }}</strong>
+                  <small>{{ artifact.detail }}</small>
+                </span>
+              </div>
+            }
+          </div>
+        </app-panel>
+
+        <!--
+          TODO(lessons.md): the plan's store allowance. The limit shown here was a hardcoded 3. Billing
+          knows the real ceiling and refuses the create with StoreQuotaRefusedException when it is hit,
+          but nothing exposes the number before the attempt — every entitlement read is store-scoped.
+          See lessons.md, "Shell — no plan selection at store creation".
+        -->
+      </div>
+    </div>
+  } @else {
+    <div class="create-store-grid">
+      <div class="column-main">
+        <div class="progress-card">
+          <header class="progress-head">
+            <span class="progress-icon" [class.done]="facade.isDone()">
+              <app-icon [name]="facade.isDone() ? 'checkCircle' : 'server'" [class.spin]="!facade.isDone()" />
+            </span>
+            <span class="progress-copy">
+              <h2>{{ facade.headline() }}</h2>
+              <p>{{ facade.stateNote() }}</p>
+            </span>
+          </header>
+
+          <!--
+            TODO(lessons.md): there is no percentage, no ETA and no per-step progress to show. The server
+            reports one of four ProvisioningState values and nothing else; the seven-row checklist that
+            used to animate here ran on a client-side timer and reported success at a fixed moment
+            regardless of what the server was doing. See lessons.md, "Shell — provisioning has four
+            states and no detail".
+          -->
+          @if (!facade.isDone() && !facade.hasFailed()) {
+            <app-progress-track
+              class="run-track indeterminate"
+              [value]="100"
+              [label]="t('createStore.progressLabel')"
+            />
+          }
+          @if (facade.isDone()) {
+            <div class="done-banner">
+              <app-icon name="checkCircle" />
+              <span>{{ t('createStore.progress.liveBanner', {name: facade.store()?.name ?? ''}) }}</span>
+              <a routerLink="/store-management/branding" class="secondary-action">{{ t('createStore.progress.configureStore') }}</a>
+              <a routerLink="/dashboard" class="primary-action">
+                <app-icon name="layoutGrid" />{{ t('createStore.progress.openConsole') }}
+              </a>
+            </div>
+          } @else if (facade.hasFailed()) {
+            <div class="done-banner failed">
+              <app-icon name="alertCircle" />
+              <span>{{ t('createStore.progress.failedBanner', {name: facade.store()?.name ?? ''}) }}</span>
+              <a routerLink="/store-management" class="secondary-action">{{ t('createStore.progress.viewStores') }}</a>
+            </div>
+            <!--
+              The pod's own refusal, verbatim and untranslated — for a validation failure it names the
+              fields it objected to. Rendered as a diagnostic rather than as the message, because it is
+              server text in whatever language the server writes. Absent for a store that failed before
+              tenancy started recording a reason.
+            -->
+            @if (facade.failureReason(); as reason) {
+              <p class="failure-reason">
+                <span class="failure-reason-label">{{ t('createStore.progress.failureReason') }}</span>
+                <code>{{ reason }}</code>
+              </p>
+            }
+          } @else if (facade.timedOut()) {
+            <div class="done-banner">
+              <app-icon name="clock" />
+              <span>{{ t('createStore.progress.timedOutBanner') }}</span>
+              <a routerLink="/store-management" class="secondary-action">{{ t('createStore.progress.viewStores') }}</a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="column-side">
+        <app-panel [title]="t('createStore.infraPanel.title')">
+          <div class="panel-pad summary-rows">
+            @for (row of facade.infra(); track row.label) {
+              <div class="summary-row">
+                <span class="summary-label">{{ row.label }}</span>
+                <span class="summary-value" [class.pending]="row.pending">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </app-panel>
+
+        <app-panel [title]="t('createStore.nextStepsPanel.title')">
+          <div class="panel-pad next-steps">
+            @for (step of facade.nextSteps; track step.id) {
+              <button type="button" class="next-step" (click)="followNextStep(step)">
+                <app-icon [name]="step.icon" />
+                <span>{{ t(step.labelKey) }}</span>
+                <app-icon name="chevronRight" [flip]="true" />
+              </button>
+            }
+          </div>
+        </app-panel>
+
+      </div>
+    </div>
+  }
+</ng-container>

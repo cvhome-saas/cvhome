@@ -17,15 +17,21 @@ async function loadIndex(ctx: StoreContext): Promise<SearchHit[]> {
     const key = `${ctx.store}:${ctx.locale}`;
     let pending = cache.get(key);
     if (!pending) {
-        pending = Promise.all([CategoryService.getCategories(ctx), ContentService.getContents(ctx)]).then(([cats, pages]) => {
+        pending = Promise.all([CategoryService.getCategories(ctx), ContentService.getSite(ctx)]).then(([cats, site]) => {
             const hits: SearchHit[] = [];
             for (const c of flatten(cats?.content)) {
                 if (!c.description || !c.visible) continue;
                 hits.push({kind: 'category', id: `c-${c.id}`, title: c.description.name, href: `/category/${c.description.friendlyUrl}`});
             }
-            for (const p of pages?.content ?? []) {
-                if (!p.description || !p.visible) continue;
-                hits.push({kind: 'page', id: `p-${p.id}`, title: p.description.name, href: `/content/${p.description.friendlyUrl}`});
+            // CMS pages come off the site document: main-menu page entries plus the footer page list.
+            const seen = new Set<string>();
+            const menuPages = (site?.menus.main ?? [])
+                .filter(n => n.kind === 'PAGE' && n.value)
+                .map(n => ({slug: n.value as string, title: n.label, href: n.href}));
+            for (const p of [...menuPages, ...(site?.footerPages ?? [])]) {
+                if (seen.has(p.slug)) continue;
+                seen.add(p.slug);
+                hits.push({kind: 'page', id: `p-${p.slug}`, title: p.title, href: p.href});
             }
             return hits;
         });

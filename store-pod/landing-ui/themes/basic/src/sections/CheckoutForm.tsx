@@ -1,11 +1,10 @@
 'use client'
 import {useTranslations} from 'next-intl';
 import {CheckCircle2Icon, HelpCircleIcon} from 'lucide-react';
-import type {Box, Order, StoreContext} from '@store-front/types';
+import type {AgreementText, Order, StoreContext} from '@store-front/types';
 import {defaultCheckoutValue} from '@store-front/types';
 import {useCheckoutForm} from '@store-front/hooks/use-checkout-form';
 import {useRouter} from '@store-front/i18n/navigation';
-import {parseDescription} from '@store-front/services/description-view-util';
 import {Button} from '@store-front/ui/button';
 import {Input} from '@store-front/ui/input';
 import {Label} from '@store-front/ui/label';
@@ -130,14 +129,14 @@ function SuccessDialog({order, open, onOpenChange}: { order: Order | undefined; 
     );
 }
 
-function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: Box | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
+function AgreementDialog({box, open, onOpenChange, setIsAgree}: { box: AgreementText | undefined; open: boolean; onOpenChange: (o: boolean) => void; setIsAgree: (a: boolean) => void }) {
     const t = useTranslations('PAGE.CHECKOUT');
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="display text-2xl">{t('TERMS_AND_CONDITIONS')}</AlertDialogTitle>
-                    {box && <AlertDialogDescription asChild><div className="prose-basic max-h-64 overflow-y-auto text-start text-sm" dangerouslySetInnerHTML={{__html: parseDescription(box.description)}}/></AlertDialogDescription>}
+                    {box && <AlertDialogDescription asChild><div className="prose-basic max-h-64 overflow-y-auto text-start text-sm" dangerouslySetInnerHTML={{__html: box.html}}/></AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setIsAgree(false)}>{t('REJECT')}</AlertDialogCancel>

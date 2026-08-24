@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
         '@store-front/theme-beauty',
         '@store-front/theme-fashion',
         '@store-front/theme-basic',
+        '@store-front/theme-grocery',
         // @themes:end
     ],
 };

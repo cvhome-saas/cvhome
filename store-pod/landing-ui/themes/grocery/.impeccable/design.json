@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-24T00:00:00Z",
+  "title": "Design System: Grocery — Cash & Carry",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "The Price Board",
+        "canonical": "var(--primary)",
+        "note": "Injected per request from the merchant's ColorTheme preset via libs/theme/src/merchant-bridge.ts; the theme owns no hex (default seed: safety yellow #EDB417 with dark text). Also the ring by mapMerchantColors (the shelf light). Printed signage only: .board, active .aisle-tile, selected option tile, quick-add square, count stickers, one primary Button per view.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--primary), black 75%)",
+          "color-mix(in oklch, var(--primary), black 55%)",
+          "color-mix(in oklch, var(--primary), black 35%)",
+          "color-mix(in oklch, var(--primary), black 15%)",
+          "var(--primary)",
+          "color-mix(in oklch, var(--primary), white 25%)",
+          "color-mix(in oklch, var(--primary), white 50%)",
+          "color-mix(in oklch, var(--primary), white 80%)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Board Print",
+        "canonical": "var(--primary-foreground)",
+        "note": "Chosen by contrast in the merchant bridge (dark on the default safety yellow); SHOP NOW inverts it as a field on the board."
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Board Hover",
+        "canonical": "var(--primary-hover)",
+        "note": "From the preset: the quick-add square's 2px border and hover field."
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Crate Blue",
+        "canonical": "var(--secondary)",
+        "note": "The aisle-board wash — the resting .aisle-tile field and nothing else; hover mixes it 18% toward its own foreground.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--secondary), black 75%)",
+          "color-mix(in oklch, var(--secondary), black 55%)",
+          "color-mix(in oklch, var(--secondary), black 35%)",
+          "color-mix(in oklch, var(--secondary), black 15%)",
+          "var(--secondary)",
+          "color-mix(in oklch, var(--secondary), white 25%)",
+          "color-mix(in oklch, var(--secondary), white 50%)",
+          "color-mix(in oklch, var(--secondary), white 80%)"
+        ]
+      },
+      "secondary-foreground": {
+        "role": "secondary",
+        "displayName": "Aisle Print",
+        "canonical": "var(--secondary-foreground)",
+        "note": "Text on the resting aisle tile."
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Concrete",
+        "canonical": "var(--background)",
+        "note": "Aliased as --floor; the page, the counter header, the aisle strip, the mobile counter bar.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--background), var(--foreground) 85%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 70%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 55%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 40%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 25%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 14%)",
+          "color-mix(in oklch, var(--background), var(--foreground) 6%)",
+          "var(--background)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Crate",
+        "canonical": "var(--card)",
+        "note": "Aliased as --cell; every crate, image bed, facet crate, option tile, search field, rail arrow, the drawer's counter foot."
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "var(--foreground)",
+        "note": "Aliased as --ink; all text, the default sticker's field, the loading-dock footer, the hero pager tray at 78%.",
+        "tonalRamp": [
+          "var(--foreground)",
+          "color-mix(in oklch, var(--foreground), var(--background) 14%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 28%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 42%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 56%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 70%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 84%)",
+          "color-mix(in oklch, var(--foreground), var(--background) 94%)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "The Hardware Line",
+        "canonical": "var(--border)",
+        "note": "Aliased as --line; every 2px line (--border-width: 2px): crate and tile borders, header and aisle-strip base, drawer edges, divide-y-2 basket lines, crate-foot top lines, gallery frames."
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "canonical": "color-mix(in srgb, var(--foreground) 55%, var(--background))",
+        "note": "The attention border: the crate's hover/focus-within edge, the gallery thumbnail's hover edge."
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "canonical": "color-mix(in srgb, var(--foreground) 7%, transparent)",
+        "note": "The rail arrows' hover wash."
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Bed",
+        "canonical": "var(--muted)",
+        "note": "Hover fields on quiet controls (option tiles, variants arrow square, search suggestions) and the load meter's empty segments."
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Print Grey",
+        "canonical": "var(--muted-foreground)",
+        "note": "Facts: SKUs, del prices, result counts, manufacturer lines, footer meta, the page-of counter; AA-guarded by the bridge."
+      },
+      "sale": {
+        "role": "tertiary",
+        "displayName": "Signal Red",
+        "canonical": "var(--sale)",
+        "note": "The preset's error role via the bridge (default seed signal red); the SALE / SAVE N% sticker only.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--sale), black 75%)",
+          "color-mix(in oklch, var(--sale), black 55%)",
+          "color-mix(in oklch, var(--sale), black 35%)",
+          "color-mix(in oklch, var(--sale), black 15%)",
+          "var(--sale)",
+          "color-mix(in oklch, var(--sale), white 25%)",
+          "color-mix(in oklch, var(--sale), white 50%)",
+          "color-mix(in oklch, var(--sale), white 80%)"
+        ]
+      },
+      "sale-foreground": {
+        "role": "tertiary",
+        "displayName": "Sale Print",
+        "canonical": "var(--sale-foreground)",
+        "note": "Text on the sale sticker."
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Stocked Green",
+        "canonical": "var(--success)",
+        "note": "The ADDED sticker that stamps onto the crate's tag, and the IN STOCK sticker in the buy box.",
+        "tonalRamp": [
+          "color-mix(in oklch, var(--success), black 75%)",
+          "color-mix(in oklch, var(--success), black 55%)",
+          "color-mix(in oklch, var(--success), black 35%)",
+          "color-mix(in oklch, var(--success), black 15%)",
+          "var(--success)",
+          "color-mix(in oklch, var(--success), white 25%)",
+          "color-mix(in oklch, var(--success), white 50%)",
+          "color-mix(in oklch, var(--success), white 80%)"
+        ]
+      },
+      "success-foreground": {
+        "role": "tertiary",
+        "displayName": "Stocked Print",
+        "canonical": "var(--success-foreground)",
+        "note": "Text on the ADDED / IN STOCK sticker."
+      },
+      "destructive": {
+        "role": "tertiary",
+        "displayName": "Fault",
+        "canonical": "var(--destructive)",
+        "note": "Text-only via shared primitives: field errors, the logout row."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Board Name",
+        "purpose": "The store's name on the price board: Fira Sans Extra Condensed 800 caps, 4.25rem → 6rem → clamp(3.5rem,5.5vw,6rem), line-height 0.92; the footer name at 3.25 → 4.25rem."
+      },
+      "headline": {
+        "displayName": "Aisle Board",
+        "purpose": "Every hanging section board (SectionHeading .signage): 800 caps 1.75rem → 2.375rem at lg; the buy-box product name at 2.375 → 3.25rem."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Drawer titles (basket 1.75rem, filters 1.375rem), facet and option legends at 1.125rem, checkout heads — all .signage."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Every price (.price): condensed 800, tabular lining, one line — 1.375rem crate, 1.125rem basket line, 2.375rem drawer subtotal, 4.25rem buy box, 1.75rem counter bar."
+      },
+      "aisle": {
+        "displayName": "Aisle Tile",
+        "purpose": "The aisle-board tiles: condensed 700 caps 0.9375rem +0.02em; the count in Manrope 600 0.75rem at 75% tabular."
+      },
+      "sticker": {
+        "displayName": "Sticker",
+        "purpose": "Every state: condensed 800 caps 0.75rem +0.05em, line-height 1.15, tabular; the header count sticker at 0.7rem."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Page copy, facts, inputs, messages: Manrope 400 0.9375rem / 1.5 (prose 1.65 at ≤70ch); buttons and option tiles 600."
+      },
+      "product-name": {
+        "displayName": "Product Name",
+        "purpose": "The crate's rail tag and the basket line: Manrope 600 0.875rem, 2-line clamp, dir=auto."
+      },
+      "sku": {
+        "displayName": "SKU",
+        "purpose": "\"SKU: …\" in ui-monospace 0.75rem print grey, dir=ltr, on crates and the buy box."
+      }
+    },
+    "shadows": [
+      {
+        "name": "elev-sm",
+        "value": "0 1px 2px 0 rgb(10 14 20 / 0.06)",
+        "purpose": "Every .sticker at rest — vinyl a hair off the surface."
+      },
+      {
+        "name": "elev-md",
+        "value": "0 6px 16px -6px rgb(10 14 20 / 0.16)",
+        "purpose": "The crate's hover/focus-within lift; the rail's prev / next buttons."
+      },
+      {
+        "name": "elev-lg",
+        "value": "0 12px 28px -10px rgb(10 14 20 / 0.22)",
+        "purpose": "Declared for the shared shell; referenced by no theme element (not canonized)."
+      },
+      {
+        "name": "elev-overlay",
+        "value": "0 28px 60px -18px rgb(10 14 20 / 0.38)",
+        "purpose": "Search suggestions, menus, drawers, and the mobile counter bar (shell shadow-overlay)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "motion-fast",
+        "value": "120ms",
+        "purpose": "Hover colour on tiles, squares, thumbnails, pager bullets, SHOP NOW opacity."
+      },
+      {
+        "name": "motion-base",
+        "value": "220ms",
+        "purpose": "The crate's lift (shadow, border, translate), the photo cross-fade, the load meter's fill."
+      },
+      {
+        "name": "motion-slow",
+        "value": "480ms",
+        "purpose": "The stamp's clock (grocery-stamp)."
+      },
+      {
+        "name": "easing-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default easing for state transitions."
+      },
+      {
+        "name": "easing-emphasized",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The stamp (grocery-stamp, 480ms): lands at scale 1.18 / −4° / opacity 0, overshoots to 0.97, settles at 1; a plain 120ms fade under prefers-reduced-motion. The crate's hover translate is also dropped under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action per view (ADD TO CART, CHECKOUT): the price-board colour as a field, signage label, 3rem, molded corners.",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"21\" r=\"1\"/><circle cx=\"19\" cy=\"21\" r=\"1\"/><path d=\"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12\"/></svg>Add to cart</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 3rem; padding: 0 1.5rem; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 0.625rem; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.125rem; line-height: 1; letter-spacing: 0.01em; text-transform: uppercase; font-variant-numeric: tabular-nums lining-nums; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1), opacity 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-primary .ds-ico { width: 1.125rem; height: 1.125rem; } .ds-btn-primary:hover:not(:disabled) { background: var(--primary-hover, var(--primary)); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Quick-Add Square",
+      "kind": "button",
+      "refersTo": "button-quick-add",
+      "description": "The crate's quick-add: a size-10 primary square with the primary-hover 2px edge; a product already in the basket shows its stepper here instead.",
+      "html": "<button class=\"ds-quick-add\" aria-label=\"Add to cart\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button>",
+      "css": ".ds-quick-add { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background: var(--primary); color: var(--primary-foreground); border: 2px solid var(--primary-hover, var(--primary)); border-radius: 0.625rem; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-quick-add .ds-ico { width: 1.25rem; height: 1.25rem; } .ds-quick-add:hover:not(:disabled) { background: var(--primary-hover, var(--primary)); } .ds-quick-add:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent); } .ds-quick-add:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Aisle Tile",
+      "kind": "nav",
+      "refersTo": "aisle-tile",
+      "description": "The aisle-board strip under the counter: crate-blue tiles in condensed caps with honest counts; the current aisle takes the price-board colour.",
+      "html": "<nav class=\"ds-aisles\"><a class=\"ds-aisle-tile\" href=\"#\">Home</a><a class=\"ds-aisle-tile\" href=\"#\" aria-current=\"page\">Fresh Produce <span class=\"ds-count\">42</span></a><a class=\"ds-aisle-tile\" href=\"#\">Dairy &amp; Eggs <span class=\"ds-count\">28</span></a><a class=\"ds-aisle-tile\" href=\"#\">Pantry</a></nav>",
+      "css": ".ds-aisles { display: flex; gap: 0.5rem; padding: 0.625rem 0; background: var(--background); border-bottom: 2px solid var(--border); } .ds-aisle-tile { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding-inline: 1rem; border-radius: 0.625rem; border: 2px solid color-mix(in srgb, currentColor 22%, transparent); background: var(--secondary); color: var(--secondary-foreground); font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 700; font-size: 0.9375rem; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap; text-decoration: none; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1), color 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-aisle-tile:hover { background: color-mix(in srgb, var(--secondary) 82%, var(--secondary-foreground)); } .ds-aisle-tile[aria-current=\"page\"] { background: var(--primary); color: var(--primary-foreground); } .ds-aisle-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-aisle-tile .ds-count { font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-weight: 600; font-size: 0.75rem; opacity: 0.75; font-variant-numeric: tabular-nums; letter-spacing: 0; }"
+    },
+    {
+      "name": "Stickers",
+      "kind": "chip",
+      "refersTo": "sticker",
+      "description": "State printed and slapped on — tilted over photos, straight in rows: ink for OUT OF STOCK, sale for SAVE N%, outline for ONLY N LEFT, success for ADDED / IN STOCK. Never a toast.",
+      "html": "<div class=\"ds-stickers\"><span class=\"ds-sticker ds-sticker-sale\" data-tilt>Save 20%</span><span class=\"ds-sticker\" data-tilt>Out of stock</span><span class=\"ds-sticker ds-sticker-outline\" data-tilt=\"alt\">Only 3 left</span><span class=\"ds-sticker ds-sticker-success\">Added</span></div>",
+      "css": ".ds-stickers { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0.5rem; } .ds-sticker { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.55rem; border-radius: 0.375rem; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 0.75rem; line-height: 1.15; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; font-variant-numeric: tabular-nums; background: var(--foreground); color: var(--background); box-shadow: 0 1px 2px 0 rgb(10 14 20 / 0.06); } .ds-sticker[data-tilt] { rotate: -2deg; } .ds-sticker[data-tilt=\"alt\"] { rotate: 1.5deg; } .ds-sticker-sale { background: var(--sale); color: var(--sale-foreground); } .ds-sticker-success { background: var(--success); color: var(--success-foreground); } .ds-sticker-outline { background: var(--card); color: var(--foreground); box-shadow: inset 0 0 0 2px var(--foreground), 0 1px 2px 0 rgb(10 14 20 / 0.06); }"
+    },
+    {
+      "name": "Crate (product card)",
+      "kind": "card",
+      "refersTo": "crate",
+      "description": "The molded crate every product ships in: 2px line, 1rem corners, lift on hover; photo with tilted stickers, then the rail tag — name, mono SKU, del + signage price beside the quick-add square. ADDED stamps over the tag.",
+      "html": "<article class=\"ds-crate\"><a class=\"ds-crate-photo\" href=\"#\" aria-label=\"Whole milk\"><span class=\"ds-sticker ds-sticker-sale\" data-tilt>Save 15%</span></a><div class=\"ds-crate-foot\"><h3 class=\"ds-crate-name\"><a href=\"#\">Organic Whole Milk 2L</a></h3><p class=\"ds-crate-sku\">SKU: <span dir=\"ltr\">GR-DA-MLK-02</span></p><div class=\"ds-crate-row\"><p class=\"ds-crate-price\"><del>SAR 14.00</del><span class=\"ds-price\">SAR 11.90</span></p><button class=\"ds-quick-add\" aria-label=\"Add to cart\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button></div></div></article>",
+      "css": ".ds-crate { display: flex; flex-direction: column; max-width: 15rem; overflow: hidden; background: var(--card); color: var(--card-foreground, var(--foreground)); border: 2px solid var(--border); border-radius: 1rem; transition: box-shadow 220ms cubic-bezier(0.2, 0, 0, 1), border-color 220ms cubic-bezier(0.2, 0, 0, 1), translate 220ms cubic-bezier(0.2, 0, 0, 1); } .ds-crate:is(:hover, :focus-within) { border-color: color-mix(in srgb, var(--foreground) 55%, var(--background)); box-shadow: 0 6px 16px -6px rgb(10 14 20 / 0.16); translate: 0 -2px; } @media (prefers-reduced-motion: reduce) { .ds-crate:is(:hover, :focus-within) { translate: none; } } .ds-crate-photo { position: relative; display: block; aspect-ratio: 1 / 1; background: color-mix(in srgb, var(--foreground) 6%, var(--card)); } .ds-crate-photo .ds-sticker { position: absolute; inset-inline-start: 0.5rem; top: 0.5rem; } .ds-crate-foot { display: flex; flex: 1; flex-direction: column; gap: 0.25rem; border-top: 2px solid var(--border); padding: 0.625rem 0.75rem 0.75rem; } .ds-crate-name { margin: 0; font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; line-height: 1.375; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } .ds-crate-name a { color: inherit; text-decoration: none; } .ds-crate-name a:hover { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 2px; } .ds-crate-sku { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; color: var(--muted-foreground); } .ds-crate-row { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; padding-top: 0.5rem; } .ds-crate-price { margin: 0; display: flex; flex-direction: column; min-width: 0; } .ds-crate-price del { font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums; } .ds-price { font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.375rem; line-height: 1; letter-spacing: 0; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; } .ds-sticker { display: inline-flex; padding: 0.25rem 0.55rem; border-radius: 0.375rem; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 0.75rem; line-height: 1.15; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 1px 2px 0 rgb(10 14 20 / 0.06); } .ds-sticker[data-tilt] { rotate: -2deg; } .ds-sticker-sale { background: var(--sale); color: var(--sale-foreground); } .ds-quick-add { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; flex-shrink: 0; background: var(--primary); color: var(--primary-foreground); border: 2px solid var(--primary-hover, var(--primary)); border-radius: 0.625rem; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-quick-add .ds-ico { width: 1.25rem; height: 1.25rem; } .ds-quick-add:hover { background: var(--primary-hover, var(--primary)); }"
+    },
+    {
+      "name": "Price Board + Shop Now",
+      "kind": "custom",
+      "refersTo": "board",
+      "description": "The floor entrance: a flat field of the merchant primary with molded corners — store name at signage scale, real facts, and SHOP NOW as the inversion.",
+      "html": "<div class=\"ds-board\"><h1 class=\"ds-board-name\">Souq Al Balad</h1><p class=\"ds-board-facts\">Jeddah · Since 2023</p><a class=\"ds-shop-now\" href=\"#\">Shop now<svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"/><path d=\"m19 12-7 7-7-7\"/></svg></a></div>",
+      "css": ".ds-board { display: flex; flex-direction: column; justify-content: flex-end; gap: 1rem; min-height: 15rem; max-width: 30rem; padding: 1.5rem; background: var(--primary); color: var(--primary-foreground); border-radius: 1rem; } .ds-board-name { margin: 0; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 4.25rem; line-height: 0.92; letter-spacing: 0.01em; text-transform: uppercase; overflow-wrap: anywhere; font-variant-numeric: tabular-nums lining-nums; text-wrap: balance; } .ds-board-facts { margin: 0; font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; opacity: 0.85; font-variant-numeric: tabular-nums; } .ds-shop-now { display: inline-flex; align-self: flex-start; align-items: center; gap: 0.5rem; height: 3rem; padding: 0 1.25rem; border-radius: 0.625rem; background: var(--primary-foreground); color: var(--primary); font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.125rem; letter-spacing: 0.01em; text-transform: uppercase; text-decoration: none; transition: opacity 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-shop-now .ds-ico { width: 1.25rem; height: 1.25rem; } .ds-shop-now:hover { opacity: 0.9; } .ds-shop-now:focus-visible { outline: 2px solid var(--primary-foreground); outline-offset: 2px; }"
+    },
+    {
+      "name": "Aisle Board (section heading)",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "A hanging aisle board over a 2px base line: the section name in the signage voice, the honest count on the same baseline.",
+      "html": "<div class=\"ds-aisle-board\"><div class=\"ds-ab-start\"><h2 class=\"ds-ab-title\">Fresh this week</h2><span class=\"ds-ab-meta\">12</span></div><a class=\"ds-ab-action\" href=\"#\">View all</a></div>",
+      "css": ".ds-aisle-board { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.5rem 1rem; border-bottom: 2px solid var(--border); padding-bottom: 0.75rem; } .ds-ab-start { display: flex; min-width: 0; align-items: baseline; gap: 0.75rem; } .ds-ab-title { margin: 0; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 2.375rem; line-height: 0.92; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; } .ds-ab-meta { font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--muted-foreground); font-variant-numeric: tabular-nums; } .ds-ab-action { font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--foreground); text-decoration: none; } .ds-ab-action:hover { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 2px; }"
+    },
+    {
+      "name": "Option Tiles",
+      "kind": "chip",
+      "refersTo": "option-tile",
+      "description": "Variant choices in the buy box: molded 2px-lined tiles; selected takes the price-board colour, unavailable goes dashed and struck.",
+      "html": "<div class=\"ds-options\" role=\"radiogroup\" aria-label=\"Size\"><button class=\"ds-option\" role=\"radio\" aria-checked=\"true\">1 kg</button><button class=\"ds-option\" role=\"radio\" aria-checked=\"false\">2 kg <span class=\"ds-delta\">(+SAR 8)</span></button><button class=\"ds-option ds-option-off\" role=\"radio\" aria-checked=\"false\">5 kg</button></div>",
+      "css": ".ds-options { display: flex; flex-wrap: wrap; gap: 0.5rem; } .ds-option { min-width: 2.75rem; padding: 0.5rem 0.875rem; border: 2px solid var(--border); border-radius: 0.625rem; background: var(--card); color: var(--foreground); font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1), border-color 120ms cubic-bezier(0.2, 0, 0, 1), color 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-option:hover:not([aria-checked=\"true\"]) { background: var(--muted); } .ds-option[aria-checked=\"true\"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); } .ds-option:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent); } .ds-option-off { border-style: dashed; color: var(--muted-foreground); text-decoration: line-through; } .ds-option .ds-delta { font-size: 0.75rem; opacity: 0.8; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Basket Header + Load Meter",
+      "kind": "custom",
+      "refersTo": "sticker",
+      "description": "The cart drawer's header: signage title, the count sticker stamping in, and the honest 12-segment load meter — one segment per item, capped, no invented threshold.",
+      "html": "<div class=\"ds-basket-head\"><div class=\"ds-bh-row\"><h2 class=\"ds-bh-title\">Your basket</h2><span class=\"ds-sticker ds-sticker-count ds-stamp-in\">4 items</span></div><div class=\"ds-meter\" aria-hidden=\"true\"><span class=\"on\"></span><span class=\"on\"></span><span class=\"on\"></span><span class=\"on\"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>",
+      "css": ".ds-basket-head { display: flex; flex-direction: column; gap: 0.5rem; max-width: 24rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--border); background: var(--background); } .ds-bh-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; } .ds-bh-title { margin: 0; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.75rem; line-height: 0.92; letter-spacing: 0.01em; text-transform: uppercase; } .ds-sticker { display: inline-flex; align-items: center; padding: 0.25rem 0.55rem; border-radius: 0.375rem; font-family: var(--font-grocery-display), var(--font-grocery-arabic), var(--font-grocery-sans), 'Arial Narrow', sans-serif; font-weight: 800; font-size: 0.75rem; line-height: 1.15; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; font-variant-numeric: tabular-nums; box-shadow: 0 1px 2px 0 rgb(10 14 20 / 0.06); } .ds-sticker-count { background: var(--primary); color: var(--primary-foreground); } .ds-stamp-in { animation: ds-grocery-stamp 480ms cubic-bezier(0.16, 1, 0.3, 1) both; } @keyframes ds-grocery-stamp { 0% { scale: 1.18; rotate: -4deg; opacity: 0; } 55% { scale: 0.97; opacity: 1; } 100% { scale: 1; rotate: 0deg; opacity: 1; } } @media (prefers-reduced-motion: reduce) { .ds-stamp-in { animation: ds-grocery-stamp-still 120ms linear both; } @keyframes ds-grocery-stamp-still { from { opacity: 0; } to { opacity: 1; } } } .ds-meter { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0.25rem; } .ds-meter span { height: 0.375rem; border-radius: 0.375rem; background: var(--muted); transition: background-color 220ms cubic-bezier(0.2, 0, 0, 1); } .ds-meter span.on { background: var(--primary); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "The counter's search slot: a 2.75rem field on the crate material with the 2px line, icon at start; suggestions drop as a molded overlay.",
+      "html": "<label class=\"ds-search\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input class=\"ds-search-input\" type=\"search\" placeholder=\"Search categories and pages…\"></label>",
+      "css": ".ds-search { position: relative; display: block; max-width: 28rem; } .ds-search .ds-ico { position: absolute; inset-inline-start: 0.625rem; top: 50%; width: 1rem; height: 1rem; transform: translateY(-50%); color: var(--muted-foreground); pointer-events: none; } .ds-search-input { width: 100%; height: 2.75rem; padding: 0 2rem; border: 2px solid var(--border); border-radius: 0.625rem; background: var(--card); color: var(--foreground); font-family: var(--font-grocery-sans), var(--font-grocery-arabic), ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; outline: none; transition: border-color 120ms cubic-bezier(0.2, 0, 0, 1), box-shadow 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-search-input::placeholder { color: var(--muted-foreground); } .ds-search-input:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Warehouse Floor",
+    "overview": "**Creative North Star: \"The Warehouse Floor\"**\n\nThe store is a working cash-and-carry, not a produce app. Goods sit at quantity in molded plastic crates — every product card is a `.crate` with a 2px hardware line, big soft corners and a lift on hover — and everything the store says, it prints: prices as signage on a board, categories as aisle-board tiles hanging in a strip under the counter, state as stickers slapped on at a tilt, never a toast. The world refuses the clean white produce-app grammar every grocery storefront ships, and the dark gourmet-deli page alike. The merchant's PRIMARY is the price-board colour (safety yellow by default): the hero board, the active aisle tile, every primary action, the focus ring. The first viewport is the floor entrance: announcement tape → chunky counter header → the aisle strip → the price board answering the merchant's slider across one seam — board first in the stack on phones — with the first rail's crates already in reach below.\n\nThe materials are the preset's concrete floor and near-black ink (`--floor` / `--ink` alias the merchant background and foreground) with one 2px hardware line (`--line`) running through every crate, tile and control; `--line-strong` (ink at 55%) is the line under attention. Type is two voices: Fira Sans Extra Condensed 700/800 uppercase is the printed signage — boards, prices, running heads, stickers, aisle tiles — and Manrope carries everything that explains; Almarai is the Arabic companion leading both roles under `:lang(ar)`. Shopping is stepper-first: quick-add straight from the crate, and a product already in the basket shows its stepper right there. There is one motion clock: everything that appears lands like a stamp (`.stamp-in`, 480ms emphasized), and everything else is a 120–220ms transition on the same easings. The basket drawer shows the load honestly — a 12-segment meter that fills one segment per item and caps, inventing no threshold.",
+    "keyCharacteristics": [
+      "Products in `.crate` cells: `--cell` field, 2px `--line` border, 1rem molded corners; hover/focus-within lifts 2px with `--elev-md` and `--line-strong` (translate dropped under reduced motion).",
+      "The merchant primary as the price board: `.board` (hero), the active `.aisle-tile`, the quick-add square, the one primary `Button` per view, the count sticker, the ring / caret / accent-color / `::selection`.",
+      "State printed as a `.sticker` slapped on (`data-tilt` −2° over photos, straight in text rows): ink for OUT OF STOCK, `--sale` for SALE / SAVE N%, outline for ONLY N LEFT, success for ADDED and IN STOCK. Never a toast.",
+      "Fira Sans Extra Condensed 800 uppercase for signage and every price (`.signage`, `.price`, tabular lining); Manrope 400–700 for names, facts, prose; Almarai leads both roles in `:lang(ar)`; SKUs in `ui-monospace`.",
+      "One motion moment, the stamp (`grocery-stamp`, 480ms `--easing-emphasized`: lands at 118% and −4°, settles; a plain fade under reduced motion) — on ADDED stickers, the header count, the drawer's count sticker.",
+      "Molded-plastic radii (0.625rem controls / 1rem crates / 0.375rem stickers / 1.25rem overlays), 2px borders everywhere, real offset-and-blur elevation on lifted surfaces."
+    ],
+    "rules": [
+      {
+        "name": "The Price-Board Rule",
+        "body": "The merchant primary is printed signage: the `.board`, the active `.aisle-tile`, the selected option tile, the quick-add square, the count sticker, the one primary button per view, and the ring / caret / selection. No primary text, no primary tint, no second primary button in a view.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sticker Rule",
+        "body": "State prints itself as a `.sticker` and is slapped on where it applies — tilted (`data-tilt`) over a photo, straight in a text row: ink for OUT OF STOCK, `--sale` for SALE, outline for ONLY N LEFT, success for ADDED / IN STOCK. Never a toast, never a coloured border or wash for state.",
+        "section": "colors"
+      },
+      {
+        "name": "The Honest Count Rule",
+        "body": "Numbers are only ever real: aisle tiles show counts only when the catalog hierarchy provides them (a parent with none of its own sums its children; a hierarchy with no counts renders plain tiles), and the load meter fills one segment per item and caps at 12 — it never invents a free-shipping threshold.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signage Rule",
+        "body": "If the store prints it — a name, a board, a price, a sticker, a tile, a primary action's label — it is Fira Sans Extra Condensed 800 uppercase (Almarai in Arabic) with tabular lining numerals; product names, facts and prose are never condensed, and a price is never Manrope.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Fact Rule",
+        "body": "Prices come pre-formatted from the API and are never re-formatted; counts, SKUs and the meter carry `tabular-nums`; merchant-supplied names sit in `<bdi dir=\"auto\">` and the board name breaks with `overflow-wrap: anywhere`.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hardware-Line Rule",
+        "body": "Every crate, tile, control and seam is drawn with the same 2px `--line` (`--border-width: 2px` feeds the shared `border-2` scale); attention turns the line strong or primary, never a glow. The only borders that are not the line are the quick-add square's `--primary-hover` edge and the sticker-outline's inset ink.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Lift-Is-Earned Rule",
+        "body": "Only interaction and floating surfaces lift: the crate's hover (2px translate + `--elev-md`), the rail arrows, the counter bar, overlays. Nothing ships pre-lifted; no glows, no coloured shadows.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Layering Rule",
+        "body": "World classes (`.signage`, `.price`, `.board`, `.crate`, `.aisle-tile`, `.sticker`, `.stamp-in`, `.scroll-x`, `.scroll-x-fade`, `.prose-grocery`) live in `@layer components`, so a Tailwind utility on the same element (`text-2xl`, `bg-primary`, `absolute`) always wins; only the Swiper overrides (`.stage`, `.rail`) stay unlayered because Swiper's CSS is.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** ship every product as a `.crate` with fixed slots — 1:1 photo, stickers at `start-2 top-2`, a 2px-lined foot with name (2 lines, Manrope 600), mono SKU, `<del>` + `.price` beside the quick-add slot — in the 2 / 3 / 4 / 5 grid or a `.rail`.",
+      "**Do** keep quick-add stepper-first: the plus square for a product not yet in the basket, its `QuantityStepper` in the crate once it is, the page link only when variants force a choice; stamp ADDED as a `.sticker-success .stamp-in` over the tag.",
+      "**Do** reserve the merchant primary for printed signage: the `.board`, the active `.aisle-tile`, the selected option tile, the quick-add square, count stickers, the one primary button per view, the ring; keep SHOP NOW as the inversion on the board.",
+      "**Do** print state as a `.sticker` (`data-tilt` over photos, straight in rows) and let counts and stickers land with `.stamp-in` on the shared clock; leave in-stock silent on crates.",
+      "**Do** set everything the store prints in Fira Sans Extra Condensed 800 uppercase with tabular lining numerals (`.signage`, `.price`, `.sticker`, `.aisle-tile`) and everything it says in Manrope; wrap merchant strings in `<bdi dir=\"auto\">`.",
+      "**Do** draw every crate, tile, control and seam with the 2px `--line` (`border-2`, `divide-y-2`) and keep radii to the molded scale: 1rem crates / boards, 0.625rem controls and images, 0.375rem stickers, 1.25rem overlays.",
+      "**Do** cap the stage (38 / 46 / 56vh) and keep the board first in the stack on phones; let the board stand alone, full width, when the merchant has no image.",
+      "**Do** mirror for RTL with logical properties, `rtl:rotate-180` on directional icons, the mirrored `.scroll-x-fade`, Swiper re-keyed on `dir`, and trust the `:lang(ar)` swap (Almarai leads both roles, tracking drops to 0)."
+    ],
+    "donts": [
+      "**Don't** hard-code hex; every colour is a role variable from the merchant bridge or one of the two declared mixes (`--faint`, `--line-strong`). `mapMerchantColors` touches only `ring`.",
+      "**Don't** announce state anywhere but a sticker — no toasts, no banners, no coloured borders or washes; no sale / success background wider than a sticker.",
+      "**Don't** invent numbers: no counts on aisle tiles the hierarchy didn't provide, no thresholds on the load meter, no re-formatted prices.",
+      "**Don't** add a second motion clock: `grocery-stamp` (480ms, `--easing-emphasized`, 118% / −4° landing, a fade under `prefers-reduced-motion`) is the theme's only keyframe; everything else is a 120–220ms transition on `--easing-standard`, and the crate's hover translate drops under reduced motion.",
+      "**Don't** set a price, a board or a sticker in Manrope, or a product name / fact / prose in the condensed face; don't print signage in sentence case.",
+      "**Don't** put category navigation in the header — it is the aisle strip; don't give the entrance a full-bleed or uncapped slider, and don't let the stage push the first crates out of the first viewport.",
+      "**Don't** thin the hardware line (no 1px borders), pre-lift a resting crate, or draw a border in anything but `--line` (the quick-add's `--primary-hover` edge, the aisle tile's currentColor 22%, the sticker-outline's ink inset and the footer's background/20–25 are the exceptions the build owns)."
+    ]
+  }
+}
