@@ -71,6 +71,19 @@ jobs:
           report_paths: '**/build/test-results/integrationTest/TEST-*.xml'
           check_name: Integration test results
 
+      # A container-backed failure is usually only explicable from the service log the test captured, so keep the
+      # raw results and the HTML report whenever the job goes red.
+      - name: Upload integration test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            **/build/test-results/integrationTest/**
+            **/build/reports/tests/integrationTest/**
+          if-no-files-found: warn
+          retention-days: 14
+
   coverage:
     name: Coverage reports
     runs-on: ubuntu-latest
