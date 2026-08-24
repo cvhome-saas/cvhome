@@ -29,3 +29,8 @@ compiles.** Same pattern as `store-pod/content-deprecated`: reference only.
    documents their shape.
 3. The `CATALOG.PRODUCT_VARIANT.*` / `CATALOG.PRODUCT_VARIATION.*` error codes were pruned from `CatalogErrors`
    with the code; the exception classes here still name them, so re-add the constants when re-registering.
+4. Product options / attributes / property sets (`model/product/attribute/**`, `entity/product/attribute/**`,
+   their repositories, services, facades, mappers, `ProductAttributeOptionApi`, `ProductPropertySetApi`) were parked
+   here on 2026-08-24 with the catalog rewrite: no console or storefront screen used them. Their DDL is in
+   `deprecated-ddl.sql`; the live `schema.sql` no longer creates those tables. The code targets the pre-rewrite
+   catalog layering (facade → mapper → populator) and must be rewritten against `services/<domain>` when it returns.

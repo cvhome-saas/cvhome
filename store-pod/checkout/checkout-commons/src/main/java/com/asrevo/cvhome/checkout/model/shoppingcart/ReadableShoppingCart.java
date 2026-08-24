@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.asrevo.cvhome.catalog.model.product.attribute.ReadableProductVariant;
 import com.asrevo.cvhome.checkout.model.order.total.ReadableOrderTotal;
 
 import lombok.Getter;
@@ -45,8 +44,6 @@ public class ReadableShoppingCart extends ShoppingCartEntity {
     private Long order;
 
     private String promoCode;
-
-    private ReadableProductVariant variant;
 
     private Long customer;
 

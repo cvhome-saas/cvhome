@@ -1,82 +1,98 @@
-# ProductApi — com.asrevo.cvhome.catalog.api.v1.product.ProductApi (@RequestMapping "/api/v1")
+# ProductApiV2 + ProductApi + ExternalProductApi — com.asrevo.cvhome.catalog.api
 #
-# Addressed through the gateway, not catalog's own port: a seller request really crosses
-# store-core-gateway (:8000) then the pod's spg, so `{{SELLER_UI_URL}}/spg/catalog/...` is what
-# production traffic looks like. Env vars come from the repo-root http-client.env.json; the session
-# id comes from http-client.private.env.json (gitignored — copy the .example and log in once).
+# Addressed through the gateway, not catalog's own port: a seller request crosses store-core-gateway (:8000)
+# then the pod's spg, so `{{SELLER_UI_URL}}/spg/catalog/...` is what production traffic looks like. Env vars
+# come from the repo-root http-client.env.json; the session id from http-client.private.env.json (gitignored).
 #
 # Requires a running stack: ./extra/scripts/run-lcl.sh
 
-### create a product
+### create a product (v2 definition) — 201 {"id": n}
 # @name createProduct
-POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product?store={{STORE_ID}}&lang={{LANG}}
+POST {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
 {
   "sku": "HTTP-DEMO-001",
-  "available": true,
   "visible": true,
-  "productSpecifications": {
-    "weight": 1,
-    "height": 1,
-    "width": 1,
-    "length": 1
-  },
+  "shipeable": true,
+  "productSpecifications": {"weight": 1, "height": 1, "width": 1, "length": 1},
   "descriptions": [
-    {
-      "language": "en",
-      "name": "Demo product",
-      "description": "Created from product-api.http",
-      "friendlyUrl": "demo-product"
-    }
+    {"language": "en", "name": "Demo product", "description": "Created from product-api.http", "friendlyUrl": "demo-product"}
   ]
 }
 
 > {%
     client.test("created", function () {
-        client.assert(response.status === 201 || response.status === 200, "status " + response.status);
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("PRODUCT_ID", response.body.id);
     });
-    client.global.set("PRODUCT_ID", response.body.id);
 %}
 
-### is the sku unique — 200 with {"exists": true|false}
-GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/unique?store={{STORE_ID}}&lang={{LANG}}&code=HTTP-DEMO-001
+### invalid body — 400 (sku is required)
+POST {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
-Accept: application/json
+Content-Type: application/json
 
-### patch the product created above
-PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+{"descriptions": []}
+
+### unknown brand code — 400 CATALOG.MANUFACTURER.REFERENCE_UNRESOLVABLE
+POST {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"sku": "HTTP-DEMO-002", "manufacturer": "no-such-brand", "descriptions": [{"language": "en", "name": "x"}]}
+
+### the definition, every language
+GET {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### update the definition — 200, no body
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v2/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 Content-Type: application/json
 
 {
-  "available": false
+  "sku": "HTTP-DEMO-001",
+  "visible": true,
+  "categories": [{"id": 1}],
+  "descriptions": [{"language": "en", "name": "Demo product, renamed", "friendlyUrl": "demo-product"}]
 }
 
-### add it to a category
-POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/1?store={{STORE_ID}}&lang={{LANG}}
+### is the sku taken — {"exists": true}
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/unique?store={{STORE_ID}}&lang={{LANG}}&code=HTTP-DEMO-001
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 
-### remove it from that category
-DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/1?store={{STORE_ID}}&lang={{LANG}}
+### inline edit: the two switches
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
 
-### reorder it
-PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}&position=2
-Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+{"available": false, "productShipeable": true}
 
-### public — fetch by friendly url, no auth (storefront path, not the seller gateway)
-GET {{LANDING_UI_URL}}/catalog/api/v1/product/demo-product?store={{STORE_ID}}&lang={{LANG}}
-Accept: application/json
-
-### another store's product — 404, not 403 (see ProductApi's javadoc on why)
-GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID_2}}&lang={{LANG}}
-Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
-Accept: application/json
-
-### delete it
-DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+### category membership — 201, then 409 CATALOG.CATEGORY.ALREADY_ATTACHED on repeat
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/2?store={{STORE_ID}}&lang={{LANG}}
 Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
 
 ###
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}/category/2?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the listing (public; the console reads the same one) — filters: sku, available, categoryIds, manufacturerId
+GET {{LANDING_UI_URL}}/catalog/api/v2/products?store={{STORE_ID}}&lang={{LANG}}&sku=NK&count=5&page=0
+
+### the product page, by slug — 404 CATALOG.PRODUCT.NOT_FOUND for an unknown slug
+GET {{LANDING_UI_URL}}/catalog/api/v2/product/name/demo-product?store={{STORE_ID}}&lang={{LANG}}
+
+### checkout's s2s read, by sku (public read, no price — inventory has that)
+GET {{LANDING_UI_URL}}/catalog/api/v1/detailed-product?store={{STORE_ID}}&lang={{LANG}}&sku=HTTP-DEMO-001
+
+### delete the product (and its image files)
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/{{PRODUCT_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### private write without a session — 401
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1?store={{STORE_ID}}&lang={{LANG}}
+Content-Type: application/json
+
+{"available": true, "productShipeable": true}

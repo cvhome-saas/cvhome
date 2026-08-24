@@ -1,16 +1,14 @@
 package com.asrevo.cvhome.catalog.model.manufacturer;
 
 import java.io.Serial;
-import java.io.Serializable;
 
 import com.asrevo.cvhome.store.core.model.catalog.NamedEntity;
 
-public class ManufacturerDescription extends NamedEntity implements Serializable {
+/**
+ * One language's copy of a manufacturer (brand).
+ */
+public class ManufacturerDescription extends NamedEntity {
 
-    /**
-     *
-     */
     @Serial
     private static final long serialVersionUID = 1L;
-
 }

@@ -1,243 +1,214 @@
 package com.asrevo.cvhome.catalog.services.product;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.entity.product.image.ProductImage;
-import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
+import com.asrevo.cvhome.billing.commons.EntitlementKey;
+import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
+import com.asrevo.cvhome.billing.guard.StoreEntitlements;
+import com.asrevo.cvhome.catalog.entity.Category;
+import com.asrevo.cvhome.catalog.entity.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
-import com.asrevo.cvhome.catalog.errors.ProductNotPersistedException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.model.category.CategoryReference;
+import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
+import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
+import com.asrevo.cvhome.catalog.model.product.ProductFilter;
 import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
-import com.asrevo.cvhome.catalog.repositories.product.ProductRepository;
-import com.asrevo.cvhome.catalog.service.mapper.catalog.ReadableMinimalProductMapper;
-import com.asrevo.cvhome.catalog.services.product.image.ProductImageService;
+import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
+import com.asrevo.cvhome.catalog.repositories.CategoryRepository;
+import com.asrevo.cvhome.catalog.repositories.ManufacturerRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductRepository;
+import com.asrevo.cvhome.catalog.repositories.ProductTypeRepository;
+import com.asrevo.cvhome.catalog.services.Pages;
+import com.asrevo.cvhome.catalog.services.image.ProductImageService;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.errors.UncheckedBaseException;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
+import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
-@Service("productService")
-@Slf4j
-public class ProductServiceImpl extends SalesManagerEntityServiceImpl<Long, Product> implements ProductService {
-
-    private static final String CANNOT_GET_PRODUCT_WITH_SKU_TEMPLATE = "Cannot get product with sku [%s]";
+@Service
+@RequiredArgsConstructor
+public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
+    private final CategoryRepository categoryRepository;
+
+    private final ManufacturerRepository manufacturerRepository;
+
+    private final ProductTypeRepository productTypeRepository;
+
     private final ProductImageService productImageService;
 
-    private final ReadableMinimalProductMapper readableMinimalProductMapper;
+    private final ProductMapper productMapper;
 
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageService productImageService,
-                              ReadableMinimalProductMapper readableMinimalProductMapper) {
-        super(productRepository);
-        this.productRepository = productRepository;
-        this.productImageService = productImageService;
-        this.readableMinimalProductMapper = readableMinimalProductMapper;
-    }
+    private final StoreEntitlements storeEntitlements;
 
     @Override
-    public Optional<Product> retrieveById(Long id, StoreMerchantId store) {
-        return Optional.ofNullable(findOne(id, store));
-    }
-
-    @Override
-    public List<Product> getProducts(List<Long> categoryIds) {
-        Set<Long> ids = new HashSet<>(categoryIds);
-        return productRepository.getProductsListByCategories(ids);
-    }
-
-    @Override
-    public Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale) {
-        return productRepository.getByFriendlyUrl(store, seUrl, locale);
-    }
-
-    @Override
-    public List<Product> listByStore(StoreMerchantId store) {
-
-        return productRepository.listByStore(store);
-    }
-
-    @Override
-    public void delete(Product product) {
-        product = this.getById(product.getId());
-        product.setCategories(null);
-
-        Set<ProductImage> images = product.getImages();
-
-        for (ProductImage image : images) {
-            try {
-                productImageService.removeProductImage(image);
-            } catch (AssetDeleteFailedException e) {
-                // delete(E) is the root entity contract and declares nothing checked, and Java forbids an override
-                // from widening a throws clause. The carrier is how a typed failure crosses that boundary: the
-                // advice unwraps it, so the asset's own code and status still reach the client.
-                throw new UncheckedBaseException(e);
-            }
+    @Transactional(readOnly = true)
+    public ReadableEntityList<ReadableProduct> list(StoreMerchantId store, ProductFilter filter,
+                                                    LanguageCode language, Pageable pageable) {
+        if (filter.getCategoryIds() != null && filter.getCategoryIds().size() == 1) {
+            categoryRepository.findByStoreAndId(store, filter.getCategoryIds().getFirst())
+                    .ifPresent(category -> filter.setCategoryIds(
+                            categoryRepository.findSubtree(store, category.subtreePrefix()).stream()
+                                    .map(Category::getId).toList()));
         }
-
-        product.setImages(null);
-
-        super.delete(product);
-
+        return Pages.toReadable(productRepository.search(store, filter, pageable),
+                p -> productMapper.toReadable(p, language));
     }
 
     @Override
-    public void create(Product product) {
-        saveOrUpdate(product);
-    }
-
-    @Override
-    public void update(Product product) {
-        saveOrUpdate(product);
-    }
-
-    private Product saveOrUpdate(Product product) {
-        Set<ProductImage> originalProductImages = new HashSet<>(product.getImages());
-
-        if (product.getId() != null && product.getId() > 0) {
-            super.update(product);
-        } else {
-            super.create(product);
-        }
-
-        List<Long> newImageIds = new ArrayList<>();
-        Set<ProductImage> images = product.getImages();
-
-        try {
-            addNewImages(product, images, newImageIds);
-            cleanupImages(product, originalProductImages, newImageIds);
-        } catch (Exception e) {
-            log.error("Cannot save images {}", e.getMessage());
-        }
-
-        return product;
-    }
-
-    private void addNewImages(Product product, Set<ProductImage> images, List<Long> newImageIds)
-            throws ProductImageNotPersistedException {
-        if (images == null || images.isEmpty()) {
-            return;
-        }
-        for (ProductImage image : images) {
-            if (image.getImage() != null && (image.getId() == null || image.getId() == 0L)) {
-                addProductImage(product, image);
-                newImageIds.add(image.getId());
-            } else if (image.getId() != null) {
-                productImageService.save(image);
-                newImageIds.add(image.getId());
-            }
-        }
-    }
-
-    private void cleanupImages(Product product, Set<ProductImage> originalProductImages, List<Long> newImageIds)
-            throws ProductImageNotPersistedException {
-        // cleanup old and new images
-        for (ProductImage image : originalProductImages) {
-            if (image.getImage() != null && image.getId() == null) {
-                addProductImage(product, image);
-                newImageIds.add(image.getId());
-            } else if (!newImageIds.contains(image.getId())) {
-                productImageService.delete(image);
-            }
-        }
-    }
-
-    private void addProductImage(Product product, ProductImage image) throws ProductImageNotPersistedException {
-        image.setProduct(product);
-
-        InputStream inputStream = image.getImage();
-        ImageContentFile cmsContentImage = new ImageContentFile();
-        cmsContentImage.setFileName(image.getProductImage());
-        cmsContentImage.setFile(inputStream);
-        cmsContentImage.setFileContentType(FileContentType.PRODUCT);
-
-        productImageService.addProductImage(product, image, cmsContentImage);
-    }
-
-    @Override
-    public Product findOne(Long id, StoreMerchantId merchant) {
-        return productRepository.getById(id, merchant);
-    }
-
-
-    @Override
-    public Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store) {
-        return productRepository.findAll(criteria, store, criteria.getPageable());
-    }
-
-    @SneakyThrows
-    @Override
-    public ReadableMinimalProduct getDetailedProduct(StoreMerchantId store, String sku, LanguageCode language) {
-        Product p = getMinimalProductBySku(sku, store, language);
-        return readableMinimalProductMapper.convert(p, store, language);
-    }
-
-    @Override
-    public Product saveProduct(Product product) throws ProductNotPersistedException {
-        try {
-            return this.saveOrUpdate(product);
-        } catch (DataAccessException e) {
-            // The legacy root wrapped every persistence failure into ServiceException; the store now raises its own
-            // unchecked type, and this is the one place that still owes the caller a named condition.
-            throw ProductNotPersistedException.of(product.getId(), e);
-        }
-    }
-
-    public Product getMinimalProductBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+    @Transactional(readOnly = true)
+    public ReadableProduct getByFriendlyUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
             throws ProductNotFoundException {
-
-        Long productId = findProductIdByCode(productCode, merchant);
-        return productRepository.getMinimalProductById(productId, merchant, language);
+        Product product = productRepository.findByStoreAndFriendlyUrl(store, friendlyUrl, language)
+                .orElseThrow(() -> ProductNotFoundException.of(friendlyUrl, store));
+        return productMapper.toReadable(product, language);
     }
 
     @Override
-    public Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language)
+    @Transactional(readOnly = true)
+    public ReadableMinimalProduct getBySku(StoreMerchantId store, String sku, LanguageCode language)
             throws ProductNotFoundException {
-
-        // The try/catch that used to wrap these three lookups turned "no such sku" and "the query failed" into one
-        // ServiceException. The first is now a 404 naming the sku; the second stays an unchecked DataAccessException
-        // and renders as a 500 with a traceId, which is what it is.
-        Long productId = findProductIdByCode(productCode, merchant);
-        return productRepository.getById(productId, merchant, language);
-    }
-
-    public Product getBySku(String productCode, StoreMerchantId merchant) throws ProductNotFoundException {
-
-        Long productId = findProductIdByCode(productCode, merchant);
-        return this.findOne(productId, merchant);
-    }
-
-    private Long findProductIdByCode(String productCode, StoreMerchantId merchant) throws ProductNotFoundException {
-        List<Long> products = productRepository.findBySku(productCode, merchant);
-        if (products.isEmpty()) {
-            throw ProductNotFoundException.of(productCode, merchant);
-        }
-        return products.getFirst();
+        Product product = productRepository.findByStoreAndSku(store, sku)
+                .orElseThrow(() -> ProductNotFoundException.of(sku, store));
+        return productMapper.toMinimal(product, language);
     }
 
     @Override
-    public boolean exists(String sku, StoreMerchantId store) {
-        return productRepository.existsBySku(sku, store);
+    @Transactional(readOnly = true)
+    public ReadableProductDefinition getDefinition(StoreMerchantId store, Long id, LanguageCode language)
+            throws ProductNotFoundException {
+        return productMapper.toDefinition(require(store, id), language);
     }
 
+    @Override
+    public boolean exists(StoreMerchantId store, String sku) {
+        return productRepository.existsByStoreAndSku(store, sku);
+    }
+
+    @Override
+    @Transactional
+    public Long create(StoreMerchantId store, PersistableProductDefinition source)
+            throws ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
+            CategoryReferenceUnresolvableException, EntitlementExceededException {
+        // Only a new product can take the store past its plan's ceiling; the count runs only when a plan caps it.
+        storeEntitlements.require(store, EntitlementKey.MAX_PRODUCTS, () -> productRepository.countByStore(store));
+        Product product = new Product();
+        product.setStore(store);
+        applyDefinition(store, source, product);
+        return productRepository.save(product).getId();
+    }
+
+    @Override
+    @Transactional
+    public void update(StoreMerchantId store, Long id, PersistableProductDefinition source)
+            throws ProductNotFoundException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException {
+        applyDefinition(store, source, require(store, id));
+    }
+
+    private void applyDefinition(StoreMerchantId store, PersistableProductDefinition source, Product product)
+            throws ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
+            CategoryReferenceUnresolvableException {
+        ProductMapper.apply(source, product);
+        product.setManufacturer(resolveManufacturer(store, source.getManufacturer()));
+        product.setType(resolveType(store, source.getType()));
+        if (!source.getCategories().isEmpty()) {
+            Set<Category> categories = new HashSet<>();
+            for (CategoryReference reference : source.getCategories()) {
+                categories.add(resolveCategory(store, reference));
+            }
+            product.setCategories(categories);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void patch(StoreMerchantId store, Long id, LightPersistableProduct source)
+            throws ProductNotFoundException {
+        Product product = require(store, id);
+        product.setAvailable(source.isAvailable());
+        product.setProductShipeable(source.isProductShipeable());
+    }
+
+    @Override
+    @Transactional
+    public void addToCategory(StoreMerchantId store, Long productId, Long categoryId)
+            throws ProductNotFoundException, CategoryNotFoundException, CategoryAlreadyAttachedException {
+        Product product = require(store, productId);
+        Category category = requireCategory(store, categoryId);
+        if (product.getCategories().contains(category)) {
+            throw CategoryAlreadyAttachedException.of(categoryId, productId);
+        }
+        product.getCategories().add(category);
+    }
+
+    @Override
+    @Transactional
+    public void removeFromCategory(StoreMerchantId store, Long productId, Long categoryId)
+            throws ProductNotFoundException, CategoryNotFoundException {
+        require(store, productId).getCategories().remove(requireCategory(store, categoryId));
+    }
+
+    @Override
+    @Transactional
+    public void delete(StoreMerchantId store, Long id) throws ProductNotFoundException {
+        delete(store, require(store, id));
+    }
+
+    @Override
+    @Transactional
+    public void delete(StoreMerchantId store, Product product) {
+        productImageService.removeFiles(product);
+        productRepository.delete(product);
+    }
+
+    private Product require(StoreMerchantId store, Long id) throws ProductNotFoundException {
+        return productRepository.findByStoreAndId(store, id).orElseThrow(() -> ProductNotFoundException.of(id, store));
+    }
+
+    private Category requireCategory(StoreMerchantId store, Long id) throws CategoryNotFoundException {
+        return categoryRepository.findByStoreAndId(store, id).orElseThrow(() -> CategoryNotFoundException.of(id, store));
+    }
+
+    private com.asrevo.cvhome.catalog.entity.Manufacturer resolveManufacturer(StoreMerchantId store, String code)
+            throws ManufacturerReferenceUnresolvableException {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return manufacturerRepository.findByStoreAndCode(store, code)
+                .orElseThrow(() -> ManufacturerReferenceUnresolvableException.of(code, store));
+    }
+
+    private com.asrevo.cvhome.catalog.entity.ProductType resolveType(StoreMerchantId store, String code)
+            throws ProductTypeReferenceUnresolvableException {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return productTypeRepository.findByStoreAndCode(store, code)
+                .orElseThrow(() -> ProductTypeReferenceUnresolvableException.of(code, store));
+    }
+
+    private Category resolveCategory(StoreMerchantId store, CategoryReference reference)
+            throws CategoryReferenceUnresolvableException {
+        Optional<Category> category = reference.getId() != null
+                ? categoryRepository.findByStoreAndId(store, reference.getId())
+                : categoryRepository.findByStoreAndCode(store, reference.getCode());
+        return category.orElseThrow(() -> CategoryReferenceUnresolvableException.of(
+                reference.getId() != null ? reference.getId() : reference.getCode(), store));
+    }
 }
