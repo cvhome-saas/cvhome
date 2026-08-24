@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import com.asrevo.cvhome.content.service.PublishingService;
 import com.asrevo.cvhome.testsupport.annotations.StorageIntegrationTest;
@@ -46,6 +47,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @StorageIntegrationTest
 @Import(TestClockConfiguration.class)
+// ScheduledPublishJob promotes and ARCHIVES content on a timer, against the same clock these tests move. Left on,
+// it fires part-way through a slow run (CI, not a laptop) and archives rows behind the assertions. Promotion here
+// is driven explicitly through PublishingService.tick().
+@TestPropertySource(properties = {
+        "com.asrevo.cvhome.content.scheduler.initial-delay=PT24H",
+        "com.asrevo.cvhome.content.scheduler.delay=PT24H"})
 class ContentApiIntegrationTest {
 
     /** Seeded store (languages ar, fr). */
@@ -105,6 +112,7 @@ class ContentApiIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        clock.reset();
         api = new ApiTestSupport(port, signer);
         admin = api.token(ROLE_STORE_ADMIN, STORE_A);
     }
