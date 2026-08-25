@@ -1,0 +1,103 @@
+# lcl.yml — the local stack, as run by ./extra/scripts/lcl (engine in extra/lcl, project-agnostic).
+#
+# Every service here is started, supervised, health-checked and logged by lcl. Ports are declared per service
+# (keep them equal to common-config.yml, which the Spring services bind); when a port is taken the whole stack
+# shifts by `ports.step` × k (gateway 9000, catalog 9122, postgres 6432 …) and every ${port.<service>} follows.
+#
+# Variables usable in strings: ${stack} ${stack.dir} ${root} ${project} ${offset} ${service} ${port}
+#                              ${port.<service>} ${port.<compose service>:<container port>} ${env.NAME}
+
+name: cvhome
+
+ports:
+  step: 1000
+  skip-configured: false             # true: never use the ports above, always start at +step (or `--no-default-ports`)
+
+build: [./gradlew, build, -x, test, -x, check, --console=plain]   # `lcl start --build`
+
+compose:
+  file: docker-compose-lcl.yml
+  default: [postgres, minio, spg]    # `lcl start`; `--infra all` starts every compose service, `--infra a,b` a subset
+  env:                               # extra entries for the compose env file (LCL_PORT_<SERVICE> is always there)
+    NAMESPACE: gateway.com
+
+env:                                 # for every process lcl starts
+  LCL_INSTANCE_YML: ${stack.dir}/spring-instance.yml
+
+files:                               # rendered per stack before anything starts
+  - path: ${stack.dir}/spring-instance.yml
+    template: extra/lcl-config/spring-instance.yml.tpl
+
+defaults:
+  gradle:
+    task: bootRun
+    args:
+      # `lcl` is the environment slice, `test-stores` seeds the demo orgs/stores and users the local hostnames point at.
+      - "--args=--spring.profiles.active=lcl,test-stores --spring.config.additional-location=file:${stack.dir}/spring-instance.yml"
+      # separate Gradle task state per stack, so two stacks can run the same module from this checkout
+      - "--project-cache-dir=${stack.dir}/gradle"
+      - "--console=plain"
+    health: { path: /actuator/health, expect: '"status":"UP"', ready-log: 'Started \S+ in [\d.]+ seconds', timeout: 300 }
+  npm:
+    health: { timeout: 240 }
+
+services:
+  # store-core — uaa first: it issues the tokens everything else validates
+  uaa:                { type: gradle, port: 8001, module: ":store-core:uaa" }
+  store-core-gateway: { type: gradle, port: 8000, module: ":store-core:gateway:gateway-service",       after: [uaa] }
+  tenancy:            { type: gradle, port: 8020, module: ":store-core:tenancy:tenancy-service",       after: [uaa] }
+  billing:            { type: gradle, port: 8021, module: ":store-core:billing:billing-service",       after: [uaa] }
+  pod-registry:       { type: gradle, port: 8022, module: ":store-core:pod-registry:pod-registry-service", after: [uaa] }
+  console-ui:
+    type: npm
+    port: 8011
+    dir: store-core/console-ui
+    command: [npx, ng, serve, --port, "${port}"]
+    after: [uaa]
+  # store-pod
+  spg:                { type: container, port: 80, compose: spg }
+  merchant:           { type: gradle, port: 8120, module: ":store-pod:merchant:merchant-service",      after: [uaa] }
+  content:            { type: gradle, port: 8121, module: ":store-pod:content:content-service",        after: [uaa] }
+  catalog:            { type: gradle, port: 8122, module: ":store-pod:catalog:catalog-service",        after: [uaa] }
+  checkout:           { type: gradle, port: 8123, module: ":store-pod:checkout:checkout-service",      after: [uaa] }
+  cua:                { type: gradle, port: 8124, module: ":store-pod:cua",                            after: [uaa] }
+  payment:            { type: gradle, port: 8125, module: ":store-pod:payment:payment-service",        after: [uaa] }
+  inventory:          { type: gradle, port: 8126, module: ":store-pod:inventory:inventory-service",    after: [uaa] }
+  landing-ui:
+    type: npm
+    port: 8110
+    dir: store-pod/landing-ui/storefront
+    install: store-pod/landing-ui                # workspace root that owns node_modules
+    # libs are consumed as built output (dist/); tsc -b is incremental so rebuilding every start is cheap
+    prep:
+      - { dir: store-pod/landing-ui, command: [npm, run, build:libs-types] }
+      - { dir: store-pod/landing-ui, command: [npm, run, build:libs-services] }
+      - { dir: store-pod/landing-ui, command: [npm, run, build:libs-hooks] }
+    command: [npx, next, dev, -p, "${port}", --turbopack]
+    env:
+      INTERNAL_SPG: "http://spg-507f1f77.gateway.com:${port.spg}"
+      NEXT_DIST_DIR: ".next-${stack}"           # read by storefront/next.config.ts: one .next per stack
+    after: [uaa]
+
+hooks:
+  after-up:
+    # uaa's seeded `web-app` OAuth client pins its redirect URIs to the configured gateway port; on a shifted stack
+    # rewrite them to this stack's gateway port (Spring Authorization Server reads clients from JDBC per request).
+    - service: uaa
+      when: "${offset} != 0"
+      shell: >-
+        docker compose -p ${project} -f ${compose.file} exec -T postgres
+        psql -v ON_ERROR_STOP=1 -U postgres -d cvhome -c
+        "update uaa.oauth2_registered_client set
+           redirect_uris = 'http://localhost:${port.store-core-gateway}/login/oauth2/code/uaa,http://gateway.com:${port.store-core-gateway}/login/oauth2/code/uaa,http://console-ui.gateway.com:${port.store-core-gateway}/login/oauth2/code/uaa',
+           post_logout_redirect_uris = 'http://localhost:${port.store-core-gateway},http://gateway.com:${port.store-core-gateway},http://console-ui.gateway.com:${port.store-core-gateway}'
+         where client_id = 'web-app'"
+
+urls:
+  - { label: seller console, url: "http://gateway.com:${port.store-core-gateway}" }
+  - { label: uaa,            url: "http://uaa.gateway.com:${port.uaa}" }
+  - { label: storefront,     url: "http://org1-store1.spg-507f1f77.gateway.com:${port.spg}" }
+  - { label: pod gateway,    url: "http://spg-507f1f77.gateway.com:${port.spg}" }
+  - { label: minio console,  url: "http://localhost:${port.minio:9001}" }
+  - { label: grafana,        url: "http://localhost:${port.grafana:3000}" }
+  - { label: postgres,       url: "postgresql://postgres:password@localhost:${port.postgres:5432}/cvhome" }

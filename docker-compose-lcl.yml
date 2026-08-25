@@ -1,8 +1,10 @@
+# Host ports are ${LCL_PORT_*:-default} so several instances can run side by side (see extra/lcl). Plain
+# `docker compose -f docker-compose-lcl.yml up` still uses the defaults, which mirror common-config.yml.
 services:
   postgres:
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - "${LCL_PORT_POSTGRES:-5432}:5432"
     environment:
       POSTGRES_DB: cvhome
       POSTGRES_USER: postgres
@@ -11,17 +13,17 @@ services:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${LCL_PORT_MINIO:-9000}:9000"
+      - "${LCL_PORT_MINIO_CONSOLE:-9001}:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
   spg:
     image: ashraf1abdelrasool/saas-gateway:sha-4a6d381
     ports:
-      - "80:80"
-      - "443:443"
-      - "2019:2019"
+      - "${LCL_PORT_SPG:-80}:80"
+      - "${LCL_PORT_SPG_TLS:-443}:443"
+      - "${LCL_PORT_SPG_ADMIN:-2019}:2019"
     volumes:
       - ./store-pod/spg/Caddyfile:/etc/caddy/Caddyfile
     extra_hosts:
@@ -37,11 +39,20 @@ services:
       - "spg-507f1f77.gateway.com:host-gateway"
     environment:
       NAMESPACE: gateway.com
-      ASK_TLS_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/ask-for-tls
-      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/lookup-by-domain
+      # Upstream ports for the Caddyfile. Defaults match common-config.yml; extra/lcl overrides them per instance.
+      LCL_PORT_MERCHANT: ${LCL_PORT_MERCHANT:-8120}
+      LCL_PORT_CONTENT: ${LCL_PORT_CONTENT:-8121}
+      LCL_PORT_CATALOG: ${LCL_PORT_CATALOG:-8122}
+      LCL_PORT_CHECKOUT: ${LCL_PORT_CHECKOUT:-8123}
+      LCL_PORT_CUA: ${LCL_PORT_CUA:-8124}
+      LCL_PORT_PAYMENT: ${LCL_PORT_PAYMENT:-8125}
+      LCL_PORT_INVENTORY: ${LCL_PORT_INVENTORY:-8126}
+      LCL_PORT_LANDING_UI: ${LCL_PORT_LANDING_UI:-8110}
+      ASK_TLS_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
       CERT_BUCKET_REGION: eu-central-1
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:${LCL_PORT_OTEL_GRPC:-4317}
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_SERVICE_NAME: spg
   otel-collector:
@@ -50,10 +61,10 @@ services:
     volumes:
       - ./extra/monitoring/logging-otel-collector-config.yml:/etc/logging-otel-collector-config.yml
     ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "8889:8889"
-      - "13133:13133"
+      - "${LCL_PORT_OTEL_GRPC:-4317}:4317"
+      - "${LCL_PORT_OTEL_HTTP:-4318}:4318"
+      - "${LCL_PORT_OTEL_PROM:-8889}:8889"
+      - "${LCL_PORT_OTEL_HEALTH:-13133}:13133"
     depends_on:
       - loki
       - tempo
@@ -65,14 +76,14 @@ services:
     volumes:
       - ./extra/monitoring/loki.yml:/etc/loki/loki.yml
     ports:
-      - "3100:3100"
+      - "${LCL_PORT_LOKI:-3100}:3100"
   tempo:
     image: grafana/tempo:2.10.5
     command: [ "-config.file=/etc/tempo/tempo.yml" ]
     volumes:
       - ./extra/monitoring/tempo.yml:/etc/tempo/tempo.yml
     ports:
-      - "3200:3200"
+      - "${LCL_PORT_TEMPO:-3200}:3200"
   prometheus:
     image: prom/prometheus:v3.11.2
     command:
@@ -81,7 +92,7 @@ services:
     volumes:
       - ./extra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "${LCL_PORT_PROMETHEUS:-9090}:9090"
   grafana:
     image: grafana/grafana:12.4
     environment:
@@ -90,7 +101,7 @@ services:
     volumes:
       - ./extra/monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     ports:
-      - "3000:3000"
+      - "${LCL_PORT_GRAFANA:-3000}:3000"
     depends_on:
       - prometheus
       - loki

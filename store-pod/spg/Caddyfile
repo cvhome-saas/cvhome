@@ -31,7 +31,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://content.{$NAMESPACE}:8121
+        reverse_proxy http://content.{$NAMESPACE}:{$LCL_PORT_CONTENT:8121}
     }
 
     handle_path /merchant* {
@@ -42,7 +42,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://merchant.{$NAMESPACE}:8120
+        reverse_proxy http://merchant.{$NAMESPACE}:{$LCL_PORT_MERCHANT:8120}
     }
 
     handle_path /inventory* {
@@ -53,7 +53,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://inventory.{$NAMESPACE}:8126
+        reverse_proxy http://inventory.{$NAMESPACE}:{$LCL_PORT_INVENTORY:8126}
     }
 
     handle_path /catalog* {
@@ -64,7 +64,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://catalog.{$NAMESPACE}:8122
+        reverse_proxy http://catalog.{$NAMESPACE}:{$LCL_PORT_CATALOG:8122}
     }
 
     handle_path /checkout* {
@@ -75,7 +75,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://checkout.{$NAMESPACE}:8123
+        reverse_proxy http://checkout.{$NAMESPACE}:{$LCL_PORT_CHECKOUT:8123}
     }
 
     handle /cua* {
@@ -86,7 +86,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://cua.{$NAMESPACE}:8124 {
+        reverse_proxy http://cua.{$NAMESPACE}:{$LCL_PORT_CUA:8124} {
             header_up X-Forwarded-Prefix /cua
         }
     }
@@ -99,7 +99,7 @@
             response X-Trace-Id {http.vars.trace_id}
             response X-Span-Id {http.vars.span_id}
         }
-        reverse_proxy http://payment.{$NAMESPACE}:8125
+        reverse_proxy http://payment.{$NAMESPACE}:{$LCL_PORT_PAYMENT:8125}
     }
 
 
@@ -116,7 +116,7 @@
             cache_ttl  {$DOMAIN_LOOKUP_TTL:5m}
         }
 
-        reverse_proxy http://landing-ui.{$NAMESPACE}:8110
+        reverse_proxy http://landing-ui.{$NAMESPACE}:{$LCL_PORT_LANDING_UI:8110}
     }
     
 }

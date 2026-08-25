@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Local stack runner. See `lcl --help` and extra/lcl/README.md.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+exec node --disable-warning=ExperimentalWarning "$ROOT/extra/lcl/src/main.ts" --root "$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || echo "$ROOT")" "$@"

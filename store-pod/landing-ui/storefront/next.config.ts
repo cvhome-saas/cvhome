@@ -8,6 +8,8 @@ const monorepoRoot = path.join(__dirname, '..');
 
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    // extra/lcl sets NEXT_DIST_DIR per stack so two dev servers from one checkout do not share `.next`.
+    ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
     // Standalone output: the Dockerfile copies `.next/standalone` (server.js + traced node_modules).
     output: 'standalone',
     outputFileTracingRoot: monorepoRoot,

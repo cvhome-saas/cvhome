@@ -51,3 +51,6 @@ http-client.private.env.json
 /.codex/hooks.json
 **/.angular/
 /store-pod/landing-ui/.impeccable/*
+
+# per-stack Next dev output (extra/lcl sets NEXT_DIST_DIR=.next-<stack>)
+/store-pod/landing-ui/storefront/.next-*/

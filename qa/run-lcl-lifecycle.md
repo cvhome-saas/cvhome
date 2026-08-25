@@ -1,188 +1,133 @@
-# QA — local stack lifecycle script
+# QA — local stack lifecycle (`lcl`)
 
-`extra/scripts/run-lcl.sh` owns local stack startup, shutdown, targeted service recovery, logs, and pid/status
-inspection. These cases prove the script can manage the full stack and selected services without accidentally
-tearing down unrelated work.
+`extra/scripts/lcl` (source `extra/lcl`) owns local stack startup, shutdown, per-service recovery, health, logs,
+audit and isolation between named stacks. These cases prove it manages the full stack, single services, and
+several stacks at once (`--stack xxx`) without touching each other. `extra/scripts/run-lcl.sh` is a shim over the same tool.
 
-- **Scope** — `extra/scripts/run-lcl.sh`, local Docker infra, Java services, frontends
-- **Change** — local lifecycle hardening for `start`, `stop`, `restart`, `-d`, `--list`, `pid`, and `logs`
-- **Cases** — 13
+- **Scope** — `extra/scripts/lcl`, `extra/lcl/` (engine), `lcl.yml` + `extra/lcl-config/` (project), `docker-compose-lcl.yml`, `store-pod/spg/Caddyfile`
+  (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
+- **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
+- **Cases** — 14
 
-Each case is tagged:
-
-- **[verified]** — run against this branch and passed.
-- **[not verified]** — documented but not yet run end to end.
+Each case is tagged **[verified]** (run on this branch, passed) or **[not verified]**.
 
 ---
 
 ## 00 — Before you start
 
-Run from the repository root. Docker must be running, and the local hosts file should already be configured.
+Run from the repository root. Docker must be running; hosts file configured. Every command below takes
+`--stack <name>`; without it the `default` stack is meant.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh
-bash -n extra/scripts/run-lcl.sh
-bash extra/scripts/run-lcl.sh --list
+./extra/scripts/lcl doctor            # every line ✓ (a "!" about ports in use is fine)
+./extra/scripts/lcl ports             # configured ports from lcl.yml
 ```
 
-Use these probes while testing:
+Probes:
 
 ```bash
-bash extra/scripts/run-lcl.sh pid
-bash extra/scripts/run-lcl.sh --list
-lsof -nP -iTCP:8125 -sTCP:LISTEN
-lsof -nP -iTCP:8010 -sTCP:LISTEN
-docker compose -f docker-compose-lcl.yml ps
+./extra/scripts/lcl status
+./extra/scripts/lcl list
+./extra/scripts/lcl events | tail
+docker compose ls                     # one project per stack: lcl-<stack>
+lsof -nP -iTCP:8122 -sTCP:LISTEN
 ```
 
-Stop the stack through the script, not with manual `kill`:
-
-```bash
-bash extra/scripts/run-lcl.sh stop
-```
+Stop through the tool (`lcl stop`), never with a manual `kill`.
 
 ---
 
-## FUL — Full stack lifecycle
+## 01 — Ports and services come from `lcl.yml` [verified]
 
-### FUL-01 — Foreground start opens the whole stack · critical · [verified]
+- **Steps** — `lcl ports`; temporarily change `catalog`'s `port:` in `lcl.yml`; `lcl ports` again; revert.
+- **Expect** — the table lists 14 services + spg + infra with the configured ports; the changed port shows up
+  without touching the tool. `lcl doctor` validates `lcl.yml` (runnable services, `after` references, templates, hooks).
 
-- **Setup** — no recorded stack is running.
-- **Steps** — run `bash extra/scripts/run-lcl.sh start` in terminal 1.
-- **Expect** — infra starts, Java services start in dependency order, frontends start, and `pid` shows a
-  supervisor plus service pids. Expected key ports include `8000`, `8001`, `8020`, `8021`, `8022`, `8010`,
-  `8011`, `8110`, `8120`, `8121`, `8122`, `8123`, `8124`, and `8125`.
-- **Seen** — foreground supervisor `73983`; `payment` `74574`, `gateway` `74328`, `catalog` `74473`,
-  `seller-ui` `74640`; all expected services reached their ports.
+## 02 — Full start in the background, health, urls [verified]
 
-### FUL-02 — Full stop cleans services, logs, pids, and volumes · critical · [verified]
+- **Steps** — `lcl start -d --parallel 3`.
+- **Expect** — infra `minio postgres spg` up under project `lcl-default`; every service reported `up on :<port>`
+  as it becomes healthy; the final `status` table shows 14 × `up` with `UP` health for Java services;
+  `lcl urls` prints `http://gateway.com:8000`, the storefront, minio, postgres. `curl -sI http://gateway.com:8000/`
+  → 200 and `curl -sL http://org1-store1.spg-507f1f77.gateway.com/` → 200.
 
-- **Setup** — FUL-01 is running.
-- **Steps** — from terminal 2, run `bash extra/scripts/run-lcl.sh stop`.
-- **Expect** — terminal 1 exits cleanly. `--list` reports stopped services, `build/lcl-runtime/services` is
-  gone, `build/lcl-logs` is gone, key service ports are closed, and compose containers/volumes are removed.
-- **Seen** — `--list payment gateway catalog seller-ui` reported stopped, `docker compose ... ps` was empty,
-  ports `8000`, `8010`, `8122`, and `8125` were closed, and runtime/log paths were removed.
+## 03 — Foreground start and Ctrl-C [verified]
 
-### FUL-03 — Detached start returns only after requested ports are ready · high · [not verified]
+- **Steps** — `lcl stop`; `lcl start uaa --infra postgres` in a terminal; wait for `uaa up`; press Ctrl-C.
+- **Expect** — the supervisor prints transitions live, then `shutting down` … `all stopped`; `lcl status` says
+  `supervisor stopped`; `docker compose ls` has no `lcl-default` project; `:8001` free.
 
-- **Setup** — no recorded stack is running.
-- **Steps** — run `bash extra/scripts/run-lcl.sh start -d`, then immediately run `pid` and `--list`.
-- **Expect** — the command returns after ports are open. `build/lcl-stack.log` exists, the supervisor keeps
-  running in the background, and `stop` still performs full cleanup.
-- **Seen** — in the Codex command runner, `start -d` returned `ready. supervisor 72102`, but the runner later
-  reaped the background supervisor. Re-run manually in a normal terminal before marking verified.
+## 04 — Stop whole stack [verified]
 
-### FUL-04 — Full detached restart replaces the full stack · high · [not verified]
+- **Steps** — with a running stack, `lcl stop`.
+- **Expect** — services stopped in reverse order, containers down (volumes kept), registry entry removed,
+  `events` ends with `instance.stopped`. `lcl stop --hard` additionally runs `compose down -v`.
 
-- **Setup** — full stack is running.
-- **Steps** — record the supervisor pid, run `bash extra/scripts/run-lcl.sh restart -d`, then run `pid`.
-- **Expect** — the old supervisor is gone, a new supervisor is recorded, services reopen their ports, and logs
-  are fresh for the restarted stack.
+## 05 — Restart whole stack [verified]
 
----
+- **Steps** — `lcl restart -d`.
+- **Expect** — old supervisor gone, new supervisor pid, all services `up`, same ports.
 
-## SEL — Selected service lifecycle
+## 06 — Stop / start / restart one service [verified]
 
-### SEL-01 — Stop one Java service without killing the stack · critical · [verified]
+- **Steps** — `lcl stop payment`; `lcl status`; `lcl start payment`; `lcl restart payment`.
+- **Expect** — only payment changes state (`stopped` → `up`), new pid each time, other services keep their
+  pids and uptime; `events` shows `service.stopping/stopped/starting/up` for payment only; infra untouched.
 
-- **Setup** — full stack is running. Record supervisor, `payment`, `gateway`, and `catalog` pids.
-- **Steps** — run `bash extra/scripts/run-lcl.sh stop payment`.
-- **Expect** — only `payment` stops. Port `8125` closes, `pid payment` reports stopped, the supervisor pid is
-  unchanged, and unrelated ports such as `8000` and `8122` remain open.
-- **Seen** — `stop payment` closed `8125`; supervisor stayed `73983`; `gateway` stayed `74328`, `catalog`
-  stayed `74473`, and `seller-ui` stayed `74640`.
+## 07 — Crash isolation and `why` [verified]
 
-### SEL-02 — Start one stopped Java service with `-d` from another terminal · critical · [verified]
+- **Steps** — `kill -9 $(lsof -t -iTCP:8125 -sTCP:LISTEN)`; wait 5 s; `lcl status`; `lcl why payment`.
+- **Expect** — payment `crashed` with the exit reason, every other service still `up` (the stack does **not**
+  come down); `why` shows exit code/signal, `port :8125 is free`, the exact command, `LCL_*` env and the last
+  error lines. `lcl start payment` brings it back.
 
-- **Setup** — SEL-01 has left `payment` stopped while the foreground supervisor still runs.
-- **Steps** — run `bash extra/scripts/run-lcl.sh start -d payment`.
-- **Expect** — the command returns after `payment` is ready, port `8125` opens, `payment` has a new pid, and the
-  main foreground terminal does not shut down the rest of the stack.
-- **Seen** — `start -d payment` returned `ready: payment`; `payment` reopened as pid `75191`, then later
-  `75817` in the `port-used` case; supervisor and unrelated service pids stayed stable.
+## 08 — `--fail-fast` and `--restart` [not verified]
 
-### SEL-03 — Restart one Java service only · critical · [verified]
+- **Steps** — `lcl start -d uaa tenancy --fail-fast --infra postgres`; kill tenancy's JVM. Then
+  `lcl start -d uaa --restart on-failure:2 --infra postgres`; kill uaa's JVM.
+- **Expect** — first: the whole stack shuts down (old behaviour). Second: `service.restart-scheduled` then
+  `service.up` again; after the 2nd crash no further restart.
 
-- **Setup** — full stack is running and `payment` is healthy.
-- **Steps** — record `payment`, `gateway`, and `catalog` pids; run
-  `bash extra/scripts/run-lcl.sh restart payment`.
-- **Expect** — `payment` pid changes and port `8125` reopens. `gateway` and `catalog` pids remain stable.
-- **Seen** — after routing selected restart through the supervisor, `restart payment` replaced `75191` with
-  `75306`; `gateway` stayed `74328`, `catalog` stayed `74473`, and `seller-ui` stayed `74640`.
+## 09 — Second stack runs concurrently on a shifted sequence [verified]
 
-### SEL-04 — Stop and restart one frontend only · high · [verified]
+- **Steps** — with the default stack running: `lcl start -d --parallel 4 --stack xxx`.
+- **Expect** — the start warns which ports are in use and shifts: `offset +1000` (or the next free one — +1000
+  is skipped when the default stack's minio 9000 collides with a +1000 gateway), compose project `lcl-xxx`,
+  `docker compose ls` shows both projects, `lcl list` shows both stacks with their gateway ports. Gradle runs with
+  `--project-cache-dir build/lcl/xxx/gradle` and landing-ui with `.next-xxx`, so the same checkout serves both. Login
+  redirect from `http://gateway.com:<gw-b>/oauth2/authorization/uaa` targets `uaa.gateway.com:<uaa-b>` with
+  `redirect_uri=http://gateway.com:<gw-b>/…` (the seeded `web-app` client was patched — `events` has
+  `uaa.redirects.patched`). `curl -sL http://org1-store1.spg-507f1f77.gateway.com:<spg-b>/` → 200 with the
+  store's title (Caddy dials landing-ui on the shifted port; domain lookup works with a port in `Host`).
 
-- **Setup** — full stack is running and `seller-ui` is healthy.
-- **Steps** — run `bash extra/scripts/run-lcl.sh stop seller-ui`, then
-  `bash extra/scripts/run-lcl.sh start -d seller-ui`.
-- **Expect** — port `8010` closes and reopens, `seller-ui` receives a new pid, and Java services remain
-  running.
-- **Seen** — `seller-ui` stopped from `74640`, `8010` closed, then `start -d seller-ui` reopened it as pid
-  `75640`; `gateway` and `payment` stayed running.
+## 10 — Stopping one stack leaves the other alone [verified]
 
----
+- **Steps** — `lcl stop --stack xxx`; `lcl status`.
+- **Expect** — xxx's containers and processes gone, xxx removed from `lcl list`; the default stack still 14 × `up`
+  with unchanged pids.
 
-## STA — Status, logs, and rejected commands
+## 11 — Port policy flags [verified: offset=1; not verified: configured]
 
-### STA-01 — `--list` reports running, stopped, and port-used states · high · [verified]
+- **Steps** — with the default stack running: `lcl start -d uaa --ports configured --infra postgres --stack yyy`
+  and `lcl start -d uaa --ports offset=1 --infra postgres --stack yyy`.
+- **Expect** — `configured` fails fast listing the busy ports; `offset=1` forces uaa on 9001 / postgres on 6432
+  (or fails listing what holds them).
 
-- **Setup** — full stack is running.
-- **Steps** — check `--list`; stop `payment` and check again. For `port-used`, stop the stack, bind a test
-  process to `8125`, then run `bash extra/scripts/run-lcl.sh --list payment`.
-- **Expect** — running services show `running <pid>`, stopped services show `stopped`, and an externally held
-  port shows `port-used <pid>`.
-- **Seen** — running rows showed pids, stopped `payment` showed `stopped`, and a temporary `nc -l 8125`
-  listener showed `payment        port-used 75782`.
+## 12 — Logs and events [verified]
 
-### STA-02 — `pid` reports supervisor and selected service pids · high · [verified]
+- **Steps** — `lcl logs payment -n 20`; `lcl logs --errors`; `lcl logs payment -f` (Ctrl-C); `lcl events --service payment`.
+- **Expect** — lines from `build/lcl/logs/payment.log`; only `ERROR|Exception|Caused by` lines across services;
+  live tail; the payment event history.
 
-- **Setup** — full stack is running.
-- **Steps** — run `bash extra/scripts/run-lcl.sh pid` and `bash extra/scripts/run-lcl.sh pid payment`.
-- **Expect** — the first command includes supervisor and service pid rows; the selected command reports only
-  `payment`.
-- **Seen** — `pid payment` reported `payment        75306 running` while payment was up.
+## 13 — Orphan recovery [verified]
 
-### STA-03 — `logs` tails existing selected logs · [verified]
+- **Steps** — `kill -9 <supervisor pid>` from `lcl status`; `lcl status`; `lcl stop`.
+- **Expect** — `status` reports the supervisor as not answering; `stop` kills the recorded service processes,
+  sweeps only this stack's ports, brings the compose project down and clears the registry.
 
-- **Setup** — full stack is running and `payment` has started at least once.
-- **Steps** — run `bash extra/scripts/run-lcl.sh logs payment`, then stop the tail with `Ctrl-C`.
-- **Expect** — the command tails `build/lcl-logs/payment.log` and does not affect the running service.
-- **Seen** — a bounded tail of `logs payment` produced output and exited after the test killed only the tail
-  process.
+## 14 — Compatibility shim [verified: --list, pid; not verified: start/stop through the shim]
 
-### STA-04 — Invalid selected-service volume operations are refused · high · [verified]
-
-- **Steps** — run `bash extra/scripts/run-lcl.sh stop --volumes payment` and
-  `bash extra/scripts/run-lcl.sh restart --volumes payment`.
-- **Expect** — both commands exit non-zero with a clear message that `--volumes` cannot be used with selected
-  services.
-- **Seen** — both commands exited `1` with the expected refusal messages.
-
-### STA-05 — Unknown service names are refused · high · [verified]
-
-- **Steps** — run `bash extra/scripts/run-lcl.sh start -d missing-service`,
-  `bash extra/scripts/run-lcl.sh stop missing-service`, and
-  `bash extra/scripts/run-lcl.sh restart missing-service`.
-- **Expect** — each exits non-zero with `unknown service: missing-service`.
-- **Seen** — all three unknown-service commands exited `1` with `unknown service: missing-service`.
-
----
-
-## REG — Regression watchlist
-
-| Regression | How it looks | Covered by |
-|---|---|---|
-| `start -d payment` kills the foreground full stack | terminal 1 shuts down all services after terminal 2 starts payment | SEL-02 |
-| Targeted restart leaves the port closed | `payment` pid changes or disappears, but `8125` never reopens | SEL-03 |
-| Targeted stop deletes full logs or runtime state | unrelated service pids disappear after `stop payment` | SEL-01 |
-| `--list` hides useful status | output lacks `running <pid>`, `stopped`, or `port-used <pid>` | STA-01 |
-| Selected restart starts from the short-lived command shell | service briefly opens its port, then disappears after the command exits | SEL-03 |
-
-## 99 — Known gaps
-
-- Full stack startup can fail for service-level reasons unrelated to this script, such as a database migration
-  or app boot failure. In that case, attach `build/lcl-logs/<service>.log` and `build/lcl-stack.log`.
-- `logs` is intentionally a following tail. Stop it with `Ctrl-C`; that should not stop the stack.
-
-Attach the exact command, terminal output, and relevant files from `build/lcl-logs/` when raising a finding.
+- **Steps** — `./extra/scripts/run-lcl.sh --list`, `./extra/scripts/run-lcl.sh start -d uaa --no-infra`,
+  `./extra/scripts/run-lcl.sh pid`, `./extra/scripts/run-lcl.sh stop`.
+- **Expect** — each prints the `lcl` command it forwards to and behaves like it (`--list` → `ports`, `pid` → `status`).
