@@ -3288,3 +3288,83 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
   it is a shopper localStorage key, and renaming it would empty every live cart.
 - **What this file is now:** the record of what the platform could not do when the console was
   built, entry by entry. The migration is over; the gaps are not. New entries keep the same format.
+
+## Module 14 — billing, put under test
+
+> **Shipped.** Billing went from 9.8 % / 11.1 % / 19.6 % (unit / integration / merged line coverage)
+> to 86.5 % / 60.8 % / 91.8 %. What follows is what the tests found, because four of the six items
+> were bugs no screen would have reported and one of them was losing money on the operator's own
+> revenue chart.
+
+- **Every first-time-paid invoice was missing from platform revenue.** `WebhookApplyServiceImpl
+  .recordInvoice` built a new row with `SubscriptionInvoiceEntity.record`, which writes no `paid_at`;
+  only the *update* branch called `settled(...)`. `SubscriptionInvoiceRepository.revenueStatistic`
+  sums `where status = 'PAID' and paid_at >= :from`, so an invoice was counted only if it had been
+  seen as `OPEN` first — that is, only a renewal that failed and then succeeded. Every renewal that
+  succeeded on its first delivery, which is nearly all of them, was absent from
+  `/platform/billing` → Overview. Fixed by settling the new row too.
+- **`resume` could leave Stripe changed and the local row untouched.** `SubscriptionServiceImpl
+  .resume` guards on "cancelled **or** a pending downgrade", then called
+  `revokeScheduledCancel()` unconditionally — and that method refuses a subscription that was never
+  cancelled. So resuming a store that had only a scheduled downgrade released the schedule at
+  Stripe, set renewal at Stripe, and *then* threw 422: exactly the leave-the-provider-changed failure
+  the ordering above it exists to prevent. Second half of the same bug: the local
+  `pending_plan_price_id` was never cleared, so the console kept showing a downgrade the customer had
+  undone and `ApplyPendingPlanChangesJob` would eventually apply it. Now
+  `StoreSubscriptionEntity.revokePendingChange()` clears the local half, and the cancel flag is
+  revoked only when it is set.
+- **The public Stripe webhook answered 500 to two things anyone could send.** `Webhook.constructEvent`
+  touches the request before it validates it: `Signature.getTimestamp` calls `sigHeader.split`, so a
+  POST with no `Stripe-Signature` was a `NullPointerException`; and it deserialises the payload
+  *before* verifying, so a body that is not JSON came back as an unchecked `JsonSyntaxException`.
+  Both became 500s on an unauthenticated endpoint — and 5xx is precisely what tells Stripe to
+  redeliver, so the noise compounds. Both are now the 400 the endpoint already had a branch for.
+  **This is the same defect payment's `StripeProcessor` carried**; a second provider integration
+  reproduced it independently, which is the argument for the shared verifier this platform does not
+  have.
+- **`ListSubscriptionQuery.blockedOnly` as a primitive made the operator's default screen
+  unrequestable.** This amends the `blockedOnly` entry above. The flag being "a named boolean rather
+  than a status list" is right, but it was declared `boolean`, and Jackson refuses to map an absent
+  or null value onto a primitive — so `{}` and `{"status":"ACTIVE"}` were both 400s with
+  `COMMON.MALFORMED_REQUEST` and nothing naming the field. Nobody noticed because
+  `platform-billing.service.ts` sends `blockedOnly: query.blockedOnly === true` on every call, and
+  `PlatformBillingServiceImpl` already built a filter with it false when the whole body was absent —
+  two places assuming an omitted flag was legal. Now boxed with a compact constructor defaulting to
+  false. **The lesson worth keeping:** on a filter DTO where every other field is optional, a
+  primitive is a required field in disguise, and only a client that happens to always send it hides
+  that.
+- **`ExternalEntitlementApi.private/snapshot` has no store boundary, and that is not obvious from
+  reading it.** It takes a `?store=` and is gated on `STORE-CORE.BILLING.ENTITLEMENT-READ`, which
+  `PermissionAccessChecker` grants to anything carrying the `store_pod` scope — and every staff token
+  carries it. So a store admin can read *any* store's snapshot: its plan code, whether it is operable,
+  and its ceilings. The widening is deliberate (the pods enforce these ceilings and billing is
+  store-core, so routing through `isScopeStorePod` denied every pod that asked) and the payload
+  carries nothing a store's own `subscription/current` would not. But the `store` parameter reads
+  like a boundary and is not one. Recorded rather than changed:
+  `ExternalBillingApiIntegrationTest.theSnapshotIsDeliberatelyWide` pins the behaviour so a future
+  reader meets it as a decision instead of an accident.
+- **`Tokens.orgAdmin` in `store-commons/test-support` cannot be used for org-scoped assertions.** It
+  mints the `store_core` scope, and `SecurityUtils.getOrgStoreIdentity` checks scope *before* role —
+  so that principal resolves to "platform-wide, no org", `SubscriptionApi.tenantScopeOf` hands the
+  service a null tenant scope, and the org predicate drops out of every query. A cross-org isolation
+  test written with it passes whether or not the boundary exists, which is worse than having no test.
+  Billing's integration tests mint the realistic shape themselves (`ROLE_ORG_ADMIN` + `store_pod` +
+  the `org` claim) in `BillingApiSupport.orgAdmin`, and the boundary was verified by removing it: all
+  five cross-org cases fail. **The lesson worth keeping:** a negative test is only worth what its
+  failure mode is worth — if you cannot make it fail on demand, it is decoration.
+- **A test fixture encrypted with a key that only exists on one laptop passes only on that laptop.**
+  Payment's `everySeededConfigurationComesBackWithItsSecretsDecrypted` read a seeded `ENC:1:…` row
+  and asserted it came back as plaintext. `SecretCryptoAutoConfiguration` resolves a local key by
+  priority — `COM_ASREVO_CVHOME_CRYPTO_KEY`, then `~/.cvhome/secret-crypto/keys`, then a **RANDOM**
+  key with a warning — so CI got a fresh key per JVM, the envelope could not decrypt, and
+  `PaymentConfigurationMapper.decrypt` swallowed the failure and returned null, which the API
+  rendered as `""`. Green locally, red on CI, for a month. The `test-stores` profile now pins a
+  STATIC key that lives in the repository and every seeded envelope is re-encrypted under it.
+  **Watch for it elsewhere:** `store-pod/cua`'s seed rows carry `ENC:1:…` envelopes under the same
+  arrangement and nothing asserts their plaintext yet.
+- **What is still not covered, deliberately.** `StripeCredentials`' decryption path (needs
+  `secret-crypto` wiring and is `config/*`-excluded from the coverage gate), and the timezone
+  question `BillingStatisticApi` documents in its own Javadoc — `date()` resolves in the database
+  session's timezone, so a payment at 23:50 local lands on the previous day for an operator
+  elsewhere. Doing it properly means an `AT TIME ZONE` parameter on both dated queries; no test pins
+  a timezone-dependent bucket, so that change is still free to make.
