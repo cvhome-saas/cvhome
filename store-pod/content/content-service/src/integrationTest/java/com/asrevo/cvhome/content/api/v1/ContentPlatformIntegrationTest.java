@@ -26,6 +26,7 @@ import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.CONTENT;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ID;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.PRIVATE;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ROLE_STORE_ADMIN;
+import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.ROLE_STORE_MODERATOR;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.STATUS;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.STOREFRONT;
 import static com.asrevo.cvhome.content.api.v1.ApiTestSupport.TITLE;
@@ -52,6 +53,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         "com.asrevo.cvhome.content.scheduler.initial-delay=PT24H",
         "com.asrevo.cvhome.content.scheduler.delay=PT24H"})
 class ContentPlatformIntegrationTest {
+
+    private static final String FOLDERS2 = "folders";
+
+    private static final String FILECOUNT = "fileCount";
 
     private static final String STORE = "65f023632bc46470c104b76f";
 
@@ -106,6 +111,16 @@ class ContentPlatformIntegrationTest {
     private static final String ORDERING = "ordering";
 
     private static final String PIXEL_PNG = "pixel.png";
+
+    private static final String FOLDERS = FOLDERS2;
+
+    private static final String CAMPAIGN_KEY = "campaign-shots";
+
+    private static final String USED_QUERY = "used=true";
+
+    private static final String UNUSED_QUERY = "used=false";
+
+    private static final String OTHER_STORE = com.asrevo.cvhome.testsupport.security.Tokens.STORE_2;
 
     private static final String ABOUT_US = "about-us";
 
@@ -188,6 +203,22 @@ class ContentPlatformIntegrationTest {
         return String.format("<p>%s</p>", word.repeat(times));
     }
 
+    private static java.util.List<Long> ids(ResponseEntity<String> response) {
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        json(response).get(CONTENT).forEach(row -> out.add(row.get(ID).asLong()));
+        return out;
+    }
+
+    /**
+     * A distinct 1x1 PNG per call: the library deduplicates on the sha-256 of the bytes, so two tests that upload
+     * the identical pixel would be handed the same asset.
+     */
+    private static byte[] pngOf(int seed) {
+        byte[] bytes = java.util.Arrays.copyOf(PNG, PNG.length + 1);
+        bytes[PNG.length] = (byte) seed;
+        return bytes;
+    }
+
     // ------------------------------------------------------------------------------------------------ media
 
     @Test
@@ -217,7 +248,7 @@ class ContentPlatformIntegrationTest {
         assertThat(json(svg).get(0).get(KIND).asString()).isEqualTo("VECTOR");
 
         // folders exist by default, list filters
-        assertThat(json(get(path(MEDIA, "folders"))).size()).isGreaterThanOrEqualTo(5);
+        assertThat(json(get(path(MEDIA, FOLDERS2))).size()).isGreaterThanOrEqualTo(5);
         assertThat(json(get(query(MEDIA, "kind=IMAGE"))).get(CONTENT).size()).isGreaterThanOrEqualTo(1);
 
         // reference it from a post, then deleting is a 409 until forced
@@ -244,7 +275,71 @@ class ContentPlatformIntegrationTest {
         expect(send(HttpMethod.DELETE, query(path(MEDIA, id), "force=true"), null), HttpStatus.NO_CONTENT);
         expect(get(path(MEDIA, id)), HttpStatus.NOT_FOUND);
         JsonNode summary = json(get(path(PRIVATE, "summary")));
-        assertThat(summary.get(MEDIA_SEGMENT).get("fileCount").asLong()).isGreaterThanOrEqualTo(1);
+        assertThat(summary.get(MEDIA_SEGMENT).get(FILECOUNT).asLong()).isGreaterThanOrEqualTo(1);
+    }
+
+    /**
+     * The library's own screen: the console filters by folder, by free text and by "used / unused", and moves or
+     * renames folders. Those filters are a criteria sub-query, so only a real query proves them.
+     */
+    @Test
+    void mediaLibraryFiltersByFolderTextAndUsageAndMovesFolders() {
+        var created = send(HttpMethod.POST, path(MEDIA, FOLDERS), """
+                {"name":"Campaign shots","position":50}""");
+        expect(created, HttpStatus.CREATED);
+        long folderId = json(created).get(ID).asLong();
+        assertThat(json(created).get(KEY).asString()).isEqualTo(CAMPAIGN_KEY);
+
+        var upload = api.upload(query(scoped(MEDIA, STORE), String.format("folderId=%d", folderId)), admin,
+                "campaign-hero.png", pngOf(2));
+        expect(upload, HttpStatus.CREATED);
+        long assetId = json(upload).get(0).get(ID).asLong();
+
+        // by folder, by free text on the filename, and by "not used anywhere yet"
+        assertThat(ids(get(query(MEDIA, String.format("folder=%d", folderId))))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, "q=CAMPAIGN")))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, UNUSED_QUERY)))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, USED_QUERY)))).doesNotContain(assetId);
+
+        // referencing it from a post flips it to "used"
+        createAndPublish(POSTS, String.format("""
+                {"slug":"%s","heroMediaId":%d,
+                 "translations":[{"language":"en","title":"Campaign","body":"<p>copy</p>"}]}""",
+                slug("campaign"), assetId));
+        assertThat(ids(get(query(MEDIA, USED_QUERY)))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, UNUSED_QUERY)))).doesNotContain(assetId);
+
+        // a folder that still holds files refuses to go until its files have somewhere to move to
+        var refused = send(HttpMethod.DELETE, path(MEDIA, FOLDERS, folderId), null);
+        expect(refused, HttpStatus.CONFLICT);
+        assertThat(json(refused).get(CODE).asString()).isEqualTo("MEDIA.FOLDER.NOT_EMPTY");
+
+        var renamed = send(HttpMethod.PATCH, path(MEDIA, FOLDERS, folderId), """
+                {"name":"Campaigns","key":"campaign-shots","position":3}""");
+        expect(renamed, HttpStatus.OK);
+        assertThat(json(renamed).get("name").asString()).isEqualTo("Campaigns");
+        assertThat(json(renamed).get(FILECOUNT).asLong()).isEqualTo(1);
+
+        long fallback = json(get(path(MEDIA, FOLDERS))).get(0).get(ID).asLong();
+        expect(send(HttpMethod.DELETE, query(path(MEDIA, FOLDERS, folderId), String.format("moveTo=%d", fallback)),
+                null), HttpStatus.NO_CONTENT);
+        assertThat(json(get(path(MEDIA, assetId))).get("folderId").asLong()).isEqualTo(fallback);
+    }
+
+    @Test
+    void mediaOfAnotherStoreIsInvisibleAndAReaderCannotUpload() {
+        var upload = api.upload(scoped(MEDIA, STORE), admin, "isolated.png", pngOf(3));
+        expect(upload, HttpStatus.CREATED);
+        long assetId = json(upload).get(0).get(ID).asLong();
+
+        String otherAdmin = api.token(ROLE_STORE_ADMIN, OTHER_STORE);
+        expect(api.get(scoped(path(MEDIA, assetId), OTHER_STORE), otherAdmin), HttpStatus.NOT_FOUND);
+        assertThat(ids(api.get(scoped(MEDIA, OTHER_STORE), otherAdmin))).doesNotContain(assetId);
+
+        String reader = api.token(ROLE_STORE_MODERATOR, STORE);
+        expect(api.upload(scoped(MEDIA, STORE), reader, "denied.png", pngOf(4)), HttpStatus.FORBIDDEN);
+        expect(api.send(HttpMethod.DELETE, scoped(path(MEDIA, assetId), STORE), reader, null),
+                HttpStatus.FORBIDDEN);
     }
 
     // ---------------------------------------------------------------------------------------------- banners
