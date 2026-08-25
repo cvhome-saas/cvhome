@@ -13,10 +13,12 @@ dependencies {
     api libs.testcontainers.minio
     api libs.junit.platform.launcher
     api libs.archunit.junit5
-    api libs.spring.boot.starter.data.jpa.test
 
     compileOnly libs.spring.boot.starter.security.oauth2.resource.server
     compileOnly libs.spring.webmvc
     compileOnly libs.spring.webflux
     compileOnly libs.jackson.databind
+    // @RepositoryIntegrationTest only: a consumer adds `integrationTestImplementation libs.spring.boot.starter.data.jpa.test`.
+    // Exporting it here would auto-configure a DataSource in services that have none (the gateway).
+    compileOnly libs.spring.boot.starter.data.jpa.test
 }
