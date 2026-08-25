@@ -51,3 +51,7 @@ http-client.private.env.json
 /.codex/hooks.json
 **/.angular/
 /store-pod/landing-ui/.impeccable/*
+
+# lcl stack runner state (.lcl/<stack>/) and its per-stack Next build dirs (.next-<stack>/)
+.lcl/
+**/.next-*/

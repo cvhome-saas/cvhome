@@ -12,7 +12,7 @@
 # back at the server's default.
 #
 # Run with a super-admin session in SESSION_ID and an org1-admin session in ORG_ADMIN_SESSION_ID.
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### every subscription on the platform
 POST {{SELLER_UI_URL}}/billing/api/v1/platform/subscriptions?page=0&count=20

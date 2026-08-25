@@ -1,5 +1,5 @@
 # ManufacturerApi — com.asrevo.cvhome.catalog.api.v1.ManufacturerApi (@RequestMapping "/api/v1")
-# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+# See product-api.http for the env-var conventions. Requires a running stack: lcl start -d
 
 ### create a brand — 201, echoes the body with its id
 # @name createBrand

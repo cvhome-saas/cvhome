@@ -46,6 +46,6 @@ Each of these has already cost someone an afternoon.
 
 ## Local stack
 
-`run-lcl.sh` supervises every service and records a pid per service. Use `restart console-ui`;
+`lcl` supervises every service and records a pid per service. Use `lcl restart console-ui`;
 killing the process and starting your own `ng serve` leaves the gateway routing to an instance it no
 longer knows, which reads as "the app does not compile".

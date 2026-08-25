@@ -29,30 +29,19 @@ largest known gap is [`isOrgAdmin`](#99--known-gaps) — the pods are still perm
 
 ## 00 — Before you start
 
-### Do not run this QA under `run-lcl.sh`
+### Run this QA under `lcl`
 
-`run-lcl.sh` supervises its children and **tears the whole stack down when any one of them exits**. Most cases
-here stop a single service, so under the script the gateway dies with it and the case "fails" for a reason that
-has nothing to do with the code. This cost time twice during the build. Start the services independently:
+`lcl` can stop and restart one supervised service while the rest of the stack stays up. Most cases here stop
+one service, so use `lcl stop <service>` and `lcl restart <service>`; never kill a supervised PID directly.
 
 ```bash
-sudo ./extra/scripts/configure-domain.sh              # once per machine
-docker compose -f docker-compose-lcl.yml up -d        # infra, including the spg Caddy edge
-
-# each in its own shell, so they can be stopped individually
-./gradlew :store-core:uaa:bootRun                                --args='--spring.profiles.active=lcl,test-stores'
-./gradlew :store-core:billing:billing-service:bootRun            --args='--spring.profiles.active=lcl,test-stores'
-./gradlew :store-core:pod-registry:pod-registry-service:bootRun  --args='--spring.profiles.active=lcl,test-stores'
-./gradlew :store-core:tenancy:tenancy-service:bootRun            --args='--spring.profiles.active=lcl,test-stores'
-./gradlew :store-core:gateway:gateway-service:bootRun            --args='--spring.profiles.active=lcl,test-stores'
-./gradlew :store-pod:merchant:merchant-service:bootRun           --args='--spring.profiles.active=lcl,test-stores'
+sudo ./extra/scripts/configure-domain.sh   # once per machine
+lcl start -d
 ```
 
 Both profiles are needed: `lcl` is the environment slice, `test-stores` seeds the orgs, stores and logins.
-Stop a service with **SIGTERM** (`kill <pid>`), never `kill -9` and never Ctrl-C on a backgrounded run.
-
-> When killing one service by port, use `lsof -ti :8020 -sTCP:LISTEN`. Plain `lsof -ti :8020` also returns the
-> **gateway's** pid, because it holds a client connection — killing that list kills the gateway too.
+The commands in `lcl.yml` activate both profiles. `lcl why <service>` shows the exact command and failure
+evidence when a service does not recover.
 
 ### Signing in
 
@@ -164,7 +153,7 @@ duplicate is safe only if Spring Data JDBC was not relying on registration order
 ### RNM-03 — Nothing recreates the old schemas on boot · critical · [verified]
 
 - **Steps** — start the stack against the migrated database.
-- **Expect** — `run-lcl.sh --list` shows **tenancy** on 8020, and `\dn` still shows no `manager` / `control`.
+- **Expect** — `lcl status` shows **tenancy** up on 8020, and `\dn` still shows no `manager` / `control`.
   The store list serves the **migrated** four stores. Seed data in `tenancy` *plus* a populated `manager` schema
   means the migration was skipped — that is the silent failure above.
 
@@ -400,7 +389,7 @@ on the screen a seller uses to reach their own store.
 
 ### PDR-01 — The service is registered · [verified]
 
-`./extra/scripts/run-lcl.sh --list` → a `pod-registry … :8022` row.
+`lcl status` → a `pod-registry … :8022` row.
 
 ### PDR-02 — The gateway route is not swallowed by seller-ui · critical · [verified]
 
@@ -985,5 +974,5 @@ clean. `./gradlew test` for the whole repo has **not** been run.
 ---
 
 Raise anything unexpected against PR #271. Include the store or pod id, the time, and the matching lines from
-`build/lcl-logs/tenancy.log` or `pod-registry.log` — most of these paths are asynchronous, so the log is usually
+`.lcl/default/logs/tenancy.log` or `pod-registry.log` — most of these paths are asynchronous, so the log is usually
 the only place the real cause appears.

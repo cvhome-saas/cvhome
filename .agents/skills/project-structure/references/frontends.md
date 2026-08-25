@@ -46,7 +46,7 @@ Feature areas live under `src/app/features/`. Note this module also carries its 
 | configuration | used by | shape |
 |---|---|---|
 | `production` | `ng build` (its default), the container image | SSR — `server`, `outputMode: server`, `ssr.entry`; emits `dist/console-ui/server/` |
-| `development` | `ng serve` / `npm start` / `run-lcl.sh` | plain CSR, so HMR works |
+| `development` | `ng serve` / `npm start` / `lcl` | plain CSR, so HMR works |
 
 ### `landing-ui` specifics
 

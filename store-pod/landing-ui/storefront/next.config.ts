@@ -8,6 +8,9 @@ const monorepoRoot = path.join(__dirname, '..');
 
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    // Two lcl stacks can run this app from one checkout; each needs its own build directory or they
+    // overwrite each other's dev output. Unset (a plain `npm run dev`) keeps Next's default `.next`.
+    distDir: process.env.NEXT_DIST_DIR || '.next',
     // Standalone output: the Dockerfile copies `.next/standalone` (server.js + traced node_modules).
     output: 'standalone',
     outputFileTracingRoot: monorepoRoot,

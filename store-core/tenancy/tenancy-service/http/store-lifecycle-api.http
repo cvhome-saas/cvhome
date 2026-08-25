@@ -3,7 +3,7 @@
 # Suspend and resume are super-admin only; archive and delete belong to the store's owner. Use a super-admin
 # session for the first two.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### suspend — takes a merchant's business offline, so it is the operator's lever
 POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/suspend?store={{STORE_ID}}&reason=qa&lang={{LANG}}

@@ -7,7 +7,7 @@
 #   POST {{UAA_URL}}/oauth2/token  grant_type=client_credentials  scope=store_core
 #   client: store-core@service.store-core.internal
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### a token for the store-core service principal
 # @name s2sToken

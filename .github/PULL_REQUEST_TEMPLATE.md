@@ -41,7 +41,7 @@ Branch cut from an up-to-date `origin/develop`, merged into `develop`. Never pus
 - [ ] `./gradlew build -x test -x check` clean
 - [ ] `./gradlew test` — or the touched module's `:test` — clean (Docker up for Testcontainers)
 - [ ] Touched `-ui` module: `npm run build` clean (landing-ui: the **root** build chain, libs → templates → app)
-- [ ] Exercised against a running stack (`./extra/scripts/run-lcl.sh`) where behaviour changed
+- [ ] Exercised against a running stack (`lcl start -d`) where behaviour changed
 
 ---
 

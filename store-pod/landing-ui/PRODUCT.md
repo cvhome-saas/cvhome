@@ -63,7 +63,7 @@ primary visual material; a theme must look finished with a single image and with
 ## Evidence on Hand
 
 Demo stores seeded by the `test-stores` profile (`org1-store1.spg-507f1f77.gateway.com`, shopper
-`user`/`revo`); local stack via `./extra/scripts/run-lcl.sh`. No customer testimonials, case studies or
+`user`/`revo`); local stack via `lcl start -d`. No customer testimonials, case studies or
 benchmarks exist — do not invent them.
 
 ## Product Principles

@@ -1,5 +1,5 @@
 # ProductGroupApi + ProductRelationshipApi — com.asrevo.cvhome.catalog.api.v1 (@RequestMapping "/api/v1")
-# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+# See product-api.http for the env-var conventions. Requires a running stack: lcl start -d
 
 ### upsert a store-level group with two members — 201, echoes the body with its id
 POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups?store={{STORE_ID}}&lang={{LANG}}

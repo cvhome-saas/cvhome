@@ -37,11 +37,21 @@ services:
       - "spg-507f1f77.gateway.com:host-gateway"
     environment:
       NAMESPACE: gateway.com
-      ASK_TLS_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/ask-for-tls
-      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:80/merchant/api/v1/router/public/lookup-by-domain
+      # Upstream ports for the Caddyfile and the two self-addressed lookup URLs. Defaults keep a plain
+      # `docker compose up` on the canonical ports; lcl passes the assigned values (see lcl.yml compose.environment).
+      LCL_PORT_MERCHANT: ${LCL_PORT_MERCHANT:-8120}
+      LCL_PORT_CONTENT: ${LCL_PORT_CONTENT:-8121}
+      LCL_PORT_CATALOG: ${LCL_PORT_CATALOG:-8122}
+      LCL_PORT_CHECKOUT: ${LCL_PORT_CHECKOUT:-8123}
+      LCL_PORT_CUA: ${LCL_PORT_CUA:-8124}
+      LCL_PORT_PAYMENT: ${LCL_PORT_PAYMENT:-8125}
+      LCL_PORT_INVENTORY: ${LCL_PORT_INVENTORY:-8126}
+      LCL_PORT_LANDING_UI: ${LCL_PORT_LANDING_UI:-8110}
+      ASK_TLS_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/ask-for-tls
+      DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
       CERT_BUCKET_REGION: eu-central-1
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:${LCL_PORT_OTEL_GRPC:-4317}
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_SERVICE_NAME: spg
   otel-collector:

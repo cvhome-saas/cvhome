@@ -1,6 +1,6 @@
 ---
 name: project-structure
-description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, tenancy, console-ui), store-pod (business pods - merchant, content, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with run-lcl.sh and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like console-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, run-lcl.sh, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
+description: Map of the cvhome monorepo - every service and what it does, whether it is backend / frontend / mixed, its port, and where its code lives. Covers store-commons (shared libs), store-core (platform services - uaa, gateway, tenancy, console-ui), store-pod (business pods - merchant, content, catalog, checkout, payment, cua, spg, landing-ui), the multi-tenancy model (orgs, stores, and pods as physical per-region deployments, store provisioning, pod routing), the -commons/-core/-external-api/-service module pattern, API conventions (every endpoint takes StoreMerchantId and LanguageCode, heavy use of value objects, @PreAuthorize hasPermission authorization), encryption of tenant secrets at rest via secret-crypto, the two OAuth2 authorization servers (uaa for staff, cua for shoppers), shared configuration in store-commons/autoconfigure, database schema per service (Spring Data JDBC vs JPA, schema.sql / init-sql DDL), how every service is reachable both on its own port and as a path behind its gateway (store-core-gateway and the pod's spg/Caddy), the local docker-compose-lcl setup and the configure-domain.sh /etc/hosts script, how to run the whole stack locally with lcl (several named stacks at once) and how QA is done here (demo logins, browser-driven QA, .http API QA, tenant-isolation and permission checks, logs and traces, known local gaps), service-to-service calls via @HttpExchange -external-api clients, service discovery unified behind lb:// (Spring SimpleDiscoveryClient locally, the ecs-service-discoveryclient module over AWS Cloud Map on Fargate), managing uaa users through the uaa-client / uaa-client-impl admin SDK, domain events and the namastack transactional outbox, the landing-ui Next.js template system, and the Gradle version catalog. Includes the full step-by-step guide for creating a new landing-ui storefront template/theme, and for creating a whole new service - backend like catalog or tenancy, UI like console-ui, or one deployable serving both like uaa - covering module layout, registering it in settings.gradle and the common/lcl/fargate config files, lcl.yml, gateway/Caddy routing and permissions. Trigger when navigating the repo, adding or scaffolding a new service or module, deciding where new code belongs, tracing a dependency or request path, writing or securing an API endpoint, adding a table or column or writing DDL, storing a secret or API key, working on tenancy/pods/store provisioning or where a store's data physically lives, calling another service, creating or looking up a user account, working out what URL to hit a service on or why a request is not reaching it, adding a service to discovery or debugging instance resolution, setting up or fixing local dev domains, running the app locally or QA-ing/verifying a change end to end or reproducing a UI bug in a browser, publishing a domain event, changing a port or config, adding a dependency version, creating or designing a storefront template or theme, or asking "where is X" / "what does this module do".
 metadata:
   version: '3.2'
 ---
@@ -253,7 +253,7 @@ slices, the s2s client and the fronting gateway.
 
 Whatever the shape, the service does not exist until it is registered in **four** places —
 `settings.gradle`, `common-config.yml` (block key **must** equal `spring.application.name`), `lcl-config.yml`,
-`fargate-config.yml` — plus a row in `run-lcl.sh` and a route on its edge. For a pod service that is a
+`fargate-config.yml` — plus a service block in `lcl.yml` and a route on its edge. For a pod service that is a
 `store-pod/spg/Caddyfile` block; **for any `store-core/` service — backend, UI or both — it is
 `GatewayRouteLocatorImpl`, and the name must go in its `backendServices` array as well as getting a
 `.route(...)`**, because that array is negated to build console-ui's catch-all, which otherwise swallows the
@@ -265,21 +265,19 @@ your API.
 ## QA — proving a change works end to end
 
 Unit tests prove a unit; **QA proves the feature works through the path a user takes** — browser → gateway →
-uaa → pod service → database. Bring the whole stack up with **`./extra/scripts/run-lcl.sh`** (infra + every
+uaa → pod service → database. Install `@cvhome-saas/lcl` globally, then bring the whole stack up with
+**`lcl start -d`** (infra + every
 Java service + both frontends, profiles `lcl,test-stores`), sign in as the seeded `org1-admin` / `admin` on
 `http://gateway.com:8000/` or as `user` / `revo` on `http://org1-store1.spg-507f1f77.gateway.com`, and drive
 it in the browser or through the endpoint's `.http` blocks. Two things QA must show beyond the happy path:
 **tenant isolation** (repeat as a second store — it must not see the first store's data) and the
 **permission gate** (no token → 403, not an empty 200).
 
-Use `./extra/scripts/run-lcl.sh start` to bring the stack up, `stop` to tear down the recorded run,
-`stop <service...>` to stop only selected services, `restart` to replace the stack, `restart <service...>` to
-restart only selected services, `logs [service...]` to tail service logs, and `pid [service...]` to inspect the
-recorded processes. A no-argument run still means `start`.
-Full `start`, `stop`, and `restart` reset compose volumes, logs, and runtime pid files. Selected service
-start/stop/restart is scoped to the named service and keeps infra/data in place. Use `start -d` or full
-`restart -d` to return the terminal after the requested service ports open; selected `start -d <service>` asks
-the recorded supervisor to start that service without stopping the rest of the stack.
+Use `lcl start -d` to bring the stack up, `lcl status` / `lcl urls` to see it, `lcl restart <svc>` /
+`lcl stop <svc>` for one service (the rest keep running), `lcl why <svc>` and `lcl logs <svc> --errors` when
+something is wrong, and `lcl stop` to tear that stack down. Several named stacks can run at once
+(`--stack xxx`); when the configured ports are taken a stack shifts to the next free +1000 sequence
+(`lcl ports`). The engine is the public `@cvhome-saas/lcl` package; this repository owns only `lcl.yml`.
 
 **Procedure, flags, logins, browser tooling, log/trace locations, known local gaps and the checklist:
 `references/qa-testing.md`.**
@@ -304,8 +302,8 @@ See `references/frontends.md`.
 | Find a REST endpoint | the `<domain>-service` module, in `**/api/**` or `**/controller/**` |
 | Write a new endpoint | take `StoreMerchantId merchantStore` + `LanguageCode language`, add `@PreAuthorize("hasPermission(...)")`, add its block to `<service>/http/<api-class>.http` |
 | Run an endpoint by hand | `<service>/http/<api-class>.http` — or write it there if it is missing |
-| QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `./extra/scripts/run-lcl.sh` |
-| Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`run-lcl.sh start/stop/restart/logs/pid`) |
+| QA a change / reproduce a UI bug / drive the app in a browser | `references/qa-testing.md` — start with `lcl start -d` |
+| Bring the local stack up or shut it down | `references/qa-testing.md` §1 (`lcl start/stop/restart/status/logs/why`) |
 | Log in locally (seller or storefront) | `references/qa-testing.md` §2 — the `test-stores` demo accounts |
 | Add a new permission | a `case` in `CustomPermissionEvaluator` + a method on `PermissionAccessChecker` |
 | Store an API key / secret | encrypt in the mapper via `SecretCryptoProvider` — never a plaintext column |
@@ -360,7 +358,7 @@ See `references/frontends.md`.
 - `references/events-outbox.md` — aggregate roots, `@OutboxEvent`/`@OutboxHandler`, when to use events vs. calls.
 
 **Running & QA**
-- `references/qa-testing.md` — **how QA is done here**: `run-lcl.sh` and its flags, the seeded demo logins and
+- `references/qa-testing.md` — **how QA is done here**: `lcl` and its commands, the seeded demo logins and
   entry points, browser-driven QA with the Chrome tooling, API QA through the `.http` files, logs/traces/outbox
   as evidence, the known local gaps (no MinIO → broken images), the QA checklist, and where `unitTest` /
   `integrationTest` fit.

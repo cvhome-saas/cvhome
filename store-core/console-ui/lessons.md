@@ -1748,10 +1748,10 @@ behind it worth keeping.
 - **A native checkbox reads as checked when it is not.** `accent-color` tints the checked state and
   leaves the unchecked one to the platform, which against a dark theme is a solid dark square —
   indistinguishable from selected. Controls in a themed surface have to be drawn, not tinted.
-- **Never `kill` a process the stack manager is supervising.** `run-lcl.sh` records a pid per
+- **Never `kill` a process the stack manager is supervising.** `lcl` records a pid per
   service; killing `console-ui` and starting an unsupervised `ng serve` in its place left the gateway
   routing to an instance it no longer knew, which then read as "the app does not compile". The stack
-  has `restart console-ui` for exactly this, and it only works while the supervisor is alive.
+  has `lcl restart console-ui` for exactly this, and it only works while the supervisor is alive.
 - **The weight and dimension units were an invented uppercase subset.** The server enums are
   `WeightUnitOfMeasure {g, kg, l, lb, T}` and `DimensionUnitOfMeasure {cm, cu, ft, in, m}` — lowercase
   bar the ton. This console declared `['KG','LB']` and `['CM','IN']`, so the value never matched what

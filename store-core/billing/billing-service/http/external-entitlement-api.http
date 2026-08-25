@@ -6,7 +6,7 @@
 # it carries nothing that store's own /subscription/current does not — but not the batch or the blocked
 # list, which span orgs.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### one store's standing and ceilings
 GET {{SELLER_UI_URL}}/billing/api/v1/entitlement/private/snapshot?store={{STORE_ID}}

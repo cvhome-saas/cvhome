@@ -1,5 +1,5 @@
 # ProductImageApi — com.asrevo.cvhome.catalog.api.v1.ProductImageApi (@RequestMapping "/api/v1")
-# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+# See product-api.http for the env-var conventions. Requires a running stack: lcl start -d
 
 ### upload one image to product 1 — 201; the first image of a product becomes its default
 POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1/image?store={{STORE_ID}}&lang={{LANG}}&order=0

@@ -53,9 +53,11 @@ gateway 503s.**
 
 Then make it reachable and runnable:
 
-- **`extra/scripts/run-lcl.sh`** — add a row to `JAVA_SERVICES` (`name|:gradle:module:path|port`) or
-  `NODE_SERVICES` (`name|dir|npm-script|port|prebuild-scripts`). Order in `JAVA_SERVICES` is startup order;
-  `uaa` must stay first. Without a row the service simply never starts locally.
+- **`lcl.yml`** (repo root) — a service block copied from a neighbour: a foreground `command`, a named `http`
+  port equal to the `common-config.yml` one, `depends-on: [uaa, postgres]` (plus `minio` for a pod service) and
+  the shared `*spring-health` anchor. Without a block the service simply never starts locally. A pod service
+  also needs its `LCL_PORT_<NAME>` line under `compose.environment`, so spg's Caddyfile can reach it on a
+  shifted stack. `lcl validate` checks the file, `lcl doctor` checks the machine.
 - **`extra/scripts/configure-domain.sh`** — a `127.0.0.1 <name>.gateway.com` line if the service gets its own
   local hostname; users must re-run it with `sudo`.
 - **Routing** — a `store-pod/` service gets a block in `store-pod/spg/Caddyfile`; **a `store-core/` service of
@@ -269,8 +271,8 @@ plain `docker build .`. So the module **must contain a `Dockerfile`** — consol
 `dist/`, `CMD node server/server.mjs`, `EXPOSE 8011`.
 
 Requirements the plugin imposes on `package.json`: a `build` script, and a `dev` script if you want
-`gradle bootRun` (console-ui only has `start`, which is why `run-lcl.sh` names the script per row —
-`console-ui|store-core/console-ui|start|8011|`).
+`gradle bootRun` (console-ui only has `start`, which is why `lcl.yml` spells the command out —
+`command: [npm, run, start, --, --port, "${port.console-ui.http}"]`).
 
 Register it in the four config files exactly like a backend — a UI service is discovered via `lb://` too
 (`GatewayRouteLocatorImpl` routes to `lb://console-ui`), so it needs the `common-config` block, the
@@ -334,7 +336,7 @@ that service's own data). Anything a user navigates to as a product surface belo
 [ ] common-config.yml: services.<name> block, key == spring.application.name, free port
 [ ] lcl-config.yml: simple discovery instance
 [ ] fargate-config.yml: eager-load client + service-ports entry
-[ ] run-lcl.sh: JAVA_SERVICES or NODE_SERVICES row (right startup position)
+[ ] lcl.yml: service block (command, ports, depends-on, health) + compose.environment LCL_PORT_<NAME> for a pod service
 [ ] Routing, pod: spg Caddyfile block placed BEFORE the landing-ui catch-all,
     + the hostname in spg's extra_hosts in docker-compose-lcl.yml
 [ ] Routing, core (BE, FE or both): GatewayRouteLocatorImpl route with
@@ -349,5 +351,5 @@ that service's own data). Anything a user navigates to as a product surface belo
 [ ] FE: app.sub entry if it is browser-facing behind uaa login
 [ ] Versions via libs.versions.toml only
 [ ] ./gradlew checkstyleMain checkstyleTest && ./gradlew build -x test -x check clean
-[ ] ./extra/scripts/run-lcl.sh start --list shows it; a real run starts it
+[ ] lcl validate is clean and lcl doctor is green; a real `lcl start -d` starts it
 ```

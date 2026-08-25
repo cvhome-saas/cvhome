@@ -4,7 +4,7 @@
 # service-to-service by checkout with an s2s token, so the seller session below only works because the
 # permission maps to same-pod access. See inventory-api.http for the env-var conventions.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### reserve stock for a ref
 POST {{SELLER_UI_URL}}/spg/inventory/api/v1/private/reserve/http-demo-ref-1?store={{STORE_ID}}&lang={{LANG}}

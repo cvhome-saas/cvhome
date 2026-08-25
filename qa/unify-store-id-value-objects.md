@@ -36,7 +36,7 @@ and a pod's JPA column with no conversion anywhere.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
-./extra/scripts/run-lcl.sh                      # background it; stop with SIGTERM, never SIGINT
+lcl start -d             # stop later with `lcl stop`
 ```
 
 Seller console `http://gateway.com:8000` — `org1-admin` / `admin`. Local seed data only.
@@ -59,7 +59,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
   "select store_id, pod_id from pod_registry.pod_store_placement;"
 
 # a converter that is still missing shows up only here, at read time
-grep -i 'ConverterNotFound' build/lcl-logs/*.log
+grep -i 'ConverterNotFound' .lcl/default/logs/*.log
 ```
 
 ---
@@ -161,7 +161,7 @@ Spring Data JDBC needs a `String → StoreMerchantId` reading converter per modu
 error, it throws `ConverterNotFoundException` the first time that column is read.
 
 **C1 [verified]** — tenancy reads stores. `POST /tenancy/api/v1/store-manager/list` → **200** with the store
-rows, and `grep -i ConverterNotFound build/lcl-logs/tenancy.log` is empty.
+rows, and `grep -i ConverterNotFound .lcl/default/logs/tenancy.log` is empty.
 
 **C2 [verified]** — billing reads `store_subscription`, whose `@Id` **is** the store id. Provisioning a store
 creates a TRIALING row; `GET /billing/api/v1/subscription/current?store=<new id>` → **200**. The response is
@@ -184,8 +184,8 @@ So the missing reading converter was **latent, not live**: it could not have thr
 converter makes the declared id type actually usable and stops the first `findById` anyone adds from failing.
 Do not go hunting for a bug it was masking; there wasn't one in production use.
 
-**C4 [verified]** — nothing regressed at startup: after a full `run-lcl.sh`,
-`grep -i 'ConverterNotFound\|Cannot deserialize\|MismatchedInput' build/lcl-logs/*.log` is empty across all ten
+**C4 [verified]** — nothing regressed at startup: after a full `lcl start -d`,
+`grep -i 'ConverterNotFound\|Cannot deserialize\|MismatchedInput' .lcl/default/logs/*.log` is empty across all ten
 services.
 
 ---
@@ -206,7 +206,7 @@ reads a `StoreCreatedEvent` payload stored in the **old** shape.
 **W2 [verified]** — the gateway ↔ billing boundary, where the shape change actually crosses a network hop.
 `StoreBillingStatusClient.refresh()` polls billing's `blockedStores()`, which now returns `["65f0…"]` instead of
 `[{"id":"65f0…"}]`. On a running stack the scheduled refresh completes with no error in
-`build/lcl-logs/gateway.log` — grep for `Could not refresh blocked stores`, which must **not** appear.
+`.lcl/default/logs/gateway.log` — grep for `Could not refresh blocked stores`, which must **not** appear.
 
 **W3 [verified]** — a non-empty blocked list is not just parsed but **honoured**. Creating stores whose
 subscription is `PENDING` grew the gateway's set (`Blocked store set changed: 0 -> 1 -> 2 -> 3` in
