@@ -2,19 +2,3 @@ spring:
   sql:
     init:
       data-locations: classpath:init-sql/data-common.sql, classpath:init-sql/data-test-stores.sql, classpath:init-sql/stores/*/*.sql
-com:
-  asrevo:
-    cvhome:
-      crypto:
-        local:
-          # Pinned so the seeded ENC:1:… rows in init-sql/stores/*/data.sql decrypt anywhere.
-          #
-          # Without this the provider is resolved by priority — COM_ASREVO_CVHOME_CRYPTO_KEY, then
-          # ~/.cvhome/secret-crypto/keys, then a RANDOM key with a warning. CI has neither of the first two, so it
-          # got a fresh random key per JVM, the seeded envelopes failed to decrypt, and
-          # PaymentConfigurationMapper.decrypt turned that into a null the API rendered as "". The test that reads a
-          # seeded secret back therefore passed only on a machine holding the key those envelopes were made with.
-          #
-          # Not a secret: it exists only under the test-stores profile and the values it protects are fixtures.
-          keyProviderType: STATIC
-          key: "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"

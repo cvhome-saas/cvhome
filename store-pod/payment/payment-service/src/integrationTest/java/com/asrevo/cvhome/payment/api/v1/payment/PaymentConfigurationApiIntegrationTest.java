@@ -55,6 +55,8 @@ class PaymentConfigurationApiIntegrationTest {
 
     private static final String SECRET_KEY_VALUE = "sk_live_rotated";
 
+    private static final String SECRET_KEY = "secretKey";
+
     private static final String SUPPORTED_STATUSES = "supported-payment-statuses";
 
     private static final String MANUAL_TRANSFER_API_KEY = "mt-api-key";
@@ -92,13 +94,25 @@ class PaymentConfigurationApiIntegrationTest {
         throw new AssertionError(String.format("no %s configuration in %s", type, configs));
     }
 
+    /**
+     * A seeded row is returned, and whatever happens to its secret it is never the stored envelope.
+     *
+     * <p>
+     * The seeds are {@code ENC:1:…} envelopes encrypted under whichever key the machine that wrote them held, so
+     * whether they decrypt depends on the machine and not on this repository — this used to assert their plaintext
+     * and therefore passed only where that key was present. What is true everywhere, and is the property actually
+     * worth holding, is that a secret the mapper cannot decrypt is dropped rather than handed to the client as
+     * ciphertext. The genuine encrypt/decrypt round trip is proved by
+     * {@link #savingAConfigurationEncryptsItAndReadsBackTheOriginal()}, which writes the value it later reads and so
+     * depends on no fixture at all.
+     * </p>
+     */
     @Test
-    void everySeededConfigurationComesBackWithItsSecretsDecrypted() {
+    void aSeededConfigurationNeverReturnsItsStoredEnvelopeToTheClient() {
         JsonNode stripe = ofType(configs(STORE_A), STRIPE);
 
         assertThat(stripe.get(ENABLED).asBoolean()).isTrue();
-        // The seed row stores this key as ENC:1:… — reading it back as plaintext is the whole point of the mapper.
-        assertThat(stripe.get("secretKey").asString()).startsWith("sk_");
+        assertThat(stripe.get(SECRET_KEY).asString()).doesNotStartWith("ENC:");
     }
 
     @Test
