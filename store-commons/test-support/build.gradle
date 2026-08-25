@@ -6,6 +6,11 @@ plugins {
     alias(libs.plugins.java.library.conventions)
 }
 
+// This module's src/main is test infrastructure, not production code: it runs from every other domain's
+// integrationTest, and that execution is recorded against those domains, never against `shared`. Counting it would
+// mean gating the coverage of test helpers.
+ext.coverageExempt = true
+
 dependencies {
     api platform("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
     api project(":store-commons:commons")

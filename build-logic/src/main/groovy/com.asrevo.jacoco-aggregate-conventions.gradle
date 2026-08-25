@@ -23,30 +23,42 @@ plugins {
 // The root is evaluated first, but the plugin lists below need every module's plugins applied already.
 subprojects.each { evaluationDependsOn(it.path) }
 
-def javaProjects = subprojects.findAll { it.plugins.hasPlugin('com.asrevo.java-common-conventions') }
+// A module may opt out entirely with `ext.coverageExempt = true`: test-support's src/main *is* test infrastructure,
+// executed thousands of times per CI run from other domains' integrationTest runs, none of which credits `shared`.
+def javaProjects = subprojects.findAll {
+    it.plugins.hasPlugin('com.asrevo.java-common-conventions') && !(it.findProperty('coverageExempt') ?: false)
+}
 def hasIntegration = { Project p -> p.plugins.hasPlugin('com.asrevo.java-integration-test-conventions') }
 
-// Classes that are wiring, not logic. Scoped to `**/config/*` on purpose: a bare `*Configuration` would drop domain
-// classes such as payment's PaymentConfiguration entity. Lombok is filtered by lombok.config (@Generated), and the
+// Classes that are wiring, not logic. Filtered by name rather than by whole package: `CustomPermissionEvaluator` is
+// 140 lines of real permission logic and lives in s2s/config/internal, so `**/config/**` wholesale would drop it.
+// The `**` before the file name matters — `*` does not cross a `/`, so `**/config/*Config.class` silently missed
+// every wiring class nested under s2s/config/internal/. Lombok is filtered by lombok.config (@Generated), and the
 // only generated mappers are MapStruct's *MapperImpl / *MappersImpl.
 def coverageExcludes = [
         '**/*Application.class', '**/*Application$*.class',
-        '**/config/*Config.class', '**/config/*Config$*.class',
-        '**/config/*Configuration.class', '**/config/*Configuration$*.class',
-        '**/config/*Configurer.class', '**/config/*Configurer$*.class',
-        '**/config/*Properties.class', '**/config/*Properties$*.class',
+        '**/config/**/*Config.class', '**/config/**/*Config$*.class',
+        '**/config/**/*Configuration.class', '**/config/**/*Configuration$*.class',
+        '**/config/**/*Configurer.class', '**/config/**/*Configurer$*.class',
         '**/config/JobScheduling.class',
+        '**/*Properties.class', '**/*Properties$*.class',
         '**/*AutoConfiguration.class', '**/*AutoConfiguration$*.class',
         '**/*MapperImpl.class', '**/*MapperImpl$*.class', '**/*MappersImpl.class', '**/*MappersImpl$*.class',
 ]
 
+// `shared` is the store-commons libraries every service depends on. `:store-pod:commons:*` is a different thing —
+// customer/reference/CMS code whose packages are literally com.asrevo.cvhome.checkout — so it reports as its own
+// domain rather than diluting the one gate that covers crypto, s2s security and the error contract.
 def domainOf = { Project p ->
     if (p.hasProperty('coverageDomain')) {
         return p.coverageDomain as String
     }
     def segs = p.path.split(':').findAll { it }
-    if (segs[0] == 'store-commons' || segs[1] == 'commons') {
+    if (segs[0] == 'store-commons') {
         return 'shared'
+    }
+    if (segs[1] == 'commons') {
+        return 'pod-commons'
     }
     return segs[1]
 }
