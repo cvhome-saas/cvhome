@@ -12,3 +12,23 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
 }
+
+// Per-domain LINE-coverage floors, one per test kind (see com.asrevo.jacoco-aggregate-conventions). Ratchet: run
+// `./gradlew printDomainCoverage`, bump a domain's floors to what it now achieves (rounded down to 0.01); never lower.
+// Target: merged 0.85 everywhere. uaa, cua and checkout stay at 0.0 (reports only) until their legacy code is
+// refactored.
+ext.domainCoverageMinimum = [
+        inventory     : [unit: 0.16, integration: 0.0, merged: 0.16],
+        'pod-registry': [unit: 0.56, integration: 0.06, merged: 0.61],
+        merchant      : [unit: 0.06, integration: 0.05, merged: 0.11],
+        gateway       : [unit: 0.17, integration: 0.27, merged: 0.38],
+        payment       : [unit: 0.0, integration: 0.04, merged: 0.04],
+        content       : [unit: 0.01, integration: 0.78, merged: 0.78],
+        tenancy       : [unit: 0.43, integration: 0.1, merged: 0.47],
+        catalog       : [unit: 0.01, integration: 0.04, merged: 0.06],
+        billing       : [unit: 0.09, integration: 0.11, merged: 0.19],
+        shared        : [unit: 0.03, integration: 0.0, merged: 0.03],
+        checkout      : [unit: 0.0, integration: 0.0, merged: 0.0],
+        uaa           : [unit: 0.0, integration: 0.0, merged: 0.0],
+        cua           : [unit: 0.0, integration: 0.0, merged: 0.0],
+]

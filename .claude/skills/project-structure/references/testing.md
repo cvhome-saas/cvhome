@@ -139,29 +139,38 @@ legacy package to `controllersLiveIn(DOMAIN, "…controller..")`, so the debt is
 appear. Two live ones: tenancy/checkout/payment keep controllers outside `..api..`, and checkout's v2 statistic APIs
 inject repositories directly (its `API_GOES_THROUGH_SERVICES` rule is commented out with what must change first).
 
-## Coverage — a report per micro service
+## Coverage — reported and gated per domain
 
-JaCoCo is applied to **every** Java module by `java-common-conventions`.
+JaCoCo is applied to **every** Java module by `java-common-conventions`; the root `jacoco-aggregate-conventions`
+plugin groups modules into **domains** (a service's `-commons/-core/-events/-external-api/-service` union, derived
+from the project path; `store-commons/*` and `store-pod/commons/*` are `shared`; override with
+`ext.coverageDomain = 'checkout'` in a module) and produces three reports per domain:
 
 ```bash
-./gradlew perServiceCoverage    # build/reports/coverage/<service>/index.html + coverage.xml   ← per micro service
-./gradlew coverageReport        # build/reports/jacoco/aggregate/html                          ← whole monorepo
-./gradlew :store-pod:catalog:catalog-service:jacocoMergedReport   # one service, unit + integration merged
+./gradlew domainCoverage printDomainCoverage   # table + build/reports/coverage/<domain>/{unit,integration}/ and /coverage.xml + /html (merged)
+./gradlew jacocoCatalogReport                  # one domain, merged; jacocoCatalogUnitReport / jacocoCatalogIntegrationReport per kind
+./gradlew coverageReport                       # build/reports/jacoco/aggregate/html  ← whole monorepo
+./gradlew domainCoverage -PcoverageFromArtifacts   # re-render from existing .exec files without re-running tests
 ```
 
-Per module: `jacocoTestReport` (unit), `jacocoIntegrationTestReport` (integration), `jacocoMergedReport` (both — the
-number a service is judged on). XML and HTML are always produced; CI uploads `coverage-per-service` and
-`coverage-aggregate` as artifacts on every PR.
+Per module `jacocoTestReport` / `jacocoIntegrationTestReport` still exist for a quick local look. CI uploads
+`coverage-per-domain` and `coverage-aggregate` on every PR and prints the domain table in the step summary.
 
-**The gate is soft and ratcheted per module.** `jacocoTestCoverageVerification` runs in `check` with a minimum of
-`0.0`. When a module reaches a number, lock it in so it cannot fall back:
+**Three hard gates per domain, ratcheted.** `domainCoverageMinimum` in the root `build.gradle` holds a
+`[unit:, integration:, merged:]` LINE-ratio floor per domain; `check` (and CI's coverage job) runs
+`domainCoverageVerification` = `jacoco<Domain>UnitVerification` + `…IntegrationVerification` + `…Verification`
+(merged). Integration gates never pass vacuously: with a non-zero floor and `-x integrationTest` (or missing
+`integrationTest.exec` in CI) they fail with "integrationTest did not run". `domainUnitCoverageVerification` is the
+Docker-free subset.
 
-```groovy
-// in the module's build.gradle
-coverageMinimum = 0.6   // LINE covered ratio, enforced by check
-```
+Ratchet: after a test PR run `./gradlew printDomainCoverage`, bump the domain's three floors to what it achieves
+(rounded down to 0.01); never lower a floor to make a build pass — fix the tests. Target is `merged: 0.85` for every
+domain. `uaa`, `cua` and `checkout` stay at `0.0` until their legacy code is refactored.
 
-Raise it when coverage rises; never lower it to make a build pass — fix the tests instead.
+Excluded from every number: `*Application`, classes in a `config` package named `*Config`, `*Configuration`,
+`*Configurer`, `*Properties`, `JobScheduling`, `*AutoConfiguration`, MapStruct `*MapperImpl`/`*MappersImpl`, and
+Lombok-generated code (`lombok.config`). Hence: **every `@Configuration` class lives in a `config` package**; a
+domain class like `PaymentConfiguration` (an entity) stays in scope on purpose.
 
 ## Rules of thumb
 
