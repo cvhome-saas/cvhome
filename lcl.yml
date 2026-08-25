@@ -67,8 +67,13 @@ defaults:
     # One override document per service, above every config file but below command-line args. Every address the
     # platform resolves hangs off `com.asrevo.cvhome.services.<name>.port` (server.port, the uaa issuer and JWKS
     # URIs, the pod endpoints) or off the SimpleDiscoveryClient instance URIs that back every `lb://` call, so
-    # rewriting both from the assigned map is what makes a shifted stack coherent. `{{#each services}}` walks the
-    # whole map, containers included — that is where spg's entry comes from.
+    # rewriting both from the assigned map is what makes a shifted stack coherent.
+    #
+    # `{{#each services}}` iterates the *source* services only — Compose services are a separate list and are not
+    # in it. spg is configured under com.asrevo.cvhome.services like any other service but runs as a container, so
+    # its port has to be set by hand below. Leave it out and it stays 80 while spg listens on the shifted port:
+    # the pod's `issuer-uri-set` then trusts `…gateway.com:80/cua`, which UrlNormalize collapses to the portless
+    # form, and a shopper token issued by `…gateway.com:1080/cua` is rejected as an unsupported issuer.
     SPRING_APPLICATION_JSON: >-
       {
         "com.asrevo.cvhome.app.handlers[0].schema": "http",
@@ -84,6 +89,7 @@ defaults:
         "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].instance-id": "store-core-gateway-ns-1",
         "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.service-name": "store-core-gateway",
         "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.instance": "store-core-gateway-ns-1",
+        "com.asrevo.cvhome.services.spg.port": ${port.spg.80},
         "spring.datasource.url": "jdbc:postgresql://localhost:${port.postgres.5432}/cvhome",
         "com.asrevo.cvhome.cdn.storage.s3-url": "http://localhost:${port.minio.9000}",
         "com.asrevo.cvhome.cdn.base-path": "http://localhost:${port.minio.9000}/d0dd4299-963a-4458-b31f-8efe31c35e8e",
