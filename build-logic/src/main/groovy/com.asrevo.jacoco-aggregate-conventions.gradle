@@ -117,6 +117,10 @@ domains.each { String domain, List<Project> modules ->
                 }
             }
             modules.each { m ->
+                // classDirectories reads compileJava's output. With -x test -x integrationTest (the CI coverage job)
+                // the dependency the test tasks would have carried is gone, but compileJava still runs, and Gradle
+                // fails the task rather than risk reading half-written classes.
+                dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
                     fileTree(dir).exclude(coverageExcludes)
@@ -138,6 +142,7 @@ domains.each { String domain, List<Project> modules ->
             dependsOn report
             executionData.from execFiles
             modules.each { m ->
+                dependsOn m.tasks.named('classes')
                 sourceDirectories.from m.sourceSets.main.allJava.srcDirs
                 classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
                     fileTree(dir).exclude(coverageExcludes)
