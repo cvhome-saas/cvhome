@@ -1,0 +1,23 @@
+# The integration-test profile, the same shape tenancy, content, merchant, payment and uaa already use: fixture rows
+# appended to the service's ordinary data locations, plus the credentials a test needs to exercise a path that would
+# otherwise be unreachable.
+#
+# Billing's own DDL stays where Spring Boot's defaults find it (`schema.sql`); this only adds the subscription rows
+# the API integration tests read and mutate. The plan catalog is not seeded here — `PlanCatalogSeeder` writes it from
+# `plan-catalog.yml` on start, with ids it mints itself, so a fixture that named a plan id would go stale the moment
+# the catalog changed.
+spring:
+  sql:
+    init:
+      data-locations: classpath:init-sql/data-test-stores.sql
+com:
+  asrevo:
+    cvhome:
+      stripe:
+        # A signing key so StripeWebhookApi can be driven end to end with a payload the test signs itself. Not a
+        # secret: it is a literal in the repository precisely so that nothing real is ever verified against it, and
+        # it exists only under this profile.
+        webhook-signing-key: "whsec_integration_test_key"
+        # Deliberately left unset. Every Stripe*Gateway is replaced by a stub in the integration context, so a call
+        # that escaped the stubs should fail loudly rather than reach for a credential.
+        key: ""

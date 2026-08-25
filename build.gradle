@@ -26,7 +26,7 @@ ext.domainCoverageMinimum = [
         content       : [unit: 0.89, integration: 0.81, merged: 0.97],
         tenancy       : [unit: 0.82, integration: 0.76, merged: 0.96],
         catalog       : [unit: 0.72, integration: 0.94, merged: 0.98],
-        billing       : [unit: 0.09, integration: 0.11, merged: 0.19],
+        billing       : [unit: 0.85, integration: 0.59, merged: 0.91],
         shared        : [unit: 0.03, integration: 0.0, merged: 0.03],
         checkout      : [unit: 0.0, integration: 0.0, merged: 0.0],
         uaa           : [unit: 0.0, integration: 0.0, merged: 0.0],

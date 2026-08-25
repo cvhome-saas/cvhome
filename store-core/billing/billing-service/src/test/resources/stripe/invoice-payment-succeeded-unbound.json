@@ -1,0 +1,24 @@
+{
+  "id": "evt_invoice_paid_unbound",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "invoice.payment_succeeded",
+  "data": {
+    "object": {
+      "id": "in_test_unbound",
+      "object": "invoice",
+      "customer": "cus_test_1",
+      "currency": "usd",
+      "amount_due": 3000,
+      "amount_paid": 3000,
+      "created": 1767225600,
+      "parent": {
+        "type": "subscription_details",
+        "subscription_details": {
+          "subscription": "sub_not_bound_yet"
+        }
+      }
+    }
+  }
+}
