@@ -15,4 +15,6 @@ dependencies {
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.hibernate.core
 }
