@@ -29,7 +29,7 @@ ext.domainCoverageMinimum = [
         billing       : [unit: 0.85, integration: 0.59, merged: 0.91],
         // shared = the store-commons libraries. No module here applies the integration-test convention, so the
         // integration floor stays 0.0 and the unit gate is the real one.
-        shared        : [unit: 0.41, integration: 0.0, merged: 0.41],
+        shared        : [unit: 0.46, integration: 0.0, merged: 0.46],
         // :store-pod:commons:* — customer/reference/CMS code queued behind the checkout refactor. It has no tests
         // at all yet, so its reports are skipped and the table shows n/a until the first one lands.
         'pod-commons' : [unit: 0.0, integration: 0.0, merged: 0.0],
