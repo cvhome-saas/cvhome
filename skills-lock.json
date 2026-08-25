@@ -7,6 +7,12 @@
       "skillPath": "angular-developer/SKILL.md",
       "computedHash": "258cc410839924d8c2b31afe9dd7349a1c03b9215ddba7942a87ce976c894adb"
     },
+    "lcl-stack-builder": {
+      "source": "cvhome-saas/lcl",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/lcl-stack-builder/SKILL.md",
+      "computedHash": "c3fac21163cdade4983d60b558ec254f64c971e37d755509fc14e6621b175963"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
