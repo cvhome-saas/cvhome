@@ -12,6 +12,7 @@ import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.PlanEntity;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
+import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
@@ -38,8 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class StripeCatalogGateway extends StripeGatewaySupport {
 
-    public StripeCatalogGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository) {
-        super(credentials, stripeRequestRepository);
+    public StripeCatalogGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository,
+                                StripeClient stripe) {
+        super(credentials, stripeRequestRepository, stripe);
     }
 
     /**
@@ -57,7 +59,7 @@ public class StripeCatalogGateway extends StripeGatewaySupport {
                 .setDescription(plan.getDescription())
                 .build();
         try {
-            Product product = Product.create(params, options(key));
+            Product product = stripe().products().create(params, options(key));
             recordCompletion(key, product.getId());
             log.info("Published plan {} to Stripe as product {}", plan.getCode(), product.getId());
             return new StripeProductId(product.getId());
@@ -91,7 +93,7 @@ public class StripeCatalogGateway extends StripeGatewaySupport {
                         .build())
                 .build();
         try {
-            Price created = Price.create(params, options(key));
+            Price created = stripe().prices().create(params, options(key));
             recordCompletion(key, created.getId());
             log.info("Published {} {} price of plan {} to Stripe as {}", price.getCurrency().code(),
                     price.getBillingInterval(), plan.getCode(), created.getId());

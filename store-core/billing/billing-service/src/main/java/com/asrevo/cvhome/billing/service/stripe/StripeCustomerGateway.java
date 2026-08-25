@@ -12,6 +12,7 @@ import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.repository.StoreSubscriptionRepository;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
+import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
@@ -41,8 +42,8 @@ public class StripeCustomerGateway extends StripeGatewaySupport {
     private final StoreSubscriptionRepository subscriptionRepository;
 
     public StripeCustomerGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository,
-                                 StoreSubscriptionRepository subscriptionRepository) {
-        super(credentials, stripeRequestRepository);
+                                 StripeClient stripe, StoreSubscriptionRepository subscriptionRepository) {
+        super(credentials, stripeRequestRepository, stripe);
         this.subscriptionRepository = subscriptionRepository;
     }
 
@@ -76,7 +77,7 @@ public class StripeCustomerGateway extends StripeGatewaySupport {
                 .putAllMetadata(Map.of(ORG_METADATA_KEY, org.getId().toString()))
                 .build();
         try {
-            Customer customer = Customer.create(params, options(key));
+            Customer customer = stripe().customers().create(params, options(key));
             recordCompletion(key, customer.getId());
             log.info("Created Stripe customer for org {}", org);
             return new StripeCustomerId(customer.getId());
