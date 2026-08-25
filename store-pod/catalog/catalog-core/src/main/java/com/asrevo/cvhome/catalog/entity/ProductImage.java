@@ -76,8 +76,12 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
         this.defaultImage = defaultImage;
     }
 
+    /**
+     * Reads the type through {@link #getImageType()} rather than the raw column: an image the upload path created
+     * has never had one set, and unboxing that null threw on the first read of every freshly uploaded image.
+     */
     public boolean isExternal() {
-        return imageType == TYPE_EXTERNAL_URL && productImageUrl != null;
+        return getImageType() == TYPE_EXTERNAL_URL && productImageUrl != null;
     }
 
     public boolean isDefaultImage() {
