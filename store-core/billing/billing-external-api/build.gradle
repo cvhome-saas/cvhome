@@ -12,4 +12,10 @@ dependencies {
     compileOnly libs.slf4j.api
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+
+    // The compileOnly dependencies above are provided by whichever service consumes this module, but a test of
+    // StoreEntitlements has to actually run its Caffeine caches and its logging, so they are needed on the test
+    // classpath here.
+    testImplementation libs.caffeine
+    testImplementation libs.slf4j.api
 }
