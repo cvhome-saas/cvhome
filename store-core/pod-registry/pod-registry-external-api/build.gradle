@@ -12,4 +12,10 @@ dependencies {
     compileOnly libs.slf4j.api
     compileOnly libs.lombok
     annotationProcessor libs.lombok
+    // The @HttpExchange proxies are exercised in src/test against a MockRestServiceServer.
+    testImplementation libs.spring.web
+    testImplementation libs.jackson.databind
+    testImplementation 'org.springframework:spring-context'
+    testImplementation 'org.hamcrest:hamcrest'
+    testImplementation 'com.jayway.jsonpath:json-path'
 }
