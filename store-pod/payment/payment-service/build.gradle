@@ -1,0 +1,85 @@
+plugins {
+    alias(libs.plugins.java.application.conventions)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.hibernate.orm)
+    //    alias(libs.plugins.graalvm)
+}
+
+group = 'com.asrevo.cvhome'
+
+springBoot {
+    buildInfo()
+}
+
+bootBuildImage {
+/*
+	builder = "bellsoft/buildpacks.builder:musl"
+*/
+    environment["BP_JVM_JLINK_ENABLED"] = "true"
+    environment["BP_JVM_JLINK_ARGS"] = " --compress zip-6 --no-header-files --no-man-pages --vm client --add-modules java.base,java.se,jdk.unsupported,jdk.crypto.ec"
+    imageName = createImageName("store-pod/payment", project.version)
+    tags = createImageTags("store-pod/payment", project.version)
+    docker {
+        publishRegistry {
+            url = System.getenv("REGISTRY")
+            username = System.getenv("ECR_TOKEN") ? 'AWS' : null
+            password = System.getenv("ECR_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    testImplementation project(':store-commons:test-support')
+    implementation libs.spring.cloud.starter.loadbalancer
+    implementation libs.spring.boot.starter.web
+    implementation libs.spring.boot.starter.validation
+    implementation libs.spring.boot.starter.actuator
+
+    implementation libs.spring.boot.starter.restclient
+    implementation libs.spring.boot.starter.security
+    implementation libs.spring.boot.starter.oauth2.client
+    implementation libs.spring.boot.starter.security.oauth2.resource.server
+    implementation libs.spring.boot.starter.cache
+    implementation libs.spring.boot.starter.data.jpa
+    implementation libs.namastack.outbox.starter.jpa
+    runtimeOnly libs.postgresql
+
+    implementation libs.spring.boot.starter.opentelemetry
+    implementation libs.io.opentelemetry.instrumentation.opentelemetry.spring.boot.starter
+
+    implementation libs.aws.sdk.s3
+
+    implementation libs.commons.validator
+    implementation libs.commons.io
+
+    implementation project(':store-pod:merchant:merchant-external-api')
+    implementation project(':store-pod:payment:payment-core')
+    implementation project(':store-pod:payment:payment-external-api')
+    implementation project(':store-commons:ecs-commons:fargate-task-info')
+    implementation project(':store-commons:ecs-commons:ecs-service-discoveryclient')
+
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+    implementation libs.springdoc.openapi.starter.webmvc.ui
+
+    implementation project(':store-commons:autoconfigure')
+
+//    developmentOnly libs.spring.boot.docker.compose
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    annotationProcessor libs.lombok.mapstruct.binding
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.1.0"
+        mavenBom "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.27.0"
+    }
+}
+
+//hibernate {
+//    enhancement {
+//        enableAssociationManagement = true
+//    }
+//}

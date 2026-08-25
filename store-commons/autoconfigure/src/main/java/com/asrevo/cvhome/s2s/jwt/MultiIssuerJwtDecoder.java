@@ -61,7 +61,7 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
         } catch (JwtException e) {
             throw e;
         } catch (Exception e) {
-            throw new JwtException("Failed to decode JWT: " + e.getMessage(), e);
+            throw new JwtException(String.format("Failed to decode JWT: %s", e.getMessage()), e);
         }
     }
 
@@ -76,13 +76,14 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
     private JwtDecoder getDecoderForIssuer(String issuer) throws JwtException {
         if (!this.supportedIssuerUris.contains(issuer)) {
             throw new JwtException(String.format(
-                    "Unsupported issuer: '%s'. Issuer not in the configured list of" + " supported issuers: %s.",
+                    "Unsupported issuer: '%s'. Issuer not in the configured list of supported issuers: %s.",
                     issuer, this.supportedIssuerUris));
         }
         JwtDecoder delegateDecoder = this.issuerDecoders.computeIfAbsent(issuer, this.decoderFactory);
         if (delegateDecoder == null) {
-            throw new JwtException(String.format("Decoder factory returned null for supported issuer: '%s'. This"
-                    + " indicates an issue with the factory configuration.", issuer));
+            throw new JwtException(String.format(
+                    "Decoder factory returned null for supported issuer: '%s'. This indicates an issue with the factory configuration.",
+                    issuer));
         }
         return delegateDecoder;
     }
@@ -105,7 +106,7 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
             }
             return issuer;
         } catch (ParseException e) {
-            throw new JwtException("Failed to parse token to extract issuer: " + e.getMessage(), e);
+            throw new JwtException(String.format("Failed to parse token to extract issuer: %s", e.getMessage()), e);
         }
     }
 

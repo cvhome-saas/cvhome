@@ -1,0 +1,183 @@
+/*
+ * The image grid, from `Add Product.dc.html`.
+ *
+ * Images and the drop target are one grid, and the dashed cell is the last tile — not a separate
+ * well below a list. The well used to be drawn at the asset's own square aspect with no width cap,
+ * which in the wizard's centre column made a 774x774 box.
+ */
+
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: .85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shot {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.shot-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--muted);
+  color: var(--foreground-quiet);
+}
+
+.shot-frame img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Which image the storefront uses. First in the order, so reordering is what moves it. */
+.shot-main {
+  position: absolute;
+  inset-block-start: .35rem;
+  inset-inline-start: .35rem;
+  padding: .1rem .35rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/*
+ * Revealed on hover, and **always present on touch** — a device with no hover would otherwise have
+ * no way to delete an image at all. The same rule the tree's row actions carry.
+ */
+.shot-overlay {
+  position: absolute;
+  inset-block-start: .35rem;
+  inset-inline-end: .35rem;
+  display: flex;
+  gap: .2rem;
+  opacity: 0;
+  transition: opacity var(--default-transition-duration);
+}
+
+.shot:hover .shot-overlay,
+.shot:focus-within .shot-overlay {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .shot-overlay {
+    opacity: 1;
+  }
+}
+
+.shot-overlay button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  /* Reads on a photograph of any colour, which a token surface cannot promise. */
+  background: color-mix(in oklab, var(--foreground-strong) 72%, transparent);
+  color: var(--background);
+  cursor: pointer;
+}
+
+.shot-overlay button:hover:not(:disabled) {
+  background: var(--foreground-strong);
+}
+
+.shot-overlay button.danger:hover:not(:disabled) {
+  background: var(--chart-5-foreground);
+}
+
+.shot-overlay button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.shot-foot {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .35rem .4rem;
+  border-block-start: 1px solid var(--border-soft);
+}
+
+.shot-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shot-foot button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.35rem;
+  block-size: 1.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+}
+
+.shot-foot button:hover:not(:disabled) {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.shot-foot button:disabled {
+  cursor: not-allowed;
+  opacity: .35;
+}
+
+.shot-foot button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* The drop target is a tile, so it takes the tile's shape rather than setting its own. */
+.shot-drop {
+  display: flex;
+}
+
+.shot-drop app-image-picker {
+  display: block;
+  inline-size: 100%;
+}
+
+.no-images {
+  margin: 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-overlay,
+  .shot-foot button {
+    transition: none;
+  }
+}

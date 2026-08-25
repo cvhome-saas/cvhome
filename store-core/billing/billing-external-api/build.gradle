@@ -1,0 +1,15 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-core:billing:billing-commons')
+    // Servlet callers (tenancy, the pods) and the reactive gateway both consume this module. The Mono-returning
+    // methods live on their own interface so a servlet caller never sees reactor types on its proxy.
+    compileOnly libs.spring.web
+    compileOnly libs.spring.webflux
+    compileOnly libs.caffeine
+    compileOnly libs.slf4j.api
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

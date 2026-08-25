@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.panel-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.panel-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.panel-meta {
+  flex: none;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.panel-body {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/* The standard interior, for a body that is content rather than a table. See `padded`. */
+:host(.padded) .panel-body {
+  padding: 1.25rem 1.5rem;
+}

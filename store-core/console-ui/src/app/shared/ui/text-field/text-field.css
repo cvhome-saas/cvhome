@@ -1,0 +1,161 @@
+/*
+ * Metrics are `number-field.css`'s, which took them from `.control` — the class every text input in
+ * this console used to wear. A name, a price and a brand sit in one row on most of these forms, and
+ * any difference in height, radius or border between them reads as a mistake.
+ */
+
+:host {
+  display: block;
+}
+
+.text-shell {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  inline-size: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  transition: border-color var(--default-transition-duration);
+}
+
+.text-shell:hover,
+.text-shell:focus-within {
+  border-color: var(--primary);
+}
+
+:host(.text-invalid) .text-shell {
+  border-color: var(--chart-5-foreground);
+}
+
+:host(.text-disabled) .text-shell {
+  background: var(--muted);
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.text-input {
+  flex: 1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+/* A key, an app id, a token: fixed-width, and a size down because it is a machine value. */
+:host(.text-mono) .text-input {
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+}
+
+.text-input::placeholder {
+  color: var(--foreground-quiet);
+}
+
+.text-input:disabled {
+  cursor: not-allowed;
+}
+
+/*
+ * Latin data in a page that may be right-to-left — a SKU, a slug, a domain, an email.
+ *
+ * `plaintext` rather than `dir="ltr"` alone: the paragraph direction follows the first strong
+ * character, so a value that is genuinely Arabic still reads correctly, while `user@example.com`
+ * inside an RTL form keeps its `@` where it belongs.
+ */
+.text-input.latin {
+  unicode-bidi: plaintext;
+}
+
+/* A leading glyph. Quiet, and never the only thing naming the field. */
+.text-icon {
+  flex: none;
+  color: var(--foreground-quiet);
+  --icon-size: .9rem;
+}
+
+/* A scheme, a currency, a domain suffix. A label on the value rather than part of it. */
+.text-affix {
+  flex: none;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/*
+ * A count over a limit is a numeric expression, not prose, so it is pinned left-to-right.
+ *
+ * Without this the RTL page lays "0 / 160" out as "160 / 0" — visually inverting what it means, so
+ * an empty field looks like one already 160 characters over. Found in Arabic on the store details
+ * page. The same rule `number-field` applies to a price, for the same reason.
+ */
+.text-counter {
+  direction: ltr;
+  flex: none;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+/* The uniqueness answer. Colour is redundant with the icon's shape, per the categorical rule. */
+.text-check {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  --icon-size: .9rem;
+}
+
+.text-check.pending {
+  color: var(--foreground-quiet);
+}
+
+.text-check.free {
+  color: var(--chart-1-foreground);
+}
+
+.text-check.taken {
+  color: var(--chart-5-foreground);
+}
+
+/*
+ * The reveal toggle. `tabindex="-1"` on the button in the template: the field itself is the tab
+ * stop, and a password input followed by a second stop that only changes how it is drawn is a stop
+ * most people tab straight past into the submit button.
+ */
+.text-reveal {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition: color var(--default-transition-duration);
+  --icon-size: 1rem;
+}
+
+.text-reveal:hover:not(:disabled) {
+  color: var(--foreground-strong);
+}
+
+.text-reveal:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-shell,
+  .text-reveal {
+    transition: none;
+  }
+}

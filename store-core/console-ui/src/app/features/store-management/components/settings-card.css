@@ -1,0 +1,281 @@
+/*
+ * The settings sections' shared vocabulary: field, grid, provider card, quiet row.
+ *
+ * Pulled into each section component's `styleUrls` rather than hoisted into `styles.css`,
+ * because it belongs to this page rather than to the console. Style encapsulation means a
+ * parent cannot reach into a child's template, so a shared file is how sibling components
+ * agree on what a field looks like. Each copy is scoped to its own component, so the
+ * `anyComponentStyle` budget still applies per section.
+ */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+/* ---- Fields ------------------------------------------------------------------------ */
+
+/*
+ * What is left of this file after the field vocabulary moved.
+ *
+ * `.field-grid`, `.field-wide` and `.cross-field-error` are layout, so they live in
+ * `@shared/styles/field.css`, which each section pulls in beside its own sheet. `.field`,
+ * `.control`, `.field-label` and `.required` described what a *control* looks like, and that is now
+ * `app-form-field` with `app-text-field`, `app-select` and their siblings — where Angular's
+ * encapsulation can actually reach it, and where it cannot drift into a fifth copy.
+ *
+ * A `.field` wrapper with a `.field-label` over something that is not a form control — a copy
+ * field, an image picker, a list of allocated domains — is still a real thing, so those two rules
+ * stay.
+ */
+.field {
+  min-inline-size: 0;
+}
+
+.field-label {
+  display: block;
+  margin-block-end: .4rem;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.field-hint,
+.field-foot {
+  margin: 0.35rem 0 0;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.field-foot {
+  display: flex;
+  gap: 1rem;
+}
+
+.field-foot .counter {
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+/* Over the recommended length is worth saying, but it is not an error. */
+.counter.over {
+  color: var(--chart-4-foreground);
+}
+
+app-field-error {
+  display: block;
+  margin-block-start: 0.35rem;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}
+
+/* ---- Quiet rows and dividers ------------------------------------------------------- */
+
+.divider {
+  block-size: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--border-soft);
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  --icon-size: 1rem;
+}
+
+.info-row > app-icon {
+  flex: none;
+  color: var(--muted-foreground);
+}
+
+.info-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.info-copy strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.info-copy small {
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+/* ---- Actions ----------------------------------------------------------------------- */
+/* A word that acts — "Replace", "Rotate". Not a button silhouette; it sits inside a field. */
+.text-action {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.text-action:hover {
+  color: var(--primary-emphasis);
+  text-decoration: underline;
+}
+
+.icon-action {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 30px;
+  block-size: 30px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--secondary-foreground);
+  cursor: pointer;
+  transition: background-color var(--default-transition-duration);
+  --icon-size: 0.75rem;
+}
+
+.icon-action:hover {
+  background: var(--input);
+}
+
+.icon-action.danger {
+  color: var(--chart-5-foreground);
+}
+
+.icon-action.danger:hover {
+  background: var(--chart-5-wash);
+}
+
+/* ---- Provider and gateway cards ---------------------------------------------------- */
+
+.provider-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--default-transition-duration);
+}
+
+.provider-card.on {
+  border-color: var(--edge);
+}
+
+.provider-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  background: var(--muted);
+  --icon-size: 1.05rem;
+}
+
+.provider-card.on .provider-head {
+  background: var(--accent-veil);
+}
+
+.provider-head > app-icon {
+  flex: none;
+  color: var(--secondary-foreground);
+}
+
+.provider-card.on .provider-head > app-icon {
+  color: var(--primary-emphasis);
+}
+
+.provider-name {
+  display: grid;
+  flex: 1;
+  min-inline-size: 8rem;
+}
+
+.provider-name strong {
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.provider-name small {
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.provider-head app-toggle {
+  flex: none;
+}
+
+.provider-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-block-start: 1px solid var(--border-soft);
+}
+
+/* ---- Secrets ----------------------------------------------------------------------- */
+
+/*
+ * A stored secret is never a populated input: it is not returned, so the field states what
+ * is on record and offers the one action that can change it.
+ */
+.secret {
+  background: var(--muted);
+}
+
+.secret .mask {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Medium and narrow ------------------------------------------------------------- */
+
+@container settings (max-width: 52rem) {
+  .field-grid,
+  .provider-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container settings (max-width: 34rem) {
+  .section-body {
+    padding: 1rem;
+  }
+
+  .info-row {
+    flex-wrap: wrap;
+  }
+}
+
+/*
+ * A control the platform cannot store. Muted and struck out of the tab order by `disabled` on the
+ * control itself; this only makes the state visible. Kept legible rather than faded to illegibility
+ * — the operator still needs to read what the field would have been.
+ */
+/*
+ * A message about a group rather than one control — `app-field-error` binds to a single control,
+ * and the credential rules read the switch as well as the fields. Same voice, same colour.
+ */

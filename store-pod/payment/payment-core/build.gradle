@@ -1,0 +1,20 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:payment:payment-commons')
+    api project(':store-pod:checkout:checkout-external-api')
+    implementation project(':store-commons:secret-crypto:secret-crypto-autoconfigure')
+    implementation libs.stripe.java
+    implementation libs.gson
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.jackson.annotations
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.hibernate.core
+}

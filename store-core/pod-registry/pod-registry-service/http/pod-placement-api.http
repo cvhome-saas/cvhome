@@ -1,0 +1,97 @@
+# PodPlacementApi — com.asrevo.cvhome.podregistry.api.v1.PodPlacementApi (@RequestMapping "api/v1/pod/private")
+#
+# Service-to-service only: tenancy asks on behalf of an org while deciding whether a store can be created at
+# all. A human session will NOT work here — STORE-CORE.POD.PLACEMENT checks the store_core scope, so these
+# need a client_credentials token rather than the SESSION cookie the other files use.
+#
+#   POST {{UAA_URL}}/oauth2/token  grant_type=client_credentials  scope=store_core
+#   client: store-core@service.store-core.internal
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### a token for the store-core service principal
+# @name s2sToken
+POST {{UAA_URL}}/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic store-core@service.store-core.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+
+grant_type=client_credentials&scope=store_core
+
+> {%
+    client.test("got a service token", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    client.global.set("S2S_TOKEN", response.body.access_token);
+%}
+
+### where should a new store for org1 go? the local pod is shared, so this lands there
+# @name place
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod/private/placement
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "org": "{{ORG_ID}}"
+}
+
+> {%
+    client.test("a pod was chosen", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.podId.id === "507f1f77bcf86cd799439011", "unexpected pod");
+    });
+    client.test("and it is shared, not dedicated", function () {
+        client.assert(response.body.dedicated === false, "the local pod has no owner");
+    });
+%}
+
+### a preference for a pod that is not a candidate is ignored, not honoured
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod/private/placement
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "org": "{{ORG_ID}}",
+  "preferredPodId": "000000000000000000000000"
+}
+
+> {%
+    client.test("falls back to the normal choice rather than the requested id", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.podId.id !== "000000000000000000000000", "a non-candidate was honoured");
+    });
+%}
+
+### the failure this endpoint exists to produce — drain every shared pod first, then ask
+# Setup:  PUT /api/v1/pod/{{POD_ID}} is not enough on its own; lifecycle changes land in phase 8. Until then,
+# reproduce by setting lifecycle_state = 'DRAINING' directly:
+#   update pod_registry.pod set lifecycle_state = 'DRAINING';
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod/private/placement
+Authorization: Bearer {{S2S_TOKEN}}
+Content-Type: application/json
+
+{
+  "org": "{{ORG_ID}}"
+}
+
+> {%
+    client.test("nothing eligible is a typed 422, not a 500", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "POD_REGISTRY.PLACEMENT.NO_ELIGIBLE_POD",
+            "code " + response.body.code);
+    });
+%}
+
+### a human session must not be able to ask this at all
+POST {{SELLER_UI_URL}}/pod-registry/api/v1/pod/private/placement
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": "{{ORG_ID}}"
+}
+
+> {%
+    client.test("placement is service-to-service only", function () {
+        client.assert(response.status === 403, "status " + response.status);
+    });
+%}

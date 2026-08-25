@@ -1,35 +1,49 @@
 package com.asrevo.cvhome.catalog.model.product;
 
 import java.io.Serial;
-import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.asrevo.cvhome.catalog.model.product.product.ProductEntity;
-import com.asrevo.cvhome.store.core.model.entity.ReadableDescription;
+import com.asrevo.cvhome.commons.domain.Entity;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+/**
+ * The product data every consumer needs — a cart line, a merchandising strip, a search hit. Pure catalog data: price
+ * and stock live in the inventory service, keyed by {@code sku}.
+ */
 @Getter
-public class ReadableMinimalProduct extends ProductEntity implements Serializable {
+@Setter
+public class ReadableMinimalProduct extends Entity {
 
-    /**
-     *
-     */
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private ReadableDescription description;
+    private String sku;
 
-    private ReadableProductPrice productPrice;
+    private boolean available;
 
-    private String finalPrice = "0";
+    private boolean productShipeable;
 
-    private String originalPrice = null;
+    private boolean productVirtual;
 
+    private int sortOrder;
+
+    private Instant dateAvailable;
+
+    private ProductSpecification productSpecifications;
+
+    /**
+     * The copy in the language asked for.
+     */
+    private ProductDescription description;
+
+    /**
+     * The default image, also present in {@code images}.
+     */
     private ReadableImage image;
 
-    private List<ReadableImage> images;
-
+    private List<ReadableImage> images = new ArrayList<>();
 }

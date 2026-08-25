@@ -1,0 +1,61 @@
+# StripeWebhookApi — com.asrevo.cvhome.billing.api.v1.StripeWebhookApi
+# (@RequestMapping "/api/v1/stripe-webhook")
+#
+# The one billing endpoint with no session and no ?store= — Stripe holds no credential of ours and cannot
+# log in. What authenticates a request is the signature over the raw body, so these blocks can only check
+# the *refusal* paths. The accepting path needs a real signature and is exercised with the Stripe CLI:
+#
+#   stripe listen --forward-to http://gateway.com:8000/billing/api/v1/stripe-webhook/public/events
+#   # prints whsec_... — start billing with it:
+#   STRIPE_WEBHOOK_SECRET=whsec_... ./extra/scripts/run-lcl.sh
+#
+#   stripe trigger customer.subscription.created     # attributed to no store -> recorded IGNORED, 200
+#   stripe events resend evt_...                     # redelivery -> "already accepted", state unchanged
+#
+# To drive a real payment end to end, create a subscription carrying the store in metadata — that is the
+# same attribution path a hosted checkout produces:
+#
+#   stripe subscriptions create -d customer=cus_... -d "items[0][price]=price_..." \
+#     -d "metadata[storeId]=<store>" -d "metadata[orgId]=<org>"
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### an unsigned payload must be refused with 400, never 500
+# 400 is deliberate: a payload that cannot verify will never verify, so Stripe must stop retrying it.
+# A 5xx here would have Stripe redeliver the same junk for days.
+POST {{SELLER_UI_URL}}/billing/api/v1/stripe-webhook/public/events
+Content-Type: application/json
+
+{
+  "id": "evt_forged",
+  "type": "invoice.payment_succeeded",
+  "data": {
+    "object": {
+      "id": "in_forged",
+      "amount_paid": 999999
+    }
+  }
+}
+
+> {%
+    client.test("an unsigned payload is refused", function () {
+        client.assert(response.status === 400, "expected 400, got " + response.status);
+    });
+%}
+
+### a forged signature is refused too — the header being present is not enough
+POST {{SELLER_UI_URL}}/billing/api/v1/stripe-webhook/public/events
+Content-Type: application/json
+Stripe-Signature: t=1700000000,v1=0000000000000000000000000000000000000000000000000000000000000000
+
+{
+  "id": "evt_forged_signed",
+  "type": "invoice.payment_succeeded",
+  "data": { "object": { "id": "in_forged" } }
+}
+
+> {%
+    client.test("a bad signature is refused", function () {
+        client.assert(response.status === 400, "expected 400, got " + response.status);
+    });
+%}

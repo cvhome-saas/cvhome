@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 /**
  *
@@ -34,15 +33,15 @@ public abstract class SalesManagerEntityServiceImpl<K extends Serializable & Com
         repository.saveAll(entities);
     }
 
-    public void create(E entity) throws ServiceException {
+    public void create(E entity) {
         save(entity);
     }
 
-    public void update(E entity) throws ServiceException {
+    public void update(E entity) {
         save(entity);
     }
 
-    public void delete(E entity) throws ServiceException {
+    public void delete(E entity) {
         repository.delete(entity);
     }
 

@@ -1,0 +1,120 @@
+/* Shares `text-field.css`'s frame so a one-line and a several-line field agree. */
+
+:host {
+  display: block;
+}
+
+.textarea-shell {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  transition: border-color var(--default-transition-duration);
+}
+
+.textarea-shell:hover,
+.textarea-shell:focus-within {
+  border-color: var(--primary);
+}
+
+:host(.textarea-invalid) .textarea-shell {
+  border-color: var(--chart-5-foreground);
+}
+
+:host(.textarea-disabled) .textarea-shell {
+  background: var(--muted);
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+.textarea-input {
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+}
+
+.textarea-input::placeholder {
+  color: var(--foreground-quiet);
+}
+
+.textarea-input:disabled {
+  cursor: not-allowed;
+}
+
+.textarea-input.latin {
+  unicode-bidi: plaintext;
+}
+
+/*
+ * `rows` becomes the floor rather than the height. Where `field-sizing` is unsupported the
+ * declaration is dropped and the field is exactly what it was, which is why `rows` is still set.
+ */
+.textarea-input.auto-grow {
+  field-sizing: content;
+  max-block-size: 22rem;
+}
+
+/*
+ * The grip only where it still does something. A box that sizes itself to its content has nothing
+ * for a drag to accomplish, and the guard keeps it on the engines that ignore `field-sizing`.
+ */
+@supports (field-sizing: content) {
+  .textarea-input.auto-grow {
+    resize: none;
+  }
+}
+
+/*
+ * The counter sits under the text rather than inside it: a textarea's own resize grip occupies the
+ * bottom corner, and anything placed there is either covered by it or moves when it is dragged.
+ */
+/*
+ * A count over a limit is a numeric expression, not prose, so it is pinned left-to-right.
+ *
+ * Without this the RTL page lays "0 / 160" out as "160 / 0" — visually inverting what it means, so
+ * an empty field looks like one already 160 characters over. Found in Arabic on the store details
+ * page. The same rule `number-field` applies to a price, for the same reason.
+ */
+.textarea-counter {
+  display: block;
+  margin-block-start: .3rem;
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  user-select: none;
+}
+
+/*
+ * The alignment follows the page — under an RTL box the counter sits at the left edge — but the
+ * expression inside it does not. `direction` on the block would move both, so the run is isolated
+ * separately.
+ */
+.textarea-counter > span {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Amber, not red: being outside an advised range is not an error and never blocks a save. */
+.textarea-counter.off-recommendation {
+  color: var(--chart-4-foreground);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textarea-shell {
+    transition: none;
+  }
+}

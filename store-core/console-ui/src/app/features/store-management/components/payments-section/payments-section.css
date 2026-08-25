@@ -1,0 +1,23 @@
+.providers {
+  gap: 1rem;
+}
+
+/* Inside a card body rather than under a panel header, so it takes the card's own shape. */
+.secrets-notice {
+  align-items: flex-start;
+  border: 1px solid var(--chart-2-wash);
+  border-radius: var(--radius-lg);
+  line-height: 1.6;
+}
+
+.field-note {
+  color: var(--foreground-subtle);
+  font-weight: 400;
+}
+
+.field-hint.endpoint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  --icon-size: 0.7rem;
+}

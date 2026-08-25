@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.cua.config.SocialProvider;
-import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
 import com.asrevo.cvhome.cua.service.SocialLoginConfigService;
+import com.asrevo.cvhome.cua.web.dto.PersistableSocialLoginConfig;
+import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,13 +26,13 @@ public class SocialLoginConfigController {
 
     @GetMapping
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUA.*')")
-    public List<SocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
+    public List<ReadableSocialLoginConfig> getConfigs(StoreMerchantId merchantStore) {
         return service.getConfigs(merchantStore);
     }
 
     @PostMapping
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CUA.*')")
-    public void saveConfigs(StoreMerchantId merchantStore, @RequestBody List<SocialLoginConfig> configs) {
+    public void saveConfigs(StoreMerchantId merchantStore, @RequestBody List<PersistableSocialLoginConfig> configs) {
         service.saveConfigs(merchantStore, configs);
     }
 

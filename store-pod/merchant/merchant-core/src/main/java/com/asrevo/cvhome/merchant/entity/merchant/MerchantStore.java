@@ -26,11 +26,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
 import com.asrevo.cvhome.commons.domain.ColorTheme;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.SliderImage;
 import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.Theme;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.core.converter.CountryIsoCodeConverter;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.converter.LanguageCodeConverter;
@@ -38,10 +42,6 @@ import com.asrevo.cvhome.store.core.converter.ZoneCodeConverter;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.core.entity.common.audit.Auditable;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -1,0 +1,7 @@
+spring:
+  config:
+    import:
+      # store-core-lcl-config.yml declares the local pod. PodSeedInitializer reconciles it into the registry on
+      # start-up, which is why there is no data.sql here: one seeding mechanism, not two disagreeing ones.
+      - "classpath:lcl-config.yml"
+      - "classpath:store-core-lcl-config.yml"

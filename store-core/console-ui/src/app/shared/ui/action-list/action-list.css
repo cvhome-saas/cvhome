@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.action-list {
+  margin: 0;
+  padding: 0.5rem 0.75rem 1rem;
+  list-style: none;
+}
+
+.action-list li > button {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    transform var(--default-transition-duration);
+}
+
+.action-list li > button:hover {
+  background: var(--muted);
+  transform: translateX(4px);
+}
+
+.action-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: var(--radius-lg);
+  background: var(--input);
+  color: var(--muted-foreground);
+  --icon-size: 0.95rem;
+}
+
+.action-icon.green { background: var(--chart-1-wash); color: var(--chart-1-foreground); }
+.action-icon.blue { background: var(--chart-2-wash); color: var(--chart-2-foreground); }
+.action-icon.cyan { background: var(--chart-3-wash); color: var(--chart-3-foreground); }
+.action-icon.amber { background: var(--chart-4-wash); color: var(--chart-4-foreground); }
+.action-icon.red { background: var(--chart-5-wash); color: var(--chart-5-foreground); }
+.action-icon.violet { background: var(--chart-6-wash); color: var(--chart-6-foreground); }
+
+.action-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-copy strong {
+  display: block;
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.action-copy small {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.action-count {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  background: var(--input);
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.action-count.green { background: var(--chart-1-wash); color: var(--chart-1-foreground); }
+.action-count.blue { background: var(--chart-2-wash); color: var(--chart-2-foreground); }
+.action-count.cyan { background: var(--chart-3-wash); color: var(--chart-3-foreground); }
+.action-count.amber { background: var(--chart-4-wash); color: var(--chart-4-foreground); }
+.action-count.red { background: var(--chart-5-wash); color: var(--chart-5-foreground); }
+.action-count.violet { background: var(--chart-6-wash); color: var(--chart-6-foreground); }
+
+.action-chevron {
+  flex: none;
+  color: var(--foreground-quiet);
+  --icon-size: 0.85rem;
+}

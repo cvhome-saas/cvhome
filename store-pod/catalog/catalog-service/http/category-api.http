@@ -1,0 +1,88 @@
+# CategoryApi — com.asrevo.cvhome.catalog.api.v1.CategoryApi (@RequestMapping "/api/v1")
+# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### create a root category — 201, echoes the body with its id
+# @name createCategory
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "code": "http-demo",
+  "visible": true,
+  "sortOrder": 10,
+  "descriptions": [{"language": "en", "name": "HTTP demo", "friendlyUrl": "http-demo"}]
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("CATEGORY_ID", response.body.id);
+    });
+%}
+
+### create a child under it, by parent code
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-demo-child", "visible": true, "parent": {"code": "http-demo"}, "descriptions": [{"language": "en", "name": "Child"}]}
+
+### unknown parent — 400 CATALOG.CATEGORY.REFERENCE_UNRESOLVABLE
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "orphan", "parent": {"code": "no-such-parent"}, "descriptions": [{"language": "en", "name": "x"}]}
+
+### one category with every language and its subtree
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the tree (private: every language) and the flat list
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category-hierarchy?store={{STORE_ID}}&lang={{LANG}}&count=50
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category?store={{STORE_ID}}&lang={{LANG}}&name=demo
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the storefront's tree, one language
+GET {{LANDING_UI_URL}}/catalog/api/v1/category-hierarchy?store={{STORE_ID}}&lang={{LANG}}&count=50
+
+### the storefront's category page, by slug — 404 CATALOG.CATEGORY.FRIENDLY_URL_NOT_FOUND when unknown
+GET {{LANDING_UI_URL}}/catalog/api/v1/category/http-demo?store={{STORE_ID}}&lang={{LANG}}
+
+### is the code taken
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/unique?store={{STORE_ID}}&lang={{LANG}}&code=http-demo
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### update
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-demo", "visible": true, "featured": true, "descriptions": [{"language": "en", "name": "HTTP demo, renamed"}]}
+
+### hide it
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}/visible?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-demo", "visible": false}
+
+### move it under category 1, then back to the root (-1)
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}/move/1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}/move/-1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the categories of a product
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/product/1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### delete the subtree — 404 CATALOG.CATEGORY.NOT_FOUND on a second run
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/category/{{CATEGORY_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

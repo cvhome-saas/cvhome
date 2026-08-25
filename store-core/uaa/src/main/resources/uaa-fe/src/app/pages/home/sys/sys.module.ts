@@ -9,4 +9,5 @@ import {SysRoutingModule} from './sys-routing.module';
     SysRoutingModule
   ]
 })
-export class SysModule { }
+export class SysModule {
+}

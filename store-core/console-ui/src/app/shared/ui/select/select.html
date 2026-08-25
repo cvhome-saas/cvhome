@@ -1,0 +1,83 @@
+<!--
+  The trigger is the only tab stop. Options take focus while the list is open, which is why the
+  host — not the button — carries the keydown handler: the keys have to keep working once focus has
+  moved into the list.
+-->
+<button
+  #trigger
+  class="select-trigger"
+  type="button"
+  [id]="id()"
+  [class.is-placeholder]="isPlaceholder()"
+  [class.is-open]="open()"
+  [class.is-invalid]="invalid()"
+  [disabled]="isDisabled()"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="open() ? listId : null"
+  [attr.aria-activedescendant]="activeOptionId()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="invalid() ? 'true' : null"
+  (click)="toggle()"
+>
+  <span class="select-value" dir="auto">{{ triggerLabel() }}</span>
+  <app-icon name="chevronDown" [size]="14" class="select-caret" />
+</button>
+
+<!--
+  Outside the trigger, not inside it: a button inside a button is invalid, and nesting them made
+  the clear click open the list on its way past. Positioned over the caret's inner edge instead.
+-->
+@if (showClear()) {
+  <button
+    class="select-clear"
+    type="button"
+    [attr.aria-label]="clearLabel()"
+    (click)="clear($event)"
+  >
+    <app-icon name="x" [size]="12" />
+  </button>
+}
+
+@if (open()) {
+  <!--
+    Inside an `@if` so `animate.leave` has something to run on, and so an idle select adds nothing
+    to the accessibility tree. The global `.popover` already animates its own entry.
+  -->
+  <div
+    class="popover select-list"
+    [class.drop-up]="dropUp()"
+    animate.leave="select-list-out"
+    role="listbox"
+    [id]="listId"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-labelledby]="labelledBy()"
+  >
+    @for (option of options(); track option.value; let index = $index) {
+      <button
+        #option
+        class="select-option"
+        type="button"
+        role="option"
+        [id]="listId + '-' + index"
+        [class.is-selected]="option.value === value()"
+        [attr.aria-selected]="option.value === value()"
+        [attr.aria-disabled]="option.disabled ? 'true' : null"
+        [attr.tabindex]="index === activeIndex() ? 0 : -1"
+        (click)="choose(index)"
+      >
+        <span class="option-copy">
+          <span class="option-label" dir="auto">{{ option.label }}</span>
+          @if (option.detail) {
+            <small class="option-detail" dir="auto">{{ option.detail }}</small>
+          }
+        </span>
+        @if (option.value === value()) {
+          <app-icon name="check" [size]="13" class="option-tick" />
+        }
+      </button>
+    }
+  </div>
+}

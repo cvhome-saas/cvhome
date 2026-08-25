@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.menus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.menu-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--foreground-strong);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.menu-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.menu-row {
+  display: grid;
+  grid-template-columns: auto minmax(7rem, 1.2fr) 8rem minmax(7rem, 1.4fr) auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-block-end: 1px solid var(--border-soft);
+}
+
+.menu-row.child {
+  padding-inline-start: 2.25rem;
+  background: var(--muted);
+}
+
+.menu-row.hidden-item {
+  opacity: 0.6;
+}
+
+.row-grip {
+  color: var(--foreground-quiet);
+}
+
+.row-value.fixed {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: var(--text-2xs);
+  color: var(--foreground-quiet);
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.menu-empty {
+  padding: 1rem;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.add-link {
+  align-self: flex-start;
+}
+
+@container (max-width: 40rem) {
+  .menu-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}

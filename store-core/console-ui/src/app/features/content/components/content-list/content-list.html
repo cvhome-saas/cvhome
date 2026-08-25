@@ -1,0 +1,162 @@
+<ng-container *transloco="let t">
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.retry()" />
+  }
+
+  <app-busy-overlay [busy]="facade.isLoading() || facade.busy()" [label]="t('content.list.loading')" reserve="panel">
+    <app-panel class="list-panel" [title]="t('content.tab.' + type())" [subtitle]="facade.subtitle()">
+      <div panelAction class="panel-controls" role="search">
+        <app-search-box
+          width="13rem"
+          [value]="facade.search()"
+          (valueChange)="facade.search.set($event)"
+          [label]="t('content.filter.search')"
+          [placeholder]="t('content.filter.searchPlaceholder')"
+          [clearLabel]="t('content.filter.clearSearch')"
+        />
+        <app-select
+          class="filter-select"
+          clearable
+          [options]="localeOptions()"
+          [value]="facade.locale() ?? ''"
+          (valueChange)="onLocale($event)"
+          [ariaLabel]="t('content.filter.language')"
+          [clearLabel]="t('content.filter.clearLanguage')"
+        />
+        <app-tab-switcher
+          [tabs]="facade.tabs()"
+          [active]="facade.statusTab()"
+          (activeChange)="onStatusTab($event)"
+          [label]="t('content.filter.byStatus')"
+          [panelId]="'content-list-' + type()"
+        />
+      </div>
+
+      @if (canManage() && facade.selected().size > 0) {
+        <div class="bulk-bar" role="toolbar" [attr.aria-label]="t('content.bulk.label')">
+          <span class="bulk-count">{{ t('content.bulk.selected', {count: selectedCount()}) }}</span>
+          <button class="secondary-action" type="button" (click)="bulk('PUBLISH')">
+            <app-icon name="checkCircle" />{{ t('content.action.publish') }}
+          </button>
+          <button class="secondary-action" type="button" (click)="bulk('UNPUBLISH')">
+            <app-icon name="eyeOff" />{{ t('content.action.unpublish') }}
+          </button>
+          <button class="secondary-action" type="button" (click)="bulk('ARCHIVE')">
+            <app-icon name="box" />{{ t('content.action.archive') }}
+          </button>
+          <button class="danger-action" type="button" (click)="bulk('DELETE')">
+            <app-icon name="trash" />{{ t('content.action.delete') }}
+          </button>
+          <button class="ghost-action" type="button" (click)="facade.clearSelection()">
+            {{ t('content.bulk.clear') }}
+          </button>
+        </div>
+      }
+
+      @if (facade.rows().length) {
+        <app-data-table [id]="'content-list-' + type()" [columns]="columns()" [label]="t('content.tab.' + type())">
+          @if (canManage()) {
+            <div class="select-all" role="row">
+              <app-checkbox
+                hideLabel
+                [checked]="facade.allSelected()"
+                (checkedChange)="facade.toggleAll()"
+                [label]="t('content.bulk.selectAll')"
+              />
+              <span class="select-all-copy">{{ t('content.bulk.selectAll') }}</span>
+            </div>
+          }
+          @for (row of facade.rows(); track row.id) {
+            <app-table-row [interactive]="true">
+              @if (canManage()) {
+                <div class="cell-select" role="cell">
+                  <app-checkbox
+                    hideLabel
+                    [checked]="facade.selected().has(row.id)"
+                    (checkedChange)="facade.toggleSelected(row.id)"
+                    [label]="t('content.bulk.selectRow', {title: row.title})"
+                  />
+                </div>
+              }
+              <div class="cell-title" role="cell" [attr.data-label]="t('content.column.' + type())">
+                <span class="thumb" [class.live]="row.status === 'PUBLISHED'" aria-hidden="true">
+                  <app-icon [name]="rowIcon()" [size]="14" />
+                </span>
+                <span class="title-copy">
+                  <button class="row-title" type="button" (click)="open.emit(row)" dir="auto">{{ row.title }}</button>
+                  <small dir="ltr">{{ row.subtitle }}</small>
+                </span>
+              </div>
+              <div class="cell-status" role="cell" [attr.data-label]="t('content.column.status')">
+                <app-badge [tone]="tone(row.status)" shape="square">{{ statusLabel(row) }}</app-badge>
+              </div>
+              <div class="cell-languages" role="cell" [attr.data-label]="t('content.column.languages')">
+                <app-locale-badges [locales]="row.locales" [expected]="expectedCodes()" />
+              </div>
+              <div class="cell-updated" role="cell" [attr.data-label]="t('content.column.updated')">
+                <span>{{ updatedLabel(row) }}</span>
+                @if (row.updatedBy) {
+                  <small>{{ row.updatedBy }}</small>
+                }
+              </div>
+              <div class="cell-actions" role="cell" [attr.data-label]="t('content.column.actions')">
+                <button
+                  class="icon-action"
+                  type="button"
+                  [attr.aria-label]="t('content.action.editFor', {title: row.title})"
+                  [title]="t('content.action.edit')"
+                  (click)="open.emit(row)"
+                >
+                  <app-icon name="pencil" [size]="15" />
+                </button>
+                @if (canManage()) {
+                  <app-action-menu
+                    [actions]="menuFor(row)"
+                    [ariaLabel]="t('content.action.moreFor', {title: row.title})"
+                    (picked)="onMenu(row, $event)"
+                  />
+                }
+              </div>
+            </app-table-row>
+          }
+        </app-data-table>
+      } @else if (!facade.isEmpty()) {
+        <app-empty-state
+          [icon]="rowIcon()"
+          [message]="facade.filtered() ? t('content.list.noneMatch') : t('content.list.empty.' + type())"
+        >
+          @if (facade.filtered()) {
+            <button class="secondary-action" type="button" (click)="facade.clearFilters()">
+              {{ t('content.filter.clear') }}
+            </button>
+          } @else if (canManage()) {
+            <button class="primary-action" type="button" (click)="create.emit()">
+              <app-icon name="plus" />
+              {{ t('content.create.' + type()) }}
+            </button>
+          }
+        </app-empty-state>
+      }
+
+      <app-pagination
+        [page]="facade.page().pageNumber"
+        [totalPages]="facade.page().totalPages"
+        [totalElements]="facade.page().totalElements"
+        [pageSize]="pageSize"
+        [unit]="t('content.list.unit.' + type())"
+        [label]="t('content.list.pagesLabel')"
+        (pageChange)="facade.goToPage($event)"
+      />
+    </app-panel>
+  </app-busy-overlay>
+
+  <app-confirm-dialog
+    [open]="facade.pendingDelete() !== null"
+    [title]="deleteTitle()"
+    [message]="t('content.delete.message')"
+    [confirmLabel]="t('content.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDelete()"
+  />
+</ng-container>

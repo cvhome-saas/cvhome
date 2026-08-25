@@ -1,0 +1,54 @@
+# ProductGroupApi + ProductRelationshipApi — com.asrevo.cvhome.catalog.api.v1 (@RequestMapping "/api/v1")
+# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### upsert a store-level group with two members — 201, echoes the body with its id
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "HTTP_STRIP", "active": true, "productIds": [1, 2], "descriptions": [{"language": "en", "name": "HTTP strip"}]}
+
+### unknown member — 404 CATALOG.PRODUCT.NOT_FOUND
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "HTTP_STRIP", "productIds": [999999]}
+
+### the console's list (no members) and one group with members
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups/HTTP_STRIP?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### is the code taken
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups/unique?store={{STORE_ID}}&lang={{LANG}}&code=HTTP_STRIP
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### add and remove a member
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups/HTTP_STRIP/product/3?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups/HTTP_STRIP/product/3?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the storefront's strip, one language (the home page reads FEATURED_ITEMS, NEWLY_ADDED, HOME_PAGE, RECOMMENDED)
+GET {{LANDING_UI_URL}}/catalog/api/v1/products/groups/FEATURED_ITEMS?store={{STORE_ID}}&lang={{LANG}}
+
+### delete — 204; 404 CATALOG.PRODUCT_GROUP.NOT_FOUND on a second run
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/groups/HTTP_STRIP?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### related items: relate product 2 to product 1 (creates product 1's RELATED_ITEM group on first use)
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/1/relationship/2?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### the storefront's "you may also like" — 404 CATALOG.PRODUCT_GROUP.NOT_FOUND for a product with none
+GET {{LANDING_UI_URL}}/catalog/api/v1/products/1/relationship?store={{STORE_ID}}&lang={{LANG}}
+
+###
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/products/1/relationship/2?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

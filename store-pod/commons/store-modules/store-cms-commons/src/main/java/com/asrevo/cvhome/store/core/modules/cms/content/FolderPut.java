@@ -10,6 +10,6 @@ public interface FolderPut {
     /**
      * Create folder on root or on specific path
      */
-    void addFolder(final String merchantStoreCode, String folderName, Optional<String> path);
+    void addFolder(String merchantStoreCode, String folderName, Optional<String> path);
 
 }

@@ -1,0 +1,84 @@
+<main class="auth-shell" *transloco="let t">
+  <app-auth-story [story]="facade.signUpStory()" />
+
+  <section class="auth-entry" [attr.aria-label]="t('auth.accountAccess')">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="auth-tabs" role="group" [attr.aria-label]="t('auth.accountAction')">
+        <a routerLink="/sign-up" class="active" aria-current="page">{{ t('auth.createAccount') }}</a>
+        <a routerLink="/sign-in">{{ t('auth.signIn') }}</a>
+      </div>
+
+      <div class="auth-fields" formGroupName="user">
+        <app-form-field
+          [label]="t('auth.signUp.firstName')"
+          [control]="user.controls.firstName"
+          required
+          [fallback]="t('auth.signUp.firstNameFallback')"
+        >
+          <app-text-field formControlName="firstName" autocomplete="given-name" />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.lastName')"
+          [control]="user.controls.lastName"
+          required
+          [fallback]="t('auth.signUp.lastNameFallback')"
+        >
+          <app-text-field formControlName="lastName" autocomplete="family-name" />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.email')"
+          [control]="user.controls.emailAddress"
+          required
+          [fallback]="t('auth.signUp.emailFallback')"
+        >
+          <app-text-field type="email" formControlName="emailAddress" latin autocomplete="email" />
+        </app-form-field>
+
+        <!--
+          The reveal is the control's own now. This page drew it with `position: absolute` and
+          `right: .55rem`, which put the eye on the wrong side of the field in Arabic — and the two
+          password fields disagreed about whether they had one at all.
+        -->
+        <app-form-field
+          [label]="t('auth.signUp.password')"
+          [control]="user.controls.password"
+          required
+          [fallback]="t('auth.signUp.passwordFallback')"
+        >
+          <app-text-field
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [revealLabel]="t('auth.signUp.showPassword')"
+          />
+        </app-form-field>
+
+        <app-form-field
+          [label]="t('auth.signUp.repeatPassword')"
+          [control]="user.controls.repeatPassword"
+          required
+          [fallback]="t('auth.signUp.repeatPasswordFallback')"
+        >
+          <app-text-field
+            type="password"
+            formControlName="repeatPassword"
+            autocomplete="new-password"
+            [revealLabel]="t('auth.signUp.showPassword')"
+          />
+        </app-form-field>
+        @if (user.errors?.['passwordMismatch'] && user.controls.repeatPassword.touched) {
+          <p class="cross-field-error" role="alert">{{ t('auth.signUp.passwordMismatch') }}</p>
+        }
+
+        <button class="auth-submit" type="submit" [disabled]="facade.busy() || facade.submitted()">
+          {{ facade.busy() ? t('auth.signUp.creating') : t('auth.createAccount') }}
+          @if (!facade.busy()) { <span aria-hidden="true">→</span> }
+        </button>
+
+        <p class="legal">{{ t('auth.signUp.legalNote') }}</p>
+      </div>
+    </form>
+  </section>
+</main>

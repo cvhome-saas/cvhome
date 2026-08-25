@@ -1,0 +1,93 @@
+/*
+ * Page-level layout only. The console frame (banner, rail, toolbar) belongs to
+ * ConsoleShell, the card chrome belongs to Panel, and the field vocabulary belongs to
+ * components/settings-card.css.
+ */
+
+:host {
+  display: contents;
+}
+
+/*
+ * The named container the page responds to.
+ *
+ * A container query rather than a viewport one, because what decides the layout is how much
+ * room this page has — and that changes when the shell's rail collapses, at no particular
+ * viewport width. The container is a wrapper rather than the grid itself: a container query
+ * styles descendants, never the container it measures.
+ */
+.settings-region {
+  container: settings / inline-size;
+}
+
+/*
+ * The rail's column is the thing that animates.
+ *
+ * `grid-template-columns` is interpolable when both sides are lengths, so folding the rail is one
+ * transition on the container rather than a width on the rail and a reflow everything else has to
+ * follow. The card widens into the space in the same motion, which is the point of folding it.
+ */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  transition: grid-template-columns 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.settings-layout.rail-collapsed {
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/*
+ * The card animates, not the layout around it.
+ *
+ * It used to sit on `.settings-layout`, which is created once and then persists — so the entrance
+ * played on the first load and never again, and switching sections swapped the card with no
+ * transition at all. `@switch` destroys and recreates the section component, so a rule on its
+ * element runs afresh every time the operator picks a section, while the rail and the tab track
+ * stay put. `prefers-reduced-motion` is handled globally in `styles.css`.
+ */
+.settings-section > * {
+  --rise-from: 0.625rem;
+  animation: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * Below the swap width the rail would take a third of the page for eight links, so the
+ * sections become a horizontal track above the card instead. Both are in the DOM and CSS
+ * picks — a container query is not readable from TypeScript.
+ */
+.settings-tabs {
+  display: none;
+}
+
+@container settings (max-width: 44rem) {
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-rail {
+    display: none;
+  }
+
+  .settings-tabs {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* ---- Page header actions ---------------------------------------------------------- */
+/*
+ * Nothing to save is the resting state of this page, so the disabled button has to read as
+ * quiet rather than as broken.
+ */
+/* ---- Error ------------------------------------------------------------------------ */
+

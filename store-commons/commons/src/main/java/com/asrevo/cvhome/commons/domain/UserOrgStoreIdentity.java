@@ -2,7 +2,7 @@ package com.asrevo.cvhome.commons.domain;
 
 import java.util.Set;
 
-public record UserOrgStoreIdentity(ManagerOrgId org, String store, Set<Roles> roles) {
+public record UserOrgStoreIdentity(ManagerOrgId org, StoreMerchantId store, Set<Roles> roles) {
 
     public boolean hasRole(Roles roles) {
         return this.roles.contains(roles);

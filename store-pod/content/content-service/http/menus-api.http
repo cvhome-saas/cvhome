@@ -1,0 +1,25 @@
+### Navigation menus (MAIN bootstraps from link_to_menu pages on first read)
+
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/menus?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/menus/MAIN?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+### Replace the whole tree (one level of nesting; broken PAGE targets come back flagged)
+PUT {{SELLER_UI_URL}}/spg/content/api/v1/private/content/menus/MAIN?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "items": [
+    {"labels": {"en": "Shop", "ar": "تسوّق"}, "target": {"kind": "URL", "value": "/category/all"}, "children": [
+      {"labels": {"en": "Office"}, "target": {"kind": "CATEGORY", "value": "office"}},
+      {"labels": {"en": "Warehouse"}, "target": {"kind": "CATEGORY", "value": "warehouse"}}
+    ]},
+    {"labels": {"en": "Bulk ordering"}, "target": {"kind": "PAGE", "value": "bulk-ordering"}},
+    {"labels": {"en": "Blog"}, "target": {"kind": "BLOG_INDEX"}},
+    {"labels": {"en": "Help"}, "target": {"kind": "FAQ_INDEX"}}
+  ]
+}

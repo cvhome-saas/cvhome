@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api libs.namastack.outbox.api
+    compileOnly libs.spring.web
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:merchant:merchant-commons')
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
+}

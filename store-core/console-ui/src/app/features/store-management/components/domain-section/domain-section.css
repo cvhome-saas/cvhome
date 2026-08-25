@@ -1,0 +1,280 @@
+.domain-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/*
+ * The scheme is part of the field, not a label beside it.
+ *
+ * It reads as the dimmed start of the value the operator is typing — same face and size as the
+ * input, muted, and hard against it, so `https://shop.example.com` looks like one string with its
+ * fixed half greyed out. `user-select: none` keeps it out of a copy of the field, which is the
+ * point of not putting it in the value: the record is about the host, not the URL.
+ */
+.scheme {
+  flex: none;
+  margin-inline-end: -0.25rem;
+  color: var(--muted-foreground);
+  font-size: inherit;
+  user-select: none;
+}
+
+/* Tone of the field's state mark, matching the status panel below it. */
+.control > app-icon.green { color: var(--chart-1-foreground); }
+.control > app-icon.blue { color: var(--chart-2-foreground); }
+.control > app-icon.amber { color: var(--chart-4-foreground); }
+.control > app-icon.red { color: var(--chart-5-foreground); }
+.control > app-icon.slate { color: var(--muted-foreground); }
+
+/* ---- Status panel ------------------------------------------------------------------- */
+
+.status {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  --status-ink: var(--muted-foreground);
+  --icon-size: 0.95rem;
+}
+
+.status.green {
+  border-color: var(--edge);
+  background: var(--chart-1-wash);
+  --status-ink: var(--chart-1-foreground);
+}
+
+.status.blue {
+  background: var(--chart-2-wash);
+  --status-ink: var(--chart-2-foreground);
+}
+
+.status.amber {
+  background: var(--chart-4-wash);
+  --status-ink: var(--chart-4-foreground);
+}
+
+.status.red {
+  background: var(--chart-5-wash);
+  --status-ink: var(--chart-5-foreground);
+}
+
+.status-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.status-head app-icon {
+  flex: none;
+  color: var(--status-ink);
+}
+
+.status-head strong {
+  color: var(--status-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.status-meta {
+  margin-inline-start: auto;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.status-body {
+  margin: 0.5rem 0 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* ---- DNS record --------------------------------------------------------------------- */
+
+.dns {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.dns-head,
+.dns-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr 1.4fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.6rem 1rem;
+}
+
+.dns-head {
+  border-block-end: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dns-row {
+  padding-block: 0.6rem;
+  color: var(--foreground-strong);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+}
+
+/* The value already sits in a bordered copy field; a second frame around it reads as a box. */
+.dns-row app-copy-field {
+  margin-inline: -0.4rem;
+}
+
+.dns-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 0.6rem;
+  --icon-size: 0.8rem;
+}
+
+@container settings (max-width: 40rem) {
+  .domain-row {
+    flex-wrap: wrap;
+  }
+
+  /* Three monospace columns stop fitting long before the card does. */
+  .dns {
+    overflow-x: auto;
+  }
+
+  .dns-head,
+  .dns-row {
+    min-inline-size: 26rem;
+  }
+}
+
+
+/*
+ * A custom-domain row. Reuses `.info-row` for the frame and adds only what a row of actions needs —
+ * the subdomain above it is the same shape with fewer controls, and they have to line up.
+ */
+.domain-row.info-row {
+  flex-wrap: wrap;
+  margin-block-start: 0.5rem;
+}
+
+.domain-row.info-row .info-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-row a.icon-action {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+}
+
+.info-row .ghost-action {
+  flex: none;
+}
+
+.icon-action:disabled,
+.ghost-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+/* ---- Bidi and the host field --------------------------------------------------------------- */
+
+/*
+ * A hostname is one Latin string, whatever language the console is in.
+ *
+ * `dir="ltr"` on the wrapper puts the scheme before the field and stops the RTL algorithm
+ * reordering `https://` into `//:https`, and `text-align: left` keeps the caret where a reader of
+ * that string expects it — direction alone leaves the text hugging the right edge of the box.
+ */
+.control.host {
+  direction: ltr;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list */
+  text-align: left;
+}
+
+/*
+ * A hostname inside an Arabic page: Latin-ordered, but still where the page puts everything else.
+ *
+ * `isolate` rather than `plaintext`, and the difference is the whole fix. Both order the characters
+ * correctly, but `plaintext` (like `dir="ltr"`) also re-resolves the *paragraph* direction from the
+ * content, which takes alignment with it — the hostname jumped to the left edge of the row while the
+ * Arabic caption directly under it stayed on the right, so one row read in two directions. `isolate`
+ * keeps the element's inherited RTL direction, so the box still starts on the right, and only seals
+ * the Latin run off from the text around it. The order screens use `plaintext` because addresses
+ * there are a whole column of mixed-language lines, each of which should own its alignment; a
+ * hostname is one field in a row, and the row owns it.
+ */
+.info-row .info-copy strong,
+.dns-row span {
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+/* The "your domain" stand-in, before one has been typed: prose, not a hostname. */
+.dns-row .awaiting {
+  color: var(--foreground-subtle);
+  font-family: var(--font-sans);
+}
+
+/* ---- The check in flight ------------------------------------------------------------------- */
+
+/*
+ * A DNS lookup goes out to a public resolver and back, which is long enough to look like nothing
+ * happened. The button says what it is doing and spins while it does it, and is the only control
+ * that changes — a whole-page veil for one field would be worse than no feedback.
+ */
+.spinner {
+  flex: none;
+  inline-size: 0.7rem;
+  block-size: 0.7rem;
+  border: 2px solid currentColor;
+  border-block-start-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/*
+ * The verdict arrives in place of nothing, so it moves in rather than appearing — the one moment on
+ * this page where something happened that the operator did not do themselves. Held to a short slide
+ * because it lands under the field they are still looking at. Global `prefers-reduced-motion` in
+ * `styles.css` turns it off.
+ */
+.status {
+  animation: domain-verdict 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes domain-verdict {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Each allocated domain settles in on load, in the order they are listed. */
+.domain-row.info-row {
+  animation: domain-row-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes domain-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+
+/* Not an error: the check could not be made, which blocks nothing. Amber rather than red. */
+.field-warning {
+  margin: 0.35rem 0 0;
+  color: var(--chart-4-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+}

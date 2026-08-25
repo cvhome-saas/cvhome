@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import com.asrevo.cvhome.uaa.domain.User;
 
-public class UserSpecifications {
+public final class UserSpecifications {
 
     private UserSpecifications() {
     }

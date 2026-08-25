@@ -3,15 +3,12 @@ package com.asrevo.cvhome.checkout.services.order;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,41 +20,32 @@ import com.asrevo.cvhome.checkout.entity.order.OrderTotal;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalSummary;
 import com.asrevo.cvhome.checkout.entity.order.OrderTotalType;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
-import com.asrevo.cvhome.checkout.entity.payments.Transaction;
-import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.order.OrderCriteria;
-import com.asrevo.cvhome.checkout.model.order.OrderSummaryType;
-import com.asrevo.cvhome.checkout.model.payments.Payment;
 import com.asrevo.cvhome.checkout.repositories.order.OrderRepository;
-import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order> implements OrderService {
 
-    private final ShoppingCartService shoppingCartService;
-
     private final OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, ShoppingCartService shoppingCartService) {
+    public OrderServiceImpl(OrderRepository orderRepository) {
         super(orderRepository);
-        this.shoppingCartService = shoppingCartService;
         this.orderRepository = orderRepository;
     }
 
     @Override
     @Transactional
-    public void addOrderStatusHistory(Order order, OrderStatusHistory history) throws ServiceException {
+    public void addOrderStatusHistory(Order order, OrderStatusHistory history) {
         order.setStatus(history.getStatus());
         order.getOrderHistory().add(history);
         history.setOrder(order);
@@ -65,74 +53,19 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
     }
 
     @Override
-    public OrderTotalSummary caculateOrderTotal(OrderSummary orderSummary, Customer customer, StoreMerchantId store,
-                                                LanguageCode language) throws ServiceException {
-        try {
-            return calculateOrder(orderSummary, customer, store, language);
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
-    }
-
-    @Override
-    public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final Customer customer,
-                                                        final StoreMerchantId store, final LanguageCode language) throws ServiceException {
-        try {
-            return caculateshoppingcart(shoppingCart, customer, store, language);
-        } catch (Exception e) {
-            log.error("Error while calculating shopping cart total", e);
-            throw new ServiceException(e);
-        }
-    }
-
-    private OrderTotalSummary caculateshoppingcart(ShoppingCart shoppingCart, final Customer customer,
-                                                   final StoreMerchantId store, final LanguageCode language) throws Exception {
-
-        OrderSummary orderSummary = new OrderSummary();
-        orderSummary.setOrderSummaryType(OrderSummaryType.SHOPPINGCART);
-
-        if (!StringUtils.isBlank(shoppingCart.getPromoCode())) {
-            Instant promoDateAdded = shoppingCart.getPromoAdded();
-            if (promoDateAdded == null) {
-                promoDateAdded = Instant.now();
-            }
-            ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
-            LocalDate date = zdt.toLocalDate();
-            LocalDate tomorrow = LocalDate.now().plusDays(1);
-            if (date.isBefore(tomorrow)) {
-                orderSummary.setPromoCode(shoppingCart.getPromoCode());
-            } else {
-                shoppingCart.setPromoCode(null);
-                shoppingCartService.saveOrUpdate(shoppingCart);
-            }
-        }
-
-        List<ShoppingCartItem> itemList = new ArrayList<>(shoppingCart.getLineItems());
-        orderSummary.setProducts(itemList);
-
-        return calculateOrder(orderSummary, customer, store, language);
-    }
-
-    @Override
-    public OrderTotalSummary calculateShoppingCartTotal(final ShoppingCart shoppingCart, final StoreMerchantId store,
-                                                        final LanguageCode language) throws ServiceException {
-        try {
-            return caculateshoppingcart(shoppingCart, null, store, language);
-        } catch (Exception e) {
-            log.error("Error while calculating shopping cart total", e);
-            throw new ServiceException(e);
-        }
+    public OrderTotalSummary calculateOrderTotal(OrderSummary orderSummary, StoreMerchantId store) {
+        return calculateOrder(orderSummary, store);
     }
 
     @Override
     @Transactional
-    public void delete(final Order order) throws ServiceException {
+    public void delete(Order order) {
 
         super.delete(order);
     }
 
     @Override
-    public Order getOrder(final Long orderId, StoreMerchantId store) {
+    public Order getOrder(Long orderId, StoreMerchantId store) {
         return orderRepository.findOne(orderId, store);
     }
 
@@ -143,14 +76,15 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
 
     @Transactional
     @Override
-    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary,
-                         Payment payment, Transaction transaction, StoreMerchantId store) throws ServiceException {
+    public Order process(Order order, Customer customer, List<ShoppingCartItem> items, OrderTotalSummary summary, StoreMerchantId store) {
 
         if (order.getOrderHistory() == null || order.getOrderHistory().isEmpty() || order.getStatus() == null) {
             OrderStatus status = order.getStatus();
             if (status == null) {
-                status = OrderStatus.ORDERED;
+                status = OrderStatus.CREATED;
                 order.setStatus(status);
+                order.setInventoryStatus(InventoryStatus.NOT_REQUESTED);
+                order.setPaymentStatus(PaymentStatus.PENDING);
             }
             Set<OrderStatusHistory> statusHistorySet = new HashSet<>();
             OrderStatusHistory statusHistory = new OrderStatusHistory();
@@ -167,9 +101,7 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return order;
     }
 
-    @SneakyThrows
-    private OrderTotalSummary calculateOrder(OrderSummary summary, Customer customer, final StoreMerchantId store,
-                                             final LanguageCode language) {
+    private OrderTotalSummary calculateOrder(OrderSummary summary, StoreMerchantId store) {
 
         OrderTotalSummary totalSummary = new OrderTotalSummary();
         List<OrderTotal> orderTotals = new ArrayList<>();
@@ -211,4 +143,45 @@ public class OrderServiceImpl extends SalesManagerEntityServiceImpl<Long, Order>
         return totalSummary;
     }
 
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus) {
+        updateOrderStatus(orderId, orderStatus, inventoryStatus, paymentStatus, null);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus, InventoryStatus inventoryStatus, PaymentStatus paymentStatus,
+                                  String redirectUri) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order != null) {
+            if (orderStatus != null && !orderStatus.equals(order.getStatus())) {
+                order.setStatus(orderStatus);
+                // Add to history
+                OrderStatusHistory statusHistory = new OrderStatusHistory();
+                statusHistory.setStatus(orderStatus);
+                statusHistory.setDateAdded(Instant.now());
+                statusHistory.setOrder(order);
+                order.getOrderHistory().add(statusHistory);
+            }
+            if (inventoryStatus != null) {
+                order.setInventoryStatus(inventoryStatus);
+            }
+            if (paymentStatus != null) {
+                order.setPaymentStatus(paymentStatus);
+            }
+            if (redirectUri != null) {
+                order.setRedirectUri(redirectUri);
+            }
+            orderRepository.save(order);
+            log.info("Order {} status updated: status={}, inventory={}, payment={}", orderId, orderStatus, inventoryStatus, paymentStatus);
+        } else {
+            log.warn("Attempted to update status for non-existent order {}", orderId);
+        }
+    }
+
+    @Override
+    public Optional<Order> findOrderByShoppingCartCodeAndStoreMerchantId(String shoppingCartCode, StoreMerchantId storeMerchantId) {
+        return orderRepository.findOrderByShoppingCartCodeAndStoreMerchantId(shoppingCartCode, storeMerchantId);
+    }
 }

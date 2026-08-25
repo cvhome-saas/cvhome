@@ -1,0 +1,155 @@
+/*
+ * Layer 2 — Forest, the default identity.
+ *
+ * Every token here is a plain custom property, named to the shadcn/tweakcn convention the
+ * Tailwind ecosystem has standardised on. A theme is exactly one of these blocks and
+ * nothing else: no component references a palette value directly, so adding a theme means
+ * adding one file beside this one and listing it in theme.service.ts.
+ *
+ * The names beyond shadcn's core set are grouped separately below. A theme exported from
+ * tweakcn defines only the core set; the extensions then fall back to Forest's, which is
+ * why this file must stay first in the cascade and complete.
+ *
+ * One world: the deep-forest marketing identity governs every surface, marketing through
+ * console. The console is denser — tighter radii, the operations-* type roles — but it is
+ * the same palette.
+ *
+ * Forest is the default: it applies on bare `:root` as well as under its own
+ * `[data-theme]`, so the app renders correctly before any theme has been chosen. The other
+ * themes are later in the cascade at equal specificity and override it token for token.
+ */
+
+:root,
+[data-theme='forest'] {
+  color-scheme: dark;
+
+  /* ------------------------------------------------------- shadcn core set ---- */
+
+  --background: var(--color-forest-900);
+  --foreground: var(--color-sage-100);
+  /* Headings and figures sit above body copy. */
+  --foreground-strong: var(--color-white);
+  /* Helper text and captions sit below it. */
+  --foreground-subtle: var(--color-sage-500);
+  --foreground-quiet: var(--color-sage-600);
+
+  /* A card reads as a card because of its edge, not its brightness. */
+  --card: var(--color-forest-800);
+  --card-foreground: var(--foreground-strong);
+
+  --popover: var(--color-forest-800);
+  --popover-foreground: var(--color-sage-100);
+
+  --primary: var(--color-emerald-500);
+  --primary-foreground: var(--color-forest-950);
+
+  --secondary: --alpha(var(--color-white) / 6%);
+  --secondary-foreground: var(--color-sage-300);
+
+  --muted: --alpha(var(--color-white) / 2%);
+  --muted-foreground: var(--color-sage-400);
+
+  /* Emerald tint for hover and selected states. */
+  --accent: --alpha(var(--color-emerald-500) / 6%);
+  --accent-foreground: var(--color-emerald-300);
+
+  --destructive: var(--color-red-300);
+  --destructive-foreground: var(--color-forest-950);
+
+  /* Standard 1px divider and card edge. */
+  --border: --alpha(var(--color-white) / 10%);
+  /* Segmented-control troughs and other inset wells. */
+  --input: --alpha(var(--color-white) / 6%);
+  --ring: var(--color-emerald-300);
+
+  /* ---------------------------------------------------------- categorical ---- */
+
+  /*
+   * Categorical colour is never the only signal: every use is accompanied by a label, a
+   * number, or position.
+   *
+   * `--chart-N` is the saturated fill (bars, swatches, borders) where contrast is carried
+   * by area. `--chart-N-foreground` is the readable on-dark ink for text and icons, and
+   * `--chart-N-wash` is the backing it sits on.
+   */
+  --chart-1: var(--color-emerald-500);
+  --chart-1-foreground: var(--color-emerald-300);
+  --chart-1-wash: --alpha(var(--color-emerald-500) / 16%);
+
+  --chart-2: var(--color-blue-500);
+  --chart-2-foreground: var(--color-blue-300);
+  --chart-2-wash: --alpha(var(--color-blue-500) / 16%);
+
+  --chart-3: var(--color-cyan-500);
+  --chart-3-foreground: var(--color-cyan-300);
+  --chart-3-wash: --alpha(var(--color-cyan-500) / 16%);
+
+  --chart-4: var(--color-amber-500);
+  --chart-4-foreground: var(--color-amber-300);
+  --chart-4-wash: --alpha(var(--color-amber-500) / 16%);
+
+  --chart-5: var(--color-red-500);
+  --chart-5-foreground: var(--color-red-300);
+  --chart-5-wash: --alpha(var(--color-red-500) / 16%);
+
+  --chart-6: var(--color-violet-500);
+  --chart-6-foreground: var(--color-violet-300);
+  --chart-6-wash: --alpha(var(--color-violet-500) / 16%);
+
+  /* ------------------------------------------- extensions beyond shadcn ---- */
+
+  /* Emerald steps used decoratively — links, hovers, gradient stops, focus rings. */
+  --primary-emphasis: var(--color-emerald-400);
+  --primary-soft: var(--color-emerald-300);
+  --primary-muted: var(--color-emerald-200);
+
+  /* Quieter divider for section boundaries and header underlines. */
+  --border-soft: --alpha(var(--color-white) / 7%);
+  /* Emerald edge for hovered and selected cards, and its focus/active strength. */
+  --edge: --alpha(var(--color-emerald-400) / 42%);
+  --edge-strong: --alpha(var(--color-emerald-400) / 55%);
+
+  /* Marketing's storefront illustration — decorative swatches, never data. */
+  --seat-1: var(--color-emerald-800);
+  --seat-2: var(--color-teal-900);
+  --seat-3: var(--color-slate-800);
+  --seat-3-foreground: var(--color-slate-200);
+
+  /* Emerald tint, heavier — active pills, featured cards. */
+  --accent-strong: --alpha(var(--color-emerald-500) / 16%);
+  /* Barely-there emerald cast behind the pull quote. */
+  --accent-veil: --alpha(var(--color-emerald-500) / 7%);
+
+  /*
+   * Unfilled portion of a chart — donut remainder, bar baseline, progress track. Sits
+   * well above --input because it has to read as data at a glance, not as an inset.
+   */
+  --track: --alpha(var(--color-white) / 18%);
+
+  /* Forms and popovers that must sit visually above the canvas. */
+  --panel: --alpha(var(--color-forest-950) / 60%);
+  /* Sticky header over scrolling content, paired with backdrop-blur-md. */
+  --header-veil: --alpha(var(--color-forest-900) / 82%);
+  /* Dims the canvas behind the mobile navigation drawer. */
+  --scrim: --alpha(var(--color-forest-950) / 72%);
+
+  /*
+   * Only two shadows exist, and both are reactions to interaction — nothing floats at
+   * rest. Bridged into the --shadow-* namespace in theme-bridge.css.
+   */
+  --lift: 0 20px 45px rgb(0 0 0 / 20%);
+  --lift-primary: 0 12px 30px --alpha(var(--color-emerald-500) / 25%);
+  --lift-subtle: 0 1px 2px rgb(0 0 0 / 24%);
+
+  /* The hero and auth-story atmosphere. One definition, three call sites. */
+  --glow-color: --alpha(var(--color-emerald-500) / 27%);
+
+}
+
+/* Not part of any theme: structure, and the two glow dimensions that never vary. */
+:root {
+  --rail-width: 280px;
+  --rail-collapsed: 76px;
+  --glow-stop: 68%;
+  --glow-blur: 22px;
+}

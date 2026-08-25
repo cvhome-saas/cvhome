@@ -11,13 +11,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.CurrencyValidator;
 
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 import com.asrevo.cvhome.store.core.model.MerchantStorePricingBase;
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.store.errors.NonPositivePriceException;
+import com.asrevo.cvhome.store.errors.PriceNotParseableException;
 
-public class PriceUtils {
+public final class PriceUtils {
 
     private static final char DECIMALCOUNT = '2';
 
@@ -75,59 +76,78 @@ public class PriceUtils {
         return currencyInstance.format(amount.doubleValue());
     }
 
-    public static BigDecimal getAmount(String amount) throws ServiceException {
+    /**
+     * Parses a price as entered by a seller.
+     *
+     * @throws PriceNotParseableException the text is not a number this parser understands
+     * @throws NonPositivePriceException  the text is a number, but not a positive one
+     */
+    public static BigDecimal getAmount(String amount) throws PriceNotParseableException, NonPositivePriceException {
+        String newAmount = stripSeparators(amount);
+        validateNumeric(newAmount, amount);
 
+        if (isPlainInteger(amount)) {
+            return parsePlainInteger(amount);
+        }
+        return parseDecimal(amount);
+    }
+
+    private static String stripSeparators(String amount) {
         StringBuilder newAmount = new StringBuilder();
         for (int i = 0; i < amount.length(); i++) {
             if (amount.charAt(i) != DECIMALPOINT && amount.charAt(i) != THOUSANDPOINT) {
                 newAmount.append(amount.charAt(i));
             }
         }
+        return newAmount.toString();
+    }
 
+    private static void validateNumeric(String newAmount, String originalAmount) throws PriceNotParseableException {
         try {
-            Integer.parseInt(newAmount.toString());
-        } catch (Exception e) {
-            throw new ServiceException("Cannot parse " + amount, e);
+            Integer.parseInt(newAmount);
+        } catch (NumberFormatException e) {
+            throw PriceNotParseableException.of(originalAmount, e);
+        }
+    }
+
+    private static boolean isPlainInteger(String amount) {
+        return !amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
+                && !amount.contains(" ");
+    }
+
+    private static BigDecimal parsePlainInteger(String amount)
+            throws PriceNotParseableException, NonPositivePriceException {
+        if (!matchPositiveInteger(amount)) {
+            throw NonPositivePriceException.of(amount);
+        }
+        BigDecimalValidator validator = CurrencyValidator.getInstance();
+        BigDecimal bdamount = validator.validate(amount, Locale.US);
+        if (bdamount == null) {
+            throw PriceNotParseableException.of(amount);
+        }
+        return bdamount;
+    }
+
+    private static BigDecimal parseDecimal(String amount) throws PriceNotParseableException {
+        Pattern pattern = Pattern.compile(buildDecimalPattern());
+        Matcher matcher = pattern.matcher(amount);
+
+        if (!matcher.matches()) {
+            throw PriceNotParseableException.of(amount);
         }
 
-        if (!amount.contains(Character.toString(DECIMALPOINT)) && !amount.contains(Character.toString(THOUSANDPOINT))
-                && !amount.contains(" ")) {
+        Locale locale = Constants.DEFAULT_LOCALE;
+        BigDecimalValidator validator = CurrencyValidator.getInstance();
+        return validator.validate(amount, locale);
+    }
 
-            if (matchPositiveInteger(amount)) {
-                BigDecimalValidator validator = CurrencyValidator.getInstance();
-                BigDecimal bdamount = validator.validate(amount, Locale.US);
-                if (bdamount == null) {
-                    throw new ServiceException("Cannot parse " + amount);
-                } else {
-                    return bdamount;
-                }
-            } else {
-                throw new ServiceException("Not a positive integer " + amount);
-            }
-
-        } else {
-
-            StringBuilder pat = new StringBuilder();
-
-            if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
-                pat.append("\\d{1,3}(" + THOUSANDPOINT + "?\\d{3})*");
-            }
-
-            pat.append("(\\" + DECIMALPOINT + "\\d{1," + DECIMALCOUNT + "})");
-
-            Pattern pattern = Pattern.compile(pat.toString());
-            Matcher matcher = pattern.matcher(amount);
-
-            if (matcher.matches()) {
-
-                Locale locale = Constants.DEFAULT_LOCALE;
-                BigDecimalValidator validator = CurrencyValidator.getInstance();
-
-                return validator.validate(amount, locale);
-            } else {
-                throw new ServiceException("Cannot parse " + amount);
-            }
+    private static String buildDecimalPattern() {
+        StringBuilder pat = new StringBuilder();
+        if (!StringUtils.isBlank(Character.toString(THOUSANDPOINT))) {
+            pat.append(String.format("\\d{1,3}(%s?\\d{3})*", THOUSANDPOINT));
         }
+        pat.append(String.format("(\\%s\\d{1,%s})", DECIMALPOINT, DECIMALCOUNT));
+        return pat.toString();
     }
 
     public static boolean matchPositiveInteger(String amount) {

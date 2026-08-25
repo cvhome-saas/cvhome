@@ -9,4 +9,5 @@ import {ManagedRoutingModule} from './managed-routing.module';
     ManagedRoutingModule
   ]
 })
-export class ManagedModule { }
+export class ManagedModule {
+}

@@ -56,7 +56,8 @@ POST http://localhost:8001/oauth2/token
 Content-Type: application/x-www-form-urlencoded
 Authorization: Basic store-pod-1@service.store-pod.internal hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
 
-grant_type=client_credentials&scope=internal
+grant_type = client_credentials &
+scope = internal
 
 ###
 # http://org1-store1.spg-507f1f77.gateway.com:80/cua/oauth2/authorize?response_type=code&client_id=65f023632bc46470c104b76f&scope=openid&state=wluMmDBnDBX9ukT3ngWhC2vSTrhAZu10pGBXOtcZ9Qo%3D&redirect_uri=http://org1-store1.spg-507f1f77.gateway.com/callback&nonce=U6H2w96cGF3jSEpaCNNtKpkYgUWRAhGf3Wuu0W536oc&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256

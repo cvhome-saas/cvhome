@@ -1,0 +1,70 @@
+# OrgManagerApi — com.asrevo.cvhome.tenancy.manager.controller.admin.OrgManagerApi
+#
+# Super-admin only, all of it. Needs a super-admin session.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### every organization
+GET {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/find-all?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("listed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### an organization's stores — this took an arbitrary org id with NO @PreAuthorize until phase 3, so any
+### authenticated principal could enumerate any organization's stores
+GET {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/stores?id={{ORG_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("super admin may list them", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+%}
+
+### name an organization — it had only an id, an email and a created date
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/rename?id={{ORG_ID}}&name=Acme%20Trading&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("renamed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.name === "Acme Trading", "name " + response.body.name);
+    });
+%}
+
+### suspend the organization — every store it owns follows, without a single store row being written
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/suspend?id={{ORG_ID}}&reason=qa&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("suspended", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "SUSPENDED", "status " + response.body.status);
+    });
+%}
+
+### and now none of its stores can be entered
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("a store of a suspended organization is closed too", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.STORE.NOT_OPERABLE", response.body.code);
+    });
+%}
+
+### put it back
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-manager/resume?id={{ORG_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("resumed", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "status " + response.body.status);
+    });
+%}

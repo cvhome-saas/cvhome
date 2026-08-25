@@ -1,0 +1,117 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="facade.totalLabel() ?? heading().context">
+    <a class="primary-action" routerLink="/platform/pods/new">
+      <app-icon name="plus" />{{ t('platform.pods.action.create') }}
+    </a>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="isLoading()" [label]="t('platform.pods.loading')">
+    @if (!isEmpty()) {
+      <div class="pods-stack">
+        <!--
+          Said once, at the top, rather than as four columns of em dashes: the paged endpoint returns
+          the routing record and the operational state is per-id only.
+        -->
+        <app-notice-bar
+          icon="info"
+          tone="blue"
+          [message]="t('platform.pods.notice.stateOnDetail')"
+        />
+
+        <app-panel [title]="t('platform.pods.panel.title')" [subtitle]="facade.subtitle()">
+          <!--
+            The registry's own search, not a filter over the page on screen: `?q=` matches the name
+            and the endpoint server-side.
+          -->
+          <app-search-box
+            panelAction
+            [value]="facade.search()"
+            (valueChange)="onSearch($event)"
+            [label]="t('platform.pods.search.label')"
+            [placeholder]="t('platform.pods.search.placeholder')"
+            [clearLabel]="t('platform.pods.search.clear')"
+          />
+
+          @if (rows().length) {
+            <app-data-table [columns]="columns()" [label]="t('platform.pods.panel.title')">
+              @for (row of rows(); track row.id) {
+                <app-table-row [interactive]="true">
+                  <div class="cell-pod" role="cell" [attr.data-label]="t('platform.pods.column.pod')">
+                    <span class="pod-mark" aria-hidden="true"><app-icon name="server" /></span>
+                    <!--
+                      The name is the affordance rather than the whole row: a row-wide click handler
+                      is invisible to a keyboard and to a screen reader.
+                    -->
+                    <button class="identity" type="button" (click)="open(row)">
+                      <strong dir="auto">{{ row.name }}</strong>
+                    </button>
+                  </div>
+
+                  <div class="cell-endpoint" role="cell" [attr.data-label]="t('platform.pods.column.endpoint')">
+                    <span class="endpoint latin" dir="auto">{{ row.endpoint }}</span>
+                    <app-badge tone="slate" shape="square">{{ row.endpointType }}</app-badge>
+                  </div>
+
+                  <span class="cell-owner" role="cell" dir="auto" [attr.data-label]="t('platform.pods.column.owner')">
+                    {{ ownerLabel(row.orgId) }}
+                  </span>
+
+                  <!--
+                    Tenancy's count, not the registry's: `manager_store.pod_id` is the fact, and
+                    `capacity_stores` is a mirror of it. An em dash means the count could not be
+                    read at all — a pod with no stores reads zero.
+                  -->
+                  <span class="cell-stores" role="cell" [attr.data-label]="t('platform.pods.column.stores')">
+                    {{ storeCount(row.stores) }}
+                  </span>
+
+                  <div class="cell-short" role="cell" [attr.data-label]="t('platform.pods.column.shortId')">
+                    <app-copy-field [value]="row.id" [label]="t('platform.pods.column.shortId')" />
+                  </div>
+
+                  <div class="cell-actions" role="cell" [attr.data-label]="t('platform.pods.column.actions')">
+                    <button
+                      class="icon-action"
+                      type="button"
+                      [title]="t('platform.pods.action.open')"
+                      [attr.aria-label]="t('platform.pods.action.openNamed', {name: row.name})"
+                      (click)="open(row)"
+                    >
+                      <app-icon name="chevronRight" />
+                    </button>
+                  </div>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('platform.pods.unit')"
+              [label]="t('platform.pods.paginationLabel')"
+              (pageChange)="onPage($event)"
+            />
+          } @else if (facade.search().trim() && facade.rowsMatchSearch()) {
+            <app-empty-state
+              icon="search"
+              [title]="t('platform.pods.noMatches.title')"
+              [message]="t('platform.pods.noMatches.message')"
+            />
+          } @else if (!facade.search().trim()) {
+            <app-empty-state
+              icon="server"
+              [title]="t('platform.pods.empty.title')"
+              [message]="t('platform.pods.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

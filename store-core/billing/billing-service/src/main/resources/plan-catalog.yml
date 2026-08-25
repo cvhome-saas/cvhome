@@ -1,0 +1,77 @@
+# The plan catalog, seeded into billing.plan / plan_price / plan_entitlement on start and, when Stripe sync is on,
+# pushed to Stripe as products and prices.
+#
+# Two rules worth knowing before editing:
+#
+#  1. `code` is the identity. Renaming one creates a second plan and orphans the subscribers of the first; change
+#     `displayName` instead, which is what anyone actually sees.
+#
+#  2. Prices are immutable in Stripe. Changing an `amount` here does not edit the existing price — the seeder mints a
+#     new plan_price row and deactivates the old one. Existing subscribers keep paying the old amount until they
+#     change plans, which is the correct behaviour and not a bug to work around.
+#
+# `tier` orders the plans: moving to a higher tier is an upgrade (immediate, prorated), a lower one a downgrade
+# (deferred to the end of the paid period). Ties would make "is this an upgrade" unanswerable, so keep them distinct.
+#
+# Entitlements: omit a key to mean unlimited. A key set to 0 means "none allowed", which is a different statement.
+
+com:
+  asrevo:
+    cvhome:
+      billing:
+        catalog:
+          plans:
+            - code: FREE
+              displayName: Free
+              description: A store to try the platform with.
+              tier: 0
+              prices:
+                - currency: USD
+                  amount: 0
+                  interval: MONTH
+              entitlements:
+                MAX_PRODUCTS: 25
+                MAX_ORDERS_MONTH: 50
+                MAX_ACCOUNTS: 1
+                MAX_STORAGE_MB: 500
+                CUSTOM_DOMAIN: false
+                ANALYTICS: false
+                PRIORITY_SUPPORT: false
+
+            - code: BASIC
+              displayName: Basic
+              description: For a store finding its feet.
+              tier: 10
+              prices:
+                - currency: USD
+                  amount: 1000
+                  interval: MONTH
+                - currency: USD
+                  amount: 10000
+                  interval: YEAR
+              entitlements:
+                MAX_PRODUCTS: 500
+                MAX_ORDERS_MONTH: 1000
+                MAX_ACCOUNTS: 3
+                MAX_STORAGE_MB: 5000
+                CUSTOM_DOMAIN: true
+                ANALYTICS: false
+                PRIORITY_SUPPORT: false
+
+            - code: PRO
+              displayName: Pro
+              description: For a store that is growing.
+              tier: 20
+              prices:
+                - currency: USD
+                  amount: 3000
+                  interval: MONTH
+                - currency: USD
+                  amount: 30000
+                  interval: YEAR
+              entitlements:
+                MAX_ACCOUNTS: 10
+                MAX_STORAGE_MB: 50000
+                CUSTOM_DOMAIN: true
+                ANALYTICS: true
+                PRIORITY_SUPPORT: true

@@ -1,0 +1,220 @@
+<ng-container *transloco="let t">
+  <app-editor-shell
+    [title]="heading()"
+    [context]="t('content.banner.context')"
+    [status]="facade.status()"
+    [isNew]="facade.isNew()"
+    [loading]="facade.loading()"
+    [saving]="facade.busy()"
+    [canSave]="facade.dirty() && !facade.busy()"
+    [canManage]="canManage()"
+    [loadError]="facade.loadError()"
+    [deleteOpen]="deleteOpen()"
+    (saved)="facade.save()"
+    (cancelled)="facade.back()"
+    (retried)="facade.reload()"
+    (commanded)="onCommand($event)"
+    (deleted)="deleteOpen.set(false); facade.delete()"
+    (deleteDismissed)="deleteOpen.set(false)"
+  >
+    <ng-container main>
+      <app-panel
+        [title]="t('content.banner.placementTitle')"
+        [subtitle]="t('content.banner.placementSubtitle')"
+        padded
+      >
+        <div
+          class="placement-cards"
+          role="radiogroup"
+          [attr.aria-label]="t('content.banner.placementTitle')"
+        >
+          @for (placement of placements; track placement) {
+            <button
+              class="placement-card"
+              type="button"
+              role="radio"
+              [class.active]="extra.controls.placement.value === placement"
+              [attr.aria-checked]="extra.controls.placement.value === placement"
+              [disabled]="!canManage()"
+              (click)="pickPlacement(placement)"
+            >
+              <strong>{{ placementLabel(placement) }}</strong>
+              <small>{{ placementHint(placement) }}</small>
+            </button>
+          }
+        </div>
+      </app-panel>
+
+      @if (!isStrip()) {
+        <app-panel
+          [title]="t('content.banner.artwork')"
+          [subtitle]="t('content.banner.artworkHint', {size: sizeHint()})"
+          padded
+        >
+          <div class="artwork-grid">
+            <div class="artwork-slot">
+              <p class="field-label">{{ t('content.banner.desktop') }}</p>
+              @if (desktopUrl(); as url) {
+                <img [src]="url" alt="" />
+              } @else {
+                <div class="artwork-empty"><app-icon name="images" [size]="22" /></div>
+              }
+              @if (canManage()) {
+                <div class="artwork-actions">
+                  <button class="secondary-action" type="button" (click)="picker.set('desktop')">
+                    <app-icon name="images" />{{ t('content.banner.chooseArtwork') }}
+                  </button>
+                  @if (desktopUrl()) {
+                    <button class="ghost-action" type="button" (click)="clearArtwork('desktop')">
+                      {{ t('content.post.removeHero') }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            <div class="artwork-slot">
+              <p class="field-label">{{ t('content.banner.mobile') }}</p>
+              @if (mobileUrl(); as url) {
+                <img [src]="url" alt="" />
+              } @else {
+                <div class="artwork-empty"><app-icon name="images" [size]="22" /></div>
+              }
+              @if (canManage()) {
+                <div class="artwork-actions">
+                  <button class="secondary-action" type="button" (click)="picker.set('mobile')">
+                    <app-icon name="images" />{{ t('content.banner.chooseArtwork') }}
+                  </button>
+                  @if (mobileUrl()) {
+                    <button class="ghost-action" type="button" (click)="clearArtwork('mobile')">
+                      {{ t('content.post.removeHero') }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </app-panel>
+      }
+
+      <app-locale-copy
+        [forms]="facade.translations()"
+        [locales]="hub.localeOptions()"
+        [defaultLocale]="hub.locales().defaultCode"
+        [written]="facade.written()"
+        [fields]="copyFields"
+        [language]="facade.language()"
+        (languageChange)="facade.chooseLanguage($event)"
+      />
+
+      <app-panel [title]="t('content.banner.targetTitle')" padded>
+        <div class="field-grid" [formGroup]="extra">
+          <app-form-field
+            [label]="t('content.banner.targetKindLabel')"
+            [control]="extra.controls.targetKind"
+            controlId="banner-target-kind"
+          >
+            <app-select
+              id="banner-target-kind"
+              [options]="targetKinds()"
+              [value]="extra.controls.targetKind.value"
+              (valueChange)="onTargetKind($event)"
+              [disabled]="!canManage()"
+            />
+          </app-form-field>
+          <app-form-field
+            [label]="t('content.banner.targetValue')"
+            [hint]="t('content.banner.targetValueHint')"
+            [control]="extra.controls.targetValue"
+            controlId="banner-target-value"
+          >
+            <app-text-field
+              id="banner-target-value"
+              formControlName="targetValue"
+              latin
+              [maxLength]="255"
+            />
+          </app-form-field>
+          <app-form-field
+            [label]="t('content.editor.slug')"
+            [control]="facade.common.controls.slug"
+            controlId="banner-slug"
+            required
+          >
+            <div [formGroup]="facade.common">
+              <app-text-field
+                id="banner-slug"
+                formControlName="slug"
+                latin
+                mono
+                [maxLength]="100"
+              />
+            </div>
+          </app-form-field>
+        </div>
+      </app-panel>
+    </ng-container>
+
+    <ng-container sidebar>
+      <app-panel [title]="t('content.banner.schedule')" padded>
+        <div class="field-grid side-grid" [formGroup]="extra">
+          <app-form-field
+            wide
+            [label]="t('content.banner.startsAt')"
+            [control]="extra.controls.startsAt"
+            controlId="banner-starts"
+          >
+            <app-date-time-field id="banner-starts" formControlName="startsAt" />
+          </app-form-field>
+          <app-form-field
+            wide
+            [label]="t('content.banner.endsAt')"
+            [control]="extra.controls.endsAt"
+            controlId="banner-ends"
+          >
+            <app-date-time-field id="banner-ends" formControlName="endsAt" />
+          </app-form-field>
+          <div class="field field-wide">
+            <app-toggle
+              formControlName="loggedInOnly"
+              [label]="t('content.banner.loggedInOnly')"
+              [description]="t('content.banner.audienceHint')"
+            />
+          </div>
+        </div>
+      </app-panel>
+
+      <app-panel [title]="t('content.banner.preview')" padded>
+        <div
+          class="banner-preview"
+          [class.strip]="isStrip()"
+          [style.background-image]="desktopUrl() ? 'url(' + desktopUrl() + ')' : null"
+        >
+          <strong dir="auto">{{
+            activeTranslation()?.controls?.title?.value || t('content.banner.previewHeadline')
+          }}</strong>
+          @if (!isStrip()) {
+            <span dir="auto">{{ activeTranslation()?.controls?.subtitle?.value }}</span>
+            @if (activeTranslation()?.controls?.ctaLabel?.value; as cta) {
+              <em>{{ cta }}</em>
+            }
+          }
+        </div>
+        <p class="field-hint">{{ t('content.banner.previewHint') }}</p>
+      </app-panel>
+
+      <app-publish-checklist [title]="t('content.checklist.title')" [items]="checklist()" />
+    </ng-container>
+  </app-editor-shell>
+
+  <app-media-picker-dialog
+    [open]="picker() !== null"
+    kind="IMAGE"
+    (picked)="onArtwork($event)"
+    (closed)="picker.set(null)"
+  />
+  <app-schedule-sheet
+    [(open)]="scheduleOpen"
+    [(at)]="scheduleAt"
+    (confirmed)="confirmSchedule($event)"
+  />
+</ng-container>

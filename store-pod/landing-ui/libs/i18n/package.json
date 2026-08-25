@@ -1,0 +1,15 @@
+{
+  "name": "@store-front/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "next-intl": "4.x",
+    "react": "19.x"
+  },
+  "dependencies": {
+    "@store-front/types": "0.0.0"
+  }
+}

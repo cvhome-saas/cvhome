@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  min-block-size: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.legal {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+  max-inline-size: 46rem;
+  margin-inline: auto;
+  padding: clamp(3rem, 8vw, 6rem) 1.5rem;
+}
+
+.back,
+.contact {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+h1 {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 1.05rem;
+}
+
+.pending {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  color: var(--muted-foreground);
+}

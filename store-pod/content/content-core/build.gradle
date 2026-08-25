@@ -1,0 +1,23 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:content:content-commons')
+    // api, not implementation: the media service's signatures name cms-commons exception types, so a consumer has
+    // to see them to catch them.
+    api project(':store-pod:commons:store-modules:store-cms-commons')
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.spring.tx
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.jackson.databind
+    compileOnly libs.jackson.annotations
+    compileOnly libs.aws.sdk.s3
+    compileOnly libs.commons.io
+    compileOnly libs.slf4j.api
+    implementation libs.jsoup
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
+}

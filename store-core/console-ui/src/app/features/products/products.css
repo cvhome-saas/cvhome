@@ -1,0 +1,218 @@
+:host {
+  display: contents;
+}
+
+/* ---- Filters ----------------------------------------------------------------------- */
+
+/*
+ * The filters, on the panel's header row.
+ *
+ * Sized from `Inventory.dc.html`: a **fixed** 230px search box and two chips sized to their content.
+ * They previously sat on a rail of their own at `flex: 1 1 11rem`, which grew each to 372px — three
+ * controls taking more width than the table's first three columns, for a job that is incidental to
+ * the table. Compact and in the header is what the template draws and what leaves the data the room.
+ */
+/*
+ * The filters claim a basis so the panel's title does not pay for them.
+ *
+ * `.panel-copy` is `flex: 1` with `min-width: 0`, and this row is unusually wide — eleven status
+ * tabs and a search box — so with no basis of its own it shrank the title to two words per line
+ * and squeezed the subtitle into a column. A basis makes the header wrap the controls onto their
+ * own row instead, which is what there is room for.
+ */
+.panel-controls {
+  display: flex;
+  flex: 1 1 26rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+
+.filter {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: .45rem;
+  inline-size: 14.5rem;
+  /* One explicit height for every control on this row — a min alone left the select 2px taller. */
+  block-size: 2.25rem;
+  padding: 0 .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-subtle);
+  transition: border-color var(--default-transition-duration);
+}
+
+.filter:focus-within {
+  border-color: var(--primary);
+}
+
+.filter input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  outline: none;
+}
+
+.filter input::placeholder {
+  color: var(--foreground-quiet);
+  font-weight: 400;
+}
+
+/*
+ * A fixed width, not one sized to the label.
+ *
+ * It used to be `auto` between a 9rem floor and a 13rem ceiling, which meant picking a long
+ * category widened the box and shoved the search field and everything else in the row sideways —
+ * the row rearranged itself every time a filter changed. The select truncates its value with an
+ * ellipsis, so a fixed width costs nothing and the row stays where the eye left it.
+ */
+.filter-select {
+  flex: none;
+  inline-size: 11rem;
+  /* The one hook the component offers — see select.css. */
+  --select-height: 2.25rem;
+}
+
+/* ---- Cells ------------------------------------------------------------------------- */
+
+.cell-product {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  min-inline-size: 0;
+}
+
+.thumb {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-quiet);
+}
+
+.thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.product-copy {
+  display: grid;
+  min-inline-size: 0;
+  gap: .05rem;
+}
+
+/*
+ * The name is the row's one focusable target, so the table has one tab stop per row rather than
+ * one per cell — the same rule the order book follows.
+ */
+.product-name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-name:hover {
+  color: var(--primary-emphasis);
+}
+
+.product-copy small {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  letter-spacing: .03em;
+}
+
+.cell-category,
+.cell-brand {
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--foreground-quiet);
+}
+
+.cell-price,
+.cell-quantity {
+  display: flex;
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Width only.
+ *
+ * Everything else this used to declare — the border, radius, background, type size and alignment —
+ * belongs to the field, and setting it here drew a second frame around the component's own while
+ * the font-size and text-align never reached the input at all. `compact` and `align="end"` on
+ * `app-number-field` are where those live now.
+ */
+.inline-input {
+  inline-size: 100%;
+  max-inline-size: 6.5rem;
+}
+
+.availability {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.availability:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.availability:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.cell-actions {
+  display: flex;
+  gap: .1rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  /* Room runs out before the row does, so the search box gives up its fixed width first. */
+  .filter {
+    flex: 1 1 100%;
+    inline-size: auto;
+  }
+
+  .filter-select {
+    flex: 1 1 10rem;
+    max-inline-size: none;
+  }
+}

@@ -12,19 +12,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.checkout.errors.OrderNotFoundException;
 import com.asrevo.cvhome.checkout.model.order.history.PersistableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.model.order.history.ReadableOrderStatusHistory;
 import com.asrevo.cvhome.checkout.service.facade.order.OrderFacade;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.inventory.api.errors.InventoryApiUnavailableException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -46,7 +48,7 @@ public class OrderStatusHistoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public List<ReadableOrderStatusHistory> list(@PathVariable final Long id, StoreMerchantId merchantStore,
-                                                 LanguageCode language) {
+                                                 LanguageCode language) throws OrderNotFoundException {
 
         return orderFacade.getReadableOrderHistory(id, merchantStore, language);
     }
@@ -60,7 +62,8 @@ public class OrderStatusHistoryApi {
 
     @PreAuthorize("hasPermission(#merchantStore,'StoreMerchantId','STORE-POD.CHECKOUT.*')")
     public void create(@PathVariable final Long id, @RequestBody PersistableOrderStatusHistory history,
-                       StoreMerchantId merchantStore) {
+                       StoreMerchantId merchantStore)
+            throws OrderNotFoundException, InventoryApiUnavailableException {
         orderFacade.createOrderStatus(history, id, merchantStore);
     }
 

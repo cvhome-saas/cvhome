@@ -1,0 +1,94 @@
+# OrgMemberApi — com.asrevo.cvhome.tenancy.manager.controller.OrgMemberApi (@RequestMapping "api/v1/org-member")
+#
+# The organization comes from the session, never a query parameter, so an org admin cannot address someone
+# else's organization by editing a URL. Use an org-admin session.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### invite someone — the ONLY time the token is readable
+# There is no mail sender in this platform, so nothing emails the invitee: the console shows this link for an
+# admin to send. Only the token's SHA-256 hash is stored, so this response cannot be reconstructed later.
+# @name invite
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations?email=Newbie@Example.COM&role=STORE_ADMIN&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("invited", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.token && response.body.token.length > 20, "no usable token");
+    });
+    client.test("the address is normalised, so one person cannot hold two invitations", function () {
+        client.assert(response.body.invitation.email === "newbie@example.com",
+            "email " + response.body.invitation.email);
+    });
+    client.global.set("INVITE_TOKEN", response.body.token);
+    client.global.set("INVITE_ID", response.body.invitation.id);
+%}
+
+### a second live invitation for the same address is refused
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations?email=newbie@example.com&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("refused", function () {
+        client.assert(response.status === 409, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.INVITATION.ALREADY_EXISTS", response.body.code);
+    });
+%}
+
+### listing must never carry the token — anyone who can list could otherwise accept
+GET {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("no token in a read", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(!JSON.stringify(response.body).includes(client.global.get("INVITE_TOKEN")),
+            "the invitation token leaked into a list response");
+    });
+%}
+
+### accept — authenticated, but carrying no permission token: the invitee is not a member yet, so the
+### bearer token in the link is the authorization
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations/accept?token={{INVITE_TOKEN}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("accepted", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACCEPTED", "status " + response.body.status);
+    });
+%}
+
+### the same link a second time is dead
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations/accept?token={{INVITE_TOKEN}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("single use", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.INVITATION.NOT_USABLE", response.body.code);
+    });
+%}
+
+### an unknown token answers exactly the same, so this cannot be used to probe which tokens existed
+POST {{SELLER_UI_URL}}/tenancy/api/v1/org-member/invitations/accept?token=not-a-real-token&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("indistinguishable from a spent one", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.INVITATION.NOT_USABLE", response.body.code);
+    });
+%}
+
+### the members of my organization
+GET {{SELLER_UI_URL}}/tenancy/api/v1/org-member/list?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("the accepted invitee is a member", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.length > 0, "no members");
+    });
+%}

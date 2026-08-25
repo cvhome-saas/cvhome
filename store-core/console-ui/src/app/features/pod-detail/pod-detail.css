@@ -1,0 +1,114 @@
+/*
+ * Page-level layout only. The card chrome belongs to Panel and the field vocabulary to
+ * `@shared/styles/field.css`, which this component lists ahead of this sheet.
+ */
+
+:host {
+  display: contents;
+}
+
+.pod-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.facts {
+  display: grid;
+  gap: 1.15rem;
+  margin: 0;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.fact {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  min-inline-size: 0;
+}
+
+/* The endpoint and the capacity bar want the whole row rather than a third of it. */
+.fact-wide {
+  grid-column: 1 / -1;
+}
+
+.fact dt {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fact dd {
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.fact-value {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  unicode-bidi: plaintext;
+}
+
+/* What the badge above cannot say: why a state is not the alarm it looks like. */
+.fact-note {
+  margin: 0.35rem 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+/* ---- Stores ---------------------------------------------------------------------- */
+
+.cell-store {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+.cell-store strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-id {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-org {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+}
+
+/* An organization name is data, so it takes its own direction under RTL. */
+.org-name {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.latin {
+  unicode-bidi: plaintext;
+}
+
+/* A value the platform has never recorded reads as absent, not as blank. */
+.unset {
+  color: var(--muted-foreground);
+  font-style: italic;
+}

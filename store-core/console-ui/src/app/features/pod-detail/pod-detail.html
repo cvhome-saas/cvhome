@@ -1,0 +1,313 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context">
+    <a class="secondary-action" routerLink="/platform/pods">
+      <app-icon name="arrowLeft" />{{ t('platform.pod.action.backToFleet') }}
+    </a>
+
+    @if (!facade.isNew()) {
+      <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.startEdit()">
+        <app-icon name="pencil" />{{ t('platform.pod.form.edit') }}
+      </button>
+      @if (facade.canResume()) {
+        <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('resume')">
+          <app-icon name="play" />{{ t('platform.pod.action.resume') }}
+        </button>
+      }
+      @if (facade.canDrain()) {
+        <button class="secondary-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('drain')">
+          <app-icon name="minus" />{{ t('platform.pod.action.drain') }}
+        </button>
+      }
+      <button class="danger-action" type="button" [disabled]="facade.busy()" (click)="facade.ask('delete')">
+        <app-icon name="trash" />{{ t('platform.pod.action.delete') }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.pod.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="pod-stack">
+        @if (facade.pod(); as pod) {
+          <app-panel [title]="t('platform.pod.state.title')" padded>
+            <dl class="facts">
+              <div class="fact">
+                <dt>{{ t('platform.pod.state.lifecycle') }}</dt>
+                <dd>
+                  <app-badge [tone]="facade.lifecycleTone()" shape="square">{{ facade.lifecycleLabel() }}</app-badge>
+                  <!--
+                    Lifecycle gates placement, never routing: a draining pod keeps its gateway route
+                    and keeps serving the stores already on it.
+                  -->
+                  <p class="fact-note">{{ t('platform.pod.state.lifecycleNote') }}</p>
+                </dd>
+              </div>
+
+              <div class="fact">
+                <dt>{{ t('platform.pod.state.health') }}</dt>
+                <dd>
+                  <app-badge [tone]="facade.healthTone()" shape="square">{{ facade.healthLabel() }}</app-badge>
+                  <p class="fact-note">{{ t('platform.pod.state.lastProbed', {at: facade.lastHealthAt()}) }}</p>
+                </dd>
+              </div>
+
+              <div class="fact fact-wide">
+                <dt>{{ t('platform.pod.state.capacity') }}</dt>
+                <dd>
+                  @if (facade.capacityPercent(); as percent) {
+                    <app-progress-track
+                      [value]="percent"
+                      [tone]="facade.capacityTone()"
+                      [label]="facade.capacityLabel()"
+                    />
+                  } @else {
+                    <!-- A null ceiling means unlimited, which is every pod on the platform today. -->
+                    <span class="fact-value">{{ facade.capacityLabel() }}</span>
+                  }
+                </dd>
+              </div>
+            </dl>
+
+            @if (facade.capacityDisagrees()) {
+              <!--
+                The registry's counter is a mirror of a fact tenancy owns, and it is what placement decides
+                against — so when the two differ the operator needs to know which is which. Tenancy reconciles
+                the registry at startup, so this should be rare after a boot.
+                TODO(lessons.md): see lessons.md, "Pods — the registry's store count is a mirror, and mirrors
+                drift".
+              -->
+              <app-notice-bar
+                icon="alertCircle"
+                tone="amber"
+                [message]="
+                  t('platform.pod.state.capacityDisagrees', {
+                    registry: facade.capacityLabel(),
+                    placed: facade.placedStoresLabel()
+                  })
+                "
+              />
+            }
+          </app-panel>
+
+          <app-panel [title]="t('platform.pod.routing.title')" padded>
+            <dl class="facts">
+              <div class="fact fact-wide">
+                <dt>{{ t('platform.pod.routing.endpoint') }}</dt>
+                <dd>
+                  <app-copy-field [value]="pod.endpoint" [label]="t('platform.pod.routing.endpoint')" />
+                </dd>
+              </div>
+
+              <div class="fact">
+                <dt>{{ t('platform.pod.routing.endpointType') }}</dt>
+                <dd><app-badge tone="slate" shape="square">{{ pod.endpointType }}</app-badge></dd>
+              </div>
+
+              <div class="fact">
+                <dt>{{ t('platform.pod.routing.visibility') }}</dt>
+                <dd>
+                  <app-badge [tone]="facade.visibilityTone()" shape="square">
+                    {{ facade.visibilityLabel() }}
+                  </app-badge>
+                </dd>
+              </div>
+
+              <div class="fact">
+                <dt>{{ t('platform.pod.routing.region') }}</dt>
+                <dd class="fact-value">
+                  @if (pod.region) {
+                    {{ pod.region }}
+                  } @else {
+                    <!-- A column on `pod_registry.pod` that no endpoint writes. -->
+                    <em class="unset">{{ t('platform.pod.routing.noRegion') }}</em>
+                  }
+                </dd>
+              </div>
+
+              <div class="fact">
+                <dt>{{ t('platform.pod.routing.id') }}</dt>
+                <dd><app-copy-field [value]="pod.id" [label]="t('platform.pod.routing.id')" /></dd>
+              </div>
+            </dl>
+          </app-panel>
+        }
+
+        @if (!facade.isNew()) {
+          <app-panel
+            [title]="t('platform.pod.stores.title')"
+            [subtitle]="t('platform.pod.stores.subtitle')"
+            [meta]="facade.placedStoresLabel()"
+          >
+            <!-- Server-side: the term matches a store's name or its id across the whole pod. -->
+            <app-search-box
+              panelAction
+              [value]="facade.storeSearch()"
+              (valueChange)="onStoreSearch($event)"
+              [label]="t('platform.pod.stores.search.label')"
+              [placeholder]="t('platform.pod.stores.search.placeholder')"
+              [clearLabel]="t('platform.pod.stores.search.clear')"
+            />
+
+            @if (facade.storesError(); as failure) {
+              <!--
+                The panel's failure, not the page's: a pod's routing, health and lifecycle are still worth
+                reading when tenancy is unreachable — which is when an operator is most likely to be here.
+              -->
+              <app-load-error [message]="failure.message" (retry)="facade.reloadStores()" />
+            }
+
+            <app-busy-overlay
+              reserve="panel"
+              [busy]="facade.storesLoading()"
+              [label]="t('platform.pod.stores.loading')"
+            >
+              @if (facade.storeRows().length) {
+                <app-data-table [columns]="storeColumns()" [label]="t('platform.pod.stores.title')">
+                  @for (row of facade.storeRows(); track row.id) {
+                    <app-table-row>
+                      <div
+                        class="cell-store"
+                        role="cell"
+                        [attr.data-label]="t('platform.pod.stores.column.store')"
+                      >
+                        <strong>{{ row.name }}</strong>
+                        <span class="cell-id latin">{{ row.id }}</span>
+                      </div>
+
+                      <!--
+                        The id sits under the label because the label is not unique: an organization with no
+                        name falls back to its contact email, and two of them can share one — which on the
+                        seeded stack made four stores in two different orgs read identically.
+                      -->
+                      <div
+                        class="cell-org"
+                        role="cell"
+                        [attr.data-label]="t('platform.pod.stores.column.organization')"
+                      >
+                        <span class="org-name" dir="auto">{{ orgLabel(row.orgId) }}</span>
+                        <span class="cell-id latin">{{ row.orgId }}</span>
+                      </div>
+
+                      <span role="cell" [attr.data-label]="t('platform.pod.stores.column.status')">
+                        <app-badge [tone]="facade.storeStatusTone(row.status)" shape="square">
+                          {{ storeStatusLabel(row.status) }}
+                        </app-badge>
+                      </span>
+
+                      <span role="cell" [attr.data-label]="t('platform.pod.stores.column.provisioning')">
+                        <app-badge [tone]="facade.provisioningTone(row.provisioningState)" shape="square">
+                          {{ provisioningLabel(row.provisioningState) }}
+                        </app-badge>
+                      </span>
+
+                      <span role="cell" [attr.data-label]="t('platform.pod.stores.column.billing')">
+                        @if (row.billingStatus) {
+                          <app-badge [tone]="facade.billingTone(row.billingStatus)" shape="square">
+                            {{ billingLabel(row.billingStatus) }}
+                          </app-badge>
+                        } @else {
+                          <span class="unset" [title]="t('platform.organization.stores.billingUnknown')">
+                            {{ t('platform.organization.stores.billingUnknownShort') }}
+                          </span>
+                        }
+                      </span>
+                    </app-table-row>
+                  }
+                </app-data-table>
+
+                <app-pagination
+                  [page]="facade.storesPage()"
+                  [totalPages]="facade.storesTotalPages()"
+                  [totalElements]="facade.storesTotal()"
+                  [pageSize]="storesPageSize"
+                  [unit]="t('platform.pod.stores.unit')"
+                  [label]="t('platform.pod.stores.paginationLabel')"
+                  (pageChange)="facade.storesPage.set($event)"
+                />
+              } @else if (facade.storeSearch().trim() && facade.storeRowsMatchSearch()) {
+                <app-empty-state
+                  icon="search"
+                  [title]="t('platform.pod.stores.noMatches.title')"
+                  [message]="t('platform.pod.stores.noMatches.message')"
+                />
+              } @else if (!facade.storesLoading() && !facade.storeSearch().trim()) {
+                <app-empty-state
+                  icon="shoppingCart"
+                  [title]="t('platform.pod.stores.empty.title')"
+                  [message]="t('platform.pod.stores.empty.message')"
+                />
+              }
+            </app-busy-overlay>
+          </app-panel>
+        }
+
+      </div>
+    }
+  </app-busy-overlay>
+
+  <app-pod-form-dialog
+    [open]="facade.editing()"
+    [busy]="facade.busy()"
+    [form]="facade.form()"
+    [creating]="facade.isNew()"
+    [title]="facade.isNew() ? t('platform.pod.form.createTitle') : t('platform.pod.form.editTitle')"
+    [editableFields]="t('platform.pod.form.editableFields')"
+    [nameLabel]="t('platform.pod.form.name')"
+    [nameHint]="t('platform.pod.form.nameHint')"
+    [nameInvalid]="t('platform.pod.form.nameInvalid')"
+    [endpointLabel]="t('platform.pod.form.endpoint')"
+    [endpointHint]="t('platform.pod.form.endpointHint')"
+    [endpointInvalid]="t('platform.pod.form.endpointInvalid')"
+    [endpointTypeLabel]="t('platform.pod.form.endpointType')"
+    [endpointTypes]="facade.endpointTypes()"
+    [ownerLabel]="t('platform.pod.form.owner')"
+    [ownerHint]="facade.isNew() ? t('platform.pod.form.ownerHint') : t('platform.pod.form.ownerFixed')"
+    [ownerOptions]="facade.ownerOptions()"
+    [confirmLabel]="facade.isNew() ? t('platform.pod.form.create') : t('platform.pod.form.save')"
+    [busyLabel]="t('platform.pod.form.saving')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.save()"
+    (dismissed)="facade.cancelEdit()"
+  />
+
+  <!-- Draining is the safe lever, so the dialog says what it does rather than warning about it. -->
+  <app-confirm-dialog
+    [open]="facade.prompt() === 'drain'"
+    [title]="t('platform.pod.drain.title', {name: facade.heading().title})"
+    [message]="t('platform.pod.drain.message')"
+    [confirmLabel]="t('platform.pod.action.drain')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+
+  <app-confirm-dialog
+    [open]="facade.prompt() === 'resume'"
+    [title]="t('platform.pod.resume.title', {name: facade.heading().title})"
+    [message]="t('platform.pod.resume.message')"
+    [confirmLabel]="t('platform.pod.action.resume')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+
+  <!--
+    Behind a typed confirmation: `PodApi.delete` checks nothing, there is no foreign key from
+    tenancy's `manager_store.pod_id`, and deleting a populated pod orphans every store on it.
+    Clicking through a dialog is muscle memory; typing a pod's name is not.
+  -->
+  <app-confirm-dialog
+    [open]="facade.prompt() === 'delete'"
+    [title]="t('platform.pod.delete.title', {name: facade.heading().title})"
+    [message]="t('platform.pod.delete.message')"
+    [confirmationText]="facade.heading().title"
+    [confirmationLabel]="t('platform.pod.delete.confirmationLabel')"
+    [confirmLabel]="t('platform.pod.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmPrompt()"
+    (dismissed)="facade.dismissPrompt()"
+  />
+</ng-container>

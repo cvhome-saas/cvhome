@@ -1,0 +1,130 @@
+<ng-container *transloco="let t">
+  <!-- `step-stack` is what puts air between the panels; see product-form.css. -->
+  <div class="step-stack" [formGroup]="form()">
+    <app-panel
+      [title]="t('productForm.organize.categories')"
+      [subtitle]="t('productForm.organize.categoriesSubtitle')"
+    >
+      <div class="editor-body">
+        @if (facade.categories().length) {
+          <!--
+            A group of checkboxes rather than a second tree: this is a membership question, not a
+            restructuring one, and the indent carries as much of the hierarchy as the answer needs.
+          -->
+          <fieldset class="category-picker">
+            <legend class="sr-only">{{ t('productForm.organize.categories') }}</legend>
+            @for (category of facade.categories(); track category.id) {
+              <app-checkbox
+                class="category"
+                [label]="category.label"
+                [depth]="category.depth"
+                [checked]="selected().has(category.id)"
+                (checkedChange)="facade.toggleCategory(category.id)"
+              />
+            }
+          </fieldset>
+
+          <p class="field-hint">
+            {{
+              facade.selectedCategories().length
+                ? t('productForm.organize.selectedCount', {count: facade.selectedCategories().length})
+                : t('productForm.organize.noneSelected')
+            }}
+          </p>
+        } @else {
+          <p class="field-hint">{{ t('productForm.organize.noCategories') }}</p>
+        }
+      </div>
+    </app-panel>
+
+    <app-panel
+      [title]="t('productForm.organize.classification')"
+      [subtitle]="t('productForm.organize.classificationSubtitle')"
+    >
+      <div class="editor-body">
+        <div class="field-grid">
+          <div class="field">
+            <label for="product-brand">{{ t('productForm.organize.brand') }}</label>
+            <!--
+              `formControlName`, not `[value]`: these options arrive with the snapshot, and a plain
+              value binding is applied before they exist — the browser then discards it and shows
+              the first option, so a product with a brand read as "No brand".
+            -->
+            <!--
+              The value is the brand's code, not its id: the product DTO addresses a manufacturer by
+              unique code, and an id here resolves to no brand at all.
+            -->
+            <app-select
+              id="product-brand"
+              formControlName="brandCode"
+              [options]="brandOptions()"
+              [ariaLabel]="t('productForm.organize.brand')"
+            />
+            <p class="field-hint">{{ t('productForm.organize.brandHint') }}</p>
+          </div>
+
+          <div class="field">
+            <label for="product-type">{{ t('productForm.organize.type') }}</label>
+            <app-select
+              id="product-type"
+              formControlName="typeCode"
+              [options]="typeOptions()"
+              [ariaLabel]="t('productForm.organize.type')"
+            />
+            <p class="field-hint">{{ t('productForm.organize.typeHint') }}</p>
+          </div>
+        </div>
+      </div>
+    </app-panel>
+
+    <app-panel
+      [title]="t('productForm.organize.related')"
+      [subtitle]="t('productForm.organize.relatedSubtitle')"
+    >
+      <div class="editor-body">
+        @if (!saved()) {
+          <app-notice-bar icon="info" tone="blue" [message]="t('productForm.organize.relatedSaveFirst')" />
+        } @else {
+          <app-autocomplete
+            class="picker-search"
+            [options]="facade.relatedResults()"
+            [loading]="facade.relatedSearching()"
+            [disabled]="facade.saving()"
+            [label]="t('productForm.organize.addRelated')"
+            [placeholder]="t('productForm.organize.searchProducts')"
+            (termChanged)="facade.searchRelated($event)"
+            (selected)="addRelated($event)"
+          />
+          <!--
+            Said plainly rather than hidden: the pod has no name predicate, so the match is made on
+            the client over the products already read.
+          -->
+          <p class="field-hint">{{ t('productForm.organize.searchPool') }}</p>
+
+          <!--
+            Chips rather than rows. See product-picker.css: a vertical list of twenty-four bordered
+            rows moved everything below it every time one was added or removed.
+          -->
+          <ul class="picker-chips">
+            @for (product of facade.related(); track product.id) {
+              <li class="picker-chip">
+                <span class="picker-chip-name" dir="auto">{{ product.name }}</span>
+                <span class="picker-chip-sku" dir="ltr">{{ product.sku }}</span>
+                <button
+                  type="button"
+                  [disabled]="facade.saving()"
+                  [attr.aria-label]="t('productForm.organize.removeRelated', {name: product.name})"
+                  (click)="facade.removeRelated(product.id)"
+                >
+                  <app-icon name="x" [size]="12" />
+                </button>
+              </li>
+            } @empty {
+              <li class="picker-empty">{{ t('productForm.organize.noRelated') }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </app-panel>
+  </div>
+</ng-container>
