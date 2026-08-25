@@ -35,6 +35,22 @@ public final class Tokens {
 
     public static final String STORE_4 = "65f020632bc46470c104b76f";
 
+    /** Claim names. Named because checkstyle counts a repeated literal, and because a typo in one of these
+     * mints a token the resource server silently reads as anonymous rather than rejecting. */
+    private static final String SUB = "sub";
+
+    private static final String NAME = "name";
+
+    private static final String ROLES = "roles";
+
+    private static final String SCOPE = "scope";
+
+    private static final String ORG = "org";
+
+    private static final String STORE = "store";
+
+    private static final String EXP = "exp";
+
     private static final long ONE_HOUR = 3600;
 
     private final TestJwtSigner signer;
@@ -52,13 +68,13 @@ public final class Tokens {
 
     public String staff(String role, String store, String org) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", String.format("%s@%s", role.toLowerCase(), store));
-        claims.put("name", String.format("Test %s", role));
-        claims.put("roles", List.of(role));
-        claims.put("scope", SCOPE_STORE_POD);
-        claims.put("org", org);
-        claims.put("store", store);
-        claims.put("exp", Instant.now().plusSeconds(ONE_HOUR).getEpochSecond());
+        claims.put(SUB, String.format("%s@%s", role.toLowerCase(), store));
+        claims.put(NAME, String.format("Test %s", role));
+        claims.put(ROLES, List.of(role));
+        claims.put(SCOPE, SCOPE_STORE_POD);
+        claims.put(ORG, org);
+        claims.put(STORE, store);
+        claims.put(EXP, Instant.now().plusSeconds(ONE_HOUR).getEpochSecond());
         return signer.sign(claims);
     }
 
@@ -74,8 +90,8 @@ public final class Tokens {
      * An org administrator of {@code org}: sees every store the org owns.
      */
     public String orgAdmin(String org) {
-        Map<String, Object> claims = base("org-admin@" + org, "Test Org Admin", List.of(ROLE_ORG_ADMIN), SCOPE_STORE_CORE);
-        claims.put("org", org);
+        Map<String, Object> claims = base(String.format("org-admin@%s", org), "Test Org Admin", List.of(ROLE_ORG_ADMIN), SCOPE_STORE_CORE);
+        claims.put(ORG, org);
         return signer.sign(claims);
     }
 
@@ -84,7 +100,7 @@ public final class Tokens {
      * {@link #SCOPE_STORE_POD}); {@code resource} names the pod for pod-scoped calls.
      */
     public String s2s(String scope, String resource) {
-        Map<String, Object> claims = base("s2s-" + scope, "Test S2S " + scope, List.of(), scope);
+        Map<String, Object> claims = base(String.format("s2s-%s", scope), String.format("Test S2S %s", scope), List.of(), scope);
         if (resource != null) {
             claims.put("resource", resource);
         }
@@ -97,11 +113,11 @@ public final class Tokens {
 
     private static Map<String, Object> base(String sub, String name, List<String> roles, String scope) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", sub);
-        claims.put("name", name);
-        claims.put("roles", roles);
-        claims.put("scope", scope);
-        claims.put("exp", Instant.now().plusSeconds(ONE_HOUR).getEpochSecond());
+        claims.put(SUB, sub);
+        claims.put(NAME, name);
+        claims.put(ROLES, roles);
+        claims.put(SCOPE, scope);
+        claims.put(EXP, Instant.now().plusSeconds(ONE_HOUR).getEpochSecond());
         return claims;
     }
 
