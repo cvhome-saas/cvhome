@@ -15,6 +15,9 @@ ports:
 
 build: [./gradlew, build, -x, test, -x, check, --console=plain]   # `lcl start --build`
 
+hosts:                               # must resolve to 127.0.0.1 (sudo ./extra/scripts/configure-domain.sh); checked by `lcl doctor`
+  [gateway.com, www.gateway.com, uaa.gateway.com, console-ui.gateway.com, spg-507f1f77.gateway.com, catalog.gateway.com, merchant.gateway.com, content.gateway.com, checkout.gateway.com, cua.gateway.com, payment.gateway.com, inventory.gateway.com, landing-ui.gateway.com, org1-store1.spg-507f1f77.gateway.com, org1-store2.spg-507f1f77.gateway.com, org2-store1.spg-507f1f77.gateway.com, org2-store2.spg-507f1f77.gateway.com, spg-org3.gateway.com, org3-store1.spg-507f1f77.gateway.com]
+
 compose:
   file: docker-compose-lcl.yml
   default: [postgres, minio, spg]    # `lcl start`; `--infra all` starts every compose service, `--infra a,b` a subset

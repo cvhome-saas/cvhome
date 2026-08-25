@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-# Local stack runner. See `lcl --help` and extra/lcl/README.md.
+# Local stack runner. The stack is described by the nearest lcl.yml above the current directory (or --config).
+# See `lcl --help` and extra/lcl/README.md.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-exec node --disable-warning=ExperimentalWarning "$ROOT/extra/lcl/src/main.ts" --root "$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || echo "$ROOT")" "$@"
+exec node --disable-warning=ExperimentalWarning "$ROOT/extra/lcl/src/main.ts" "$@"
