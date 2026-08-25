@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     testImplementation libs.jakarta.persistence.api
+    testImplementation libs.spring.data.jpa
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:merchant:merchant-commons')
     // api, not implementation: this module's service and facade signatures name cms-commons exception types,

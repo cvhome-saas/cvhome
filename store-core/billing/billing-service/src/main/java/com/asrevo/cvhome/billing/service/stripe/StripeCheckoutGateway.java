@@ -11,6 +11,7 @@ import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.stripe.StripeClient;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -37,8 +38,9 @@ public class StripeCheckoutGateway extends StripeGatewaySupport {
 
     private static final String PRICE_METADATA_KEY = "planPriceId";
 
-    public StripeCheckoutGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository) {
-        super(credentials, stripeRequestRepository);
+    public StripeCheckoutGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository,
+                                 StripeClient stripe) {
+        super(credentials, stripeRequestRepository, stripe);
     }
 
     /**
@@ -80,7 +82,7 @@ public class StripeCheckoutGateway extends StripeGatewaySupport {
                 .build();
 
         try {
-            Session session = Session.create(params, options(key));
+            Session session = stripe().checkout().sessions().create(params, options(key));
             recordCompletion(key, session.getId());
             log.info("Opened Stripe checkout {} for store {}", session.getId(), store);
             return session.getUrl();

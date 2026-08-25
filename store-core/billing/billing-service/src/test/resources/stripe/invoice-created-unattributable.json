@@ -1,0 +1,18 @@
+{
+  "id": "evt_invoice_created_foreign",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "invoice.created",
+  "data": {
+    "object": {
+      "id": "in_test_foreign",
+      "object": "invoice",
+      "customer": "cus_someone_else",
+      "currency": "usd",
+      "amount_due": 3000,
+      "amount_paid": 0,
+      "created": 1767225600
+    }
+  }
+}

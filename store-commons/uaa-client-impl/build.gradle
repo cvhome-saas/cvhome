@@ -15,4 +15,8 @@ dependencies {
     annotationProcessor libs.mapstruct.processor
     annotationProcessor libs.lombok
     annotationProcessor libs.lombok.mapstruct.binding
+
+    // ReadableUserList extends ReadableList from commons, which is compileOnly for consumers who bring their own.
+    // A test asserting what a listing returns has to see it.
+    testImplementation project(":store-commons:commons")
 }

@@ -1,0 +1,16 @@
+{
+  "id": "evt_subscription_no_store",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "customer.subscription.updated",
+  "data": {
+    "object": {
+      "id": "sub_foreign",
+      "object": "subscription",
+      "customer": "cus_someone_else",
+      "status": "active",
+      "metadata": {}
+    }
+  }
+}

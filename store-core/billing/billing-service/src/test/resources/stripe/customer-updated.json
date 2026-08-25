@@ -1,0 +1,14 @@
+{
+  "id": "evt_customer_updated",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "customer.updated",
+  "data": {
+    "object": {
+      "id": "cus_test_1",
+      "object": "customer",
+      "email": "owner@example.test"
+    }
+  }
+}

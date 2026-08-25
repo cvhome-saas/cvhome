@@ -20,4 +20,13 @@ dependencies {
     compileOnly libs.lombok
     compileOnly libs.hibernate.core
     annotationProcessor libs.lombok
+    // Unit tests exercise the services directly, so the compileOnly halves of the main classpath have to be
+    // real dependencies of the test one.
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.spring.tx
+    testImplementation libs.hibernate.core
+    testImplementation libs.jackson.databind
+    testImplementation libs.jakarta.validation.api
+    testImplementation libs.aws.sdk.s3
+    testImplementation libs.slf4j.api
 }

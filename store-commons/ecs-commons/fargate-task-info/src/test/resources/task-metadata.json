@@ -1,0 +1,34 @@
+{
+  "Cluster": "arn:aws:ecs:eu-west-1:111122223333:cluster/cvhome",
+  "TaskARN": "arn:aws:ecs:eu-west-1:111122223333:task/cvhome/abc123",
+  "Family": "catalog",
+  "Revision": "7",
+  "DesiredStatus": "RUNNING",
+  "KnownStatus": "RUNNING",
+  "Limits": { "CPU": 1, "Memory": 2048 },
+  "PullStartedAt": "2026-08-25T09:00:00.000000000Z",
+  "PullStoppedAt": "2026-08-25T09:00:12.000000000Z",
+  "AvailabilityZone": "eu-west-1a",
+  "LaunchType": "FARGATE",
+  "Containers": [
+    {
+      "DockerId": "d1",
+      "Name": "catalog",
+      "Image": "cvhome/catalog:7",
+      "DesiredStatus": "RUNNING",
+      "KnownStatus": "RUNNING",
+      "Limits": { "CPU": 1024 },
+      "Type": "NORMAL",
+      "Networks": [
+        { "NetworkMode": "awsvpc", "IPv4Addresses": ["10.0.1.7"] }
+      ],
+      "Health": { "status": "HEALTHY", "statusSince": "2026-08-25T09:01:00Z" }
+    }
+  ],
+  "ClockDrift": {
+    "ClockErrorBound": 0.4,
+    "ReferenceTimestamp": "2026-08-25T09:00:00Z",
+    "ClockSynchronizationStatus": "SYNCHRONIZED"
+  },
+  "EphemeralStorageMetrics": { "Utilized": 261, "Reserved": 20496 }
+}

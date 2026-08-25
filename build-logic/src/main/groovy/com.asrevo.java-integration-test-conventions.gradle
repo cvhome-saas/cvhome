@@ -50,20 +50,7 @@ tasks.register('jacocoIntegrationTestReport', JacocoReport) {
     }
 }
 
-// One report per service, unit + integration merged. This is the number a service is judged on.
-tasks.register('jacocoMergedReport', JacocoReport) {
-    group = 'verification'
-    description = 'Merged unit + integration coverage report for this module.'
-    dependsOn tasks.named('test'), integrationTest
-    executionData fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
-    sourceSets sourceSets.main
-    reports {
-        xml.required = true
-        html.required = true
-        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/merged/html')
-        xml.outputLocation = layout.buildDirectory.file('reports/jacoco/merged/jacocoMergedReport.xml')
-    }
-}
+// Merged unit + integration numbers are reported and gated per domain by the root plugin (`./gradlew domainCoverage`).
 
 checkstyleReport('integrationTest')
 

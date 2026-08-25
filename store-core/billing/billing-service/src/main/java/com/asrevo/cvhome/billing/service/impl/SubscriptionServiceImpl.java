@@ -174,7 +174,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // place would surprise the customer at the period boundary with a change they thought they had undone.
         releaseAnySchedule(entity);
         subscriptionGateway.setRenewal(store, subscription, true);
-        StoreSubscriptionEntity saved = subscriptionRepository.save(reload(entity).revokeScheduledCancel());
+
+        StoreSubscriptionEntity current = reload(entity);
+        // The local half of "called off too", which was missing: the schedule was released at Stripe and the row
+        // kept its pending_plan_price_id, so the customer went on being shown a downgrade they had just undone —
+        // and ApplyPendingPlanChangesJob would eventually apply it, moving a paying store onto the cheaper plan
+        // with no schedule at Stripe to have caused it.
+        current.revokePendingChange();
+        // Only asserted when there is something to revoke. The guard above admits a store with a pending downgrade
+        // and no cancellation at all, and revokeScheduledCancel refuses that outright — so resuming such a store
+        // called Stripe twice and then threw, leaving the provider changed and the row untouched, which is exactly
+        // the failure the ordering above exists to prevent.
+        if (current.isCancelAtPeriodEnd()) {
+            current.revokeScheduledCancel();
+        }
+        StoreSubscriptionEntity saved = subscriptionRepository.save(current);
         from.record(auditService, saved, AuditEventType.CANCEL_REVOKED);
         return mappers.toView(saved);
     }

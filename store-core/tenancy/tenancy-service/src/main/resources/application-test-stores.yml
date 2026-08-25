@@ -1,0 +1,10 @@
+# The integration-test seed, the same shape content, merchant, payment and uaa already use: a `test-stores` profile
+# that appends one `init-sql/data-test-stores.sql` to the service's ordinary data locations.
+#
+# Tenancy's own DDL and local-stack rows stay where Spring Boot's defaults find them (`schema.sql`, `data.sql`), so
+# this only adds the fixture rows the API integration tests mutate — a lifecycle test has to be able to close an
+# organization without taking the two shared ones down with it.
+spring:
+  sql:
+    init:
+      data-locations: classpath:data.sql, classpath:init-sql/data-test-stores.sql

@@ -13,4 +13,6 @@ dependencies {
 
     // The entity under test extends AbstractAggregateRoot, which is compileOnly for main.
     testImplementation libs.spring.data.jpa
+    // Mockito mocks the JPA repositories, whose annotations reference jakarta.persistence at load time.
+    testImplementation libs.jakarta.persistence.api
 }

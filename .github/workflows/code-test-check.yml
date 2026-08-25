@@ -43,6 +43,15 @@ jobs:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           check_name: Unit test results
 
+      - name: Upload unit coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-exec-unit
+          path: '**/build/jacoco/test.exec'
+          if-no-files-found: error
+          retention-days: 3
+
   integration:
     name: Integration tests
     runs-on: ubuntu-latest
@@ -70,6 +79,15 @@ jobs:
         with:
           report_paths: '**/build/test-results/integrationTest/TEST-*.xml'
           check_name: Integration test results
+
+      - name: Upload integration coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-exec-integration
+          path: '**/build/jacoco/integrationTest.exec'
+          if-no-files-found: error
+          retention-days: 3
 
       # A container-backed failure is usually only explicable from the service log the test captured, so keep the
       # raw results and the HTML report whenever the job goes red.
@@ -102,15 +120,23 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # One report per micro service, plus the whole-monorepo aggregate.
-      - name: Generate coverage reports
-        run: ./gradlew coverageReport perServiceCoverage jacocoTestCoverageVerification
+      # The .exec files come from the two jobs above; the gates read them instead of re-running the tests.
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: jacoco-exec-*
+          merge-multiple: true
 
-      - name: Upload per-service coverage
+      # One report per domain (unit / integration / merged), the whole-monorepo aggregate, and the three gates
+      # against domainCoverageMinimum in the root build.gradle.
+      - name: Generate coverage reports and verify floors
+        run: ./gradlew compileJava domainCoverage coverageReport printDomainCoverage domainCoverageVerification -x test -x integrationTest -PcoverageFromArtifacts --continue
+
+      - name: Upload per-domain coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-per-service
+          name: coverage-per-domain
           path: build/reports/coverage/**
           if-no-files-found: error
           retention-days: 14

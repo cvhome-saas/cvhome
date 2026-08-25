@@ -306,6 +306,24 @@ public class StoreSubscriptionEntity extends BaseEntity<StoreSubscriptionEntity,
     }
 
     /**
+     * Calls off a deferred plan change, locally, without touching anything else.
+     *
+     * <p>
+     * Separate from {@link #revokeScheduledCancel} because the two are independently revocable: a store may have a
+     * pending downgrade and no cancellation, and resuming has to be able to drop the first without asserting the
+     * second. Idempotent, so it is safe on a row that had nothing pending.
+     * </p>
+     */
+    public StoreSubscriptionEntity revokePendingChange() {
+        if (this.pendingPlanPriceId == null && this.stripeScheduleId == null) {
+            return this;
+        }
+        this.clearPendingChange();
+        this.updatedDate = Instant.now();
+        return this;
+    }
+
+    /**
      * Renewal switched back on.
      */
     public StoreSubscriptionEntity revokeScheduledCancel() throws IllegalSubscriptionTransitionException {

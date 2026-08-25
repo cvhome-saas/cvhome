@@ -60,18 +60,21 @@ public class StripeProcessor implements PaymentProcessor {
 
     private static Event getEvent(String payload, Map<String, String> headers, PaymentSecret configuration)
             throws InvalidWebhookSignatureException {
+        String sigHeader = headers.get(SIGNATURE_HEADER);
+        if (sigHeader == null) {
+            sigHeader = headers.get(SIGNATURE_HEADER_TITLE_CASE);
+        }
+        if (sigHeader == null) {
+            // Stripe's verifier dereferences the header before it validates it, so an unsigned request would leave
+            // here as a NullPointerException — a 500 for what is the most ordinary probe a public endpoint sees.
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, false, null);
+        }
         try {
-            String sigHeader = headers.get(SIGNATURE_HEADER);
-            if (sigHeader == null) {
-                sigHeader = headers.get(SIGNATURE_HEADER_TITLE_CASE);
-            }
             return Webhook.constructEvent(payload, sigHeader, configuration.getWebhookSecret());
         } catch (SignatureVerificationException e) {
             // Deliberately not logged here: the caller logs it once with the store context, and a failed signature is
             // an expected condition on a public endpoint, not an incident worth a stack trace at every layer.
-            boolean signaturePresent = headers.containsKey(SIGNATURE_HEADER)
-                    || headers.containsKey(SIGNATURE_HEADER_TITLE_CASE);
-            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, signaturePresent, e);
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, true, e);
         }
     }
 

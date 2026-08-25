@@ -13,6 +13,7 @@ import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.PlanPriceEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.stripe.StripeClient;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Subscription;
@@ -53,8 +54,9 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      */
     private static final Set<String> RELEASABLE_STATUSES = Set.of("not_started", "active");
 
-    public StripeSubscriptionGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository) {
-        super(credentials, stripeRequestRepository);
+    public StripeSubscriptionGateway(StripeCredentials credentials, StripeRequestRepository stripeRequestRepository,
+                                     StripeClient stripe) {
+        super(credentials, stripeRequestRepository, stripe);
     }
 
     /**
@@ -76,7 +78,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
                 String.format(SUBJECT, subscription.id(), target.getStripePriceId().id()));
         recordIntent(key, store, SUBSCRIPTION_UPDATE);
         try {
-            Subscription current = Subscription.retrieve(subscription.id(), readOptions());
+            Subscription current = stripe().subscriptions().retrieve(subscription.id(), readOptions());
             String itemId = current.getItems().getData().getFirst().getId();
             SubscriptionUpdateParams params = SubscriptionUpdateParams.builder()
                     .addItem(SubscriptionUpdateParams.Item.builder()
@@ -86,7 +88,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
                     .setProrationBehavior(SubscriptionUpdateParams.ProrationBehavior.ALWAYS_INVOICE)
                     .setPaymentBehavior(SubscriptionUpdateParams.PaymentBehavior.ERROR_IF_INCOMPLETE)
                     .build();
-            current.update(params, options(key));
+            stripe().subscriptions().update(subscription.id(), params, options(key));
             recordCompletion(key, subscription.id());
             log.info("Upgraded store {} to {} immediately", store, target.getStripePriceId().id());
         } catch (CardException e) {
@@ -124,7 +126,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
         try {
             SubscriptionSchedule schedule = scheduleFor(subscription, key);
             SubscriptionSchedule.Phase existing = schedule.getPhases().getFirst();
-            SubscriptionSchedule updated = schedule.update(
+            SubscriptionSchedule updated = stripe().subscriptionSchedules().update(schedule.getId(),
                     SubscriptionScheduleUpdateParams.builder()
                             .addPhase(SubscriptionScheduleUpdateParams.Phase.builder()
                                     .addItem(SubscriptionScheduleUpdateParams.Phase.Item.builder()
@@ -165,11 +167,11 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
      */
     private SubscriptionSchedule scheduleFor(StripeSubscriptionId subscription, String idempotencyKey)
             throws StripeException {
-        String existing = Subscription.retrieve(subscription.id(), readOptions()).getSchedule();
+        String existing = stripe().subscriptions().retrieve(subscription.id(), readOptions()).getSchedule();
         if (existing != null) {
-            return SubscriptionSchedule.retrieve(existing, readOptions());
+            return stripe().subscriptionSchedules().retrieve(existing, readOptions());
         }
-        return SubscriptionSchedule.create(
+        return stripe().subscriptionSchedules().create(
                 SubscriptionScheduleCreateParams.builder().setFromSubscription(subscription.id()).build(),
                 options(idempotencyKey));
     }
@@ -187,7 +189,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
         String key = idempotencyKey(SUBSCRIPTION_RESUME, schedule.id());
         recordIntent(key, store, SUBSCRIPTION_RESUME);
         try {
-            SubscriptionSchedule current = SubscriptionSchedule.retrieve(schedule.id(), readOptions());
+            SubscriptionSchedule current = stripe().subscriptionSchedules().retrieve(schedule.id(), readOptions());
             if (!RELEASABLE_STATUSES.contains(current.getStatus())) {
                 // Already released, or already ran its course. The end state this asks for is the one that holds, so
                 // treating it as a failure would turn a retry — or a local row that lagged behind — into a dead end.
@@ -195,7 +197,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
                 recordCompletion(key, schedule.id());
                 return;
             }
-            current.release(options(key));
+            stripe().subscriptionSchedules().release(schedule.id(), options(key));
             recordCompletion(key, schedule.id());
             log.info("Released the pending schedule on store {}", store);
         } catch (StripeException e) {
@@ -218,7 +220,7 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
         String key = idempotencyKey(SUBSCRIPTION_UPDATE, String.format("%s:renew:%s", subscription.id(), renew));
         recordIntent(key, store, SUBSCRIPTION_UPDATE);
         try {
-            Subscription.retrieve(subscription.id(), readOptions()).update(
+            stripe().subscriptions().update(subscription.id(),
                     SubscriptionUpdateParams.builder().setCancelAtPeriodEnd(!renew).build(), options(key));
             recordCompletion(key, subscription.id());
             log.info("Store {} renewal switched {}", store, renew ? "on" : "off");
@@ -241,8 +243,8 @@ public class StripeSubscriptionGateway extends StripeGatewaySupport {
         String key = idempotencyKey(SUBSCRIPTION_CANCEL, subscription.id());
         recordIntent(key, store, SUBSCRIPTION_CANCEL);
         try {
-            Subscription.retrieve(subscription.id(), readOptions())
-                    .cancel(SubscriptionCancelParams.builder().build(), options(key));
+            stripe().subscriptions().cancel(subscription.id(), SubscriptionCancelParams.builder().build(),
+                    options(key));
             recordCompletion(key, subscription.id());
             log.info("Store {} subscription cancelled immediately", store);
         } catch (StripeException e) {

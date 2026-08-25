@@ -44,19 +44,33 @@ public class StripeWebhookVerifier {
         if (signature == null) {
             signature = headers.get(SIGNATURE_HEADER_TITLE_CASE);
         }
+        if (signature == null || signature.isBlank()) {
+            // Refused here rather than handed to the SDK. Webhook.constructEvent dereferences the header before it
+            // validates it — Signature.getTimestamp calls sigHeader.split — so a request with no signature threw a
+            // NullPointerException, which on a public, unauthenticated endpoint became a 500 anyone could produce at
+            // will. A missing signature is the plainest possible "this did not come from Stripe", and 400 is the
+            // answer that says so.
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, false, null);
+        }
         if (credentials.webhookSigningKey() == null || credentials.webhookSigningKey().isBlank()) {
             // Nothing can be verified without a secret, so nothing may be trusted. Refusing here rather than letting
             // the SDK fail on a null turns a 500 — which Stripe would retry for days — into a clear 400 and one log
             // line naming the actual problem, which is configuration rather than the payload.
             log.error("No Stripe webhook signing key is configured; every webhook will be refused until one is set");
-            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, signature != null, null);
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, true, null);
         }
         try {
             return Webhook.constructEvent(payload, signature, credentials.webhookSigningKey());
         } catch (SignatureVerificationException e) {
             // Not logged here: the caller logs it once with context, and a failed signature is an ordinary condition
             // on a public endpoint rather than an incident deserving a stack trace at every layer.
-            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, signature != null, e);
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, true, e);
+        } catch (RuntimeException e) {
+            // constructEvent deserialises the payload *before* it verifies the signature, so a body that is not JSON
+            // at all comes back as an unchecked JsonSyntaxException rather than as a verification failure. Same
+            // conclusion either way — this is not a payload Stripe signed — and the same 400, instead of the 500 an
+            // unauthenticated caller could otherwise produce with three characters of garbage.
+            throw InvalidWebhookSignatureException.verificationFailed(STRIPE, true, e);
         }
     }
 

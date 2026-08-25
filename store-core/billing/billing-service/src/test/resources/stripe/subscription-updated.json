@@ -1,0 +1,38 @@
+{
+  "id": "evt_subscription_updated",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "customer.subscription.updated",
+  "data": {
+    "object": {
+      "id": "sub_test_1",
+      "object": "subscription",
+      "customer": "cus_test_1",
+      "status": "active",
+      "schedule": "sub_sched_test_1",
+      "cancel_at_period_end": false,
+      "current_period_start": 1767225600,
+      "current_period_end": 1769904000,
+      "metadata": {
+        "storeId": "65f023632bc46470c104b76f",
+        "orgId": "32a034a43cd77581d105c87a"
+      },
+      "items": {
+        "object": "list",
+        "data": [
+          {
+            "id": "si_test_1",
+            "object": "subscription_item",
+            "price": {
+              "id": "price_pro_monthly",
+              "object": "price",
+              "unit_amount": 3000,
+              "currency": "usd"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

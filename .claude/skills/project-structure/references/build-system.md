@@ -60,9 +60,9 @@ itself in the `include(...)` list. Plugins in
 |---|---|---|
 | `com.asrevo.java-common-conventions` | (base) | Java toolchain, checkstyle, **unit-test wiring (`src/test`, JUnit/AssertJ/Mockito/ArchUnit) and JaCoCo** |
 | `com.asrevo.java-library-conventions` | every `-commons`, `-core`, `-external-api`, `-events` | `java-common-conventions` + `java-library` |
-| `com.asrevo.java-integration-test-conventions` | (applied by application conventions) | the `src/integrationTest` source set, its Testcontainers classpath, `store-commons:test-support`, and the integration/merged coverage reports |
+| `com.asrevo.java-integration-test-conventions` | (applied by application conventions) | the `src/integrationTest` source set, its Testcontainers classpath, `store-commons:test-support`, and the module's integration coverage report |
 | `com.asrevo.java-application-conventions` | every `-service`, `uaa`, `cua` | integration-test conventions + `application` + image helpers |
-| `com.asrevo.jacoco-aggregate-conventions` | the **root** project only | `coverageReport` (whole monorepo) and `perServiceCoverage` (one report per micro service) |
+| `com.asrevo.jacoco-aggregate-conventions` | the **root** project only | `coverageReport` (whole monorepo), `domainCoverage` / `printDomainCoverage` (unit, integration and merged reports per domain) and the three ratcheted gates `domainCoverageVerification` reads from `domainCoverageMinimum` in the root `build.gradle` |
 | `com.asrevo.docker-conventions` | services and UIs | `bootBuildImage` helpers `createImageName()` / `createImageTags()`, ECR publish wiring |
 | `com.asrevo.ui-conventions` | `console-ui`, `landing-ui` | node plugin + npm build/dev/clean wiring (see `frontends.md`) |
 
@@ -106,10 +106,10 @@ Tests are split by **source set**, not by tag (`@Tag` is gone — do not reintro
 ```bash
 ./gradlew test                 # unit + architecture tests, no Docker
 ./gradlew integrationTest      # Testcontainers; Docker MUST be running
-./gradlew check                # both + checkstyle + verifyTestNaming + the coverage gate
+./gradlew check                # both + checkstyle + verifyTestNaming + the per-domain coverage gates
 ./gradlew check -x integrationTest             # laptop without Docker
 ./gradlew checkstyleMain checkstyleTest checkstyleIntegrationTest   # what CI's quality job runs
-./gradlew perServiceCoverage   # build/reports/coverage/<service>/ — a report per micro service
+./gradlew domainCoverage printDomainCoverage   # build/reports/coverage/<domain>/ + a domain × {unit, integration, merged} table
 ./gradlew :store-pod:catalog:catalog-service:test --tests '*PagesTest*'
 ```
 

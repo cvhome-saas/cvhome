@@ -112,12 +112,14 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = creating ? newCategory(store) : require(store, source.getId());
         CategoryMapper.apply(source, category);
         Category parent = resolveParent(store, source.getParent());
+        // The descendants are found by the path they still hold, so it has to be read before the node moves.
+        String previousPrefix = creating ? null : category.subtreePrefix();
         if (creating) {
             category = categoryRepository.saveAndFlush(category); // the lineage needs the generated id
         }
         category.placeUnder(parent);
         if (!creating) {
-            replace(store, category); // an edit may have re-parented: descendants follow
+            replace(store, category, previousPrefix); // an edit may have re-parented: descendants follow
         }
         categoryRepository.save(category);
         source.setId(category.getId());
@@ -134,9 +136,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void move(StoreMerchantId store, Long id, Long parentId) throws CategoryNotFoundException {
         Category category = require(store, id);
+        String previousPrefix = category.subtreePrefix();
         Category parent = parentId == null || parentId == ROOT ? null : require(store, parentId);
         category.placeUnder(parent);
-        replace(store, category);
+        replace(store, category, previousPrefix);
     }
 
     @Override
@@ -157,11 +160,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Rewrites the paths of every descendant after {@code moved} changed place.
+     *
+     * <p>
+     * {@code previousPrefix} is the path the node held <em>before</em> the move, and it is not a convenience: the
+     * descendants are still stored under it, so looking them up by the new one found nothing and left every child
+     * of a moved category pointing at a path no ancestor has any more.
+     * </p>
      */
-    private void replace(StoreMerchantId store, Category moved) {
+    private void replace(StoreMerchantId store, Category moved, String previousPrefix) {
         Map<Long, Category> byId = new LinkedHashMap<>();
         byId.put(moved.getId(), moved);
-        for (Category node : categoryRepository.findSubtree(store, moved.subtreePrefix())) {
+        for (Category node : categoryRepository.findSubtree(store, previousPrefix)) {
             if (!node.getId().equals(moved.getId())) {
                 byId.put(node.getId(), node);
             }

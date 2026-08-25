@@ -12,6 +12,7 @@ import com.asrevo.cvhome.billing.config.StripeCredentials;
 import com.asrevo.cvhome.billing.domain.StripeRequestEntity;
 import com.asrevo.cvhome.billing.repository.StripeRequestRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
 import com.stripe.net.RequestOptions;
 
@@ -26,6 +27,13 @@ import lombok.RequiredArgsConstructor;
  * makes it process-wide state that no call site can see or override, and silently binds every call in the JVM to
  * whichever key was set last.
  * </p>
+ *
+ * <p>
+ * Calls go through the injected {@link StripeClient} rather than the SDK's static resource methods. Same requests,
+ * same {@link RequestOptions} — the per-call credential still wins over whatever the client was built with — but a
+ * seam a test can replace, which the statics are not. Only {@code Webhook.constructEvent} stays static: it is a pure
+ * function of the payload, the signature and the secret and reaches no network at all.
+ * </p>
  */
 @RequiredArgsConstructor
 public abstract class StripeGatewaySupport {
@@ -39,6 +47,12 @@ public abstract class StripeGatewaySupport {
     private final StripeCredentials credentials;
 
     private final StripeRequestRepository stripeRequestRepository;
+
+    /**
+     * The SDK entry point every call is made through. Held here rather than in each gateway so that "which client"
+     * is one decision and the subclasses only say what they ask it for.
+     */
+    private final StripeClient stripe;
 
     /**
      * The status Stripe reported, or {@code 0} when the call never reached it at all.
@@ -59,6 +73,13 @@ public abstract class StripeGatewaySupport {
     protected static String idempotencyKey(StripeRequestOperation operation, Object subject) {
         return String.format("%s:%s:%s", operation.name().toLowerCase(Locale.ROOT), subject,
                 Instant.now().truncatedTo(ChronoUnit.MINUTES).getEpochSecond());
+    }
+
+    /**
+     * The client to make a call on.
+     */
+    protected StripeClient stripe() {
+        return stripe;
     }
 
     protected RequestOptions options(String idempotencyKey) {

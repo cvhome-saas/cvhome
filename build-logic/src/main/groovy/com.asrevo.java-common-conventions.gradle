@@ -69,20 +69,8 @@ tasks.named('jacocoTestReport') {
     }
 }
 
-// Soft gate: 0 by default. A module ratchets by setting `coverageMinimum = 0.6` in its build.gradle.
-ext.coverageMinimum = 0.0d
-tasks.named('jacocoTestCoverageVerification') {
-    dependsOn 'test'
-    violationRules {
-        rule {
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = provider { project.coverageMinimum as BigDecimal }.get()
-            }
-        }
-    }
-}
+// Coverage is gated per domain by the root com.asrevo.jacoco-aggregate-conventions plugin (domainCoverageMinimum in
+// the root build.gradle); modules carry no gate of their own.
 
 // The suffix is the contract: a misplaced test silently never runs, so fail loudly instead.
 tasks.register('verifyTestNaming') {
@@ -112,5 +100,5 @@ tasks.register('verifyTestNaming') {
 }
 
 tasks.named('check') {
-    dependsOn 'verifyTestNaming', 'jacocoTestCoverageVerification'
+    dependsOn 'verifyTestNaming'
 }

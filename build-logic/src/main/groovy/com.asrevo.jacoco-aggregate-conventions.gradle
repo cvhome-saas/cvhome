@@ -1,11 +1,18 @@
 /*
- * Root-only plugin: coverage reporting across modules.
+ * Root-only plugin: coverage reporting and gating across modules.
  *
- *   ./gradlew coverageReport        # one whole-monorepo report: build/reports/jacoco/aggregate/
- *   ./gradlew perServiceCoverage    # one report per micro service: build/reports/coverage/<service>/
+ *   ./gradlew coverageReport                    # one whole-monorepo report: build/reports/jacoco/aggregate/
+ *   ./gradlew domainCoverage                    # per domain (unit / integration / merged): build/reports/coverage/<domain>/
+ *   ./gradlew printDomainCoverage               # domain x {unit, integration, merged} table
+ *   ./gradlew domainCoverageVerification        # all three gates against rootProject.domainCoverageMinimum
  *
- * Both read the .exec files the modules' own test / integrationTest tasks produce, so they never resolve another
- * module's dependencies — a service's BOM-managed versions are only visible inside that service.
+ * A "domain" is the union of one service's modules (-commons/-core/-events/-external-api/-service), derived from the
+ * project path: `:store-pod:catalog:*` and `:store-core:billing:*` are domains, single-module services (`:store-pod:cua`,
+ * `:store-core:uaa`) are their own domain, and `:store-commons:*` / `:store-pod:commons:*` fold into `shared`.
+ * A module may override with `ext.coverageDomain = 'checkout'`.
+ *
+ * Every task only reads the .exec files the modules' own test / integrationTest tasks produce, so it never resolves
+ * another module's dependencies — a service's BOM-managed versions are only visible inside that service.
  */
 
 plugins {
@@ -16,22 +23,59 @@ plugins {
 // The root is evaluated first, but the plugin lists below need every module's plugins applied already.
 subprojects.each { evaluationDependsOn(it.path) }
 
-def javaProjects = subprojects.findAll { it.plugins.hasPlugin('com.asrevo.java-common-conventions') }
-def serviceProjects = subprojects.findAll { it.plugins.hasPlugin('com.asrevo.java-application-conventions') }
-
-def coverageTasks = { Project p ->
-    def names = ['test']
-    if (p.plugins.hasPlugin('com.asrevo.java-integration-test-conventions')) {
-        names << 'integrationTest'
-    }
-    names.collect { p.tasks.named(it) }
+// A module may opt out entirely with `ext.coverageExempt = true`: test-support's src/main *is* test infrastructure,
+// executed thousands of times per CI run from other domains' integrationTest runs, none of which credits `shared`.
+def javaProjects = subprojects.findAll {
+    it.plugins.hasPlugin('com.asrevo.java-common-conventions') && !(it.findProperty('coverageExempt') ?: false)
 }
+def hasIntegration = { Project p -> p.plugins.hasPlugin('com.asrevo.java-integration-test-conventions') }
+
+// Classes that are wiring, not logic. Filtered by name rather than by whole package: `CustomPermissionEvaluator` is
+// 140 lines of real permission logic and lives in s2s/config/internal, so `**/config/**` wholesale would drop it.
+// The `**` before the file name matters — `*` does not cross a `/`, so `**/config/*Config.class` silently missed
+// every wiring class nested under s2s/config/internal/. Lombok is filtered by lombok.config (@Generated), and the
+// only generated mappers are MapStruct's *MapperImpl / *MappersImpl.
+def coverageExcludes = [
+        '**/*Application.class', '**/*Application$*.class',
+        '**/config/**/*Config.class', '**/config/**/*Config$*.class',
+        '**/config/**/*Configuration.class', '**/config/**/*Configuration$*.class',
+        '**/config/**/*Configurer.class', '**/config/**/*Configurer$*.class',
+        '**/config/JobScheduling.class',
+        '**/*Properties.class', '**/*Properties$*.class',
+        '**/*AutoConfiguration.class', '**/*AutoConfiguration$*.class',
+        '**/*MapperImpl.class', '**/*MapperImpl$*.class', '**/*MappersImpl.class', '**/*MappersImpl$*.class',
+]
+
+// `shared` is the store-commons libraries every service depends on. `:store-pod:commons:*` is a different thing —
+// customer/reference/CMS code whose packages are literally com.asrevo.cvhome.checkout — so it reports as its own
+// domain rather than diluting the one gate that covers crypto, s2s security and the error contract.
+def domainOf = { Project p ->
+    if (p.hasProperty('coverageDomain')) {
+        return p.coverageDomain as String
+    }
+    def segs = p.path.split(':').findAll { it }
+    if (segs[0] == 'store-commons') {
+        return 'shared'
+    }
+    if (segs[1] == 'commons') {
+        return 'pod-commons'
+    }
+    return segs[1]
+}
+
+def domains = javaProjects.groupBy(domainOf).sort()
+ext.coverageDomains = domains.keySet() as List
+
+def camel = { String s -> s.split('-').collect { it.capitalize() }.join('') }
 
 tasks.register('coverageReport', JacocoReport) {
     group = 'verification'
     description = 'Unit + integration coverage of every Java module, in one report.'
     javaProjects.each { p ->
-        dependsOn coverageTasks(p)
+        dependsOn p.tasks.named('test')
+        if (hasIntegration(p)) {
+            dependsOn p.tasks.named('integrationTest')
+        }
         sourceDirectories.from p.sourceSets.main.allSource.srcDirs
         classDirectories.from p.sourceSets.main.output
     }
@@ -44,16 +88,173 @@ tasks.register('coverageReport', JacocoReport) {
     }
 }
 
-tasks.register('perServiceCoverage', Copy) {
+// kind -> [exec file names, task each module must have run, sub-directory of the report]
+def kinds = [
+        unit       : [execs: ['test.exec'], task: 'test', dir: 'unit'],
+        integration: [execs: ['integrationTest.exec'], task: 'integrationTest', dir: 'integration'],
+        merged     : [execs: ['test.exec', 'integrationTest.exec'], task: null, dir: ''],
+]
+
+def floorOf = { String domain, String kind ->
+    def floors = rootProject.findProperty('domainCoverageMinimum') ?: [:]
+    ((floors[domain] ?: [:])[kind] ?: 0.0d) as BigDecimal
+}
+
+def reportTasks = [:].withDefault { [] }
+def verifyTasks = [:].withDefault { [] }
+
+domains.each { String domain, List<Project> modules ->
+    def name = camel(domain)
+    kinds.each { String kind, Map spec ->
+        def suffix = kind == 'merged' ? '' : kind.capitalize()
+        def reportDir = spec.dir ? "reports/coverage/${domain}/${spec.dir}" : "reports/coverage/${domain}"
+        def modulesWithData = modules.findAll { m -> kind != 'integration' || hasIntegration(m) }
+        def execFiles = files(modulesWithData.collect { m ->
+            fileTree(m.layout.buildDirectory.dir('jacoco')).include(spec.execs)
+        })
+        // Coverage produced upstream (CI downloads the .exec artifacts) or on a no-Docker laptop is fed in without
+        // re-running the tests; the integration gate then checks the files exist instead of the task graph.
+        def fromArtifacts = rootProject.hasProperty('coverageFromArtifacts')
+
+        def report = tasks.register("jacoco${name}${suffix}Report", JacocoReport) {
+            group = 'verification'
+            description = "${kind.capitalize()} line coverage of the ${domain} domain (${modules.size()} modules)."
+            if (!fromArtifacts) {
+                modules.each { m ->
+                    (spec.task ? [spec.task] : ['test', 'integrationTest']).each { t ->
+                        if (t == 'test' || hasIntegration(m)) {
+                            dependsOn m.tasks.named(t)
+                        }
+                    }
+                }
+            }
+            modules.each { m ->
+                // classDirectories reads compileJava's output. With -x test -x integrationTest (the CI coverage job)
+                // the dependency the test tasks would have carried is gone, but compileJava still runs, and Gradle
+                // fails the task rather than risk reading half-written classes.
+                dependsOn m.tasks.named('classes')
+                sourceDirectories.from m.sourceSets.main.allJava.srcDirs
+                classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
+                    fileTree(dir).exclude(coverageExcludes)
+                }
+            }
+            executionData.from execFiles
+            reports {
+                xml.required = true
+                html.required = true
+                xml.outputLocation = layout.buildDirectory.file("${reportDir}/coverage.xml")
+                html.outputLocation = layout.buildDirectory.dir("${reportDir}/html")
+            }
+        }
+        reportTasks[kind] << report
+
+        def verify = tasks.register("jacoco${name}${suffix}Verification", JacocoCoverageVerification) {
+            group = 'verification'
+            description = "Fails when ${kind} line coverage of the ${domain} domain is below domainCoverageMinimum.${domain}.${kind}."
+            dependsOn report
+            executionData.from execFiles
+            modules.each { m ->
+                dependsOn m.tasks.named('classes')
+                sourceDirectories.from m.sourceSets.main.allJava.srcDirs
+                classDirectories.from m.sourceSets.main.output.classesDirs.collect { dir ->
+                    fileTree(dir).exclude(coverageExcludes)
+                }
+            }
+            violationRules {
+                rule {
+                    limit {
+                        counter = 'LINE'
+                        value = 'COVEREDRATIO'
+                        minimum = floorOf(domain, kind)
+                    }
+                }
+            }
+            // The integration gate must never pass vacuously: with `-x integrationTest` (or with no .exec files
+            // downloaded in CI) it errors instead of reporting 0 %.
+            if (kind != 'unit') {
+                doFirst {
+                    def floor = floorOf(domain, kind)
+                    // Only modules that actually contain integration tests can produce an integrationTest.exec.
+                    def itModules = modulesWithData.findAll { m -> hasIntegration(m) && !m.sourceSets.integrationTest.allJava.isEmpty() }
+                    if (floor > 0 && itModules) {
+                        def ran = fromArtifacts
+                                ? itModules.any { m -> m.layout.buildDirectory.file('jacoco/integrationTest.exec').get().asFile.exists() }
+                                : itModules.every { m -> project.gradle.taskGraph.hasTask(m.tasks.named('integrationTest').get()) }
+                        if (!ran) {
+                            throw new GradleException("integrationTest did not run for ${domain}: the ${kind} coverage gate " +
+                                    "(floor ${floor}) needs its integrationTest.exec files. Run without -x integrationTest, " +
+                                    "or pass -PcoverageFromArtifacts with the .exec files in place.")
+                        }
+                    }
+                }
+            }
+        }
+        verifyTasks[kind] << verify
+    }
+}
+
+tasks.register('domainCoverage') {
     group = 'verification'
-    description = 'Collects each service\'s merged jacoco report under build/reports/coverage/<service>/.'
-    serviceProjects.each { svc ->
-        dependsOn svc.tasks.named('jacocoMergedReport')
-        from(svc.layout.buildDirectory.dir('reports/jacoco/merged/html')) { into svc.name }
-        from(svc.layout.buildDirectory.file('reports/jacoco/merged/jacocoMergedReport.xml')) {
-            into svc.name
-            rename { 'coverage.xml' }
+    description = 'Unit, integration and merged coverage reports for every domain: build/reports/coverage/<domain>/.'
+    dependsOn reportTasks.values().flatten()
+}
+tasks.register('perServiceCoverage') {
+    group = 'verification'
+    description = 'Alias of domainCoverage.'
+    dependsOn 'domainCoverage'
+}
+tasks.register('domainUnitCoverageVerification') {
+    group = 'verification'
+    description = 'Unit coverage gate of every domain (no Docker needed).'
+    dependsOn verifyTasks.unit
+}
+tasks.register('domainIntegrationCoverageVerification') {
+    group = 'verification'
+    description = 'Integration coverage gate of every domain.'
+    dependsOn verifyTasks.integration
+}
+tasks.register('domainCoverageVerification') {
+    group = 'verification'
+    description = 'All three coverage gates (unit, integration, merged) of every domain.'
+    dependsOn verifyTasks.values().flatten()
+}
+
+tasks.register('printDomainCoverage') {
+    group = 'verification'
+    description = 'Prints a domain x {unit, integration, merged} line-coverage table from the last domainCoverage run.'
+    dependsOn 'domainCoverage'
+    def reportsDir = layout.buildDirectory.dir('reports/coverage')
+    def domainNames = domains.keySet() as List
+    def floors = { d, k -> floorOf(d, k) }
+    doLast {
+        def pct = { File xml ->
+            if (!xml.exists()) return null
+            def m = (xml.text =~ /<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/)
+            if (!m.find()) return null
+            def last = null
+            m.reset(); while (m.find()) { last = [m.group(1) as long, m.group(2) as long] }
+            def total = last[0] + last[1]
+            total == 0 ? 0.0d : last[1] * 100.0d / total
+        }
+        def fmt = { Double v, BigDecimal floor -> v == null ? '   n/a' : String.format('%5.1f%%%s', v, v < floor * 100 ? '!' : ' ') }
+        def lines = [String.format('%-14s %10s %13s %10s', 'domain', 'unit', 'integration', 'merged')]
+        domainNames.each { d ->
+            def base = reportsDir.get().asFile
+            lines << String.format('%-14s %10s %13s %10s', d,
+                    fmt(pct(new File(base, "${d}/unit/coverage.xml")), floors(d, 'unit')),
+                    fmt(pct(new File(base, "${d}/integration/coverage.xml")), floors(d, 'integration')),
+                    fmt(pct(new File(base, "${d}/coverage.xml")), floors(d, 'merged')))
+        }
+        lines << '(! = below its floor in domainCoverageMinimum)'
+        def text = lines.join('\n')
+        println text
+        def summary = System.getenv('GITHUB_STEP_SUMMARY')
+        if (summary) {
+            new File(summary) << "### Domain line coverage\n```\n${text}\n```\n"
         }
     }
-    into layout.buildDirectory.dir('reports/coverage')
+}
+
+tasks.named('check') {
+    dependsOn 'domainCoverageVerification'
 }
