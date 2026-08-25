@@ -168,9 +168,15 @@ public class WebhookApplyServiceImpl implements WebhookApplyService {
         SubscriptionInvoiceEntity entity = invoiceRepository.findById(invoiceId)
                 .map(it -> it.settled(status, amountPaid, paidAt))
                 .orElseGet(() -> SubscriptionInvoiceEntity.record(invoiceId, subscription.getId(),
-                        subscription.getOrgId(), subscription.getStripeSubscriptionId(),
-                        StripeJson.string(invoice, StripeFields.NUMBER), status, amountDue, amountPaid,
-                        firstNonNull(StripeJson.timestamp(invoice, StripeFields.CREATED), Instant.now())));
+                                subscription.getOrgId(), subscription.getStripeSubscriptionId(),
+                                StripeJson.string(invoice, StripeFields.NUMBER), status, amountDue, amountPaid,
+                                firstNonNull(StripeJson.timestamp(invoice, StripeFields.CREATED), Instant.now()))
+                        // Settled on creation too, and this is the whole of it: `record` writes no paid_at, so a
+                        // renewal that succeeded first time was stored PAID with a null paid_at — and
+                        // `revenueStatistic` sums `where status = 'PAID' and paid_at >= :from`. Every invoice that
+                        // was never seen as OPEN first was therefore missing from platform revenue, which is most
+                        // of them.
+                        .settled(status, amountPaid, paidAt));
         invoiceRepository.save(entity
                 .covering(periodStartOf(invoice), periodEndOf(invoice))
                 .hostedAt(StripeJson.string(invoice, StripeFields.HOSTED_INVOICE_URL),

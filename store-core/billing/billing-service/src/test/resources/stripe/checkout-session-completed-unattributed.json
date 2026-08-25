@@ -1,0 +1,16 @@
+{
+  "id": "evt_checkout_unattributed",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_foreign",
+      "object": "checkout.session",
+      "mode": "payment",
+      "customer": "cus_someone_else",
+      "status": "complete"
+    }
+  }
+}

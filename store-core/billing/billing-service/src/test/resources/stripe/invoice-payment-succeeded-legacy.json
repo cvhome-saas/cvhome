@@ -1,0 +1,22 @@
+{
+  "id": "evt_invoice_paid_legacy",
+  "object": "event",
+  "api_version": "2024-06-20",
+  "created": 1767225600,
+  "type": "invoice.payment_succeeded",
+  "data": {
+    "object": {
+      "id": "in_test_legacy",
+      "object": "invoice",
+      "number": "CVH-0002",
+      "customer": "cus_test_1",
+      "currency": "usd",
+      "amount_due": 3000,
+      "amount_paid": 3000,
+      "created": 1767225600,
+      "subscription": "sub_test_1",
+      "period_start": 1767225600,
+      "period_end": 1769904000
+    }
+  }
+}

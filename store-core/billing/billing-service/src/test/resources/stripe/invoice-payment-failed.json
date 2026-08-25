@@ -1,0 +1,45 @@
+{
+  "id": "evt_invoice_failed",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "invoice.payment_failed",
+  "data": {
+    "object": {
+      "id": "in_test_failed",
+      "object": "invoice",
+      "number": "CVH-0003",
+      "customer": "cus_test_1",
+      "currency": "usd",
+      "amount_due": 3000,
+      "amount_paid": 0,
+      "created": 1767225600,
+      "hosted_invoice_url": "https://invoice.stripe.test/in_test_failed",
+      "invoice_pdf": "https://invoice.stripe.test/in_test_failed.pdf",
+      "parent": {
+        "type": "subscription_details",
+        "subscription_details": {
+          "subscription": "sub_test_1"
+        }
+      },
+      "lines": {
+        "object": "list",
+        "data": [
+          {
+            "id": "il_test_failed",
+            "object": "line_item",
+            "subscription": "sub_test_1",
+            "period": {
+              "start": 1767225600,
+              "end": 1769904000
+            },
+            "price": {
+              "id": "price_pro_monthly",
+              "object": "price"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

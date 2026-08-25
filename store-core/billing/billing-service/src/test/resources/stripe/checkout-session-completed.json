@@ -1,0 +1,18 @@
+{
+  "id": "evt_checkout_completed",
+  "object": "event",
+  "api_version": "2025-03-31.basil",
+  "created": 1767225600,
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_1",
+      "object": "checkout.session",
+      "mode": "subscription",
+      "client_reference_id": "65f023632bc46470c104b76f",
+      "customer": "cus_test_1",
+      "subscription": "sub_test_1",
+      "status": "complete"
+    }
+  }
+}
