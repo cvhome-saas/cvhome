@@ -59,6 +59,8 @@ dependencies {
     testImplementation libs.testcontainers.junit.jupiter
     testImplementation libs.testcontainers.postgresql
     testRuntimeOnly libs.junit.platform.launcher
+    // WebClientsUtils overloads on WebClient.Builder; the compiler needs the type to pick the RestClient one.
+    testCompileOnly libs.spring.webflux
 }
 
 dependencyManagement {

@@ -59,6 +59,18 @@ class SkuInventoryMapperTest {
         assertThat(price.finalPrice()).isEqualByComparingTo(sixty);
     }
 
+    /**
+     * A zero base amount would make the percent-off division blow up; the mapper reports no discount instead.
+     */
+    @Test
+    void zeroBaseAmountNeverReportsADiscountPercentage() {
+        SkuPrice price = SkuInventoryMapper.toSkuPrice(
+                price(BigDecimal.ZERO, new BigDecimal("5"), TODAY.minusDays(1), TODAY.plusDays(1)), TODAY);
+
+        assertThat(price.discounted()).isTrue();
+        assertThat(price.discountPercent()).isZero();
+    }
+
     @Test
     void notPurchasableWithoutStockOrWhenUnavailable() {
         assertThat(SkuInventoryMapper.toSkuInventory(inventory(5, true), TODAY).canBePurchased()).isTrue();
