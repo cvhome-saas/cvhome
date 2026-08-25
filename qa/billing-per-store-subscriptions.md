@@ -28,13 +28,17 @@ appear to do nothing** — the money moves at Stripe and nothing reaches us.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
+stripe login                                    # once per machine
 
-# terminal 1 — prints whsec_...; billing needs it
-stripe listen --forward-to http://gateway.com:8000/billing/api/v1/stripe-webhook/public/events
+lcl start -d                                    # `stripe-billing-webhook` is one of the services it starts
+lcl logs stripe-billing-webhook -n 5            # its ready line prints this run's whsec_...
 
-# terminal 2 — stop with SIGTERM, never SIGINT on a backgrounded run
-STRIPE_WEBHOOK_SECRET=whsec_... lcl start -d
+# billing verifies against that secret, so hand it over and restart just billing
+COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
 ```
+
+The listener follows the assigned port map, so it forwards to the right gateway on a shifted stack too. The
+store-side listener is the separate `stripe-payment-webhook` service.
 
 **Sign-in.** Seller console `http://gateway.com:8000` — `org1-admin` / `admin`. The console works on one store
 at a time; use the store switcher in the header, because every billing answer on the page belongs to the store

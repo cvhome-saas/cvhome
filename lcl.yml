@@ -225,6 +225,47 @@ services:
     depends-on: [spg, merchant, content, catalog, checkout, inventory]
     health: { type: tcp, port: http, timeout: 300 }
 
+  # Stripe CLI listeners. Two separate webhook paths exist — the platform's own billing events go to
+  # store-core-gateway, a store's payment events go through the pod edge — so each needs its own listener.
+  # They are portless: `stripe listen` opens an outbound websocket to Stripe and forwards inbound events over it.
+  #
+  # Both need the CLI logged in once (`stripe login`). Without that they fail immediately and show as crashed;
+  # nothing depends on them, so the rest of the stack is unaffected — `lcl stop stripe-billing-webhook` silences it.
+  #
+  # Each listener prints its own signing secret on the ready line, and it differs per listener and per run:
+  #
+  #   lcl logs stripe-billing-webhook -n 5     # -> whsec_...
+  #
+  # billing verifies against `com.asrevo.cvhome.stripe.webhook-signing-key`, so restart it with that secret:
+  #
+  #   COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
+  #
+  # (LCL passes its own environment through to the services it starts.) A store's payment secret is per store and
+  # lives in the payment configuration row, not in the environment.
+  stripe-billing-webhook:
+    description: Stripe CLI listener forwarding platform billing events to store-core-gateway -> billing
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://gateway.com:${port.store-core-gateway.http}/billing/api/v1/stripe-webhook/public/events"
+    depends-on: [store-core-gateway, billing]
+    health: &stripe-listen-health
+      type: log
+      ready-log: 'Ready! You are using Stripe API Version'
+      timeout: 60
+
+  stripe-payment-webhook:
+    description: Stripe CLI listener forwarding one demo store's payment events through spg -> payment
+    # spg's `handle_path /payment*` strips the prefix, so payment sees its own /api/v1/public/webhook/{store}/{type}.
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc46470c104b76f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
 hooks:
   after-up:
     # The seeded `web-app` client carries redirect URIs on the canonical gateway port. OAuth2ClientDatabaseInitializer
