@@ -20,10 +20,11 @@ import tools.jackson.databind.JsonNode;
  * <p>
  * Tenancy is org- and platform-scoped rather than store-scoped, so {@link Tokens#staff} alone is not enough. The
  * three shapes that matter here are the platform operator, an organization's administrator, and one store's
- * administrator — and the second of those cannot come from {@link Tokens#orgAdmin}: that helper mints a
- * {@code store_core} scope, which {@code SecurityUtils.getOrgStoreIdentity} reads as "platform-wide, no org" before
- * it ever looks at the role. A console org admin carries the {@code store_pod} scope, and the difference is exactly
- * what the cross-organization tests are about, so {@link #orgAdmin(String)} mints the realistic one.
+ * administrator. {@link #orgAdmin(String)} additionally carries a wildcard {@code store} claim, which is what the
+ * console sends and what tenancy's own listing endpoints read; {@link Tokens#orgAdmin} leaves the claim out.
+ * Both now mint the {@code store_pod} scope: an org admin carrying {@code store_core} would be read as
+ * "platform-wide, no org" by {@code SecurityUtils.getOrgStoreIdentity}, which tests the scope before the role, and
+ * every cross-organization assertion would pass without proving anything.
  * </p>
  */
 public final class TenancyApiTestSupport {
