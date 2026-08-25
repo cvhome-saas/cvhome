@@ -3,6 +3,7 @@ package com.asrevo.cvhome.podregistry.service;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -47,16 +48,26 @@ public class PodHealthProbe {
 
     private final RestClient probeClient;
 
+    @Autowired
     public PodHealthProbe(PodRepository podRepository, PodHealthCheckRepository healthCheckRepository,
                           @Value("${cvhome.pod-registry.health.timeout:PT3S}") Duration timeout) {
+        this(podRepository, healthCheckRepository, RestClient.builder().requestFactory(requestFactory(timeout)).build());
+    }
+
+    /** Seam for tests: the same probe over a caller-supplied client, so the HTTP leg can be faked. */
+    PodHealthProbe(PodRepository podRepository, PodHealthCheckRepository healthCheckRepository, RestClient probeClient) {
         this.podRepository = podRepository;
         this.healthCheckRepository = healthCheckRepository;
+        this.probeClient = probeClient;
+    }
+
+    private static SimpleClientHttpRequestFactory requestFactory(Duration timeout) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         // A probe that can hang is worse than no probe: it would hold the scheduler thread and make every pod look
         // fine because none of them ever finished being checked.
         factory.setConnectTimeout(timeout);
         factory.setReadTimeout(timeout);
-        this.probeClient = RestClient.builder().requestFactory(factory).build();
+        return factory;
     }
 
     @Scheduled(fixedRateString = "${cvhome.pod-registry.health.rate:PT1M}")
