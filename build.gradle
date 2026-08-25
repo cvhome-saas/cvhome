@@ -18,10 +18,10 @@ repositories {
 // Target: merged 0.85 everywhere. uaa, cua and checkout stay at 0.0 (reports only) until their legacy code is
 // refactored.
 ext.domainCoverageMinimum = [
-        inventory     : [unit: 0.16, integration: 0.0, merged: 0.16],
-        'pod-registry': [unit: 0.56, integration: 0.06, merged: 0.61],
+        inventory     : [unit: 0.88, integration: 0.85, merged: 0.95],
+        'pod-registry': [unit: 0.81, integration: 0.61, merged: 0.97],
         merchant      : [unit: 0.06, integration: 0.05, merged: 0.11],
-        gateway       : [unit: 0.17, integration: 0.27, merged: 0.38],
+        gateway       : [unit: 0.97, integration: 0.71, merged: 0.97],
         payment       : [unit: 0.0, integration: 0.04, merged: 0.04],
         content       : [unit: 0.01, integration: 0.78, merged: 0.78],
         tenancy       : [unit: 0.43, integration: 0.1, merged: 0.47],
