@@ -1,0 +1,34 @@
+// Root build: intentionally minimal. Everything about a module lives in its own build.gradle and the
+// convention plugins in build-logic/. This file only aggregates coverage across modules.
+plugins {
+    alias(libs.plugins.jacoco.aggregate.conventions)
+}
+
+// The aggregation resolves every module's runtime classpath, so the root needs the same repositories the
+// convention plugins give the modules.
+repositories {
+    mavenLocal()
+    maven { url = 'https://repo.spring.io/milestone' }
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+// Per-domain LINE-coverage floors, one per test kind (see com.asrevo.jacoco-aggregate-conventions). Ratchet: run
+// `./gradlew printDomainCoverage`, bump a domain's floors to what it now achieves (rounded down to 0.01); never lower.
+// Target: merged 0.85 everywhere. uaa, cua and checkout stay at 0.0 (reports only) until their legacy code is
+// refactored.
+ext.domainCoverageMinimum = [
+        inventory     : [unit: 0.88, integration: 0.85, merged: 0.95],
+        'pod-registry': [unit: 0.81, integration: 0.61, merged: 0.97],
+        merchant      : [unit: 0.95, integration: 0.88, merged: 0.95],
+        gateway       : [unit: 0.97, integration: 0.71, merged: 0.97],
+        payment       : [unit: 0.92, integration: 0.61, merged: 0.99],
+        content       : [unit: 0.01, integration: 0.78, merged: 0.78],
+        tenancy       : [unit: 0.43, integration: 0.1, merged: 0.47],
+        catalog       : [unit: 0.01, integration: 0.04, merged: 0.06],
+        billing       : [unit: 0.09, integration: 0.11, merged: 0.19],
+        shared        : [unit: 0.03, integration: 0.0, merged: 0.03],
+        checkout      : [unit: 0.0, integration: 0.0, merged: 0.0],
+        uaa           : [unit: 0.0, integration: 0.0, merged: 0.0],
+        cua           : [unit: 0.0, integration: 0.0, merged: 0.0],
+]

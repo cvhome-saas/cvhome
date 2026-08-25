@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: tenancy
+  config:
+    import: "classpath:common-config.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-core@service.store-core.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_core
+com:
+  asrevo:
+    cvhome:
+      uaa:
+        client:
+          client-id: admin-sdk
+          client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+          base-url: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jdbc:
+      schema-initialization:
+        enabled: false
+      schema-name: tenancy_outbox

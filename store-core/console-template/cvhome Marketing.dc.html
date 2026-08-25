@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+html,body{margin:0;padding:0}
+body{background:#05140f;font-family:Inter,system-ui,sans-serif;color:#e6efeb;-webkit-font-smoothing:antialiased}
+a{color:#34d399;text-decoration:none}
+a:hover{color:#6ee7b7}
+*{box-sizing:border-box}
+::selection{background:#065f46;color:#ecfdf5}
+@keyframes sk-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes sk-in{from{opacity:0}to{opacity:1}}
+@keyframes sk-sweep{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sk-drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,10px)}}
+@keyframes sk-glow{0%,100%{opacity:.5}50%{opacity:.9}}
+</style>
+</helmet>
+
+<div style="min-width:1100px;background:#05140f;overflow:hidden">
+
+  <div style="position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:2rem;padding:1.25rem 3rem;background:rgba(5,20,15,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07);animation:sk-in .5s ease both">
+    <span style="font:600 1rem Inter,sans-serif;color:#fff;letter-spacing:-.02em">cvhome</span>
+    <div style="flex:1"></div>
+    <a href="#story" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Why cvhome</a>
+    <a href="#stores" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Merchants</a>
+    <a href="#reviews" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Reviews</a>
+    <a href="#contact" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Contact</a>
+    <a href="#pricing" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Pricing</a>
+    <a href="Sign In.dc.html" style="font:500 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6);transition:color .2s" style-hover="color:#fff">Sign in</a>
+    <a href="Sign In.dc.html#signup" style="padding:.6rem 1.15rem;background:#10b981;color:#04120d;border-radius:999px;font:600 .8125rem Inter,sans-serif;transition:background-color .2s,box-shadow .2s" style-hover="background:#34d399;box-shadow:0 6px 22px rgba(16,185,129,.45)">Open a store</a>
+  </div>
+
+  <section style="position:relative;padding:9rem 3rem 8rem;text-align:center;overflow:hidden">
+    <div style="position:absolute;top:-260px;left:50%;margin-left:-420px;width:840px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.28),transparent 68%);filter:blur(20px);animation:sk-drift 14s ease-in-out infinite"></div>
+    <div style="position:relative;max-width:1000px;margin:0 auto">
+      <div style="display:inline-flex;align-items:center;gap:.6rem;padding:.4rem .9rem;border:1px solid rgba(52,211,153,.35);border-radius:999px;font:500 .75rem Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6ee7b7;animation:sk-up .6s ease both">
+        <span style="width:6px;height:6px;border-radius:50%;background:#34d399;animation:sk-glow 2.4s ease-in-out infinite"></span>Commerce, unbordered
+      </div>
+      <h1 style="margin:2rem 0 0;font:300 5.25rem/1.02 Inter,sans-serif;color:#fff;letter-spacing:-.045em;animation:sk-up .7s .08s ease both">
+        Sell anywhere.<br><span style="font-weight:600;background:linear-gradient(100deg,#34d399,#a7f3d0);-webkit-background-clip:text;background-clip:text;color:transparent">Rule everywhere.</span>
+      </h1>
+      <p style="margin:2rem auto 0;max-width:46ch;font:300 1.25rem/1.7 Inter,sans-serif;color:rgba(230,239,235,.62);animation:sk-up .7s .16s ease both">cvhome is the operating table for merchants who outgrew one storefront. Many markets, many languages, many currencies. One command.</p>
+      <div style="display:flex;justify-content:center;gap:1rem;margin-top:2.75rem;animation:sk-up .7s .24s ease both">
+        <a href="Sign In.dc.html#signup" style="display:flex;align-items:center;gap:.6rem;padding:.95rem 1.75rem;background:#10b981;color:#04120d;border-radius:999px;font:600 .9375rem Inter,sans-serif;transition:background-color .2s,box-shadow .2s,transform .2s" style-hover="background:#34d399;box-shadow:0 12px 34px rgba(16,185,129,.4);transform:translateY(-2px)">Begin<i class="pi pi-arrow-right" style="font-size:.75rem"></i></a>
+        <a href="Admin Dashboard.dc.html" style="display:flex;align-items:center;gap:.6rem;padding:.95rem 1.75rem;border:1px solid rgba(255,255,255,.16);color:#e6efeb;border-radius:999px;font:600 .9375rem Inter,sans-serif;transition:border-color .2s,background-color .2s" style-hover="border-color:rgba(52,211,153,.5);background:rgba(16,185,129,.08)">See it live</a>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)"></div>
+
+  <section style="display:flex;justify-content:center;gap:6rem;padding:3.5rem 3rem;animation:sk-up .6s ease both">
+    <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="4">
+      <div style="text-align:center">
+        <div style="font:300 2.75rem Inter,sans-serif;color:#fff;letter-spacing:-.04em">{{ m.num }}</div>
+        <div style="margin-top:.5rem;font:500 .75rem Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(230,239,235,.66)">{{ m.label }}</div>
+      </div>
+    </sc-for>
+  </section>
+
+  <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)"></div>
+
+  <section id="story" style="padding:8rem 3rem">
+    <div style="max-width:1100px;margin:0 auto">
+      <h2 style="margin:0;max-width:22ch;font:300 3.5rem/1.12 Inter,sans-serif;color:#fff;letter-spacing:-.035em;animation:sk-up .6s ease both">Most platforms give you a store. We give you a <span style="font-weight:600;color:#34d399">territory</span>.</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3.5rem;margin-top:5rem">
+        <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="3">
+          <div style="{{ p.style }}">
+            <div style="width:44px;height:2px;background:#10b981"></div>
+            <div style="margin-top:1.75rem;font:500 1.375rem Inter,sans-serif;color:#fff;letter-spacing:-.02em">{{ p.title }}</div>
+            <p style="margin:1rem 0 0;font:300 1rem/1.75 Inter,sans-serif;color:rgba(230,239,235,.58)">{{ p.copy }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="stores" style="padding:7rem 3rem;border-top:1px solid rgba(255,255,255,.07)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;gap:2rem">
+        <h2 style="flex:1;margin:0;max-width:18ch;font:300 3.5rem/1.12 Inter,sans-serif;color:#fff;letter-spacing:-.035em">Merchants already <span style="font-weight:600;color:#34d399">on the map</span>.</h2>
+        <span style="font:400 .875rem Inter,sans-serif;color:rgba(230,239,235,.66);padding-bottom:.75rem">Four live storefronts, one account</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3.5rem">
+        <sc-for list="{{ showcase }}" as="sc" hint-placeholder-count="4">
+          <a href="Storefront Builder.dc.html" style="{{ sc.cardStyle }}">
+            <div style="{{ sc.thumbStyle }}">
+              <span style="{{ sc.markStyle }}">{{ sc.mark }}</span>
+              <span style="position:absolute;top:.85rem;right:.85rem;display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;border-radius:999px;background:rgba(4,18,13,.7);font:600 .625rem Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6ee7b7"><span style="width:5px;height:5px;border-radius:50%;background:#34d399;animation:sk-glow 2.4s ease-in-out infinite"></span>Live</span>
+            </div>
+            <div style="padding:1.25rem">
+              <div style="font:500 1rem Inter,sans-serif;color:#fff;letter-spacing:-.01em">{{ sc.name }}</div>
+              <div style="margin-top:.35rem;font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.68)">{{ sc.trade }}</div>
+              <div style="margin-top:1.25rem;display:flex;align-items:center;gap:.5rem;font:400 .75rem Inter,sans-serif;color:rgba(230,239,235,.66)">
+                <i class="pi pi-map-marker" style="font-size:.65rem"></i>{{ sc.market }}
+                <div style="flex:1"></div>
+                <span style="font:600 .75rem Inter,sans-serif;color:#34d399">{{ sc.since }}</span>
+              </div>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews" style="padding:7rem 3rem;border-top:1px solid rgba(255,255,255,.07)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;gap:2rem">
+        <h2 style="flex:1;margin:0;max-width:20ch;font:300 3.5rem/1.12 Inter,sans-serif;color:#fff;letter-spacing:-.035em">What merchants say <span style="font-weight:600;color:#34d399">after a year</span>.</h2>
+        <div style="padding-bottom:.75rem;text-align:right">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:.3rem">
+            <sc-for list="{{ ratingStars }}" as="s" hint-placeholder-count="5">
+              <i class="pi pi-star-fill" style="font-size:.8rem;color:#34d399"></i>
+            </sc-for>
+          </div>
+          <div style="margin-top:.5rem;font:400 .875rem Inter,sans-serif;color:rgba(230,239,235,.66)">4.8 average from 312 reviews</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem;margin-top:3.5rem">
+        <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;gap:1.25rem;padding:1.75rem;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(255,255,255,.02);transition:border-color .25s,background-color .25s,transform .25s" style-hover="border-color:rgba(52,211,153,.4);background:rgba(16,185,129,.06);transform:translateY(-3px)">
+            <div style="display:flex;align-items:center;gap:.3rem">
+              <sc-for list="{{ r.stars }}" as="s" hint-placeholder-count="5">
+                <i class="{{ s.icon }}" style="{{ s.style }}"></i>
+              </sc-for>
+              <div style="flex:1"></div>
+              <span style="font:500 .6875rem Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(230,239,235,.5)">{{ r.market }}</span>
+            </div>
+            <p style="margin:0;font:300 1.0625rem/1.7 Inter,sans-serif;color:rgba(230,239,235,.82);text-wrap:pretty">{{ r.quote }}</p>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:.85rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.08)">
+              <div style="{{ r.avatarStyle }}">{{ r.initials }}</div>
+              <div style="min-width:0">
+                <div style="font:500 .875rem Inter,sans-serif;color:#fff">{{ r.name }}</div>
+                <div style="margin-top:.2rem;font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6)">{{ r.role }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:2.5rem;margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.08)">
+        <sc-for list="{{ reviewStats }}" as="s" hint-placeholder-count="3">
+          <div>
+            <div style="font:300 2rem Inter,sans-serif;color:#fff;letter-spacing:-.03em">{{ s.num }}</div>
+            <div style="margin-top:.35rem;font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.6)">{{ s.label }}</div>
+          </div>
+        </sc-for>
+        <div style="flex:1;min-width:1rem"></div>
+        <a href="Sign In.dc.html#signup" style="display:flex;align-items:center;gap:.6rem;padding:.85rem 1.5rem;border:1px solid rgba(255,255,255,.16);color:#e6efeb;border-radius:999px;font:600 .875rem Inter,sans-serif;transition:border-color .2s,background-color .2s,color .2s" style-hover="border-color:rgba(52,211,153,.5);background:rgba(16,185,129,.08);color:#fff">Start your own trial<i class="pi pi-arrow-right" style="font-size:.7rem"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <section style="position:relative;padding:7rem 3rem;background:linear-gradient(180deg,rgba(16,185,129,.07),transparent)">
+    <div style="max-width:900px;margin:0 auto;text-align:center">
+      <i class="pi pi-bolt" style="font-size:1.5rem;color:#34d399"></i>
+      <p style="margin:2rem 0 0;font:300 2.5rem/1.35 Inter,sans-serif;color:#fff;letter-spacing:-.03em">"We opened Germany on a Tuesday morning and took our first order before lunch."</p>
+      <div style="margin-top:2.5rem;font:500 .8125rem Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(230,239,235,.68)">Head of Commerce · Acme Supply Holdings</div>
+    </div>
+  </section>
+
+  <section id="pricing" style="padding:7rem 3rem 8rem">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;gap:2rem">
+        <h2 style="flex:1;margin:0;max-width:16ch;font:300 3.5rem/1.12 Inter,sans-serif;color:#fff;letter-spacing:-.035em">One price. Per store.</h2>
+        <div style="display:flex;padding:.25rem;background:rgba(255,255,255,.06);border-radius:999px;gap:.2rem">
+          <sc-for list="{{ cycles }}" as="c" hint-placeholder-count="2">
+            <div onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem">
+        <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
+          <div style="{{ p.cardStyle }}">
+            <div style="font:500 .8125rem Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:{{ p.nameColor }}">{{ p.name }}</div>
+            <div style="margin-top:1.75rem;display:flex;align-items:baseline;gap:.5rem">
+              <span style="font:300 3.25rem Inter,sans-serif;color:#fff;letter-spacing:-.04em">{{ p.price }}</span>
+              <span style="font:400 .875rem Inter,sans-serif;color:rgba(230,239,235,.66)">/mo</span>
+            </div>
+            <div style="margin-top:.5rem;font:400 .8125rem Inter,sans-serif;color:{{ p.noteColor }}">{{ p.note }}</div>
+            <p style="margin:2rem 0 2.5rem;font:300 .9375rem/1.7 Inter,sans-serif;color:rgba(230,239,235,.58)">{{ p.blurb }}</p>
+            <a href="Sign In.dc.html#signup" style="{{ p.btnStyle }}">{{ p.cta }}</a>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:2.5rem 0 0;text-align:center;font:300 .9375rem Inter,sans-serif;color:rgba(230,239,235,.66)">Every plan is the whole platform. The account is free — you only pay for stores you open.</p>
+    </div>
+  </section>
+
+  <section id="contact" style="padding:7rem 3rem 8rem;border-top:1px solid rgba(255,255,255,.07)">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start">
+
+      <div>
+        <h2 style="margin:0;max-width:18ch;font:300 3.5rem/1.12 Inter,sans-serif;color:#fff;letter-spacing:-.035em">Talk to someone who <span style="font-weight:600;color:#34d399">runs stores</span>.</h2>
+        <p style="margin:1.5rem 0 0;max-width:38ch;font:300 1.0625rem/1.75 Inter,sans-serif;color:rgba(230,239,235,.6);text-wrap:pretty">Migration questions, tax setup in a new market, or a plan that does not fit the pricing page. Our team answers in under four hours on weekdays.</p>
+
+        <div style="margin-top:3rem;display:flex;flex-direction:column;gap:1.25rem">
+          <sc-for list="{{ channels }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.02);transition:border-color .25s,background-color .25s" style-hover="border-color:rgba(52,211,153,.4);background:rgba(16,185,129,.06)">
+              <i class="{{ c.icon }}" style="margin-top:.15rem;font-size:1rem;color:#34d399"></i>
+              <div style="min-width:0">
+                <div style="font:500 .9375rem Inter,sans-serif;color:#fff">{{ c.title }}</div>
+                <div style="margin-top:.3rem;font:400 .8125rem/1.6 Inter,sans-serif;color:rgba(230,239,235,.62)">{{ c.detail }}</div>
+              </div>
+              <div style="flex:1"></div>
+              <span style="flex:none;font:500 .8125rem Inter,sans-serif;color:#34d399;white-space:nowrap">{{ c.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:2rem;display:flex;align-items:center;gap:.6rem;font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.5)">
+          <i class="pi pi-map-marker" style="font-size:.75rem"></i>Prinsengracht 263, Amsterdam · Mon–Fri, 09:00–18:00 CET
+        </div>
+      </div>
+
+      <div style="background:rgba(4,18,13,.6);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.75rem">
+        <div style="font:500 1.0625rem Inter,sans-serif;color:#fff">Send us a note</div>
+        <p style="margin:.5rem 0 0;font:300 .875rem/1.6 Inter,sans-serif;color:rgba(230,239,235,.6)">No sales sequence. One reply from the person who can answer.</p>
+
+        <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:1rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div>
+              <label style="display:block;font:500 .75rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(230,239,235,.68);margin-bottom:.5rem">Name</label>
+              <div style="padding:.75rem .9rem;border:1px solid rgba(255,255,255,.14);border-radius:10px;font:400 .9375rem Inter,sans-serif;color:#fff;transition:border-color .2s,background-color .2s" style-hover="border-color:rgba(52,211,153,.55);background:rgba(16,185,129,.06)">Jordan Diaz</div>
+            </div>
+            <div>
+              <label style="display:block;font:500 .75rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(230,239,235,.68);margin-bottom:.5rem">Company</label>
+              <div style="padding:.75rem .9rem;border:1px solid rgba(255,255,255,.14);border-radius:10px;font:400 .9375rem Inter,sans-serif;color:#fff;transition:border-color .2s,background-color .2s" style-hover="border-color:rgba(52,211,153,.55);background:rgba(16,185,129,.06)">Acme Supply Holdings</div>
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font:500 .75rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(230,239,235,.68);margin-bottom:.5rem">Work email</label>
+            <div style="padding:.75rem .9rem;border:1px solid rgba(255,255,255,.14);border-radius:10px;font:400 .9375rem Inter,sans-serif;color:#fff;transition:border-color .2s,background-color .2s" style-hover="border-color:rgba(52,211,153,.55);background:rgba(16,185,129,.06)">jordan@acmesupply.co</div>
+          </div>
+          <div>
+            <label style="display:block;font:500 .75rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(230,239,235,.68);margin-bottom:.5rem">What do you need?</label>
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+              <sc-for list="{{ topics }}" as="t" hint-placeholder-count="4">
+                <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font:500 .75rem Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(230,239,235,.68);margin-bottom:.5rem">Message</label>
+            <div style="padding:.75rem .9rem;border:1px solid rgba(255,255,255,.14);border-radius:10px;font:400 .9375rem Inter,sans-serif;color:#fff;transition:border-color .2s,background-color .2s;min-height:110px;color:rgba(230,239,235,.7);line-height:1.6" style-hover="border-color:rgba(52,211,153,.55);background:rgba(16,185,129,.06)">{{ messageHint }}</div>
+          </div>
+
+          <div onClick="{{ send }}" style="{{ sendStyle }}">{{ sendLabel }}<i class="{{ sendIcon }}" style="font-size:.7rem"></i></div>
+          <p style="margin:.25rem 0 0;font:300 .75rem/1.6 Inter,sans-serif;color:rgba(230,239,235,.55)">{{ sendNote }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="padding:0 3rem 4rem">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:1.5rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.08)">
+      <span style="font:600 .875rem Inter,sans-serif;color:#fff;letter-spacing:.14em">cvhome</span>
+      <div style="flex:1"></div>
+      <a href="#story" style="font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.68)">Why cvhome</a>
+      <a href="#pricing" style="font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.68)">Pricing</a>
+      <a href="Admin Dashboard.dc.html" style="font:400 .8125rem Inter,sans-serif;color:rgba(230,239,235,.68)">Console</a>
+      <span style="font:300 .8125rem Inter,sans-serif;color:rgba(230,239,235,.62)">© 2026 cvhome</span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400,&quot;height&quot;:1600}}">
+const PILLARS = [
+  { title: 'Open a market in a minute', copy: 'A new store is a decision, not a project. Choose where you want to sell and it is standing before the coffee cools.' },
+  { title: 'Speak the local language', copy: 'Every word your customers read, in their language and their currency, without running four teams to keep it true.' },
+  { title: 'One seat, every store', copy: 'Switch markets the way you switch tabs. The numbers, the orders and the shelves all answer to the same login.' },
+];
+
+const PLANS = [
+  { key: 'starter', name: 'Starter', monthly: 29, blurb: 'For the first market. Everything works, at a smaller scale.', cta: 'Start free' },
+  { key: 'growth', name: 'Growth', monthly: 99, featured: true, blurb: 'For merchants running several markets at once, with room to spare.', cta: 'Start 14-day trial' },
+  { key: 'pro', name: 'Pro', monthly: 299, blurb: 'For operations that cannot afford a quiet hour anywhere on the map.', cta: 'Talk to us' },
+];
+
+class Component extends DCLogic {
+  state = { cycle: 'monthly' };
+
+  pill(on) {
+    return 'padding:.5rem 1.1rem;border-radius:999px;font:600 .8125rem Inter,sans-serif;cursor:pointer;text-align:center;transition:background-color .2s,color .2s;' +
+      (on ? 'background:#10b981;color:#04120d' : 'color:rgba(230,239,235,.55)');
+  }
+
+  renderVals() {
+    const st = this.state;
+    const yearly = st.cycle === 'yearly';
+
+    const TOPICS = ['Migrating stores', 'New market setup', 'Custom plan', 'Something else'];
+    const topic = st.topic || TOPICS[0];
+    const topics = TOPICS.map(t => ({ label: t,
+      onClick: () => this.setState({ topic: t }),
+      style: 'padding:.5rem .85rem;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s;' +
+        (t === topic
+          ? 'background:rgba(16,185,129,.16);border:1px solid rgba(52,211,153,.5);color:#6ee7b7;font:600 .8125rem Inter,sans-serif'
+          : 'background:transparent;border:1px solid rgba(255,255,255,.14);color:rgba(230,239,235,.7);font:500 .8125rem Inter,sans-serif'),
+    }));
+    const MSG = {
+      'Migrating stores': 'We run four storefronts on two other platforms and want to consolidate before the autumn season.',
+      'New market setup': 'We are opening in Germany and Poland next quarter and need help with tax and currency setup.',
+      'Custom plan': 'We expect around 20 stores across 6 markets. The published tiers do not cover that.',
+      'Something else': 'Tell us what you are trying to do and who it is for.',
+    };
+    const sent = !!st.sent;
+
+    const REVIEWS = [
+      { name: 'Marta Kowalska', role: 'Founder, Nordwerk Interiors', market: 'Poland · 3 stores', rating: 5, initials: 'MK',
+        quote: 'We ran three storefronts on three different tools before this. Consolidating them took an afternoon, and I finally see one stock number instead of three that disagree.' },
+      { name: 'Tobias Lindqvist', role: 'Head of Ecommerce, Fjord Supply', market: 'Sweden · 5 stores', rating: 5, initials: 'TL',
+        quote: 'Opening a new market used to be a project with a budget. Now it is a form. The tax and currency rules come preconfigured per region, which is the part I dreaded.' },
+      { name: 'Amina Haddad', role: 'Operations lead, Souk Modern', market: 'UAE · 2 stores', rating: 4, initials: 'AH',
+        quote: 'Arabic and English side by side in the same product form is what sold us. Translators work in the admin directly instead of passing spreadsheets back and forth.' },
+      { name: 'Daniel Okoye', role: 'Managing director, Ridgeline Tools', market: 'UK · 4 stores', rating: 5, initially: '', initials: 'DO',
+        quote: 'Support answered a payout question in under two hours on a Saturday. That mattered more than any feature on the pricing page.' },
+      { name: 'Camille Roux', role: 'Brand director, Atelier Vert', market: 'France · 1 store', rating: 4, initials: 'CR',
+        quote: 'The storefront builder gave us something on brand without a developer. We hired one later for the checkout, not for the basics.' },
+      { name: 'Priya Nadar', role: 'Merchandising manager, Acme Supply', market: 'Netherlands · 6 stores', rating: 5, initials: 'PN',
+        quote: 'Banners, pages and FAQ entries all publish per store per language. Our seasonal campaigns went from a two-week scramble to a Monday morning.' },
+    ];
+    const avatarTints = [['#065f46', '#a7f3d0'], ['#134e4a', '#6ee7b7'], ['#1e293b', '#e2e8f0']];
+    const reviews = REVIEWS.map((r, i) => ({ ...r,
+      stars: [1, 2, 3, 4, 5].map(n => ({
+        icon: n <= r.rating ? 'pi pi-star-fill' : 'pi pi-star',
+        style: 'font-size:.8rem;color:' + (n <= r.rating ? '#34d399' : 'rgba(230,239,235,.28)'),
+      })),
+      avatarStyle: 'width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 .8125rem Inter,sans-serif;background:' +
+        avatarTints[i % 3][0] + ';color:' + avatarTints[i % 3][1],
+    }));
+    const reviewStats = [
+      { num: '4.8 / 5', label: 'Average rating across 312 reviews' },
+      { num: '94%', label: 'Would recommend to another merchant' },
+      { num: '18 months', label: 'Median time on the platform' },
+    ];
+
+    const marquee = [
+      { num: '60s', label: 'To open a market' },
+      { num: '4', label: 'Continents' },
+      { num: '4', label: 'Languages' },
+      { num: '99.95%', label: 'Uptime' },
+    ];
+
+    const pillars = PILLARS.map((p, i) => ({ ...p,
+      style: 'animation:sk-up .6s ' + (0.1 + i * 0.1) + 's ease both',
+    }));
+
+    const cycles = [
+      { key: 'monthly', label: 'Monthly' },
+      { key: 'yearly', label: 'Yearly −20%' },
+    ].map(c => ({ label: c.label, go: () => this.setState({ cycle: c.key }), style: this.pill(st.cycle === c.key) }));
+
+    const plans = PLANS.map(p => {
+      const price = yearly ? Math.round(p.monthly * 0.8) : p.monthly;
+      return { name: p.name, blurb: p.blurb, cta: p.cta,
+        price: '$' + price,
+        note: yearly ? 'billed yearly' : 'billed monthly',
+        nameColor: p.featured ? '#34d399' : 'rgba(230,239,235,.68)',
+        noteColor: yearly ? '#6ee7b7' : 'rgba(230,239,235,.64)',
+        cardStyle: 'display:flex;flex-direction:column;padding:2.25rem;border-radius:20px;transition:transform .25s,border-color .25s,background-color .25s;border:1px solid ' +
+          (p.featured ? 'rgba(52,211,153,.45)' : 'rgba(255,255,255,.1)') + ';background:' +
+          (p.featured ? 'rgba(16,185,129,.1)' : 'rgba(255,255,255,.02)'),
+        btnStyle: 'display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:auto;padding:.85rem;border-radius:999px;font:600 .875rem Inter,sans-serif;transition:background-color .2s,border-color .2s,box-shadow .2s;' +
+          (p.featured
+            ? 'background:#10b981;color:#04120d'
+            : 'border:1px solid rgba(255,255,255,.16);color:#e6efeb'),
+      };
+    });
+
+    const showcase = [
+      { name: 'Acme Supply Co.', trade: 'Workplace supplies', market: 'San Francisco', since: 'Since 2024', mark: 'A', tint: 'rgba(16,185,129,.16)', ink: '#6ee7b7' },
+      { name: 'Northline Labs', trade: 'Lab consumables', market: 'Frankfurt', since: 'Since 2025', mark: 'N', tint: 'rgba(59,130,246,.16)', ink: '#93c5fd' },
+      { name: 'Harbor Point', trade: 'Café wholesale', market: 'Seattle', since: 'Since 2025', mark: 'H', tint: 'rgba(245,158,11,.16)', ink: '#fcd34d' },
+      { name: 'Vantage Interiors', trade: 'Furniture trade', market: 'Bahrain', since: 'Since 2026', mark: 'V', tint: 'rgba(139,92,246,.16)', ink: '#c4b5fd' },
+    ].map((s2, i) => ({ ...s2,
+      cardStyle: 'display:block;border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02);color:inherit;text-decoration:none;transition:transform .25s,border-color .25s,box-shadow .25s;animation:sk-up .6s ' + (0.05 + i * 0.08) + 's ease both',
+      thumbStyle: 'position:relative;height:132px;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,' + s2.tint + ',rgba(255,255,255,.02))',
+      markStyle: 'font:300 2.75rem Inter,sans-serif;letter-spacing:-.04em;color:' + s2.ink,
+    }));
+
+    return {
+      marquee, pillars, cycles, plans, showcase, reviews, reviewStats, topics,
+      channels: [
+        { icon: 'pi pi-envelope', title: 'Email us', detail: 'For migrations, pricing and partnership questions.', value: 'hello@cvhome.co' },
+        { icon: 'pi pi-comments', title: 'Live chat', detail: 'In the console, bottom right. Weekdays 09:00–18:00 CET.', value: 'Avg. 4 min' },
+        { icon: 'pi pi-phone', title: 'Call sales', detail: 'For teams running more than five storefronts.', value: '+31 20 241 8890' },
+      ],
+      messageHint: MSG[topic],
+      send: () => this.setState({ sent: true }),
+      sent,
+      sendLabel: sent ? 'Message sent' : 'Send message',
+      sendIcon: sent ? 'pi pi-check' : 'pi pi-arrow-right',
+      sendStyle: 'display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.5rem;padding:.9rem;border-radius:999px;cursor:pointer;font:600 .9375rem Inter,sans-serif;transition:background-color .2s,box-shadow .2s;' +
+        (sent ? 'background:rgba(16,185,129,.18);color:#6ee7b7;border:1px solid rgba(52,211,153,.5)' : 'background:#10b981;color:#04120d;border:1px solid #10b981'),
+      sendNote: sent
+        ? 'Thanks — we have your note and will reply to jordan@acmesupply.co.'
+        : 'We reply within four hours on weekdays. No card, no sales sequence.',
+      ratingStars: [1, 2, 3, 4, 5].map(n => ({ n })),
+    };
+  }
+}
+</script>
+</body>
+</html>

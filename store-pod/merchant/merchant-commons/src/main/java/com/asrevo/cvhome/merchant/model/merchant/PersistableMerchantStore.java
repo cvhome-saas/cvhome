@@ -14,7 +14,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PersistableMerchantStore extends MerchantStoreEntity {
+public class PersistableMerchantStore extends MerchantStoreDetails {
 
     /**
      *

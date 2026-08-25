@@ -1,0 +1,69 @@
+<span class="text-shell">
+  @if (icon(); as glyph) {
+    <app-icon class="text-icon" [name]="glyph" />
+  }
+
+  @if (prefix()) {
+    <span class="text-affix" aria-hidden="true">{{ prefix() }}</span>
+  }
+
+  <input
+    #input
+    class="text-input"
+    [class.latin]="latin()"
+    [type]="inputType()"
+    [id]="id()"
+    [value]="value()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [attr.autocomplete]="autocomplete()"
+    [attr.inputmode]="inputmode()"
+    [attr.maxlength]="maxLength()"
+    [attr.dir]="latin() ? 'ltr' : 'auto'"
+    (input)="onInput(input)"
+    (blur)="onBlur()"
+  />
+
+  @if (counter(); as text) {
+    <span class="text-counter" aria-hidden="true">{{ text }}</span>
+  }
+
+  <!--
+    The uniqueness indicator. `role="status"` rather than a live region on the icon, so the answer
+    is announced once when it lands rather than on every keystroke that resets it to pending.
+  -->
+  @if (check() !== 'idle') {
+    <span class="text-check" [class]="check()" role="status" [attr.aria-label]="checkLabel()">
+      @switch (check()) {
+        @case ('pending') { <app-icon name="clock" /> }
+        @case ('free') { <app-icon name="checkCircle" /> }
+        @case ('taken') { <app-icon name="alertCircle" /> }
+      }
+    </span>
+  }
+
+  @if (suffix()) {
+    <span class="text-affix trailing" aria-hidden="true">{{ suffix() }}</span>
+  }
+
+  <!--
+    A real button in the flow of the field rather than an absolutely positioned one, which is what
+    `auth.css` drew and why the eye sat on the wrong side of an Arabic password field.
+  -->
+  @if (isPassword()) {
+    <button
+      class="text-reveal"
+      type="button"
+      tabindex="-1"
+      [attr.aria-label]="revealLabel()"
+      [attr.aria-pressed]="revealed()"
+      [disabled]="isDisabled()"
+      (click)="toggleReveal()"
+    >
+      <app-icon [name]="revealed() ? 'eyeOff' : 'eye'" />
+    </button>
+  }
+</span>

@@ -1,0 +1,177 @@
+<ng-container *transloco="let t">
+  <div class="split">
+    <app-panel
+      class="list-panel"
+      [title]="t('catalogue.categories.title')"
+      [subtitle]="
+        t('catalogue.categories.subtitle', {
+          total: counts().total,
+          roots: counts().roots,
+          visible: counts().visible
+        })
+      "
+    >
+      <div panelAction class="panel-controls">
+        <button class="ghost-action" type="button" (click)="facade.expandAll()">
+          {{ t('catalogue.categories.expandAll') }}
+        </button>
+        <button class="ghost-action" type="button" (click)="facade.collapseAll()">
+          {{ t('catalogue.categories.collapseAll') }}
+        </button>
+      </div>
+
+      <div class="tree-wrap">
+        <app-tree
+          [nodes]="nodes()"
+          [selectedId]="facade.selectedCategoryId()"
+          [collapsed]="facade.collapsed()"
+          [label]="t('catalogue.categories.treeLabel')"
+          [busy]="facade.busy()"
+          (selectedIdChange)="onSelect($event)"
+          (toggleCollapsed)="facade.toggleCollapsed($event)"
+          (visibilityToggled)="facade.toggleCategoryVisible($event)"
+          (moved)="onMove($event)"
+          (addChild)="facade.startCreate($event.id)"
+        />
+
+        <button class="secondary-action add-root" type="button" (click)="facade.startCreate()">
+          <app-icon name="plus" />
+          {{ t('catalogue.categories.addTopLevel') }}
+        </button>
+
+        <!--
+          The drag gesture is not discoverable, and the buttons that do the same job only appear on
+          hover. One sentence, once, beats a tooltip nobody opens.
+        -->
+        <p class="tree-hint">{{ t('catalogue.categories.dragHint') }}</p>
+      </div>
+    </app-panel>
+
+    <app-panel
+      class="editor-panel"
+      [title]="creating() ? t('catalogue.categories.newTitle') : (selected()?.name ?? t('catalogue.categories.noneTitle'))"
+      [subtitle]="creating() ? t('catalogue.categories.newSubtitle') : path().join(' / ')"
+    >
+      @if (!creating() && !selected()) {
+        <app-empty-state icon="sitemap" [message]="t('catalogue.categories.empty')">
+          <button class="secondary-action" type="button" (click)="facade.startCreate()">
+            {{ t('catalogue.categories.addTopLevel') }}
+          </button>
+        </app-empty-state>
+      } @else {
+        <form class="editor-body" [formGroup]="form" (ngSubmit)="facade.saveCategory()">
+          <div class="editor-head">
+            <app-locale-switcher
+              [languages]="facade.languages()"
+              [active]="facade.activeLanguage()"
+              [filled]="facade.translatedLanguages()"
+              [label]="t('catalogue.copy.languageLabel')"
+              (activeChange)="facade.setLanguage($event)"
+            />
+
+            @if (!creating() && selected(); as category) {
+              <button
+                class="danger-action"
+                type="button"
+                [disabled]="facade.busy()"
+                (click)="facade.askDelete('categories', category.id, category.name)"
+              >
+                <app-icon name="trash" />
+                {{ t('catalogue.categories.delete') }}
+              </button>
+            }
+          </div>
+
+          <!--
+            Deleting a category takes its children with it — `CategoryFacadeImpl` cascades — so a
+            branch says so before the dialog does, not only in it.
+          -->
+          @if (!creating() && (selected()?.children?.length ?? 0) > 0) {
+            <app-notice-bar
+              icon="alertCircle"
+              tone="amber"
+              [message]="t('catalogue.categories.hasChildren', {count: selected()?.children?.length ?? 0})"
+            />
+          }
+
+          <app-copy-fields
+            [form]="form.controls.copy"
+            scope="category"
+            [languageName]="facade.activeLanguageName()"
+            [richDescription]="true"
+            [contentDir]="facade.activeLanguageDir()"
+            [showSlug]="true"
+            [showSeo]="true"
+            slugPrefix="/c/"
+            (nameChanged)="onNameInput($event)"
+          />
+
+          <hr class="divider" />
+
+          <div class="field-grid">
+            <!--
+              One uniqueness affordance for the whole console: checking, taken, free. The spinner is not
+              decoration — the check is debounced, so without it the field looks like it has already
+              passed.
+            -->
+            <app-form-field
+              [label]="t('catalogue.code')"
+              [control]="form.controls.code"
+              required
+              controlId="category-code"
+              [hint]="creating() ? t('catalogue.codeHintNew') : t('catalogue.codeHintExisting')"
+              [fallback]="form.controls.code.hasError('codeTaken') ? t('catalogue.codeTaken') : ''"
+            >
+              <app-text-field
+                id="category-code"
+                formControlName="code"
+                latin
+                [check]="codeCheck()"
+                [checkLabel]="t('catalogue.codeChecking')"
+                [invalid]="form.controls.code.hasError('codeTaken')"
+              />
+            </app-form-field>
+
+            <div class="field">
+              <label for="category-order">{{ t('catalogue.categories.sortOrder') }}</label>
+              <app-number-field
+                id="category-order"
+                formControlName="sortOrder"
+                [decimals]="0"
+                [min]="0"
+              />
+              <p class="field-hint">{{ t('catalogue.categories.sortOrderHint') }}</p>
+            </div>
+
+            <div class="field field-wide">
+              <app-toggle
+                [checked]="form.controls.visible.value"
+                (checkedChange)="form.controls.visible.setValue($event)"
+                [label]="t('catalogue.categories.visible')"
+                [description]="
+                  form.controls.visible.value
+                    ? t('catalogue.categories.visibleOn')
+                    : t('catalogue.categories.visibleOff')
+                "
+              />
+            </div>
+          </div>
+
+          <div class="editor-actions">
+            <button class="secondary-action" type="button" (click)="facade.cancelEdit()">
+              {{ t('shared.actions.cancel') }}
+            </button>
+            <button
+              class="primary-action"
+              type="submit"
+              [disabled]="facade.busy()"
+              [attr.aria-busy]="facade.busy()"
+            >
+              {{ creating() ? t('catalogue.categories.create') : t('catalogue.categories.save') }}
+            </button>
+          </div>
+        </form>
+      }
+    </app-panel>
+  </div>
+</ng-container>

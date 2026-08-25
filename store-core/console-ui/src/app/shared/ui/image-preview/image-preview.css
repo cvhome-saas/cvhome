@@ -1,0 +1,159 @@
+:host {
+  display: contents;
+}
+
+/*
+ * Centred, and that takes a line: the project's reset zeroes every margin, and `margin: auto` is
+ * precisely what centres a native modal dialog. `shared/ui/confirm-dialog` hit the same trap and
+ * says so in its own stylesheet.
+ */
+.preview::backdrop {
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+
+.preview {
+  margin: auto;
+  overflow: hidden;
+  max-inline-size: min(92vw, 1400px);
+  max-block-size: 90vh;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+/*
+ * In and out, as two keyframes rather than one transition.
+ *
+ * A dialog flips `display` when it closes and a discrete property carries no animation with it, so
+ * the CSS-only answer is `transition-behavior: allow-discrete` with `@starting-style`. That did not
+ * survive this project's scoped stylesheets, so the component keeps the dialog open until the exit
+ * has played and hangs a class on it meanwhile — which is also the version that works in a browser
+ * without `allow-discrete` at all. Global `prefers-reduced-motion` in `styles.css` cuts both to
+ * nothing, and the component's own timer still closes the dialog.
+ */
+.preview[open] {
+  animation: preview-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.preview[open]::backdrop {
+  animation: backdrop-in 0.26s ease-out both;
+}
+
+.preview[open].closing {
+  animation: preview-out 0.22s cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+.preview[open].closing::backdrop {
+  animation: backdrop-out 0.22s ease-in both;
+}
+
+@keyframes preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+@keyframes preview-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---- The dialog's one bar of chrome ---------------------------------------------------------- */
+
+.preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.75rem 0.7rem 1.05rem;
+  border-block-end: 1px solid var(--border-soft);
+}
+
+.preview-title {
+  flex: none;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.preview-size {
+  flex: none;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Server-issued, so laid out by its own direction and allowed to be cut rather than to wrap. */
+.preview-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.preview-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  margin-inline-start: auto;
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--foreground-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.85rem;
+}
+
+.preview-close:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+/* ---- The asset itself ------------------------------------------------------------------------ */
+
+.preview-stage {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--muted);
+}
+
+.preview-image {
+  display: block;
+  /* Leaves the bar its row and the stage its padding, so a tall asset still fits whole. */
+  max-inline-size: min(88vw, 1330px);
+  max-block-size: calc(90vh - 5.5rem);
+  border-radius: var(--radius-md);
+  object-fit: contain;
+}

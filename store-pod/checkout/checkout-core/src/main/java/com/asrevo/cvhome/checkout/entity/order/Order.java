@@ -3,7 +3,6 @@ package com.asrevo.cvhome.checkout.entity.order;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -28,17 +27,18 @@ import org.hibernate.annotations.SQLOrder;
 
 import com.asrevo.cvhome.checkout.entity.order.orderproduct.OrderProduct;
 import com.asrevo.cvhome.checkout.entity.order.orderstatus.OrderStatusHistory;
+import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.SchemaConstant;
 import com.asrevo.cvhome.store.core.converter.CurrencyCodeConverter;
 import com.asrevo.cvhome.store.core.converter.LocaleConverter;
 import com.asrevo.cvhome.store.core.entity.common.Billing;
 import com.asrevo.cvhome.store.core.entity.common.Delivery;
+import com.asrevo.cvhome.store.core.entity.common.InventoryStatus;
+import com.asrevo.cvhome.store.core.entity.common.PaymentStatus;
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
 import com.asrevo.cvhome.store.core.entity.order.orderstatus.OrderStatus;
-import com.asrevo.cvhome.store.core.entity.order.payment.CreditCard;
 import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
-import com.asrevo.cvhome.store.core.model.reference.CurrencyCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -69,6 +69,14 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status;
 
+    @Column(name = "INVENTORY_STATUS")
+    @Enumerated(value = EnumType.STRING)
+    private InventoryStatus inventoryStatus;
+
+    @Column(name = "PAYMENT_STATUS")
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
     @Column(name = "LAST_MODIFIED")
     private Instant lastModified;
 
@@ -77,7 +85,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     private Long customerId;
 
     @Column(name = "DATE_PURCHASED")
-    private LocalDate datePurchased;
+    private Instant datePurchased;
 
     // used for an order payable on multiple installment
     @Column(name = "ORDER_DATE_FINISHED")
@@ -93,7 +101,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Column(name = "IP_ADDRESS")
     private String ipAddress;
 
-    @Column(name = "CART_CODE")
+    @Column(name = "CART_CODE", nullable = false, unique = true)
     private String shoppingCartCode;
 
     @Column(name = "CHANNEL")
@@ -108,12 +116,6 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Enumerated(value = EnumType.STRING)
     private PaymentType paymentType;
 
-    @Column(name = "PAYMENT_MODULE_CODE")
-    private String paymentModuleCode;
-
-    @Column(name = "SHIPPING_MODULE_CODE")
-    private String shippingModuleCode;
-
     @Column(name = "CUSTOMER_AGREED")
     private Boolean customerAgreement = false;
 
@@ -126,9 +128,6 @@ public class Order extends SalesManagerEntity<Long, Order> {
     @Valid
     @Embedded
     private Billing billing;
-
-    @Embedded
-    private CreditCard creditCard;
 
     @JsonIgnore
     @Column(name = "CURRENCY_ID", length = 6, nullable = false)
@@ -157,4 +156,7 @@ public class Order extends SalesManagerEntity<Long, Order> {
 
     @Column(name = "CUSTOMER_EMAIL_ADDRESS", length = 50, nullable = false)
     private String customerEmailAddress;
+
+    @Column(name = "REDIRECT_URI", length = 2048)
+    private String redirectUri;
 }

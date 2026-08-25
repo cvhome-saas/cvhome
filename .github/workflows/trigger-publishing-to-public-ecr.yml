@@ -52,7 +52,7 @@ jobs:
         id: suggest-build-version
         run: echo "build-version=$(source extra/scripts/suggested-version.sh ${{ github.run_id }})">> $GITHUB_OUTPUT
       - name: Print Build Version
-        run:  echo ${{ steps.suggest-build-version.outputs.build-version }}
+        run: echo ${{ steps.suggest-build-version.outputs.build-version }}
       - name: Package And Publish Docker with Gradle
         run: ./gradlew bootBuildImage --publishImage -Dorg.gradle.project.version="${{ steps.suggest-build-version.outputs.build-version }}" -x test -x check
         env: # Or as an environment variable

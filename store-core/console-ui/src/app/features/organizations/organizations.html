@@ -1,0 +1,144 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="facade.totalLabel() ?? heading().context">
+    <button class="primary-action" type="button" (click)="facade.startCreate()">
+      <app-icon name="plus" />{{ t('platform.organizations.action.create') }}
+    </button>
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="isLoading()" [label]="t('platform.organizations.loading')">
+    @if (!isEmpty()) {
+      <div class="organizations-stack">
+        <app-panel [title]="t('platform.organizations.panel.title')" [subtitle]="facade.subtitle()">
+          <!--
+            In the panel's header, where a control that narrows the list belongs — beside the thing it
+            narrows rather than stacked above the first row. Both are server-side: the term goes to
+            `org-manager/list`, so they narrow the whole registry and not the page on screen.
+          -->
+          <div panelAction class="org-filters">
+            <app-select
+              [value]="facade.status()"
+              (valueChange)="onStatus($event)"
+              [options]="facade.statusOptions()"
+              [ariaLabel]="t('platform.organizations.filter.statusLabel')"
+            />
+            <app-search-box
+              [value]="facade.search()"
+              (valueChange)="onSearch($event)"
+              [label]="t('platform.organizations.search.label')"
+              [placeholder]="t('platform.organizations.search.placeholder')"
+              [clearLabel]="t('platform.organizations.search.clear')"
+            />
+          </div>
+
+          @if (rows().length) {
+            <app-data-table [columns]="columns()" [label]="t('platform.organizations.panel.title')">
+              @for (row of rows(); track row.id) {
+                <app-table-row [interactive]="true">
+                  <div
+                    class="cell-organization"
+                    role="cell"
+                    [attr.data-label]="t('platform.organizations.column.organization')"
+                  >
+                    <span class="avatar" aria-hidden="true"><app-icon name="building" /></span>
+                    <!--
+                      The name is the affordance rather than the whole row: a row-wide click handler
+                      is invisible to a keyboard and to a screen reader.
+                    -->
+                    <button class="identity" type="button" (click)="open(row)">
+                      @if (row.name) {
+                        <strong>{{ row.name }}</strong>
+                      } @else {
+                        <!-- Nothing sets a name at creation, so this is every organization today. -->
+                        <strong class="unnamed">{{ t('platform.organizations.unnamed') }}</strong>
+                      }
+                      <span class="email" dir="auto">{{ row.email }}</span>
+                    </button>
+                  </div>
+
+                  <span role="cell" [attr.data-label]="t('platform.organizations.column.status')">
+                    <app-badge [tone]="statusTone(row.status)" shape="square">
+                      {{ statusLabel(row.status) }}
+                    </app-badge>
+                  </span>
+
+                  <span class="cell-created" role="cell" [attr.data-label]="t('platform.organizations.column.created')">
+                    {{ row.createdDate | translocoDate: {dateStyle: 'medium'} }}
+                  </span>
+
+                  <span class="cell-id latin" role="cell" [attr.data-label]="t('platform.organizations.column.id')">
+                    {{ row.id }}
+                  </span>
+
+                  <div class="cell-actions" role="cell" [attr.data-label]="t('platform.organizations.column.actions')">
+                    <button
+                      class="icon-action"
+                      type="button"
+                      [title]="t('platform.organizations.action.open')"
+                      [attr.aria-label]="t('platform.organizations.action.openNamed', {name: row.label})"
+                      (click)="open(row)"
+                    >
+                      <app-icon name="chevronRight" />
+                    </button>
+                  </div>
+                </app-table-row>
+              }
+            </app-data-table>
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('platform.organizations.unit')"
+              [label]="t('platform.organizations.paginationLabel')"
+              (pageChange)="onPage($event)"
+            />
+          } @else if (facade.filtered() && facade.rowsMatchSearch()) {
+            <!--
+              Only once the rows answer the current term: the last good page stays on screen while a
+              new search is in flight, and "nothing matched" over the previous query's results is the
+              wrong sentence at the wrong moment.
+            -->
+            <app-empty-state
+              icon="search"
+              [title]="t('platform.organizations.noMatches.title')"
+              [message]="t('platform.organizations.noMatches.message')"
+            />
+          } @else if (!facade.filtered()) {
+            <app-empty-state
+              icon="building"
+              [title]="t('platform.organizations.empty.title')"
+              [message]="t('platform.organizations.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <app-create-org-dialog
+    [open]="facade.creating()"
+    [busy]="facade.busy()"
+    [title]="t('platform.organizations.create.title')"
+    [message]="t('platform.organizations.create.message')"
+    [firstNameLabel]="t('platform.organizations.create.firstName')"
+    [lastNameLabel]="t('platform.organizations.create.lastName')"
+    [emailLabel]="t('platform.organizations.create.email')"
+    [passwordLabel]="t('platform.organizations.create.password')"
+    [repeatLabel]="t('platform.organizations.create.repeatPassword')"
+    [passwordHint]="t('platform.organizations.create.passwordHint')"
+    [unnamedHint]="t('platform.organizations.create.unnamedHint')"
+    [emailInvalidMessage]="t('platform.organizations.create.emailInvalid')"
+    [weakMessage]="t('platform.organizations.create.passwordWeak')"
+    [mismatchMessage]="t('platform.organizations.create.passwordMismatch')"
+    [confirmLabel]="t('platform.organizations.create.confirm')"
+    [busyLabel]="t('platform.organizations.create.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.create($event)"
+    (dismissed)="facade.dismissCreate()"
+  />
+</ng-container>

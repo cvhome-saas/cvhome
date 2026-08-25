@@ -1,0 +1,136 @@
+.slides {
+  gap: 0.75rem;
+}
+
+.slide {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--default-transition-duration),
+    box-shadow var(--default-transition-duration);
+}
+
+.slide:hover {
+  border-color: var(--primary);
+  box-shadow: var(--lift);
+}
+
+/*
+ * The slide's place in the carousel, which is the only thing that distinguishes one from another —
+ * `ReadableSliderImage` has no title. It replaces the grab handle: the arrows move a slide, and a
+ * handle that could not be dragged anywhere was a promise the endpoint does not keep.
+ */
+.position {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex: none;
+  inline-size: 110px;
+  block-size: 62px;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  color: var(--foreground-subtle);
+  --icon-size: 1rem;
+}
+
+.thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.slide-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.slide-copy strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slide-copy small {
+  color: var(--secondary-foreground);
+  font-size: var(--text-2xs);
+}
+
+/* A server-issued UUID. Monospaced and quiet — an identifier to match against, not a name to read. */
+.slide-copy .slide-ref {
+  overflow: hidden;
+  color: var(--foreground-subtle);
+  font-family: ui-monospace, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-action:disabled {
+  color: var(--foreground-subtle);
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.slide-actions {
+  display: flex;
+  flex: none;
+  gap: 0.25rem;
+}
+
+.slots-full {
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+/* The thumbnail is the first thing to go: the title and its state carry the row. */
+@container settings (max-width: 40rem) {
+  .slide {
+    flex-wrap: wrap;
+  }
+
+  .thumb {
+    inline-size: 72px;
+    block-size: 44px;
+  }
+
+  .slide-copy {
+    flex-basis: 100%;
+    order: 3;
+  }
+}
+
+/*
+ * The add well is one more slot in the list, so it is held to a slide row's height rather than
+ * spanning the card at its full 2.5:1 — a hero-sized dashed rectangle under five compact rows read
+ * as a different page.
+ */
+.add-slide {
+  max-inline-size: 26rem;
+}

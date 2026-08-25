@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: billing
+  config:
+    import:
+      - "classpath:common-config.yml"
+      - "classpath:plan-catalog.yml"
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-core@service.store-core.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_core
+namastack:
+  outbox:
+    multicaster:
+      enabled: true
+    polling:
+      fixed:
+        interval: 2s
+      batch-size: 10
+    jdbc:
+      schema-initialization:
+        enabled: false
+      schema-name: billing_outbox
+com:
+  asrevo:
+    cvhome:
+      billing:
+        # How long the org's one trial runs. Per store in shape, but granted once per org: the first store an org
+        # creates gets it, later ones start unpaid.
+        trial-period: P14D
+        # How long a failed renewal keeps working before the store is suspended.
+        past-due-grace: P7D
+        quota:
+          # Not a cap on stores an org may own — each store pays for itself. This stops an org stockpiling stores
+          # that no one ever pays for.
+          max-pending-stores: 3
+        catalog:
+          # Seeds plan-catalog.yml into the database on start. The Stripe half is a separate switch because it needs
+          # real credentials.
+          seed-enabled: true
+          stripe-sync-enabled: false
+      stripe:
+        # Both values may be given as plaintext or as a secret-crypto envelope (ENC:1:...), and encrypted is the
+        # intended form. The envelope is safe in a config file because the AES key that opens it lives outside the
+        # repository — COM_ASREVO_CVHOME_CRYPTO_KEY, or ~/.cvhome/secret-crypto/keys — so an envelope on its own
+        # discloses nothing. StripeCredentials decrypts once at start-up; nothing logs either value.
+        #
+        # Left empty here so no environment inherits a key by accident. The lcl profile sets a test key; deployed
+        # environments should supply their own, encrypted under AWS KMS rather than the local provider.
+        key: ""
+        webhook-signing-key: ""

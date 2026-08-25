@@ -1,0 +1,61 @@
+# ExternalStoreQuotaApi — com.asrevo.cvhome.billing.api.v1.ExternalStoreQuotaApi
+# (@RequestMapping "/api/v1/quota")
+#
+# A service-to-service API: tenancy calls it, no human does. It is gated on
+# STORE-CORE.BILLING.QUOTA-CHECK, which only a store-core service principal holds — so a seller session
+# gets 403 here, and that is the assertion worth keeping below.
+#
+# The real exercise of this API is creating a store through tenancy, which drives both endpoints:
+# see the "provisioning" block at the bottom.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### a seller session must not be able to ask billing about quota
+POST {{SELLER_UI_URL}}/billing/api/v1/quota/private/store-create
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "org": "{{ORG_ID}}"
+}
+
+> {%
+    client.test("a human is refused an s2s endpoint", function () {
+        client.assert(response.status === 403, "expected 403, got " + response.status);
+    });
+%}
+
+### provisioning, exercised the way it actually happens: create a store through tenancy
+# The store row commits, StoreCreatedEvent goes to the outbox, and BillingProvisioningEventImpl calls
+# billing. Give the outbox a couple of seconds, then read the subscription back.
+# @name createStore
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "http-billing-demo",
+  "email": "billing-demo@example.com",
+  "template": "DEFAULT"
+}
+
+> {%
+    client.test("store created", function () {
+        client.assert(response.status === 200 || response.status === 201, "status " + response.status);
+    });
+    client.global.set("NEW_STORE_ID", response.body.id.id ? response.body.id.id : response.body.id);
+%}
+
+### the org's first store is trialling; every later one is unpaid
+# Run the block above twice against a fresh org to see both outcomes — the trial is granted once per org,
+# enforced by a primary key rather than a check, so the second store loses the race by construction.
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{NEW_STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("provisioned by the outbox", function () {
+        client.assert(response.status === 200, "status " + response.status + " — is the outbox still working?");
+        client.assert(response.body.status === "TRIALING" || response.body.status === "PENDING",
+            "unexpected status " + response.body.status);
+    });
+%}

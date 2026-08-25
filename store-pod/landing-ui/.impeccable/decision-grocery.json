@@ -1,0 +1,132 @@
+{
+  "title": "Grocery theme — choose the visual world",
+  "question": "The roll assigned Cash & Carry. Keep it, take an alternate, or re-roll. (No image generation this session, so the build is code-led; cards carry facts, not comps.)",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Cash & Carry",
+      "kicker": "THE ROLL",
+      "lineage": "warehouse-club floors: stacked crates, pallet stickers, per-kilo price signage",
+      "thesis": "The shop as a working warehouse floor — goods at quantity, prices as big printed signage, unit price first-class; refuses the clean white produce-app grammar.",
+      "palette": ["#ffd23f", "#e03616", "#2f7d4f", "#141414", "#efe8da"],
+      "materials": ["molded plastic crate", "pallet sticker", "stencil caps signage", "corrugated kraft"],
+      "viewport": "A signage masthead over a crate-strip of category tiles; below, the offer row as stacked price boards — huge stencil price, small unit price on its rail tag, quick-add stepper molded into each crate cell. The merchant's primary is the crate plastic; their photos sit in the crates.",
+      "risk": "Industrial grammar can read discount-hard; the food must stay appetizing inside the cells, and a premium deli merchant may find it blunt.",
+      "raised": [
+        {"from": "phosphor terminal", "raise": "States print themselves: SALE, OUT OF STOCK, ADDED, empty and error are pallet stickers in the label grammar — never a floating toast or chrome badge."},
+        {"from": "algorave floor", "raise": "One shared clock: a single motion timing system — everything lands like one stamp, no scattered hover effects."},
+        {"from": "brodovitch spread", "raise": "Choreographed pairing: the hero offer is image and price block answering each other across a seam at poster scale, never a slapped banner."},
+        {"from": "menhera sheet", "raise": "Total line commitment: one hardware line weight carried through every control, so the crate line is a system, not a garnish."},
+        {"from": "alien understory", "raise": "Designed attention: focus and hover are designed shelf-light states, not default outlines."},
+        {"from": "ikebana ma", "raise": "Charged quiet: the dense grid earns deliberate empty bands — the floor breathes between pallets."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Weekly Flyer",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "the supermarket circular every household reads",
+      "thesis": "The storefront as this week's flyer: saturated price blocks, starburst offers, dense product grid with slashed prices — promotion as the native language.",
+      "palette": ["#e4002b", "#ffd100", "#0057a8", "#ffffff", "#111111"],
+      "materials": ["glossy newsprint", "starburst badge", "price-block grid", "slashed-price type"],
+      "viewport": "A flyer front page: masthead with the week, one lead offer at half-page scale, then the deal grid — every cell a price block with product photo, big price, crossed-out original.",
+      "risk": "The most familiar promotional grammar in the category — closest to what grocery e-commerce already gestures at; familiarity is the trade."
+    },
+    {
+      "id": "challenger-terminal",
+      "label": "Phosphor Terminal",
+      "verdict": "declined",
+      "lineage": "green-phosphor midnight machine room",
+      "thesis": "The shop as a typed transcript on curved glass.",
+      "palette": ["#0a0f0a", "#33ff66", "#1d7a33"],
+      "materials": ["P1 phosphor", "bitmap mono", "scanline glass"],
+      "viewport": "An 80-column transcript; products print as lines.",
+      "case": "A text transcript buries image-led food shopping; grocery shoppers do not identify with a machine room.",
+      "risk": "Unreadable as a shop.",
+      "kept": "States print themselves — no floating chrome.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-phosphor-terminal-midnight-hero.webp"
+    },
+    {
+      "id": "challenger-algorave",
+      "label": "Algorave Floor",
+      "verdict": "declined",
+      "lineage": "live-coded dance floor projection",
+      "thesis": "The catalog as an editable pattern buffer on one clock.",
+      "palette": ["#000000", "#39ff88", "#ff3fd4", "#ffb300"],
+      "materials": ["projector black", "stage-scale mono", "amber pre-flash"],
+      "viewport": "A code buffer whose cursor line is the downbeat.",
+      "case": "Shoppers restocking groceries do not identify with live coding; the buffer obscures products and prices.",
+      "risk": "Pure novelty for this audience.",
+      "kept": "One shared clock for all motion.",
+      "hero": "https://impeccable.style/worlds/cards/medium-native-algorave-source-floor-hero.webp"
+    },
+    {
+      "id": "challenger-bazaar",
+      "label": "Brodovitch Spread",
+      "verdict": "declined",
+      "lineage": "Harper's Bazaar under Brodovitch",
+      "thesis": "Shopping as paired spreads — pose and answer across a gutter.",
+      "palette": ["#f7f3ea", "#1b1b1b", "#c8102e"],
+      "materials": ["warm white paper", "didot hairlines", "photogravure gray"],
+      "viewport": "A two-page spread, image left, headline right.",
+      "case": "Sparse luxury editorial fights a medium–high-density grocer; spreads hide the catalog.",
+      "risk": "Wrong register for food staples.",
+      "kept": "Choreographed image/price pairing in the hero.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-brodovitch-bazaar-spread-hero.webp"
+    },
+    {
+      "id": "challenger-menhera",
+      "label": "Menhera Sheet",
+      "verdict": "declined",
+      "lineage": "pastel character sheet with hardware accessories",
+      "thesis": "The shop as a candy-pink motif sheet with a mascot.",
+      "palette": ["#ff9ecb", "#9fffd8", "#141414"],
+      "materials": ["candy pink", "black hardware line", "cross motif border"],
+      "viewport": "A centered mascot inside a repeating motif border.",
+      "case": "A mascot sheet cannot carry a multi-merchant grocery catalog; audience and clarity both fail.",
+      "risk": "Brand noise over merchant brand.",
+      "kept": "Total commitment to one line weight everywhere.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-menhera-pastel-grimness-hero.webp"
+    },
+    {
+      "id": "challenger-understory",
+      "label": "Alien Understory",
+      "verdict": "declined",
+      "lineage": "luminescent forest at nightfall",
+      "thesis": "Browsing as proximity-lit paths through glowing growths.",
+      "palette": ["#0b0d10", "#3fe8ff", "#c39bff", "#bfffcf"],
+      "materials": ["near-black loam", "spore glow", "pulsing veins"],
+      "viewport": "A dark field where labels bloom on approach.",
+      "case": "A dark proximity-reveal field hides stock, prices and the task; nobody buys rice by torchlight.",
+      "risk": "Atmosphere over errand.",
+      "kept": "Focus and hover as designed light states.",
+      "hero": "https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-luminescent-alien-understory-hero.webp"
+    },
+    {
+      "id": "challenger-ikebana",
+      "label": "Ikebana Alcove",
+      "verdict": "declined",
+      "lineage": "tokonoma arrangement, active emptiness",
+      "thesis": "One product arranged; the emptiness does the selling.",
+      "palette": ["#e9e4da", "#6b5f4e", "#3a5aa8", "#4a3b2a"],
+      "materials": ["pale plaster", "weathered pine", "bronze suiban"],
+      "viewport": "An off-center arrangement in charged empty space.",
+      "case": "Low-density contemplation against a medium–high-density working shop; the errand loses.",
+      "risk": "Beautiful, unusable for restocking.",
+      "kept": "Deliberate quiet bands pacing the dense grid.",
+      "hero": "https://impeccable.style/worlds/cards/growth-metamorphosis-branching-ikebana-ma-arrangement-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code"},
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "The clean grocery app grammar — white ground, fresh green accent, rounded cards, photography carousel — executed impeccably.",
+    "palette": ["#ffffff", "#16a34a", "#111827", "#f3f4f6"],
+    "materials": ["clean grid", "soft shadow", "product photography"],
+    "viewport": "Rounded header, hero carousel, category chips, 4-col card grid with green add buttons.",
+    "risk": "Indistinguishable from every grocery app, by design."
+  },
+  "steer": true
+}

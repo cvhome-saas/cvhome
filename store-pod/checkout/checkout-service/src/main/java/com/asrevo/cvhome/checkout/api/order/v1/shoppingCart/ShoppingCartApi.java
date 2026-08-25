@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.checkout.api.order.v1.shoppingCart;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -16,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
 import com.asrevo.cvhome.checkout.service.facade.cart.ShoppingCartFacade;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -50,23 +49,22 @@ public class ShoppingCartApi {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/cart")
     @Operation(method = "POST",
-            description = "Add product to shopping cart when no cart exists, this will create a new cart" + " id",
-            summary = "No customer ID in scope. Add to cart for non authenticated users, as simple as"
-                    + " {\"product\":1232,\"quantity\":1}")
+            description = "Add product to shopping cart when no cart exists, this will create a new cart id",
+            summary = "No customer ID in scope. Add to cart for non authenticated users")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart addToCart(@Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
-                                          StoreMerchantId merchantStore, LanguageCode language) {
+                                          StoreMerchantId merchantStore, LanguageCode language)
+            throws ProductNotPurchasableException {
         return shoppingCartFacade.addToCart(shoppingCartItem, merchantStore, language);
     }
 
     @PutMapping(value = "/cart/{code}")
     @Operation(method = "PUT", description = "Add to an existing shopping cart or modify an item quantity",
-            summary = "No customer ID in scope. Modify cart for non authenticated users, as simple as"
-                    + " {\"product\":1232,\"quantity\":0} for instance will remove item 1234" + " from cart")
+            summary = "No customer ID in scope. Modify cart for non authenticated users")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",
@@ -75,24 +73,16 @@ public class ShoppingCartApi {
     public ResponseEntity<ReadableShoppingCart> modifyCart(@PathVariable String code,
                                                            @Valid @RequestBody PersistableShoppingCartItem shoppingCartItem,
                                                            StoreMerchantId merchantStore,
-                                                           LanguageCode language) {
+                                                           LanguageCode language)
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
 
-        try {
-            ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
+        ReadableShoppingCart cart = shoppingCartFacade.modifyCart(code, shoppingCartItem, merchantStore, language);
 
-            if (cart == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(cart, HttpStatus.CREATED);
-
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e);
-            }
+        if (cart == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -104,32 +94,23 @@ public class ShoppingCartApi {
             schema = @Schema(name = "lang", type = "string", defaultValue = Constants.DEFAULT_LANGUAGE))
 
     public ReadableShoppingCart getByCode(@PathVariable String code, StoreMerchantId merchantStore,
-                                          LanguageCode language, HttpServletResponse response) {
+                                          LanguageCode language)
+            throws ShoppingCartNotFoundException {
 
-        try {
+        ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
 
-            ReadableShoppingCart cart = shoppingCartFacade.getByCode(code, merchantStore, language);
-
-            if (cart == null) {
-                response.sendError(404, "No ShoppingCart found for customer code : " + code);
-                return null;
-            }
-
-            return cart;
-
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e);
-            }
+        if (cart == null) {
+            // Previously a raw response.sendError(404), which bypassed the advice and returned an HTML error page
+            // instead of a problem document.
+            throw ShoppingCartNotFoundException.byCode(code);
         }
+
+        return cart;
     }
 
     @DeleteMapping(value = "/cart/{code}/product/{sku}", produces = {APPLICATION_JSON_VALUE})
     @Operation(method = "DELETE", description = "Remove a product from a specific cart",
-            summary = "If body set to true returns remaining cart in body, empty cart gives empty"
-                    + " body. If body set to false no body ")
+            summary = "If body set to true returns remaining cart in body, empty cart gives empty body. If body set to false no body ")
     @Parameter(name = "store",
             schema = @Schema(name = "store", type = "string", defaultValue = DEFAULT_ORG1_STORE1_STR))
     @Parameter(name = "lang",
@@ -139,7 +120,8 @@ public class ShoppingCartApi {
     public ResponseEntity<ReadableShoppingCart> deleteCartItem(@PathVariable("code") String cartCode,
                                                                @PathVariable("sku") String sku, StoreMerchantId merchantStore,
                                                                LanguageCode language,
-                                                               @RequestParam(defaultValue = "false") boolean body) throws Exception {
+                                                               @RequestParam(defaultValue = "false") boolean body)
+            throws ShoppingCartNotFoundException {
 
         ReadableShoppingCart updatedCart = shoppingCartFacade.removeShoppingCartItem(cartCode, sku, merchantStore,
                 language, body);

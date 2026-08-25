@@ -1,0 +1,69 @@
+/*
+ * Follows `shared/ui/confirm-dialog/confirm-dialog.css` — same surface, same backdrop, same
+ * top-layer entry — so the dialogs in this module do not read as coming from different apps. It is
+ * wider than the invite dialog because it holds five fields, two of them side by side.
+ */
+.create-org {
+  /* The reset zeroes margins, which is what centres a native dialog — put it back explicitly. */
+  margin: auto;
+  inline-size: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--lift);
+}
+
+.create-org-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.35rem;
+}
+
+.create-org-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.create-org-message {
+  margin: 0;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+/* Given and family name read as one question, so they share a row until there is no room. */
+.create-org-names {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.create-org-error {
+  margin: 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-xs);
+}
+
+.create-org-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.create-org-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-block-start: 0.25rem;
+}
+
+@media (max-width: 30rem) {
+  .create-org-names {
+    grid-template-columns: 1fr;
+  }
+}

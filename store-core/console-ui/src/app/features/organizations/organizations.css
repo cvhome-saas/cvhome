@@ -1,0 +1,124 @@
+:host {
+  display: contents;
+}
+
+/* The page owns its own rhythm, as `customers.css` and `users.css` do. */
+.organizations-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*
+ * The two filters share the panel's header slot. Capped rather than left to the header's flex
+ * sizing: a status label and a search box that grew to fit would push the panel's title off the row.
+ */
+.org-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.org-filters app-select {
+  inline-size: min(12rem, 40vw);
+}
+
+.cell-organization {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-strong);
+  color: var(--accent-foreground);
+}
+
+/* A button that reads as text: the affordance is the hover and the row's own interactive state. */
+.identity {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.identity strong {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity:hover strong {
+  color: var(--primary-emphasis);
+}
+
+.identity:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* An organization with no name says so, rather than leaving the line blank. */
+.unnamed {
+  color: var(--muted-foreground);
+  font-style: italic;
+  font-weight: var(--font-weight-normal);
+}
+
+.email {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Latin data inside a page that may be right-to-left. */
+  unicode-bidi: plaintext;
+}
+
+.cell-created {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+/* An ObjectId is latin data, so it takes its own direction under RTL. */
+.cell-id {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-2xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.latin {
+  unicode-bidi: plaintext;
+}
+
+.cell-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+/* The chevron points the way the page reads, so it mirrors under RTL. */
+:host-context([dir='rtl']) .cell-actions app-icon {
+  transform: scaleX(-1);
+}

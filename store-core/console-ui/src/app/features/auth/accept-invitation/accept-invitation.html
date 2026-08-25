@@ -1,0 +1,47 @@
+<main class="auth-shell" *transloco="let t">
+  <app-auth-story [story]="story()" />
+
+  <section class="auth-entry" [attr.aria-label]="t('acceptInvitation.title')">
+    <div class="accept-card">
+      @switch (facade.state()) {
+        @case ('joined') {
+          <app-icon name="checkCircle" class="accept-icon accept-icon-good" />
+          <h1>{{ t('acceptInvitation.joined.title') }}</h1>
+          <p>{{ t('acceptInvitation.joined.message') }}</p>
+          <button class="auth-submit" type="button" (click)="enterConsole()">
+            {{ t('acceptInvitation.joined.action') }}
+            <span aria-hidden="true">→</span>
+          </button>
+        }
+
+        @case ('refused') {
+          <app-icon name="alertCircle" class="accept-icon accept-icon-bad" />
+          <h1>{{ t('acceptInvitation.refused.title') }}</h1>
+          <!--
+            Rendered, not toasted. A toast dismisses itself, and this is the whole content of the
+            screen for someone who has just been told their link does not work.
+          -->
+          <p role="alert">{{ facade.failure() ?? t('acceptInvitation.refused.noToken') }}</p>
+          @if (facade.failure()) {
+            <button class="auth-submit" type="button" (click)="accept()">
+              {{ t('acceptInvitation.refused.retry') }}
+            </button>
+          }
+          <p class="accept-hint">{{ t('acceptInvitation.refused.hint') }}</p>
+        }
+
+        @default {
+          <app-icon name="send" class="accept-icon" />
+          <h1>{{ t('acceptInvitation.title') }}</h1>
+          <p>{{ t('acceptInvitation.message') }}</p>
+          <button class="auth-submit" type="button" [disabled]="facade.busy()" (click)="accept()">
+            {{ facade.busy() ? t('acceptInvitation.busy') : t('acceptInvitation.action') }}
+            <span aria-hidden="true">→</span>
+          </button>
+          <!-- Accepting is deliberate: the token is single-use and is burned on the first success. -->
+          <p class="accept-hint">{{ t('acceptInvitation.hint') }}</p>
+        }
+      }
+    </div>
+  </section>
+</main>

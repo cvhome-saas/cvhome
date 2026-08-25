@@ -94,6 +94,25 @@ export class CartManager {
     }
 
 
+    /** Sets an absolute quantity for a line (the backend PUT is an upsert by sku). */
+    updateQuantity(productSku: string, quantity: number, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
+        if (!this.cart) return;
+        if (quantity < 1) {
+            this.removeProduct(productSku, onSuccess, onError);
+            return;
+        }
+        CartService.updateProductInCart(this.storeContext, this.cart.code, productSku, quantity).then((cart: Cart | undefined) => {
+            this.setCartData(cart);
+            if (onSuccess) onSuccess(cart);
+        }).catch((err: Error) => {
+            if (onError) onError(err);
+        });
+    }
+
+    getCart(): Cart | undefined {
+        return this.cart;
+    }
+
     removeProduct(productSku: string, onSuccess?: OnSuccessCallback<Cart | undefined>, onError?: OnErrorCallback) {
         if (this.cart) {
             CartService.removeFromCartThenGetCart(this.storeContext, this.cart.code, productSku).then((cart: Cart | undefined) => {

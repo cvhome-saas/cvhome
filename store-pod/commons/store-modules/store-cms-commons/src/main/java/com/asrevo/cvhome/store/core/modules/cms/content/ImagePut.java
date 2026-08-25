@@ -6,8 +6,8 @@ import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
 
 public interface ImagePut {
 
-    void addImage(final String merchantStoreCode, InputContentFile image);
+    void addImage(String merchantStoreCode, InputContentFile image);
 
-    void addImages(final String merchantStoreCode, List<InputContentFile> imagesList);
+    void addImages(String merchantStoreCode, List<InputContentFile> imagesList);
 
 }

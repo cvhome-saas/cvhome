@@ -1,0 +1,387 @@
+/*
+ * fashion — "The Wheatpaste Wall", fused to a streetwear / drops store.
+ * The page is a fly-posted wall: the ground is a rendered surface (the merchant's background mixed toward
+ * its foreground, with grain), every product and every slider image is a pasted paper sheet, and the
+ * merchant's PRIMARY is the day-glo paper stock that carries every primary action. State is a stamp
+ * (SALE, SOLD OUT, ONLY N LEFT, ADDED), never a tint. Type: poster caps (Anton / Changa for Arabic) for
+ * anything that names, Rubik for anything that explains.
+ */
+[data-theme="fashion"] {
+    /* fonts — fonts.ts exports the variables */
+    --font-body: var(--font-fashion-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-fashion-display), var(--font-fashion-arabic), var(--font-fashion-sans), "Arial Narrow", sans-serif;
+    --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — body stays compact, poster display jumps hard */
+    --type-xs: 0.6875rem;
+    --type-sm: 0.8125rem;
+    --type-base: 0.9375rem;
+    --type-lg: 1.125rem;
+    --type-xl: 1.375rem;
+    --type-2xl: 1.75rem;
+    --type-3xl: 2.5rem;
+    --type-4xl: 3.25rem;
+    --type-5xl: 4.5rem;
+    --type-6xl: 6rem;
+    --line-tight: 0.9;
+    --line-snug: 1.15;
+    --line-normal: 1.5;
+    --line-relaxed: 1.65;
+    --track-tight: -0.01em;
+    --track-normal: 0;
+    --track-wide: 0.08em;
+
+    /* spacing & density — posters butt close, stretches of wall breathe */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 2.5rem;
+    --gutter: 1rem;
+
+    /* radius — cut paper has no corners */
+    --r-control: 0px;
+    --r-card: 0px;
+    --r-image: 0px;
+    --r-badge: 0px;
+    --r-overlay: 0px;
+
+    /* borders & elevation — paper on a wall: offset shadow, soft blur */
+    --border-width: 1px;
+    --elev-sm: 0 1px 2px rgb(0 0 0 / 0.14), 0 3px 8px -2px rgb(0 0 0 / 0.16);
+    --elev-md: 0 2px 4px rgb(0 0 0 / 0.14), 0 12px 28px -10px rgb(0 0 0 / 0.32);
+    --elev-lg: 0 4px 8px rgb(0 0 0 / 0.16), 0 24px 48px -16px rgb(0 0 0 / 0.38);
+    --elev-overlay: 0 30px 60px -20px rgb(0 0 0 / 0.5);
+
+    /* containers — the wall runs wide */
+    --width-narrow: 44rem;
+    --width-content: 84rem;
+    --width-wide: 100rem;
+
+    /* motion — one authored moment: the stamp slap */
+    --motion-fast: 100ms;
+    --motion-base: 180ms;
+    --motion-slow: 480ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* layout */
+    --header-h: 3.5rem;
+    --header-h-lg: 4rem;
+    --product-aspect: 4 / 5;
+
+    /* world materials */
+    --wall: color-mix(in srgb, var(--background) 86%, var(--foreground));
+    --wall-deep: color-mix(in srgb, var(--background) 76%, var(--foreground));
+    --paper: var(--background);
+    --ink: var(--foreground);
+    --rule: color-mix(in srgb, var(--foreground) 18%, transparent);
+    --grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+    /* browser surfaces carry the world too */
+    caret-color: var(--primary);
+    accent-color: var(--primary);
+    scrollbar-color: var(--foreground) var(--wall);
+}
+
+@media (min-width: 1024px) {
+    [data-theme="fashion"] {
+        --section-y: 4rem;
+        --gutter: 2rem;
+    }
+}
+
+/* the wall itself */
+[data-theme="fashion"] body {
+    background-color: var(--wall);
+    background-image: var(--grain), radial-gradient(120% 80% at 50% 0%, transparent 55%, color-mix(in srgb, var(--foreground) 10%, transparent) 100%);
+    background-attachment: fixed, fixed;
+}
+
+[data-theme="fashion"] ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+/* ---- world grammar as small utilities (scoped to the theme) ------------------------------------ */
+/* Layered under Tailwind's utilities so `h-*`, `text-*`, `lg:sticky` … on the same element still win. */
+@layer components {
+/* a pasted sheet of paper */
+[data-theme="fashion"] .sheet {
+    position: relative;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--elev-md);
+    rotate: calc(var(--tilt, 0deg) * var(--tilt-sign, 1));
+}
+[data-theme="fashion"] .sheet-flat { box-shadow: var(--elev-sm); }
+[dir="rtl"][data-theme="fashion"] .sheet, [data-theme="fashion"] [dir="rtl"] .sheet { --tilt-sign: -1; }
+
+/* a lifted sheet: hover raises it off the wall */
+[data-theme="fashion"] .sheet-lift {
+    transition: translate var(--motion-base) var(--easing-standard), box-shadow var(--motion-base) var(--easing-standard);
+}
+@media (hover: hover) {
+    [data-theme="fashion"] .sheet-lift:hover,
+    [data-theme="fashion"] .sheet-lift:focus-within {
+        translate: 0 -3px;
+        box-shadow: var(--elev-lg);
+    }
+}
+
+/* the paste sheen: a faint wash from the brush across the corner */
+[data-theme="fashion"] .sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 58%, rgb(0 0 0 / 0.045) 100%);
+}
+
+/* a strip of paper: nav items, labels, small controls */
+[data-theme="fashion"] .strip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.25rem;
+    padding-inline: 0.75rem;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--elev-sm);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-sm);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    rotate: calc(var(--tilt, 0deg) * var(--tilt-sign, 1));
+    transition: background-color var(--motion-fast) var(--easing-standard), color var(--motion-fast) var(--easing-standard);
+}
+[dir="rtl"][data-theme="fashion"] .strip, [data-theme="fashion"] [dir="rtl"] .strip { --tilt-sign: -1; }
+[data-theme="fashion"] .strip-hover:hover,
+[data-theme="fashion"] .strip-hover[data-state="open"],
+[data-theme="fashion"] .strip-hover[aria-current="page"] {
+    background: var(--ink);
+    color: var(--paper);
+}
+[data-theme="fashion"] .strip-on {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+/* day-glo paper: the merchant primary, every primary action */
+[data-theme="fashion"] .glo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: var(--elev-sm);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: background-color var(--motion-fast) var(--easing-standard), translate var(--motion-fast) var(--easing-standard), box-shadow var(--motion-fast) var(--easing-standard);
+}
+[data-theme="fashion"] .glo:hover:not(:disabled) { background: var(--primary-hover); }
+[data-theme="fashion"] .glo:active:not(:disabled) { translate: 0 1px; box-shadow: none; }
+[data-theme="fashion"] .glo:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* the rubber stamp: state as an overprint */
+[data-theme="fashion"] .stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.28em 0.5em 0.22em;
+    border: 3px solid currentColor;
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    rotate: -7deg;
+    opacity: 0.92;
+    pointer-events: none;
+}
+[data-theme="fashion"] .stamp-sale { color: var(--sale); }
+[data-theme="fashion"] .stamp-glo { color: var(--primary); }
+[data-theme="fashion"] .stamp-lg { font-size: var(--type-2xl); border-width: 4px; letter-spacing: 0.06em; }
+[data-theme="fashion"] .stamp-xl { font-size: var(--type-4xl); border-width: 5px; letter-spacing: 0.04em; }
+html[data-color-scheme="light"][data-theme="fashion"] .stamp { mix-blend-mode: multiply; }
+
+/* the title of an empty / error block, stamped (the shared blocks take a string title) */
+[data-theme="fashion"] .stamp-title [data-slot="empty-state-title"],
+[data-theme="fashion"] .stamp-title [data-slot="error-state-title"] {
+    display: inline-flex;
+    align-self: center;
+    max-width: 100%;
+    padding: 0.3em 0.5em 0.24em;
+    border: 4px solid currentColor;
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-2xl);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    text-align: center;
+    rotate: -5deg;
+    opacity: 0.92;
+}
+[data-theme="fashion"] .stamp-title-xl [data-slot="empty-state-title"],
+[data-theme="fashion"] .stamp-title-xl [data-slot="error-state-title"] { font-size: var(--type-4xl); border-width: 5px; letter-spacing: 0.04em; }
+[data-theme="fashion"] .stamp-title-sale [data-slot="error-state-title"] { color: var(--sale); }
+html[data-color-scheme="light"][data-theme="fashion"] .stamp-title [data-slot$="-title"] { mix-blend-mode: multiply; }
+
+/* the one authored motion: a stamp slaps onto the sheet */
+@keyframes fashion-slap {
+    0% { scale: 2; opacity: 0; rotate: -20deg; }
+    55% { scale: 0.94; opacity: 1; rotate: -5deg; }
+    100% { scale: 1; opacity: 0.92; rotate: -7deg; }
+}
+[data-theme="fashion"] .stamp-slap { animation: fashion-slap var(--motion-slow) var(--easing-emphasized) both; }
+
+/* the cart count: a plain bump, no rotation (the stamp keyframes would leave it tilted) */
+@keyframes fashion-bump {
+    0% { scale: 1.9; opacity: 0; }
+    60% { scale: 0.95; opacity: 1; }
+    100% { scale: 1; opacity: 1; }
+}
+[data-theme="fashion"] .bump { display: inline-block; animation: fashion-bump var(--motion-slow) var(--easing-emphasized) both; }
+
+/* sold out: the sheet fades like sun-bleached paper under its stamp */
+[data-theme="fashion"] .bleached { filter: saturate(0.2) contrast(0.85) brightness(1.05); opacity: 0.7; }
+
+/* a peeling corner at the reading-end foot of a big poster */
+[data-theme="fashion"] .peel::before {
+    content: '';
+    position: absolute;
+    inset-inline-end: 0;
+    bottom: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    z-index: 2;
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--paper) 78%, black) 0%,
+        var(--paper) 22%,
+        color-mix(in srgb, var(--paper) 62%, black) 49.5%,
+        var(--wall) 50.5%);
+    filter: drop-shadow(-2px -2px 2px rgb(0 0 0 / 0.22));
+    pointer-events: none;
+}
+[dir="rtl"][data-theme="fashion"] .peel::before, [data-theme="fashion"] [dir="rtl"] .peel::before {
+    background: linear-gradient(225deg,
+        color-mix(in srgb, var(--paper) 78%, black) 0%,
+        var(--paper) 22%,
+        color-mix(in srgb, var(--paper) 62%, black) 49.5%,
+        var(--wall) 50.5%);
+    filter: drop-shadow(2px -2px 2px rgb(0 0 0 / 0.22));
+}
+
+/* on dark paper the curl catches light instead of shadow */
+html[data-color-scheme="dark"][data-theme="fashion"] .peel::before {
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--paper) 70%, white) 0%,
+        color-mix(in srgb, var(--paper) 88%, white) 22%,
+        color-mix(in srgb, var(--paper) 55%, white) 49.5%,
+        var(--wall) 50.5%);
+}
+html[data-color-scheme="dark"][dir="rtl"][data-theme="fashion"] .peel::before {
+    background: linear-gradient(225deg,
+        color-mix(in srgb, var(--paper) 70%, white) 0%,
+        color-mix(in srgb, var(--paper) 88%, white) 22%,
+        color-mix(in srgb, var(--paper) 55%, white) 49.5%,
+        var(--wall) 50.5%);
+}
+
+/* tape across the top: the announcement */
+[data-theme="fashion"] .tape {
+    background-image: repeating-linear-gradient(90deg, transparent 0 46px, rgb(255 255 255 / 0.08) 46px 48px);
+}
+
+/* a wall: children take a small deterministic tilt so no two neighbours are parallel */
+[data-theme="fashion"] .wall > :nth-child(6n+1) { --tilt: -1.1deg; }
+[data-theme="fashion"] .wall > :nth-child(6n+2) { --tilt: 0.8deg; }
+[data-theme="fashion"] .wall > :nth-child(6n+3) { --tilt: -0.5deg; }
+[data-theme="fashion"] .wall > :nth-child(6n+4) { --tilt: 1.2deg; }
+[data-theme="fashion"] .wall > :nth-child(6n+5) { --tilt: -0.9deg; }
+[data-theme="fashion"] .wall > :nth-child(6n+6) { --tilt: 0.6deg; }
+[data-theme="fashion"] .wall-calm > :nth-child(n) { --tilt: 0deg; }
+[data-theme="fashion"] .wall-calm > :nth-child(3n+1) { --tilt: -0.4deg; }
+[data-theme="fashion"] .wall-calm > :nth-child(3n+3) { --tilt: 0.4deg; }
+
+/* a typographic poster: what a sheet shows when the merchant gave it no picture */
+[data-theme="fashion"] .typo-poster {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--foreground) 6%, transparent)),
+        repeating-linear-gradient(-45deg, color-mix(in srgb, var(--foreground) 5%, transparent) 0 2px, transparent 2px 14px);
+    color: var(--ink);
+}
+}
+
+@layer components {
+    /* a faint print: the name as a watermark-weight graphic when the foot already names the product */
+    [data-theme="fashion"] .typo-faint { color: color-mix(in srgb, var(--foreground) 26%, transparent); }
+}
+
+/* pencil rules: the only borders on the wall */
+[data-theme="fashion"] .rule { border-color: var(--rule); }
+
+/* inputs on paper: a pencil box, no radius */
+[data-theme="fashion"] [data-slot="input"],
+[data-theme="fashion"] [data-slot="textarea"],
+[data-theme="fashion"] [data-slot="select-trigger"] {
+    border-radius: 0;
+    border-color: color-mix(in srgb, var(--foreground) 45%, transparent);
+    background: var(--paper);
+    box-shadow: none;
+}
+[data-theme="fashion"] [data-slot="input"]:focus-visible,
+[data-theme="fashion"] [data-slot="textarea"]:focus-visible,
+[data-theme="fashion"] [data-slot="select-trigger"]:focus-visible {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+[data-theme="fashion"] [data-slot="label"] {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+[data-theme="fashion"] [data-slot="checkbox"],
+[data-theme="fashion"] [data-slot="radio-group-item"] { border-color: var(--foreground); }
+
+/* swiper (used by no rail here, but the shell may mount it) — keep controls in the world */
+[data-theme="fashion"] .swiper-pagination-bullet { width: 1.25rem; height: 0.25rem; border-radius: 0; background: var(--foreground); opacity: 0.35; }
+[data-theme="fashion"] .swiper-pagination-bullet-active { opacity: 1; background: var(--primary); }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="fashion"] .stamp-slap, [data-theme="fashion"] .bump { animation: none; opacity: 0.92; }
+    [data-theme="fashion"] .sheet-lift { transition: none; }
+    [data-theme="fashion"] body { background-attachment: scroll, scroll; }
+}
+
+/* toasts: a small pasted notice — square paper, poster caps, the progress line in day-glo */
+[data-theme="fashion"] .toast-nextjs {
+    border: 0;
+    border-radius: 0;
+    box-shadow: var(--elev-lg);
+}
+[data-theme="fashion"] .toast-nextjs .message .text {
+    font-family: var(--font-heading);
+    font-size: var(--type-sm);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+[data-theme="fashion"] .toast-nextjs .check { border-radius: 0; animation: none; }
+[data-theme="fashion"] .toast-nextjs.success .check { background-color: var(--primary) !important; color: var(--primary-foreground) !important; }
+[data-theme="fashion"] .toast-nextjs .progress::before { background-color: var(--primary) !important; }

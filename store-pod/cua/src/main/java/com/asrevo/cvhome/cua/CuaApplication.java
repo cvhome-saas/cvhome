@@ -2,13 +2,9 @@ package com.asrevo.cvhome.cua;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
-
-import com.asrevo.cvhome.s2s.config.CvhomeSharedConfig;
 
 @SpringBootApplication
-@Import(CvhomeSharedConfig.class)
-public class CuaApplication {
+public final class CuaApplication {
 
     private CuaApplication() {
     }

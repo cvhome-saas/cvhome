@@ -1,0 +1,31 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="approve" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <form method="dialog" class="approve-body" (submit)="onSubmit($event)">
+    <h2 class="approve-title">{{ title() }}</h2>
+    <p class="approve-message">{{ message() }}</p>
+
+    <app-form-field [label]="fieldLabel()" [hint]="fieldHint()" required wide>
+      <app-text-field
+        [(value)]="transactionNo"
+        [invalid]="showError()"
+        [disabled]="busy()"
+        [ariaLabel]="fieldLabel()"
+        latin
+        mono
+      />
+    </app-form-field>
+
+    @if (showError()) {
+      <p class="approve-error" role="alert">{{ requiredMessage() }}</p>
+    }
+
+    <div class="approve-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+        {{ cancelLabel() }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="busy()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </form>
+</dialog>

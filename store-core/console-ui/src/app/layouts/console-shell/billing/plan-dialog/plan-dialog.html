@@ -1,0 +1,93 @@
+<dialog #dialog class="pd" (close)="closed.emit()" (cancel)="closed.emit()" *transloco="let t">
+  <div class="pd-body">
+    <header class="pd-head">
+      <div class="pd-heading">
+        <h2 class="pd-title">{{ t('plans.title') }}</h2>
+        <p class="pd-subtitle">{{ t('plans.subtitle') }}</p>
+      </div>
+      <button class="pd-close" type="button" [attr.aria-label]="t('plans.close')" (click)="close()">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="pd-cycle" role="group" [attr.aria-label]="t('plans.billingCycle')">
+      <button type="button" [class.active]="!yearly()" [attr.aria-pressed]="!yearly()" (click)="setInterval('MONTH')">
+        {{ t('plans.monthly') }}
+      </button>
+      <button type="button" [class.active]="yearly()" [attr.aria-pressed]="yearly()" (click)="setInterval('YEAR')">
+        {{ t('plans.yearly') }}
+      </button>
+    </div>
+
+    @if (failed()) {
+      <!-- A billing outage is not a reason to imply the plans changed, so this offers a retry rather than an empty grid. -->
+      <p class="pd-note" role="status">
+        {{ t('plans.unavailable') }}
+        <button type="button" class="pd-retry" (click)="retry()">{{ t('plans.retry') }}</button>
+      </p>
+    } @else if (isLoading()) {
+      <div class="pd-grid" aria-busy="true">
+        @for (slot of [1, 2, 3]; track slot) {
+          <article class="pd-plan pd-placeholder" aria-hidden="true"></article>
+        }
+      </div>
+    } @else if (isEmpty()) {
+      <p class="pd-note" role="status">{{ t('plans.noneAtInterval') }}</p>
+    } @else {
+      <div class="pd-grid">
+        @for (plan of plans(); track plan.priceId) {
+          <article class="pd-plan" [class.featured]="plan.featured">
+            @if (plan.featured) {
+              <span class="pd-flag">{{ t('plans.popular') }}</span>
+            }
+            <h3 class="pd-plan-name">{{ name(plan) }}</h3>
+            @if (plan.description; as description) {
+              <p class="pd-plan-copy">{{ description }}</p>
+            }
+
+            <p class="pd-price">
+              <strong>{{ price(plan) }}</strong>
+              <span>{{ plan.interval === 'YEAR' ? t('plans.perYear') : t('plans.perMonth') }}</span>
+            </p>
+            @if (plan.savingPercent; as saving) {
+              <small class="pd-saving">{{ t('plans.saving', {percent: saving}) }}</small>
+            }
+
+            <ul class="pd-features">
+              @for (feature of plan.features; track feature.key) {
+                <li>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M4 12.5l5 5L20 6.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span>
+                    {{
+                      feature.unlimited
+                        ? t('shared.entitlement.' + feature.key + '.unlimited')
+                        : feature.limit === null
+                          ? t('shared.entitlement.' + feature.key + '.granted')
+                          : t('shared.entitlement.' + feature.key + '.limit', {count: feature.limit})
+                    }}
+                  </span>
+                </li>
+              }
+            </ul>
+
+            <button type="button" class="pd-choose" (click)="choose(plan.priceId)">
+              {{
+                plan.free
+                  ? t('plans.startFree')
+                  : plan.trialDays > 0
+                    ? t('plans.startTrial', {days: plan.trialDays})
+                    : t('plans.choose')
+              }}
+            </button>
+          </article>
+        }
+      </div>
+
+      <p class="pd-foot">{{ t('plans.note') }}</p>
+    }
+  </div>
+</dialog>

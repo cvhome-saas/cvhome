@@ -1,0 +1,21 @@
+/* The language track sits in the panel header, where the mockup puts it. */
+.lang-track {
+  flex: none;
+}
+
+/*
+ * Prose, capped at a readable measure.
+ *
+ * The only thing this section still needs of its own. Everything else it used to declare — a
+ * bordered "composer" sheet, borderless transparent controls, a hand-written counter, a fill meter
+ * for the advised meta length — was a field vocabulary that existed on this page alone; it is now
+ * `app-form-field`, `app-text-field` and `app-textarea` like every other section.
+ */
+.section-body {
+  max-inline-size: 46rem;
+}
+
+.fallback-notice {
+  border-radius: var(--radius-lg);
+  border-block-end: 0;
+}

@@ -1,0 +1,74 @@
+/*
+ * The layout a form is arranged on, and the two-pane split a list-and-editor page uses.
+ *
+ * **Layout only.** What a field *looks* like — the label, the frame, the message, the counter —
+ * belongs to `app-form-field`, `app-text-field` and their siblings, where Angular's encapsulation
+ * can actually reach it. This file holds the arrangement of several fields, which is the page's
+ * business and cannot live in a child component: a rule written in a page's stylesheet stops at the
+ * child's host and never reaches inside it (lessons.md, "The design pass — encapsulation, and three more
+ * things a native control hid"), so a shared stylesheet pulled into each sibling's `styleUrls` is
+ * how components on one page agree on a grid.
+ *
+ * Pull it in beside the component's own sheet:
+ *
+ * ```ts
+ * styleUrls: ['../../../shared/styles/field.css', './details-section.css'],
+ * ```
+ *
+ * `styleUrls` cannot resolve the `@shared` alias, hence the relative path. `product-picker.css` set
+ * the precedent.
+ */
+
+/*
+ * Two columns of fields.
+ *
+ * `1.25rem` is store management's gutter; the catalogue and the product form used `1rem`. The wider
+ * one wins because it is the one used by the page with the most fields on it, where the tighter
+ * gutter made a twelve-field grid read as a wall.
+ */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 1.25rem;
+}
+
+/* An address, a description, a URL — a value that needs the whole width rather than half of it. */
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+/*
+ * A list beside the editor for whatever is selected in it.
+ *
+ * Declared six times before this — once in each catalogue tab and again in first-run — always with
+ * the same ratio and the same breakpoint, because each was copied from the last.
+ */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+/*
+ * Below 1100px the editor is narrower than the fields it holds, so the two panes stack and the list
+ * becomes a header for the editor rather than a column beside it.
+ */
+@media (max-width: 1100px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * A message about the form as a whole rather than one field — a default language that is not in the
+ * supported set, a provider enabled with no credentials. Styled like a field error because it is
+ * one, and placed by the form rather than by a control.
+ */
+.cross-field-error {
+  margin: .35rem 0 0;
+  color: var(--chart-5-foreground);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  line-height: 1.45;
+}

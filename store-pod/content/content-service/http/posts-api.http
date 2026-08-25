@@ -1,0 +1,40 @@
+### Blog posts — same workflow surface as pages (see pages-api.http) plus categories.
+
+### List published posts
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/posts?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}&status=PUBLISHED
+Cookie: SESSION={{SESSION_ID}}
+
+### Create a post
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/posts?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{
+  "slug": "quarterly-supply-budget",
+  "heroMediaId": null,
+  "categoryIds": [],
+  "tags": ["budgeting", "b2b"],
+  "authorName": "Maya Chen",
+  "featured": true,
+  "translations": [
+    {"language": "en", "title": "How to plan a quarterly supply budget", "excerpt": "A short guide.", "body": "<p>…</p>", "metaDescription": "Plan your quarter."}
+  ]
+}
+
+### Schedule it
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/posts/1/publish?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"publishAt": "2026-12-09T09:00:00Z"}
+
+### Categories
+GET {{SELLER_UI_URL}}/spg/content/api/v1/private/content/posts/categories?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+###
+POST {{SELLER_UI_URL}}/spg/content/api/v1/private/content/posts/categories?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Content-Type: application/json
+Cookie: SESSION={{SESSION_ID}}
+
+{"slug": "guides", "names": {"en": "Guides", "ar": "أدلة"}, "position": 0}

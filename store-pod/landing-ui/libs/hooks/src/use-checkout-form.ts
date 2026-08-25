@@ -3,14 +3,11 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import {useTranslations} from "next-intl";
-import {StoreContext} from "@store-front/types";
-import {Box} from "@store-front/types";
-import {Order} from "@store-front/types";
-import {ReadableCountryList} from "@store-front/types";
-import {defaultCheckoutValue} from "@store-front/types";
+import {AgreementText, defaultCheckoutValue, Order, PaymentType, ReadableCountryList, StoreContext} from "@store-front/types";
 import {CartService} from "@store-front/services/cart-service";
 import {ContentService} from "@store-front/services/content-service";
 import {getCartManager} from "@store-front/services/cart-manager";
+import {parseDescription} from "@store-front/services/description-view-util";
 import {showToast} from "nextjs-toast-notify";
 import {toastDirection} from "@store-front/services/direction-utils";
 import {useUser} from "./use-user";
@@ -20,19 +17,17 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const [agreeDialogOpen, setAgreeDialogOpen] = useState(false);
     const [loginRequiredDialogOpen, setLoginRequiredDialogOpen] = useState(false);
-    const [agreement, setAgreement] = useState<Box | undefined>();
+    const [agreement, setAgreement] = useState<AgreementText | undefined>();
     const [order, setOrder] = useState<Order | undefined>();
     const [isAgree, setIsAgree] = useState(false);
     const [readableCountryList, setReadableCountryList] = useState<ReadableCountryList | undefined>();
+    const [supportedPaymentTypes, setSupportedPaymentTypes] = useState<PaymentType[] | undefined>();
     const cartManager = getCartManager(storeContext);
     const {user, loading, login} = useUser(storeContext);
 
     const getSchema = useCallback(() => {
         return Yup.object().shape({
-            payment: Yup.object().shape({
-                paymentType: Yup.string().required(t('PAYMENT_TYPE_REQUIRED')),
-                transactionType: Yup.string().required(t('TRANSACTION_TYPE_REQUIRED')),
-            }),
+            paymentType: Yup.string().required(t('PAYMENT_TYPE_REQUIRED')),
             customer: Yup.object().shape({
                 emailAddress: Yup.string()
                     .required(t('EMAIL_REQUIRED'))
@@ -80,13 +75,29 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
             setReadableCountryList(countries);
         };
 
-        fetchCountries().then();
-        ContentService.getBox(storeContext, "agreement").then(it => {
-            if (it == undefined) {
-                setIsAgree(true);
+        const fetchPaymentTypes = async () => {
+            const types = await CartService.getSupportedPaymentTypes(storeContext);
+            setSupportedPaymentTypes(types);
+            if (types && types.length > 0) {
+                setValue("paymentType", types[0]);
             }
-            setAgreement(it);
-        });
+        };
+
+        fetchCountries().then();
+        fetchPaymentTypes().then();
+        // The checkout agreement: the live TERMS policy; a store without one has nothing to accept.
+        ContentService.getPolicy(storeContext, 'TERMS')
+            .then((policy): AgreementText => ({
+                title: policy.heading,
+                html: parseDescription({description: policy.body} as never),
+            }))
+            .catch(() => undefined)
+            .then(it => {
+                if (it == undefined) {
+                    setIsAgree(true);
+                }
+                setAgreement(it);
+            });
     }, [storeContext]);
 
     // Handle initial login required dialog
@@ -121,9 +132,19 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
         }
         cartManager.checkout(checkoutCart, (o) => {
                 setOrder(o);
-                if (o) {
+                if (o && o.redirectUrl) {
+                    window.location.href = o.redirectUrl;
+                } else if (o && o.orderStatus !== 'CANCELLED') {
                     setSuccessDialogOpen(true);
                     reset();
+                } else {
+                    showToast.error(t('PAYMENT_FAILED'), {
+                        duration: 3000,
+                        progress: false,
+                        position: toastDirection(storeContext.locale),
+                        transition: "bounceIn",
+                        sound: false,
+                    });
                 }
             }, () => showToast.error(t('FAILED_TO_PLACE_ORDER'), {
                 duration: 3000,
@@ -154,6 +175,7 @@ export const useCheckoutForm = (storeContext: StoreContext, requireLoginForOrder
         isAgree,
         setIsAgree,
         readableCountryList,
+        supportedPaymentTypes,
         handleClickOnAgreement,
         onSubmit,
         login,

@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
-import com.asrevo.cvhome.commons.domain.ManagerStoreId;
 import com.asrevo.cvhome.commons.domain.Pod;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,20 +33,20 @@ public class StoreRoleAccessChecker {
         return hasSuperAdminRole(authentication);
     }
 
-    public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isOrgAdmin(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isOrgAdmin(authentication, requestedStoreId, null);
     }
 
-    public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreAdmin(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isStoreAdmin(authentication, requestedStoreId, null);
     }
 
-    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreModerator(Authentication authentication, StoreMerchantId requestedStoreId) {
         return isStoreModerator(authentication, requestedStoreId, null);
     }
 
     @SuppressWarnings("java:S1172")
-    public boolean isOrgAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isOrgAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
         if (!hasOrgAdminRole(authentication)) {
             return false;
         }
@@ -60,7 +60,7 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
-    public boolean isStoreAdmin(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isStoreAdmin(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
         if (!hasStoreAdminRole(authentication)) {
             log.debug("User {} does not have store admin role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -72,7 +72,7 @@ public class StoreRoleAccessChecker {
                     authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
             return false;
         }
-        if (!requestedStoreId.getId().toString().equals(identity.store())) {
+        if (!requestedStoreId.equals(identity.store())) {
             log.debug(
                     "User {} does not have store admin role with roles {} because request store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, identity.store());
@@ -81,7 +81,7 @@ public class StoreRoleAccessChecker {
         return true;
     }
 
-    public boolean isStoreModerator(Authentication authentication, ManagerStoreId requestedStoreId, Pod pod) {
+    public boolean isStoreModerator(Authentication authentication, StoreMerchantId requestedStoreId, Pod pod) {
         if (!hasStoreModeratorRole(authentication)) {
             log.debug("User {} does not have store moderator role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -93,7 +93,7 @@ public class StoreRoleAccessChecker {
                     authentication.getName(), getRoles(authentication), pod.name(), identity.org().id().toString());
             return false;
         }
-        if (!requestedStoreId.getId().toString().equals(identity.store())) {
+        if (!requestedStoreId.equals(identity.store())) {
             log.debug(
                     "User {} does not have store moderator role with roles {} because request store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, identity.store());
@@ -118,7 +118,7 @@ public class StoreRoleAccessChecker {
 
     }
 
-    public boolean isStoreCustomer(Authentication authentication, ManagerStoreId requestedStoreId) {
+    public boolean isStoreCustomer(Authentication authentication, StoreMerchantId requestedStoreId) {
         if (!hasStoreCustomerRole(authentication)) {
             log.debug("User {} does not have store customer role with roles {}", authentication.getName(),
                     getRoles(authentication));
@@ -128,7 +128,7 @@ public class StoreRoleAccessChecker {
             return false;
         }
         String storeId = getStoreId(auth);
-        if (!storeId.equals(requestedStoreId.getId().toString())) {
+        if (!storeId.equals(requestedStoreId.getId())) {
             log.debug(
                     "User {} does not have store customer role with roles {} because requested store {} not match identity store {}",
                     authentication.getName(), getRoles(authentication), requestedStoreId, storeId);

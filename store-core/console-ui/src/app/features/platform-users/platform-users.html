@@ -1,0 +1,119 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.totalLabel() ?? facade.heading().context" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.users.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="users-stack">
+        <!--
+          Said once, at the top, rather than as a search box that would narrow the page on screen:
+          uaa's admin list matches metadata equality and offers no text query at all.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('platform.users.notice.noSearch')" />
+
+        <app-panel [title]="t('platform.users.panel.title')" [subtitle]="facade.subtitle()">
+          <!--
+            In the panel's header, where the control that narrows the list belongs — beside the thing
+            it narrows rather than stacked on top of the first row.
+          -->
+          <div panelAction class="org-filter">
+            <app-select
+              [value]="facade.orgFilter()"
+              (valueChange)="onOrgFilter($event)"
+              [options]="facade.orgOptions()"
+              [ariaLabel]="t('platform.users.filter.label')"
+            />
+          </div>
+
+          @if (facade.rows().length) {
+            <app-user-admin-table
+              [rows]="facade.rows()"
+              [label]="t('platform.users.panel.title')"
+              [busy]="facade.busy()"
+              [roleList]="roleList"
+              [orgLabel]="orgLabel"
+              (act)="onAction($event)"
+            />
+
+            <app-pagination
+              [page]="facade.pageIndex()"
+              [totalPages]="facade.totalPages()"
+              [totalElements]="facade.totalElements()"
+              [pageSize]="pageSize"
+              [unit]="t('platform.users.unit')"
+              [label]="t('platform.users.paginationLabel')"
+              (pageChange)="onPage($event)"
+            />
+          } @else if (facade.orgFilter()) {
+            <app-empty-state
+              icon="filter"
+              [title]="t('platform.users.noMatches.title')"
+              [message]="t('platform.users.noMatches.message')"
+            />
+          } @else {
+            <app-empty-state
+              icon="users"
+              [title]="t('platform.users.empty.title')"
+              [message]="t('platform.users.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+
+  <app-set-password-dialog
+    [open]="!!facade.resetting()"
+    [busy]="facade.busy()"
+    [title]="t('platform.users.reset.title')"
+    [message]="t('platform.users.reset.message', {name: userName(facade.resetting())})"
+    [passwordLabel]="t('platform.users.reset.password')"
+    [repeatLabel]="t('platform.users.reset.repeatPassword')"
+    [hint]="t('platform.users.reset.hint')"
+    [handoverHint]="t('platform.users.reset.handoverHint')"
+    [weakMessage]="t('platform.users.reset.weak')"
+    [mismatchMessage]="t('platform.users.reset.mismatch')"
+    [confirmLabel]="t('platform.users.reset.confirm')"
+    [busyLabel]="t('platform.users.reset.busy')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (submitted)="facade.confirmReset($event)"
+    (dismissed)="facade.dismissDialogs()"
+  />
+
+  @if (facade.editingRoles(); as target) {
+    <app-roles-dialog
+      [open]="true"
+      [busy]="facade.busy()"
+      [title]="t('platform.users.roles.title')"
+      [message]="t('platform.users.roles.message', {name: userName(target)})"
+      [options]="facade.roleOptions()"
+      [held]="target.roles"
+      [emptyMessage]="t('platform.users.roles.empty')"
+      [confirmLabel]="t('platform.users.roles.confirm')"
+      [busyLabel]="t('platform.users.roles.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (submitted)="facade.confirmRoles($event)"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+
+  <!--
+    A typed confirmation, because there is no undo and no soft delete: `AdminService.delete` removes
+    the row. uaa refuses outright when the target is the platform's own super admin, and that refusal
+    is shown rather than predicted.
+  -->
+  <app-confirm-dialog
+    [open]="!!facade.deleting()"
+    [title]="t('platform.users.delete.title')"
+    [message]="t('platform.users.delete.message', {name: userName(facade.deleting())})"
+    [confirmationText]="facade.deleting()?.username ?? null"
+    [confirmationLabel]="t('platform.users.delete.confirmationLabel')"
+    [confirmLabel]="t('platform.users.action.delete')"
+    [cancelLabel]="t('shared.actions.cancel')"
+    (confirmed)="facade.confirmDelete()"
+    (dismissed)="facade.dismissDialogs()"
+  />
+</ng-container>

@@ -5,56 +5,27 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/cvhome-saas/cvhome)](https://github.com/cvhome-saas/cvhome/releases)
 [![Documentation](https://img.shields.io/badge/docs-cvhome.io-success)](https://cvhome-saas.github.io)
 
-Welcome to **cvhome**, a robust, open-source platform engineered for building scalable, multi-tenant e-commerce
-solutions. Designed with flexibility and modern architecture in mind, `cvhome` provides the foundational backend
-microservices (Java/Spring Boot) and frontend applications (Next.js/Angular) necessary to power sophisticated online
-retail operations.
+Welcome to **cvhome**, an open-source, multi-tenant e-commerce platform built for scalability and flexibility. It
+provides a modern foundation of Java/Spring Boot microservices and Next.js/React/Angular frontends to power
+sophisticated online retail operations.
 
-Whether you're an entrepreneur aiming to launch a niche e-commerce SaaS, an agency managing multiple client stores, or a
-developer seeking a powerful e-commerce framework, `cvhome` offers the tools to succeed.
+**Key Features:**
 
-**Key Features & What cvhome Provides:**
-
-* 🚀 **True Multi-Tenancy:** Host and manage numerous independent stores, each with potentially distinct branding,
-  products, and configurations, all running on a shared or isolated, optimized infrastructure. **Crucially, each store
-  will be mapped
-  to its own custom domain (e.g., `mystore.com`, `www.mystore.com`) and have its subdomain (e.g., `mystore.yourplatform.com`) for a
-  fully branded
-  presence.**
-* 🔧 **Microservice Architecture:** Built with scalable and resilient Java/Spring Boot microservices (API Gateway, Auth,
-  Tenant Management, Store Core, etc.), allowing for independent development, deployment, and scaling of different
-  platform components.
-* ☁️ **Cloud-Native Design:** Architected for deployment on cloud platforms like AWS, leveraging services like ECS
-  Fargate for container orchestration and RDS for databases (see full documentation for deployment guides).
-* 💡 **Foundation for SaaS:** Provides the essential building blocks – tenant isolation, centralized
-  management,subscription management, scalable infrastructure patterns – required to build and operate your own
-  e-commerce Software-as-a-Service.
-* 🔓 **Open Source:** Fully open-source under the Apache 2.0 License, offering transparency, community collaboration, and
-  the freedom to customize and extend the platform to meet specific needs.
+* 🚀 **True Multi-Tenancy:** Manage multiple independent stores with custom domains on shared or isolated infrastructure.
+* 🔧 **Microservices:** Scalable architecture (Auth, Tenant Mgmt, Store Core) for independent development and deployment.
+* ☁️ **Cloud-Native:** Built for AWS (ECS Fargate, RDS) and containerized with Docker.
+* 💡 **SaaS Ready:** Essential building blocks for tenant isolation, centralized management, and subscriptions.
+* 🔓 **Open Source:** Licensed under Apache 2.0 for transparency and easy customization.
 
 ## History
 
-`cvhome` builds upon the foundation laid by the excellent open-source e-commerce project, **[Shopizer](https://github.com/cvhome-saas/shopizer)**.
+`cvhome` evolves the single-instance model of **[Shopizer](https://github.com/shopizer-ecommerce/shopizer)** into a
+scalable, multi-tenant SaaS platform. We've significantly refactored the architecture to introduce robust tenant
+isolation, cloud-native optimization, and a modernized technology stack.
 
-While leveraging core e-commerce concepts and potentially some code structures inspired by Shopizer,
-`cvhome` significantly enhances and refactors the architecture to introduce robust **Software-as-a-Service (SaaS)**
-capabilities.
-Key enhancements include:
-
-* **True Multi-Tenancy:** Designed from the ground up to support multiple isolated tenant stores.
-* **Tenant Isolation:** Mechanisms to ensure data and configuration separation between tenants.
-* **Cloud-Native Architecture:** Optimized for deployment and scaling on cloud platforms like AWS using
-  containerization (Docker/Fargate).
-* **Subscription Management:** Integrated capabilities for managing tenant subscriptions.
-* **Modernized Stack:** Incorporates updated frameworks and technologies (e.g., specific versions of Spring Boot,
-  Next.js, Angular).
-
-Essentially,
-`cvhome` takes the single-instance e-commerce model and evolves it into a scalable, multi-tenant platform suitable for SaaS providers.
 ---
 
-**➡️ Full Documentation:** For comprehensive guides on architecture, deployment, concepts, and usage, please visit the
-main documentation site: **https://cvhome-saas.github.io**
+**➡️ Full Documentation:** **https://cvhome-saas.github.io**
 
 ---
 
@@ -71,10 +42,10 @@ main documentation site: **https://cvhome-saas.github.io**
 
 **Backend:**
 
-* Java (JDK 21)
-* Spring Boot 3.5.0
+* Java (JDK 25)
+* Spring Boot 4.0.1
 * Spring Boot & Spring Cloud
-* Spring Data JPA / Hibernate
+* Spring Data JPA / Hibernate 7.2.0
 * Postgres SQL
 * Gradle
 
@@ -83,8 +54,9 @@ main documentation site: **https://cvhome-saas.github.io**
 * Npm (v10)
 * Node.js (v20)
 * TypeScript
-* Next.js
-* Angular
+* Next.js 16
+* React 19
+* Angular 20
 
 **Cloud:**
 

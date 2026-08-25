@@ -20,6 +20,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "gen:colors": "node scripts/build-color-schemas.mjs",
+    "test": "node scripts/build-color-schemas.mjs --check",
     "clean": "rimraf dist"
   },
   "devDependencies": {

@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.hero-preview {
+  inline-size: 100%;
+  max-block-size: 12rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.hero-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 7rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--foreground-quiet);
+  background: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+}
+
+.side-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.schedule-sheet {
+  position: fixed;
+  inset-block-end: 1.25rem;
+  inset-inline-end: 1.25rem;
+  z-index: 30;
+  inline-size: min(30rem, calc(100vw - 2.5rem));
+  box-shadow: var(--lift);
+}
+
+.schedule-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.schedule-row app-date-time-field {
+  flex: 1 1 12rem;
+}

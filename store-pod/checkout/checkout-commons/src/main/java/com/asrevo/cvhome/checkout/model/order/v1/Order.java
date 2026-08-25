@@ -21,6 +21,4 @@ public class Order extends Entity {
 
     private String comments;
 
-    private String currency;
-
 }

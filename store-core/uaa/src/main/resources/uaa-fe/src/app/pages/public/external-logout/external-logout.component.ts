@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-external-logout',
@@ -6,7 +6,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ExternalLogoutComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
     window.location.href = '/logout';

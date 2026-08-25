@@ -1,0 +1,369 @@
+/*
+ * basic — "The Catalogue Page", the platform's multi-purpose default.
+ * The store is one continuous ruled catalogue: every product is an entry — photo, name, catalogue number
+ * and a big condensed price in the same fixed slots — entries share 1px rules instead of floating as
+ * cards, the categories are the book's thumb-index, and the merchant's PRIMARY is a flat field on the
+ * cover title block, the active index tab and the one primary action per view. Colour roles are NOT set
+ * here — they come from the merchant's ColorTheme preset through the bridge (inline style on <html>).
+ */
+[data-theme="basic"] {
+    /* fonts — next/font variables from fonts.ts. Cairo rides as the Arabic companion on both roles. */
+    --font-body: var(--font-basic-sans), var(--font-basic-arabic), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-basic-display), var(--font-basic-arabic), var(--font-basic-sans), "Arial Narrow", sans-serif;
+    --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — body stays compact, the catalogue cover and prices jump */
+    --type-xs: 0.75rem;
+    --type-sm: 0.875rem;
+    --type-base: 0.9375rem;
+    --type-lg: 1.125rem;
+    --type-xl: 1.375rem;
+    --type-2xl: 1.75rem;
+    --type-3xl: 2.25rem;
+    --type-4xl: 3rem;
+    --type-5xl: 4rem;
+    --type-6xl: 6rem;
+    --line-tight: 0.95;
+    --line-snug: 1.2;
+    --line-normal: 1.5;
+    --line-relaxed: 1.65;
+    --track-tight: -0.015em;
+    --track-normal: 0;
+    --track-wide: 0.08em;
+
+    /* spacing & density */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 3rem;
+    --gutter: 1rem;
+
+    /* radius — a printed page has square cells; controls get a hairline softening */
+    --r-control: 0.25rem;
+    --r-card: 0px;
+    --r-image: 0px;
+    --r-badge: 0.125rem;
+    --r-overlay: 0.5rem;
+
+    /* borders & elevation — flat planes; only floating surfaces lift, with a real offset and blur */
+    --border-width: 1px;
+    --elev-sm: 0 0 0 0 transparent;
+    --elev-md: 0 4px 12px -4px rgb(0 0 0 / 0.12);
+    --elev-lg: 0 10px 28px -10px rgb(0 0 0 / 0.2);
+    --elev-overlay: 0 24px 56px -18px rgb(0 0 0 / 0.35);
+
+    /* containers */
+    --width-narrow: 44rem;
+    --width-content: 84rem;
+    --width-wide: 96rem;
+
+    /* motion — one authored moment: the price flash on add */
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --motion-slow: 420ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* layout */
+    --header-h: 3.5rem;
+    --header-h-lg: 4rem;
+    --product-aspect: 1 / 1;
+
+    /* world materials */
+    --rule: var(--border);
+    --ink: var(--foreground);
+    --paper: var(--background);
+    --cell: var(--card);
+    --faint: color-mix(in srgb, var(--foreground) 8%, transparent);
+
+    /* browser surfaces carry the world too */
+    caret-color: var(--primary);
+    accent-color: var(--primary);
+    scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
+    scrollbar-width: thin;
+}
+
+/* Arabic editions lead with Cairo on both roles: next/font's metric fallback for the Sofia cuts carries Arabic
+   glyphs and would otherwise catch them before Cairo; Cairo's Latin then sets the few Latin words on an Arabic page. */
+[data-theme="basic"]:lang(ar) {
+    --font-body: var(--font-basic-arabic), var(--font-basic-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-basic-arabic), var(--font-basic-display), var(--font-basic-sans), sans-serif;
+}
+
+@media (min-width: 1024px) {
+    [data-theme="basic"] {
+        --section-y: 5rem;
+        --gutter: 2rem;
+    }
+}
+
+[data-theme="basic"] ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+[data-theme="basic"] a { text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+
+[data-theme="basic"] .swiper-pagination-bullet { opacity: 1; }
+
+/* ---- world grammar as small utilities (scoped to the theme) ------------------------------------ */
+/* Layered under Tailwind's utilities so `h-*`, `text-*`, `lg:sticky` … on the same element still win. */
+@layer components {
+    /* display voice: the catalogue cover, running heads, prices */
+    [data-theme="basic"] .display {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        line-height: var(--line-tight);
+        letter-spacing: 0.005em;
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums lining-nums;
+        text-wrap: balance;
+    }
+    [data-theme="basic"] .display-black { font-weight: 800; }
+    /* Arabic has no case; a slightly heavier cut keeps the same weight on the page */
+    [data-theme="basic"] :is(.display, .price, .stamp, .index-tab, .running-head-title):lang(ar) { letter-spacing: 0; }
+
+    /* a price: condensed, bold, tabular, one line */
+    [data-theme="basic"] .price {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0;
+        font-variant-numeric: tabular-nums lining-nums;
+        white-space: nowrap;
+    }
+
+    /* the running head: a rule with the title at the start and the facts/actions at the end */
+    [data-theme="basic"] .running-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: var(--border-width) solid var(--rule);
+    }
+    [data-theme="basic"] .running-head-title {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: var(--type-2xl);
+        line-height: 1;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        text-wrap: balance;
+    }
+    @media (min-width: 1024px) {
+        [data-theme="basic"] .running-head-title { font-size: var(--type-3xl); }
+    }
+
+    /* the ruled grid: cells share hairlines, nothing floats */
+    [data-theme="basic"] .ruled {
+        display: grid;
+        gap: var(--border-width);
+        background: var(--rule);
+        border: var(--border-width) solid var(--rule);
+    }
+    [data-theme="basic"] .ruled > * { background: var(--cell); min-width: 0; }
+
+    /* a flat field of the merchant primary: the cover title block, the active tab, the one CTA */
+    [data-theme="basic"] .plate {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+
+    /* the index tab: thumb-index of the catalogue */
+    [data-theme="basic"] .index-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: 2.5rem;
+        padding-inline: 0.875rem;
+        border-inline-end: var(--border-width) solid var(--rule);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: var(--foreground);
+        transition: background-color var(--motion-fast) var(--easing-standard), color var(--motion-fast) var(--easing-standard);
+    }
+    [data-theme="basic"] .index-tab:hover { background: var(--faint); }
+    [data-theme="basic"] .index-tab[aria-current="page"],
+    [data-theme="basic"] .index-tab[data-active="true"] {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+    [data-theme="basic"] .index-tab > .count { font-weight: 500; opacity: 0.7; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+
+    /* a stamp: state printed in the entry's fixed slot — SALE, SOLD OUT, ONLY N LEFT, ADDED */
+    [data-theme="basic"] .stamp {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.45rem;
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: var(--type-xs);
+        line-height: 1.1;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+        border-radius: var(--r-badge);
+        background: var(--foreground);
+        color: var(--background);
+    }
+    [data-theme="basic"] .stamp-sale { background: var(--sale); color: var(--sale-foreground); }
+    [data-theme="basic"] .stamp-outline { background: var(--cell); color: var(--foreground); box-shadow: inset 0 0 0 var(--border-width) var(--foreground); }
+    [data-theme="basic"] .stamp-success { background: var(--success); color: var(--success-foreground); }
+
+    /* the catalogue number: small, tabular, quiet */
+    [data-theme="basic"] .cat-no {
+        font-size: var(--type-xs);
+        color: var(--muted-foreground);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    /* a choice chip in a ruled row: variants, sub-index, facets */
+    [data-theme="basic"] .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 2.25rem;
+        padding-inline: 0.75rem;
+        border: var(--border-width) solid var(--rule);
+        border-radius: var(--r-control);
+        font-size: var(--type-sm);
+        font-weight: 500;
+        background: var(--cell);
+        color: var(--foreground);
+        transition: background-color var(--motion-fast) var(--easing-standard), color var(--motion-fast) var(--easing-standard), border-color var(--motion-fast) var(--easing-standard);
+    }
+    [data-theme="basic"] .chip:hover:not(:disabled) { background: var(--faint); }
+    [data-theme="basic"] .chip[aria-checked="true"], [data-theme="basic"] .chip[aria-current="page"], [data-theme="basic"] .chip[data-on="true"] {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-color: var(--primary);
+    }
+    [data-theme="basic"] .chip-off { border-style: dashed; color: var(--muted-foreground); text-decoration: line-through; }
+
+    /* the one authored moment: the price flash. The cell floods from the start edge with a colour field,
+       holds, and lets go — an exponential ease-out from an already-visible state. */
+    [data-theme="basic"] .flash {
+        position: relative;
+        isolation: isolate;
+    }
+    [data-theme="basic"] .flash::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--success);
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+    }
+    [data-theme="basic"] .flash[data-flash="on"]::before {
+        animation: basic-flash 1.6s var(--easing-emphasized) both;
+    }
+    [dir="rtl"] [data-theme="basic"] .flash::before, [data-theme="basic"][dir="rtl"] .flash::before { transform-origin: 100% 50%; }
+    @keyframes basic-flash {
+        0% { transform: scaleX(0); }
+        12% { transform: scaleX(1); }
+        78% { transform: scaleX(1); opacity: 1; }
+        100% { transform: scaleX(1); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        [data-theme="basic"] .flash[data-flash="on"]::before { animation: basic-flash-still 1.6s linear both; }
+        @keyframes basic-flash-still { 0%, 78% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+    }
+
+    /* quiet horizontal scroll strips (index strip, thumbnails) */
+    [data-theme="basic"] .scroll-x {
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    [data-theme="basic"] .scroll-x::-webkit-scrollbar { display: none; }
+    /* a strip that is cut by the viewport says so: the end edge fades (narrow screens only) */
+    [data-theme="basic"] .scroll-x-fade { mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); }
+    [dir="rtl"] [data-theme="basic"] .scroll-x-fade, [data-theme="basic"][dir="rtl"] .scroll-x-fade { mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent); }
+    @media (min-width: 1024px) {
+        [data-theme="basic"] .scroll-x-fade,
+        [dir="rtl"] [data-theme="basic"] .scroll-x-fade,
+        [data-theme="basic"][dir="rtl"] .scroll-x-fade { mask-image: none; }
+    }
+
+    /* long-form CMS and product copy */
+    [data-theme="basic"] .prose-basic { line-height: var(--line-relaxed); max-width: 70ch; }
+    [data-theme="basic"] .prose-basic :is(p, ul, ol) { margin-bottom: 1rem; }
+    [data-theme="basic"] .prose-basic :is(h2, h3) { font-family: var(--font-heading); text-transform: uppercase; letter-spacing: 0.01em; margin-top: 2rem; margin-bottom: 0.625rem; line-height: 1.05; }
+    [data-theme="basic"] .prose-basic h2 { font-size: var(--type-2xl); }
+    [data-theme="basic"] .prose-basic h3 { font-size: var(--type-xl); }
+    [data-theme="basic"] .prose-basic ul { list-style: disc; padding-inline-start: 1.25rem; }
+    [data-theme="basic"] .prose-basic ol { list-style: decimal; padding-inline-start: 1.25rem; }
+    [data-theme="basic"] .prose-basic li { margin-bottom: 0.25rem; }
+    [data-theme="basic"] .prose-basic a { text-decoration: underline; text-decoration-color: var(--primary); }
+    [data-theme="basic"] .prose-basic img { max-width: 100%; height: auto; }
+}
+
+/* ---- third-party (Swiper) overrides: Swiper ships unlayered CSS, so these must stay unlayered too ---- */
+/* the cover stage's page stubs (Swiper pagination rendered as numbered tabs) */
+[data-theme="basic"] .cover .swiper-pagination {
+    position: absolute;
+    left: auto;
+    right: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    bottom: 0;
+    width: auto;
+    z-index: 11;
+    display: flex;
+    gap: var(--border-width);
+    padding: 0;
+    background: var(--rule);
+    border-inline-start: var(--border-width) solid var(--rule);
+    border-top: var(--border-width) solid var(--rule);
+}
+[data-theme="basic"] .cover .swiper-pagination-bullet {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: 0;
+    border-radius: 0;
+    background: var(--cell);
+    color: var(--foreground);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--type-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--motion-fast) var(--easing-standard), color var(--motion-fast) var(--easing-standard);
+}
+[data-theme="basic"] .cover .swiper-pagination-bullet-active { background: var(--primary); color: var(--primary-foreground); }
+
+/* the ruled rail: a scrolling row of entries sharing rules; arrows are square cells */
+[data-theme="basic"] .rail { border: var(--border-width) solid var(--rule); background: var(--rule); }
+[data-theme="basic"] .rail .swiper-slide { background: var(--cell); border-inline-end: var(--border-width) solid var(--rule); }
+[data-theme="basic"] .rail .swiper-button-prev, [data-theme="basic"] .rail .swiper-button-next {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-top: -1.25rem;
+    background: var(--cell);
+    color: var(--foreground);
+    border: var(--border-width) solid var(--rule);
+    border-radius: var(--r-control);
+    box-shadow: var(--elev-md);
+    transition: background-color var(--motion-fast) var(--easing-standard), opacity var(--motion-fast) var(--easing-standard);
+}
+[data-theme="basic"] .rail .swiper-button-prev::after, [data-theme="basic"] .rail .swiper-button-next::after { font-size: 0.875rem; font-weight: 700; }
+[data-theme="basic"] .rail .swiper-button-prev:hover, [data-theme="basic"] .rail .swiper-button-next:hover { background: var(--faint); }
+[data-theme="basic"] .rail .swiper-button-disabled { opacity: 0; pointer-events: none; }
+[data-theme="basic"] .rail .swiper-button-prev { left: auto; right: auto; inset-inline-start: 0.5rem; }
+[data-theme="basic"] .rail .swiper-button-next { left: auto; right: auto; inset-inline-end: 0.5rem; }
+@media (hover: none) {
+    [data-theme="basic"] .rail .swiper-button-prev, [data-theme="basic"] .rail .swiper-button-next { display: none; }
+}
+

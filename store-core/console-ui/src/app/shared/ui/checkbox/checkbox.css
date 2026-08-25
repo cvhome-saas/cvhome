@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .4rem .55rem;
+  padding-inline-start: calc(.55rem + var(--checkbox-depth, 0) * 1rem);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration);
+}
+
+.checkbox:hover:not(.disabled) {
+  border-color: var(--edge);
+  background: var(--input);
+}
+
+.checkbox:has(.native:checked) {
+  border-color: var(--edge);
+  background: var(--accent);
+  color: var(--foreground-strong);
+}
+
+.checkbox:has(.native:focus-visible) {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.checkbox.disabled {
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+/*
+ * The real control, kept where the platform can still see it.
+ *
+ * `display: none` would take it out of the tab order and out of the accessibility tree; clipping it
+ * keeps the keyboard behaviour, the label association and form participation, and lets the drawn
+ * box below be purely visual.
+ */
+.native {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Drawn rather than tinted — see the class note. Both states are explicit. */
+.box {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--background);
+  color: var(--primary-foreground);
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration);
+}
+
+.checkbox:has(.native:checked) .box {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.checkbox.disabled .box {
+  background: var(--muted);
+}
+
+.copy {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkbox,
+  .box {
+    transition: none;
+  }
+}

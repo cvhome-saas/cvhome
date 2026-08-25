@@ -1,0 +1,42 @@
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/subscription-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/subscription-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "lang": "en",
+  "store": "",
+  "fromDate": "2024-11-14T19:07:54.073Z",
+  "toDate": "2024-11-21T19:07:54.073Z"
+}
+
+###
+
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/org-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/org-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "lang": "en",
+  "store": "",
+  "fromDate": "2024-11-14T19:07:54.073Z",
+  "toDate": "2024-11-21T19:07:54.073Z"
+}
+
+###
+
+# curl '{{GATEWAY_URL}}/manager/api/v2/private/store-statistic'
+POST {{GATEWAY_URL}}/manager/api/v2/private/store-statistic
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{SUPER_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "lang": "en",
+  "store": "",
+  "fromDate": "2024-11-14T19:07:54.073Z",
+  "toDate": "2024-11-21T19:07:54.073Z"
+}
+
+###
+

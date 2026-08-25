@@ -3,7 +3,6 @@ package com.asrevo.cvhome.store.core.services.generic;
 import java.io.Serializable;
 
 import com.asrevo.cvhome.store.core.entity.generic.SalesManagerEntity;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
 
 /**
  * <p>
@@ -31,21 +30,21 @@ public interface SalesManagerEntityService<K extends Serializable & Comparable<K
      *
      * @param entity entité
      */
-    void update(E entity) throws ServiceException;
+    void update(E entity);
 
     /**
      * Crée l'entité dans la base de données.
      *
      * @param entity entité
      */
-    void create(E entity) throws ServiceException;
+    void create(E entity);
 
     /**
      * Supprime l'entité de la base de données
      *
      * @param entity entité
      */
-    void delete(E entity) throws ServiceException;
+    void delete(E entity);
 
     /**
      * Retourne une entité à partir de son id.

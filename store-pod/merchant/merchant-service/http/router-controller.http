@@ -1,0 +1,20 @@
+# RouterController — SPG domain lookup and seller-managed allocation.
+
+### lookup a seeded storefront domain
+GET {{SPG_URL}}/merchant/api/v1/router/public/lookup-by-domain?domain=org1-store1.asrevo.com
+Accept: application/json
+
+### ask for TLS for a seeded storefront domain
+GET {{SPG_URL}}/merchant/api/v1/router/public/ask-for-tls?domain=org1-store1.asrevo.com
+
+### list allocated domains
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/router/private/allocates?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### missing store returns typed 404
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/router/private/allocates?store=missing-store&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/problem+json
+
+###

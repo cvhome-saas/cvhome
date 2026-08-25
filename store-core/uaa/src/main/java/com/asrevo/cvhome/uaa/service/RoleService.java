@@ -27,7 +27,8 @@ public class RoleService {
     }
 
     public Role findBy(UUID id) {
-        return roleRepository.findById(id).orElseThrow(() -> new RuntimeException("Invalid role id " + id));
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("Invalid role id %s", id)));
     }
 
     @Transactional

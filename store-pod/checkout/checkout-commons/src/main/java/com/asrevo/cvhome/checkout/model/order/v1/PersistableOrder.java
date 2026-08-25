@@ -2,7 +2,7 @@ package com.asrevo.cvhome.checkout.model.order.v1;
 
 import java.io.Serial;
 
-import com.asrevo.cvhome.checkout.model.order.transaction.PersistablePayment;
+import com.asrevo.cvhome.store.core.entity.payments.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 /**
  * This object is used when processing an order from the API It will be used for
- * processing the payment and as Order meta data
+ * processing the Order meta data
  *
  * @author c.samson
  */
@@ -24,8 +24,6 @@ public class PersistableOrder extends Order {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private PersistablePayment payment;
-
     private Long shippingQuote;
 
     @JsonIgnore
@@ -36,5 +34,7 @@ public class PersistableOrder extends Order {
 
     @JsonIgnore
     private String cuaExternalId;
+
+    private PaymentType paymentType;
 
 }

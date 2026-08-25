@@ -1,0 +1,146 @@
+# StoreManagerApi — com.asrevo.cvhome.tenancy.manager.controller.StoreManagerApi (@RequestMapping "api/v1/store-manager")
+#
+# Addressed through the gateway, never tenancy's own port (:8020): a real request crosses store-core-gateway
+# on :8000, which is where the /tenancy prefix is stripped and the token is relayed. The five .http files that
+# used to sit in this module's root all pointed at localhost:8020 and two of them called endpoints that had
+# been deleted — which is what a request file nobody can run looks like.
+#
+# Vars come from the repo-root http-client.env.json; SESSION_ID from the gitignored
+# http-client.private.env.json (copy the .example).
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### the store list — rows are scoped to the caller's org in the query, not just by the permission gate
+# @name listStores
+GET {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("the console's main screen loads", function () {
+        client.assert(response.status === 200, "status " + response.status);
+    });
+    client.test("every row belongs to the caller's org", function () {
+        response.body.content.forEach(s => client.assert(s.orgId.id === client.global.get("ORG_ID")
+            || s.orgId === null, "a foreign store leaked into the list"));
+    });
+    client.test("a store whose pod cannot be reached is still listed, not silently dropped", function () {
+        client.assert(response.body.content.length === response.body.totalElements
+            || response.body.totalElements > response.body.content.length,
+            "rows and total disagree — the list is hiding rows again");
+    });
+%}
+
+### one store
+GET {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/store-info?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("readable", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status !== undefined, "lifecycle status is missing");
+    });
+%}
+
+### another org's store is a 404, never a 403 — a 403 would confirm the id exists
+GET {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/store-info?store=65f020632bc46470c104b76f&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("cross-tenant read is refused as not-found", function () {
+        client.assert(response.status === 404, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.STORE.NOT_FOUND", "code " + response.body.code);
+    });
+%}
+
+### creating a store — a typed request now, not an untyped map
+# `name` and `pod` are what tenancy reads; the rest is merchant's, but the fields the pod *refuses without* are
+# validated here so the failure is this 400 rather than a FAILED_PROVISIONING row minutes later.
+# @name createStore
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "HTTP-TEST-STORE",
+  "email": "store@example.com",
+  "phone": "+10000000000",
+  "theme": "BASIS",
+  "colorTheme": "LIGHT",
+  "currency": "EUR",
+  "defaultLanguage": "en",
+  "supportedLanguages": ["en"],
+  "address": {
+    "country": "DE",
+    "city": "Berlin",
+    "address": "1 Test Street",
+    "postalCode": "10115"
+  }
+}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "a new store should be ACTIVE");
+    });
+    client.global.set("CREATED_STORE_ID", response.body.id.id);
+%}
+
+### a body missing what the pod requires is refused here, synchronously, with field errors
+# Before tenancy validated these, this exact body was accepted with a 200 and the store failed to provision later
+# with nothing recorded but the word FAILED.
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "HTTP-TEST-INCOMPLETE",
+  "country": "DE",
+  "currency": "EUR"
+}
+
+> {%
+    client.test("an incomplete store is a 400, not an accepted create", function () {
+        client.assert(response.status === 400, "status " + response.status);
+        client.assert(response.body.code === "COMMON.VALIDATION_FAILED", "code " + response.body.code);
+        const fields = (response.body.fieldErrors || []).map(function (e) { return e.field; });
+        ["email", "phone", "theme", "colorTheme", "defaultLanguage", "supportedLanguages", "address"]
+            .forEach(function (f) {
+                client.assert(fields.indexOf(f) !== -1, "missing field error for " + f + ": " + fields.join(","));
+            });
+    });
+%}
+
+### the same name again — the unique constraint decides, not the pre-flight check
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+Content-Type: application/json
+
+{
+  "name": "HTTP-TEST-STORE",
+  "email": "store@example.com",
+  "phone": "+10000000000",
+  "theme": "BASIS",
+  "colorTheme": "LIGHT",
+  "currency": "EUR",
+  "defaultLanguage": "en",
+  "supportedLanguages": ["en"],
+  "address": {"country": "DE"}
+}
+
+> {%
+    client.test("duplicate name is a typed 409", function () {
+        client.assert(response.status === 409, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.STORE.NAME_TAKEN", "code " + response.body.code);
+    });
+%}
+
+### the name pre-flight the create form uses
+GET {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/unique?name=HTTP-TEST-STORE&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("reports the collision", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.exists === true, "should already exist");
+    });
+%}

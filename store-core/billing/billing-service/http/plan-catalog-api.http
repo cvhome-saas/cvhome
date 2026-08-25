@@ -1,0 +1,57 @@
+# PlanCatalogApi — com.asrevo.cvhome.billing.api.v1.PlanCatalogApi (@RequestMapping "/api/v1/plan")
+#
+# Addressed through the gateway, not billing's own port (:8021): a real request crosses store-core-gateway
+# on :8000, which is where the /billing prefix is stripped. Env vars come from the repo-root
+# http-client.env.json.
+#
+# Unlike every other billing endpoint these need no session and no ?store= — the catalog is public,
+# because a pricing page is read by people who have not signed up yet.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### the whole catalog, every currency
+# @name listPlans
+GET {{SELLER_UI_URL}}/billing/api/v1/plan/public/plans
+
+> {%
+    client.test("catalog is served without a token", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.length > 0, "no plans seeded");
+    });
+    client.test("plans come back cheapest tier first", function () {
+        for (let i = 1; i < response.body.length; i++) {
+            client.assert(response.body[i].tier >= response.body[i - 1].tier, "plans are out of order");
+        }
+    });
+    client.test("an omitted entitlement means unlimited, not zero", function () {
+        const pro = response.body.find(p => p.code === "PRO");
+        client.assert(pro !== undefined, "no PRO plan");
+        client.assert(pro.entitlements.MAX_PRODUCTS === undefined,
+            "PRO is supposed to leave MAX_PRODUCTS uncapped");
+    });
+    client.global.set("PLAN_PRICE_ID", response.body.find(p => p.code === "BASIC").prices[0].id);
+%}
+
+### narrowed to one currency — prices in other currencies drop out, plans stay
+GET {{SELLER_UI_URL}}/billing/api/v1/plan/public/plans?currency=USD
+
+> {%
+    client.test("only USD prices", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        response.body.forEach(plan => plan.prices.forEach(price => {
+            client.assert(price.amount.currency.code === "USD", "leaked a " + price.amount.currency.code + " price");
+        }));
+    });
+%}
+
+### a currency nobody is priced in — plans still listed, with no prices to buy
+GET {{SELLER_UI_URL}}/billing/api/v1/plan/public/plans?currency=XXX
+
+> {%
+    client.test("no prices, but the catalog still answers", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        response.body.forEach(plan => {
+            client.assert(plan.prices.length === 0, plan.code + " should have no XXX price");
+        });
+    });
+%}

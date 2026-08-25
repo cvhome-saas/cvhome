@@ -1,0 +1,66 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context">
+    <app-date-range-picker [value]="facade.dateRange()" (valueChange)="facade.dateRange.set($event)" />
+  </app-page-header>
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.dashboard.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="platform-stack">
+        <!--
+          Three counts and a money figure per currency. The notice bar that used to stand here said
+          the platform aggregated no money at all; billing answers that now, so the bar is gone
+          rather than restated.
+        -->
+        <app-kpi-grid [label]="t('platform.dashboard.kpiLabel')" [data]="facade.kpis()" [columns]="3" />
+
+        <section class="panel-row">
+          <app-trend-chart
+            [title]="t('platform.dashboard.organizations.title')"
+            [data]="facade.organizations()"
+            [unit]="t('platform.dashboard.organizations.unit')"
+            [total]="facade.organizationsTotal()"
+            tone="green"
+          />
+
+          <app-trend-chart
+            [title]="t('platform.dashboard.stores.title')"
+            [data]="facade.stores()"
+            [unit]="t('platform.dashboard.stores.unit')"
+            [total]="facade.storesTotal()"
+            tone="cyan"
+          />
+        </section>
+
+        <!--
+          The third chart seller-ui always drew and never had an endpoint for. One plot per plan
+          rather than one stack: the trend chart draws a single series, and a row of small multiples
+          reads better than a legend of plan codes.
+
+          Hidden rather than drawn empty when billing could not answer — its leg is optional, and an
+          empty plot is a claim that nobody subscribed.
+        -->
+        @if (facade.hasSubscriptionSeries()) {
+          <section class="panel-row">
+            @for (series of facade.subscriptionSeries(); track series.plan) {
+              <app-trend-chart
+                [title]="t('platform.dashboard.subscriptions.title', {plan: series.plan})"
+                [data]="series.points"
+                [unit]="t('platform.dashboard.subscriptions.unit')"
+                [total]="series.total"
+                tone="violet"
+              />
+            }
+          </section>
+        }
+
+        <p class="deeper">
+          <a routerLink="/platform/billing">{{ t('platform.dashboard.seeBilling') }}</a>
+        </p>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

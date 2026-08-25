@@ -6,6 +6,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.asrevo.cvhome.uaa.api.errors.UaaApiException;
+import com.asrevo.cvhome.uaa.api.errors.UaaApiUnavailableException;
+import com.asrevo.cvhome.uaa.api.errors.UaaConflictException;
+import com.asrevo.cvhome.uaa.api.errors.UaaOperationForbiddenException;
+import com.asrevo.cvhome.uaa.api.errors.UaaUserNotFoundException;
 import com.asrevo.cvhome.uaa.domain.user.PersistableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUser;
 import com.asrevo.cvhome.uaa.domain.user.ReadableUserList;
@@ -20,6 +25,17 @@ import com.asrevo.cvhome.uaa.service.UserAccountService;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Adapts {@link AdminUserClient} to the caller-facing contract, which is also where the SDK's transport-level
+ * vocabulary narrows to a per-operation one.
+ *
+ * <p>
+ * {@code AdminUserClient} declares {@code UaaApiException} throughout, because at the transport any uaa endpoint can
+ * answer anything. Each method here names what its operation can actually mean and folds everything else into
+ * {@link UaaApiUnavailableException} — the judgement the compiler cannot make, made once, in the one place that knows
+ * what the call was for.
+ * </p>
+ */
 @AllArgsConstructor
 public class UserAccountServiceImpl implements UserAccountService {
 
@@ -54,42 +70,87 @@ public class UserAccountServiceImpl implements UserAccountService {
         return readableUser;
     }
 
-    @Override
-    public ReadableUser createUser(PersistableUser user) {
-        var createdUser = client.createUser(CreateUserRequest.builder()
-                .email(user.getEmailAddress())
-                .username(user.getUserName())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .roles(user.getRoles())
-                .metadata(extractMetadata(user))
-                .build());
-        client.resetPassword(createdUser.id().toString(), user.getPassword());
-        return toReadableUser(createdUser);
+    /**
+     * Anything this contract does not name leaves the outcome undecided, which is the only thing a caller can safely
+     * act on: a code the SDK could not name might have been a refusal or might have been a hiccup, and pretending to
+     * know which is how a caller records a guess as a fact. uaa's own code and status ride along on the wrapper.
+     */
+    private static UaaApiUnavailableException undecided(UaaApiException cause) {
+        return cause instanceof UaaApiUnavailableException unavailable ? unavailable
+                : UaaApiUnavailableException.wrapping(cause);
+    }
+
+    /**
+     * The three mutations that share a failure shape: uaa refuses because the user is missing, refuses because it is
+     * the super administrator, or leaves the outcome unknown.
+     */
+    private static void mutate(Mutation mutation)
+            throws UaaUserNotFoundException, UaaOperationForbiddenException, UaaApiUnavailableException {
+        try {
+            mutation.run();
+        } catch (UaaUserNotFoundException | UaaOperationForbiddenException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
     }
 
     @Override
-    public ReadableUser updateUser(PersistableUser user) {
-        var updatedUser = client.updateUser(user.getId(),
-                UpdateUserRequest.builder()
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .enabled(user.isActive())
-                        .roles(user.getRoles())
-                        .metadata(extractMetadata(user))
-                        .build());
-
-        return toReadableUser(updatedUser);
+    public ReadableUser createUser(PersistableUser user) throws UaaConflictException, UaaApiUnavailableException {
+        try {
+            var createdUser = client.createUser(CreateUserRequest.builder()
+                    .email(user.getEmailAddress())
+                    .username(user.getUserName())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .roles(user.getRoles())
+                    .metadata(extractMetadata(user))
+                    .build());
+            client.resetPassword(createdUser.id().toString(), user.getPassword());
+            return toReadableUser(createdUser);
+        } catch (UaaConflictException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
     }
 
     @Override
-    public ReadableUser current(String id) {
-        return toReadableUser(client.getUser(id));
+    public ReadableUser updateUser(PersistableUser user)
+            throws UaaUserNotFoundException, UaaConflictException, UaaApiUnavailableException {
+        try {
+            var updatedUser = client.updateUser(user.getId(),
+                    UpdateUserRequest.builder()
+                            .firstName(user.getFirstName())
+                            .lastName(user.getLastName())
+                            .enabled(user.isActive())
+                            .roles(user.getRoles())
+                            .metadata(extractMetadata(user))
+                            .build());
+
+            return toReadableUser(updatedUser);
+        } catch (UaaUserNotFoundException | UaaConflictException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
     }
 
     @Override
-    public ReadableUserList list(Map<String, String> filters, Integer pageNumber, Integer pageSize) {
-        PageResponse<UserDto> response = client.listUsers(filters, new PageRequest(pageNumber, pageSize));
+    public ReadableUser current(String id) throws UaaUserNotFoundException, UaaApiUnavailableException {
+        return findOne(id);
+    }
+
+    @Override
+    public ReadableUserList list(Map<String, String> filters, Integer pageNumber, Integer pageSize)
+            throws UaaApiUnavailableException {
+        PageResponse<UserDto> response;
+        try {
+            response = client.listUsers(filters, new PageRequest(pageNumber, pageSize));
+        } catch (UaaApiException e) {
+            // A listing names no failure of its own: either uaa answered or the caller found nothing out.
+            throw undecided(e);
+        }
         ReadableUserList list = new ReadableUserList();
         list.setTotalElements(response.totalElements());
         list.setTotalPages(response.totalPages());
@@ -100,37 +161,67 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void deleteUser(String userId) {
-        client.deleteUser(userId);
+    public void deleteUser(String userId)
+            throws UaaUserNotFoundException, UaaOperationForbiddenException, UaaApiUnavailableException {
+        mutate(() -> client.deleteUser(userId));
     }
 
     @Override
-    public void enableUser(String userId) {
-        client.enableUser(userId);
+    public void enableUser(String userId)
+            throws UaaUserNotFoundException, UaaOperationForbiddenException, UaaApiUnavailableException {
+        mutate(() -> client.enableUser(userId));
     }
 
     @Override
-    public void disableUser(String userId) {
-        client.disableUser(userId);
+    public void disableUser(String userId)
+            throws UaaUserNotFoundException, UaaOperationForbiddenException, UaaApiUnavailableException {
+        mutate(() -> client.disableUser(userId));
     }
 
     @Override
-    public ReadableUser findOne(String userId) {
-        return toReadableUser(client.getUser(userId));
+    public ReadableUser findOne(String userId) throws UaaUserNotFoundException, UaaApiUnavailableException {
+        try {
+            return toReadableUser(client.getUser(userId));
+        } catch (UaaUserNotFoundException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
     }
 
     @Override
-    public void changePassword(String userId, UserPassword request) {
-        client.resetPassword(userId, request.getChangePassword());
+    public void changePassword(String userId, UserPassword request)
+            throws UaaUserNotFoundException, UaaApiUnavailableException {
+        try {
+            client.resetPassword(userId, request.getChangePassword());
+        } catch (UaaUserNotFoundException e) {
+            throw e;
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
     }
 
     @Override
-    public Set<String> getAssignableRoles() {
+    public Set<String> getAssignableRoles() throws UaaApiUnavailableException {
         Set<String> reservedRoles = Set.of("USER", "ORG_ADMIN");
-        return client.getAssignableRoles()
-                .stream()
-                .filter(it -> !reservedRoles.contains(it))
-                .collect(Collectors.toSet());
+        try {
+            return client.getAssignableRoles()
+                    .stream()
+                    .filter(it -> !reservedRoles.contains(it))
+                    .collect(Collectors.toSet());
+        } catch (UaaApiException e) {
+            throw undecided(e);
+        }
+    }
+
+    /**
+     * A uaa call with no return value, so {@link #mutate(Mutation)} can serve the three that share a failure shape.
+     */
+    @FunctionalInterface
+    private interface Mutation {
+
+        void run() throws UaaApiException;
+
     }
 
 }

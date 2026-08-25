@@ -1,0 +1,206 @@
+<ng-container *transloco="let t">
+  <!-- `step-stack` is what puts air between the panels; see product-form.css. -->
+  <div class="step-stack" [formGroup]="form()">
+    <app-panel
+      [title]="t('productForm.essentials.identifiers')"
+      [subtitle]="t('productForm.essentials.identifiersSubtitle')"
+    >
+      <div class="editor-body">
+        <div class="field-grid">
+          <!-- An identifier: left-to-right even inside the Arabic console. -->
+          <app-form-field
+            [label]="t('productForm.essentials.sku')"
+            [control]="form().controls.sku"
+            required
+            controlId="product-sku"
+            [hint]="t('productForm.essentials.skuHint')"
+            [fallback]="t('productForm.essentials.skuInvalid')"
+          >
+            <app-text-field
+              id="product-sku"
+              formControlName="sku"
+              latin
+              [check]="skuCheck()"
+              [checkLabel]="t('productForm.essentials.skuChecking')"
+              [invalid]="form().controls.sku.hasError('skuTaken')"
+            />
+          </app-form-field>
+
+          <app-form-field
+            [label]="t('productForm.essentials.dateAvailable')"
+            controlId="product-available-from"
+            [hint]="t('productForm.essentials.dateAvailableHint')"
+          >
+            <!--
+              The console's own picker, not the native control: it is a `ControlValueAccessor` over
+              the same `YYYY-MM-DD` string, it is themed and localised, and it is what create-store
+              already uses for a date on a form.
+            -->
+            <app-date-picker
+              id="product-available-from"
+              formControlName="dateAvailable"
+              [placeholder]="t('productForm.essentials.dateAvailablePlaceholder')"
+            />
+          </app-form-field>
+
+          <app-form-field
+            [label]="t('productForm.essentials.sortOrder')"
+            controlId="product-sort-order"
+            [hint]="t('productForm.essentials.sortOrderHint')"
+          >
+            <app-number-field
+              id="product-sort-order"
+              formControlName="sortOrder"
+              [decimals]="0"
+              [min]="0"
+            />
+          </app-form-field>
+
+          <div class="field">
+            <app-toggle
+              [checked]="form().controls.visible.value"
+              (checkedChange)="form().controls.visible.setValue($event)"
+              [label]="t('productForm.essentials.visible')"
+              [description]="
+                form().controls.visible.value
+                  ? t('productForm.essentials.visibleOn')
+                  : t('productForm.essentials.visibleOff')
+              "
+            />
+          </div>
+        </div>
+      </div>
+    </app-panel>
+
+    <app-panel
+      [title]="t('productForm.essentials.copy')"
+      [subtitle]="t('productForm.essentials.copySubtitle')"
+    >
+      <div class="editor-body">
+        <!--
+          The one sentence that makes a multilingual product form comprehensible: this block is
+          per-language, everything else on the product is not.
+        -->
+        <app-notice-bar
+          icon="info"
+          tone="blue"
+          [message]="t('productForm.essentials.perLanguage', {language: activeLanguageName()})"
+        />
+
+        <!--
+          The shared strip, not a hand-rolled one. This was its own radiogroup keyed by *index*
+          rather than by language code, with no arrow keys and no mark for a language that already
+          holds copy — three differences from the identical control in the catalogue.
+        -->
+        <app-locale-switcher
+          [languages]="languages()"
+          [active]="activeLanguageCode()"
+          (activeChange)="onLanguagePicked($event)"
+          [filled]="translatedLanguages()"
+          display="label"
+          [label]="t('productForm.essentials.languageLabel')"
+        />
+
+        @if (activeRow(); as row) {
+          <div class="field-grid" [formGroup]="row">
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.name')"
+              required
+              controlId="product-name"
+              [hint]="t('productForm.essentials.nameHint')"
+            >
+              <app-text-field id="product-name" formControlName="name" />
+            </app-form-field>
+
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.slug')"
+              controlId="product-slug"
+              [hint]="t('productForm.essentials.slugHint')"
+            >
+              <app-text-field
+                id="product-slug"
+                formControlName="friendlyUrl"
+                [prefix]="t('productForm.essentials.slugPrefix')"
+                latin
+              />
+            </app-form-field>
+
+            <!--
+              One line, not a textarea. The product_highlight column is varchar(255), and a box
+              three rows tall is an invitation to write a paragraph into a column that cannot hold
+              one. seller-ui used an input here for the same reason. The counter is the control's,
+              so the limit is stated once and enforced in the same place.
+            -->
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.highlights')"
+              controlId="product-highlights"
+              [hint]="t('productForm.essentials.highlightsHint')"
+            >
+              <app-text-field id="product-highlights" formControlName="highlights" [maxLength]="255" />
+            </app-form-field>
+
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.description')"
+              controlId="product-description"
+            >
+              <!--
+                The one field on this platform that genuinely holds HTML: the seeded descriptions
+                are `<h2>`/`<p>`/`<ul>` documents and the Arabic rows carry a `dir="rtl"` wrapper.
+                seller-ui edited them with Quill; a textarea shows the operator raw markup.
+              -->
+              <app-rich-text
+                id="product-description"
+                formControlName="description"
+                [ariaLabel]="t('productForm.essentials.description')"
+                [placeholder]="t('productForm.essentials.descriptionPlaceholder')"
+                [contentDir]="activeLanguageDir()"
+              />
+            </app-form-field>
+
+            <div class="field field-wide">
+              <hr class="divider" />
+            </div>
+
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.seoTitle')"
+              controlId="product-seo-title"
+            >
+              <app-text-field id="product-seo-title" formControlName="title" />
+            </app-form-field>
+
+            <app-form-field
+              wide
+              [label]="t('productForm.essentials.metaDescription')"
+              controlId="product-meta"
+            >
+              <app-textarea id="product-meta" formControlName="metaDescription" [rows]="2" />
+            </app-form-field>
+
+            <div class="field field-wide">
+              <span class="field-label" [id]="'product-keywords-label'">
+                {{ t('productForm.essentials.keywords') }}
+              </span>
+              <!--
+                Chips, not a comma-separated string. The column stores one string and always has, so
+                the split and join happen here — but "wireless, noise cancelling" typed into a text
+                box is a format an operator has to be told about, and a chip is not.
+              -->
+              <app-tag-input
+                [tags]="keywords()"
+                (tagsChange)="onKeywords($event)"
+                [label]="t('productForm.essentials.keywords')"
+                [placeholder]="t('productForm.essentials.keywordsPlaceholder')"
+              />
+              <p class="field-hint">{{ t('productForm.essentials.keywordsHint') }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </app-panel>
+  </div>
+</ng-container>

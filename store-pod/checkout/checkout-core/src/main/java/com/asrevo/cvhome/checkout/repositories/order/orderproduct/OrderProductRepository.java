@@ -1,6 +1,6 @@
 package com.asrevo.cvhome.checkout.repositories.order.orderproduct;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,7 +21,7 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
             and o.datePurchased between :from and :to
             group by op.sku
             """)
-    List<StatisticEntry> productStatistic(@Param("from") Date from, @Param("to") Date to,
+    List<StatisticEntry> productStatistic(@Param("from") Instant from, @Param("to") Instant to,
                                           @Param("storeId") StoreMerchantId storeMerchantId);
 
 }

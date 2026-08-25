@@ -11,6 +11,7 @@ import {UsersService} from '../services/users-service';
 })
 export class UserEditComponent implements OnInit, AfterViewInit {
   user: any;
+
   constructor(private usersService: UsersService, private activatedRoute: ActivatedRoute) {
   }
 

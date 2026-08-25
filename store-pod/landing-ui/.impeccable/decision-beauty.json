@@ -1,0 +1,128 @@
+{
+  "title": "Choose the visual world for the beauty theme",
+  "question": "The roll assigned The Attar Stall. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Attar Stall",
+      "kicker": "THE ROLL",
+      "lineage": "Gulf souk attar & beauty stalls — tiered shelves, ranks of small bottles, hand-lettered price cards, brass trays",
+      "thesis": "Abundance you can read: products stand in dense, ordered tiers on shelf lines, every one with its own price card — the opposite of the airy pastel beauty page.",
+      "palette": ["#B8772E", "#F4EFE6", "#2A1F14", "#C44B63"],
+      "materials": ["shelf rules", "price cards", "brass tray rims", "bottle silhouettes"],
+      "viewport": "Header as the stall's awning strip (announcement + nav); hero is not a carousel but a tiered shelf of the merchant's slider images and featured products; below, each product group is one shelf tier you scroll along, every card a small bottle-like tile with a price card hanging under it.",
+      "risk": "Density must stay ordered — one tier too many and the shelf becomes clutter; merchant photos must sit inside consistent tiles so the shelf stays calm.",
+      "raised": [
+        {"from": "cutting-bench select rail", "raise": "State is a mark, not a hue: sold-out is a folded price card, sale is a second card clipped over the first, selected filters are pinned tags — never colour washes."},
+        {"from": "pickling brine calendar", "raise": "Every tile carries the same facts band in the same place: price · stock · SKU — the trusted counter's honesty as a fixed label, not a tooltip."},
+        {"from": "one-bit desktop", "raise": "Integer shelf grid: tiers snap to a fixed pitch at every breakpoint; narrow screens drop tiles per tier, never tile size."},
+        {"from": "leather studio", "raise": "Objects are the navigation: the shelf, the tray, the tag — you browse by handling them, no abstract chrome."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Counter Card",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "department-store beauty counter tester trays and shade cards",
+      "thesis": "Every product presented the way the counter assistant hands it to you: on a white tester tray, shade dots first, facts printed on the card.",
+      "palette": ["#FFFFFF", "#1B1B1B", "#D4A5A5", "#8C8C8C"],
+      "materials": ["tester trays", "shade-dot chips", "printed cards"],
+      "viewport": "A tray grid of products with shade chips leading, a sticky facts card on the product page.",
+      "risk": "This is the direction most runs land on for beauty — familiar by design; it wins on clarity, not on memory."
+    },
+    {
+      "id": "challenger-streetwear",
+      "label": "Industrial Quote Grammar",
+      "verdict": "competitive",
+      "lineage": "industrial streetwear — straight-quoted labels, zip-tie tags, hazard diagonals",
+      "thesis": "Every zone named literally in straight quotes, the active thing keeps its orange tag on.",
+      "palette": ["#FFFFFF", "#111111", "#FF6A13"],
+      "materials": ["stockroom cotton", "zip-tie tags", "hazard stripes"],
+      "viewport": "A stockroom grid of garments, each plate labelled \"JACKET\" in quotes, the cart tag swinging orange.",
+      "case": "Fuses for the fashion half of the boutique and for fact-first labelling; loses clarity for cosmetics (shades, ingredients read as slogans).",
+      "risk": "Reads as a streetwear drop, not a trusted counter.",
+      "hero": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-industrial-quote-grammar-hero.webp"
+    },
+    {
+      "id": "challenger-gyaru",
+      "label": "Magazine Shingle",
+      "verdict": "competitive",
+      "lineage": "Japanese street-fashion magazine spreads — cut-out figures, handwritten price call-outs",
+      "thesis": "The boutique as a crowded spread: products shingled, every one with a hand-priced call-out on a leader line.",
+      "palette": ["#FF2D95", "#F2C94C", "#FFFFFF", "#1B1B1B"],
+      "materials": ["cut-outs", "leader lines", "glitter outlines"],
+      "viewport": "Overlapping product cut-outs across the first screen, prices on leader lines, one figure lifting on hover.",
+      "case": "Holds the young boutique audience and prices-front clarity; loses the trusted-counter calm and breaks on merchant photos that are not cut-outs.",
+      "risk": "Chaos unless the merchant ships cut-out imagery, which most do not.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-gyaru-magazine-density-hero.webp"
+    },
+    {
+      "id": "challenger-cutting-bench",
+      "label": "Cutting Bench Rail",
+      "verdict": "declined",
+      "lineage": "film editing bench select rail",
+      "thesis": "Products as frames on a perforated rail.",
+      "palette": ["#000000", "#FF7A1A", "#FFFFFF"],
+      "materials": ["film grain", "perforations", "tape flags"],
+      "viewport": "A horizontal strip of frames crossing the page.",
+      "case": "Fuses poorly: beauty shoppers do not identify with an editing bench; frame pitch fights product imagery.",
+      "kept": "State is a mark, not a hue — donated to the shelf.",
+      "risk": "Looks like a video tool.",
+      "hero": "https://impeccable.style/worlds/cards/operate-a-cutting-bench-select-rail-hero.webp"
+    },
+    {
+      "id": "challenger-leather",
+      "label": "Leather Studio",
+      "verdict": "declined",
+      "lineage": "skeuomorphic stitched-leather shelf",
+      "thesis": "Digital things rendered as loved objects on wood.",
+      "palette": ["#8B5A2B", "#EFE9DF", "#3A2A1A"],
+      "materials": ["leather", "linen", "walnut"],
+      "viewport": "A wooden shelf with leather headers.",
+      "case": "Fuses poorly: dated rendering and the wrong material for cosmetics; wins nothing on clarity.",
+      "kept": "Objects as navigation — donated.",
+      "risk": "Reads 2011.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-skeuomorph-leather-studio-hero.webp"
+    },
+    {
+      "id": "challenger-pickling",
+      "label": "Brine Calendar",
+      "verdict": "declined",
+      "lineage": "pickling jars on seasonal shelves",
+      "thesis": "Jars ranked on shelf lines, each label banded with facts.",
+      "palette": ["#E7F0F2", "#E2675A", "#6B8E3A", "#B38B5A"],
+      "materials": ["jar glass", "kraft labels"],
+      "viewport": "A shelf of jars with date bands.",
+      "case": "Fuses poorly: fermentation has no audience overlap; the fixed facts band is the one discipline worth keeping.",
+      "kept": "Fixed facts band per tile — donated.",
+      "risk": "Smells of the kitchen.",
+      "hero": "https://impeccable.style/worlds/cards/food-fermentation-culinary-theater-pickling-brine-calendar-hero.webp"
+    },
+    {
+      "id": "challenger-onebit",
+      "label": "One-bit Desktop",
+      "verdict": "declined",
+      "lineage": "early dithered desktop UI",
+      "thesis": "Every tone as dither, windows as navigation.",
+      "palette": ["#000000", "#FFFFFF"],
+      "materials": ["ordered dither", "pixel chrome"],
+      "viewport": "Overlapping windows of products.",
+      "case": "Fuses poorly: no colour means no shades, no merchant palette; audience mismatch.",
+      "kept": "Integer grid discipline — donated.",
+      "risk": "Novelty.",
+      "hero": "https://impeccable.style/worlds/cards/medium-native-one-bit-desktop-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code", "toggle": false},
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "The beauty storefront everyone ships: blush neutrals, thin serif display, airy product grid, executed impeccably.",
+    "palette": ["#FFFFFF", "#F6E7E4", "#1A1A1A", "#B76E79"],
+    "materials": ["airy grid", "product photography", "serif display"],
+    "viewport": "Full-bleed lifestyle hero, serif headline, four-up product grid.",
+    "risk": "Indistinguishable from every other beauty shop by design."
+  },
+  "steer": true
+}

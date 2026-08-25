@@ -18,7 +18,7 @@ import com.asrevo.cvhome.uaa.dto.ClientDetailsTokens;
 import com.asrevo.cvhome.uaa.service.ClientAuthMethod;
 import com.asrevo.cvhome.uaa.service.OAuthGrantType;
 
-public class ClientClientDetailsMapper {
+public final class ClientClientDetailsMapper {
 
     public static final Set<String> KNOWN_TOKEN_SETTINGS = Set.of("settings.token.authorization-code-time-to-live",
             "settings.token.access-token-time-to-live", "settings.token.access-token-format",

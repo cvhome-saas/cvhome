@@ -1,0 +1,247 @@
+/*
+ * Layer 3 — the bridge.
+ *
+ * Re-exports the semantic tokens from theme-forest.css into Tailwind's namespaces so
+ * `bg-background`, `text-muted-foreground`, `border-border` and `shadow-lift` exist as
+ * real utilities. `inline` is what makes this work: the utility resolves through the
+ * var() chain at use time, so swapping theme-forest.css swaps every utility with it.
+ *
+ * Also defines the type roles. A role carries size, weight, line-height and tracking
+ * together, so `text-headline` is a complete decision rather than a size that still needs
+ * three more. They are built from the standard ladder in theme.css rather than owning
+ * their own sizes, because several roles share a size and differ only in weight —
+ * something Tailwind's --text-* namespace cannot express on its own.
+ *
+ * The Quiet Authority rule: large headings stay light (300) and tightly tracked; small
+ * labels are sturdy (600-700) and loose. Weight rises as size falls.
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-1-foreground: var(--chart-1-foreground);
+  --color-chart-1-wash: var(--chart-1-wash);
+  --color-chart-2: var(--chart-2);
+  --color-chart-2-foreground: var(--chart-2-foreground);
+  --color-chart-2-wash: var(--chart-2-wash);
+  --color-chart-3: var(--chart-3);
+  --color-chart-3-foreground: var(--chart-3-foreground);
+  --color-chart-3-wash: var(--chart-3-wash);
+  --color-chart-4: var(--chart-4);
+  --color-chart-4-foreground: var(--chart-4-foreground);
+  --color-chart-4-wash: var(--chart-4-wash);
+  --color-chart-5: var(--chart-5);
+  --color-chart-5-foreground: var(--chart-5-foreground);
+  --color-chart-5-wash: var(--chart-5-wash);
+  --color-chart-6: var(--chart-6);
+  --color-chart-6-foreground: var(--chart-6-foreground);
+  --color-chart-6-wash: var(--chart-6-wash);
+
+  --color-foreground-strong: var(--foreground-strong);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-foreground-quiet: var(--foreground-quiet);
+  --color-primary-emphasis: var(--primary-emphasis);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-muted: var(--primary-muted);
+  --color-border-soft: var(--border-soft);
+  --color-edge: var(--edge);
+  --color-edge-strong: var(--edge-strong);
+  --color-accent-strong: var(--accent-strong);
+  --color-seat-1: var(--seat-1);
+  --color-seat-2: var(--seat-2);
+  --color-seat-3: var(--seat-3);
+  --color-seat-3-foreground: var(--seat-3-foreground);
+  --color-accent-veil: var(--accent-veil);
+  --color-track: var(--track);
+  --color-panel: var(--panel);
+  --color-header-veil: var(--header-veil);
+  --color-scrim: var(--scrim);
+
+  --shadow-lift: var(--lift);
+  --shadow-lift-primary: var(--lift-primary);
+  --shadow-lift-subtle: var(--lift-subtle);
+
+  --container-rail: var(--rail-width);
+}
+
+/* ------------------------------------------------------------- display roles ---- */
+
+@utility text-display {
+  font-size: clamp(3.25rem, 7.1vw, 5.75rem);
+  font-weight: var(--font-weight-light);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+@utility text-headline {
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: var(--font-weight-light);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+@utility text-auth-headline {
+  font-size: clamp(2.6rem, 4vw, 3rem);
+  font-weight: var(--font-weight-light);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+/* Marketing hero. Larger and tighter than the display role. */
+@utility text-hero {
+  font-size: var(--text-8xl);
+  font-weight: var(--font-weight-light);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+/* The pull quote. */
+@utility text-quote {
+  font-size: var(--text-6xl);
+  font-weight: var(--font-weight-light);
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+}
+
+/* Marketing metric figures, and the secondary row beneath them. */
+@utility text-metric {
+  font-size: var(--text-7xl);
+  font-weight: var(--font-weight-light);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+@utility text-metric-small {
+  font-size: var(--text-5xl);
+  font-weight: var(--font-weight-light);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+/* --------------------------------------------------------------- heading roles ---- */
+
+/* Story pillar and card headings. */
+@utility text-subtitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+@utility text-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+/* ------------------------------------------------------------------ body roles ---- */
+
+@utility text-body-prominent {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-book);
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+
+@utility text-body {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-book);
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+
+@utility text-body-compact {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-book);
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+/* The workhorse UI size — nav items, list rows, panel copy. */
+@utility text-body-strong {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-caption {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-book);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-micro {
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-label {
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+}
+
+/* Smallest step. Counters, unread dots, "LIVE" flags. */
+@utility text-tiny {
+  font-size: var(--text-4xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+/* ------------------------------------------------------------ console-only roles ---- */
+
+/* Deliberately heavier than their marketing counterparts — the console is denser. */
+@utility text-operations-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* KPI figures on the console. */
+@utility text-operations-metric {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@utility text-operations-body {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-operations-label {
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.07em;
+}

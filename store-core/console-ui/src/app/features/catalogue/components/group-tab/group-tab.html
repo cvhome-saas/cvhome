@@ -1,0 +1,210 @@
+<ng-container *transloco="let t">
+  @if (unavailable()) {
+    <app-notice-bar icon="alertCircle" tone="red" [message]="t('catalogue.groups.unavailable')" />
+  }
+
+  <div class="split">
+    <app-panel
+      class="list-panel"
+      [title]="t('catalogue.groups.title')"
+      [subtitle]="t('catalogue.groups.subtitle', {count: groups().length})"
+    >
+      <ul class="group-list">
+        @for (group of groups(); track group.code) {
+          <li>
+            <button
+              class="group-row"
+              type="button"
+              [class.current]="group.code === facade.selectedGroupCode()"
+              [attr.aria-pressed]="group.code === facade.selectedGroupCode()"
+              (click)="facade.select('groups', group.code)"
+            >
+              <span class="group-copy">
+                <strong dir="auto">{{ group.name }}</strong>
+                <small dir="ltr">{{ group.code }}</small>
+              </span>
+              <span class="group-meta">
+                {{ t('catalogue.groups.memberCount', {count: group.members.length}) }}
+              </span>
+              <!--
+                The state, as a word. The toggle for it is in the editor: a switch inside a list row
+                that also selects the row makes an accidental click change data.
+              -->
+              <span class="group-state" [class.on]="group.active">
+                {{ group.active ? t('catalogue.groups.active') : t('catalogue.groups.inactive') }}
+              </span>
+            </button>
+          </li>
+        } @empty {
+          <li class="list-empty">{{ t('catalogue.groups.none') }}</li>
+        }
+      </ul>
+
+      <div class="list-foot">
+        <button class="secondary-action" type="button" (click)="facade.startCreate()">
+          <app-icon name="plus" />
+          {{ t('catalogue.add.groups') }}
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel
+      class="editor-panel"
+      [title]="creating() ? t('catalogue.groups.newTitle') : (selected()?.name ?? t('catalogue.groups.noneTitle'))"
+      [subtitle]="creating() ? t('catalogue.groups.newSubtitle') : (selected()?.code ?? null)"
+    >
+      @if (!creating() && !selected()) {
+        <app-empty-state icon="list" [message]="t('catalogue.groups.empty')">
+          <button class="secondary-action" type="button" (click)="facade.startCreate()">
+            {{ t('catalogue.add.groups') }}
+          </button>
+        </app-empty-state>
+      } @else {
+        <div class="editor-body">
+          <form [formGroup]="form" (ngSubmit)="facade.saveGroup()">
+            <div class="editor-head">
+              <app-locale-switcher
+                [languages]="facade.languages()"
+                [active]="facade.activeLanguage()"
+                [filled]="facade.translatedLanguages()"
+                [label]="t('catalogue.copy.languageLabel')"
+                (activeChange)="facade.setLanguage($event)"
+              />
+
+              @if (!creating() && selected(); as group) {
+                <button
+                  class="danger-action"
+                  type="button"
+                  [disabled]="facade.busy()"
+                  (click)="facade.askDelete('groups', group.code, group.name)"
+                >
+                  <app-icon name="trash" />
+                  {{ t('catalogue.groups.delete') }}
+                </button>
+              }
+            </div>
+
+            <app-copy-fields
+              [form]="form.controls.copy"
+              scope="group"
+              [languageName]="facade.activeLanguageName()"
+              [showSlug]="false"
+              (nameChanged)="onNameInput($event)"
+            />
+
+            <hr class="divider" />
+
+            <div class="field-grid">
+              <!--
+                One uniqueness affordance for the whole console: checking, taken, free. The spinner is not
+                decoration — the check is debounced, so without it the field looks like it has already
+                passed. It used to be three hand-placed marks here, a fourth arrangement in create-store,
+                and a lone tick in the social links.
+              -->
+              <app-form-field
+                wide
+                [label]="t('catalogue.code')"
+                [control]="form.controls.code"
+                required
+                controlId="group-code"
+                [hint]="creating() ? t('catalogue.codeHintNew') : t('catalogue.codeHintExisting')"
+                [fallback]="form.controls.code.hasError('codeTaken') ? t('catalogue.codeTaken') : ''"
+              >
+                <app-text-field
+                  id="group-code"
+                  formControlName="code"
+                  latin
+                  [check]="codeCheck()"
+                  [checkLabel]="t('catalogue.codeChecking')"
+                  [invalid]="form.controls.code.hasError('codeTaken')"
+                />
+              </app-form-field>
+
+              <div class="field field-wide">
+                <app-toggle
+                  [checked]="form.controls.active.value"
+                  (checkedChange)="form.controls.active.setValue($event)"
+                  [label]="t('catalogue.groups.activeLabel')"
+                  [description]="t('catalogue.groups.activeHint')"
+                />
+              </div>
+            </div>
+
+            <div class="editor-actions">
+              <button class="secondary-action" type="button" (click)="facade.cancelEdit()">
+                {{ t('shared.actions.cancel') }}
+              </button>
+              <button
+                class="primary-action"
+                type="submit"
+                [disabled]="facade.busy()"
+                [attr.aria-busy]="facade.busy()"
+              >
+                {{ creating() ? t('catalogue.groups.create') : t('catalogue.groups.save') }}
+              </button>
+            </div>
+          </form>
+
+          @if (!creating() && selected(); as group) {
+            <hr class="divider" />
+
+            <!--
+              Outside the form on purpose: each of these is its own endpoint and takes effect at
+              once. Putting them inside Save would make a copy edit able to drop a member.
+            -->
+            <section class="members">
+              <h3 class="members-title picker-head">
+                {{ t('catalogue.groups.members') }}
+                <span class="picker-count">{{ group.members.length }}</span>
+              </h3>
+              <p class="field-hint">{{ t('catalogue.groups.membersHint') }}</p>
+
+              <app-autocomplete
+                class="picker-search"
+                [options]="candidates()"
+                [loading]="facade.memberSearching()"
+                [disabled]="facade.busy()"
+                [label]="t('catalogue.groups.addMember')"
+                [placeholder]="t('catalogue.groups.searchProducts')"
+                (termChanged)="facade.searchProducts($event)"
+                (selected)="addMember($event)"
+              />
+              <!--
+                Said plainly rather than hidden. The pod has no name predicate at all — the match is
+                made here, over the products already read — so "no results" can mean "not in the
+                pool" and the operator deserves to know that is possible.
+              -->
+              <p class="field-hint">{{ t('catalogue.groups.searchPool') }}</p>
+
+              <!--
+                Chips rather than rows. A merchandising group holds two dozen products; as a vertical
+                list that was a block a thousand pixels tall which moved every time one was added.
+                See product-picker.css.
+              -->
+              <ul class="picker-chips">
+                @for (member of group.members; track member.id) {
+                  <li class="picker-chip">
+                    <span class="picker-chip-name" dir="auto">{{ member.name }}</span>
+                    <span class="picker-chip-sku" dir="ltr">{{ member.sku }}</span>
+                    <button
+                      type="button"
+                      [disabled]="facade.busy()"
+                      [attr.aria-label]="t('catalogue.groups.removeMember', {name: member.name})"
+                      (click)="facade.removeMember(group.code, member.id)"
+                    >
+                      <app-icon name="x" [size]="12" />
+                    </button>
+                  </li>
+                } @empty {
+                  <li class="picker-empty">{{ t('catalogue.groups.noMembers') }}</li>
+                }
+              </ul>
+            </section>
+          } @else if (creating()) {
+            <app-notice-bar icon="info" tone="blue" [message]="t('catalogue.groups.saveFirst')" />
+          }
+        </div>
+      }
+    </app-panel>
+  </div>
+</ng-container>

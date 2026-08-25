@@ -1,0 +1,120 @@
+/*
+ * Picking products, in the two places the console does it: related products on the Organize step,
+ * and a group's members on the catalogue's Groups tab.
+ *
+ * Shared for the same reason `editor-card.css` is — these two are the same interaction, and when
+ * they had their own copies they had already drifted into two different widths and two different
+ * list shapes.
+ *
+ * **What was wrong.** The search box spanned the whole panel, which is far more than a name needs
+ * and made the results panel below it just as wide. The chosen products were a vertical list of
+ * bordered rows, so a group with twenty-four members was a block over a thousand pixels tall: adding
+ * one more moved everything below it, and removing one moved it all back. The page grew and shrank
+ * under the operator while they worked.
+ */
+
+/* Wide enough for a product name and a SKU, and no wider. */
+.picker-search {
+  display: block;
+  max-inline-size: 22rem;
+}
+
+.picker-head {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+}
+
+.picker-count {
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Chips, wrapping, with a ceiling.
+ *
+ * The cap is the point: past it the block scrolls instead of growing, so the page is the same height
+ * with four members as with forty and nothing below the picker moves when one is added.
+ */
+.picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  max-block-size: 12rem;
+  margin: 0;
+  padding: .1rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  max-inline-size: 16rem;
+  padding: .3rem .3rem .3rem .6rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+}
+
+/* The name carries the chip; the SKU is the disambiguator when two products share one. */
+.picker-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-chip-sku {
+  flex: none;
+  color: var(--foreground-quiet);
+  font-size: var(--text-2xs);
+}
+
+.picker-chip button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--foreground-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.picker-chip button:hover:not(:disabled) {
+  background: var(--chart-5-wash);
+  color: var(--chart-5-foreground);
+}
+
+.picker-chip button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.picker-chip button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.picker-empty {
+  padding: .9rem 0;
+  color: var(--foreground-quiet);
+  font-size: var(--text-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker-chip button {
+    transition: none;
+  }
+}

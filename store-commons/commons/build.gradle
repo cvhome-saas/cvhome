@@ -1,12 +1,13 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api libs.mongodb.bson
-	compileOnly libs.jackson.databind
-	compileOnly libs.spring.data.commons
-	compileOnly libs.spring.cloud.stream
-	compileOnly libs.lombok
-	annotationProcessor libs.lombok
+    api project(':store-commons:errors')
+    api libs.mongodb.bson
+    compileOnly libs.jackson.annotations
+    compileOnly libs.jackson.databind
+    compileOnly libs.spring.data.commons
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 }

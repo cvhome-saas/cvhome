@@ -1,74 +1,171 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:dir="${#locale.language == 'ar' ? 'rtl' : 'ltr'}">
+<html th:dir="${#locale.language == 'ar' ? 'rtl' : 'ltr'}" th:lang="${#locale.language}"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title th:text="#{register.title}">Register</title>
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAFklEQVQYV2P8z8DAwMDAwMDAwMAAEYACV6tDkYAAAAAElFTkSuQmCC">
+    <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAFklEQVQYV2P8z8DAwMDAwMDAwMAAEYACV6tDkYAAAAAElFTkSuQmCC"
+          rel="icon"
+          type="image/png">
     <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
-        .login-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { margin-bottom: 1.5rem; text-align: center; color: #333; }
-        form { display: grid; gap: 1rem; }
-        .form-group { display: flex; flex-direction: column; }
-        label { margin-bottom: 0.25rem; font-weight: bold; }
-        input { padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 0.75rem; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-        button:hover { background-color: #0056b3; }
-        .error { color: red; margin-bottom: 1rem; text-align: center; }
-        .store-header { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
-        .store-logo { max-width: 96px; max-height: 96px; object-fit: contain; border-radius: 8px; }
-        .store-name { margin: 0; text-align: center; color: #333; font-size: 1.25rem; font-weight: 700; }
-        .footer { margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-size: 0.9rem; }
-        .footer a { color: #007bff; text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .store-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .store-logo {
+            max-width: 96px;
+            max-height: 96px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .store-name {
+            margin: 0;
+            text-align: center;
+            color: #333;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
 
         /* RTL Specific Adjustments */
-        [dir="rtl"] .form-group label { text-align: right; }
-        [dir="rtl"] input { text-align: right; }
+        [dir="rtl"] .form-group label {
+            text-align: right;
+        }
+
+        [dir="rtl"] input {
+            text-align: right;
+        }
     </style>
-    <link rel="stylesheet" href="../css/login.css">
+    <link href="../css/login.css" rel="stylesheet">
 </head>
 <body>
 <div class="login-container">
-    <div th:if="${store}" class="store-header">
-        <img th:if="${store.logo != null}"
-             th:src="${store.logo.path}"
+    <div class="store-header" th:if="${store}">
+        <img class="store-logo"
              th:alt="#{register.store.logo.alt(${store.name})}"
-             class="store-logo" />
+             th:if="${store.logo != null}"
+             th:src="${store.logo.path}"/>
         <h2 class="store-name" th:text="${store.name}">Store Name</h2>
     </div>
 
     <h2 th:if="${store == null}" th:text="#{register.header.create}">Create Account</h2>
     <h2 th:if="${store != null}" th:text="#{register.header.at(${store.name})}">Register at <span>Store Name</span></h2>
 
-    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <div class="error" th:if="${error}" th:text="${error}"></div>
 
     <form method="post" th:action="@{/register}" th:object="${registrationRequest}">
-        <input type="hidden" th:field="*{clientId}">
+        <input th:field="*{clientId}" type="hidden">
         <div class="form-group">
             <label for="username" th:text="#{register.username}">Username</label>
-            <input type="text" id="username" th:field="*{username}" required autofocus />
-            <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></div>
+            <input autofocus id="username" required th:field="*{username}" type="text"/>
+            <div class="error" th:errors="*{username}" th:if="${#fields.hasErrors('username')}"></div>
         </div>
         <div class="form-group">
             <label for="email" th:text="#{register.email}">Email</label>
-            <input type="email" id="email" th:field="*{email}" required />
-            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+            <input id="email" required th:field="*{email}" type="email"/>
+            <div class="error" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></div>
         </div>
         <div class="form-group">
             <label for="password" th:text="#{register.password}">Password</label>
-            <input type="password" id="password" th:field="*{password}" required />
-            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></div>
+            <input id="password" required th:field="*{password}" type="password"/>
+            <div class="error" th:errors="*{password}" th:if="${#fields.hasErrors('password')}"></div>
         </div>
         <div class="form-group">
             <label for="firstName" th:text="#{register.firstname}">First Name</label>
-            <input type="text" id="firstName" th:field="*{firstName}" />
+            <input id="firstName" th:field="*{firstName}" type="text"/>
         </div>
         <div class="form-group">
             <label for="lastName" th:text="#{register.lastname}">Last Name</label>
-            <input type="text" id="lastName" th:field="*{lastName}" />
+            <input id="lastName" th:field="*{lastName}" type="text"/>
         </div>
-        <button type="submit" th:text="#{register.button.signup}">Sign Up</button>
+        <button th:text="#{register.button.signup}" type="submit">Sign Up</button>
     </form>
 
     <div class="footer">

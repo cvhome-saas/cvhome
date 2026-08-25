@@ -10,9 +10,17 @@ import {Role, RolesService} from '../services/roles-service';
 })
 export class RoleFormComponent implements OnInit {
   form!: FormGroup;
-  private _value: any;
 
   constructor(private fb: FormBuilder, private rolesService: RolesService) {
+  }
+
+  private _value: any;
+
+  @Input() set value(v: any) {
+    this._value = v;
+    if (this.form) {
+      this.update(v);
+    }
   }
 
   ngOnInit(): void {
@@ -24,14 +32,6 @@ export class RoleFormComponent implements OnInit {
       this.update(this._value);
     }
   }
-
-  @Input() set value(v: any) {
-    this._value = v;
-    if (this.form) {
-      this.update(v);
-    }
-  }
-
 
   submit() {
     if (this.form.value.id) {
