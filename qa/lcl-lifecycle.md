@@ -102,7 +102,10 @@ Stop through the tool (`lcl stop`), never with a manual `kill`.
   redirect from `http://gateway.com:<gw-b>/oauth2/authorization/uaa` targets `uaa.gateway.com:<uaa-b>` with
   `redirect_uri=http://gateway.com:<gw-b>/…` (the seeded `web-app` client was patched — `events` has
   `uaa.redirects.patched`). `curl -sL http://org1-store1.spg-507f1f77.gateway.com:<spg-b>/` → 200 with the
-  store's title (Caddy dials landing-ui on the shifted port; domain lookup works with a port in `Host`).
+  store's title (Caddy dials landing-ui on the shifted port; domain lookup works with a port in `Host`). Shopper login
+  through cua should keep the port too — spg now sets `X-Forwarded-Port`, so `DynamicRegisteredClientRepository`
+  derives `redirect_uri=http://org1-store1.spg-507f1f77.gateway.com:<spg-b>/callback` instead of dropping to :80
+  **[not verified]**: the header was added after this case was last run.
 
 ## 10 — Stopping one stack leaves the other alone [verified]
 

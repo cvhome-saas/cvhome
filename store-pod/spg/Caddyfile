@@ -23,6 +23,13 @@
 
 (routes) {
 
+    # Caddy sends X-Forwarded-Proto and X-Forwarded-Host but never X-Forwarded-Port, and Tomcat's RemoteIpValve
+    # (forward-headers-strategy: NATIVE) strips the port out of X-Forwarded-Host and then falls back to 80/443.
+    # Anything building an absolute URL from the request — cua's DynamicRegisteredClientRepository derives the
+    # shopper login redirect_uri that way — would drop the port and the redirect would not match. {args[0]} is the
+    # public port of the site importing this snippet.
+    request_header X-Forwarded-Port {args[0]}
+
     handle_path /content* {
         tracing {
             span content
@@ -123,7 +130,7 @@
 
 http:// {
 	log
-    import routes
+    import routes {$LCL_PORT_SPG:80}
 }
 
 https:// {
@@ -133,5 +140,5 @@ https:// {
 		on_demand
 	}
 
-    import routes
+    import routes {$LCL_PORT_SPG_TLS:443}
 }

@@ -47,8 +47,11 @@ compose:
   default: [postgres, minio, spg]
   environment:
     # Consumed by the ${LCL_PORT_*:-default} placeholders in docker-compose-lcl.yml: the upstream ports the
-    # Caddyfile proxies to on the host, and spg's two self-addressed lookup URLs.
+    # Caddyfile proxies to on the host, spg's two self-addressed lookup URLs, and the X-Forwarded-Port it sets
+    # on every proxied request (Caddy does not send that header on its own, and Tomcat's RemoteIpValve then
+    # falls back to 80/443 — which is what dropped the port from cua's shopper login redirect_uri).
     LCL_PORT_SPG: "${port.spg.80}"
+    LCL_PORT_SPG_TLS: "${port.spg.443}"
     LCL_PORT_MERCHANT: "${port.merchant.http}"
     LCL_PORT_CONTENT: "${port.content.http}"
     LCL_PORT_CATALOG: "${port.catalog.http}"

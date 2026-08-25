@@ -47,6 +47,10 @@ services:
       LCL_PORT_PAYMENT: ${LCL_PORT_PAYMENT:-8125}
       LCL_PORT_INVENTORY: ${LCL_PORT_INVENTORY:-8126}
       LCL_PORT_LANDING_UI: ${LCL_PORT_LANDING_UI:-8110}
+      # spg's own public ports — the two lookup URLs below, and the X-Forwarded-Port the Caddyfile sets so
+      # services behind it can rebuild the URL the browser actually used.
+      LCL_PORT_SPG: ${LCL_PORT_SPG:-80}
+      LCL_PORT_SPG_TLS: ${LCL_PORT_SPG_TLS:-443}
       ASK_TLS_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/ask-for-tls
       DOMAIN_LOOKUP_URL: http://spg-507f1f77.gateway.com:${LCL_PORT_SPG:-80}/merchant/api/v1/router/public/lookup-by-domain
       CERT_BUCKET: random-bucket
