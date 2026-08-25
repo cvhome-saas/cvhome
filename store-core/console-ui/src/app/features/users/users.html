@@ -1,0 +1,292 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading().title" [context]="heading().context">
+    <!--
+      The template's control says "Export CSV". Nothing on the platform produces one and the console
+      already renders PDFs from the DOM it is showing — see lessons.md, "Users — no export of any kind".
+    -->
+    <app-export-button
+      [target]="report()"
+      fileName="team"
+      [title]="heading().title"
+      [subtitle]="heading().context"
+      [disabled]="isLoading() || isEmpty()"
+    />
+    @if (facade.activeTab() === 'invitations') {
+      @if (facade.canManageInvitations) {
+        <button class="primary-action" type="button" (click)="facade.startInvite()">
+          <app-icon name="send" />
+          {{ t('users.action.invite') }}
+        </button>
+      }
+    } @else if (facade.canManageUsers) {
+      <button class="primary-action" type="button" (click)="facade.startCreate()">
+        <app-icon name="userPlus" />
+        {{ t('users.action.addUser') }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="isLoading()" [label]="t('users.loading')">
+    @if (!isEmpty()) {
+      <div class="team-stack" #report>
+        <app-tab-switcher
+          [tabs]="facade.tabs()"
+          [active]="facade.activeTab()"
+          (activeChange)="onTab($event)"
+          [label]="t('users.tabsLabel')"
+          panelId="users-panel"
+        />
+
+        @if (facade.activeTab() === 'invitations') {
+          <app-panel
+            id="users-panel"
+            [title]="t('users.invitations.title')"
+            [subtitle]="t('users.invitations.subtitle')"
+          >
+            @if (facade.invitationsError(); as failure) {
+              <app-load-error [message]="failure.message" (retry)="facade.reloadInvitations()" />
+            } @else if (facade.invitationRows().length) {
+              <app-data-table [columns]="invitationColumns()" [label]="t('users.invitations.title')">
+                @for (invitation of facade.invitationRows(); track invitation.id) {
+                  <app-table-row>
+                    <span class="cell-email" role="cell" [attr.data-label]="t('users.column.email')" dir="auto">
+                      {{ invitation.email }}
+                    </span>
+
+                    <span class="cell-roles" role="cell" [attr.data-label]="t('users.column.role')">
+                      {{ facade.roleLabel(invitation.role) }}
+                    </span>
+
+                    <div class="cell-status" role="cell" [attr.data-label]="t('users.column.status')">
+                      <app-badge [tone]="invitation.tone" shape="square">
+                        {{ facade.invitationStatusLabel(invitation.status) }}
+                      </app-badge>
+                    </div>
+
+                    <span class="cell-date" role="cell" [attr.data-label]="t('users.column.expires')">
+                      {{ invitation.expiresAt | translocoDate: {dateStyle: 'medium'} }}
+                    </span>
+
+                    <div class="cell-actions" role="cell" [attr.data-label]="t('users.column.actions')">
+                      <!--
+                        Only a pending invitation can be acted on. Resending rotates the token and
+                        invalidates the old link, which is why it is offered rather than "copy the
+                        link again" — that is impossible, only the hash is stored.
+                      -->
+                      @if (invitation.pending && facade.canManageInvitations) {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          [title]="t('users.action.resend')"
+                          [attr.aria-label]="t('users.action.resendFor', {email: invitation.email})"
+                          [disabled]="busy()"
+                          (click)="facade.resend(invitation)"
+                        >
+                          <app-icon name="undo" />
+                        </button>
+                        <button
+                          class="icon-action danger-action"
+                          type="button"
+                          [title]="t('users.action.revoke')"
+                          [attr.aria-label]="t('users.action.revokeFor', {email: invitation.email})"
+                          [disabled]="busy()"
+                          (click)="facade.askToRevoke(invitation)"
+                        >
+                          <app-icon name="x" />
+                        </button>
+                      }
+                    </div>
+                  </app-table-row>
+                }
+              </app-data-table>
+            } @else {
+              <app-empty-state
+                icon="send"
+                [title]="t('users.invitations.empty.title')"
+                [message]="t('users.invitations.empty.message')"
+              />
+            }
+          </app-panel>
+        } @else {
+          <app-panel id="users-panel" [title]="t('users.allUsers')" [subtitle]="facade.subtitle()">
+            @if (rows().length) {
+              <app-data-table [columns]="columns()" [label]="t('users.allUsers')">
+                @for (row of rows(); track row.id) {
+                  <app-table-row [interactive]="true">
+                    <div class="cell-user" role="cell" [attr.data-label]="t('users.column.user')">
+                      <span class="avatar" aria-hidden="true">{{ facade.initialsOf(row) }}</span>
+                      <!--
+                        The name is the affordance rather than the whole row: a row-wide click
+                        handler is invisible to a keyboard and to a screen reader, and this cell has
+                        to stay reachable in the same tab order as the actions beside it.
+                      -->
+                      <button class="identity" type="button" (click)="open(row.id)">
+                        <strong>
+                          {{ row.name }}
+                          @if (row.isSelf) {
+                            <span class="self-tag">{{ t('users.you') }}</span>
+                          }
+                        </strong>
+                        <span class="email" dir="auto">{{ row.email }}</span>
+                      </button>
+                    </div>
+
+                    <span class="cell-username latin" role="cell" [attr.data-label]="t('users.column.userName')">
+                      {{ row.userName }}
+                    </span>
+
+                    <div class="cell-roles" role="cell" [attr.data-label]="t('users.column.roles')">
+                      @for (role of row.roles; track role) {
+                        <app-badge tone="green" shape="square">{{ facade.roleLabel(role) }}</app-badge>
+                      } @empty {
+                        <span class="muted-value">—</span>
+                      }
+                    </div>
+
+                    <div class="cell-status" role="cell" [attr.data-label]="t('users.column.status')">
+                      <app-badge [tone]="row.active ? 'green' : 'slate'" shape="square">
+                        {{ row.active ? t('users.status.active') : t('users.status.disabled') }}
+                      </app-badge>
+                    </div>
+
+                    <div class="cell-actions" role="cell" [attr.data-label]="t('users.column.actions')">
+                      <button
+                        class="icon-action"
+                        type="button"
+                        [title]="t('users.action.openDetails')"
+                        [attr.aria-label]="t('users.action.openDetailsFor', {name: row.name})"
+                        (click)="open(row.id)"
+                      >
+                        <app-icon name="chevronRight" />
+                      </button>
+                    </div>
+                  </app-table-row>
+                }
+              </app-data-table>
+
+              <app-pagination
+                [page]="facade.pageIndex()"
+                [totalPages]="facade.totalPages()"
+                [totalElements]="facade.totalElements()"
+                [pageSize]="pageSize"
+                [unit]="t('users.unit')"
+                [label]="t('users.paginationLabel')"
+                (pageChange)="onPage($event)"
+              />
+            } @else {
+              <app-empty-state icon="users" [message]="t('users.empty.message')" [title]="t('users.empty.title')" />
+            }
+          </app-panel>
+        }
+      </div>
+    }
+  </app-busy-overlay>
+
+  <!-- One dialog, two modes: reading an account, and editing or creating one. -->
+  @if (facade.selected() || facade.form()) {
+    <app-user-dialog
+      [open]="true"
+      [busy]="busy()"
+      [form]="facade.form()"
+      [mode]="facade.railMode()"
+      [user]="facade.selected()"
+      [storeName]="facade.storeName()"
+      [roles]="facade.assignableRoles()"
+      [canManage]="facade.canManageUsers"
+      [roleLabel]="roleLabel"
+      [roleList]="roleList"
+      [initials]="initials"
+      [hasRole]="hasRole"
+      (edit)="facade.startEdit()"
+      (save)="facade.save()"
+      (cancelEdit)="onCancelEdit()"
+      (toggleRole)="facade.toggleRole($event)"
+      (setActive)="facade.setActiveFlag($event)"
+      (resetPassword)="facade.askToResetPassword($event)"
+      (toggleActive)="facade.toggleActive($event)"
+      (remove)="facade.askToDelete($event)"
+      (dismissed)="closeDialog()"
+    />
+  }
+
+  @if (facade.deleting(); as target) {
+    <app-confirm-dialog
+      [open]="true"
+      [title]="t('users.delete.title')"
+      [message]="t('users.delete.message', {name: target.name})"
+      [confirmLabel]="t('users.action.delete')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      [confirmationText]="target.userName"
+      (confirmed)="facade.confirmDelete()"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+
+  @if (facade.resetting(); as target) {
+    <app-set-password-dialog
+      [open]="true"
+      [busy]="busy()"
+      [title]="t('users.reset.title')"
+      [message]="t('users.reset.message', {name: target.name})"
+      [passwordLabel]="t('users.field.newPassword')"
+      [repeatLabel]="t('users.field.repeatPassword')"
+      [hint]="t('users.field.passwordHint')"
+      [handoverHint]="t('users.reset.handoverHint')"
+      [weakMessage]="t('users.reset.weak')"
+      [mismatchMessage]="t('users.reset.mismatch')"
+      [confirmLabel]="t('users.reset.confirm')"
+      [busyLabel]="t('users.reset.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (submitted)="facade.confirmReset($event)"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+
+  @if (facade.inviting()) {
+    <app-invite-dialog
+      [open]="true"
+      [busy]="busy()"
+      [title]="t('users.invite.title')"
+      [message]="t('users.invite.message')"
+      [emailLabel]="t('users.field.email')"
+      [roleLabel]="t('users.field.role')"
+      [roles]="roleOptions()"
+      [invalidMessage]="t('users.invite.invalid')"
+      [noMailHint]="t('users.invite.noMailHint')"
+      [confirmLabel]="t('users.invite.confirm')"
+      [busyLabel]="t('users.invite.busy')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (invited)="facade.invite($event.email, $event.role)"
+      (dismissed)="facade.dismissInvite()"
+    />
+  }
+
+  @if (facade.issued(); as issued) {
+    <app-invitation-link-dialog
+      [open]="true"
+      [title]="t('users.issued.title')"
+      [message]="t('users.issued.message', {email: issued.email})"
+      [linkLabel]="t('users.issued.linkLabel')"
+      [link]="issued.link"
+      [warning]="t('users.issued.warning')"
+      [doneLabel]="t('users.issued.done')"
+      (dismissed)="facade.dismissIssued()"
+    />
+  }
+
+  @if (facade.revoking(); as invitation) {
+    <app-confirm-dialog
+      [open]="true"
+      [title]="t('users.revoke.title')"
+      [message]="t('users.revoke.message', {email: invitation.email})"
+      [confirmLabel]="t('users.action.revoke')"
+      [cancelLabel]="t('shared.actions.cancel')"
+      (confirmed)="facade.confirmRevoke()"
+      (dismissed)="facade.dismissDialogs()"
+    />
+  }
+</ng-container>

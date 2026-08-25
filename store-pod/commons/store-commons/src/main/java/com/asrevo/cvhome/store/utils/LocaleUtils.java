@@ -2,13 +2,13 @@ package com.asrevo.cvhome.store.utils;
 
 import java.util.Locale;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LocaleUtils {
+public final class LocaleUtils {
     private static final Locale[] locales = Locale.getAvailableLocales();
 
     private LocaleUtils() {

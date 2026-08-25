@@ -22,7 +22,6 @@ public class ReactiveWebConfig {
             e.setPageParameterName("page");
             e.setSizeParameterName("count");
             configurer.addCustomResolver(e);
-            configurer.addCustomResolver(new ReactiveOrgStorePrincipalInfoArgumentResolver());
         }
 
     }

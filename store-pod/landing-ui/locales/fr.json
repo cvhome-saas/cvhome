@@ -5,7 +5,10 @@
       "FEATURED_ITEMS": "Articles en vedette",
       "NEWLY_ADDED": "Nouveautés",
       "HOME_PRODUCT": "Produit d'accueil",
-      "RECOMMENDED": "Recommandé"
+      "RECOMMENDED": "Recommandé",
+      "SHOP_NOW": "Acheter",
+      "HERO_SLIDE": "Diapositive {index} sur {total}",
+      "SINCE": "Depuis {year}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Détails du produit",
@@ -18,7 +21,22 @@
       "AVAILABLE": "disponible",
       "PRODUCT_ALREADY_EXIST_IN_CART": "Déjà dans votre panier.",
       "ADD_TO_SECURE_CHECKOUT": "Ajouter au panier pour un paiement sécurisé.",
-      "OUT_OF_STOCK": "En rupture de stock"
+      "OUT_OF_STOCK": "En rupture de stock",
+      "SELECT_OPTION": "Choisir {option}",
+      "OPTION_REQUIRED": "Veuillez choisir {option}",
+      "SALE": "Promo",
+      "SAVE_PERCENT": "Économisez {percent}%",
+      "LOW_STOCK": "Plus que {count}",
+      "IN_STOCK": "En stock",
+      "SKU": "Réf.",
+      "IN_CART": "{count, plural, =1 {1 dans votre panier} other {# dans votre panier}}",
+      "DECREASE_QUANTITY": "Diminuer la quantité",
+      "INCREASE_QUANTITY": "Augmenter la quantité",
+      "ADDING": "Ajout…",
+      "GALLERY_IMAGE": "Image {index} sur {total}",
+      "UNAVAILABLE_COMBINATION": "Indisponible",
+      "DETAILS": "Détails",
+      "SPECIFICATIONS": "Caractéristiques"
     },
     "CHECKOUT": {
       "TITLE": "Paiement",
@@ -49,6 +67,14 @@
       "CITY": "Ville",
       "POSTAL_CODE": "Code Postal",
       "ADDRESS": "Adresse",
+      "PAYMENT_TYPE": "Type de paiement",
+      "SELECT_PAYMENT_TYPE": "Sélectionner le type de paiement",
+      "PAYMENT_TYPES": {
+        "COD": "Paiement à la livraison",
+        "STRIPE": "Stripe",
+        "PAYPAL": "PayPal",
+        "MANUAL_TRANSFER": "Virement Manuel"
+      },
       "AGREEMENT": "J'accepte les",
       "PLACE_ORDER": "Passer la commande",
       "ORDER_PLACED_SUCCESSFULLY": "Commande passée avec succès !",
@@ -59,6 +85,18 @@
       "REJECT": "Refuser",
       "ORDER_ID": "ID de commande",
       "FAILED_TO_PLACE_ORDER": "Échec de la passation de la commande",
+      "PAYMENT_FAILED": "Le paiement a échoué. Votre commande n'a pas été confirmée.",
+      "RESULT_LOADING": "Vérification du statut de votre commande...",
+      "RESULT_NOT_FOUND": "Nous n'avons pas trouvé cette commande.",
+      "RESULT_SUCCESS_TITLE": "Paiement Réussi",
+      "RESULT_SUCCESS_MESSAGE": "Votre commande a été confirmée. Merci pour votre achat !",
+      "RESULT_PENDING_TITLE": "Paiement en Attente",
+      "RESULT_PENDING_MESSAGE": "Nous attendons la confirmation de votre paiement.",
+      "RESULT_FAILED_TITLE": "Paiement Échoué",
+      "RESULT_FAILED_MESSAGE": "Votre paiement n'a pas pu être finalisé et votre commande a été annulée.",
+      "ORDER_NUMBER": "Numéro de Commande",
+      "COMPLETE_PAYMENT": "Finaliser le Paiement",
+      "BACK_TO_HOME": "Retour à l'Accueil",
       "LOGIN_REQUIRED_TITLE": "Connexion requise",
       "LOGIN_REQUIRED_DESCRIPTION": "Vous devez être connecté pour passer une commande.",
       "CANCEL": "Annuler",
@@ -71,7 +109,24 @@
       "HOME_TITLE": "Catégorie",
       "FILTER_BY_MANUFACTURER": "Filtrer par fabricant",
       "ALL": "Tout",
-      "NO_PRODUCTS_FOUND": "Aucun produit trouvé."
+      "NO_PRODUCTS_FOUND": "Aucun produit trouvé.",
+      "SORT_LABEL": "Trier par",
+      "SORT": {
+        "RELEVANCE": "Pertinence",
+        "NEWEST": "Plus récents",
+        "OLDEST": "Plus anciens"
+      },
+      "RESULTS_COUNT": "{count, plural, =0 {Aucun produit} =1 {1 produit} other {# produits}}",
+      "PAGE_OF": "Page {page} sur {total}",
+      "PREVIOUS": "Précédent",
+      "NEXT": "Suivant",
+      "FILTERS": "Filtres",
+      "CLEAR_FILTERS": "Effacer les filtres",
+      "FILTER_BY_OPTION": "Filtrer par {option}",
+      "LISTING_ERROR": "Impossible de charger les produits.",
+      "SHOW_FILTERS": "Afficher les filtres",
+      "PRODUCTS_IN_CATEGORY": "{count, plural, =0 {Aucun produit} =1 {1 produit} other {# produits}}",
+      "SUBCATEGORIES": "Sous-catégories"
     },
     "CUSTOMER": {
       "TITLE": "Mon compte",
@@ -106,7 +161,35 @@
       "PROCESSED": "Traitée",
       "DELIVERED": "Livrée",
       "REFUNDED": "Remboursée",
-      "CANCELED": "Annulée"
+      "CANCELED": "Annulée",
+      "CREATED": "Créée",
+      "CONFIRMED": "Confirmée",
+      "PENDING_PAYMENT": "Paiement en attente",
+      "ORDER_NOT_FOUND": "Commande introuvable.",
+      "ERROR_LOADING": "Impossible de charger votre compte pour le moment.",
+      "SIGNED_IN_AS": "Connecté en tant que {name}"
+    },
+    "BLOG": {
+      "TITLE": "Blog",
+      "SUBTITLE": "Actualités, guides et histoires de la boutique.",
+      "READ_MORE": "Lire la suite",
+      "MIN_READ": "{minutes} min de lecture",
+      "BY": "Par {author}",
+      "RELATED": "Articles liés",
+      "EMPTY": "Aucun article pour le moment.",
+      "FILTERED_BY": "Filtré par {value}",
+      "ALL_POSTS": "Tous les articles",
+      "PREVIOUS": "Plus récents",
+      "NEXT": "Plus anciens"
+    },
+    "FAQ": {
+      "TITLE": "Aide et FAQ",
+      "SUBTITLE": "Réponses aux questions les plus fréquentes.",
+      "EMPTY": "Aucune question publiée pour le moment."
+    },
+    "POLICY": {
+      "VERSION": "Version {version}",
+      "EFFECTIVE": "En vigueur à partir du {date}"
     }
   },
   "COMPONENTS": {
@@ -118,7 +201,13 @@
       "OUT_OF_STOCK": "En rupture de stock",
       "ADD_TO_CART": "Ajouter au panier",
       "QUICK_VIEW": "Aperçu rapide",
-      "VIEW_DETAILS": "Voir les détails"
+      "VIEW_DETAILS": "Voir les détails",
+      "FAILED_TO_REMOVED_PRODUCT": "Échec de la suppression du produit.",
+      "FAILED_TO_UPDATE_QUANTITY": "Échec de la mise à jour de la quantité.",
+      "SALE": "Promo",
+      "LOW_STOCK": "Stock limité",
+      "ADDED": "Ajouté",
+      "CATALOGUE_NO": "N°"
     },
     "HEADER": {
       "HOME_TITLE": "Accueil",
@@ -136,7 +225,15 @@
       },
       "LOGIN": "Connexion",
       "LOGOUT": "Se déconnecter",
-      "PROFILE": "Profil"
+      "PROFILE": "Profil",
+      "ANNOUNCEMENT_DISMISS": "Fermer l'annonce",
+      "ACCOUNT": "Compte",
+      "MAIN_NAVIGATION": "Navigation principale",
+      "SEARCH": "Rechercher",
+      "CART_WITH_COUNT": "Panier, {count, plural, =0 {vide} =1 {1 article} other {# articles}}",
+      "VIEW_ALL_IN": "Tout {name}",
+      "ANNOUNCEMENT": "Note",
+      "INDEX": "Catégories"
     },
     "FOOTER": {
       "SOCIAL_FACEBOOK": "Facebook",
@@ -145,7 +242,11 @@
       "SOCIAL_INSTAGRAM": "Instagram",
       "SOCIAL_TIKTOK": "TikTok",
       "LEGAL": "Légal",
-      "RIGHT_RESERVED": "Tous droits réservés."
+      "RIGHT_RESERVED": "Tous droits réservés.",
+      "SHOP": "Boutique",
+      "INFORMATION": "Informations",
+      "CONTACT": "Contact",
+      "FOLLOW_US": "Suivez-nous"
     },
     "CART": {
       "QTY": "Qté",
@@ -156,15 +257,117 @@
       "CHECKOUT": "Paiement",
       "CONTINUE_SHOPPING": "Continuer les achats",
       "OR": "ou",
-      "CART_IS_EMPTY": "Votre panier est vide."
+      "CART_IS_EMPTY": "Votre panier est vide.",
+      "EMPTY_TITLE": "Votre panier est vide",
+      "EMPTY_BODY": "Ajoutez un article qui vous plaît, il apparaîtra ici.",
+      "QUANTITY": "Quantité",
+      "VIEW_CART": "Voir le panier",
+      "ITEMS_COUNT": "{count, plural, =0 {Aucun article} =1 {1 article} other {# articles}}",
+      "DECREASE_QUANTITY": "Diminuer la quantité",
+      "INCREASE_QUANTITY": "Augmenter la quantité"
     },
     "CHECKOUT": {},
     "CONTENT": {},
-    "CATEGORY": {}
+    "CATEGORY": {},
+    "SEARCH": {
+      "LABEL": "Rechercher",
+      "PLACEHOLDER": "Rechercher des catégories et des pages…",
+      "NOT_AVAILABLE": "La recherche n'est pas encore disponible dans cette boutique.",
+      "NO_RESULTS": "Aucune correspondance.",
+      "CATEGORIES": "Catégories",
+      "PAGES": "Pages",
+      "PRODUCTS": "Produits",
+      "SUGGESTIONS_ONLY": "Catégories et pages uniquement"
+    }
   },
-  "HOME": {},
-  "PRODUCT": {},
-  "CHECKOUT": {},
-  "CONTENT": {},
-  "CATEGORY": {}
+  "ERRORS": {
+    "CODE": {
+      "CATALOG_PRODUCT_NOT_FOUND": "Ce produit n'est plus disponible.",
+      "CATALOG_RESERVATION_INSUFFICIENT_INVENTORY": "Il ne reste que {available} de {sku}. Veuillez réduire la quantité.",
+      "CATALOG_RESERVATION_EMPTY": "Votre panier ne contient aucun article à réserver.",
+      "CHECKOUT_CART_NOT_FOUND": "Nous n'avons pas trouvé votre panier. Il a peut-être expiré.",
+      "CHECKOUT_CART_PRODUCT_NOT_PURCHASABLE": "Ce produit ne peut pas être acheté pour le moment.",
+      "CHECKOUT_ORDER_NOT_FOUND": "Nous n'avons pas trouvé cette commande.",
+      "CHECKOUT_ORDER_LOGIN_REQUIRED": "Veuillez vous connecter pour passer votre commande.",
+      "CHECKOUT_ORDER_CLIENT_MISMATCH": "Cette commande appartient à une autre boutique.",
+      "PAYMENT_INITIATE_REJECTED": "Votre paiement a été refusé. Veuillez essayer un autre moyen de paiement.",
+      "PAYMENT_INITIATE_FAILED": "Nous confirmons encore votre paiement. Ne payez pas à nouveau — consultez vos commandes dans quelques minutes.",
+      "PAYMENT_CONFIGURATION_MISSING": "Cette boutique n'accepte pas les paiements pour le moment.",
+      "PAYMENT_PROCESSOR_UNSUPPORTED": "Ce moyen de paiement n'est pas disponible pour cette boutique.",
+      "CUA_REGISTRATION_EMAIL_TAKEN": "Un compte existe déjà avec cette adresse e-mail.",
+      "CUA_REGISTRATION_USERNAME_TAKEN": "Ce nom d'utilisateur est déjà pris.",
+      "CUSTOMER_COUNTRY_UNSUPPORTED": "Nous ne livrons pas dans le pays sélectionné.",
+      "CUSTOMER_ZONE_UNSUPPORTED": "La région sélectionnée n'est pas valide pour ce pays.",
+      "COMMON_UNAUTHENTICATED": "Veuillez vous connecter pour continuer.",
+      "COMMON_VALIDATION_FAILED": "Veuillez vérifier les champs signalés et réessayer.",
+      "COMMON_REMOTE_UNAVAILABLE": "Ce service est injoignable pour le moment. Veuillez réessayer sous peu.",
+      "COMMON_REMOTE_TIMEOUT": "L'opération a pris trop de temps. Veuillez réessayer.",
+      "CLIENT_NETWORK_UNAVAILABLE": "Vous semblez hors ligne. Vérifiez votre connexion et réessayez.",
+      "CLIENT_CART_EMPTY": "Votre panier est vide."
+    },
+    "CATEGORY": {
+      "VALIDATION": "Veuillez vérifier les informations saisies et réessayer.",
+      "MALFORMED": "Nous n'avons pas pu lire cette requête. Veuillez réessayer.",
+      "CONVERSION": "Certaines informations saisies ne sont pas valides.",
+      "UNAUTHENTICATED": "Veuillez vous connecter pour continuer.",
+      "FORBIDDEN": "Vous n'avez pas accès à cela.",
+      "NOT_FOUND": "Nous n'avons pas trouvé ce que vous demandez.",
+      "CONFLICT": "Cela entre en conflit avec un élément existant.",
+      "PAYLOAD_TOO_LARGE": "Ce fichier est trop volumineux.",
+      "UNPROCESSABLE": "Nous n'avons pas pu traiter cette demande.",
+      "STORAGE": "Nous n'avons pas pu accéder aux fichiers stockés. Veuillez réessayer.",
+      "INTERNAL": "Une erreur est survenue de notre côté. Veuillez réessayer.",
+      "REMOTE_SERVICE": "Un service dont nous dépendons ne répond pas. Veuillez réessayer sous peu.",
+      "TIMEOUT": "L'opération a pris trop de temps. Veuillez réessayer.",
+      "NETWORK": "Vous semblez hors ligne. Vérifiez votre connexion et réessayez.",
+      "UNKNOWN": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "GENERIC": "Une erreur est survenue. Veuillez réessayer.",
+    "TRACE": "Référence : {traceId}",
+    "UI": {
+      "TITLE": "Une erreur est survenue",
+      "RETRY": "Réessayer",
+      "GO_HOME": "Retour à l'accueil",
+      "NOT_FOUND_TITLE": "Page introuvable",
+      "NOT_FOUND_MESSAGE": "La page que vous cherchez n'existe pas ou a été déplacée."
+    }
+  },
+  "COMMON": {
+    "LOADING": "Chargement…",
+    "RETRY": "Réessayer",
+    "BACK_TO_HOME": "Retour à l'accueil",
+    "CONTINUE_SHOPPING": "Continuer mes achats",
+    "CLOSE": "Fermer",
+    "MENU": "Menu",
+    "SKIP_TO_CONTENT": "Aller au contenu",
+    "VIEW_ALL": "Tout voir",
+    "SEARCH": "Rechercher",
+    "HOME": "Accueil",
+    "LANGUAGE_LABEL": "Langue",
+    "CURRENCY": "Devise",
+    "ITEMS": "Articles"
+  },
+  "STATES": {
+    "REDIRECTING_LOGIN": "Redirection vers la connexion…",
+    "AUTHENTICATING": "Connexion en cours…",
+    "ERROR_TITLE": "Une erreur est survenue",
+    "ERROR_BODY": "Impossible de charger cette page. Veuillez réessayer.",
+    "ERROR_REFERENCE": "Référence : {digest}",
+    "NOT_FOUND_TITLE": "Page introuvable",
+    "NOT_FOUND_BODY": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "PRODUCT_NOT_FOUND_TITLE": "Produit introuvable",
+    "PRODUCT_NOT_FOUND_BODY": "Ce produit n'est plus disponible.",
+    "CATEGORY_NOT_FOUND_TITLE": "Catégorie introuvable",
+    "CATEGORY_NOT_FOUND_BODY": "Cette catégorie n'existe pas ou a été déplacée.",
+    "CONTENT_NOT_FOUND_TITLE": "Page introuvable",
+    "CONTENT_NOT_FOUND_BODY": "Cette page n'existe pas ou a été déplacée.",
+    "EMPTY_CART_TITLE": "Votre panier est vide",
+    "EMPTY_CART_BODY": "Ajoutez un article qui vous plaît, il apparaîtra ici.",
+    "EMPTY_LISTING_TITLE": "Aucun produit trouvé",
+    "EMPTY_LISTING_BODY": "Essayez une autre catégorie ou effacez vos filtres.",
+    "EMPTY_ORDERS_TITLE": "Aucune commande pour l'instant",
+    "EMPTY_ORDERS_BODY": "Vos commandes apparaîtront ici après votre premier achat.",
+    "EMPTY_SEARCH_TITLE": "Aucun résultat",
+    "EMPTY_SEARCH_BODY": "Essayez un autre mot."
+  }
 }

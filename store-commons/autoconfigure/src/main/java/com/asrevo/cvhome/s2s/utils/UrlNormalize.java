@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 import org.springframework.security.oauth2.jwt.JwtException;
 
-public class UrlNormalize {
+public final class UrlNormalize {
 
     private UrlNormalize() {
     }
@@ -22,13 +22,13 @@ public class UrlNormalize {
             int port = uri.getPort();
 
             if (scheme == null || host == null) {
-                throw new JwtException("Issuer URI must include scheme and host: " + uriString);
+                throw new JwtException(String.format("Issuer URI must include scheme and host: %s", uriString));
             }
 
             scheme = scheme.toLowerCase();
             host = host.toLowerCase();
 
-            if (("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443)) {
+            if ("http".equals(scheme) && port == 80 || "https".equals(scheme) && port == 443) {
                 port = -1;
             }
 
@@ -37,7 +37,7 @@ public class UrlNormalize {
                     .toString();
 
         } catch (URISyntaxException e) {
-            throw new JwtException("Malformed issuer URI string: " + uriString, e);
+            throw new JwtException(String.format("Malformed issuer URI string: %s", uriString), e);
         }
     }
 

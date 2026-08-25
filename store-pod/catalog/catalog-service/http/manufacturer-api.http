@@ -1,0 +1,43 @@
+# ManufacturerApi — com.asrevo.cvhome.catalog.api.v1.ManufacturerApi (@RequestMapping "/api/v1")
+# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### create a brand — 201, echoes the body with its id
+# @name createBrand
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturer?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-brand", "order": 5, "descriptions": [{"language": "en", "name": "HTTP brand"}]}
+
+> {%
+    client.test("created", function () {
+        client.assert(response.status === 201, "status " + response.status);
+        client.global.set("BRAND_ID", response.body.id);
+    });
+%}
+
+### list, filtered by name fragment
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturers?store={{STORE_ID}}&lang={{LANG}}&name=http
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### one brand, every language
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturer/{{BRAND_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### is the code taken
+GET {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturer/unique?store={{STORE_ID}}&lang={{LANG}}&code=http-brand
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### update — 200, no body
+PUT {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturer/{{BRAND_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{"code": "http-brand", "order": 6, "descriptions": [{"language": "en", "name": "HTTP brand, renamed"}]}
+
+### the brands present in a category subtree (storefront facet) — 404 CATALOG.CATEGORY.NOT_FOUND when unknown
+GET {{LANDING_UI_URL}}/catalog/api/v1/category/1/manufacturer?store={{STORE_ID}}&lang={{LANG}}
+
+### delete — 404 CATALOG.MANUFACTURER.NOT_FOUND on a second run
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/manufacturer/{{BRAND_ID}}?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}

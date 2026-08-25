@@ -1,0 +1,24 @@
+spring:
+  application:
+    # Must match the key under com.asrevo.cvhome.services in common-config.yml — server.port resolves through it.
+    name: pod-registry
+  config:
+    import:
+      - "classpath:common-config.yml"
+  datasource:
+    hikari:
+      # Overrides common-config.yml, which sets this to ${spring.application.name}. That works for every other
+      # service because their names are valid schema identifiers; `pod-registry` is not, and the hyphen would leave
+      # the connection pointed at a schema that does not exist. Every @Table pins schema = "pod_registry" anyway, so
+      # this is belt-and-braces — but an unqualified query added later would otherwise fail in a confusing way.
+      schema: pod_registry
+  security:
+    oauth2:
+      client:
+        registration:
+          s2s:
+            provider: uaa
+            client-id: store-core@service.store-core.internal
+            client-secret: hLwOF59NEOdMzYYrfxUbQEGVK1uTczj7
+            authorization-grant-type: client_credentials
+            scope: store_core

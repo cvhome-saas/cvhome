@@ -1,5 +1,17 @@
 #!/bin/bash
-npm i ; npm run build;npm prune --omit=dev;
+set -euo pipefail
+npm ci
+npm run build
 docker build -t store-front-app .
-docker run -p 8110:8110 store-front-app
-docker images | grep store-front-app
+docker run --rm -p 8110:8110 \
+  -e FALLBACK_STORE_ID="${FALLBACK_STORE_ID:-}" \
+  -e STATIC_ASSETS_SYNC_ENABLED="${STATIC_ASSETS_SYNC_ENABLED:-}" \
+  -e STATIC_ASSETS_S3_BUCKET="${STATIC_ASSETS_S3_BUCKET:-}" \
+  -e STATIC_ASSETS_S3_PREFIX="${STATIC_ASSETS_S3_PREFIX:-}" \
+  -e STATIC_ASSETS_BASE_URL="${STATIC_ASSETS_BASE_URL:-}" \
+  -e STATIC_ASSETS_S3_ENDPOINT="${STATIC_ASSETS_S3_ENDPOINT:-}" \
+  -e STATIC_ASSETS_S3_FORCE_PATH_STYLE="${STATIC_ASSETS_S3_FORCE_PATH_STYLE:-}" \
+  -e AWS_REGION="${AWS_REGION:-}" \
+  -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}" \
+  -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}" \
+  store-front-app

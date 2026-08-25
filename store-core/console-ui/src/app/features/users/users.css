@@ -1,0 +1,164 @@
+:host {
+  display: contents;
+}
+
+/*
+ * The page owns its own rhythm, as `payments.css` does. `.page-body` was cited here and in
+ * `ARCHITECTURE.md` and is defined nowhere.
+ */
+.team-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*
+ * The tab strip is a control, not a band: it sizes to its tabs and sits at the start of the row
+ * rather than stretching the width of the page. As a full-width bar with two tabs in it, the
+ * 900px of empty rule to their right read as a broken table header.
+ */
+app-tab-switcher {
+  align-self: flex-start;
+}
+
+/*
+ * The table is the page. It had been sharing the width with a detail rail that was empty on
+ * arrival and permanently a third of the page, which squeezed five columns hard enough that
+ * `app-data-table` dropped them to stacked cards. The detail is a dialog now.
+ */
+.cell-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-strong);
+  color: var(--accent-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* A button that reads as text: the affordance is the hover and the row's own interactive state. */
+.identity {
+  display: grid;
+  gap: 0.15rem;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.identity strong {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity:hover strong {
+  color: var(--primary-emphasis);
+}
+
+.identity:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.email {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Latin data inside a page that may be right-to-left. */
+  unicode-bidi: plaintext;
+}
+
+.self-tag {
+  flex: none;
+  padding-inline: 0.35rem;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.cell-username {
+  overflow: hidden;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* `latin` is the app's name for plaintext bidi; the class is declared here because it is a cell. */
+.latin {
+  unicode-bidi: plaintext;
+}
+
+/*
+ * Roles are badges rather than a joined sentence. Two operators with "Store administrator" and
+ * "Store administrator, Store moderator" are the same shape as prose and different at a glance
+ * as chips, which is the question this column is actually asked.
+ */
+.cell-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+
+.muted-value {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+}
+
+.cell-email {
+  overflow: hidden;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  unicode-bidi: plaintext;
+}
+
+.cell-date {
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+}
+
+.cell-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+/* The chevron points the way the page reads, so it mirrors under RTL. */
+.cell-actions app-icon {
+  transform: scaleX(1);
+}
+
+:host-context([dir='rtl']) .cell-actions app-icon {
+  transform: scaleX(-1);
+}

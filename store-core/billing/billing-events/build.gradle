@@ -1,0 +1,12 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-core:billing:billing-commons')
+    api libs.namastack.outbox.api
+    compileOnly libs.spring.data.commons
+    compileOnly libs.spring.data.relational
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

@@ -151,8 +151,9 @@ public class DefaultServiceInstance implements ServiceInstance {
 
     @Override
     public String toString() {
-        return "DefaultServiceInstance{" + "instanceId='" + instanceId + '\'' + ", serviceId='" + serviceId + '\''
-                + ", host='" + host + '\'' + ", port=" + port + ", secure=" + secure + ", metadata=" + metadata + '}';
+        return String.format(
+                "DefaultServiceInstance{instanceId='%s', serviceId='%s', host='%s', port=%d, secure=%s, metadata=%s}",
+                instanceId, serviceId, host, port, secure, metadata);
     }
 
     @Override

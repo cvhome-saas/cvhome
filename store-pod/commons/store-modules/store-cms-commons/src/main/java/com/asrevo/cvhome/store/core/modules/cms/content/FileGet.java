@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import com.asrevo.cvhome.store.core.entity.content.FileContentType;
 import com.asrevo.cvhome.store.core.entity.content.OutputContentFile;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetListFailedException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetNotFoundException;
+import com.asrevo.cvhome.store.core.modules.cms.errors.AssetReadFailedException;
 
 /**
  * Methods to retrieve the static content from the CMS
@@ -14,13 +16,13 @@ import com.asrevo.cvhome.store.core.exception.ServiceException;
  */
 public interface FileGet {
 
-    OutputContentFile getFile(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType,
-                              String contentName) throws ServiceException;
+    OutputContentFile getFile(String merchantStoreCode, Optional<String> path, FileContentType fileContentType,
+                              String contentName) throws AssetNotFoundException, AssetReadFailedException;
 
-    List<String> getFileNames(final String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
-            throws ServiceException;
+    List<String> getFileNames(String merchantStoreCode, Optional<String> path, FileContentType fileContentType)
+            throws AssetListFailedException;
 
-    List<OutputContentFile> getFiles(final String merchantStoreCode, Optional<String> path,
-                                     FileContentType fileContentType) throws ServiceException;
+    List<OutputContentFile> getFiles(String merchantStoreCode, Optional<String> path,
+                                     FileContentType fileContentType) throws AssetListFailedException;
 
 }

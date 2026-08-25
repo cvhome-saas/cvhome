@@ -4,8 +4,8 @@ import java.util.Objects;
 
 import com.asrevo.cvhome.checkout.entity.reference.zone.Zone;
 import com.asrevo.cvhome.checkout.entity.reference.zone.ZoneDescription;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 import com.asrevo.cvhome.store.core.populator.AbstractDataPopulator;
 import com.asrevo.cvhome.store.model.references.ReadableZone;
 

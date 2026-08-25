@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.dt-input {
+  inline-size: 100%;
+  min-block-size: 2.25rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: var(--text-xs);
+  transition:
+    border-color var(--default-transition-duration),
+    box-shadow var(--default-transition-duration);
+}
+
+.dt-input:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.dt-input[aria-invalid='true'] {
+  border-color: var(--chart-5-foreground);
+}
+
+.dt-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

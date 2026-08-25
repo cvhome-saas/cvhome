@@ -1,20 +1,22 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api project(':store-pod:commons:store-commons')
-	api project(':store-pod:merchant:merchant-external-api')
-	api project(':store-pod:catalog:catalog-external-api')
-	api project(':store-pod:checkout:checkout-commons')
-	api project(':store-pod:commons:customer:customer-core')
-	implementation project(':store-pod:commons:reference:reference-core')
-	implementation libs.commons.beanutils
-	compileOnly libs.spring.data.jpa
-	compileOnly libs.jakarta.validation.api
-	compileOnly libs.jackson.annotations
-	compileOnly libs.apache.commons.lang3
-	compileOnly libs.lombok
-	compileOnly libs.hibernate.core
-	annotationProcessor libs.lombok
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:merchant:merchant-external-api')
+    api project(':store-pod:catalog:catalog-external-api')
+    api project(':store-pod:inventory:inventory-external-api')
+    api project(':store-pod:payment:payment-external-api')
+    api project(':store-pod:checkout:checkout-commons')
+    api project(':store-pod:commons:customer:customer-core')
+    implementation project(':store-pod:commons:reference:reference-core')
+    implementation libs.commons.beanutils
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.jackson.annotations
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
 }

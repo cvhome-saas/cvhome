@@ -1,0 +1,164 @@
+:host {
+  display: contents;
+}
+
+/* Rail, work area, evidence. The middle column takes what the other two do not need. */
+.wizard {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr) 17rem;
+  gap: 1rem;
+  align-items: start;
+}
+
+/*
+ * The wizard's steps stack their own panels — see `editor-card.css`, which every step includes.
+ *
+ * It cannot be done from here: `:host { display: contents }` hands the shell's `.workspace` rhythm
+ * to this page's children, but it stops at `app-busy-overlay`, and the panels themselves live inside
+ * each step's template where this component's styles do not reach.
+ */
+
+.rail {
+  position: sticky;
+  inset-block-start: 1rem;
+  padding: .85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+}
+
+/*
+ * The step's own panels, and the evidence column's.
+ *
+ * The shell's 1.5rem rhythm stops at the `busy-overlay` boundary — the structural reason
+ * `order-details.css` documents — so each stack inside it owns one gap rather than every panel
+ * carrying a margin.
+ */
+.step-body,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.side {
+  position: sticky;
+  inset-block-start: 1rem;
+}
+
+
+.side-body {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  padding: 1rem 1.1rem;
+}
+
+.checklist,
+.locales {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--foreground-subtle);
+  font-size: var(--text-2xs);
+}
+
+.check app-icon {
+  color: var(--chart-4-foreground);
+}
+
+.check.done {
+  color: var(--foreground);
+}
+
+.check.done app-icon {
+  color: var(--primary-emphasis);
+}
+
+.check span {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.req {
+  flex: none;
+  padding: .05rem .35rem;
+  border-radius: var(--radius-full);
+  background: var(--input);
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.publish-note {
+  margin: 0;
+  color: var(--chart-4-foreground);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+
+.locale {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .5rem;
+  font-size: var(--text-2xs);
+}
+
+.locale-code {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.locale-name {
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.locale-state {
+  color: var(--foreground-quiet);
+  font-size: var(--text-3xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.locale-state.empty {
+  color: var(--chart-4-foreground);
+}
+
+/* The evidence column goes under the work area before the rail does — the rail is navigation. */
+@media (max-width: 1180px) {
+  .wizard {
+    grid-template-columns: 14rem minmax(0, 1fr);
+  }
+
+  .side {
+    position: static;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .wizard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    position: static;
+  }
+}

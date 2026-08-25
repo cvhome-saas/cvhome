@@ -1,0 +1,80 @@
+/*
+ * How a modal arrives. Included per component beside the dialog's own stylesheet, the way
+ * `field.css` is — Angular scopes it, so the bare `dialog` selector matches only that component's
+ * own element and nothing else on the page.
+ *
+ * **Why this exists.** Eight dialogs each carried a copy of this and they had drifted into three
+ * different answers: seven faded and rose 0.5rem over the theme's default duration, one scaled in
+ * over a hand-written curve, and the scrim was a literal black at 45%, at 55%, and as a keyframed
+ * fade. This is one definition of the console's modal entrance.
+ *
+ * **What the seven were missing, and it is the reason a modal felt wrong here:** none of them
+ * animated the backdrop at all. The box eased in over 200ms while the scrim slammed to full
+ * strength in a single frame, so the page went dark before the dialog had begun to arrive. The
+ * scrim now resolves with the box.
+ *
+ * The scrim is `--scrim`, the token the navigation drawer already dims the page with. A literal is
+ * a defect under the Token Rule, and it is also why the scrim did not lighten on Daylight — three
+ * hard-coded blacks over a near-white page.
+ *
+ * **There is deliberately no exit.** `close()` flips `display` to `none` at once, and the CSS-only
+ * answer for that — `transition-behavior: allow-discrete` on `overlay` and `display`, with
+ * `@starting-style` — does not run here. `image-preview.ts` recorded the same finding before this
+ * file existed, and was re-confirmed while writing it: with the transition forced to three seconds
+ * and `!important`, the box is still gone on the next frame. A dialog that needs to animate out
+ * uses the pattern `image-preview` settled on — a `closing` class playing a reverse keyframe, with
+ * the real `close()` deferred until it finishes — which is component behavior rather than a
+ * stylesheet, and is why it is not in this file.
+ */
+
+dialog::backdrop {
+  background: var(--scrim);
+}
+
+/*
+ * The fade is not inside the motion-preference query. It is the feedback that something arrived,
+ * and a modal that appears between two frames reads as a glitch at any setting; what belongs to
+ * preference is the travel, below.
+ */
+dialog {
+  opacity: 1;
+  transition: opacity 220ms ease-out;
+}
+
+dialog::backdrop {
+  opacity: 1;
+  transition: opacity 220ms ease-out;
+}
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+  }
+
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/*
+ * The movement, only where movement is welcome.
+ *
+ * A modal in this system is a surface brought forward rather than a card sliding up a page, so it
+ * settles out of a slight recess instead of rising from below, on an exponential ease-out that
+ * arrives decisively and stops. Under reduced motion the fade above still runs; what goes is the
+ * travel, which is the part that causes trouble.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  dialog {
+    transform: none;
+    transition:
+      opacity 220ms ease-out,
+      transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @starting-style {
+    dialog[open] {
+      transform: scale(0.97) translateY(0.5rem);
+    }
+  }
+}

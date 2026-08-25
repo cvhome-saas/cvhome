@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/features/content/components/media-tab/media-tab.html"
+        ],
+        "createdAt": "2026-08-24T05:38:46.716Z",
+        "reason": "false positive: img src is an Angular [src]=asset.url binding, populated at runtime from the media API"
+      }
+    ]
+  }
+}

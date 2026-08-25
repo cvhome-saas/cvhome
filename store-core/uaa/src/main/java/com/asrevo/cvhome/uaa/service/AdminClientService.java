@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.dto.ClientSummary;
-import com.asrevo.cvhome.uaa.exception.ResourceNotExistException;
+import com.asrevo.cvhome.uaa.errors.ClientNotFoundException;
 import com.asrevo.cvhome.uaa.mapper.ClientClientDetailsMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -58,10 +58,10 @@ public class AdminClientService {
         return updatedRows > 0;
     }
 
-    public ClientDetails findById(String id) {
+    public ClientDetails findById(String id) throws ClientNotFoundException {
         RegisteredClient client = this.clients.findById(id);
         if (Objects.isNull(client)) {
-            throw new ResourceNotExistException("Client not found with id " + id);
+            throw ClientNotFoundException.of(id);
         }
         return ClientClientDetailsMapper.toClientDetails(client);
     }
@@ -90,14 +90,23 @@ public class AdminClientService {
         }
     }
 
-    public void resetSecret(String id, String newSecret) {
+    /**
+     * Rotates a client's secret.
+     *
+     * <p>
+     * A missing client is now a 404 rather than a silent success. The previous {@code if (client != null)} answered
+     * HTTP 200 without rotating anything, so an operator rotating a secret for a mistyped id was told it had worked.
+     * </p>
+     */
+    public void resetSecret(String id, String newSecret) throws ClientNotFoundException {
         RegisteredClient client = clients.findById(id);
-        if (client != null) {
-            RegisteredClient updatedClient = RegisteredClient.from(client)
-                    .clientSecret(encoder.encode(newSecret))
-                    .build();
-            clients.save(updatedClient);
+        if (client == null) {
+            throw ClientNotFoundException.of(id);
         }
+        RegisteredClient updatedClient = RegisteredClient.from(client)
+                .clientSecret(encoder.encode(newSecret))
+                .build();
+        clients.save(updatedClient);
     }
 
 }

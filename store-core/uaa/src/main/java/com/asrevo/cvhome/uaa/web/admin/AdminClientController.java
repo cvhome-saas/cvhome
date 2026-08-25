@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.uaa.dto.ClientDetails;
 import com.asrevo.cvhome.uaa.dto.ClientSummary;
+import com.asrevo.cvhome.uaa.errors.ClientNotFoundException;
 import com.asrevo.cvhome.uaa.service.AdminClientService;
 import com.asrevo.cvhome.uaa.service.ClientAuthMethod;
 import com.asrevo.cvhome.uaa.service.OAuthGrantType;
@@ -52,7 +53,8 @@ public class AdminClientController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @PostMapping("{id}/reset-secret")
-    public void resetSecret(@PathVariable String id, @RequestBody ResetSecretRequest req) {
+    public void resetSecret(@PathVariable String id, @RequestBody ResetSecretRequest req)
+            throws ClientNotFoundException {
         adminClientService.resetSecret(id, req.newSecret());
     }
 
@@ -64,7 +66,7 @@ public class AdminClientController {
 
     @PreAuthorize("hasAuthority('SCOPE_super_admin') or hasRole('SUPER_ADMIN')")
     @GetMapping("{id}")
-    public ClientDetails findOne(@PathVariable String id) {
+    public ClientDetails findOne(@PathVariable String id) throws ClientNotFoundException {
         return adminClientService.findById(id);
     }
 

@@ -1,0 +1,46 @@
+# MerchantStoreApi — requests travel through both gateways.
+
+### canonical public store read
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/store?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Accept: application/json
+
+### compatibility public store read
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/store/{{STORE_ID}}?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Accept: application/json
+
+### compatibility path cannot select another tenant — 400
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/store/{{STORE_ID_2}}?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Accept: application/problem+json
+
+### private store read
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/private/store?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Accept: application/json
+
+### supported languages
+GET {{SELLER_UI_URL}}/spg/merchant/api/v1/store/languages?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Accept: application/json
+
+### update store
+PUT {{SELLER_UI_URL}}/spg/merchant/api/v1/private/store?store={{STORE_ID}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "id": "{{STORE_ID}}",
+  "name": "Riyadh Fashion Hub",
+  "org": "{{ORG_ID}}",
+  "email": "info@riyadhfashion.sa",
+  "phone": "+966501234567",
+  "theme": "BASIS",
+  "colorTheme": "LIGHT",
+  "currency": "SAR",
+  "defaultLanguage": "ar",
+  "supportedLanguages": ["ar", "en"]
+}
+
+### delete another store is permission-gated — 403
+DELETE {{SELLER_UI_URL}}/spg/merchant/api/v1/private/store?store={{STORE_ID_2}}&pod={{POD_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+###

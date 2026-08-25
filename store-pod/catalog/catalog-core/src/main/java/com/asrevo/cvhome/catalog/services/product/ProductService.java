@@ -1,55 +1,79 @@
 package com.asrevo.cvhome.catalog.services.product;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.domain.Page;
-
-import com.asrevo.cvhome.catalog.entity.product.Product;
-import com.asrevo.cvhome.catalog.entity.product.ProductCriteria;
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ProductReservationStatus;
+import com.asrevo.cvhome.billing.commons.errors.EntitlementExceededException;
+import com.asrevo.cvhome.catalog.entity.Product;
+import com.asrevo.cvhome.catalog.errors.CategoryAlreadyAttachedException;
+import com.asrevo.cvhome.catalog.errors.CategoryNotFoundException;
+import com.asrevo.cvhome.catalog.errors.CategoryReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ManufacturerReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.errors.ProductTypeReferenceUnresolvableException;
+import com.asrevo.cvhome.catalog.model.product.LightPersistableProduct;
+import com.asrevo.cvhome.catalog.model.product.PersistableProductDefinition;
+import com.asrevo.cvhome.catalog.model.product.ProductFilter;
+import com.asrevo.cvhome.catalog.model.product.ReadableMinimalProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProduct;
+import com.asrevo.cvhome.catalog.model.product.ReadableProductDefinition;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.catalog.ProductReservationList;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
-import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityService;
+import com.asrevo.cvhome.store.core.model.entity.ReadableEntityList;
 
-public interface ProductService extends SalesManagerEntityService<Long, Product> {
-
-    Optional<Product> retrieveById(Long id, StoreMerchantId store);
-
-    List<Product> getProducts(List<Long> categoryIds);
+/**
+ * Products: the listing, the product page, the console's definition, and the small writes around them.
+ */
+public interface ProductService {
 
     /**
-     * The method to be used
+     * The listing. A single category filter widens to that category's subtree.
      */
-    Product saveProduct(Product product) throws ServiceException;
-
-    boolean exists(String sku, StoreMerchantId store);
-
-    List<Product> listByStore(StoreMerchantId store);
-
-    Product getBySeUrl(StoreMerchantId store, String seUrl, Locale locale);
+    ReadableEntityList<ReadableProduct> list(StoreMerchantId store, ProductFilter filter, LanguageCode language,
+                                             Pageable pageable);
 
     /**
-     * Product and or product variant
+     * The storefront's product page, by slug in the shopper's language.
      */
-    Product getBySku(String productCode, StoreMerchantId merchant, LanguageCode language) throws ServiceException;
-
-    Product getBySku(String productCode, StoreMerchantId merchant) throws ServiceException;
+    ReadableProduct getByFriendlyUrl(StoreMerchantId store, String friendlyUrl, LanguageCode language)
+            throws ProductNotFoundException;
 
     /**
-     * Find a product for a specific merchant
+     * The product data a cart or order needs, by sku.
      */
-    Product findOne(Long id, StoreMerchantId merchant);
+    ReadableMinimalProduct getBySku(StoreMerchantId store, String sku, LanguageCode language)
+            throws ProductNotFoundException;
 
-    ProductReservationStatus reserve(StoreMerchantId store, ProductReservationList productReservation)
-            throws ServiceException;
+    ReadableProductDefinition getDefinition(StoreMerchantId store, Long id, LanguageCode language)
+            throws ProductNotFoundException;
 
-    Page<Product> findAll(ProductCriteria criteria, StoreMerchantId store);
+    boolean exists(StoreMerchantId store, String sku);
 
-    ProductDetails getDetailedProduct(StoreMerchantId store, String sku, LanguageCode lang);
+    /**
+     * @throws EntitlementExceededException the store's plan caps products and the cap is reached
+     */
+    Long create(StoreMerchantId store, PersistableProductDefinition product)
+            throws ManufacturerReferenceUnresolvableException, ProductTypeReferenceUnresolvableException,
+            CategoryReferenceUnresolvableException, EntitlementExceededException;
 
+    void update(StoreMerchantId store, Long id, PersistableProductDefinition product)
+            throws ProductNotFoundException, ManufacturerReferenceUnresolvableException,
+            ProductTypeReferenceUnresolvableException, CategoryReferenceUnresolvableException;
+
+    /**
+     * The console's inline edit: the two switches, nothing else.
+     */
+    void patch(StoreMerchantId store, Long id, LightPersistableProduct product) throws ProductNotFoundException;
+
+    void addToCategory(StoreMerchantId store, Long productId, Long categoryId)
+            throws ProductNotFoundException, CategoryNotFoundException, CategoryAlreadyAttachedException;
+
+    void removeFromCategory(StoreMerchantId store, Long productId, Long categoryId)
+            throws ProductNotFoundException, CategoryNotFoundException;
+
+    void delete(StoreMerchantId store, Long id) throws ProductNotFoundException;
+
+    /**
+     * Deletes a product already in hand, with its image files. For the category cascade.
+     */
+    void delete(StoreMerchantId store, Product product);
 }

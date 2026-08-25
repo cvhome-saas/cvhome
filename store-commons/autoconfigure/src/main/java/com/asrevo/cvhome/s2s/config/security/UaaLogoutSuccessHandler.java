@@ -29,9 +29,12 @@ public class UaaLogoutSuccessHandler {
 
     private String extractLogoutUrl(ServerWebExchange exchange, String idToken) {
         ServerHttpRequest request = exchange.getRequest();
-        String idTokenHintParam = Optional.ofNullable(idToken).map(it -> "&id_token_hint=" + it).orElse("");
-        String redirectUri = request.getURI().getScheme() + "://" + request.getURI().getAuthority();
-        return this.endSessionEndpoint + "?post_logout_redirect_uri=" + redirectUri + idTokenHintParam;
+        String idTokenHintParam = Optional.ofNullable(idToken)
+                .map(it -> String.format("&id_token_hint=%s", it))
+                .orElse("");
+        String redirectUri = String.format("%s://%s", request.getURI().getScheme(), request.getURI().getAuthority());
+        return String.format("%s?post_logout_redirect_uri=%s%s", this.endSessionEndpoint, redirectUri,
+                idTokenHintParam);
     }
 
     public Mono<Void> onLogoutSuccess(ServerWebExchange exchange, Authentication authentication) {

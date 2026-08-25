@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Carl Samson
  */
-public class ProductImageSizeUtils {
+public final class ProductImageSizeUtils {
 
     private ProductImageSizeUtils() {
     }

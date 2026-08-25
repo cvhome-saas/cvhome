@@ -1,0 +1,12 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    api project(':store-commons:commons')
+    api project(':store-commons:errors')
+    compileOnly libs.jackson.databind
+    compileOnly libs.spring.data.relational
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

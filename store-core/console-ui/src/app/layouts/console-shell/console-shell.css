@@ -1,0 +1,78 @@
+:host {
+  --banner-h: 0px;
+  display: block;
+  min-block-size: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  color-scheme: dark;
+  font-size: 16px;
+}
+
+.console.banner-on {
+  --banner-h: 49px;
+}
+
+.console-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem 2.5rem;
+  transition: gap 0.28s var(--ease-emphasis);
+}
+
+/*
+ * The page's own content. `min-width: 0` matters: without it a wide child (a chart, a
+ * table) would push the flex item past the viewport instead of scrolling inside it.
+ */
+.workspace {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mobile-nav-toggle {
+  display: none;
+}
+
+.nav-scrim {
+  display: none;
+}
+
+@media (max-width: 56.25rem) {
+  .console-body {
+    position: relative;
+    gap: 0;
+    padding: 1rem;
+  }
+
+  .mobile-nav-toggle {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 1rem;
+    inset-inline-start: 1rem;
+    z-index: 60;
+    inline-size: 40px;
+    block-size: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    color: var(--secondary-foreground);
+    cursor: pointer;
+  }
+
+  .nav-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    border: 0;
+    background: var(--scrim);
+  }
+
+  .workspace {
+    padding-top: 3.5rem;
+  }
+}

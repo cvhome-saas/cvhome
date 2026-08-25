@@ -116,7 +116,7 @@ public enum SocialProvider {
                 }
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + this);
+            default -> throw new IllegalStateException(String.format("Unexpected value: %s", this));
         }
         if (email == null) {
             email = name;

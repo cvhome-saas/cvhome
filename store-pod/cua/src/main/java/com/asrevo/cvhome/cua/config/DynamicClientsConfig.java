@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 
-import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
+import com.asrevo.cvhome.cua.service.SocialLoginConfigService;
 
 import lombok.AllArgsConstructor;
 
@@ -19,14 +19,14 @@ import lombok.AllArgsConstructor;
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
 public class DynamicClientsConfig {
 
-    private final SocialLoginConfigRepository socialLoginConfigRepository;
+    private final SocialLoginConfigService socialLoginConfigService;
 
     @Bean
     @Lazy
     public DynamicClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties) {
         Map<String, ClientRegistration> registrations = new OAuth2ClientPropertiesMapper(properties)
                 .asClientRegistrations();
-        return new DynamicClientRegistrationRepository(socialLoginConfigRepository, registrations);
+        return new DynamicClientRegistrationRepository(socialLoginConfigService, registrations);
     }
 
 }

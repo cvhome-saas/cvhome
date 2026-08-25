@@ -10,8 +10,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.s2s.utils.LanguageUtils;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 public class ServletLanguageCodeArgumentResolver implements HandlerMethodArgumentResolver {
 

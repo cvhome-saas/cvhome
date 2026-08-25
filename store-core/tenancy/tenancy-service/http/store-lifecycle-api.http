@@ -1,0 +1,84 @@
+# StoreLifecycleApi — com.asrevo.cvhome.tenancy.manager.controller.StoreLifecycleApi
+#
+# Suspend and resume are super-admin only; archive and delete belong to the store's owner. Use a super-admin
+# session for the first two.
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### suspend — takes a merchant's business offline, so it is the operator's lever
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/suspend?store={{STORE_ID}}&reason=qa&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("suspended", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "SUSPENDED", "status " + response.body.status);
+    });
+%}
+
+### a suspended store cannot be entered — this is the call the console makes to open one
+GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("entering a suspended store is refused", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.STORE.NOT_OPERABLE", "code " + response.body.code);
+    });
+%}
+
+### but its record still reads, or the console could not show why it is closed
+GET {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/store-info?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("the record is still readable", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "SUSPENDED", "status " + response.body.status);
+    });
+%}
+
+### resume
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/resume?store={{STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("back in service", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "status " + response.body.status);
+    });
+%}
+
+### archive, then delete — soft, because billing and the pod registry both reference the store id
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/archive?store={{CREATED_STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("archived", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ARCHIVED", "status " + response.body.status);
+    });
+%}
+
+### DELETE is terminal; the row survives and the store leaves the listings
+DELETE {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store?store={{CREATED_STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("soft-deleted", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "DELETED", "status " + response.body.status);
+    });
+%}
+
+### and nothing brings it back
+POST {{SELLER_UI_URL}}/tenancy/api/v1/store-manager/private/store/resume?store={{CREATED_STORE_ID}}&lang={{LANG}}
+Cookie: SESSION={{SESSION_ID}}
+
+> {%
+    client.test("DELETED is terminal", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "CONTROL_PLANE.LIFECYCLE.ILLEGAL_TRANSITION",
+            "code " + response.body.code);
+    });
+%}

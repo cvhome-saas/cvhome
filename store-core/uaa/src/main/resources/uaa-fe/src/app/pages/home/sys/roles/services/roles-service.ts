@@ -28,11 +28,11 @@ export class RolesService {
     return new HttpParams({fromObject: {...request}});
   }
 
-  save(value: any) :Observable<Role>{
+  save(value: any): Observable<Role> {
     return this.httpClient.post<Role>(`${this.BASE_URL}`, value);
   }
 
-  update(id:string,value: any):Observable<Role> {
+  update(id: string, value: any): Observable<Role> {
     return this.httpClient.put<Role>(`${this.BASE_URL}/${id}`, value);
   }
 

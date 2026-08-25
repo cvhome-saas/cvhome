@@ -1,0 +1,81 @@
+<!-- The close/cancel events are the platform's dismissal signals: Escape and the backdrop. -->
+<dialog #dialog class="create-org" (close)="dismissed.emit()" (cancel)="dismissed.emit()">
+  <form method="dialog" class="create-org-body" (submit)="onSubmit($event)">
+    <h2 class="create-org-title">{{ title() }}</h2>
+    <p class="create-org-message">{{ message() }}</p>
+
+    <div class="create-org-names">
+      <app-form-field [label]="firstNameLabel()" required wide>
+        <app-text-field
+          [(value)]="firstName"
+          autocomplete="off"
+          [disabled]="busy()"
+          [ariaLabel]="firstNameLabel()"
+        />
+      </app-form-field>
+
+      <app-form-field [label]="lastNameLabel()" required wide>
+        <app-text-field
+          [(value)]="lastName"
+          autocomplete="off"
+          [disabled]="busy()"
+          [ariaLabel]="lastNameLabel()"
+        />
+      </app-form-field>
+    </div>
+
+    <!--
+      The address is the organization's contact address *and* the administrator's username:
+      `SignupServiceImpl` sets `userName` from it and overwrites anything sent.
+    -->
+    <app-form-field [label]="emailLabel()" required wide>
+      <app-text-field
+        [(value)]="email"
+        type="email"
+        autocomplete="off"
+        latin
+        [invalid]="touched() && emailInvalid()"
+        [disabled]="busy()"
+        [ariaLabel]="emailLabel()"
+      />
+    </app-form-field>
+
+    <app-form-field [label]="passwordLabel()" [hint]="passwordHint()" required wide>
+      <app-text-field
+        [(value)]="password"
+        type="password"
+        autocomplete="new-password"
+        [invalid]="touched() && weak()"
+        [disabled]="busy()"
+        [ariaLabel]="passwordLabel()"
+      />
+    </app-form-field>
+
+    <app-form-field [label]="repeatLabel()" required wide>
+      <app-text-field
+        [(value)]="repeat"
+        type="password"
+        autocomplete="new-password"
+        [invalid]="touched() && !weak() && mismatched()"
+        [disabled]="busy()"
+        [ariaLabel]="repeatLabel()"
+      />
+    </app-form-field>
+
+    @if (error(); as message) {
+      <p class="create-org-error" role="alert">{{ message }}</p>
+    }
+
+    <!-- Nothing sets a name at creation, so the row will read as its email until it is renamed. -->
+    <p class="create-org-hint">{{ unnamedHint() }}</p>
+
+    <div class="create-org-actions">
+      <button class="secondary-action" type="button" [disabled]="busy()" (click)="close()">
+        {{ cancelLabel() }}
+      </button>
+      <button class="primary-action" type="submit" [disabled]="busy()">
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </form>
+</dialog>

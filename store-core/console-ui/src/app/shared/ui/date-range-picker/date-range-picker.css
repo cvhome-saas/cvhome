@@ -1,0 +1,352 @@
+/*
+ * Range picker: a popover anchored to the trigger, showing two months when there is room
+ * and one when there is not.
+ *
+ * The month count is driven by a container query on the panel, so it responds to the
+ * panel's own width rather than the viewport's — the picker stays correct wherever it
+ * is placed.
+ */
+
+.dp {
+  position: relative;
+  display: inline-block;
+  text-align: start;
+}
+
+/* Trigger ---------------------------------------------------------------- */
+
+.date-range-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  /* Height is intentionally not pinned: this padding and font-size match the adjacent
+     toolbar actions, so it aligns with them by construction. */
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    border-color var(--default-transition-duration);
+}
+
+.date-range-trigger:hover:not(:disabled) {
+  border-color: var(--edge);
+  background: var(--input);
+}
+
+.date-range-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.date-range-trigger-icon {
+  flex: none;
+  color: var(--secondary-foreground);
+  --icon-size: 0.75rem;
+}
+
+.date-range-trigger-chevron {
+  flex: none;
+  margin-inline-start: 0.125rem;
+  color: var(--foreground-subtle);
+  --icon-size: 0.625rem;
+}
+
+.date-range-trigger-label {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Panel ------------------------------------------------------------------ */
+
+.dp-panel {
+  position: absolute;
+  z-index: 120;
+  inset-inline-end: 0;
+  top: calc(100% + 0.6rem);
+  /*
+   * `container-type: inline-size` suppresses content-based sizing on the inline axis,
+   * so the width has to be definite — `max-content` would collapse the panel.
+   */
+  container-type: inline-size;
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: min(32rem, calc(100vh - 8rem));
+  overflow: hidden auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--lift);
+  transform-origin: top var(--dp-origin, right);
+}
+
+.dp:dir(rtl) .dp-panel {
+  --dp-origin: left;
+}
+
+/* Head ------------------------------------------------------------------- */
+
+.dp-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.dp-nav {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+  --icon-size: 0.75rem;
+}
+
+.dp-nav:hover {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+/* Previous/next point the other way when the calendar reads right-to-left. */
+.dp:dir(rtl) .dp-nav app-icon {
+  transform: scaleX(-1);
+}
+
+.dp-hint {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dp-hint-strong {
+  color: var(--foreground-strong);
+  font-weight: 600;
+}
+
+.dp-hint-quiet {
+  margin-inline-start: 0.35rem;
+  color: var(--muted-foreground);
+}
+
+/* Months ----------------------------------------------------------------- */
+
+.dp-months {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.dp-month {
+  min-width: 15rem;
+}
+
+/* One month until the panel is genuinely wide enough for two. */
+.dp-month-secondary {
+  display: none;
+}
+
+@container (min-width: 34rem) {
+  .dp-months {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dp-month-secondary {
+    display: block;
+  }
+}
+
+.dp-month-label {
+  margin: 0 0 0.75rem;
+  color: var(--foreground-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.dp-weekdays,
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.dp-weekdays {
+  margin-bottom: 0.35rem;
+  color: var(--foreground-subtle);
+  font-size: var(--text-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.07em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* A heading that does not fit is clipped rather than allowed to overlap the next column. */
+.dp-weekdays > span {
+  overflow: hidden;
+  min-inline-size: 0;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.dp-grid {
+  row-gap: 0.15rem;
+}
+
+/* Days ------------------------------------------------------------------- */
+
+.dp-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  /* Comfortable touch target; the cell still scales with the column width. */
+  min-block-size: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--secondary-foreground);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--default-transition-duration);
+}
+
+.dp-day-empty {
+  cursor: default;
+}
+
+.dp-day:disabled {
+  color: var(--foreground-quiet);
+  cursor: not-allowed;
+}
+
+/*
+ * The range reads as one continuous bar rather than a row of separate chips: the wash
+ * sits on the cell itself (which has no horizontal gap), and only the two ends round off.
+ */
+.dp-day.in-bar {
+  background: var(--accent);
+  color: var(--chart-1-foreground);
+}
+
+.dp-day.bar-start {
+  border-start-start-radius: var(--radius-full);
+  border-end-start-radius: var(--radius-full);
+}
+
+.dp-day.bar-end {
+  border-start-end-radius: var(--radius-full);
+  border-end-end-radius: var(--radius-full);
+}
+
+.dp-day-inner {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  max-inline-size: 100%;
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--default-transition-duration),
+    color var(--default-transition-duration);
+}
+
+.dp-day:hover:not(:disabled):not(.selected) .dp-day-inner {
+  background: var(--input);
+  color: var(--foreground-strong);
+}
+
+.dp-day.today:not(.selected) .dp-day-inner {
+  box-shadow: inset 0 0 0 1px var(--edge);
+  color: var(--primary-soft);
+}
+
+.dp-day.selected .dp-day-inner {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+}
+
+.dp-day:focus-visible {
+  outline: none;
+}
+
+.dp-day:focus-visible .dp-day-inner {
+  outline: 3px solid var(--primary-soft);
+  outline-offset: 2px;
+}
+
+/* Narrow screens --------------------------------------------------------- */
+
+/*
+ * The panel stays absolutely positioned at every size rather than becoming a fixed
+ * bottom sheet. `position: fixed` is not dependable here: any ancestor with a transform,
+ * filter, `backdrop-filter` or `contain` becomes its containing block, and the console
+ * toolbar this picker sits in does exactly that with `backdrop-filter`. Staying absolute
+ * keeps the panel anchored to the trigger no matter what it is nested inside.
+ *
+ * Centring uses `inset-inline: 0` plus `margin-inline: auto` rather than a translate, so
+ * it does not fight the enter/leave animation for the transform property.
+ */
+@media (max-width: 37.5rem) {
+  .dp-panel {
+    inset-inline: 0;
+    width: min(22rem, calc(100vw - 2rem));
+    margin-inline: auto;
+    max-height: min(28rem, calc(100vh - 6rem));
+  }
+
+  /* A phone gets one month regardless of how wide the panel resolves to. */
+  .dp-months {
+    grid-template-columns: 1fr;
+  }
+
+  .dp-month-secondary {
+    display: none;
+  }
+
+  .dp-month {
+    min-width: 0;
+  }
+}
+
+/* Motion ----------------------------------------------------------------- */
+
+@keyframes dp-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem) scale(0.97);
+  }
+}
+
+.dp-panel-in {
+  animation: dp-panel-enter 0.16s ease-out;
+}
+
+.dp-panel-out {
+  animation: dp-panel-enter 0.12s ease-in reverse;
+}
+
+

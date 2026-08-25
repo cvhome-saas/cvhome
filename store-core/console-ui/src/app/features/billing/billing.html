@@ -1,0 +1,229 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="heading()" [context]="subtitle()" />
+
+  @if (billing.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="billing.refresh()" />
+  }
+
+  <app-busy-overlay
+    [busy]="billing.isLoading() || facade.busy()"
+    reserve="page"
+    [label]="t('billing.loading')"
+  >
+    <div class="billing-layout" [class.rail-collapsed]="railCollapsed()">
+      <app-section-nav
+        class="billing-rail"
+        basePath="/subscription"
+        [sections]="sections"
+        [active]="section()"
+        [heading]="t('billing.nav.heading')"
+        [label]="t('billing.nav.ariaLabel')"
+        [(collapsed)]="railCollapsed"
+      />
+
+      <app-tab-switcher
+        class="billing-tabs"
+        [tabs]="tabs(t)"
+        [active]="section()"
+        (activeChange)="pickSection($event)"
+        [label]="t('billing.nav.ariaLabel')"
+        panelId="billing-section"
+      />
+
+      <div class="billing-grid" id="billing-section">
+        @if (section() === 'plan') {
+        <div class="row-lead">
+        <app-panel padded [title]="t('billing.plan.title')" [subtitle]="t('billing.plan.subtitle')">
+          @if (statusLabel()) {
+            <app-badge panelAction [tone]="statusTone()">{{ statusLabel() }}</app-badge>
+          }
+
+          @if (billing.subscription(); as subscription) {
+            <div class="plan-body">
+              <div class="plan-headline">
+                <div class="plan-identity">
+                  <!-- A row with no plan says so, rather than rendering a dash where a name goes. -->
+                  <p class="plan-name" [class.unset]="!subscription.planCode">
+                    {{ subscription.planCode ? billing.planName() : t('billing.plan.noPlanYet') }}
+                  </p>
+                  @if (subscription.amount; as amount) {
+                    <!-- The figure is the point of this panel, so it carries the console's metric role. -->
+                    <p class="plan-price">
+                      <span class="plan-amount">{{ this.amount(amount.minorUnits, amount.currency.code) }}</span>
+                      <span class="plan-cadence">{{ t('billing.plan.perPeriod') }}</span>
+                    </p>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="primary-action"
+                  [attr.aria-busy]="facade.busy() ? 'true' : null"
+                  [disabled]="facade.busy()"
+                  (click)="facade.plansOpen.set(true)"
+                >
+                  {{ subscription.planCode ? t('billing.plan.change') : t('billing.plan.choose') }}
+                </button>
+              </div>
+
+              @if (subscription.pendingPlanChange; as pending) {
+                <!-- A downgrade waits for the period to end, so the store keeps what it paid for. -->
+                <p class="plan-pending">
+                  <app-icon name="clock" />
+                  {{ t('billing.plan.pendingChange', {plan: pending.planCode, date: billing.formatDate(pending.effectiveAt)}) }}
+                </p>
+              }
+
+              <!--
+                Dates and the controls that act on them share one band, so the panel reads as two
+                statements — what you are on, and what happens next — rather than a ragged stack with
+                a button floating beside it.
+              -->
+              <div class="plan-terms">
+                <dl class="plan-facts">
+                  @if (subscription.status === 'TRIALING' && subscription.trialEnd) {
+                    <div>
+                      <dt>{{ t('billing.plan.trialEnds') }}</dt>
+                      <dd>{{ billing.formatDate(subscription.trialEnd) }}</dd>
+                    </div>
+                  }
+                  @if (subscription.currentPeriodEnd) {
+                    <div>
+                      <!-- The same date means two different things depending on whether renewal is on. -->
+                      <dt>{{ subscription.cancelAtPeriodEnd ? t('billing.plan.endsOn') : t('billing.plan.renewsOn') }}</dt>
+                      <dd>{{ billing.formatDate(subscription.currentPeriodEnd) }}</dd>
+                    </div>
+                  }
+                  @if (subscription.graceUntil) {
+                    <div class="attention">
+                      <dt>{{ t('billing.plan.graceUntil') }}</dt>
+                      <dd>{{ billing.formatDate(subscription.graceUntil) }}</dd>
+                    </div>
+                  }
+                </dl>
+
+                <div class="plan-actions">
+
+                @if (facade.canResume()) {
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    [attr.aria-busy]="facade.busy() ? 'true' : null"
+                    [disabled]="facade.busy()"
+                    (click)="facade.resume()"
+                  >
+                    <app-icon name="undo" />{{ t('billing.plan.resume') }}
+                  </button>
+                }
+                @if (facade.canCancel()) {
+                  <button
+                    type="button"
+                    class="danger-action"
+                    [disabled]="facade.busy()"
+                    (click)="confirmingCancel.set(true)"
+                  >
+                    {{ t('billing.plan.cancel') }}
+                  </button>
+                }
+                </div>
+              </div>
+            </div>
+          } @else if (!billing.isLoading()) {
+            <!--
+              Billing learns about a store from an outbox event, so a store created moments ago can
+              reach this page before its subscription row exists. Not an error, and not an upgrade
+              prompt — there is nothing to buy against a subscription that does not exist yet.
+            -->
+            <app-empty-state icon="clock" [message]="t('billing.plan.noSubscription')">
+              <button type="button" class="secondary-action" (click)="billing.refresh()">
+                {{ t('shared.actions.retry') }}
+              </button>
+            </app-empty-state>
+          }
+        </app-panel>
+
+      </div>
+
+          <app-panel [title]="t('billing.allowances.title')" [subtitle]="t('billing.allowances.subtitle')">
+          @if (facade.allowances().length === 0) {
+            <!-- No plan means no ceilings to report. Rendering the empty map through the
+                 absent-means-unlimited rule would claim the opposite. -->
+            <app-empty-state compact icon="list" [message]="t('billing.allowances.none')" />
+          } @else {
+            <!--
+              A ledger rather than a list of ticks. Every row has a value, so the tick would be
+              carrying no information the value does not already carry — and a column of checkmarks
+              is the generic pattern this system's density is meant to replace.
+            -->
+            <dl class="allowance-list">
+              @for (row of facade.allowances(); track row.key) {
+                <div class="allowance-row" [class.withheld]="row.withheld">
+                  <dt>{{ row.label }}</dt>
+                  <dd>{{ row.value }}</dd>
+                </div>
+              }
+            </dl>
+          }
+          <!--
+            TODO(lessons.md): these are the plan's *ceilings*, not what the store has used. Billing
+            publishes the entitlement map but no usage counters, so "3 of 500 products" cannot be
+            drawn. See lessons.md, "Billing — entitlements are ceilings with no usage behind them".
+          -->
+          <p class="allowance-note">{{ t('billing.allowances.note') }}</p>
+          </app-panel>
+        } @else if (section() === 'invoices') {
+        <app-panel [title]="t('billing.invoices.title')" [subtitle]="t('billing.invoices.subtitle')">
+          @if (facade.invoices().length === 0) {
+            <app-empty-state compact icon="receipt" [message]="t('billing.invoices.none')" />
+          } @else {
+            <div class="invoice-list">
+              @for (invoice of facade.invoices(); track invoice.id) {
+                <div class="invoice-row">
+                  <span class="invoice-number">
+                    <strong>{{ invoice.number ?? t('billing.invoices.unnumbered') }}</strong>
+                    <small>{{ billing.formatDate(invoice.issuedAt ?? invoice.periodStart) }}</small>
+                  </span>
+                  <span class="invoice-amount">
+                    {{ this.amount(invoice.amountDue.minorUnits, invoice.amountDue.currency.code) }}
+                  </span>
+                  <span class="invoice-status" [class.paid]="invoice.status === 'PAID'">
+                    {{ t('billing.invoiceStatus.' + invoice.status) }}
+                  </span>
+                  <span class="invoice-links">
+                    <!-- The provider's copy is the invoice; the console links to it rather than redrawing it. -->
+                    @if (invoice.hostedInvoiceUrl; as hosted) {
+                      <a class="ghost-action" [href]="hosted" target="_blank" rel="noopener noreferrer">
+                        {{ t('billing.invoices.view') }}<app-icon name="externalLink" />
+                      </a>
+                    }
+                    @if (invoice.invoicePdfUrl; as pdf) {
+                      <a class="ghost-action" [href]="pdf" target="_blank" rel="noopener noreferrer">
+                        {{ t('billing.invoices.pdf') }}<app-icon name="download" />
+                      </a>
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </app-panel>
+        }
+      </div>
+    </div>
+  </app-busy-overlay>
+
+  <app-plan-dialog
+    [open]="facade.plansOpen()"
+    (chosen)="facade.choosePlan($event)"
+    (closed)="facade.plansOpen.set(false)"
+  />
+
+  <app-confirm-dialog
+    [open]="confirmingCancel()"
+    [title]="t('billing.cancelDialog.title')"
+    [message]="t('billing.cancelDialog.message', {date: billing.formatDate(billing.subscription()?.currentPeriodEnd ?? null)})"
+    [confirmLabel]="t('billing.cancelDialog.confirm')"
+    [cancelLabel]="t('billing.cancelDialog.dismiss')"
+    (confirmed)="confirmCancel()"
+    (dismissed)="confirmingCancel.set(false)"
+  />
+</ng-container>

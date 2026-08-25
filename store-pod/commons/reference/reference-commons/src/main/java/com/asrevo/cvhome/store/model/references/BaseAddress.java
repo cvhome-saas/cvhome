@@ -3,8 +3,8 @@ package com.asrevo.cvhome.store.model.references;
 import java.io.Serial;
 import java.io.Serializable;
 
-import com.asrevo.cvhome.store.core.model.reference.CountryIsoCode;
-import com.asrevo.cvhome.store.core.model.reference.ZoneCode;
+import com.asrevo.cvhome.commons.domain.CountryIsoCode;
+import com.asrevo.cvhome.commons.domain.ZoneCode;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeDeSerializer;
 import com.asrevo.cvhome.store.core.serializer.CountryIsoCodeSerializer;
 import com.asrevo.cvhome.store.core.serializer.ZoneCodeDeSerializer;

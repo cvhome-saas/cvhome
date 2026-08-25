@@ -16,9 +16,17 @@ export class UserFormComponent implements OnInit {
   passwordForm!: FormGroup;
   rolesForm!: FormGroup;
   metadataForm!: FormArray;
-  private _value: any;
 
   constructor(private fb: FormBuilder, private usersService: UsersService, private rolesService: RolesService, private router: Router) {
+  }
+
+  private _value: any;
+
+  @Input() set value(v: any) {
+    this._value = v;
+    if (this.form) {
+      this.patchForm(v);
+    }
   }
 
   ngOnInit(): void {
@@ -42,13 +50,6 @@ export class UserFormComponent implements OnInit {
     this.rolesService.list({page: 0, count: 1000}).subscribe(page => {
       this.roles = page.content.map(r => r.name);
     });
-  }
-
-  @Input() set value(v: any) {
-    this._value = v;
-    if (this.form) {
-      this.patchForm(v);
-    }
   }
 
   patchForm(v: any) {

@@ -1,0 +1,59 @@
+/*
+ * Adds the src/integrationTest source set: Spring Boot context + Testcontainers tests named *IntegrationTest.
+ * Applied by java-application-conventions; a library module may apply it explicitly when it owns real
+ * infrastructure (a repository, an outbox).
+ *
+ *   ./gradlew integrationTest                 # needs Docker
+ *   ./gradlew check -x integrationTest        # laptop without Docker
+ */
+
+plugins {
+    id 'com.asrevo.java-common-conventions'
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    integrationTestImplementation libs.bundles.test.integration
+    integrationTestImplementation project(':store-commons:test-support')
+}
+
+def integrationTest = tasks.register('integrationTest', Test) {
+    group = 'verification'
+    description = 'Runs *IntegrationTest classes from src/integrationTest (Testcontainers, Docker required).'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    include '**/*IntegrationTest.class'
+    shouldRunAfter tasks.named('test')
+    finalizedBy 'jacocoIntegrationTestReport'
+}
+
+tasks.register('jacocoIntegrationTestReport', JacocoReport) {
+    group = 'verification'
+    description = 'Coverage of src/main by the integration tests.'
+    executionData integrationTest.get()
+    sourceSets sourceSets.main
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// Merged unit + integration numbers are reported and gated per domain by the root plugin (`./gradlew domainCoverage`).
+
+checkstyleReport('integrationTest')
+
+tasks.named('check') {
+    dependsOn integrationTest
+}

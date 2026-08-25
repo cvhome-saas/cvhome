@@ -3,11 +3,24 @@ import {Observable} from "rxjs";
 
 export abstract class BaseTable<T> {
   public perPageSize = 10;
+
+  protected constructor() {
+  }
+
   private _params: PageRequest = {
     page: 0,
     count: this.perPageSize
   };
+
+  get params(): PageRequest {
+    return this._params;
+  }
+
   private _isLoading: boolean = false;
+
+  get isLoading(): boolean {
+    return this._isLoading;
+  }
 
   private _page: PageT<T> = {
     size: 0,
@@ -17,9 +30,9 @@ export abstract class BaseTable<T> {
     content: []
   };
 
-  protected constructor() {
+  get page(): PageT<T> {
+    return this._page;
   }
-
 
   abstract list(request: PageRequest): Observable<PageT<T>>;
 
@@ -43,20 +56,6 @@ export abstract class BaseTable<T> {
       this._params.page = event.offset;
       this.trigger();
     }
-  }
-
-
-  get params(): PageRequest {
-    return this._params;
-  }
-
-
-  get page(): PageT<T> {
-    return this._page;
-  }
-
-  get isLoading(): boolean {
-    return this._isLoading;
   }
 }
 

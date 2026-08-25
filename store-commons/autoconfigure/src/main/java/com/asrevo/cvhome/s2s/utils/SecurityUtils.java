@@ -11,15 +11,21 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Roles;
+import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
 
-public class SecurityUtils {
+public final class SecurityUtils {
 
     public static final String CLAIMS_ORG_KEY = "org";
 
     public static final String CLAIMS_STORE_KEY = "store";
 
-    private static final String WILD_CARD_STORE_ACCESS = "*";
+    /**
+     * Stands for "every store", for a principal that is not confined to one. Deliberately not a valid store id — a
+     * sentinel that can never collide with a real one — and deliberately kept here rather than on
+     * {@link StoreMerchantId}, which is a tenant identifier and has no business knowing about authorization.
+     */
+    private static final StoreMerchantId WILD_CARD_STORE_ACCESS = new StoreMerchantId("*");
 
     private SecurityUtils() {
     }
@@ -73,13 +79,14 @@ public class SecurityUtils {
             return new UserOrgStoreIdentity(null, WILD_CARD_STORE_ACCESS, roles);
         } else if (hasOrgAdminRole(authentication)) {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
             return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), WILD_CARD_STORE_ACCESS, roles);
         } else {
             Map<String, Object> claims = ((Jwt) authentication.getPrincipal()).getClaims();
-            String adminOrg = ((String) claims.get(CLAIMS_ORG_KEY));
-            String adminStore = ((String) claims.get(CLAIMS_STORE_KEY));
-            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg), adminStore, roles);
+            String adminOrg = (String) claims.get(CLAIMS_ORG_KEY);
+            String adminStore = (String) claims.get(CLAIMS_STORE_KEY);
+            return new UserOrgStoreIdentity(new ManagerOrgId(adminOrg),
+                    adminStore == null ? null : new StoreMerchantId(adminStore), roles);
         }
     }
 

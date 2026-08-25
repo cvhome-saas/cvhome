@@ -26,12 +26,12 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User u = users.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User not found: %s", username)));
 
         Set<GrantedAuthority> authorities = u.getRoles()
                 .stream()
                 .map(Role::getName)
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                .map(r -> new SimpleGrantedAuthority(String.format("ROLE_%s", r)))
                 .collect(Collectors.toSet());
 
         return org.springframework.security.core.userdetails.User.withUsername(u.getUsername())

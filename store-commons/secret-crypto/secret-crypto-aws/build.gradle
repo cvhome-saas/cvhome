@@ -1,0 +1,12 @@
+plugins {
+    alias(libs.plugins.java.library.conventions)
+}
+
+dependencies {
+    implementation project(":store-commons:secret-crypto:secret-crypto-core")
+    
+    api libs.aws.sdk.kms
+    
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

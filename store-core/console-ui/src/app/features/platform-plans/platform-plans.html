@@ -1,0 +1,78 @@
+<ng-container *transloco="let t">
+  <app-page-header [title]="facade.heading().title" [context]="facade.heading().context" />
+
+  @if (facade.error(); as failure) {
+    <app-load-error [message]="failure.message" (retry)="facade.reload()" />
+  }
+
+  <app-busy-overlay reserve="page" [busy]="facade.isLoading()" [label]="t('platform.plans.loading')">
+    @if (!facade.isEmpty()) {
+      <div class="plans-stack">
+        <!--
+          Said once, at the top. The catalogue is mirrored from Stripe into `billing.plan` and no
+          endpoint writes it, so this screen reads and cannot edit.
+        -->
+        <app-notice-bar icon="info" tone="blue" [message]="t('platform.plans.notice.readOnly')" />
+
+        <app-panel [title]="t('platform.plans.panel.title')" [subtitle]="t('platform.plans.panel.subtitle')">
+          @if (facade.rows().length) {
+            <app-data-table [columns]="columns()" [label]="t('platform.plans.panel.title')">
+              @for (row of facade.rows(); track row.code) {
+                <app-table-row>
+                  <div class="cell-plan" role="cell" [attr.data-label]="t('platform.plans.column.plan')">
+                    <strong>{{ row.name }}</strong>
+                    <span class="plan-code latin">{{ row.code }}</span>
+                    @if (row.trialDays) {
+                      <span class="plan-trial">{{ t('platform.plans.trial', {days: row.trialDays}) }}</span>
+                    }
+                  </div>
+
+                  <span class="cell-price" role="cell" [attr.data-label]="t('platform.plans.column.monthly')">
+                    {{ row.monthly }}
+                  </span>
+
+                  <!-- An em dash, not a zero: a plan sold monthly-only is not a plan that is free yearly. -->
+                  <span class="cell-price" role="cell" [attr.data-label]="t('platform.plans.column.yearly')">
+                    {{ row.yearly }}
+                  </span>
+
+                  <span
+                    class="cell-price"
+                    role="cell"
+                    [attr.data-label]="t('platform.plans.column.subscribers')"
+                  >
+                    {{ row.subscribers }}
+                  </span>
+
+                  <span
+                    class="cell-price"
+                    role="cell"
+                    [attr.data-label]="t('platform.plans.column.recurring')"
+                  >
+                    {{ row.recurring }}
+                  </span>
+
+                  @for (allowance of row.allowances; track $index) {
+                    <span
+                      class="cell-allowance"
+                      role="cell"
+                      [attr.data-label]="facade.entitlementRows()[$index]?.label"
+                    >
+                      {{ allowance }}
+                    </span>
+                  }
+                </app-table-row>
+              }
+            </app-data-table>
+          } @else {
+            <app-empty-state
+              icon="creditCard"
+              [title]="t('platform.plans.empty.title')"
+              [message]="t('platform.plans.empty.message')"
+            />
+          }
+        </app-panel>
+      </div>
+    }
+  </app-busy-overlay>
+</ng-container>

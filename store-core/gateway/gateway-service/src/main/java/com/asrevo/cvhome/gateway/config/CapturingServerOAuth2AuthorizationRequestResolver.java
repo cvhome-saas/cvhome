@@ -1,5 +1,6 @@
 package com.asrevo.cvhome.gateway.config;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,26 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import reactor.core.publisher.Mono;
 
 public class CapturingServerOAuth2AuthorizationRequestResolver implements ServerOAuth2AuthorizationRequestResolver {
+
+    /*
+     * The forwarded values are re-encoded before they are appended, because the URI is then built
+     * with build(true) — "everything here is already encoded".
+     *
+     * getQueryParams() hands back *decoded* values, so a redirectTo carrying a query string of its
+     * own arrived as `/accept-invitation?token=abc`, and build(true) rejected the bare '?' and '='
+     * as illegal in a query parameter:
+     *
+     *   IllegalArgumentException: Invalid character '=' for QUERY_PARAM in "/accept-invitation?token=abc"
+     *
+     * That surfaced as a **500 on the login redirect** for any deep link with a query string —
+     * a filtered list, a selected row, an invitation link — while a bare path like /dashboard
+     * worked, which is why it went unnoticed: every hand-typed URL is a bare path.
+     */
 
     // Session key prefix to store the captured parameters
     public static final String CAPTURED_PARAMETERS_SESSION_KEY_PREFIX = "CAPTURED_OAUTH2_LOGIN_PARAMS_FOR_STATE_";
@@ -75,7 +92,8 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
                 .stream()
                 .filter(it -> Objects.nonNull(it.getKey()) && Objects.nonNull(it.getValue()) && !it.getValue().isEmpty()
                         && !originalQueryParams.containsKey(it.getKey()))
-                .forEach(param -> componentsBuilder.queryParam(param.getKey(), param.getValue().getFirst()));
+                .forEach(param -> componentsBuilder.queryParam(param.getKey(),
+                        UriUtils.encode(param.getValue().getFirst(), StandardCharsets.UTF_8)));
 
         String newRequestUri = componentsBuilder.build(true).toUriString();
 
@@ -104,13 +122,13 @@ public class CapturingServerOAuth2AuthorizationRequestResolver implements Server
             // callback
             String state = authorizationRequest.getState();
             if (state == null || state.isEmpty()) {
-                logger.warn("OAuth2AuthorizationRequest state is null or empty. Cannot reliably store"
-                        + " captured parameters for this flow.");
+                logger.warn(
+                        "OAuth2AuthorizationRequest state is null or empty. Cannot reliably store captured parameters for this flow.");
                 return Mono.just(authorizationRequest); // Proceed without storing if
                 // state is missing
             }
 
-            String sessionKey = CAPTURED_PARAMETERS_SESSION_KEY_PREFIX + state;
+            String sessionKey = "%s%s".formatted(CAPTURED_PARAMETERS_SESSION_KEY_PREFIX, state);
             logger.info("Storing captured parameters in session with key '{}': {}", sessionKey, capturedParamsMap);
 
             return exchange.getSession().map(webSession -> {

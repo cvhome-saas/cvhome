@@ -1,18 +1,22 @@
 <div class="duration-container">
   <div class="duration-field">
     <label>Days</label>
-    <input nbInput type="number" min="0" [(ngModel)]="days" (ngModelChange)="update()" placeholder="D" fieldSize="small">
+    <input (ngModelChange)="update()" [(ngModel)]="days" fieldSize="small" min="0" nbInput placeholder="D"
+           type="number">
   </div>
   <div class="duration-field">
     <label>Hours</label>
-    <input nbInput type="number" min="0" [(ngModel)]="hours" (ngModelChange)="update()" placeholder="H" fieldSize="small">
+    <input (ngModelChange)="update()" [(ngModel)]="hours" fieldSize="small" min="0" nbInput placeholder="H"
+           type="number">
   </div>
   <div class="duration-field">
     <label>Minutes</label>
-    <input nbInput type="number" min="0" [(ngModel)]="minutes" (ngModelChange)="update()" placeholder="M" fieldSize="small">
+    <input (ngModelChange)="update()" [(ngModel)]="minutes" fieldSize="small" min="0" nbInput placeholder="M"
+           type="number">
   </div>
   <div class="duration-field">
     <label>Seconds</label>
-    <input nbInput type="number" min="0" [(ngModel)]="seconds" (ngModelChange)="update()" placeholder="S" fieldSize="small">
+    <input (ngModelChange)="update()" [(ngModel)]="seconds" fieldSize="small" min="0" nbInput placeholder="S"
+           type="number">
   </div>
 </div>

@@ -1,0 +1,28 @@
+# ProductImageApi — com.asrevo.cvhome.catalog.api.v1.ProductImageApi (@RequestMapping "/api/v1")
+# See product-api.http for the env-var conventions. Requires a running stack: ./extra/scripts/run-lcl.sh
+
+### upload one image to product 1 — 201; the first image of a product becomes its default
+POST {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1/image?store={{STORE_ID}}&lang={{LANG}}&order=0
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="demo.png"
+Content-Type: image/png
+
+< ../../../landing-ui/storefront/public/placeholder.png
+--WebAppBoundary--
+
+### the product's images, in display order (public)
+GET {{LANDING_UI_URL}}/catalog/api/v1/product/1/images?store={{STORE_ID}}&lang={{LANG}}
+
+### move an image to position 2 — 404 CATALOG.PRODUCT_IMAGE.NOT_FOUND when the image is not the product's
+PATCH {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1/image/1?store={{STORE_ID}}&lang={{LANG}}&order=2
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### remove an image (row and file)
+DELETE {{SELLER_UI_URL}}/spg/catalog/api/v1/private/product/1/image/1?store={{STORE_ID}}&lang={{LANG}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+### unknown product — 404 CATALOG.PRODUCT.NOT_FOUND
+GET {{LANDING_UI_URL}}/catalog/api/v1/product/999999/images?store={{STORE_ID}}&lang={{LANG}}

@@ -35,7 +35,7 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
 
         StringBuilder dynamicUri = new StringBuilder();
         dynamicUri.append(scheme).append("://").append(serverName);
-        if (("http".equals(scheme) && serverPort != 80) || ("https".equals(scheme) && serverPort != 443)) {
+        if ("http".equals(scheme) && serverPort != 80 || "https".equals(scheme) && serverPort != 443) {
             dynamicUri.append(":").append(serverPort);
         }
         if (useLang) {
@@ -70,7 +70,8 @@ public class DynamicRegisteredClientRepository implements RegisteredClientReposi
                 .clientName("Web App")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(host -> it.add(host + "/callback")))
+                .redirectUris(it -> Optional.ofNullable(extractHost(true))
+                        .ifPresent(host -> it.add(String.format("%s/callback", host))))
                 .postLogoutRedirectUris(it -> Optional.ofNullable(extractHost(true)).ifPresent(it::add))
                 .scope(OidcScopes.OPENID)
                 .clientSettings(ClientSettings.builder().requireProofKey(true).requireAuthorizationConsent(false).build())

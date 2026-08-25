@@ -17,21 +17,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.model.product.ReadableProductAvailability;
-import com.asrevo.cvhome.catalog.model.product.product.price.FinalPriceCalc;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.errors.ProductNotPurchasableException;
+import com.asrevo.cvhome.checkout.errors.ShoppingCartNotFoundException;
 import com.asrevo.cvhome.checkout.model.shoppingcart.PersistableShoppingCartItem;
 import com.asrevo.cvhome.checkout.model.shoppingcart.ReadableShoppingCart;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
 import com.asrevo.cvhome.checkout.service.mapper.cart.ReadableShoppingCartMapper;
 import com.asrevo.cvhome.checkout.services.shoppingcart.ShoppingCartService;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.controller.exception.ResourceNotFoundException;
-import com.asrevo.cvhome.store.controller.exception.ServiceRuntimeException;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.inventory.model.SkuInventory;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,28 +48,25 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     private final ReadableShoppingCartMapper readableShoppingCartMapper;
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     private ShoppingCartItem createCartItem(ShoppingCart cartModel, PersistableShoppingCartItem shoppingCartItem,
-                                            StoreMerchantId store, LanguageCode language) throws Exception {
+                                            StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
-        ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, shoppingCartItem.getProduct(),
-                language);
-        ReadableProductAvailability availability = detailedProduct.availability();
+        SkuInventory inventory = productDetailsComposer
+                .getDetailedProduct(store, shoppingCartItem.getProduct(), language).inventory();
 
-        if (!availability.isCanBePurchased()) {
-            throw new ServiceException("Product with sku " + availability.getSku()
-                    + " is not available or is not properly configured. It contains no" + " inventory");
+        if (!inventory.canBePurchased() || inventory.price() == null) {
+            throw ProductNotPurchasableException.of(inventory.sku());
         }
 
-        FinalPriceCalc price = detailedProduct.price();
-
-        ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(availability.getSku(),
-                price.getFinalPrice(), store);
+        ShoppingCartItem item = shoppingCartService.populateShoppingCartItem(inventory.sku(),
+                inventory.price().finalPrice(), store);
 
         item.setQuantity(shoppingCartItem.getQuantity());
         item.setShoppingCart(cartModel);
-        item.setSku(availability.getSku());
+        item.setSku(inventory.sku());
 
         return item;
     }
@@ -94,10 +88,6 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         if (StringUtils.isNotBlank(cartId)) {
             try {
                 return shoppingCartService.loadCartByCode(cartId, store, language);
-            } catch (ServiceException e) {
-                log.error("unable to find any cart asscoiated with this Id: {}", cartId);
-                log.error("error while fetching cart model...", e);
-                return null;
             } catch (NoResultException _) {
                 // nothing
             }
@@ -106,14 +96,14 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     @Override
-    public void saveOrUpdateShoppingCart(ShoppingCart cart) throws Exception {
+    public void saveOrUpdateShoppingCart(ShoppingCart cart) {
         shoppingCartService.saveOrUpdate(cart);
     }
 
     @Override
     // KEEP ** ENTRY POINT **
     public ReadableShoppingCart addToCart(PersistableShoppingCartItem item, StoreMerchantId store,
-                                          LanguageCode language) {
+                                          LanguageCode language) throws ProductNotPurchasableException {
 
         ShoppingCart cartModel = new ShoppingCart();
         cartModel.setStoreMerchantId(store);
@@ -124,24 +114,17 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
             cartModel.setPromoAdded(Instant.now());
         }
 
-        try {
-            return readableShoppingCart(cartModel, item, store, language);
-        } catch (Exception e) {
-            if (e instanceof ResourceNotFoundException ex) {
-                throw ex;
-            } else {
-                throw new ServiceRuntimeException(e.getMessage(), e);
-            }
-        }
+        return readableShoppingCart(cartModel, item, store, language);
     }
 
     @Override
     public ReadableShoppingCart removeShoppingCartItem(String cartCode, String sku, StoreMerchantId merchant,
-                                                       LanguageCode language, boolean returnCart) throws Exception {
+                                                       LanguageCode language, boolean returnCart)
+            throws ShoppingCartNotFoundException {
         ShoppingCart cart = getCartModel(cartCode, merchant, language);
 
         if (cart == null) {
-            throw new ResourceNotFoundException("Cart code [ " + cartCode + " ] not found");
+            throw ShoppingCartNotFoundException.byCode(cartCode);
         }
 
         Set<ShoppingCartItem> items = new HashSet<>();
@@ -174,7 +157,8 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     // KEEP
     private ReadableShoppingCart readableShoppingCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                                      StoreMerchantId store, LanguageCode language) throws Exception {
+                                                      StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
@@ -186,63 +170,15 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
     }
 
     private ReadableShoppingCart modifyCart(ShoppingCart cartModel, PersistableShoppingCartItem item,
-                                            StoreMerchantId store, LanguageCode language) throws Exception {
+                                            StoreMerchantId store, LanguageCode language)
+            throws ProductNotPurchasableException {
 
         ShoppingCartItem itemModel = createCartItem(cartModel, item, store, language);
 
-        boolean itemModified = false;
-        // check if existing product
-        Set<ShoppingCartItem> items = cartModel.getLineItems();
-        if (!CollectionUtils.isEmpty(items)) {
-            Set<ShoppingCartItem> newItems = new HashSet<>();
-            Set<ShoppingCartItem> removeItems = new HashSet<>();
-            for (ShoppingCartItem anItem : items) { // take care of existing
-                // product
-                if (itemModel.getSku().equals(anItem.getSku())) {
-                    if (item.getQuantity() == 0) {
-                        // left aside item to be removed
-                        // don't add it to new list of item
-                        removeItems.add(anItem);
-                    } else {
-                        // new quantity
-                        anItem.setQuantity(item.getQuantity());
-                        newItems.add(anItem);
-                    }
-                    itemModified = true;
-                } else {
-                    newItems.add(anItem);
-                }
-            }
-
-            if (!removeItems.isEmpty()) {
-                for (ShoppingCartItem emptyItem : removeItems) {
-                    shoppingCartService.deleteShoppingCartItem(emptyItem.getId());
-                }
-            }
-
-            if (!itemModified) {
-                newItems.add(itemModel);
-            }
-
-            if (newItems.isEmpty()) {
-                newItems = null;
-            }
-
-            cartModel.setLineItems(newItems);
-        } else {
-            // new item
-            if (item.getQuantity() > 0) {
-                cartModel.getLineItems().add(itemModel);
-            }
-        }
-
-        // if cart items are null just return cart with no items
+        mergeCartItem(cartModel, item, itemModel);
 
         // promo code added to the cart but no promo cart exists
-        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
-            cartModel.setPromoCode(item.getPromoCode());
-            cartModel.setPromoAdded(Instant.now());
-        }
+        applyPromoCodeIfMissing(cartModel, item);
 
         saveShoppingCart(cartModel);
 
@@ -256,14 +192,64 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
         return readableShoppingCartMapper.convert(cartModel, store, language);
     }
 
+    private void mergeCartItem(ShoppingCart cartModel, PersistableShoppingCartItem item, ShoppingCartItem itemModel) {
+        // check if existing product
+        Set<ShoppingCartItem> items = cartModel.getLineItems();
+        if (CollectionUtils.isEmpty(items)) {
+            // new item
+            if (item.getQuantity() > 0) {
+                cartModel.getLineItems().add(itemModel);
+            }
+            return;
+        }
+
+        boolean itemModified = false;
+        Set<ShoppingCartItem> newItems = new HashSet<>();
+        Set<ShoppingCartItem> removeItems = new HashSet<>();
+        for (ShoppingCartItem anItem : items) { // take care of existing
+            // product
+            if (!itemModel.getSku().equals(anItem.getSku())) {
+                newItems.add(anItem);
+                continue;
+            }
+            if (item.getQuantity() == 0) {
+                // left aside item to be removed
+                // don't add it to new list of item
+                removeItems.add(anItem);
+            } else {
+                // new quantity
+                anItem.setQuantity(item.getQuantity());
+                newItems.add(anItem);
+            }
+            itemModified = true;
+        }
+
+        removeItems.forEach(emptyItem -> shoppingCartService.deleteShoppingCartItem(emptyItem.getId()));
+
+        if (!itemModified) {
+            newItems.add(itemModel);
+        }
+
+        // if cart items are null just return cart with no items
+        cartModel.setLineItems(newItems.isEmpty() ? null : newItems);
+    }
+
+    private void applyPromoCodeIfMissing(ShoppingCart cartModel, PersistableShoppingCartItem item) {
+        if (!StringUtils.isBlank(item.getPromoCode()) && StringUtils.isBlank(cartModel.getPromoCode())) {
+            cartModel.setPromoCode(item.getPromoCode());
+            cartModel.setPromoAdded(Instant.now());
+        }
+    }
+
     @Override
     // KEEP
     public ReadableShoppingCart modifyCart(String cartCode, PersistableShoppingCartItem item, StoreMerchantId store,
-                                           LanguageCode language) throws Exception {
+                                           LanguageCode language)
+            throws ShoppingCartNotFoundException, ProductNotPurchasableException {
 
         ShoppingCart cartModel = shoppingCartService.findCart(cartCode, store);
         if (cartModel == null) {
-            throw new ResourceNotFoundException("Cart code [" + cartCode + "] not found");
+            throw ShoppingCartNotFoundException.byCode(cartCode);
         }
 
         return modifyCart(cartModel, item, store, language);
@@ -279,31 +265,35 @@ public class ShoppingCartFacadeImpl implements ShoppingCartFacade {
 
     @Override
     // KEEP
-    public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) throws Exception {
+    public ReadableShoppingCart getByCode(String code, StoreMerchantId store, LanguageCode language) {
 
         ShoppingCart cart = shoppingCartService.loadCartByCode(code, store, language);
         ReadableShoppingCart readableCart = null;
 
         if (cart != null) {
-
             readableCart = readableShoppingCartMapper.convert(cart, store, language);
-
-            if (!StringUtils.isBlank(cart.getPromoCode())) {
-                Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
-                if (promoDateAdded == null) {
-                    promoDateAdded = Instant.now();
-                }
-                ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
-                LocalDate date = zdt.toLocalDate();
-                // date added < date + 1 day
-                LocalDate tomorrow = LocalDate.now().plusDays(1);
-                if (date.isBefore(tomorrow)) {
-                    readableCart.setPromoCode(cart.getPromoCode());
-                }
-            }
+            applyValidPromoCode(cart, readableCart);
         }
 
         return readableCart;
+    }
+
+    private void applyValidPromoCode(ShoppingCart cart, ReadableShoppingCart readableCart) {
+        if (StringUtils.isBlank(cart.getPromoCode())) {
+            return;
+        }
+
+        Instant promoDateAdded = cart.getPromoAdded(); // promo valid 1 day
+        if (promoDateAdded == null) {
+            promoDateAdded = Instant.now();
+        }
+        ZonedDateTime zdt = promoDateAdded.atZone(ZoneId.systemDefault());
+        LocalDate date = zdt.toLocalDate();
+        // date added < date + 1 day
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        if (date.isBefore(tomorrow)) {
+            readableCart.setPromoCode(cart.getPromoCode());
+        }
     }
 
 }

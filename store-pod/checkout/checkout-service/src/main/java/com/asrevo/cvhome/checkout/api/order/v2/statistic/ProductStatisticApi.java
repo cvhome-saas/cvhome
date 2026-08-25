@@ -1,6 +1,5 @@
 package com.asrevo.cvhome.checkout.api.order.v2.statistic;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -12,12 +11,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.asrevo.cvhome.checkout.repositories.order.orderproduct.OrderProductRepository;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StatisticEntry;
 import com.asrevo.cvhome.commons.domain.StatisticList;
 import com.asrevo.cvhome.commons.domain.StatisticRange;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.store.core.constants.Constants;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.asrevo.cvhome.commons.utils.Constants.DEFAULT_ORG1_STORE1_STR;
+import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1_STR;
 
 @RestController
 @RequestMapping("/api/v2")
@@ -48,8 +47,8 @@ public class ProductStatisticApi {
     public StatisticList productStatistic(StoreMerchantId merchantStore, LanguageCode language,
                                           @RequestBody StatisticRange range) {
 
-        List<StatisticEntry> entries = orderProductRepository.productStatistic(Date.from(range.fromDate().toInstant()),
-                Date.from(range.toDate().toInstant()), merchantStore);
+        List<StatisticEntry> entries = orderProductRepository.productStatistic(range.fromDate().toInstant(),
+                range.toDate().toInstant(), merchantStore);
         return new StatisticList(entries);
     }
 

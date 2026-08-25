@@ -179,12 +179,12 @@ create table if not exists checkout.optin
 );
 create table if not exists checkout.orders
 (
-    order_id                bigint      not null primary key,
+    order_id                bigint       not null primary key,
     billing_street_address  varchar(256),
     billing_city            varchar(100),
     billing_company         varchar(100),
-    billing_first_name      varchar(64) not null,
-    billing_last_name       varchar(64) not null,
+    billing_first_name      varchar(64)  not null,
+    billing_last_name       varchar(64)  not null,
     latitude                varchar(100),
     longitude               varchar(100),
     billing_postcode        varchar(20),
@@ -200,23 +200,9 @@ create table if not exists checkout.orders
                 )
             ),
     confirmed_address       boolean,
-    card_type               varchar(255)
-        constraint orders_card_type_check check (
-            (card_type):: text = ANY (
-                (
-                    ARRAY [ 'AMEX' :: character varying,
-                        'VISA' :: character varying, 'MASTERCARD' :: character varying,
-                        'DINERS' :: character varying, 'DISCOVERY' :: character varying]
-                    ):: text[]
-                )
-            ),
-    cc_cvv                  varchar(255),
-    cc_expires              varchar(255),
-    cc_number               varchar(255),
-    cc_owner                varchar(255),
     currency_value          numeric(38, 2),
     customer_agreed         boolean,
-    customer_email_address  varchar(50) not null,
+    customer_email_address  varchar(50)  not null,
     customer_id             bigint,
     date_purchased          date,
     delivery_street_address varchar(256),
@@ -240,42 +226,79 @@ create table if not exists checkout.orders
                     ):: text[]
                 )
             ),
-    payment_module_code     varchar(255),
-    payment_type            varchar(255)
-        constraint orders_payment_type_check check (
-            (payment_type):: text = ANY (
-                (
-                    ARRAY [ 'CREDITCARD' :: character varying,
-                        'FREE' :: character varying, 'COD' :: character varying,
-                        'MONEYORDER' :: character varying,
-                        'PAYPAL' :: character varying, 'INVOICE' :: character varying,
-                        'DIRECTBANK' :: character varying,
-                        'PAYMENTPLAN' :: character varying,
-                        'ACCOUNTCREDIT' :: character varying]
-                    ):: text[]
-                )
-            ),
-    shipping_module_code    varchar(255),
-    cart_code               varchar(255),
+    cart_code               varchar(255) not null
+        constraint uk_g6b5qebd5yvy3msjrut230w91 unique,
     order_status            varchar(255)
         constraint orders_order_status_check check (
             (order_status):: text = ANY (
                 (
-                    ARRAY [ 'ORDERED' :: character varying,
-                        'PROCESSED' :: character varying,
+                    ARRAY [
+                        'CREATED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying,
+                        'CONFIRMED' :: character varying,
+                        'PROCESSING' :: character varying,
+                        'SHIPPED' :: character varying,
+                        'DELIVERING' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying, 'CANCELED' :: character varying]
+                        'COMPLETED' :: character varying,
+                        'CANCELLED' :: character varying,
+                        'RETURNED' :: character varying
+                        ]
                     ):: text[]
                 )
             ),
+    inventory_status        varchar(255)
+        constraint orders_inventory_status_check check (
+            (inventory_status):: text = ANY (
+                (
+                    ARRAY [
+                        'NOT_REQUESTED' :: character varying,
+                        'RESERVED' :: character varying,
+                        'COMMITTED' :: character varying,
+                        'RELEASED' :: character varying,
+                        'RESERVATION_FAILED' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+    payment_status          varchar(255)
+        constraint orders_payment_status_check check (
+            (payment_status):: text = ANY (
+                (
+                    ARRAY [
+                        'PENDING' :: character varying,
+                        'PAID' :: character varying,
+                        'FAILED' :: character varying,
+                        'AUTHORIZED' :: character varying,
+                        'REFUNDED' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+    payment_type            varchar(255)
+        constraint orders_payment_type_check check (
+            (payment_type):: text = ANY (
+                (
+                    ARRAY [
+                        'COD' :: character varying,
+                        'MANUAL_TRANSFER' :: character varying,
+                        'PAYPAL' :: character varying,
+                        'STRIPE' :: character varying
+                        ]
+                    ):: text[]
+                )
+            ),
+
     order_total             numeric(38, 2),
-    billing_country_code      varchar(6)  not null,
-    billing_zone_code         varchar(100),
+    billing_country_code    varchar(6)   not null,
+    billing_zone_code       varchar(100),
     currency_id             varchar(6),
     delivery_country_CODE   varchar(6),
-    delivery_zone_code        varchar(100),
-    store_merchant_id       varchar(50)
+    delivery_zone_code      varchar(100),
+    store_merchant_id       varchar(50),
+    redirect_uri            varchar(2048)
 );
+create index if not exists orders_cart_code_idx on checkout.orders (cart_code);
 create table if not exists checkout.order_account
 (
     order_account_id         bigint  not null primary key,
@@ -364,10 +387,18 @@ create table if not exists checkout.order_status_history
         constraint order_status_history_status_check check (
             (status):: text = ANY (
                 (
-                    ARRAY [ 'ORDERED' :: character varying,
-                        'PROCESSED' :: character varying,
+                    ARRAY [
+                        'CREATED' :: character varying,
+                        'PENDING_PAYMENT' :: character varying,
+                        'CONFIRMED' :: character varying,
+                        'PROCESSING' :: character varying,
+                        'SHIPPED' :: character varying,
+                        'DELIVERING' :: character varying,
                         'DELIVERED' :: character varying,
-                        'REFUNDED' :: character varying, 'CANCELED' :: character varying]
+                        'COMPLETED' :: character varying,
+                        'CANCELLED' :: character varying,
+                        'RETURNED' :: character varying
+                        ]
                     ):: text[]
                 )
             ),
@@ -445,41 +476,4 @@ create table if not exists checkout.shopping_cart_attr_item
     product_attr_id       bigint not null,
     shp_cart_item_id      bigint not null
         constraint fkt3iw5nxx7h55j5vta1tyrvgv3 references checkout.shopping_cart_item
-);
-create table if not exists checkout.sm_transaction
-(
-    transaction_id   bigint not null primary key,
-    amount           numeric(38, 2),
-    date_created     timestamp(6),
-    date_modified    timestamp(6),
-    updt_id          varchar(60),
-    details          text,
-    payment_type     varchar(255)
-        constraint sm_transaction_payment_type_check check (
-            (payment_type):: text = ANY (
-                (
-                    ARRAY [ 'CREDITCARD' :: character varying,
-                        'FREE' :: character varying, 'COD' :: character varying,
-                        'MONEYORDER' :: character varying,
-                        'PAYPAL' :: character varying, 'INVOICE' :: character varying,
-                        'DIRECTBANK' :: character varying,
-                        'PAYMENTPLAN' :: character varying,
-                        'ACCOUNTCREDIT' :: character varying]
-                    ):: text[]
-                )
-            ),
-    transaction_date timestamp(6),
-    transaction_type varchar(255)
-        constraint sm_transaction_transaction_type_check check (
-            (transaction_type):: text = ANY (
-                (
-                    ARRAY [ 'INIT' :: character varying,
-                        'AUTHORIZE' :: character varying,
-                        'CAPTURE' :: character varying, 'AUTHORIZECAPTURE' :: character varying,
-                        'REFUND' :: character varying, 'OK' :: character varying]
-                    ):: text[]
-                )
-            ),
-    order_id         bigint
-        constraint fkdgyct8065xy9kp7entj7lcgsj references checkout.orders
 );

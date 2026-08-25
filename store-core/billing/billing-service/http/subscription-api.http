@@ -1,0 +1,217 @@
+# SubscriptionApi — com.asrevo.cvhome.billing.api.v1.SubscriptionApi (@RequestMapping "/api/v1/subscription")
+#
+# Addressed through the gateway, not billing's own port (:8021): store-core-gateway on :8000 is what
+# strips the /billing prefix and relays the session as a bearer token. Env vars come from the repo-root
+# http-client.env.json; the session id from http-client.private.env.json (gitignored — copy the .example
+# and log in once).
+#
+# Requires a running stack: ./extra/scripts/run-lcl.sh
+#
+# STORE_ID must be a store billing has seen. A store created before billing existed has no subscription
+# and correctly answers 404 — create one through tenancy first if you get that.
+
+### what the store is on, and when it renews
+# @name current
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("200 with a status", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status !== undefined, "no subscription status");
+    });
+    client.test("a trialling store carries its trial end and next renewal", function () {
+        if (response.body.status === "TRIALING") {
+            client.assert(response.body.trialEnd !== null, "TRIALING with no trialEnd");
+            client.assert(response.body.currentPeriodEnd !== null, "TRIALING with no renewal date");
+        }
+    });
+    client.test("an unpaid store names no plan", function () {
+        if (response.body.status === "PENDING") {
+            client.assert(response.body.planCode === null, "PENDING should not be on a plan");
+        }
+    });
+%}
+
+### tenant isolation — another ORG's store must never come back with data
+# Note STORE_ID and STORE_ID_2 in http-client.env.json are two stores of the SAME org, so neither
+# proves isolation. 65f020632bc46470c104b76f is ORG2-STORE1, seeded under a different org, and that is
+# what makes this block meaningful.
+#
+# The answer is 404 rather than 403, deliberately: "exists but is not yours" would confirm another
+# org's store to someone who cannot see it. The service scopes the query by the caller's org, so the
+# row is simply not found — see SubscriptionApi.tenantScopeOf for why the @PreAuthorize alone is not
+# enough today.
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store=65f020632bc46470c104b76f
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("another org's subscription is not disclosed", function () {
+        client.assert(response.status === 404, "expected 404, got " + response.status);
+        client.assert(response.body.planCode === undefined, "leaked another org's plan");
+    });
+%}
+
+### no session at all — the permission evaluator denies by default, so this must never reach the service
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store={{STORE_ID}}
+
+> {%
+    client.test("unauthenticated is refused", function () {
+        client.assert(response.status === 401 || response.status === 302,
+            "expected 401 or a login redirect, got " + response.status);
+    });
+%}
+
+### a store billing has never seen — 404 with a typed code, not an empty 200
+GET {{SELLER_UI_URL}}/billing/api/v1/subscription/current?store=000000000000000000000000
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("404 or 403, never a blank success", function () {
+        client.assert(response.status === 404 || response.status === 403, "status " + response.status);
+        if (response.status === 404) {
+            client.assert(response.body.code === "BILLING.SUBSCRIPTION.NOT_FOUND",
+                "untyped 404: " + JSON.stringify(response.body));
+        }
+    });
+%}
+
+
+### open a Stripe checkout — 200 with a URL, not a 302
+# A single-page console has to open the URL itself, and a browser will not usefully follow a redirect out
+# of an XHR. Needs BILLING.MANAGE (org admin), because this is the call that leads to a charge.
+# PLAN_PRICE_ID is set by plan-catalog-api.http; run that first.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/checkout?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PLAN_PRICE_ID}}
+}
+
+> {%
+    client.test("a checkout url comes back", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.url.startsWith("https://checkout.stripe.com/"),
+            "not a Stripe checkout url: " + response.body.url);
+    });
+%}
+
+### a price that was never published to Stripe is not purchasable — 404, not a provider error
+# Nothing is wrong with Stripe here; the catalog sync has not run. Reporting it as a provider fault would
+# send someone looking at the wrong system.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/checkout?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": "000000000000000000000000"
+}
+
+> {%
+    client.test("unknown price is a typed 404", function () {
+        client.assert(response.status === 404, "status " + response.status);
+        client.assert(response.body.code === "BILLING.PLAN_PRICE.NOT_FOUND", JSON.stringify(response.body));
+    });
+%}
+
+
+### upgrade — applies at once and charges the difference
+# Direction is not a parameter: billing works it out from the catalog (tier first, price as tie-break), so a client
+# cannot ask for an immediate move to a cheaper plan and take away a month the customer already paid for.
+# PRO_MONTH_PRICE_ID comes from plan-catalog-api.http.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/plan?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PRO_MONTH_PRICE_ID}}
+}
+
+> {%
+    client.test("the new plan is in force immediately, with nothing pending", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.planCode === "PRO", "plan is " + response.body.planCode);
+        client.assert(response.body.pendingPlanChange === null, "an upgrade should not be deferred");
+    });
+%}
+
+### downgrade — deferred, so the customer keeps what they paid for
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/plan?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "planPriceId": {{PLAN_PRICE_ID}}
+}
+
+> {%
+    client.test("the old plan stays in force and the change is pending", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.planCode === "PRO", "a downgrade must not apply immediately");
+        client.assert(response.body.pendingPlanChange !== null, "no pending change recorded");
+        client.assert(response.body.pendingPlanChange.effectiveAt === response.body.currentPeriodEnd,
+            "a downgrade should land exactly at the period end");
+    });
+%}
+
+### stop renewing — access is kept until the paid period runs out
+# Not a cancellation: status stays ACTIVE. A pending downgrade is dropped with it, because it would have landed at
+# the very moment the subscription ends.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/cancel?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "immediate": false
+}
+
+> {%
+    client.test("renewal off, access retained", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.status === "ACTIVE", "status changed to " + response.body.status);
+        client.assert(response.body.cancelAtPeriodEnd === true, "renewal was not switched off");
+        client.assert(response.body.pendingPlanChange === null, "a pending downgrade should have been dropped");
+    });
+%}
+
+### ending it now is administrators only
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/cancel?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+Content-Type: application/json
+
+{
+  "immediate": true
+}
+
+> {%
+    client.test("an org admin cannot throw away paid time", function () {
+        client.assert(response.status === 403, "expected 403, got " + response.status);
+        client.assert(response.body.code === "BILLING.SUBSCRIPTION.IMMEDIATE_CANCEL_FORBIDDEN",
+            JSON.stringify(response.body));
+    });
+%}
+
+### resume — renewal back on
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/resume?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("renewal restored", function () {
+        client.assert(response.status === 200, "status " + response.status);
+        client.assert(response.body.cancelAtPeriodEnd === false, "renewal is still off");
+    });
+%}
+
+### resuming something that was never stopped — 422, and Stripe is never called
+# The check runs before any provider call on purpose: an earlier version released the schedule at Stripe and only
+# then found there was nothing to resume, leaving the provider changed by a request that failed.
+POST {{SELLER_UI_URL}}/billing/api/v1/subscription/resume?store={{STORE_ID}}
+Cookie: STORE-CORE-GATEWAY-JSESSIONID={{ORG_ADMIN_SESSION_ID}}
+
+> {%
+    client.test("nothing to resume is a typed refusal", function () {
+        client.assert(response.status === 422, "status " + response.status);
+        client.assert(response.body.code === "BILLING.SUBSCRIPTION.TRANSITION_ILLEGAL", JSON.stringify(response.body));
+    });
+%}

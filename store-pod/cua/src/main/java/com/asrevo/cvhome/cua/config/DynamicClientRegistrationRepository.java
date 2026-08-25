@@ -7,23 +7,23 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 
-import com.asrevo.cvhome.cua.domain.SocialLoginConfig;
 import com.asrevo.cvhome.cua.domain.SocialLoginConfigId;
-import com.asrevo.cvhome.cua.repo.SocialLoginConfigRepository;
+import com.asrevo.cvhome.cua.service.SocialLoginConfigService;
+import com.asrevo.cvhome.cua.web.dto.ReadableSocialLoginConfig;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class DynamicClientRegistrationRepository implements ClientRegistrationRepository {
 
-    private final SocialLoginConfigRepository socialLoginConfigRepository;
+    private final SocialLoginConfigService socialLoginConfigService;
 
     private final InMemoryClientRegistrationRepository delegate;
 
-    public DynamicClientRegistrationRepository(SocialLoginConfigRepository socialLoginConfigRepository,
+    public DynamicClientRegistrationRepository(SocialLoginConfigService socialLoginConfigService,
                                                Map<String, ClientRegistration> registrations) {
 
-        this.socialLoginConfigRepository = socialLoginConfigRepository;
+        this.socialLoginConfigService = socialLoginConfigService;
         this.delegate = new InMemoryClientRegistrationRepository(new ArrayList<>(registrations.values()));
 
     }
@@ -41,26 +41,27 @@ public class DynamicClientRegistrationRepository implements ClientRegistrationRe
             return null;
         }
 
-        return socialLoginConfigRepository.findById(SocialLoginConfigId.fromRegistrationId(registrationId))
+        return socialLoginConfigService.findById(SocialLoginConfigId.fromRegistrationId(registrationId))
                 .map(config -> createClientRegistration(registrationId, config))
                 .orElse(null);
     }
 
-    private ClientRegistration.Builder createBuilder(String registrationId, SocialLoginConfig config) {
-        return config.getId().providerId().createBuilder(registrationId);
-    }
-
-    private ClientRegistration createClientRegistration(String registrationId, SocialLoginConfig config) {
+    private ClientRegistration createClientRegistration(String registrationId, ReadableSocialLoginConfig config) {
 
         ClientRegistration.Builder builder = createBuilder(registrationId, config);
 
         builder.clientId(config.getAppId()).clientSecret(config.getAppSecret());
 
-        if (config.getId().providerId() != null) {
-            builder.clientName(config.getId().providerId().getClientName());
+        if (config.getProviderId() != null) {
+            builder.clientName(config.getProviderId().getClientName());
         }
 
         return builder.build();
     }
+
+    private ClientRegistration.Builder createBuilder(String registrationId, ReadableSocialLoginConfig config) {
+        return config.getProviderId().createBuilder(registrationId);
+    }
+
 
 }

@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asrevo.cvhome.catalog.model.product.ProductDetails;
-import com.asrevo.cvhome.catalog.services.product.ExternalProductService;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCart;
 import com.asrevo.cvhome.checkout.entity.shoppingcart.ShoppingCartItem;
+import com.asrevo.cvhome.checkout.model.product.ProductDetails;
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartItemRepository;
 import com.asrevo.cvhome.checkout.repositories.shoppingcart.ShoppingCartRepository;
+import com.asrevo.cvhome.checkout.service.facade.product.ProductDetailsComposer;
+import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.exception.ServiceException;
-import com.asrevo.cvhome.store.core.model.reference.LanguageCode;
+import com.asrevo.cvhome.inventory.model.SkuPrice;
 import com.asrevo.cvhome.store.core.services.generic.SalesManagerEntityServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +28,17 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
 
     private final ShoppingCartRepository shoppingCartRepository;
 
-    private final ExternalProductService externalProductService;
+    private final ProductDetailsComposer productDetailsComposer;
 
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     @Autowired
     public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository,
-                                   ExternalProductService externalProductService, ShoppingCartItemRepository shoppingCartItemRepository) {
+                                   ProductDetailsComposer productDetailsComposer, ShoppingCartItemRepository shoppingCartItemRepository) {
         super(shoppingCartRepository);
         this.shoppingCartRepository = shoppingCartRepository;
 
-        this.externalProductService = externalProductService;
+        this.productDetailsComposer = productDetailsComposer;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
@@ -46,7 +46,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      * Save or update a {@link ShoppingCart} for a given customer
      */
     @Override
-    public void saveOrUpdate(ShoppingCart shoppingCart) throws ServiceException {
+    public void saveOrUpdate(ShoppingCart shoppingCart) {
 
         if (shoppingCart.getId() == null || shoppingCart.getId() == 0) {
             super.create(shoppingCart);
@@ -78,8 +78,7 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
      */
     @Override
     @Transactional
-    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store, LanguageCode languageCode)
-            throws ServiceException {
+    public ShoppingCart loadCartByCode(final String code, final StoreMerchantId store, LanguageCode languageCode) {
 
         try {
             ShoppingCart shoppingCart = shoppingCartRepository.findByCode(store, code);
@@ -91,60 +90,57 @@ public class ShoppingCartServiceImpl extends SalesManagerEntityServiceImpl<Long,
             if (shoppingCart.isObsolete()) {
                 delete(shoppingCart);
                 return null;
-            } else {
-                return shoppingCart;
             }
+            return shoppingCart;
 
         } catch (jakarta.persistence.NoResultException _) {
             return null;
-        } catch (Exception e) {
-            throw new ServiceException(e);
         }
     }
 
     private ShoppingCart getPopulatedShoppingCart(final ShoppingCart shoppingCart, StoreMerchantId store,
-                                                  LanguageCode language) throws Exception {
+                                                  LanguageCode language) {
 
-        try {
+        boolean cartIsObsolete = false;
+        if (shoppingCart != null) {
 
-            boolean cartIsObsolete = false;
-            if (shoppingCart != null) {
-
-                Set<ShoppingCartItem> items = shoppingCart.getLineItems();
-                if (items == null || items.isEmpty()) {
-                    shoppingCart.setObsolete(true);
-                    return shoppingCart;
-                }
-
-                for (ShoppingCartItem item : items) {
-                    log.debug("Populate item {}", item.getId());
-                    ProductDetails detailedProduct = externalProductService.getDetailedProduct(store, item.getSku(),
-                            language);
-                    item.setItemPrice(detailedProduct.price().getFinalPrice());
-
-                    BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
-                    item.setSubTotal(subTotal);
-
-                    log.debug("Obsolete item ? {}", item.isObsolete());
-                    if (item.isObsolete()) {
-                        cartIsObsolete = true;
-                    }
-                }
-
-                Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
-
-                shoppingCart.setLineItems(refreshedItems);
-                update(shoppingCart);
-
-                if (cartIsObsolete) {
-                    shoppingCart.setObsolete(true);
-                }
+            Set<ShoppingCartItem> items = shoppingCart.getLineItems();
+            if (items == null || items.isEmpty()) {
+                shoppingCart.setObsolete(true);
                 return shoppingCart;
             }
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ServiceException(e);
+            for (ShoppingCartItem item : items) {
+                log.debug("Populate item {}", item.getId());
+                ProductDetails detailedProduct = productDetailsComposer.getDetailedProduct(store, item.getSku(),
+                        language);
+                SkuPrice price = detailedProduct.inventory().price();
+                if (price == null) {
+                    // Priced nowhere any more: the line cannot be sold, and the cart is rebuilt without it.
+                    item.setObsolete(true);
+                    cartIsObsolete = true;
+                    continue;
+                }
+                item.setItemPrice(price.finalPrice());
+
+                BigDecimal subTotal = item.getItemPrice().multiply(new BigDecimal(item.getQuantity()));
+                item.setSubTotal(subTotal);
+
+                log.debug("Obsolete item ? {}", item.isObsolete());
+                if (item.isObsolete()) {
+                    cartIsObsolete = true;
+                }
+            }
+
+            Set<ShoppingCartItem> refreshedItems = new HashSet<>(items);
+
+            shoppingCart.setLineItems(refreshedItems);
+            update(shoppingCart);
+
+            if (cartIsObsolete) {
+                shoppingCart.setObsolete(true);
+            }
+            return shoppingCart;
         }
 
         return shoppingCart;

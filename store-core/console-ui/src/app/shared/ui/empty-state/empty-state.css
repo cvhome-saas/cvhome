@@ -1,0 +1,38 @@
+:host {
+  display: grid;
+  justify-items: center;
+  gap: .75rem;
+  margin: 0;
+  padding: 3.5rem 1.25rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  text-align: center;
+  --icon-size: 1.25rem;
+}
+
+/* Inside a list column or an editor pane, where 3.5rem of air would push the panel off-screen. */
+:host(.compact) {
+  padding: 1.75rem 1rem;
+}
+
+app-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  color: var(--foreground-subtle);
+}
+
+.empty-title {
+  margin: 0;
+  color: var(--foreground-strong);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.empty-copy {
+  margin: 0;
+  max-inline-size: 26rem;
+}

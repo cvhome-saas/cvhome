@@ -1,20 +1,20 @@
 package com.asrevo.cvhome.catalog.model.product;
 
 import java.io.Serial;
-import java.io.Serializable;
 
 import com.asrevo.cvhome.commons.domain.Entity;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+/**
+ * A product image as read: {@code imageUrl} is where a browser fetches it from, whether that is the store's CDN
+ * path or an external url.
+ */
 @Getter
-public class ReadableImage extends Entity implements Serializable {
+@Setter
+public class ReadableImage extends Entity {
 
-    /**
-     *
-     */
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -31,5 +31,4 @@ public class ReadableImage extends Entity implements Serializable {
     private int order;
 
     private boolean defaultImage;
-
 }

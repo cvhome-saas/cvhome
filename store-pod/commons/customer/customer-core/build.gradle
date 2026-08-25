@@ -1,17 +1,19 @@
 plugins {
-	alias(libs.plugins.java.library.conventions)
+    alias(libs.plugins.java.library.conventions)
 }
 
 dependencies {
-	api project(':store-pod:commons:store-commons')
-	api project(':store-pod:commons:reference:reference-core')
-	implementation project(':store-pod:commons:customer:customer-commons')
-	implementation libs.commons.beanutils
-	compileOnly libs.spring.data.jpa
-	compileOnly libs.jakarta.validation.api
-	compileOnly libs.jackson.annotations
-	compileOnly libs.apache.commons.lang3
-	compileOnly libs.lombok
-	compileOnly libs.hibernate.core
-	annotationProcessor libs.lombok
+    api project(':store-pod:commons:store-commons')
+    api project(':store-pod:commons:reference:reference-core')
+    // api, not implementation: the populators' throws clauses name customer-commons exception types, so a consumer
+    // has to see them to catch them.
+    api project(':store-pod:commons:customer:customer-commons')
+    implementation libs.commons.beanutils
+    compileOnly libs.spring.data.jpa
+    compileOnly libs.jakarta.validation.api
+    compileOnly libs.jackson.annotations
+    compileOnly libs.apache.commons.lang3
+    compileOnly libs.lombok
+    compileOnly libs.hibernate.core
+    annotationProcessor libs.lombok
 }
