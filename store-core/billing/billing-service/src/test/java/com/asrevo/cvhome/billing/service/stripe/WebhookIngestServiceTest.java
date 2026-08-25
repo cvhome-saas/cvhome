@@ -42,6 +42,12 @@ import static org.mockito.Mockito.when;
  */
 class WebhookIngestServiceTest {
 
+    private static final String CUS_TEST_1 = "cus_test_1";
+
+    private static final String SUB_TEST_1 = "sub_test_1";
+
+    private static final String SUBSCRIPTION_UPDATED_JSON = "subscription-updated.json";
+
     private static final String STORE = "65f023632bc46470c104b76f";
 
     private ProcessedStripeEventRepository processed;
@@ -65,11 +71,11 @@ class WebhookIngestServiceTest {
     private static StoreSubscriptionEntity boundSubscription() {
         StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(new StoreMerchantId(STORE),
                 new ManagerOrgId("32a034a43cd77581d105c87a"));
-        return entity.bindProvider(new StripeCustomerId("cus_test_1"), new StripeSubscriptionId("sub_test_1"));
+        return entity.bindProvider(new StripeCustomerId(CUS_TEST_1), new StripeSubscriptionId(SUB_TEST_1));
     }
 
     private void subscriptionIsBound() {
-        when(subscriptions.findByStripeSubscriptionId(new StripeSubscriptionId("sub_test_1")))
+        when(subscriptions.findByStripeSubscriptionId(new StripeSubscriptionId(SUB_TEST_1)))
                 .thenReturn(Optional.of(boundSubscription()));
     }
 
@@ -98,7 +104,7 @@ class WebhookIngestServiceTest {
     @Test
     @DisplayName("a subscription event is attributed by the metadata set at checkout")
     void subscriptionIsAttributedByMetadata() {
-        service.ingest(StripeEventFixtures.event("subscription-updated.json"));
+        service.ingest(StripeEventFixtures.event(SUBSCRIPTION_UPDATED_JSON));
 
         assertThat(scheduled().store()).isEqualTo(STORE);
     }
@@ -189,7 +195,7 @@ class WebhookIngestServiceTest {
     void anInvoiceThatArrivedTooEarlyFails() {
         when(subscriptions.findByStripeSubscriptionId(new StripeSubscriptionId("sub_not_bound_yet")))
                 .thenReturn(Optional.empty());
-        when(subscriptions.existsByStripeCustomerId(new StripeCustomerId("cus_test_1"))).thenReturn(true);
+        when(subscriptions.existsByStripeCustomerId(new StripeCustomerId(CUS_TEST_1))).thenReturn(true);
 
         // Stripe does not order deliveries, so a paid invoice can genuinely arrive before the subscription event
         // that binds it. Recording it as ignored would drop a payment from history for good, because the event id
@@ -208,7 +214,7 @@ class WebhookIngestServiceTest {
     void aRedeliveryIsDropped() {
         when(processed.claim(anyString(), anyString(), any(), anyString(), any(), any())).thenReturn(0);
 
-        service.ingest(StripeEventFixtures.event("subscription-updated.json"));
+        service.ingest(StripeEventFixtures.event(SUBSCRIPTION_UPDATED_JSON));
 
         // The claim is the whole idempotency story: two deliveries race on the primary key, one wins and enqueues,
         // the other sees zero rows and returns.
@@ -218,7 +224,7 @@ class WebhookIngestServiceTest {
     @Test
     @DisplayName("a scheduled event is recorded as SCHEDULED with no processed time")
     void aScheduledEventIsNotYetProcessed() {
-        service.ingest(StripeEventFixtures.event("subscription-updated.json"));
+        service.ingest(StripeEventFixtures.event(SUBSCRIPTION_UPDATED_JSON));
 
         ArgumentCaptor<Instant> processedAt = ArgumentCaptor.forClass(Instant.class);
         verify(processed).claim(eq("evt_subscription_updated"), eq("customer.subscription.updated"), any(),
@@ -231,7 +237,7 @@ class WebhookIngestServiceTest {
     @Test
     @DisplayName("the outbox is partitioned by store, which is what stands in for a distributed lock")
     void schedulesOnTheStorePartition() {
-        service.ingest(StripeEventFixtures.event("subscription-updated.json"));
+        service.ingest(StripeEventFixtures.event(SUBSCRIPTION_UPDATED_JSON));
 
         ArgumentCaptor<String> key = ArgumentCaptor.forClass(String.class);
         verify(outbox).schedule(any(StripeWebhookReceivedEvent.class), key.capture());

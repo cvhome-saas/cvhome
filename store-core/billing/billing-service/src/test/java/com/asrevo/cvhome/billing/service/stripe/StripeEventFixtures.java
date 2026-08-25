@@ -30,10 +30,10 @@ public final class StripeEventFixtures {
 
     /** The raw body of a fixture, byte for byte as it will be signed. */
     public static String payload(String name) {
-        String resource = "/stripe/" + name;
+        String resource = String.format("/stripe/%s", name);
         try (InputStream in = StripeEventFixtures.class.getResourceAsStream(resource)) {
             if (in == null) {
-                throw new IllegalArgumentException("No such Stripe fixture: " + resource);
+                throw new IllegalArgumentException(String.format("No such Stripe fixture: %s", resource));
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {

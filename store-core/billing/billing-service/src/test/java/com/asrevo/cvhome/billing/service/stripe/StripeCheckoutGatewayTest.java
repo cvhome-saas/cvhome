@@ -47,11 +47,23 @@ import static org.mockito.Mockito.when;
  */
 class StripeCheckoutGatewayTest {
 
+    private static final String CS_1 = "cs_1";
+
+    private static final String HTTPS_CHECKOUT_STRIPE_TEST_CS_1 = "https://checkout.stripe.test/cs_1";
+
+    private static final String HTTPS_CONSOLE_NO = "https://console/no";
+
+    private static final String HTTPS_CONSOLE_OK = "https://console/ok";
+
+    private static final String PRICE_PRO_MONTHLY = "price_pro_monthly";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
 
-    private static final StripeCustomerId CUSTOMER = new StripeCustomerId("cus_1");
+    private static final String CUSTOMER_ID = "cus_1";
+
+    private static final StripeCustomerId CUSTOMER = new StripeCustomerId(CUSTOMER_ID);
 
     private StripeClient stripe;
 
@@ -71,20 +83,20 @@ class StripeCheckoutGatewayTest {
     private static PlanPriceEntity price() {
         PlanPriceEntity price = PlanPriceEntity.create(PlanId.newId(), new CurrencyCode("USD"), 3000L,
                 BillingInterval.MONTH, 0);
-        return price.publishedAs(new StripePriceId("price_pro_monthly"));
+        return price.publishedAs(new StripePriceId(PRICE_PRO_MONTHLY));
     }
 
     private String open() throws Exception {
-        return gateway.createSubscriptionSession(STORE, ORG, CUSTOMER, price(), "https://console/ok",
-                "https://console/no");
+        return gateway.createSubscriptionSession(STORE, ORG, CUSTOMER, price(), HTTPS_CONSOLE_OK,
+                HTTPS_CONSOLE_NO);
     }
 
     @Test
     @DisplayName("the session is subscription mode, on the org's customer, and returns its URL")
     void opensASubscriptionSession() throws Exception {
         Session session = mock(Session.class);
-        when(session.getId()).thenReturn("cs_1");
-        when(session.getUrl()).thenReturn("https://checkout.stripe.test/cs_1");
+        when(session.getId()).thenReturn(CS_1);
+        when(session.getUrl()).thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
         when(stripe.checkout().sessions().create(any(SessionCreateParams.class), any(RequestOptions.class)))
                 .thenReturn(session);
 
@@ -92,14 +104,14 @@ class StripeCheckoutGatewayTest {
 
         ArgumentCaptor<SessionCreateParams> params = ArgumentCaptor.forClass(SessionCreateParams.class);
         verify(stripe.checkout().sessions()).create(params.capture(), any(RequestOptions.class));
-        assertThat(url).isEqualTo("https://checkout.stripe.test/cs_1");
+        assertThat(url).isEqualTo(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
         assertThat(params.getValue().getMode()).isEqualTo(SessionCreateParams.Mode.SUBSCRIPTION);
-        assertThat(params.getValue().getCustomer()).isEqualTo("cus_1");
-        assertThat(params.getValue().getSuccessUrl()).isEqualTo("https://console/ok");
-        assertThat(params.getValue().getCancelUrl()).isEqualTo("https://console/no");
+        assertThat(params.getValue().getCustomer()).isEqualTo(CUSTOMER_ID);
+        assertThat(params.getValue().getSuccessUrl()).isEqualTo(HTTPS_CONSOLE_OK);
+        assertThat(params.getValue().getCancelUrl()).isEqualTo(HTTPS_CONSOLE_NO);
         assertThat(params.getValue().getLineItems()).singleElement()
                 .satisfies(item -> {
-                    assertThat(item.getPrice()).isEqualTo("price_pro_monthly");
+                    assertThat(item.getPrice()).isEqualTo(PRICE_PRO_MONTHLY);
                     assertThat(item.getQuantity()).isEqualTo(1L);
                 });
     }
@@ -108,8 +120,8 @@ class StripeCheckoutGatewayTest {
     @DisplayName("the store id travels both as the client reference and in the subscription's metadata")
     void carriesTheStoreTwice() throws Exception {
         Session session = mock(Session.class);
-        when(session.getId()).thenReturn("cs_1");
-        when(session.getUrl()).thenReturn("https://checkout.stripe.test/cs_1");
+        when(session.getId()).thenReturn(CS_1);
+        when(session.getUrl()).thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
         when(stripe.checkout().sessions().create(any(SessionCreateParams.class), any(RequestOptions.class)))
                 .thenReturn(session);
 
@@ -151,13 +163,13 @@ class StripeCheckoutGatewayTest {
     @DisplayName("the idempotency key names the store and the price, and buckets by the minute")
     void idempotencyKeyIsScopedAndTimeBucketed() throws Exception {
         Session session = mock(Session.class);
-        when(session.getId()).thenReturn("cs_1");
-        when(session.getUrl()).thenReturn("https://checkout.stripe.test/cs_1");
+        when(session.getId()).thenReturn(CS_1);
+        when(session.getUrl()).thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
         when(stripe.checkout().sessions().create(any(SessionCreateParams.class), any(RequestOptions.class)))
                 .thenReturn(session);
         PlanPriceEntity price = price();
 
-        gateway.createSubscriptionSession(STORE, ORG, CUSTOMER, price, "https://console/ok", "https://console/no");
+        gateway.createSubscriptionSession(STORE, ORG, CUSTOMER, price, HTTPS_CONSOLE_OK, HTTPS_CONSOLE_NO);
 
         ArgumentCaptor<RequestOptions> options = ArgumentCaptor.forClass(RequestOptions.class);
         verify(stripe.checkout().sessions()).create(any(SessionCreateParams.class), options.capture());

@@ -146,7 +146,7 @@ class StripeWebhookVerifierTest {
     void refusesAHeaderWithoutASignature() {
         StripeWebhookVerifier verifier = verifierWith(SECRET);
 
-        assertThatThrownBy(() -> verifier.verify(PAYLOAD, headers("t=" + Instant.now().getEpochSecond())))
+        assertThatThrownBy(() -> verifier.verify(PAYLOAD, headers(String.format("t=%d", Instant.now().getEpochSecond()))))
                 .isInstanceOf(InvalidWebhookSignatureException.class);
     }
 

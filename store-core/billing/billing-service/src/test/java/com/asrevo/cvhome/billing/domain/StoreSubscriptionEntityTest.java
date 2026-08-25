@@ -51,6 +51,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class StoreSubscriptionEntityTest {
 
+    private static final String CUS_1 = "cus_1";
+
+    private static final String DOMAIN_EVENTS = "domainEvents";
+
+    private static final String SUB_1 = "sub_1";
+
+    private static final String SUB_SCHED_1 = "sub_sched_1";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
@@ -87,12 +95,12 @@ class StoreSubscriptionEntityTest {
     private static Method findDomainEvents(Class<?> type) throws NoSuchMethodException {
         for (Class<?> current = type; current != null; current = current.getSuperclass()) {
             try {
-                return current.getDeclaredMethod("domainEvents");
+                return current.getDeclaredMethod(DOMAIN_EVENTS);
             } catch (NoSuchMethodException ignored) {
                 // keep walking up to AbstractAggregateRoot
             }
         }
-        throw new NoSuchMethodException("domainEvents");
+        throw new NoSuchMethodException(DOMAIN_EVENTS);
     }
 
     private static StoreSubscriptionEntity active() throws IllegalSubscriptionTransitionException {
@@ -361,7 +369,7 @@ class StoreSubscriptionEntityTest {
         void upgradeAppliesImmediately() throws Exception {
             StoreSubscriptionEntity entity = active();
             entity.scheduleDowngradeTo(CHEAPER_PRICE, PERIOD_END);
-            entity.bindSchedule(new StripeScheduleId("sub_sched_1"));
+            entity.bindSchedule(new StripeScheduleId(SUB_SCHED_1));
 
             entity.upgradeTo(OTHER_PLAN, CHEAPER_PRICE, PERIOD_START, PERIOD_END);
 
@@ -397,7 +405,7 @@ class StoreSubscriptionEntityTest {
         void applyPendingChangeIsIdempotent() throws Exception {
             StoreSubscriptionEntity entity = active();
             entity.scheduleDowngradeTo(CHEAPER_PRICE, PERIOD_END);
-            entity.bindSchedule(new StripeScheduleId("sub_sched_1"));
+            entity.bindSchedule(new StripeScheduleId(SUB_SCHED_1));
 
             entity.applyPendingChange(OTHER_PLAN, CHEAPER_PRICE);
             int announced = eventsOf(entity).size();
@@ -471,7 +479,7 @@ class StoreSubscriptionEntityTest {
             StoreSubscriptionEntity entity = active();
             entity.scheduleCancel();
             entity.scheduleDowngradeTo(CHEAPER_PRICE, PERIOD_END);
-            entity.bindSchedule(new StripeScheduleId("sub_sched_1"));
+            entity.bindSchedule(new StripeScheduleId(SUB_SCHED_1));
 
             entity.revokePendingChange();
 
@@ -585,8 +593,8 @@ class StoreSubscriptionEntityTest {
         @DisplayName("reopening returns a cancelled store to unpaid and forgets every provider identifier")
         void reopenClearsProviderState() throws Exception {
             StoreSubscriptionEntity entity = active();
-            entity.bindProvider(new StripeCustomerId("cus_1"), new StripeSubscriptionId("sub_1"));
-            entity.bindSchedule(new StripeScheduleId("sub_sched_1"));
+            entity.bindProvider(new StripeCustomerId(CUS_1), new StripeSubscriptionId(SUB_1));
+            entity.bindSchedule(new StripeScheduleId(SUB_SCHED_1));
             entity.cancelNow(PERIOD_END);
 
             entity.reopen();
@@ -602,7 +610,7 @@ class StoreSubscriptionEntityTest {
             assertThat(entity.getCurrentPeriodStart()).isNull();
             assertThat(entity.getCurrentPeriodEnd()).isNull();
             // The customer is the org's and outlives the subscription — the card stays on file.
-            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_1"));
+            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_1));
         }
 
         @Test
@@ -625,10 +633,10 @@ class StoreSubscriptionEntityTest {
         void bindProviderIsNotATransition() {
             StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(STORE, ORG);
 
-            entity.bindProvider(new StripeCustomerId("cus_1"), new StripeSubscriptionId("sub_1"));
+            entity.bindProvider(new StripeCustomerId(CUS_1), new StripeSubscriptionId(SUB_1));
 
-            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_1"));
-            assertThat(entity.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId("sub_1"));
+            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_1));
+            assertThat(entity.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId(SUB_1));
             // Checkout completing is not payment. Activating here would open stores that abandoned the payment page.
             assertThat(entity.getStatus()).isEqualTo(SubscriptionStatus.PENDING);
             assertThat(eventsOf(entity)).isEmpty();
@@ -639,9 +647,9 @@ class StoreSubscriptionEntityTest {
         void bindCustomerAlone() {
             StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(STORE, ORG);
 
-            entity.bindCustomer(new StripeCustomerId("cus_1"));
+            entity.bindCustomer(new StripeCustomerId(CUS_1));
 
-            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_1"));
+            assertThat(entity.getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_1));
             assertThat(entity.getStripeSubscriptionId()).isNull();
         }
     }

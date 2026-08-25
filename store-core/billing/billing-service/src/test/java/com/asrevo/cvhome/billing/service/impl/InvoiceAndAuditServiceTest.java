@@ -56,6 +56,18 @@ import static org.mockito.Mockito.when;
  */
 class InvoiceAndAuditServiceTest {
 
+    private static final String CVH_0001 = "CVH-0001";
+
+    private static final String EVT_1 = "evt_1";
+
+    private static final String HTTPS_INVOICE_STRIPE_TEST_IN_1 = "https://invoice.stripe.test/in_1";
+
+    private static final String HTTPS_INVOICE_STRIPE_TEST_IN_1_PDF = "https://invoice.stripe.test/in_1.pdf";
+
+    private static final String IN_1 = "in_1";
+
+    private static final String OWNER_EXAMPLE_TEST = "owner@example.test";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
@@ -79,11 +91,11 @@ class InvoiceAndAuditServiceTest {
     }
 
     private static SubscriptionInvoiceEntity invoice() {
-        return SubscriptionInvoiceEntity.record(new StripeInvoiceId("in_1"), STORE, ORG,
-                        new StripeSubscriptionId("sub_1"), "CVH-0001", InvoiceStatus.PAID,
+        return SubscriptionInvoiceEntity.record(new StripeInvoiceId(IN_1), STORE, ORG,
+                        new StripeSubscriptionId("sub_1"), CVH_0001, InvoiceStatus.PAID,
                         new Money(new CurrencyCode("USD"), 3000L), 3000L, ISSUED)
                 .covering(ISSUED, ISSUED.plusSeconds(2_592_000L))
-                .hostedAt("https://invoice.stripe.test/in_1", "https://invoice.stripe.test/in_1.pdf");
+                .hostedAt(HTTPS_INVOICE_STRIPE_TEST_IN_1, HTTPS_INVOICE_STRIPE_TEST_IN_1_PDF);
     }
 
     // ---------------------------------------------------------------------------------------------- invoices
@@ -121,15 +133,15 @@ class InvoiceAndAuditServiceTest {
 
         InvoiceView view = invoiceService.list(STORE, null, PageRequest.of(0, 20)).getContent().getFirst();
 
-        assertThat(view.id()).isEqualTo(new StripeInvoiceId("in_1"));
-        assertThat(view.number()).isEqualTo("CVH-0001");
+        assertThat(view.id()).isEqualTo(new StripeInvoiceId(IN_1));
+        assertThat(view.number()).isEqualTo(CVH_0001);
         assertThat(view.status()).isEqualTo(InvoiceStatus.PAID);
         // Minor units end to end, which is what Stripe speaks — no rounding step between the catalog and an invoice.
         assertThat(view.amountDue().minorUnits()).isEqualTo(3000L);
         assertThat(view.amountPaid().minorUnits()).isEqualTo(3000L);
         assertThat(view.issuedAt()).isEqualTo(ISSUED);
-        assertThat(view.hostedInvoiceUrl()).isEqualTo("https://invoice.stripe.test/in_1");
-        assertThat(view.invoicePdfUrl()).isEqualTo("https://invoice.stripe.test/in_1.pdf");
+        assertThat(view.hostedInvoiceUrl()).isEqualTo(HTTPS_INVOICE_STRIPE_TEST_IN_1);
+        assertThat(view.invoicePdfUrl()).isEqualTo(HTTPS_INVOICE_STRIPE_TEST_IN_1_PDF);
     }
 
     // ------------------------------------------------------------------------------------------------- audit
@@ -142,7 +154,7 @@ class InvoiceAndAuditServiceTest {
         PlanId fromPlan = PlanId.newId();
 
         auditService.record(SubscriptionStatus.PENDING, fromPlan, after, AuditEventType.ACTIVATED,
-                ChangeSource.API, "owner@example.test");
+                ChangeSource.API, OWNER_EXAMPLE_TEST);
 
         ArgumentCaptor<SubscriptionAuditEntity> saved = ArgumentCaptor.forClass(SubscriptionAuditEntity.class);
         verify(audits).save(saved.capture());
@@ -150,7 +162,7 @@ class InvoiceAndAuditServiceTest {
         assertThat(saved.getValue().getToStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
         assertThat(saved.getValue().getFromPlanId()).isEqualTo(fromPlan);
         assertThat(saved.getValue().getSource()).isEqualTo(ChangeSource.API);
-        assertThat(saved.getValue().getActor()).isEqualTo("owner@example.test");
+        assertThat(saved.getValue().getActor()).isEqualTo(OWNER_EXAMPLE_TEST);
         assertThat(saved.getValue().getStripeEventId()).isNull();
     }
 
@@ -161,7 +173,7 @@ class InvoiceAndAuditServiceTest {
                 .activate(PlanId.newId(), null, ISSUED, ISSUED);
 
         auditService.recordFromWebhook(SubscriptionStatus.PENDING, null, after, AuditEventType.ACTIVATED,
-                new StripeEventId("evt_1"));
+                new StripeEventId(EVT_1));
 
         ArgumentCaptor<SubscriptionAuditEntity> saved = ArgumentCaptor.forClass(SubscriptionAuditEntity.class);
         verify(audits).save(saved.capture());
@@ -169,7 +181,7 @@ class InvoiceAndAuditServiceTest {
         // Not the customer: the customer's act was the payment, and this is the provider telling us what came of it.
         assertThat(saved.getValue().getActor()).isEqualTo("stripe");
         // The link back to the delivery, which is what makes a disputed charge traceable.
-        assertThat(saved.getValue().getStripeEventId()).isEqualTo(new StripeEventId("evt_1"));
+        assertThat(saved.getValue().getStripeEventId()).isEqualTo(new StripeEventId(EVT_1));
     }
 
     @Test
@@ -204,7 +216,7 @@ class InvoiceAndAuditServiceTest {
     void filtersReachTheQuery() {
         when(audits.findVisible(any(), any(), any(), any(), any(), any(), anyInt(), anyLong()))
                 .thenReturn(List.of());
-        Instant from = Instant.parse("2026-01-01T00:00:00Z");
+        Instant from = ISSUED;
         Instant to = Instant.parse("2026-02-01T00:00:00Z");
 
         auditService.search(new ListAuditQuery(STORE, ORG, AuditEventType.CANCELED, ChangeSource.API, from, to),

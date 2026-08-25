@@ -40,6 +40,12 @@ import static org.mockito.Mockito.when;
  */
 class StripeCustomerGatewayTest {
 
+    private static final String CUS_EXISTING = "cus_existing";
+
+    private static final String CUS_NEW = "cus_new";
+
+    private static final String OWNER_EXAMPLE_TEST = "owner@example.test";
+
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
 
     private StripeClient stripe;
@@ -65,11 +71,11 @@ class StripeCustomerGatewayTest {
     @Test
     @DisplayName("an org that already has a customer is not given a second one")
     void reusesTheOrgsCustomer() throws Exception {
-        when(subscriptions.findCustomerOf(ORG)).thenReturn(Optional.of(new StripeCustomerId("cus_existing")));
+        when(subscriptions.findCustomerOf(ORG)).thenReturn(Optional.of(new StripeCustomerId(CUS_EXISTING)));
 
-        StripeCustomerId id = gateway.findOrCreate(ORG, "owner@example.test");
+        StripeCustomerId id = gateway.findOrCreate(ORG, OWNER_EXAMPLE_TEST);
 
-        assertThat(id).isEqualTo(new StripeCustomerId("cus_existing"));
+        assertThat(id).isEqualTo(new StripeCustomerId(CUS_EXISTING));
         // Not one call to Stripe. Billing details, the card and the portal are things an org owns once; creating a
         // second customer would ask the owner to enter the same card for every store they open.
         verify(stripe.customers(), never()).create(any(CustomerCreateParams.class), any(RequestOptions.class));
@@ -80,23 +86,23 @@ class StripeCustomerGatewayTest {
     void createsTheCustomer() throws Exception {
         when(subscriptions.findCustomerOf(ORG)).thenReturn(Optional.empty());
         Customer created = mock(Customer.class);
-        when(created.getId()).thenReturn("cus_new");
+        when(created.getId()).thenReturn(CUS_NEW);
         when(stripe.customers().create(any(CustomerCreateParams.class), any(RequestOptions.class)))
                 .thenReturn(created);
 
-        StripeCustomerId id = gateway.findOrCreate(ORG, "owner@example.test");
+        StripeCustomerId id = gateway.findOrCreate(ORG, OWNER_EXAMPLE_TEST);
 
         ArgumentCaptor<CustomerCreateParams> params = ArgumentCaptor.forClass(CustomerCreateParams.class);
         ArgumentCaptor<RequestOptions> options = ArgumentCaptor.forClass(RequestOptions.class);
         verify(stripe.customers()).create(params.capture(), options.capture());
-        assertThat(id).isEqualTo(new StripeCustomerId("cus_new"));
-        assertThat(params.getValue().getEmail()).isEqualTo("owner@example.test");
+        assertThat(id).isEqualTo(new StripeCustomerId(CUS_NEW));
+        assertThat(params.getValue().getEmail()).isEqualTo(OWNER_EXAMPLE_TEST);
         // The org travels in metadata so a Stripe dashboard row can be traced back to a tenant.
         assertThat(params.getValue().getMetadata())
                 .isEqualTo(java.util.Map.of("orgId", ORG.getId().toString()));
         // Derived from the org alone, with no time component: "this org's customer" is a fact that must never be
         // created twice however far apart the attempts are.
-        assertThat(options.getValue().getIdempotencyKey()).isEqualTo("customer:" + ORG.getId());
+        assertThat(options.getValue().getIdempotencyKey()).isEqualTo(String.format("customer:%s", ORG.getId()));
     }
 
     @Test
@@ -108,7 +114,7 @@ class StripeCustomerGatewayTest {
 
         // Every failure of this call is an unknown outcome, never a refusal: creating a customer takes no payment,
         // so there is nothing for a card to decline.
-        assertThatThrownBy(() -> gateway.findOrCreate(ORG, "owner@example.test"))
+        assertThatThrownBy(() -> gateway.findOrCreate(ORG, OWNER_EXAMPLE_TEST))
                 .isInstanceOf(BillingProviderUnavailableException.class);
     }
 

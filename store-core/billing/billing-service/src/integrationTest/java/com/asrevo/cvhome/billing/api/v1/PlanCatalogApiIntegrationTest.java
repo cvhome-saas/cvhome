@@ -36,6 +36,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class PlanCatalogApiIntegrationTest {
 
+    private static final String CODE = "code";
+
+    private static final String PRICES = "prices";
+
+    private static final String USD = "USD";
+
     private static final String PLANS = path(V1, "plan", "public", "plans");
 
     @LocalServerPort
@@ -49,6 +55,10 @@ class PlanCatalogApiIntegrationTest {
     @BeforeEach
     void setUp() {
         api = new BillingApiSupport(port, signer);
+    }
+
+    private static String currency(String code) {
+        return String.format("%s?currency=%s", PLANS, code);
     }
 
     @Test
@@ -67,9 +77,9 @@ class PlanCatalogApiIntegrationTest {
 
         assertThat(plans).isNotEmpty();
         JsonNode first = plans.get(0);
-        assertThat(first.get("code").asString()).isNotBlank();
+        assertThat(first.get(CODE).asString()).isNotBlank();
         assertThat(first.get("displayName").asString()).isNotBlank();
-        assertThat(first.get("prices")).isNotEmpty();
+        assertThat(first.get(PRICES)).isNotEmpty();
         assertThat(first.get("entitlements")).isNotNull();
 
         // Ordered by tier, which is what makes "is this an upgrade" answerable and what a pricing page renders in.
@@ -85,12 +95,12 @@ class PlanCatalogApiIntegrationTest {
     @DisplayName("a currency filter narrows the prices without dropping any plan")
     void filtersByCurrency() {
         JsonNode all = json(api.get(PLANS, null));
-        JsonNode usd = json(api.get(PLANS + "?currency=USD", null));
+        JsonNode usd = json(api.get(currency(USD), null));
 
         assertThat(usd).hasSameSizeAs(all);
         for (JsonNode plan : usd) {
-            for (JsonNode price : plan.get("prices")) {
-                assertThat(price.get("amount").get("currency").get("code").asString()).isEqualTo("USD");
+            for (JsonNode price : plan.get(PRICES)) {
+                assertThat(price.get("amount").get("currency").get(CODE).asString()).isEqualTo(USD);
             }
         }
     }
@@ -98,12 +108,12 @@ class PlanCatalogApiIntegrationTest {
     @Test
     @DisplayName("a currency nobody is priced in leaves every plan with no prices, not an error")
     void anUnknownCurrencyIsEmptyRatherThanMissing() {
-        JsonNode plans = json(api.get(PLANS + "?currency=ZZZ", null));
+        JsonNode plans = json(api.get(currency("ZZZ"), null));
 
         // The plan is still a plan; what to do with an empty price list is the pricing page's decision.
         assertThat(plans).isNotEmpty();
         for (JsonNode plan : plans) {
-            assertThat(plan.get("prices")).isEmpty();
+            assertThat(plan.get(PRICES)).isEmpty();
         }
     }
 

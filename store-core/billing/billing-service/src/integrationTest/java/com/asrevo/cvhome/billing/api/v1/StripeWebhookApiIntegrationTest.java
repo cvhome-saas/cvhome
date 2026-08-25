@@ -101,7 +101,7 @@ class StripeWebhookApiIntegrationTest {
     }
 
     private static String eventId(String suffix) {
-        return "evt_it_" + suffix + "_" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        return String.format("evt_it_%s_%s", suffix, java.util.UUID.randomUUID().toString().substring(0, 8));
     }
 
     // ------------------------------------------------------------------------------------------- accepted

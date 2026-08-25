@@ -40,13 +40,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class PlatformBillingApiIntegrationTest {
 
-    private static final String SUBSCRIPTIONS = path(V1, "platform", "subscriptions");
+    private static final String ACTIVE = "ACTIVE";
 
-    private static final String INVOICES = path(V1, "platform", "invoices");
+    private static final String ID = "id";
 
-    private static final String TOTALS = path(V1, "platform", "invoices", "totals");
+    private static final String ORG_FIELD = "org";
 
-    private static final String AUDIT = path(V1, "platform", "audit");
+    private static final String STATUS_FIELD = "status";
+
+    private static final String PLATFORM = "platform";
+
+    private static final String INVOICES_SEGMENT = "invoices";
+
+    private static final String SUBSCRIPTIONS = path(V1, PLATFORM, "subscriptions");
+
+    private static final String INVOICES = path(V1, PLATFORM, INVOICES_SEGMENT);
+
+    private static final String TOTALS = path(V1, PLATFORM, INVOICES_SEGMENT, "totals");
+
+    private static final String AUDIT = path(V1, PLATFORM, "audit");
 
     private static final String CONTENT = "content";
 
@@ -91,14 +103,14 @@ class PlatformBillingApiIntegrationTest {
         assertThat(page.get(CONTENT)).isNotEmpty();
         assertThat(page.get(TOTAL_ELEMENTS).asLong()).isPositive();
         // Both tenants are seeded, so a listing that had quietly acquired an org filter would show only one.
-        assertThat(page.get(CONTENT).valueStream().map(it -> it.get("org").get("id").asString()).toList())
+        assertThat(page.get(CONTENT).valueStream().map(it -> it.get(ORG_FIELD).get(ID).asString()).toList())
                 .contains(ORG_A, ORG_B);
     }
 
     @Test
     @DisplayName("the total is the register's own count, not the size of the page")
     void theTotalIsNotThePageSize() {
-        JsonNode page = post(SUBSCRIPTIONS, "{}");
+        JsonNode page = post(SUBSCRIPTIONS, EMPTY_QUERY);
 
         // Two queries assembled by hand, because Spring Data JDBC has no countQuery. Nothing but this stops the
         // total drifting from the rows.
@@ -112,7 +124,7 @@ class PlatformBillingApiIntegrationTest {
         JsonNode page = post(SUBSCRIPTIONS, String.format("{\"org\":\"%s\"}", ORG_B));
 
         assertThat(page.get(CONTENT)).isNotEmpty();
-        assertThat(page.get(CONTENT).valueStream().map(it -> it.get("org").get("id").asString()).distinct().toList())
+        assertThat(page.get(CONTENT).valueStream().map(it -> it.get(ORG_FIELD).get(ID).asString()).distinct().toList())
                 .containsExactly(ORG_B);
     }
 
@@ -121,8 +133,8 @@ class PlatformBillingApiIntegrationTest {
     void filtersByStatus() {
         JsonNode page = post(SUBSCRIPTIONS, "{\"status\":\"ACTIVE\"}");
 
-        assertThat(page.get(CONTENT).valueStream().map(it -> it.get("status").asString()).distinct().toList())
-                .allMatch("ACTIVE"::equals);
+        assertThat(page.get(CONTENT).valueStream().map(it -> it.get(STATUS_FIELD).asString()).distinct().toList())
+                .allMatch(ACTIVE::equals);
     }
 
     @Test
@@ -130,8 +142,8 @@ class PlatformBillingApiIntegrationTest {
     void filtersBlockedOnly() {
         JsonNode page = post(SUBSCRIPTIONS, "{\"blockedOnly\":true}");
 
-        assertThat(page.get(CONTENT).valueStream().map(it -> it.get("status").asString()).distinct().toList())
-                .allMatch(status -> !"ACTIVE".equals(status) && !"TRIALING".equals(status)
+        assertThat(page.get(CONTENT).valueStream().map(it -> it.get(STATUS_FIELD).asString()).distinct().toList())
+                .allMatch(status -> !ACTIVE.equals(status) && !"TRIALING".equals(status)
                         && !"PAST_DUE".equals(status));
     }
 

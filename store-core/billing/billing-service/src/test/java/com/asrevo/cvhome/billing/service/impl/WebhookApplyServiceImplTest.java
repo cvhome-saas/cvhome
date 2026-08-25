@@ -57,6 +57,30 @@ import static org.mockito.Mockito.when;
  */
 class WebhookApplyServiceImplTest {
 
+    private static final String CVH_0001 = "CVH-0001";
+
+    private static final String USD = "USD";
+
+    private static final String CHECKOUT_SESSION_COMPLETED_JSON = "checkout-session-completed.json";
+
+    private static final String CUS_TEST_1 = "cus_test_1";
+
+    private static final String IN_TEST_1 = "in_test_1";
+
+    private static final String INVOICE_PAYMENT_FAILED_JSON = "invoice-payment-failed.json";
+
+    private static final String INVOICE_PAYMENT_SUCCEEDED_JSON = "invoice-payment-succeeded.json";
+
+    private static final String PRICE_PRO_MONTHLY = "price_pro_monthly";
+
+    private static final String SUB_TEST_1 = "sub_test_1";
+
+    private static final String SUBSCRIPTION_DELETED_JSON = "subscription-deleted.json";
+
+    private static final String SUBSCRIPTION_UPDATED_ITEMS_PERIOD_JSON = "subscription-updated-items-period.json";
+
+    private static final String SUBSCRIPTION_UPDATED_JSON = "subscription-updated.json";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
@@ -88,8 +112,8 @@ class WebhookApplyServiceImplTest {
         BillingProperties properties = new BillingProperties(Duration.ofDays(14L), Duration.ofDays(7L), null);
         service = new WebhookApplyServiceImpl(subscriptions, invoices, catalog, audit, properties);
 
-        price = PlanPriceEntity.create(PlanId.newId(), new CurrencyCode("USD"), 3000L, BillingInterval.MONTH, 0)
-                .publishedAs(new StripePriceId("price_pro_monthly"));
+        price = PlanPriceEntity.create(PlanId.newId(), new CurrencyCode(USD), 3000L, BillingInterval.MONTH, 0)
+                .publishedAs(new StripePriceId(PRICE_PRO_MONTHLY));
         when(subscriptions.save(any(StoreSubscriptionEntity.class)))
                 .thenAnswer(it -> it.getArgument(0, StoreSubscriptionEntity.class));
         when(invoices.save(any(SubscriptionInvoiceEntity.class)))
@@ -102,7 +126,7 @@ class WebhookApplyServiceImplTest {
     }
 
     private void catalogKnowsThePrice() {
-        when(catalog.findByStripePriceId("price_pro_monthly")).thenReturn(Optional.of(price));
+        when(catalog.findByStripePriceId(PRICE_PRO_MONTHLY)).thenReturn(Optional.of(price));
     }
 
     private static StoreSubscriptionEntity pending() {
@@ -111,7 +135,7 @@ class WebhookApplyServiceImplTest {
 
     private static StoreSubscriptionEntity active(PlanPriceEntity on) throws Exception {
         return pending().activate(on.getPlanId(), on.getId(), PERIOD_START, PERIOD_END)
-                .bindProvider(new StripeCustomerId("cus_test_1"), new StripeSubscriptionId("sub_test_1"));
+                .bindProvider(new StripeCustomerId(CUS_TEST_1), new StripeSubscriptionId(SUB_TEST_1));
     }
 
     private static String data(String fixture) {
@@ -137,11 +161,11 @@ class WebhookApplyServiceImplTest {
     void checkoutBindsWithoutActivating() throws Exception {
         storeIs(pending());
 
-        service.applyCheckoutCompleted(STORE, EVENT_ID, data("checkout-session-completed.json"));
+        service.applyCheckoutCompleted(STORE, EVENT_ID, data(CHECKOUT_SESSION_COMPLETED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
-        assertThat(saved.getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_test_1"));
-        assertThat(saved.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId("sub_test_1"));
+        assertThat(saved.getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_TEST_1));
+        assertThat(saved.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId(SUB_TEST_1));
         // The money has not moved yet — invoice.payment_succeeded is what says it has. Activating on the redirect
         // would open stores that abandoned the payment page.
         assertThat(saved.getStatus()).isEqualTo(SubscriptionStatus.PENDING);
@@ -163,7 +187,7 @@ class WebhookApplyServiceImplTest {
         when(subscriptions.findById(STORE)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.applyCheckoutCompleted(STORE, EVENT_ID,
-                data("checkout-session-completed.json")))
+                data(CHECKOUT_SESSION_COMPLETED_JSON)))
                 .isInstanceOf(SubscriptionNotFoundException.class);
     }
 
@@ -176,7 +200,7 @@ class WebhookApplyServiceImplTest {
         storeIs(entity);
         catalogKnowsThePrice();
 
-        service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated.json"));
+        service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
         assertThat(saved.getStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
@@ -191,7 +215,7 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         catalogKnowsThePrice();
 
-        service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated.json"));
+        service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_JSON));
 
         // Stripe emits customer.subscription.updated on almost anything. An audit row per delivery would bury the
         // transitions that matter in noise.
@@ -204,7 +228,7 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         catalogKnowsThePrice();
 
-        service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated-items-period.json"));
+        service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_ITEMS_PERIOD_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
         // Stripe moved current_period_* onto items in the 2025 versions, and an account may be pinned to either.
@@ -220,7 +244,7 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         catalogKnowsThePrice();
 
-        service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated-items-period.json"));
+        service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_ITEMS_PERIOD_JSON));
 
         verify(audit).recordFromWebhook(eq(SubscriptionStatus.ACTIVE), any(), any(),
                 eq(AuditEventType.PAST_DUE), eq(new StripeEventId(EVENT_ID)));
@@ -233,7 +257,7 @@ class WebhookApplyServiceImplTest {
         when(catalog.findByStripePriceId(anyString())).thenReturn(Optional.empty());
 
         // Retryable at the outbox: it normally means the catalog sync has not run yet.
-        assertThatThrownBy(() -> service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated.json")))
+        assertThatThrownBy(() -> service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_JSON)))
                 .isInstanceOf(com.asrevo.cvhome.billing.commons.errors.PlanPriceNotFoundException.class);
     }
 
@@ -245,11 +269,11 @@ class WebhookApplyServiceImplTest {
         storeIs(entity);
         catalogKnowsThePrice();
 
-        service.applySubscriptionChanged(STORE, EVENT_ID, data("subscription-updated.json"));
+        service.applySubscriptionChanged(STORE, EVENT_ID, data(SUBSCRIPTION_UPDATED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
-        assertThat(saved.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId("sub_test_1"));
-        assertThat(saved.getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_test_1"));
+        assertThat(saved.getStripeSubscriptionId()).isEqualTo(new StripeSubscriptionId(SUB_TEST_1));
+        assertThat(saved.getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_TEST_1));
     }
 
     // ------------------------------------------------------------------------------------ subscription ended
@@ -259,7 +283,7 @@ class WebhookApplyServiceImplTest {
     void subscriptionEnded() throws Exception {
         storeIs(active(price));
 
-        service.applySubscriptionEnded(STORE, EVENT_ID, data("subscription-deleted.json"));
+        service.applySubscriptionEnded(STORE, EVENT_ID, data(SUBSCRIPTION_DELETED_JSON));
 
         assertThat(savedSubscription().getStatus()).isEqualTo(SubscriptionStatus.CANCELED);
         verify(audit).recordFromWebhook(eq(SubscriptionStatus.ACTIVE), any(), any(), eq(AuditEventType.CANCELED),
@@ -273,7 +297,7 @@ class WebhookApplyServiceImplTest {
         entity.cancelNow(PERIOD_END);
         storeIs(entity);
 
-        service.applySubscriptionEnded(STORE, EVENT_ID, data("subscription-deleted.json"));
+        service.applySubscriptionEnded(STORE, EVENT_ID, data(SUBSCRIPTION_DELETED_JSON));
 
         // Not even a save: a second audit row for one cancellation is a lie about what happened.
         verify(subscriptions, never()).save(any(StoreSubscriptionEntity.class));
@@ -288,7 +312,7 @@ class WebhookApplyServiceImplTest {
         storeIs(pending());
         catalogKnowsThePrice();
 
-        service.applyInvoicePaid(STORE, EVENT_ID, data("invoice-payment-succeeded.json"));
+        service.applyInvoicePaid(STORE, EVENT_ID, data(INVOICE_PAYMENT_SUCCEEDED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
         assertThat(saved.getStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
@@ -303,7 +327,7 @@ class WebhookApplyServiceImplTest {
         storeIs(pending());
         catalogKnowsThePrice();
 
-        service.applyInvoicePaid(STORE, EVENT_ID, data("invoice-payment-succeeded.json"));
+        service.applyInvoicePaid(STORE, EVENT_ID, data(INVOICE_PAYMENT_SUCCEEDED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
         // The fixture's invoice-level period_start and period_end are both the moment it was cut — which is what
@@ -334,7 +358,7 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         catalogKnowsThePrice();
 
-        service.applyInvoicePaid(STORE, EVENT_ID, data("invoice-payment-succeeded.json"));
+        service.applyInvoicePaid(STORE, EVENT_ID, data(INVOICE_PAYMENT_SUCCEEDED_JSON));
 
         verify(audit).recordFromWebhook(eq(SubscriptionStatus.ACTIVE), any(), any(), eq(AuditEventType.RENEWED),
                 any());
@@ -346,15 +370,15 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         catalogKnowsThePrice();
 
-        service.applyInvoicePaid(STORE, EVENT_ID, data("invoice-payment-succeeded.json"));
+        service.applyInvoicePaid(STORE, EVENT_ID, data(INVOICE_PAYMENT_SUCCEEDED_JSON));
 
         SubscriptionInvoiceEntity saved = savedInvoice();
-        assertThat(saved.getId()).isEqualTo(new StripeInvoiceId("in_test_1"));
-        assertThat(saved.getInvoiceNumber()).isEqualTo("CVH-0001");
+        assertThat(saved.getId()).isEqualTo(new StripeInvoiceId(IN_TEST_1));
+        assertThat(saved.getInvoiceNumber()).isEqualTo(CVH_0001);
         assertThat(saved.getStatus()).isEqualTo(InvoiceStatus.PAID);
         assertThat(saved.amountDue().minorUnits()).isEqualTo(3000L);
         assertThat(saved.amountPaid().minorUnits()).isEqualTo(3000L);
-        assertThat(saved.getCurrency()).isEqualTo(new CurrencyCode("USD"));
+        assertThat(saved.getCurrency()).isEqualTo(new CurrencyCode(USD));
         // The regression this pins: `record` writes no paid_at, so a renewal that succeeded on its first delivery
         // was stored PAID with a null paid_at — and revenueStatistic sums `where status = 'PAID' and paid_at >=
         // :from`. Every such invoice, which is most of them, was missing from platform revenue.
@@ -370,12 +394,12 @@ class WebhookApplyServiceImplTest {
     void anExistingInvoiceIsSettled() throws Exception {
         storeIs(active(price));
         catalogKnowsThePrice();
-        SubscriptionInvoiceEntity existing = SubscriptionInvoiceEntity.record(new StripeInvoiceId("in_test_1"),
-                STORE, ORG, new StripeSubscriptionId("sub_test_1"), "CVH-0001", InvoiceStatus.OPEN,
-                new com.asrevo.cvhome.billing.commons.Money(new CurrencyCode("USD"), 3000L), 0L, PERIOD_START);
-        when(invoices.findById(new StripeInvoiceId("in_test_1"))).thenReturn(Optional.of(existing));
+        SubscriptionInvoiceEntity existing = SubscriptionInvoiceEntity.record(new StripeInvoiceId(IN_TEST_1),
+                STORE, ORG, new StripeSubscriptionId(SUB_TEST_1), CVH_0001, InvoiceStatus.OPEN,
+                new com.asrevo.cvhome.billing.commons.Money(new CurrencyCode(USD), 3000L), 0L, PERIOD_START);
+        when(invoices.findById(new StripeInvoiceId(IN_TEST_1))).thenReturn(Optional.of(existing));
 
-        service.applyInvoicePaid(STORE, EVENT_ID, data("invoice-payment-succeeded.json"));
+        service.applyInvoicePaid(STORE, EVENT_ID, data(INVOICE_PAYMENT_SUCCEEDED_JSON));
 
         // A failure then a success is one invoice with two states, not two rows of history that never happened.
         SubscriptionInvoiceEntity saved = savedInvoice();
@@ -392,7 +416,7 @@ class WebhookApplyServiceImplTest {
         storeIs(active(price));
         Instant before = Instant.now();
 
-        service.applyInvoiceFailed(STORE, EVENT_ID, data("invoice-payment-failed.json"));
+        service.applyInvoiceFailed(STORE, EVENT_ID, data(INVOICE_PAYMENT_FAILED_JSON));
 
         StoreSubscriptionEntity saved = savedSubscription();
         assertThat(saved.getStatus()).isEqualTo(SubscriptionStatus.PAST_DUE);
@@ -408,7 +432,7 @@ class WebhookApplyServiceImplTest {
     void aFailedInvoiceIsOpen() throws Exception {
         storeIs(active(price));
 
-        service.applyInvoiceFailed(STORE, EVENT_ID, data("invoice-payment-failed.json"));
+        service.applyInvoiceFailed(STORE, EVENT_ID, data(INVOICE_PAYMENT_FAILED_JSON));
 
         SubscriptionInvoiceEntity saved = savedInvoice();
         assertThat(saved.getStatus()).isEqualTo(InvoiceStatus.OPEN);

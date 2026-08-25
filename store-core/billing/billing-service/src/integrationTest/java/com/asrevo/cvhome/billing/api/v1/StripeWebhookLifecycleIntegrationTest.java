@@ -56,6 +56,14 @@ import static org.awaitility.Awaitility.await;
 @Import(ExternalClientsTestConfiguration.class)
 class StripeWebhookLifecycleIntegrationTest {
 
+    private static final String CUSTOMER_PREFIX = "cus";
+
+    private static final String EVENT_PREFIX = "evt";
+
+    private static final String INVOICE_PREFIX = "in";
+
+    private static final String SUBSCRIPTION_PREFIX = "sub";
+
     /** Must match {@code com.asrevo.cvhome.stripe.webhook-signing-key} in {@code application-test-stores.yml}. */
     private static final String SIGNING_KEY = "whsec_integration_test_key";
 
@@ -105,7 +113,7 @@ class StripeWebhookLifecycleIntegrationTest {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static String id(String prefix) {
-        return prefix + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        return String.format("%s_%s", prefix, UUID.randomUUID().toString().replace("-", "").substring(0, 12));
     }
 
     /** Delivers a payload signed with the configured secret and asserts Stripe was answered 200. */
@@ -126,9 +134,9 @@ class StripeWebhookLifecycleIntegrationTest {
 
     /** A store bound to a provider subscription of its own, ready for invoice events to be attributed to. */
     private String bind(String store) {
-        String subscription = id("sub");
+        String subscription = id(SUBSCRIPTION_PREFIX);
         StoreSubscriptionEntity entity = fixtures.pending(store);
-        fixtures.save(entity.bindProvider(new StripeCustomerId(id("cus")),
+        fixtures.save(entity.bindProvider(new StripeCustomerId(id(CUSTOMER_PREFIX)),
                 new StripeSubscriptionId(subscription)));
         return subscription;
     }
@@ -139,7 +147,7 @@ class StripeWebhookLifecycleIntegrationTest {
                  "type":"checkout.session.completed",
                  "data":{"object":{"id":"%s","object":"checkout.session","mode":"subscription",
                    "client_reference_id":"%s","customer":"%s","subscription":"%s","status":"complete"}}}""",
-                id("evt"), Instant.now().getEpochSecond(), id("cs"), store, customer, subscription);
+                id(EVENT_PREFIX), Instant.now().getEpochSecond(), id("cs"), store, customer, subscription);
     }
 
     private String invoicePaid(String subscription, long periodStart, long periodEnd) {
@@ -156,7 +164,7 @@ class StripeWebhookLifecycleIntegrationTest {
                    "lines":{"object":"list","data":[{"id":"il_1","object":"line_item",
                      "subscription":"%s","period":{"start":%d,"end":%d},
                      "price":{"id":"%s","object":"price"}}]}}}}""",
-                id("evt"), Instant.now().getEpochSecond(), id("in"), periodStart, periodStart, periodStart,
+                id(EVENT_PREFIX), Instant.now().getEpochSecond(), id(INVOICE_PREFIX), periodStart, periodStart, periodStart,
                 subscription, subscription, periodStart, periodEnd, stripePriceId);
     }
 
@@ -168,7 +176,7 @@ class StripeWebhookLifecycleIntegrationTest {
                    "currency":"usd","amount_due":3000,"amount_paid":0,"created":%d,
                    "parent":{"type":"subscription_details",
                              "subscription_details":{"subscription":"%s"}}}}}""",
-                id("evt"), Instant.now().getEpochSecond(), id("in"), Instant.now().getEpochSecond(), subscription);
+                id(EVENT_PREFIX), Instant.now().getEpochSecond(), id(INVOICE_PREFIX), Instant.now().getEpochSecond(), subscription);
     }
 
     private String subscriptionDeleted(String store, String subscription) {
@@ -177,7 +185,7 @@ class StripeWebhookLifecycleIntegrationTest {
                  "type":"customer.subscription.deleted",
                  "data":{"object":{"id":"%s","object":"subscription","status":"canceled",
                    "cancel_at_period_end":false,"metadata":{"storeId":"%s"}}}}""",
-                id("evt"), Instant.now().getEpochSecond(), subscription, store);
+                id(EVENT_PREFIX), Instant.now().getEpochSecond(), subscription, store);
     }
 
     private String subscriptionUpdated(String store, String subscription, boolean cancelAtPeriodEnd, long end) {
@@ -189,7 +197,7 @@ class StripeWebhookLifecycleIntegrationTest {
                    "metadata":{"storeId":"%s"},
                    "items":{"object":"list","data":[{"id":"si_1","object":"subscription_item",
                      "price":{"id":"%s","object":"price"}}]}}}}""",
-                id("evt"), Instant.now().getEpochSecond(), subscription, cancelAtPeriodEnd,
+                id(EVENT_PREFIX), Instant.now().getEpochSecond(), subscription, cancelAtPeriodEnd,
                 Instant.now().getEpochSecond(), end, store, stripePriceId);
     }
 
@@ -199,8 +207,8 @@ class StripeWebhookLifecycleIntegrationTest {
     @DisplayName("a completed checkout binds the provider ids without opening the store")
     void checkoutBinds() {
         fixtures.pending(CHECKOUT_STORE);
-        String customer = id("cus");
-        String subscription = id("sub");
+        String customer = id(CUSTOMER_PREFIX);
+        String subscription = id(SUBSCRIPTION_PREFIX);
 
         deliver(checkoutCompleted(CHECKOUT_STORE, customer, subscription));
 
@@ -310,9 +318,9 @@ class StripeWebhookLifecycleIntegrationTest {
         // what scopes reads afterwards, which the API tests cover; here the only question is that the right row
         // moved.
         fixtures.pending(CHECKOUT_STORE);
-        String subscription = id("sub");
+        String subscription = id(SUBSCRIPTION_PREFIX);
 
-        deliver(checkoutCompleted(CHECKOUT_STORE, id("cus"), subscription));
+        deliver(checkoutCompleted(CHECKOUT_STORE, id(CUSTOMER_PREFIX), subscription));
 
         awaitSubscription(CHECKOUT_STORE,
                 it -> new StripeSubscriptionId(subscription).equals(it.getStripeSubscriptionId()));

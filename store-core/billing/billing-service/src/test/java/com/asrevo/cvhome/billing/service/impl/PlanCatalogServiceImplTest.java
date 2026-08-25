@@ -41,6 +41,20 @@ import static org.mockito.Mockito.when;
  */
 class PlanCatalogServiceImplTest {
 
+    private static final String BASIC = "BASIC";
+
+    private static final String NOPE = "NOPE";
+
+    private static final String OLD = "OLD";
+
+    private static final String OLD_DISPLAY_NAME = "Old";
+
+    private static final String PRO = "PRO";
+
+    private static final String USD = "USD";
+
+    private static final String PRICE_BASIC = "price_basic";
+
     private PlanRepository plans;
 
     private PlanPriceRepository prices;
@@ -60,8 +74,8 @@ class PlanCatalogServiceImplTest {
         entitlements = mock(PlanEntitlementRepository.class);
         service = new PlanCatalogServiceImpl(plans, prices, entitlements, new PlanCatalogMappers());
 
-        basic = PlanEntity.create("BASIC", "Basic", "For a store finding its feet.", 10);
-        pro = PlanEntity.create("PRO", "Pro", "For a store that is growing.", 20);
+        basic = PlanEntity.create(BASIC, "Basic", "For a store finding its feet.", 10);
+        pro = PlanEntity.create(PRO, "Pro", "For a store that is growing.", 20);
         when(entitlements.findAllByPlanId(org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
         when(prices.findAllByPlanIdAndActiveTrue(org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
     }
@@ -77,14 +91,14 @@ class PlanCatalogServiceImplTest {
     void listsActivePlans() {
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(basic, pro));
         when(prices.findAllByPlanIdAndActiveTrue(basic.getId()))
-                .thenReturn(List.of(price(basic.getId(), "USD", 1000L, BillingInterval.MONTH)));
+                .thenReturn(List.of(price(basic.getId(), USD, 1000L, BillingInterval.MONTH)));
         PlanEntitlementEntity grant = PlanEntitlementEntity.create(basic.getId(),
                 EntitlementValue.limit(EntitlementKey.MAX_PRODUCTS, 500));
         when(entitlements.findAllByPlanId(basic.getId())).thenReturn(List.of(grant));
 
         List<PlanView> views = service.listActivePlans(null);
 
-        assertThat(views).extracting(PlanView::code).containsExactly("BASIC", "PRO");
+        assertThat(views).extracting(PlanView::code).containsExactly(BASIC, PRO);
         assertThat(views.getFirst().prices()).hasSize(1);
         assertThat(views.getFirst().entitlements())
                 .containsEntry(EntitlementKey.MAX_PRODUCTS, EntitlementValue.limit(EntitlementKey.MAX_PRODUCTS, 500));
@@ -95,7 +109,7 @@ class PlanCatalogServiceImplTest {
     void filtersPricesByCurrency() {
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(basic));
         when(prices.findAllByPlanIdAndActiveTrue(basic.getId())).thenReturn(List.of(
-                price(basic.getId(), "USD", 1000L, BillingInterval.MONTH),
+                price(basic.getId(), USD, 1000L, BillingInterval.MONTH),
                 price(basic.getId(), "EUR", 900L, BillingInterval.MONTH)));
 
         List<PlanView> views = service.listActivePlans("usd");
@@ -111,8 +125,8 @@ class PlanCatalogServiceImplTest {
     void pricesAreOrdered() {
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(basic));
         when(prices.findAllByPlanIdAndActiveTrue(basic.getId())).thenReturn(List.of(
-                price(basic.getId(), "USD", 10000L, BillingInterval.YEAR),
-                price(basic.getId(), "USD", 1000L, BillingInterval.MONTH)));
+                price(basic.getId(), USD, 10000L, BillingInterval.YEAR),
+                price(basic.getId(), USD, 1000L, BillingInterval.MONTH)));
 
         List<PlanView> views = service.listActivePlans(null);
 
@@ -125,28 +139,28 @@ class PlanCatalogServiceImplTest {
     @Test
     @DisplayName("a plan is found by code only while it is on sale")
     void requirePlanByCodeSkipsWithdrawnPlans() throws Exception {
-        when(plans.findByCode("BASIC")).thenReturn(Optional.of(basic));
+        when(plans.findByCode(BASIC)).thenReturn(Optional.of(basic));
 
-        assertThat(service.requirePlanByCode("BASIC")).isSameAs(basic);
+        assertThat(service.requirePlanByCode(BASIC)).isSameAs(basic);
 
-        when(plans.findByCode("OLD")).thenReturn(Optional.of(PlanEntity
-                .create("OLD", "Old", null, 5).deactivate()));
+        when(plans.findByCode(OLD)).thenReturn(Optional.of(PlanEntity
+                .create(OLD, OLD_DISPLAY_NAME, null, 5).deactivate()));
         // A withdrawn plan is not deleted — subscribers and invoices still point at it — but it cannot be bought.
-        assertThatThrownBy(() -> service.requirePlanByCode("OLD")).isInstanceOf(PlanNotFoundException.class);
+        assertThatThrownBy(() -> service.requirePlanByCode(OLD)).isInstanceOf(PlanNotFoundException.class);
     }
 
     @Test
     @DisplayName("a plan absent by code is reported")
     void requirePlanByCodeMissing() {
-        when(plans.findByCode("NOPE")).thenReturn(Optional.empty());
+        when(plans.findByCode(NOPE)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.requirePlanByCode("NOPE")).isInstanceOf(PlanNotFoundException.class);
+        assertThatThrownBy(() -> service.requirePlanByCode(NOPE)).isInstanceOf(PlanNotFoundException.class);
     }
 
     @Test
     @DisplayName("a plan is found by id whether or not it is still on sale")
     void requirePlanByIdIgnoresActive() throws Exception {
-        PlanEntity withdrawn = PlanEntity.create("OLD", "Old", null, 5).deactivate();
+        PlanEntity withdrawn = PlanEntity.create(OLD, OLD_DISPLAY_NAME, null, 5).deactivate();
         when(plans.findById(withdrawn.getId())).thenReturn(Optional.of(withdrawn));
 
         // Rendering an existing subscriber's plan has to work after the plan is withdrawn.
@@ -165,7 +179,7 @@ class PlanCatalogServiceImplTest {
     @Test
     @DisplayName("a withdrawn price cannot be bought, but can still be read")
     void purchasableVersusReadable() throws Exception {
-        PlanPriceEntity withdrawn = price(basic.getId(), "USD", 1000L, BillingInterval.MONTH).deactivate();
+        PlanPriceEntity withdrawn = price(basic.getId(), USD, 1000L, BillingInterval.MONTH).deactivate();
         when(prices.findById(withdrawn.getId())).thenReturn(Optional.of(withdrawn));
 
         assertThatThrownBy(() -> service.requirePurchasablePrice(withdrawn.getId()))
@@ -194,11 +208,11 @@ class PlanCatalogServiceImplTest {
     @Test
     @DisplayName("a Stripe price id is resolved to the local row")
     void findsByStripePriceId() {
-        PlanPriceEntity published = price(basic.getId(), "USD", 1000L, BillingInterval.MONTH)
-                .publishedAs(new StripePriceId("price_basic"));
-        when(prices.findByStripePriceId(new StripePriceId("price_basic"))).thenReturn(Optional.of(published));
+        PlanPriceEntity published = price(basic.getId(), USD, 1000L, BillingInterval.MONTH)
+                .publishedAs(new StripePriceId(PRICE_BASIC));
+        when(prices.findByStripePriceId(new StripePriceId(PRICE_BASIC))).thenReturn(Optional.of(published));
 
-        assertThat(service.findByStripePriceId("price_basic")).contains(published);
+        assertThat(service.findByStripePriceId(PRICE_BASIC)).contains(published);
     }
 
     @Test
@@ -237,10 +251,10 @@ class PlanCatalogServiceImplTest {
     void cheapestActivePrice() {
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(basic, pro));
         when(prices.findAllByPlanIdAndActiveTrue(basic.getId())).thenReturn(List.of(
-                price(basic.getId(), "USD", 1000L, BillingInterval.MONTH),
-                price(basic.getId(), "USD", 10000L, BillingInterval.YEAR)));
+                price(basic.getId(), USD, 1000L, BillingInterval.MONTH),
+                price(basic.getId(), USD, 10000L, BillingInterval.YEAR)));
         when(prices.findAllByPlanIdAndActiveTrue(pro.getId())).thenReturn(List.of(
-                price(pro.getId(), "USD", 3000L, BillingInterval.MONTH)));
+                price(pro.getId(), USD, 3000L, BillingInterval.MONTH)));
 
         assertThat(service.cheapestActivePrice()).hasValueSatisfying(it ->
                 assertThat(it.getUnitAmount()).isEqualTo(1000L));
@@ -261,8 +275,8 @@ class PlanCatalogServiceImplTest {
     void cheapestIsDeterministic() {
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(basic));
         when(prices.findAllByPlanIdAndActiveTrue(basic.getId())).thenReturn(List.of(
-                price(basic.getId(), "USD", 0L, BillingInterval.YEAR),
-                price(basic.getId(), "USD", 0L, BillingInterval.MONTH)));
+                price(basic.getId(), USD, 0L, BillingInterval.YEAR),
+                price(basic.getId(), USD, 0L, BillingInterval.MONTH)));
 
         // A free plan with both intervals is exactly the FREE plan in plan-catalog.yml's shape; without the
         // tiebreak, which store got which interval would depend on row order.

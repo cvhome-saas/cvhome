@@ -64,9 +64,25 @@ import static org.mockito.Mockito.when;
  */
 class StripeSubscriptionGatewayTest {
 
+    private static final String PERIOD_END_TEXT = "2026-02-01T00:00:00Z";
+
+    private static final String ACTIVE = "active";
+
+    private static final String NO_ROUTE_TO_STRIPE = "no route to stripe";
+
+    private static final String NOT_STARTED = "not_started";
+
+    private static final String SI_1 = "si_1";
+
+    private static final String SK_TEST_SUBSCRIPTION = "sk_test_subscription";
+
+    private static final String SUB_1 = "sub_1";
+
+    private static final String SUB_SCHED_UPDATED = "sub_sched_updated";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
-    private static final StripeSubscriptionId SUBSCRIPTION = new StripeSubscriptionId("sub_1");
+    private static final StripeSubscriptionId SUBSCRIPTION = new StripeSubscriptionId(SUB_1);
 
     private static final StripeScheduleId SCHEDULE = new StripeScheduleId("sub_sched_1");
 
@@ -83,7 +99,7 @@ class StripeSubscriptionGatewayTest {
     @BeforeEach
     void setUp() {
         StripeCredentials credentials = mock(StripeCredentials.class);
-        when(credentials.apiKey()).thenReturn("sk_test_subscription");
+        when(credentials.apiKey()).thenReturn(SK_TEST_SUBSCRIPTION);
         stripe = mock(StripeClient.class, RETURNS_DEEP_STUBS);
         StripeRequestRepository requests = mock(StripeRequestRepository.class);
         when(requests.existsById(anyString())).thenReturn(false);
@@ -131,7 +147,7 @@ class StripeSubscriptionGatewayTest {
     }
 
     private void retrieveReturns(Subscription subscription) throws Exception {
-        when(stripe.subscriptions().retrieve(eq("sub_1"), any(RequestOptions.class))).thenReturn(subscription);
+        when(stripe.subscriptions().retrieve(eq(SUB_1), any(RequestOptions.class))).thenReturn(subscription);
     }
 
     private void scheduleRetrieveReturns(SubscriptionSchedule schedule) throws Exception {
@@ -144,15 +160,15 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("an upgrade swaps the item's price and settles the proration invoice synchronously")
     void upgradeChargesNow() throws Exception {
-        retrieveReturns(subscriptionWithItem("si_1", null));
+        retrieveReturns(subscriptionWithItem(SI_1, null));
 
         gateway.upgradeNow(STORE, SUBSCRIPTION, target());
 
         ArgumentCaptor<SubscriptionUpdateParams> params = ArgumentCaptor.forClass(SubscriptionUpdateParams.class);
-        verify(stripe.subscriptions()).update(eq("sub_1"), params.capture(), any(RequestOptions.class));
+        verify(stripe.subscriptions()).update(eq(SUB_1), params.capture(), any(RequestOptions.class));
         assertThat(params.getValue().getItems()).singleElement().satisfies(item -> {
             // The existing item is replaced, not added to — a second item would double the bill.
-            assertThat(item.getId()).isEqualTo("si_1");
+            assertThat(item.getId()).isEqualTo(SI_1);
             assertThat(item.getPrice()).isEqualTo(TARGET_PRICE);
         });
         // Together these are what make a declined card come back as a CardException here rather than leaving the
@@ -166,7 +182,7 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("an upgrade a card refuses is reported as a rejection, so the caller can refuse it cleanly")
     void upgradeDeclinedIsARejection() throws Exception {
-        retrieveReturns(subscriptionWithItem("si_1", null));
+        retrieveReturns(subscriptionWithItem(SI_1, null));
         when(stripe.subscriptions().update(anyString(), any(SubscriptionUpdateParams.class),
                 any(RequestOptions.class)))
                 .thenThrow(new CardException("declined", "req_1", "card_declined", null, "generic_decline", null,
@@ -179,8 +195,8 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("an upgrade Stripe never answered settles nothing")
     void upgradeUnreachableIsUnavailable() throws Exception {
-        when(stripe.subscriptions().retrieve(eq("sub_1"), any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+        when(stripe.subscriptions().retrieve(eq(SUB_1), any(RequestOptions.class)))
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         // The caller must not write a local plan change on this: the change may or may not have landed.
         assertThatThrownBy(() -> gateway.upgradeNow(STORE, SUBSCRIPTION, target()))
@@ -192,12 +208,12 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("a downgrade writes two phases: the current price to the boundary, then the cheaper one")
     void downgradeBuildsTwoPhases() throws Exception {
-        Instant effectiveAt = Instant.parse("2026-02-01T00:00:00Z");
-        retrieveReturns(subscriptionWithItem("si_1", null));
-        SubscriptionSchedule fresh = scheduleWithPhase("not_started");
+        Instant effectiveAt = Instant.parse(PERIOD_END_TEXT);
+        retrieveReturns(subscriptionWithItem(SI_1, null));
+        SubscriptionSchedule fresh = scheduleWithPhase(NOT_STARTED);
         when(stripe.subscriptionSchedules().create(any(SubscriptionScheduleCreateParams.class),
                 any(RequestOptions.class))).thenReturn(fresh);
-        SubscriptionSchedule updated = scheduleNamed("sub_sched_updated");
+        SubscriptionSchedule updated = scheduleNamed(SUB_SCHED_UPDATED);
         when(stripe.subscriptionSchedules().update(anyString(), any(SubscriptionScheduleUpdateParams.class),
                 any(RequestOptions.class))).thenReturn(updated);
 
@@ -206,7 +222,7 @@ class StripeSubscriptionGatewayTest {
         ArgumentCaptor<SubscriptionScheduleUpdateParams> params =
                 ArgumentCaptor.forClass(SubscriptionScheduleUpdateParams.class);
         verify(stripe.subscriptionSchedules()).update(eq(SCHEDULE.id()), params.capture(), any(RequestOptions.class));
-        assertThat(id).isEqualTo(new StripeScheduleId("sub_sched_updated"));
+        assertThat(id).isEqualTo(new StripeScheduleId(SUB_SCHED_UPDATED));
         assertThat(params.getValue().getPhases()).hasSize(2);
         var first = params.getValue().getPhases().getFirst();
         var second = params.getValue().getPhases().get(1);
@@ -226,13 +242,13 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("a subscription that already has a schedule reuses it rather than creating a second")
     void downgradeReusesAnExistingSchedule() throws Exception {
-        retrieveReturns(subscriptionWithItem("si_1", SCHEDULE.id()));
-        scheduleRetrieveReturns(scheduleWithPhase("active"));
+        retrieveReturns(subscriptionWithItem(SI_1, SCHEDULE.id()));
+        scheduleRetrieveReturns(scheduleWithPhase(ACTIVE));
         SubscriptionSchedule updated = scheduleNamed(SCHEDULE.id());
         when(stripe.subscriptionSchedules().update(anyString(), any(SubscriptionScheduleUpdateParams.class),
                 any(RequestOptions.class))).thenReturn(updated);
 
-        gateway.scheduleDowngrade(STORE, SUBSCRIPTION, target(), Instant.parse("2026-02-01T00:00:00Z"));
+        gateway.scheduleDowngrade(STORE, SUBSCRIPTION, target(), Instant.parse(PERIOD_END_TEXT));
 
         // Not an optimisation: Stripe refuses a second schedule for one subscription, so without this a downgrade
         // could never be re-requested or corrected once one existed.
@@ -244,8 +260,8 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("a downgrade has no card branch, because nothing is charged now")
     void downgradeFailureIsAlwaysUnavailable() throws Exception {
-        when(stripe.subscriptions().retrieve(eq("sub_1"), any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+        when(stripe.subscriptions().retrieve(eq(SUB_1), any(RequestOptions.class)))
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         assertThatThrownBy(() -> gateway.scheduleDowngrade(STORE, SUBSCRIPTION, target(), Instant.now()))
                 .isInstanceOf(BillingProviderUnavailableException.class);
@@ -256,7 +272,7 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("a live schedule is released, not cancelled")
     void releasesALiveSchedule() throws Exception {
-        scheduleRetrieveReturns(scheduleWithPhase("active"));
+        scheduleRetrieveReturns(scheduleWithPhase(ACTIVE));
 
         gateway.releaseSchedule(STORE, SCHEDULE);
 
@@ -268,7 +284,7 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("a not-yet-started schedule is releasable too")
     void releasesANotStartedSchedule() throws Exception {
-        scheduleRetrieveReturns(scheduleWithPhase("not_started"));
+        scheduleRetrieveReturns(scheduleWithPhase(NOT_STARTED));
 
         gateway.releaseSchedule(STORE, SCHEDULE);
 
@@ -301,7 +317,7 @@ class StripeSubscriptionGatewayTest {
     @DisplayName("a release Stripe would not answer is a provider fault")
     void releaseFailureIsUnavailable() throws Exception {
         when(stripe.subscriptionSchedules().retrieve(eq(SCHEDULE.id()), any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         assertThatThrownBy(() -> gateway.releaseSchedule(STORE, SCHEDULE))
                 .isInstanceOf(BillingProviderUnavailableException.class);
@@ -315,7 +331,7 @@ class StripeSubscriptionGatewayTest {
         gateway.setRenewal(STORE, SUBSCRIPTION, false);
 
         ArgumentCaptor<SubscriptionUpdateParams> params = ArgumentCaptor.forClass(SubscriptionUpdateParams.class);
-        verify(stripe.subscriptions()).update(eq("sub_1"), params.capture(), any(RequestOptions.class));
+        verify(stripe.subscriptions()).update(eq(SUB_1), params.capture(), any(RequestOptions.class));
         // The subscription stays active and the customer keeps everything until the period they paid for runs out.
         assertThat(params.getValue().getCancelAtPeriodEnd()).isTrue();
     }
@@ -326,7 +342,7 @@ class StripeSubscriptionGatewayTest {
         gateway.setRenewal(STORE, SUBSCRIPTION, true);
 
         ArgumentCaptor<SubscriptionUpdateParams> params = ArgumentCaptor.forClass(SubscriptionUpdateParams.class);
-        verify(stripe.subscriptions()).update(eq("sub_1"), params.capture(), any(RequestOptions.class));
+        verify(stripe.subscriptions()).update(eq(SUB_1), params.capture(), any(RequestOptions.class));
         assertThat(params.getValue().getCancelAtPeriodEnd()).isFalse();
     }
 
@@ -338,7 +354,7 @@ class StripeSubscriptionGatewayTest {
 
         ArgumentCaptor<RequestOptions> options = ArgumentCaptor.forClass(RequestOptions.class);
         verify(stripe.subscriptions(), times(2))
-                .update(eq("sub_1"), any(SubscriptionUpdateParams.class), options.capture());
+                .update(eq(SUB_1), any(SubscriptionUpdateParams.class), options.capture());
         // Cancel then resume inside the same minute is a real sequence. A shared key would have Stripe replay the
         // stored answer to the first and silently drop the second.
         assertThat(options.getAllValues().getFirst().getIdempotencyKey())
@@ -352,7 +368,7 @@ class StripeSubscriptionGatewayTest {
     void setRenewalFailureIsUnavailable() throws Exception {
         when(stripe.subscriptions().update(anyString(), any(SubscriptionUpdateParams.class),
                 any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         assertThatThrownBy(() -> gateway.setRenewal(STORE, SUBSCRIPTION, false))
                 .isInstanceOf(BillingProviderUnavailableException.class);
@@ -365,7 +381,7 @@ class StripeSubscriptionGatewayTest {
     void cancelNow() throws Exception {
         gateway.cancelNow(STORE, SUBSCRIPTION);
 
-        verify(stripe.subscriptions()).cancel(eq("sub_1"), any(SubscriptionCancelParams.class),
+        verify(stripe.subscriptions()).cancel(eq(SUB_1), any(SubscriptionCancelParams.class),
                 any(RequestOptions.class));
     }
 
@@ -374,7 +390,7 @@ class StripeSubscriptionGatewayTest {
     void cancelFailureIsUnavailable() throws Exception {
         when(stripe.subscriptions().cancel(anyString(), any(SubscriptionCancelParams.class),
                 any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         assertThatThrownBy(() -> gateway.cancelNow(STORE, SUBSCRIPTION))
                 .isInstanceOf(BillingProviderUnavailableException.class);
@@ -385,14 +401,14 @@ class StripeSubscriptionGatewayTest {
     @Test
     @DisplayName("reads carry no idempotency key, so the request table records intent rather than traffic")
     void readsAreNotKeyed() throws Exception {
-        retrieveReturns(subscriptionWithItem("si_1", null));
+        retrieveReturns(subscriptionWithItem(SI_1, null));
 
         gateway.upgradeNow(STORE, SUBSCRIPTION, target());
 
         ArgumentCaptor<RequestOptions> read = ArgumentCaptor.forClass(RequestOptions.class);
-        verify(stripe.subscriptions()).retrieve(eq("sub_1"), read.capture());
+        verify(stripe.subscriptions()).retrieve(eq(SUB_1), read.capture());
         assertThat(read.getValue().getIdempotencyKey()).isNull();
-        assertThat(read.getValue().getApiKey()).isEqualTo("sk_test_subscription");
+        assertThat(read.getValue().getApiKey()).isEqualTo(SK_TEST_SUBSCRIPTION);
     }
 
 }

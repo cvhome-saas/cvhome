@@ -41,6 +41,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
  */
 class BillingProcessorsTest {
 
+    private static final String CUSTOMER_SUBSCRIPTION_UPDATED = "customer.subscription.updated";
+
+    private static final String EVT_1 = "evt_1";
+
+    private static final String INVOICE_PAYMENT_SUCCEEDED = "invoice.payment_succeeded";
+
     private static final String STORE_ID = "65f023632bc46470c104b76f";
 
     private static final StoreMerchantId STORE = new StoreMerchantId(STORE_ID);
@@ -58,7 +64,7 @@ class BillingProcessorsTest {
     }
 
     private static StripeWebhookReceivedEvent event(String type) {
-        return StripeWebhookReceivedEvent.of("evt_1", type, STORE_ID, PAYLOAD);
+        return StripeWebhookReceivedEvent.of(EVT_1, type, STORE_ID, PAYLOAD);
     }
 
     // -------------------------------------------------------------------------------------------- commands
@@ -126,21 +132,21 @@ class BillingProcessorsTest {
 
         handler.process(event("checkout.session.completed"));
         handler.process(event("customer.subscription.created"));
-        handler.process(event("customer.subscription.updated"));
+        handler.process(event(CUSTOMER_SUBSCRIPTION_UPDATED));
         handler.process(event("customer.subscription.deleted"));
         handler.process(event("customer.subscription.paused"));
-        handler.process(event("invoice.payment_succeeded"));
+        handler.process(event(INVOICE_PAYMENT_SUCCEEDED));
         handler.process(event("invoice.payment_failed"));
 
-        verify(applyService).applyCheckoutCompleted(eq(STORE), eq("evt_1"), eq(PAYLOAD));
+        verify(applyService).applyCheckoutCompleted(eq(STORE), eq(EVT_1), eq(PAYLOAD));
         verify(applyService, org.mockito.Mockito.times(2))
                 .applySubscriptionChanged(eq(STORE), anyString(), anyString());
         // paused is routed to "ended" alongside deleted: a paused subscription collects no money, which is the same
         // thing as far as entitlements are concerned.
         verify(applyService, org.mockito.Mockito.times(2))
                 .applySubscriptionEnded(eq(STORE), anyString(), anyString());
-        verify(applyService).applyInvoicePaid(eq(STORE), eq("evt_1"), eq(PAYLOAD));
-        verify(applyService).applyInvoiceFailed(eq(STORE), eq("evt_1"), eq(PAYLOAD));
+        verify(applyService).applyInvoicePaid(eq(STORE), eq(EVT_1), eq(PAYLOAD));
+        verify(applyService).applyInvoiceFailed(eq(STORE), eq(EVT_1), eq(PAYLOAD));
     }
 
     @Test
@@ -158,7 +164,7 @@ class BillingProcessorsTest {
                 .when(applyService).applyInvoicePaid(eq(STORE), anyString(), anyString());
 
         assertThatCode(() -> new StripeWebhookReceivedEventImpl(applyService)
-                .process(event("invoice.payment_succeeded"))).doesNotThrowAnyException();
+                .process(event(INVOICE_PAYMENT_SUCCEEDED))).doesNotThrowAnyException();
     }
 
     @Test
@@ -168,7 +174,7 @@ class BillingProcessorsTest {
                 .when(applyService).applySubscriptionChanged(eq(STORE), anyString(), anyString());
 
         assertThatCode(() -> new StripeWebhookReceivedEventImpl(applyService)
-                .process(event("customer.subscription.updated"))).doesNotThrowAnyException();
+                .process(event(CUSTOMER_SUBSCRIPTION_UPDATED))).doesNotThrowAnyException();
     }
 
     @Test
@@ -180,7 +186,7 @@ class BillingProcessorsTest {
         // The one retryable branch: it normally means the catalog has not been published to Stripe yet, which
         // resolves on the next boot without anyone doing anything.
         assertThatThrownBy(() -> new StripeWebhookReceivedEventImpl(applyService)
-                .process(event("invoice.payment_succeeded")))
+                .process(event(INVOICE_PAYMENT_SUCCEEDED)))
                 .isInstanceOf(UncheckedBaseException.class);
     }
 

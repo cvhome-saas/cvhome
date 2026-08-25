@@ -35,7 +35,7 @@ public final class StripeSignatures {
     /** A header timestamped at {@code at} — the way an expired signature is produced. */
     public static String sign(String payload, String secret, Instant at) {
         long timestamp = at.getEpochSecond();
-        return String.format("t=%d,v1=%s", timestamp, hmacHex(secret, timestamp + "." + payload));
+        return String.format("t=%d,v1=%s", timestamp, hmacHex(secret, String.format("%d.%s", timestamp, payload)));
     }
 
     private static String hmacHex(String secret, String signedPayload) {

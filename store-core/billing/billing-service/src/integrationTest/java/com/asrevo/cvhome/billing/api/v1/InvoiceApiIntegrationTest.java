@@ -50,6 +50,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class InvoiceApiIntegrationTest {
 
+    private static final String USD = "USD";
+
+    private static final String AMOUNT_PAID = "amountPaid";
+
+    private static final String ID = "id";
+
     private static final String LIST = path(V1, "invoice", "list");
 
     private static final String CONTENT = "content";
@@ -91,8 +97,9 @@ class InvoiceApiIntegrationTest {
             return;
         }
         invoices.save(SubscriptionInvoiceEntity.record(invoiceId, new StoreMerchantId(store), new ManagerOrgId(org),
-                        new StripeSubscriptionId("sub_" + id), "CVH-" + id, InvoiceStatus.PAID,
-                        new Money(new CurrencyCode("USD"), 3000L), 3000L, java.time.Instant.now())
+                        new StripeSubscriptionId(String.format("sub_%s", id)),
+                        String.format("CVH-%s", id), InvoiceStatus.PAID,
+                        new Money(new CurrencyCode(USD), 3000L), 3000L, java.time.Instant.now())
                 .settled(InvoiceStatus.PAID, 3000L, java.time.Instant.now()));
     }
 
@@ -104,7 +111,7 @@ class InvoiceApiIntegrationTest {
         expect(response, HttpStatus.OK);
         JsonNode page = json(response);
         assertThat(page.get(CONTENT)).isNotEmpty();
-        assertThat(page.get(CONTENT).valueStream().map(it -> it.get("id").get("id").asString()).toList())
+        assertThat(page.get(CONTENT).valueStream().map(it -> it.get(ID).get(ID).asString()).toList())
                 .contains(MINE)
                 .doesNotContain(NEIGHBOURS);
     }
@@ -116,8 +123,8 @@ class InvoiceApiIntegrationTest {
 
         // Minor units end to end — what Stripe speaks — so there is no rounding step between the catalog and an
         // invoice, and zero-decimal currencies work unchanged.
-        assertThat(invoice.get("amountPaid").get("minorUnits").asLong()).isEqualTo(3000L);
-        assertThat(invoice.get("amountPaid").get("currency").get("code").asString()).isEqualTo("USD");
+        assertThat(invoice.get(AMOUNT_PAID).get("minorUnits").asLong()).isEqualTo(3000L);
+        assertThat(invoice.get(AMOUNT_PAID).get("currency").get("code").asString()).isEqualTo(USD);
         assertThat(invoice.get("status").asString()).isEqualTo(InvoiceStatus.PAID.name());
     }
 
@@ -156,7 +163,7 @@ class InvoiceApiIntegrationTest {
 
         // "This merchant says they paid" is the support question a platform console exists to answer.
         expect(response, HttpStatus.OK);
-        assertThat(json(response).get(CONTENT).valueStream().map(it -> it.get("id").get("id").asString()).toList())
+        assertThat(json(response).get(CONTENT).valueStream().map(it -> it.get(ID).get(ID).asString()).toList())
                 .contains(NEIGHBOURS);
     }
 

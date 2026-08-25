@@ -38,6 +38,20 @@ import static org.mockito.Mockito.when;
  */
 class PlanCatalogPublisherTest {
 
+    private static final String PLAN_BLURB = "A plan.";
+
+    private static final String BASIC = "BASIC";
+
+    private static final String BASIC_NAME = "Basic";
+
+    private static final String PRICE_1 = "price_1";
+
+    private static final String PRICE_2 = "price_2";
+
+    private static final String PROD_1 = "prod_1";
+
+    private static final String STRIPE = "stripe";
+
     private PlanRepository plans;
 
     private PlanPriceRepository prices;
@@ -63,25 +77,25 @@ class PlanCatalogPublisherTest {
     @Test
     @DisplayName("an unpublished plan and its prices are pushed and their ids written back")
     void publishesWhatHasNoStripeId() throws Exception {
-        PlanEntity plan = PlanEntity.create("BASIC", "Basic", "A plan.", 10);
+        PlanEntity plan = PlanEntity.create(BASIC, BASIC_NAME, PLAN_BLURB, 10);
         PlanPriceEntity monthly = price(plan);
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(plan));
         when(prices.findAllByPlanIdAndActiveTrue(plan.getId())).thenReturn(List.of(monthly));
-        when(gateway.createProduct(any())).thenReturn(new StripeProductId("prod_1"));
-        when(gateway.createPrice(any(), any())).thenReturn(new StripePriceId("price_1"));
+        when(gateway.createProduct(any())).thenReturn(new StripeProductId(PROD_1));
+        when(gateway.createPrice(any(), any())).thenReturn(new StripePriceId(PRICE_1));
 
         publisher.publish();
 
-        assertThat(plan.getStripeProductId()).isEqualTo(new StripeProductId("prod_1"));
-        assertThat(monthly.getStripePriceId()).isEqualTo(new StripePriceId("price_1"));
+        assertThat(plan.getStripeProductId()).isEqualTo(new StripeProductId(PROD_1));
+        assertThat(monthly.getStripePriceId()).isEqualTo(new StripePriceId(PRICE_1));
     }
 
     @Test
     @DisplayName("a plan already published is not published again")
     void skipsWhatIsAlreadyPublished() throws Exception {
-        PlanEntity plan = PlanEntity.create("BASIC", "Basic", "A plan.", 10)
-                .publishedAs(new StripeProductId("prod_1"));
-        PlanPriceEntity monthly = price(plan).publishedAs(new StripePriceId("price_1"));
+        PlanEntity plan = PlanEntity.create(BASIC, BASIC_NAME, PLAN_BLURB, 10)
+                .publishedAs(new StripeProductId(PROD_1));
+        PlanPriceEntity monthly = price(plan).publishedAs(new StripePriceId(PRICE_1));
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(plan));
         when(prices.findAllByPlanIdAndActiveTrue(plan.getId())).thenReturn(List.of(monthly));
 
@@ -96,25 +110,25 @@ class PlanCatalogPublisherTest {
     @Test
     @DisplayName("a price added to an already published plan is published on its own")
     void publishesANewPriceOfAPublishedPlan() throws Exception {
-        PlanEntity plan = PlanEntity.create("BASIC", "Basic", "A plan.", 10)
-                .publishedAs(new StripeProductId("prod_1"));
+        PlanEntity plan = PlanEntity.create(BASIC, BASIC_NAME, PLAN_BLURB, 10)
+                .publishedAs(new StripeProductId(PROD_1));
         PlanPriceEntity fresh = price(plan);
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(plan));
         when(prices.findAllByPlanIdAndActiveTrue(plan.getId())).thenReturn(List.of(fresh));
-        when(gateway.createPrice(any(), any())).thenReturn(new StripePriceId("price_2"));
+        when(gateway.createPrice(any(), any())).thenReturn(new StripePriceId(PRICE_2));
 
         publisher.publish();
 
         verify(gateway, never()).createProduct(any());
-        assertThat(fresh.getStripePriceId()).isEqualTo(new StripePriceId("price_2"));
+        assertThat(fresh.getStripePriceId()).isEqualTo(new StripePriceId(PRICE_2));
     }
 
     @Test
     @DisplayName("Stripe being unreachable does not stop the service starting")
     void aFailureDoesNotAbortTheBoot() throws Exception {
-        PlanEntity plan = PlanEntity.create("BASIC", "Basic", "A plan.", 10);
+        PlanEntity plan = PlanEntity.create(BASIC, BASIC_NAME, PLAN_BLURB, 10);
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(plan));
-        when(gateway.createProduct(any())).thenThrow(BillingProviderUnavailableException.of("stripe", null,
+        when(gateway.createProduct(any())).thenThrow(BillingProviderUnavailableException.of(STRIPE, null,
                 StripeRequestOperation.PRODUCT_CREATE, null, 0, null));
 
         // The plan stays unpurchasable until the next start, and checkout reports that as "not purchasable" rather
@@ -126,10 +140,10 @@ class PlanCatalogPublisherTest {
     @Test
     @DisplayName("a failure stops the run rather than hammering Stripe for every remaining plan")
     void aFailureStopsTheRun() throws Exception {
-        PlanEntity first = PlanEntity.create("BASIC", "Basic", "A plan.", 10);
-        PlanEntity second = PlanEntity.create("PRO", "Pro", "A plan.", 20);
+        PlanEntity first = PlanEntity.create(BASIC, BASIC_NAME, PLAN_BLURB, 10);
+        PlanEntity second = PlanEntity.create("PRO", "Pro", PLAN_BLURB, 20);
         when(plans.findAllByActiveTrueOrderByTierAsc()).thenReturn(List.of(first, second));
-        when(gateway.createProduct(any())).thenThrow(BillingProviderUnavailableException.of("stripe", null,
+        when(gateway.createProduct(any())).thenThrow(BillingProviderUnavailableException.of(STRIPE, null,
                 StripeRequestOperation.PRODUCT_CREATE, null, 0, null));
 
         publisher.publish();

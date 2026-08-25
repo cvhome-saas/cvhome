@@ -46,6 +46,18 @@ import static org.mockito.Mockito.when;
  */
 class StripeCatalogGatewayTest {
 
+    private static final String USD = "USD";
+
+    private static final String NO_ROUTE_TO_STRIPE = "no route to stripe";
+
+    private static final String PRICE_NEW = "price_new";
+
+    private static final String PROD_NEW = "prod_new";
+
+    private static final String PROD_PRO = "prod_pro";
+
+    private static final String PRODUCT_PRO = "product:PRO";
+
     private static final String API_KEY = "sk_test_catalog";
 
     private StripeClient stripe;
@@ -67,30 +79,30 @@ class StripeCatalogGatewayTest {
 
     private static PlanEntity plan() {
         PlanEntity plan = PlanEntity.create("PRO", "Pro", "For a store that is growing.", 20);
-        return plan.publishedAs(new StripeProductId("prod_pro"));
+        return plan.publishedAs(new StripeProductId(PROD_PRO));
     }
 
     private static PlanPriceEntity price() {
-        return PlanPriceEntity.create(plan().getId(), new CurrencyCode("USD"), 3000L, BillingInterval.MONTH, 0);
+        return PlanPriceEntity.create(plan().getId(), new CurrencyCode(USD), 3000L, BillingInterval.MONTH, 0);
     }
 
     @Test
     @DisplayName("a plan is published as a product and its id comes back")
     void createsAProduct() throws Exception {
         Product created = mock(Product.class);
-        when(created.getId()).thenReturn("prod_new");
+        when(created.getId()).thenReturn(PROD_NEW);
         when(stripe.products().create(any(ProductCreateParams.class), any(RequestOptions.class))).thenReturn(created);
 
         StripeProductId id = gateway.createProduct(plan());
 
-        assertThat(id).isEqualTo(new StripeProductId("prod_new"));
+        assertThat(id).isEqualTo(new StripeProductId(PROD_NEW));
     }
 
     @Test
     @DisplayName("the product's idempotency key is the plan code alone, with no time in it")
     void productKeyIsStableForever() throws Exception {
         Product created = mock(Product.class);
-        when(created.getId()).thenReturn("prod_new");
+        when(created.getId()).thenReturn(PROD_NEW);
         when(stripe.products().create(any(ProductCreateParams.class), any(RequestOptions.class))).thenReturn(created);
 
         gateway.createProduct(plan());
@@ -99,7 +111,7 @@ class StripeCatalogGatewayTest {
         verify(stripe.products()).create(any(ProductCreateParams.class), options.capture());
         // Exactly this string, restart after restart. A time component here would mint a second Stripe product for
         // the same plan on every boot.
-        assertThat(options.getValue().getIdempotencyKey()).isEqualTo("product:PRO");
+        assertThat(options.getValue().getIdempotencyKey()).isEqualTo(PRODUCT_PRO);
         assertThat(options.getValue().getApiKey()).isEqualTo(API_KEY);
     }
 
@@ -107,7 +119,7 @@ class StripeCatalogGatewayTest {
     @DisplayName("the price's key carries everything that makes the price a different price")
     void priceKeyCoversTheWholeShape() throws Exception {
         Price created = mock(Price.class);
-        when(created.getId()).thenReturn("price_new");
+        when(created.getId()).thenReturn(PRICE_NEW);
         when(stripe.prices().create(any(PriceCreateParams.class), any(RequestOptions.class))).thenReturn(created);
 
         gateway.createPrice(plan(), price());
@@ -123,15 +135,15 @@ class StripeCatalogGatewayTest {
     @DisplayName("the price is created against the plan's published product, in lower-case currency")
     void priceIsBuiltFromTheCatalogRow() throws Exception {
         Price created = mock(Price.class);
-        when(created.getId()).thenReturn("price_new");
+        when(created.getId()).thenReturn(PRICE_NEW);
         when(stripe.prices().create(any(PriceCreateParams.class), any(RequestOptions.class))).thenReturn(created);
 
         StripePriceId id = gateway.createPrice(plan(), price());
 
         ArgumentCaptor<PriceCreateParams> params = ArgumentCaptor.forClass(PriceCreateParams.class);
         verify(stripe.prices()).create(params.capture(), any(RequestOptions.class));
-        assertThat(id).isEqualTo(new StripePriceId("price_new"));
-        assertThat(params.getValue().getProduct()).isEqualTo("prod_pro");
+        assertThat(id).isEqualTo(new StripePriceId(PRICE_NEW));
+        assertThat(params.getValue().getProduct()).isEqualTo(PROD_PRO);
         // Stripe rejects an upper-case currency code.
         assertThat(params.getValue().getCurrency()).isEqualTo("usd");
         assertThat(params.getValue().getUnitAmount()).isEqualTo(3000L);
@@ -146,7 +158,7 @@ class StripeCatalogGatewayTest {
         when(created.getId()).thenReturn("price_year");
         when(stripe.prices().create(any(PriceCreateParams.class), any(RequestOptions.class))).thenReturn(created);
         PlanEntity plan = plan();
-        PlanPriceEntity yearly = PlanPriceEntity.create(plan.getId(), new CurrencyCode("USD"), 30000L,
+        PlanPriceEntity yearly = PlanPriceEntity.create(plan.getId(), new CurrencyCode(USD), 30000L,
                 BillingInterval.YEAR, 0);
 
         gateway.createPrice(plan, yearly);
@@ -161,11 +173,11 @@ class StripeCatalogGatewayTest {
     @DisplayName("the intent is recorded before the call and the completion after it")
     void recordsIntentThenCompletion() throws Exception {
         Product created = mock(Product.class);
-        when(created.getId()).thenReturn("prod_new");
+        when(created.getId()).thenReturn(PROD_NEW);
         when(stripe.products().create(any(ProductCreateParams.class), any(RequestOptions.class))).thenReturn(created);
-        StripeRequestEntity intent = StripeRequestEntity.intent("product:PRO", null,
+        StripeRequestEntity intent = StripeRequestEntity.intent(PRODUCT_PRO, null,
                 StripeRequestOperation.PRODUCT_CREATE);
-        when(requests.findById("product:PRO")).thenReturn(java.util.Optional.of(intent));
+        when(requests.findById(PRODUCT_PRO)).thenReturn(java.util.Optional.of(intent));
 
         gateway.createProduct(plan());
 
@@ -175,15 +187,15 @@ class StripeCatalogGatewayTest {
         verify(requests, org.mockito.Mockito.times(2)).save(saved.capture());
         assertThat(saved.getAllValues().getFirst().getOperation())
                 .isEqualTo(StripeRequestOperation.PRODUCT_CREATE);
-        assertThat(saved.getAllValues().getLast().getStripeObjectId()).isEqualTo("prod_new");
+        assertThat(saved.getAllValues().getLast().getStripeObjectId()).isEqualTo(PROD_NEW);
     }
 
     @Test
     @DisplayName("an intent already on file is not written twice")
     void doesNotDuplicateAnExistingIntent() throws Exception {
-        when(requests.existsById("product:PRO")).thenReturn(true);
+        when(requests.existsById(PRODUCT_PRO)).thenReturn(true);
         Product created = mock(Product.class);
-        when(created.getId()).thenReturn("prod_new");
+        when(created.getId()).thenReturn(PROD_NEW);
         when(stripe.products().create(any(ProductCreateParams.class), any(RequestOptions.class))).thenReturn(created);
 
         gateway.createProduct(plan());
@@ -197,7 +209,7 @@ class StripeCatalogGatewayTest {
     @DisplayName("a product Stripe could not be reached for is a provider fault, never a refusal")
     void productFailureIsUnavailable() throws Exception {
         when(stripe.products().create(any(ProductCreateParams.class), any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         // No CardException branch on this path on purpose: publishing a catalog moves no money, so there is no
         // refusal to tell apart from a fault.
@@ -209,7 +221,7 @@ class StripeCatalogGatewayTest {
     @DisplayName("a price Stripe could not be reached for is a provider fault too")
     void priceFailureIsUnavailable() throws Exception {
         when(stripe.prices().create(any(PriceCreateParams.class), any(RequestOptions.class)))
-                .thenThrow(new ApiConnectionException("no route to stripe"));
+                .thenThrow(new ApiConnectionException(NO_ROUTE_TO_STRIPE));
 
         assertThatThrownBy(() -> gateway.createPrice(plan(), price()))
                 .isInstanceOf(BillingProviderUnavailableException.class);

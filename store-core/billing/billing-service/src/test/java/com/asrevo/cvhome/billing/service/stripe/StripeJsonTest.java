@@ -21,6 +21,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class StripeJsonTest {
 
+    private static final String ABSENT = "absent";
+
+    private static final String ACTIVE = "active";
+
+    private static final String ID = "id";
+
+    private static final String INCOMPLETE = "incomplete";
+
+    private static final String ITEMS = "items";
+
+    private static final String NOTHING = "nothing";
+
+    private static final String PAST_DUE = "past_due";
+
+    private static final String SUB_1 = "sub_1";
+
     private static final String DOCUMENT = """
             {"id":"sub_1","status":"active","cancel_at_period_end":true,"amount_due":3000,
              "nothing":null,
@@ -40,13 +56,13 @@ class StripeJsonTest {
     void readsScalars() {
         JsonObject doc = doc();
 
-        assertThat(StripeJson.string(doc, "id")).isEqualTo("sub_1");
+        assertThat(StripeJson.string(doc, ID)).isEqualTo(SUB_1);
         assertThat(StripeJson.number(doc, "amount_due")).isEqualTo(3000L);
         assertThat(StripeJson.flag(doc, "cancel_at_period_end")).isTrue();
 
-        assertThat(StripeJson.string(doc, "absent")).isNull();
-        assertThat(StripeJson.number(doc, "absent")).isNull();
-        assertThat(StripeJson.flag(doc, "absent")).isFalse();
+        assertThat(StripeJson.string(doc, ABSENT)).isNull();
+        assertThat(StripeJson.number(doc, ABSENT)).isNull();
+        assertThat(StripeJson.flag(doc, ABSENT)).isFalse();
     }
 
     @Test
@@ -55,22 +71,22 @@ class StripeJsonTest {
         JsonObject doc = doc();
 
         // Stripe sends explicit nulls for unset optional fields, so the two have to be the same case.
-        assertThat(StripeJson.string(doc, "nothing")).isNull();
-        assertThat(StripeJson.number(doc, "nothing")).isNull();
-        assertThat(StripeJson.flag(doc, "nothing")).isFalse();
-        assertThat(StripeJson.object(doc, "nothing")).isNull();
+        assertThat(StripeJson.string(doc, NOTHING)).isNull();
+        assertThat(StripeJson.number(doc, NOTHING)).isNull();
+        assertThat(StripeJson.flag(doc, NOTHING)).isFalse();
+        assertThat(StripeJson.object(doc, NOTHING)).isNull();
     }
 
     @Test
     @DisplayName("reading from a null object is null rather than an NPE")
     void aNullObjectIsTolerated() {
         // The nested readers chain — object(object(x, a), b) — so the inner miss has to survive the outer call.
-        assertThat(StripeJson.string(null, "id")).isNull();
-        assertThat(StripeJson.number(null, "id")).isNull();
-        assertThat(StripeJson.flag(null, "id")).isFalse();
-        assertThat(StripeJson.object(null, "id")).isNull();
-        assertThat(StripeJson.firstOfData(null, "items")).isNull();
-        assertThat(StripeJson.timestamp(null, "id")).isNull();
+        assertThat(StripeJson.string(null, ID)).isNull();
+        assertThat(StripeJson.number(null, ID)).isNull();
+        assertThat(StripeJson.flag(null, ID)).isFalse();
+        assertThat(StripeJson.object(null, ID)).isNull();
+        assertThat(StripeJson.firstOfData(null, ITEMS)).isNull();
+        assertThat(StripeJson.timestamp(null, ID)).isNull();
     }
 
     @Test
@@ -82,14 +98,14 @@ class StripeJsonTest {
     @Test
     @DisplayName("the first element of a nested data array is returned")
     void readsTheFirstOfData() {
-        assertThat(StripeJson.string(StripeJson.firstOfData(doc(), "items"), "id")).isEqualTo("si_1");
+        assertThat(StripeJson.string(StripeJson.firstOfData(doc(), ITEMS), ID)).isEqualTo("si_1");
     }
 
     @Test
     @DisplayName("an empty, missing or malformed data array answers nothing")
     void toleratesAnAbsentDataArray() {
         assertThat(StripeJson.firstOfData(doc(), "empty")).isNull();
-        assertThat(StripeJson.firstOfData(doc(), "absent")).isNull();
+        assertThat(StripeJson.firstOfData(doc(), ABSENT)).isNull();
         assertThat(StripeJson.firstOfData(doc(), "notAList")).isNull();
     }
 
@@ -98,7 +114,7 @@ class StripeJsonTest {
     void readsTimestamps() {
         assertThat(StripeJson.timestamp(doc(), "current_period_end"))
                 .isEqualTo(Instant.ofEpochSecond(1769904000L));
-        assertThat(StripeJson.timestamp(doc(), "absent")).isNull();
+        assertThat(StripeJson.timestamp(doc(), ABSENT)).isNull();
     }
 
     @Test
@@ -106,8 +122,8 @@ class StripeJsonTest {
     void projectsTheSubscriptionState() {
         ProviderSubscriptionState state = ProviderSubscriptionState.from(doc());
 
-        assertThat(state.subscriptionId()).isEqualTo("sub_1");
-        assertThat(state.status()).isEqualTo("active");
+        assertThat(state.subscriptionId()).isEqualTo(SUB_1);
+        assertThat(state.status()).isEqualTo(ACTIVE);
         assertThat(state.priceId()).isEqualTo("price_1");
         assertThat(state.cancelAtPeriodEnd()).isTrue();
         assertThat(state.currentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(1769904000L));
@@ -141,28 +157,28 @@ class StripeJsonTest {
     @Test
     @DisplayName("Stripe's status strings are grouped into the three questions that matter")
     void classifiesStatus() {
-        assertThat(state("active").paying()).isTrue();
+        assertThat(state(ACTIVE).paying()).isTrue();
         assertThat(state("trialing").paying()).isTrue();
-        assertThat(state("past_due").paying()).isFalse();
+        assertThat(state(PAST_DUE).paying()).isFalse();
 
-        assertThat(state("past_due").pastDue()).isTrue();
+        assertThat(state(PAST_DUE).pastDue()).isTrue();
         assertThat(state("unpaid").pastDue()).isTrue();
-        assertThat(state("active").pastDue()).isFalse();
+        assertThat(state(ACTIVE).pastDue()).isFalse();
 
         assertThat(state("canceled").ended()).isTrue();
         assertThat(state("incomplete_expired").ended()).isTrue();
-        assertThat(state("active").ended()).isFalse();
+        assertThat(state(ACTIVE).ended()).isFalse();
 
         // A status none of the three recognise — an unfamiliar one, or none at all — is not any of them, so a
         // reconciliation leaves the local row where it is rather than guessing.
-        assertThat(state("incomplete").paying()).isFalse();
-        assertThat(state("incomplete").pastDue()).isFalse();
-        assertThat(state("incomplete").ended()).isFalse();
+        assertThat(state(INCOMPLETE).paying()).isFalse();
+        assertThat(state(INCOMPLETE).pastDue()).isFalse();
+        assertThat(state(INCOMPLETE).ended()).isFalse();
         assertThat(ProviderSubscriptionState.from(StripeJson.parse("{}")).paying()).isFalse();
     }
 
     private static ProviderSubscriptionState state(String status) {
-        return ProviderSubscriptionState.from(StripeJson.parse("{\"status\":\"" + status + "\"}"));
+        return ProviderSubscriptionState.from(StripeJson.parse(String.format("{\"status\":\"%s\"}", status)));
     }
 
 }

@@ -50,15 +50,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class ExternalBillingApiIntegrationTest {
 
-    private static final String SNAPSHOT = path(V1, "entitlement", "private", "snapshot");
+    private static final String ENTITLEMENTS = "entitlements";
 
-    private static final String BATCH = path(V1, "entitlement", "private", "snapshot", "batch");
+    private static final String REASON = "reason";
 
-    private static final String BLOCKED = path(V1, "entitlement", "private", "blocked-stores");
+    private static final String STATUS_FIELD = "status";
 
-    private static final String QUOTA = path(V1, "quota", "private", "store-create");
+    private static final String TRIAL_AVAILABLE = "trialAvailable";
 
-    private static final String PROVISION = path(V1, "quota", "private", "provision");
+    private static final String ENTITLEMENT = "entitlement";
+
+    private static final String PRIVATE = "private";
+
+    private static final String SNAPSHOT_SEGMENT = "snapshot";
+
+    private static final String QUOTA_SEGMENT = "quota";
+
+    private static final String SNAPSHOT = path(V1, ENTITLEMENT, PRIVATE, SNAPSHOT_SEGMENT);
+
+    private static final String BATCH = path(V1, ENTITLEMENT, PRIVATE, SNAPSHOT_SEGMENT, "batch");
+
+    private static final String BLOCKED = path(V1, ENTITLEMENT, PRIVATE, "blocked-stores");
+
+    private static final String QUOTA = path(V1, QUOTA_SEGMENT, PRIVATE, "store-create");
+
+    private static final String PROVISION = path(V1, QUOTA_SEGMENT, PRIVATE, "provision");
 
     private static final String ORG_BODY = "{\"org\":\"%s\"}";
 
@@ -124,10 +140,10 @@ class ExternalBillingApiIntegrationTest {
 
         expect(response, HttpStatus.OK);
         JsonNode snapshot = json(response);
-        assertThat(snapshot.get("status").asString()).isEqualTo(SubscriptionStatus.ACTIVE.name());
+        assertThat(snapshot.get(STATUS_FIELD).asString()).isEqualTo(SubscriptionStatus.ACTIVE.name());
         assertThat(snapshot.get(OPERABLE).asBoolean()).isTrue();
         assertThat(snapshot.get("planCode").asString()).isNotBlank();
-        assertThat(snapshot.get("entitlements")).isNotEmpty();
+        assertThat(snapshot.get(ENTITLEMENTS)).isNotEmpty();
     }
 
     @Test
@@ -140,7 +156,7 @@ class ExternalBillingApiIntegrationTest {
         assertThat(snapshot.get(OPERABLE).asBoolean()).isFalse();
         // An empty grant map reads as "unlimited" in EntitlementSnapshot, which is why the status is what has to
         // gate such a store — and does.
-        assertThat(snapshot.get("entitlements")).isEmpty();
+        assertThat(snapshot.get(ENTITLEMENTS)).isEmpty();
     }
 
     @Test
@@ -234,8 +250,8 @@ class ExternalBillingApiIntegrationTest {
         // A decision rather than an error, because the caller has to render *why* — and whether a trial is still on
         // the table changes what the next screen says.
         assertThat(decision.get(ALLOWED).asBoolean()).isTrue();
-        assertThat(decision.get("reason").isNull()).isTrue();
-        assertThat(decision.get("trialAvailable").asBoolean()).isTrue();
+        assertThat(decision.get(REASON).isNull()).isTrue();
+        assertThat(decision.get(TRIAL_AVAILABLE).asBoolean()).isTrue();
         assertThat(decision.get("pendingStoreCount").asInt()).isZero();
     }
 
@@ -247,7 +263,7 @@ class ExternalBillingApiIntegrationTest {
         JsonNode decision = json(api.post(QUOTA, storeCoreService, String.format(ORG_BODY, ORG_A)));
 
         assertThat(decision.get(ALLOWED).asBoolean()).isFalse();
-        assertThat(decision.get("reason").asString()).isEqualTo("TOO_MANY_PENDING_STORES");
+        assertThat(decision.get(REASON).asString()).isEqualTo("TOO_MANY_PENDING_STORES");
     }
 
     @Test
@@ -256,7 +272,7 @@ class ExternalBillingApiIntegrationTest {
         JsonNode decision = json(api.post(QUOTA, storeCoreService, String.format(ORG_BODY, ORG_B)));
 
         // The seed records org B's trial grant, so the answer differs from org A's on this field alone.
-        assertThat(decision.get("trialAvailable").asBoolean()).isFalse();
+        assertThat(decision.get(TRIAL_AVAILABLE).asBoolean()).isFalse();
     }
 
     @Test
@@ -266,7 +282,7 @@ class ExternalBillingApiIntegrationTest {
 
         ResponseEntity<String> first = api.post(PROVISION, storeCoreService, body);
         expect(first, HttpStatus.OK);
-        String firstStatus = json(first).get("status").asString();
+        String firstStatus = json(first).get(STATUS_FIELD).asString();
         // The org's first store, so it wins the trial claim.
         assertThat(firstStatus).isEqualTo(SubscriptionStatus.TRIALING.name());
 
@@ -274,7 +290,7 @@ class ExternalBillingApiIntegrationTest {
         // would be a second chance at the org's one trial.
         ResponseEntity<String> second = api.post(PROVISION, storeCoreService, body);
         expect(second, HttpStatus.OK);
-        assertThat(json(second).get("status").asString()).isEqualTo(firstStatus);
+        assertThat(json(second).get(STATUS_FIELD).asString()).isEqualTo(firstStatus);
     }
 
     @Test

@@ -86,7 +86,7 @@ public final class BillingApiSupport {
      */
     public String orgAdmin(String org) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "org-admin@" + org);
+        claims.put("sub", String.format("org-admin@%s", org));
         claims.put("name", "Test Org Admin");
         claims.put("roles", List.of(Tokens.ROLE_ORG_ADMIN));
         claims.put("scope", Tokens.SCOPE_STORE_POD);

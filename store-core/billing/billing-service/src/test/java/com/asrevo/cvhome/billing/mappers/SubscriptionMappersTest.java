@@ -41,6 +41,14 @@ import static org.mockito.Mockito.when;
  */
 class SubscriptionMappersTest {
 
+    private static final String BASIC = "BASIC";
+
+    private static final String PRO = "PRO";
+
+    private static final String PRO_NAME = "Pro";
+
+    private static final String USD = "USD";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
@@ -61,8 +69,8 @@ class SubscriptionMappersTest {
     void setUp() {
         catalog = mock(PlanCatalogService.class);
         mappers = new SubscriptionMappers(catalog);
-        plan = PlanEntity.create("PRO", "Pro", "For a store that is growing.", 20);
-        price = PlanPriceEntity.create(plan.getId(), new CurrencyCode("USD"), 3000L, BillingInterval.MONTH, 0);
+        plan = PlanEntity.create(PRO, PRO_NAME, "For a store that is growing.", 20);
+        price = PlanPriceEntity.create(plan.getId(), new CurrencyCode(USD), 3000L, BillingInterval.MONTH, 0);
         when(catalog.findPlan(plan.getId())).thenReturn(Optional.of(plan));
         when(catalog.findPrice(price.getId())).thenReturn(Optional.of(price));
         when(catalog.entitlementsOf(plan.getId())).thenReturn(
@@ -82,8 +90,8 @@ class SubscriptionMappersTest {
 
         assertThat(view.store()).isEqualTo(STORE);
         assertThat(view.status()).isEqualTo(SubscriptionStatus.ACTIVE);
-        assertThat(view.planCode()).isEqualTo("PRO");
-        assertThat(view.planDisplayName()).isEqualTo("Pro");
+        assertThat(view.planCode()).isEqualTo(PRO);
+        assertThat(view.planDisplayName()).isEqualTo(PRO_NAME);
         assertThat(view.amount().minorUnits()).isEqualTo(3000L);
         assertThat(view.currentPeriodEnd()).isEqualTo(PERIOD_END);
         assertThat(view.providerLinked()).isTrue();
@@ -119,8 +127,8 @@ class SubscriptionMappersTest {
     @Test
     @DisplayName("a pending downgrade is rendered with the plan it moves to and when")
     void rendersThePendingChange() throws Exception {
-        PlanEntity basic = PlanEntity.create("BASIC", "Basic", null, 10);
-        PlanPriceEntity cheaper = PlanPriceEntity.create(basic.getId(), new CurrencyCode("USD"), 1000L,
+        PlanEntity basic = PlanEntity.create(BASIC, "Basic", null, 10);
+        PlanPriceEntity cheaper = PlanPriceEntity.create(basic.getId(), new CurrencyCode(USD), 1000L,
                 BillingInterval.MONTH, 0);
         when(catalog.findPrice(cheaper.getId())).thenReturn(Optional.of(cheaper));
         when(catalog.findPlan(basic.getId())).thenReturn(Optional.of(basic));
@@ -130,10 +138,10 @@ class SubscriptionMappersTest {
         SubscriptionView view = mappers.toView(entity);
 
         assertThat(view.pendingPlanChange()).isNotNull();
-        assertThat(view.pendingPlanChange().planCode()).isEqualTo("BASIC");
+        assertThat(view.pendingPlanChange().planCode()).isEqualTo(BASIC);
         assertThat(view.pendingPlanChange().effectiveAt()).isEqualTo(PERIOD_END);
         // The plan in force is unchanged — the downgrade has not happened.
-        assertThat(view.planCode()).isEqualTo("PRO");
+        assertThat(view.planCode()).isEqualTo(PRO);
     }
 
     @Test
@@ -164,7 +172,7 @@ class SubscriptionMappersTest {
         assertThat(snapshot.store()).isEqualTo(STORE);
         assertThat(snapshot.status()).isEqualTo(SubscriptionStatus.ACTIVE);
         assertThat(snapshot.operable()).isTrue();
-        assertThat(snapshot.planCode()).isEqualTo("PRO");
+        assertThat(snapshot.planCode()).isEqualTo(PRO);
         assertThat(snapshot.currentPeriodEnd()).isEqualTo(PERIOD_END);
         assertThat(snapshot.entitlement(EntitlementKey.MAX_PRODUCTS).limitValue()).isEqualTo(500);
         // A key the plan does not mention is unlimited, not forbidden.

@@ -15,7 +15,6 @@ import com.asrevo.cvhome.billing.commons.AuditEventType;
 import com.asrevo.cvhome.billing.commons.BillingInterval;
 import com.asrevo.cvhome.billing.commons.ChangeSource;
 import com.asrevo.cvhome.billing.commons.PlanId;
-import com.asrevo.cvhome.billing.commons.PlanPriceId;
 import com.asrevo.cvhome.billing.commons.StripeCustomerId;
 import com.asrevo.cvhome.billing.commons.StripePriceId;
 import com.asrevo.cvhome.billing.commons.StripeScheduleId;
@@ -71,6 +70,26 @@ import static org.mockito.Mockito.when;
  */
 class SubscriptionServiceImplTest {
 
+    private static final String USD = "USD";
+
+    private static final String BILLING_JOB = "billing-job";
+
+    private static final String CUS_1 = "cus_1";
+
+    private static final String CUS_NEW = "cus_new";
+
+    private static final String HTTPS_CHECKOUT_STRIPE_TEST_CS_1 = "https://checkout.stripe.test/cs_1";
+
+    private static final String HTTPS_NO = "https://no";
+
+    private static final String HTTPS_OK = "https://ok";
+
+    private static final String SS_1 = "ss_1";
+
+    private static final String SUB_1 = "sub_1";
+
+    private static final String SUB_SCHED_1 = "sub_sched_1";
+
     private static final StoreMerchantId STORE = new StoreMerchantId("65f023632bc46470c104b76f");
 
     private static final ManagerOrgId ORG = new ManagerOrgId("32a034a43cd77581d105c87a");
@@ -121,9 +140,9 @@ class SubscriptionServiceImplTest {
 
         basicPlan = PlanEntity.create("BASIC", "Basic", "For a store finding its feet.", 10);
         proPlan = PlanEntity.create("PRO", "Pro", "For a store that is growing.", 20);
-        basicMonthly = PlanPriceEntity.create(basicPlan.getId(), new CurrencyCode("USD"), 1000L,
+        basicMonthly = PlanPriceEntity.create(basicPlan.getId(), new CurrencyCode(USD), 1000L,
                 BillingInterval.MONTH, 0).publishedAs(new StripePriceId("price_basic"));
-        proMonthly = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode("USD"), 3000L,
+        proMonthly = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode(USD), 3000L,
                 BillingInterval.MONTH, 0).publishedAs(new StripePriceId("price_pro"));
 
         when(catalog.findPlan(basicPlan.getId())).thenReturn(Optional.of(basicPlan));
@@ -143,7 +162,7 @@ class SubscriptionServiceImplTest {
     private StoreSubscriptionEntity onBasic() throws Exception {
         StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(STORE, ORG)
                 .activate(basicPlan.getId(), basicMonthly.getId(), PERIOD_START, PERIOD_END);
-        return entity.bindProvider(new StripeCustomerId("cus_1"), new StripeSubscriptionId("sub_1"));
+        return entity.bindProvider(new StripeCustomerId(CUS_1), new StripeSubscriptionId(SUB_1));
     }
 
     /** The row every read finds, in both the scoped and unscoped queries. */
@@ -220,27 +239,27 @@ class SubscriptionServiceImplTest {
         void opensASession() throws Exception {
             inRepository(onBasic());
             when(catalog.requirePurchasablePrice(proMonthly.getId())).thenReturn(proMonthly);
-            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId("cus_1"));
+            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId(CUS_1));
             when(checkoutGateway.createSubscriptionSession(eq(STORE), eq(ORG), any(), eq(proMonthly), any(), any()))
-                    .thenReturn("https://checkout.stripe.test/cs_1");
+                    .thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
 
-            CheckoutSessionView session = service.checkout(STORE, ORG, proMonthly.getId(), "https://ok",
-                    "https://no");
+            CheckoutSessionView session = service.checkout(STORE, ORG, proMonthly.getId(), HTTPS_OK,
+                    HTTPS_NO);
 
-            assertThat(session.url()).isEqualTo("https://checkout.stripe.test/cs_1");
+            assertThat(session.url()).isEqualTo(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
         }
 
         @Test
         @DisplayName("a price the catalog never published is refused as not purchasable, not as a Stripe fault")
         void anUnpublishedPriceIsNotPurchasable() throws Exception {
             inRepository(onBasic());
-            PlanPriceEntity unpublished = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode("USD"), 3000L,
+            PlanPriceEntity unpublished = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode(USD), 3000L,
                     BillingInterval.MONTH, 0);
             when(catalog.requirePurchasablePrice(unpublished.getId())).thenReturn(unpublished);
 
             // Nothing is wrong with Stripe — the catalog sync has not run. Reporting a provider fault would page
             // somebody about a configuration step.
-            assertThatThrownBy(() -> service.checkout(STORE, ORG, unpublished.getId(), "https://ok", "https://no"))
+            assertThatThrownBy(() -> service.checkout(STORE, ORG, unpublished.getId(), HTTPS_OK, HTTPS_NO))
                     .isInstanceOf(PlanPriceNotFoundException.class);
             verify(checkoutGateway, never()).createSubscriptionSession(any(), any(), any(), any(), any(), any());
         }
@@ -251,13 +270,13 @@ class SubscriptionServiceImplTest {
             StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(STORE, ORG);
             inRepository(entity);
             when(catalog.requirePurchasablePrice(proMonthly.getId())).thenReturn(proMonthly);
-            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId("cus_new"));
+            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId(CUS_NEW));
             when(checkoutGateway.createSubscriptionSession(any(), any(), any(), any(), any(), any()))
-                    .thenReturn("https://checkout.stripe.test/cs_1");
+                    .thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
 
-            service.checkout(STORE, ORG, proMonthly.getId(), "https://ok", "https://no");
+            service.checkout(STORE, ORG, proMonthly.getId(), HTTPS_OK, HTTPS_NO);
 
-            assertThat(lastSaved().getStripeCustomerId()).isEqualTo(new StripeCustomerId("cus_new"));
+            assertThat(lastSaved().getStripeCustomerId()).isEqualTo(new StripeCustomerId(CUS_NEW));
         }
 
         @Test
@@ -265,11 +284,11 @@ class SubscriptionServiceImplTest {
         void doesNotRewriteTheSameCustomer() throws Exception {
             inRepository(onBasic());
             when(catalog.requirePurchasablePrice(proMonthly.getId())).thenReturn(proMonthly);
-            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId("cus_1"));
+            when(customerGateway.findOrCreate(ORG, null)).thenReturn(new StripeCustomerId(CUS_1));
             when(checkoutGateway.createSubscriptionSession(any(), any(), any(), any(), any(), any()))
-                    .thenReturn("https://checkout.stripe.test/cs_1");
+                    .thenReturn(HTTPS_CHECKOUT_STRIPE_TEST_CS_1);
 
-            service.checkout(STORE, ORG, proMonthly.getId(), "https://ok", "https://no");
+            service.checkout(STORE, ORG, proMonthly.getId(), HTTPS_OK, HTTPS_NO);
 
             verify(subscriptions, never()).save(any(StoreSubscriptionEntity.class));
         }
@@ -290,7 +309,7 @@ class SubscriptionServiceImplTest {
 
             service.changePlan(STORE, ORG, proMonthly.getId(), ACTOR);
 
-            verify(subscriptionGateway).upgradeNow(eq(STORE), eq(new StripeSubscriptionId("sub_1")), eq(proMonthly));
+            verify(subscriptionGateway).upgradeNow(eq(STORE), eq(new StripeSubscriptionId(SUB_1)), eq(proMonthly));
             verify(subscriptionGateway, never()).scheduleDowngrade(any(), any(), any(), any());
             assertThat(lastSaved().getPlanPriceId()).isEqualTo(proMonthly.getId());
         }
@@ -331,12 +350,12 @@ class SubscriptionServiceImplTest {
         void downgradeIsDeferred() throws Exception {
             StoreSubscriptionEntity entity = StoreSubscriptionEntity.pending(STORE, ORG)
                     .activate(proPlan.getId(), proMonthly.getId(), PERIOD_START, PERIOD_END)
-                    .bindProvider(new StripeCustomerId("cus_1"), new StripeSubscriptionId("sub_1"));
+                    .bindProvider(new StripeCustomerId(CUS_1), new StripeSubscriptionId(SUB_1));
             inRepository(entity);
             when(catalog.requirePurchasablePrice(basicMonthly.getId())).thenReturn(basicMonthly);
             when(catalog.requirePrice(proMonthly.getId())).thenReturn(proMonthly);
-            when(subscriptionGateway.scheduleDowngrade(STORE, new StripeSubscriptionId("sub_1"), basicMonthly,
-                    PERIOD_END)).thenReturn(new StripeScheduleId("sub_sched_1"));
+            when(subscriptionGateway.scheduleDowngrade(STORE, new StripeSubscriptionId(SUB_1), basicMonthly,
+                    PERIOD_END)).thenReturn(new StripeScheduleId(SUB_SCHED_1));
 
             service.changePlan(STORE, ORG, basicMonthly.getId(), ACTOR);
 
@@ -345,7 +364,7 @@ class SubscriptionServiceImplTest {
             assertThat(saved.getPlanPriceId()).isEqualTo(proMonthly.getId());
             assertThat(saved.getPendingPlanPriceId()).isEqualTo(basicMonthly.getId());
             assertThat(saved.getPendingEffectiveAt()).isEqualTo(PERIOD_END);
-            assertThat(saved.getStripeScheduleId()).isEqualTo(new StripeScheduleId("sub_sched_1"));
+            assertThat(saved.getStripeScheduleId()).isEqualTo(new StripeScheduleId(SUB_SCHED_1));
             verify(audit).record(eq(SubscriptionStatus.ACTIVE), eq(proPlan.getId()), any(),
                     eq(AuditEventType.PLAN_DOWNGRADE_SCHEDULED), eq(ChangeSource.API), eq(ACTOR));
         }
@@ -367,7 +386,7 @@ class SubscriptionServiceImplTest {
         @Test
         @DisplayName("within one tier, a dearer interval is an upgrade and a cheaper one a downgrade")
         void priceBreaksTheTieWithinATier() throws Exception {
-            PlanPriceEntity basicYearly = PlanPriceEntity.create(basicPlan.getId(), new CurrencyCode("USD"), 10000L,
+            PlanPriceEntity basicYearly = PlanPriceEntity.create(basicPlan.getId(), new CurrencyCode(USD), 10000L,
                     BillingInterval.YEAR, 0).publishedAs(new StripePriceId("price_basic_year"));
             inRepository(onBasic());
             when(catalog.requirePurchasablePrice(basicYearly.getId())).thenReturn(basicYearly);
@@ -396,7 +415,7 @@ class SubscriptionServiceImplTest {
         @DisplayName("an unpublished target is refused before Stripe is called")
         void anUnpublishedTargetIsRefused() throws Exception {
             inRepository(onBasic());
-            PlanPriceEntity unpublished = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode("USD"), 3000L,
+            PlanPriceEntity unpublished = PlanPriceEntity.create(proPlan.getId(), new CurrencyCode(USD), 3000L,
                     BillingInterval.MONTH, 0);
             when(catalog.requirePurchasablePrice(unpublished.getId())).thenReturn(unpublished);
 
@@ -436,7 +455,7 @@ class SubscriptionServiceImplTest {
 
             service.cancel(STORE, ORG, false, false, ACTOR);
 
-            verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId("sub_1"), false);
+            verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId(SUB_1), false);
             verify(subscriptionGateway, never()).cancelNow(any(), any());
             StoreSubscriptionEntity saved = lastSaved();
             assertThat(saved.isCancelAtPeriodEnd()).isTrue();
@@ -464,7 +483,7 @@ class SubscriptionServiceImplTest {
 
             service.cancel(STORE, ORG, true, true, ACTOR);
 
-            verify(subscriptionGateway).cancelNow(STORE, new StripeSubscriptionId("sub_1"));
+            verify(subscriptionGateway).cancelNow(STORE, new StripeSubscriptionId(SUB_1));
             assertThat(lastSaved().getStatus()).isEqualTo(SubscriptionStatus.CANCELED);
             verify(audit).record(any(), any(), any(), eq(AuditEventType.CANCELED), eq(ChangeSource.API), eq(ACTOR));
         }
@@ -473,7 +492,7 @@ class SubscriptionServiceImplTest {
         @DisplayName("a pending schedule is released before renewal is switched off")
         void releasesTheScheduleFirst() throws Exception {
             StoreSubscriptionEntity entity = onBasic();
-            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId("ss_1"));
+            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId(SS_1));
             inRepository(entity);
 
             service.cancel(STORE, ORG, false, false, ACTOR);
@@ -481,8 +500,8 @@ class SubscriptionServiceImplTest {
             // Stripe refuses to set cancellation behaviour directly on a scheduled subscription and says to change
             // the schedule instead, so the release has to come first.
             InOrder order = inOrder(subscriptionGateway);
-            order.verify(subscriptionGateway).releaseSchedule(STORE, new StripeScheduleId("ss_1"));
-            order.verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId("sub_1"), false);
+            order.verify(subscriptionGateway).releaseSchedule(STORE, new StripeScheduleId(SS_1));
+            order.verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId(SUB_1), false);
         }
 
         @Test
@@ -510,7 +529,7 @@ class SubscriptionServiceImplTest {
 
             service.resume(STORE, ORG, ACTOR);
 
-            verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId("sub_1"), true);
+            verify(subscriptionGateway).setRenewal(STORE, new StripeSubscriptionId(SUB_1), true);
             assertThat(lastSaved().isCancelAtPeriodEnd()).isFalse();
             verify(audit).record(any(), any(), any(), eq(AuditEventType.CANCEL_REVOKED), eq(ChangeSource.API),
                     eq(ACTOR));
@@ -533,7 +552,7 @@ class SubscriptionServiceImplTest {
         @DisplayName("a pending downgrade alone is enough to resume, and it is called off on both sides")
         void aPendingDowngradeIsCalledOff() throws Exception {
             StoreSubscriptionEntity entity = onBasic();
-            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId("ss_1"));
+            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId(SS_1));
             inRepository(entity);
 
             service.resume(STORE, ORG, ACTOR);
@@ -542,7 +561,7 @@ class SubscriptionServiceImplTest {
             // and this store was not — so resuming it released the schedule and set renewal at Stripe and *then*
             // threw, leaving the provider changed and the row untouched. And the local pending change was never
             // cleared, so the customer went on being shown a downgrade they had just undone.
-            verify(subscriptionGateway).releaseSchedule(STORE, new StripeScheduleId("ss_1"));
+            verify(subscriptionGateway).releaseSchedule(STORE, new StripeScheduleId(SS_1));
             StoreSubscriptionEntity saved = lastSaved();
             assertThat(saved.getPendingPlanPriceId()).isNull();
             assertThat(saved.getPendingEffectiveAt()).isNull();
@@ -553,11 +572,11 @@ class SubscriptionServiceImplTest {
         @DisplayName("resuming a cancelled subscription with a pending downgrade drops both")
         void bothAreRevokedTogether() throws Exception {
             StoreSubscriptionEntity entity = onBasic();
-            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId("ss_1"));
+            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId(SS_1));
             // Set last, because scheduleCancel drops a pending change of its own accord; re-added afterwards so the
             // row carries both, which is the state a webhook reconciliation can leave behind.
             entity.scheduleCancel();
-            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId("ss_1"));
+            entity.scheduleDowngradeTo(proMonthly.getId(), PERIOD_END).bindSchedule(new StripeScheduleId(SS_1));
             inRepository(entity);
 
             service.resume(STORE, ORG, ACTOR);
@@ -590,7 +609,7 @@ class SubscriptionServiceImplTest {
             // Named as a job rather than a person, so the trail distinguishes "the platform did this" from
             // "someone did this".
             verify(audit).record(eq(SubscriptionStatus.ACTIVE), eq(basicPlan.getId()), any(),
-                    eq(AuditEventType.PLAN_DOWNGRADE_APPLIED), eq(ChangeSource.JOB), eq("billing-job"));
+                    eq(AuditEventType.PLAN_DOWNGRADE_APPLIED), eq(ChangeSource.JOB), eq(BILLING_JOB));
         }
 
         @Test
@@ -614,7 +633,7 @@ class SubscriptionServiceImplTest {
 
             assertThat(lastSaved().getStatus()).isEqualTo(SubscriptionStatus.SUSPENDED);
             verify(audit).record(eq(SubscriptionStatus.TRIALING), any(), any(), eq(AuditEventType.SUSPENDED),
-                    eq(ChangeSource.JOB), eq("billing-job"));
+                    eq(ChangeSource.JOB), eq(BILLING_JOB));
         }
 
         @Test

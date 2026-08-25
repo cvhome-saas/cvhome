@@ -63,7 +63,7 @@ public class BillingFixtures {
     public void publishPrices() {
         for (PlanPriceEntity price : activePrices()) {
             if (price.getStripePriceId() == null) {
-                priceRepository.save(price.publishedAs(new StripePriceId("price_" + price.getId().getId())));
+                priceRepository.save(price.publishedAs(new StripePriceId(String.format("price_%s", price.getId().getId()))));
             }
         }
     }
@@ -112,7 +112,7 @@ public class BillingFixtures {
             throw new IllegalStateException("PENDING to ACTIVE is a legal transition", e);
         }
         entity.bindProvider(new StripeCustomerId("cus_integration_test"),
-                new StripeSubscriptionId(PROVIDER_SUBSCRIPTION + ":" + store));
+                new StripeSubscriptionId(String.format("%s:%s", PROVIDER_SUBSCRIPTION, store)));
         return subscriptionRepository.save(entity);
     }
 

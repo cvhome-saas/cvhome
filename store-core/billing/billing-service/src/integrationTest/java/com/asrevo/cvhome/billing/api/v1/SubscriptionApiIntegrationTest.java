@@ -46,15 +46,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class SubscriptionApiIntegrationTest {
 
-    private static final String CURRENT = path(V1, "subscription", "current");
+    private static final String CANCEL_AT_PERIOD_END = "cancelAtPeriodEnd";
 
-    private static final String CHECKOUT = path(V1, "subscription", "checkout");
+    private static final String PENDING_PLAN_CHANGE = "pendingPlanChange";
 
-    private static final String PLAN = path(V1, "subscription", "plan");
+    private static final String PLAN_PRICE_ID = "planPriceId";
 
-    private static final String CANCEL = path(V1, "subscription", "cancel");
+    private static final String SUBSCRIPTION = "subscription";
 
-    private static final String RESUME = path(V1, "subscription", "resume");
+    private static final String CURRENT = path(V1, SUBSCRIPTION, "current");
+
+    private static final String CHECKOUT = path(V1, SUBSCRIPTION, "checkout");
+
+    private static final String PLAN = path(V1, SUBSCRIPTION, "plan");
+
+    private static final String CANCEL = path(V1, SUBSCRIPTION, "cancel");
+
+    private static final String RESUME = path(V1, SUBSCRIPTION, "resume");
 
     private static final String STATUS = "status";
 
@@ -232,8 +240,8 @@ class SubscriptionApiIntegrationTest {
         ResponseEntity<String> response = api.post(scoped(PLAN, SUBSCRIPTION_STORE), orgAdmin, priceBody(dearest));
 
         expect(response, HttpStatus.OK);
-        assertThat(priceIdOf(json(response), "planPriceId")).isEqualTo(dearest.getId().getId().toString());
-        assertThat(json(response).get("pendingPlanChange").isNull()).isTrue();
+        assertThat(priceIdOf(json(response), PLAN_PRICE_ID)).isEqualTo(dearest.getId().getId().toString());
+        assertThat(json(response).get(PENDING_PLAN_CHANGE).isNull()).isTrue();
         assertThat(fixtures.read(SUBSCRIPTION_STORE).getPlanPriceId()).isEqualTo(dearest.getId());
     }
 
@@ -247,8 +255,8 @@ class SubscriptionApiIntegrationTest {
         expect(response, HttpStatus.OK);
         JsonNode body = json(response);
         // The direction is not the caller's to choose, and the response is how the console knows which happened.
-        assertThat(priceIdOf(body, "planPriceId")).isEqualTo(dearest.getId().getId().toString());
-        assertThat(priceIdOf(body.get("pendingPlanChange"), "planPriceId"))
+        assertThat(priceIdOf(body, PLAN_PRICE_ID)).isEqualTo(dearest.getId().getId().toString());
+        assertThat(priceIdOf(body.get(PENDING_PLAN_CHANGE), PLAN_PRICE_ID))
                 .isEqualTo(cheapest.getId().getId().toString());
         assertThat(fixtures.read(SUBSCRIPTION_STORE).getPendingPlanPriceId()).isEqualTo(cheapest.getId());
     }
@@ -295,7 +303,7 @@ class SubscriptionApiIntegrationTest {
 
         expect(response, HttpStatus.OK);
         JsonNode body = json(response);
-        assertThat(body.get("cancelAtPeriodEnd").asBoolean()).isTrue();
+        assertThat(body.get(CANCEL_AT_PERIOD_END).asBoolean()).isTrue();
         // Not a cancellation: the customer keeps everything until the period they paid for runs out.
         assertThat(body.get(STATUS).asString()).isEqualTo(SubscriptionStatus.ACTIVE.name());
     }
@@ -332,7 +340,7 @@ class SubscriptionApiIntegrationTest {
         ResponseEntity<String> response = api.post(scoped(RESUME, LIFECYCLE_STORE), orgAdmin, null);
 
         expect(response, HttpStatus.OK);
-        assertThat(json(response).get("cancelAtPeriodEnd").asBoolean()).isFalse();
+        assertThat(json(response).get(CANCEL_AT_PERIOD_END).asBoolean()).isFalse();
     }
 
     @Test
@@ -347,7 +355,7 @@ class SubscriptionApiIntegrationTest {
         // to answer 422 with the schedule already released at Stripe — and the local pending change survived, for
         // the safety-net job to apply later.
         expect(response, HttpStatus.OK);
-        assertThat(json(response).get("pendingPlanChange").isNull()).isTrue();
+        assertThat(json(response).get(PENDING_PLAN_CHANGE).isNull()).isTrue();
         assertThat(fixtures.read(LIFECYCLE_STORE).getPendingPlanPriceId()).isNull();
     }
 

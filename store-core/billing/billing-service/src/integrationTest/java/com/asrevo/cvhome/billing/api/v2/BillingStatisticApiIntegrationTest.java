@@ -40,13 +40,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ExternalClientsTestConfiguration.class)
 class BillingStatisticApiIntegrationTest {
 
-    private static final String REVENUE = path(V2, "private", "revenue-statistic");
+    private static final String ENTRIES = "entries";
 
-    private static final String SUBSCRIPTIONS = path(V2, "private", "subscription-statistic");
+    private static final String PRIVATE = "private";
 
-    private static final String PLANS = path(V2, "private", "plan-statistic");
+    private static final String REVENUE = path(V2, PRIVATE, "revenue-statistic");
 
-    private static final String HEALTH = path(V2, "private", "billing-health");
+    private static final String SUBSCRIPTIONS = path(V2, PRIVATE, "subscription-statistic");
+
+    private static final String PLANS = path(V2, PRIVATE, "plan-statistic");
+
+    private static final String HEALTH = path(V2, PRIVATE, "billing-health");
 
     private static final String RANGE = """
             {"fromDate":"2020-01-01T00:00:00.000+00:00","toDate":"2030-01-01T00:00:00.000+00:00"}""";
@@ -80,7 +84,7 @@ class BillingStatisticApiIntegrationTest {
         expect(response, HttpStatus.OK);
         // The entries list exists even when nothing has been paid; the currency is the entry's name so a caller
         // never has to guess which one a figure is in.
-        assertThat(json(response).get("entries")).isNotNull();
+        assertThat(json(response).get(ENTRIES)).isNotNull();
     }
 
     @Test
@@ -89,7 +93,7 @@ class BillingStatisticApiIntegrationTest {
         ResponseEntity<String> response = api.post(SUBSCRIPTIONS, operator, RANGE);
 
         expect(response, HttpStatus.OK);
-        assertThat(json(response).get("entries")).isNotNull();
+        assertThat(json(response).get(ENTRIES)).isNotNull();
     }
 
     @Test
