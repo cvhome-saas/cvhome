@@ -63,7 +63,7 @@ The script copies `themes/starter` → `themes/<id>`, renames ids/selectors, and
 `registry.ts`, `themes.css`, `next.config.ts` (`transpilePackages`), `legacy-theme-map.ts`,
 `storefront/package.json` and the TS `Theme` enum, then runs `npm install`. Commit that as one change.
 
-Run it with the local stack (`./extra/scripts/run-lcl.sh start -d`) and open
+Run it with the local stack (`lcl start -d`) and open
 `http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` — spg injects the store headers; `?theme=` is a dev-only
 override cookie (`STOREFRONT_THEME=<id>` also works), `?color=<PRESET|default>` likewise previews a colour theme. `http://localhost:8110` renders SSR via the `FALLBACK_STORE_ID`
 fallback but browser-side API calls need spg (see `landing-ui.md`, "Local dev URLs").
@@ -161,7 +161,7 @@ npm run gen:colors --workspace=libs/types               # after editing a THEME_
 npm run dev   # then http://localhost:8110/en?theme=<id>&color=default, /ar?theme=<id>, ?color=MIDNIGHT
 
 # full stack: spg injects the headers for the demo store
-./extra/scripts/run-lcl.sh start -d
+lcl start -d
 open http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>
 ```
 Browser QA at desktop, tablet and mobile widths, first in the theme's own palette (`?color=default`, what a

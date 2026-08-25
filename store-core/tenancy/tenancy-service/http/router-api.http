@@ -5,7 +5,7 @@
 #
 # The file this replaces called two endpoints that no longer existed and pointed at localhost:8020.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### the pod a store lives on
 GET {{SELLER_UI_URL}}/tenancy/api/v1/router/store-pod-by-store-id?store={{STORE_ID}}&lang={{LANG}}

@@ -6,7 +6,7 @@ compatibility alias. Existing databases must be recreated; this change provides 
 - **Scope** — merchant · content · SPG routing · seller-ui · landing-ui
 - **Change** — PR #273, branch `feat/split-merchant-content-services`, plan
   `.agents/plans/split-merchant-content-services.md`
-- **Run** — 2026-08-13, fresh `run-lcl.sh` stack with `test-stores`
+- **Run** — 2026-08-13, fresh `lcl start` stack with `test-stores`
 
 Tags: **[verified]** was exercised end to end; **[unit only]** was covered by automated checks but not the
 live stack; **[not verified]** remains for a human tester.
@@ -15,7 +15,7 @@ live stack; **[not verified]** remains for a human tester.
 
 ### START-01 — Both services start from fresh schemas · critical · [verified]
 
-- **Setup** — no prior local stack; run `./extra/scripts/run-lcl.sh` and wait for all readiness checks.
+- **Setup** — no prior local stack; run `lcl start -d` and wait for all readiness checks.
 - **Steps** — confirm merchant on 8120, content on 8121, SPG on 8000, seller-ui on 8010 and landing-ui on 8110.
 - **Expect** — every service is ready. Content seed SQL initializes content-service; merchant seed SQL contains
   no content fragments.

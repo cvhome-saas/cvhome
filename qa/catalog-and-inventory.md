@@ -18,7 +18,7 @@ necessary: the wire contract is unchanged and the code behind every line of it i
   rewrite, the catalog rewrite). Plan: `.claude/plans/i-want-to-split-reflective-muffin.md`.
 - **Cases** — 119 (37 verified, 8 covered by tests only, 74 never run end to end)
 - **Related** — [`qa/merchant-store-service.md`](merchant-store-service.md) for the store record both services
-  read (units of measure, default language); [`qa/run-lcl-lifecycle.md`](run-lcl-lifecycle.md) for the stack.
+  read (units of measure, default language); [`qa/lcl-lifecycle.md`](lcl-lifecycle.md) for the stack.
 
 Each case is tagged:
 
@@ -39,8 +39,10 @@ endpoint. Read section 99 before filing anything.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
-./extra/scripts/run-lcl.sh start -d             # never `restart <one-service>`: it tears the whole stack down
+lcl start -d
 ```
+
+Use `lcl restart <service>` while iterating; the rest of the supervised stack remains running.
 
 **Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
 `admin`, `org1-store1-moderator` / `admin` (read-only). Storefront `http://org1-store1.spg-507f1f77.gateway.com`
@@ -102,7 +104,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from inventory.sm_sequencer;"
 ```
 
-Logs: `build/lcl-logs/catalog.log`, `build/lcl-logs/inventory.log`, `build/lcl-logs/checkout.log`. An
+Logs: `.lcl/default/logs/catalog.log`, `.lcl/default/logs/inventory.log`, `.lcl/default/logs/checkout.log`. An
 `Unhandled failure [traceId=…]` line in any of them is a defect regardless of what the screen showed.
 
 ### State the PR's QA left behind
@@ -116,7 +118,7 @@ the INV cases if you want the seeded number:
 update inventory.product_availability set quantity=25 where sku='SKU-NK-RUN-001';
 ```
 
-or `docker compose down -v` + a fresh `run-lcl.sh start -d`, which reseeds everything.
+or `docker compose down -v` + a fresh `lcl start -d`, which reseeds everything.
 
 ---
 
@@ -627,7 +629,7 @@ points at the file name and the read builds the url from the CDN properties.
 
 The seeded image rows reference objects that a fresh MinIO does not have (MinIO runs without a volume). The
 rows and urls are correct; the storefront shows a placeholder. Upload something before judging a rendering
-case. Regenerate: `qa/run-lcl-lifecycle.md`.
+case. Regenerate: `qa/lcl-lifecycle.md`.
 
 ---
 
@@ -926,7 +928,7 @@ brands, types, groups). Specs: `features/products/**`, `features/product-form/**
 
 - **Steps** — `/en/product/does-not-exist`.
 - **Expect** — the catalog answers 404; the Next dev server currently renders a **500** for it (a pre-existing
-  stream error in the dev server, `build/lcl-logs/landing-ui.log`, `controller[kState].transformAlgorithm is
+  stream error in the dev server, `.lcl/default/logs/landing-ui.log`, `controller[kState].transformAlgorithm is
   not a function`). Not a catalog defect; listed so it is not filed as one.
 
 ---
@@ -1003,7 +1005,7 @@ Every row was a real defect found while building or verifying this PR.
 | **The console's category tree showed codes instead of names** | The private hierarchy passed `nonLanguage`, so neither `description` nor `descriptions` was set. | CAT-02 |
 | **A cart line with no price NPE'd** | The composer handed a null `price` to the cart populator. | CHK-03 |
 | **The old catalog listing hid products with no availability row** | Inner joins to `product_availability` in the fetch queries; the count was right only because every seed had one. | LST-01 (`totalElements` 45 with a product created by PRD-01 → 46) |
-| **`restart inventory` took the whole stack down** | `run-lcl.sh restart <svc>` stops it, the supervisor sees a service exit and stops everything. | `qa/run-lcl-lifecycle.md`; use `stop` + `start -d` |
+| **`restart inventory` took the whole stack down** | Under the old `run-lcl.sh` supervisor a restart read as a service exit and brought everything down. `lcl restart <svc>` replaces one service and leaves the rest up. | `qa/lcl-lifecycle.md` case 06 |
 | **Generated seed inserts had 7 values for 6 columns** | A regex added `sku` to wrapped column lists inconsistently. | ARC-01 — inventory boots and `select count(*) from inventory.product_availability` = 180 |
 
 ---
@@ -1063,7 +1065,7 @@ only `dateAvailable`.
 ---
 
 Raise anything unexpected against PR #282. Include the store id, the sku or category id, the time, and the
-matching `Unhandled failure [traceId=…]` block from `build/lcl-logs/catalog.log`, `inventory.log` or
+matching `Unhandled failure [traceId=…]` block from `.lcl/default/logs/catalog.log`, `inventory.log` or
 `checkout.log`. For a console defect attach the browser console and the failing request: a 401 is a missing
 session, a 403 is a permission problem, a 404 through `/spg/**` is usually a missing `pod` parameter, and a
 400 with a `*.REFERENCE_UNRESOLVABLE` code names the exact value that did not resolve in this store.

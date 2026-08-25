@@ -4,7 +4,7 @@
 # A thin, tenant-guarded facade over uaa. Every endpoint here needs a session and a store-scoped permission —
 # which is why public signup was moved off this base path to api/v1/signup.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### who am I
 GET {{SELLER_UI_URL}}/tenancy/api/v1/user-account/current?lang={{LANG}}

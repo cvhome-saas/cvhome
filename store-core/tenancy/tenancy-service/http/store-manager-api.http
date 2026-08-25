@@ -8,7 +8,7 @@
 # Vars come from the repo-root http-client.env.json; SESSION_ID from the gitignored
 # http-client.private.env.json (copy the .example).
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### the store list — rows are scoped to the caller's org in the query, not just by the permission gate
 # @name listStores

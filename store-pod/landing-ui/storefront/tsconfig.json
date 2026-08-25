@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,16 +17,36 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{"name": "next"}],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@store-front/ui": ["../libs/ui/src/index.ts"],
-      "@store-front/ui/*": ["../libs/ui/src/*"],
-      "@store-front/i18n": ["../libs/i18n/src/index.ts"],
-      "@store-front/i18n/*": ["../libs/i18n/src/*"],
-      "@store-front/theme": ["../libs/theme/src/index.ts"],
-      "@store-front/theme/*": ["../libs/theme/src/*"],
-      "@store-front/theme-*": ["../themes/*/src/index.ts"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@store-front/ui": [
+        "../libs/ui/src/index.ts"
+      ],
+      "@store-front/ui/*": [
+        "../libs/ui/src/*"
+      ],
+      "@store-front/i18n": [
+        "../libs/i18n/src/index.ts"
+      ],
+      "@store-front/i18n/*": [
+        "../libs/i18n/src/*"
+      ],
+      "@store-front/theme": [
+        "../libs/theme/src/index.ts"
+      ],
+      "@store-front/theme/*": [
+        "../libs/theme/src/*"
+      ],
+      "@store-front/theme-*": [
+        "../themes/*/src/index.ts"
+      ]
     }
   },
   "include": [
@@ -34,7 +58,11 @@
     "../libs/ui/src/**/*",
     "../libs/i18n/src/**/*",
     "../libs/theme/src/**/*",
-    "../themes/*/src/**/*"
+    "../themes/*/src/**/*",
+    ".next-default/types/**/*.ts",
+    ".next-default/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

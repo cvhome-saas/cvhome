@@ -5,7 +5,7 @@
 # http-client.env.json; the session id from http-client.private.env.json (gitignored — copy the .example
 # and log in once).
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 #
 # STORE_ID must be a store billing has seen. A store created before billing existed has no subscription
 # and correctly answers 404 — create one through tenancy first if you get that.

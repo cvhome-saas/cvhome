@@ -40,7 +40,7 @@ platform. Read section 99 before filing anything.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
-./extra/scripts/run-lcl.sh                      # stop with SIGTERM, never SIGINT on a backgrounded run
+lcl start -d             # stop later with `lcl stop`
 ```
 
 **Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
@@ -86,7 +86,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from merchant.social_links order by store_merchant_id;"
 ```
 
-Logs: `build/lcl-logs/merchant.log`. The router logs every edge lookup (`header lookup:` and `tls ask:`), which
+Logs: `.lcl/default/logs/merchant.log`. The router logs every edge lookup (`header lookup:` and `tls ask:`), which
 is the fastest way to see what hostname Caddy actually asked about.
 
 ### The MinIO trap, before you test any image
@@ -539,7 +539,7 @@ because the store does not exist yet.
 
 ### SEC-06 — Nothing sensitive in the log · [not verified]
 
-- **Steps** — after exercising uploads and domain allocation, grep `build/lcl-logs/merchant.log` for
+- **Steps** — after exercising uploads and domain allocation, grep `.lcl/default/logs/merchant.log` for
   `minioadmin`, `Authorization`, `secret`.
 - **Expect** — no matches. The router logs hostnames deliberately; that is fine.
 
@@ -733,7 +733,7 @@ That is why so much of BRD, SOC and DOM is `[not verified]`.
 ---
 
 Raise anything unexpected against PR #276. Include the store id, the time, and the matching lines from
-`build/lcl-logs/merchant.log` — for a routing problem the `header lookup:` / `tls ask:` lines say exactly what
+`.lcl/default/logs/merchant.log` — for a routing problem the `header lookup:` / `tls ask:` lines say exactly what
 hostname the edge asked about, which is usually the whole answer. For a console defect attach the browser
 console and the failing request: a 403 is a permission problem, a 400 with `MERCHANT.STORE.CONTEXT_MISMATCH` is
 a path/query disagreement, and a 404 through `/spg/**` is usually a missing `pod` parameter.

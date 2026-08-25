@@ -25,7 +25,7 @@ the defect this module fixed in a shared library, the other is behaviour that lo
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
-./extra/scripts/run-lcl.sh                      # stop with SIGTERM, never SIGINT
+lcl start -d             # stop later with `lcl stop`
 ```
 
 **Sign-in.** `http://console-ui.gateway.com:8000` — `org1-admin` / `admin`. Every page here is scoped to the

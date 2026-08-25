@@ -28,13 +28,17 @@ appear to do nothing** — the money moves at Stripe and nothing reaches us.
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
+stripe login                                    # once per machine
 
-# terminal 1 — prints whsec_...; billing needs it
-stripe listen --forward-to http://gateway.com:8000/billing/api/v1/stripe-webhook/public/events
+lcl start -d                                    # `stripe-billing-webhook` is one of the services it starts
+lcl logs stripe-billing-webhook -n 5            # its ready line prints this run's whsec_...
 
-# terminal 2 — stop with SIGTERM, never SIGINT on a backgrounded run
-STRIPE_WEBHOOK_SECRET=whsec_... ./extra/scripts/run-lcl.sh
+# billing verifies against that secret, so hand it over and restart just billing
+COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
 ```
+
+The listener follows the assigned port map, so it forwards to the right gateway on a shifted stack too. Store
+payment events are separate services, one per seeded store — `stripe-org1-store1-webhook` … `stripe-org2-store2-webhook`.
 
 **Sign-in.** Seller console `http://gateway.com:8000` — `org1-admin` / `admin`. The console works on one store
 at a time; use the store switcher in the header, because every billing answer on the page belongs to the store
@@ -388,7 +392,7 @@ Reading and paying are separate rights: spending is the org's money, not the sto
 
 ### SEC-05 — Nothing sensitive is in the logs · high · [not verified]
 
-- **Steps** — after exercising payments, search `build/lcl-logs/billing.log` for `sk_test`, `sk_live`, `whsec_`.
+- **Steps** — after exercising payments, search `.lcl/default/logs/billing.log` for `sk_test`, `sk_live`, `whsec_`.
 - **Expect** — no matches. The startup line should say a key was decrypted, never what it is.
 
 ---
@@ -546,5 +550,5 @@ currently the whole safety net. Everything marked **[not verified]** has never b
 ---
 
 Raise anything unexpected against PR #270. When reporting, include the store id, the time, and the matching
-lines from `build/lcl-logs/billing.log` — most of these paths are asynchronous, so the log is usually the only
+lines from `.lcl/default/logs/billing.log` — most of these paths are asynchronous, so the log is usually the only
 place the real cause appears.

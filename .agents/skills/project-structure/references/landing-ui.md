@@ -62,7 +62,7 @@ npm run lint | typecheck
 npm test --workspace=libs/theme     # colour bridge tests
 npm run new-theme <id>
 ```
-`./extra/scripts/run-lcl.sh` starts it as before (prep builds the libs, then `npm run dev`). Docker: the
+`lcl start -d` starts it (its `prepare` builds the workspace libs, then `next dev`). Docker: the
 image copies `storefront/.next/standalone` (build on host/CI first — see `docker.sh`); the container starts via
 `storefront/start.mjs` (not the generated `server.js`).
 
@@ -89,7 +89,7 @@ Implementation: `storefront/scripts/static-assets/` (constants, apply-prefix, sy
 directly against a fresh build — it would serve the un-substituted sentinel.
 
 **Local dev URLs.** The storefront needs the store headers spg injects, so the supported dev URL is through spg:
-`http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `run-lcl.sh`). Hitting `http://localhost:8110/en`
+`http://org1-store1.spg-507f1f77.gateway.com/en?theme=<id>` (stack up via `lcl start -d`). Hitting `http://localhost:8110/en`
 directly works for SSR only because the proxy falls back to `FALLBACK_STORE_ID` (env, then the demo-store constant) —
 but browser-side calls (cart, listing, auth) go to `/catalog`, `/checkout`, … on the same origin, which only spg routes;
 set `EXTERNAL_SPG=http://spg-507f1f77.gateway.com` if you must use localhost. `?theme=<id>` sets a dev-only override

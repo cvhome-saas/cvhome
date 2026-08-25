@@ -4,7 +4,7 @@
 # then the pod's spg, so `{{SELLER_UI_URL}}/spg/catalog/...` is what production traffic looks like. Env vars
 # come from the repo-root http-client.env.json; the session id from http-client.private.env.json (gitignored).
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### create a product (v2 definition) — 201 {"id": n}
 # @name createProduct

@@ -4,7 +4,7 @@
 # then the pod's spg, so `{{SELLER_UI_URL}}/spg/inventory/...` is what production traffic looks like. Env vars
 # come from the repo-root http-client.env.json; the session id from http-client.private.env.json (gitignored).
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### upsert a sku's stock and price (the console's whole write path)
 PUT {{SELLER_UI_URL}}/spg/inventory/api/v1/private/inventory/SKU-YSL-MAKE-TEIPEN46?store={{STORE_ID}}&lang={{LANG}}

@@ -7,7 +7,7 @@
 # written — nothing served it, so that panel was a 404 for its entire life.
 #
 # Run with a super-admin session in SESSION_ID and an org1-admin session in ORG_ADMIN_SESSION_ID.
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### money actually collected, per day and per currency
 POST {{SELLER_UI_URL}}/billing/api/v2/private/revenue-statistic

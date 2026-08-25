@@ -8,7 +8,7 @@
 # Nothing here is public. A pod's endpoint tells you exactly which host runs a tenant's storefront, so even
 # the list needs a token — there is no /public/ path in this service by design.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### the route source — what the gateway polls every minute to build its per-pod routes
 # @name listPods

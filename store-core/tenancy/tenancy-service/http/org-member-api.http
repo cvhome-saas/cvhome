@@ -3,7 +3,7 @@
 # The organization comes from the session, never a query parameter, so an org admin cannot address someone
 # else's organization by editing a URL. Use an org-admin session.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### invite someone — the ONLY time the token is readable
 # There is no mail sender in this platform, so nothing emails the invitee: the console shows this link for an

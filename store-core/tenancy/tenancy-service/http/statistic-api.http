@@ -5,7 +5,7 @@
 # and both queries still named the pre-rename `manager.` schema until phase 10 — they would have failed the
 # first time either screen was opened.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### organizations created per day
 POST {{SELLER_UI_URL}}/tenancy/api/v2/private/org-statistic?lang={{LANG}}

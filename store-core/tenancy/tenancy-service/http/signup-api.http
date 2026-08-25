@@ -7,7 +7,7 @@
 # Creating the organization and the uaa user is one transaction: a duplicate email can no longer leave an
 # organization behind that nobody can log into.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### sign up
 POST {{SELLER_UI_URL}}/tenancy/api/v1/signup/public/create?lang={{LANG}}

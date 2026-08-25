@@ -84,9 +84,13 @@ cd store-pod/landing-ui  && npm run dev        # Next.js 16, npm workspaces (app
 
 ## Running locally & QA
 
+The stack runner is the public `lcl` CLI — install it once with `npm install -g @cvhome-saas/lcl`; the repo-root
+`lcl.yml` is its project configuration.
+
 ```bash
 sudo ./extra/scripts/configure-domain.sh   # once — /etc/hosts entries for gateway.com, pods, demo stores
-./extra/scripts/run-lcl.sh                 # the whole stack: infra + every Java service + both frontends
+lcl start -d                               # the whole stack: infra + every Java service + both frontends
+lcl status                                 # what is up, on which ports; `lcl urls` prints the entry points
 ```
 
 **Read `references/qa-testing.md` in the `project-structure` skill before running the stack or QA-ing a
@@ -97,8 +101,9 @@ What binds every change:
 
 - **A user-visible change is not done until it has been exercised end to end** — through the gateway, in the
   browser or via its `.http` blocks. Passing unit tests is not QA.
-- `run-lcl.sh` **blocks and tears the whole stack down on exit** — run it in the background, check it isn't
-  already running first (`--list` + `lsof -i :8000`), and stop it with **`SIGTERM`**, never `SIGINT`.
+- `lcl start -d` runs the stack under its own per-stack supervisor and returns; check `lcl status` before
+  starting one, and stop it with `lcl stop` — never by killing the processes. A second stack alongside the
+  first is `lcl start -d --stack xxx`, which shifts every port by +1000·k.
 - QA proves **tenant isolation and the permission gate**, not just the happy path: repeat the action as a
   second store, and confirm a principal without the token gets 403.
 - Java services run **on the host**, not in Docker. Profiles: `lcl`, `fargate`, `test-stores`. Ports, hosts

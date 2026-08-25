@@ -13,8 +13,8 @@ The console expects the gateway, tenancy and the pods to be up, so the usual way
 part of the local stack:
 
 ```bash
-./run-lcl.sh            # from the repository root — starts everything, console-ui included
-restart console-ui      # rebuild just this app; never `kill` it, the stack tracks its pid
+lcl start -d                # from the repository root — starts everything, console-ui included
+lcl restart console-ui      # rebuild just this app; never `kill` it, the stack tracks its pid
 ```
 
 Then open `http://console-ui.gateway.com` (`configure-domain.sh` adds the hosts entry).

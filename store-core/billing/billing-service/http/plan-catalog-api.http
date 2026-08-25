@@ -7,7 +7,7 @@
 # Unlike every other billing endpoint these need no session and no ?store= — the catalog is public,
 # because a pricing page is read by people who have not signed up yet.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### the whole catalog, every currency
 # @name listPlans

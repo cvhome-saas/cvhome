@@ -1,0 +1,331 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cvhome-saas/lcl/main/schema/lcl.schema.json
+#
+# The whole local stack: infra containers, twelve Spring services, the Angular console and the Next storefront.
+#
+#   lcl start -d                 everything, on the configured ports
+#   lcl start -d --stack xxx     a second stack beside it, every port shifted by +1000·k
+#   lcl status · lcl urls · lcl logs catalog -f · lcl why catalog · lcl stop
+#
+# Ports come from store-commons/autoconfigure/src/main/resources/common-config.yml — that file stays the source
+# of truth for the defaults, and everything here is derived from the map lcl assigns at start. Prerequisites:
+# Docker running, and `sudo ./extra/scripts/configure-domain.sh` once for the /etc/hosts entries under `hosts:`.
+version: 1
+name: cvhome
+
+ports:
+  step: 1000
+  skip-configured: false
+
+build: [./gradlew, build, -x, test, -x, check, --console=plain]
+
+hosts:
+  - gateway.com
+  - www.gateway.com
+  - uaa.gateway.com
+  - console-ui.gateway.com
+  - spg-507f1f77.gateway.com
+  - catalog.gateway.com
+  - merchant.gateway.com
+  - content.gateway.com
+  - checkout.gateway.com
+  - cua.gateway.com
+  - payment.gateway.com
+  - inventory.gateway.com
+  - landing-ui.gateway.com
+  - org1-store1.spg-507f1f77.gateway.com
+  - org1-store2.spg-507f1f77.gateway.com
+  - org2-store1.spg-507f1f77.gateway.com
+  - org2-store2.spg-507f1f77.gateway.com
+  - spg-org3.gateway.com
+  - org3-store1.spg-507f1f77.gateway.com
+
+compose:
+  files: [docker-compose-lcl.yml]
+  # What the services actually need. The monitoring stack (otel-collector, loki, tempo, prometheus, grafana) is
+  # in the compose file and starts with `--infra all`; locally `otel.sdk.disabled: true`, so nothing exports to it
+  # unless you turn tracing on. spg is a container but also a routed service, so it carries a port in the map below.
+  default: [postgres, minio, spg]
+  environment:
+    # Consumed by the ${LCL_PORT_*:-default} placeholders in docker-compose-lcl.yml: the upstream ports the
+    # Caddyfile proxies to on the host, spg's two self-addressed lookup URLs, and the X-Forwarded-Port it sets
+    # on every proxied request (Caddy does not send that header on its own, and Tomcat's RemoteIpValve then
+    # falls back to 80/443 — which is what dropped the port from cua's shopper login redirect_uri).
+    LCL_PORT_SPG: "${port.spg.80}"
+    LCL_PORT_SPG_TLS: "${port.spg.443}"
+    LCL_PORT_MERCHANT: "${port.merchant.http}"
+    LCL_PORT_CONTENT: "${port.content.http}"
+    LCL_PORT_CATALOG: "${port.catalog.http}"
+    LCL_PORT_CHECKOUT: "${port.checkout.http}"
+    LCL_PORT_CUA: "${port.cua.http}"
+    LCL_PORT_PAYMENT: "${port.payment.http}"
+    LCL_PORT_INVENTORY: "${port.inventory.http}"
+    LCL_PORT_LANDING_UI: "${port.landing-ui.http}"
+    LCL_PORT_OTEL_GRPC: "${port.otel-collector.4317}"
+
+defaults:
+  environment:
+    # One override document per service, above every config file but below command-line args. Every address the
+    # platform resolves hangs off `com.asrevo.cvhome.services.<name>.port` (server.port, the uaa issuer and JWKS
+    # URIs, the pod endpoints) or off the SimpleDiscoveryClient instance URIs that back every `lb://` call, so
+    # rewriting both from the assigned map is what makes a shifted stack coherent.
+    #
+    # `{{#each services}}` iterates the *source* services only — Compose services are a separate list and are not
+    # in it. spg is configured under com.asrevo.cvhome.services like any other service but runs as a container, so
+    # its port has to be set by hand below. Leave it out and it stays 80 while spg listens on the shifted port:
+    # the pod's `issuer-uri-set` then trusts `…gateway.com:80/cua`, which UrlNormalize collapses to the portless
+    # form, and a shopper token issued by `…gateway.com:1080/cua` is rejected as an unsupported issuer.
+    SPRING_APPLICATION_JSON: >-
+      {
+        "com.asrevo.cvhome.app.handlers[0].schema": "http",
+        "com.asrevo.cvhome.app.handlers[0].port": "${port.store-core-gateway.http}",
+        {{#each services}}
+        "com.asrevo.cvhome.services.{{name}}.port": {{port}},
+        "spring.cloud.discovery.client.simple.instances.{{name}}[0].uri": "http://localhost:{{port}}",
+        "spring.cloud.discovery.client.simple.instances.{{name}}[0].instance-id": "{{name}}-1",
+        "spring.cloud.discovery.client.simple.instances.{{name}}[0].metadata.service-name": "{{name}}",
+        "spring.cloud.discovery.client.simple.instances.{{name}}[0].metadata.instance": "{{name}}-1",
+        {{/each}}
+        "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].uri": "http://localhost:${port.store-core-gateway.http}",
+        "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].instance-id": "store-core-gateway-ns-1",
+        "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.service-name": "store-core-gateway",
+        "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.instance": "store-core-gateway-ns-1",
+        "com.asrevo.cvhome.services.spg.port": ${port.spg.80},
+        "spring.datasource.url": "jdbc:postgresql://localhost:${port.postgres.5432}/cvhome",
+        "com.asrevo.cvhome.cdn.storage.s3-url": "http://localhost:${port.minio.9000}",
+        "com.asrevo.cvhome.cdn.base-path": "http://localhost:${port.minio.9000}/d0dd4299-963a-4458-b31f-8efe31c35e8e",
+        "com.asrevo.cvhome.pods[0].id": "507f1f77bcf86cd799439011",
+        "com.asrevo.cvhome.pods[0].name": "pod-507f1f77",
+        "com.asrevo.cvhome.pods[0].domain": "spg-507f1f77.gateway.com",
+        "com.asrevo.cvhome.pods[0].endpoint.endpoint": "http://spg-507f1f77.gateway.com:${port.spg.80}",
+        "com.asrevo.cvhome.pods[0].endpoint.type": "EXTERNAL",
+        "com.asrevo.cvhome.pod-info.pod.id": "507f1f77bcf86cd799439011",
+        "com.asrevo.cvhome.pod-info.pod.name": "pod-507f1f77",
+        "com.asrevo.cvhome.pod-info.pod.domain": "spg-507f1f77.gateway.com",
+        "com.asrevo.cvhome.pod-info.pod.endpoint.endpoint": "http://spg-507f1f77.gateway.com:${port.spg.80}",
+        "com.asrevo.cvhome.pod-info.pod.endpoint.type": "EXTERNAL",
+        "management.otlp.tracing.endpoint": "http://localhost:${port.otel-collector.4318}/v1/traces",
+        "management.otlp.metrics.export.url": "http://localhost:${port.otel-collector.4318}/v1/metrics",
+        "otel.exporter.otlp.endpoint": "http://localhost:${port.otel-collector.4317}"
+      }
+
+services:
+  # Both profiles, always: `lcl` is the environment slice (datasource, discovery, MinIO) and `test-stores` seeds
+  # the demo orgs, stores and users the local hostnames point at. Without the second one uaa has no test users and
+  # the pod services have no demo store to serve. The per-stack gradle cache lets two stacks build side by side.
+  uaa:
+    description: OAuth2 authorization server for staff; issues the tokens every other service validates
+    command: [./gradlew, ":store-core:uaa:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8001 }
+    depends-on: [postgres]
+    # A JVM that has logged "Started …Application" is up even if the actuator body is briefly not what we expect.
+    health: &spring-health
+      type: http
+      port: http
+      path: /actuator/health
+      expect: '"status":"UP"'
+      ready-log: 'Started \S+ in [\d.]+ seconds'
+      timeout: 300
+
+  store-core-gateway:
+    description: platform edge — routes gateway.com and console-ui.gateway.com, terminates the console's OAuth2 login
+    command: [./gradlew, ":store-core:gateway:gateway-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8000 }
+    depends-on: [uaa, postgres]
+    health: *spring-health
+
+  tenancy:
+    description: orgs, stores, members, store provisioning
+    command: [./gradlew, ":store-core:tenancy:tenancy-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8020 }
+    depends-on: [uaa, postgres]
+    health: *spring-health
+
+  billing:
+    description: plans, subscriptions, Stripe webhooks
+    command: [./gradlew, ":store-core:billing:billing-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8021 }
+    depends-on: [uaa, postgres]
+    health: *spring-health
+
+  pod-registry:
+    description: pod inventory and store placement
+    command: [./gradlew, ":store-core:pod-registry:pod-registry-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8022 }
+    depends-on: [uaa, postgres]
+    health: *spring-health
+
+  console-ui:
+    description: seller/admin console (Angular); reached through store-core-gateway, not directly
+    cwd: store-core/console-ui
+    command: [npm, run, start, --, --port, "${port.console-ui.http}"]
+    ports: { http: 8011 }
+    depends-on: [store-core-gateway]
+    health: { type: tcp, port: http, timeout: 300 }
+
+  merchant:
+    description: store settings, domains and the router spg asks for TLS and domain lookups
+    command: [./gradlew, ":store-pod:merchant:merchant-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8120 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  content:
+    description: storefront pages, layout and media
+    command: [./gradlew, ":store-pod:content:content-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8121 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  catalog:
+    description: products, categories, manufacturers, product types
+    command: [./gradlew, ":store-pod:catalog:catalog-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8122 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  checkout:
+    description: carts and orders
+    command: [./gradlew, ":store-pod:checkout:checkout-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8123 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  cua:
+    description: OAuth2 authorization server for shoppers
+    command: [./gradlew, ":store-pod:cua:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8124 }
+    depends-on: [uaa, postgres]
+    health: *spring-health
+
+  payment:
+    description: payment methods and transactions
+    command: [./gradlew, ":store-pod:payment:payment-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8125 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  inventory:
+    description: stock, prices and reservations by sku
+    command: [./gradlew, ":store-pod:inventory:inventory-service:bootRun", "--args=--spring.profiles.active=lcl,test-stores", "--project-cache-dir=${stack.dir}/gradle", --console=plain]
+    ports: { http: 8126 }
+    depends-on: [uaa, postgres, minio]
+    health: *spring-health
+
+  landing-ui:
+    description: storefront (Next); served to shoppers through spg, and calls the pod services back through it
+    cwd: store-pod/landing-ui/storefront
+    # The libs are consumed as built output (`main: dist/index.js`), so `next dev` on the app alone fails with
+    # "Can't resolve '@store-front/hooks/...'" until they exist — and they are what goes stale first. `tsc -b` is
+    # incremental, so rebuilding every start is cheap. Themes need no prebuild; Next compiles them on demand.
+    prepare:
+      - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-types] }
+      - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-services] }
+      - { cwd: store-pod/landing-ui, command: [npm, run, build:libs-hooks] }
+    command: [npx, next, dev, -p, "${port.landing-ui.http}", --turbopack]
+    ports: { http: 8110 }
+    environment:
+      # Server-side API calls go back out through spg; without this they fall back to DEFAULT_SPG on port 80.
+      INTERNAL_SPG: "http://spg-507f1f77.gateway.com:${port.spg.80}"
+      # Keeps two stacks from overwriting each other's dev build (read in storefront/next.config.ts).
+      NEXT_DIST_DIR: ".next-${stack}"
+    depends-on: [spg, merchant, content, catalog, checkout, inventory]
+    health: { type: tcp, port: http, timeout: 300 }
+
+  # Stripe CLI listeners. Two separate webhook paths exist — the platform's own billing events go to
+  # store-core-gateway, a store's payment events go through the pod edge — so each needs its own listener.
+  # They are portless: `stripe listen` opens an outbound websocket to Stripe and forwards inbound events over it.
+  #
+  # Both need the CLI logged in once (`stripe login`). Without that they fail immediately and show as crashed;
+  # nothing depends on them, so the rest of the stack is unaffected — `lcl stop stripe-billing-webhook` silences it.
+  #
+  # Each listener prints its own signing secret on the ready line, and it differs per listener and per run:
+  #
+  #   lcl logs stripe-billing-webhook -n 5     # -> whsec_...
+  #
+  # billing verifies against `com.asrevo.cvhome.stripe.webhook-signing-key`, so restart it with that secret:
+  #
+  #   COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
+  #
+  # (LCL passes its own environment through to the services it starts.) A store's payment secret is per store and
+  # lives in the payment configuration row, not in the environment.
+  stripe-billing-webhook:
+    description: Stripe CLI listener forwarding platform billing events to store-core-gateway -> billing
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://gateway.com:${port.store-core-gateway.http}/billing/api/v1/stripe-webhook/public/events"
+    depends-on: [store-core-gateway, billing]
+    health: &stripe-listen-health
+      type: log
+      ready-log: 'Ready! You are using Stripe API Version'
+      timeout: 60
+
+  # One listener per seeded store — the store is identified by the id in the path, and each store verifies the
+  # delivery against its own payment_configuration.webhook_secret. Stripe has no idea which store an event belongs
+  # to, so with more than one of these running every event is delivered to every store path; only the store whose
+  # configured secret matches the delivering listener actually processes it. Keep the ones you are not testing
+  # stopped (`lcl stop stripe-org2-store2-webhook`) if the duplicate deliveries get noisy.
+  #
+  # spg's `handle_path /payment*` strips the prefix, so payment sees its own /api/v1/public/webhook/{store}/{type}.
+  stripe-org1-store1-webhook:
+    description: Stripe CLI listener forwarding ORG1-STORE1's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc46470c104b76f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org1-store2-webhook:
+    description: Stripe CLI listener forwarding ORG1-STORE2's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc46470c104b75f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org2-store1-webhook:
+    description: Stripe CLI listener forwarding ORG2-STORE1's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f020632bc46470c104b76f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org2-store2-webhook:
+    description: Stripe CLI listener forwarding ORG2-STORE2's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc26470c104b75f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+hooks:
+  after-up:
+    # The seeded `web-app` client carries redirect URIs on the canonical gateway port. OAuth2ClientDatabaseInitializer
+    # adds the current ones for the app hosts at startup but never localhost, and never removes the stale entries —
+    # on a shifted stack the console login bounces back to :8000. Rewrite the row once uaa is up.
+    - service: uaa
+      when: "${offset} != 0"
+      shell: >-
+        docker compose -p ${project} -f ${compose.file} exec -T postgres
+        psql -v ON_ERROR_STOP=1 -U postgres -d cvhome -c
+        "update uaa.oauth2_registered_client set
+           redirect_uris = 'http://localhost:${port.store-core-gateway.http}/login/oauth2/code/uaa,http://gateway.com:${port.store-core-gateway.http}/login/oauth2/code/uaa,http://console-ui.gateway.com:${port.store-core-gateway.http}/login/oauth2/code/uaa',
+           post_logout_redirect_uris = 'http://localhost:${port.store-core-gateway.http},http://gateway.com:${port.store-core-gateway.http},http://console-ui.gateway.com:${port.store-core-gateway.http}'
+         where client_id = 'web-app'"
+
+urls:
+  - { label: seller console, url: "http://gateway.com:${port.store-core-gateway.http}" }
+  - { label: uaa, url: "http://uaa.gateway.com:${port.uaa.http}" }
+  - { label: storefront, url: "http://org1-store1.spg-507f1f77.gateway.com:${port.spg.80}" }
+  - { label: minio console, url: "http://localhost:${port.minio.9001}" }
+  - { label: postgres, url: "postgresql://localhost:${port.postgres.5432}/cvhome" }

@@ -8,7 +8,7 @@
 # The real exercise of this API is creating a store through tenancy, which drives both endpoints:
 # see the "provisioning" block at the bottom.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### a seller session must not be able to ask billing about quota
 POST {{SELLER_UI_URL}}/billing/api/v1/quota/private/store-create

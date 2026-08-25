@@ -4,7 +4,7 @@
 # Rows appear only after Stripe reports a payment, so a store that has never paid lists empty rather
 # than 404 — an empty history is a fact, not a missing resource.
 #
-# Requires a running stack: ./extra/scripts/run-lcl.sh
+# Requires a running stack: lcl start -d
 
 ### a store's billing history, newest first
 GET {{SELLER_UI_URL}}/billing/api/v1/invoice/list?store={{STORE_ID}}

@@ -34,7 +34,7 @@ defects that have already happened here, the other is behaviour that looks wrong
 
 ```bash
 sudo ./extra/scripts/configure-domain.sh        # once per machine
-./extra/scripts/run-lcl.sh                      # stop with SIGTERM, never SIGINT on a backgrounded run
+lcl start -d             # stop later with `lcl stop`
 ```
 
 **Sign-in.** Console `http://gateway.com:8000` — `org1-admin` / `admin` (org owner), `org1-store1-admin` /
@@ -92,7 +92,7 @@ docker exec cvhome-postgres-1 psql -U postgres -d cvhome -c \
 ... "select * from content.redirect;"
 ```
 
-Service log: `build/lcl-logs/content.log`. The scheduler prints `Content scheduler moved N item(s)` when it
+Service log: `.lcl/default/logs/content.log`. The scheduler prints `Content scheduler moved N item(s)` when it
 does anything, and nothing when it doesn't.
 
 ---
@@ -218,7 +218,7 @@ this minute" should not watch a spinner for a minute.
 
 The live half of SCH-01, and the one the test cannot prove.
 
-- **Steps** — from SCH-01, wait. Watch `build/lcl-logs/content.log`.
+- **Steps** — from SCH-01, wait. Watch `.lcl/default/logs/content.log`.
 - **Expect** — within ~60 s: `Content scheduler moved 1 item(s)`, status **PUBLISHED**, an audit row with actor
   **`scheduler`** and reason `publishAt reached`, and the storefront serves it. Allow for the storefront's own
   60-second cache before calling it a miss.
@@ -717,7 +717,7 @@ org*; org1-store2 shares an admin and proves less.
 
 ### SEC-06 — Nothing sensitive in the log · [not verified]
 
-- **Steps** — after exercising uploads, grep `build/lcl-logs/content.log` for `minioadmin`, `secret`,
+- **Steps** — after exercising uploads, grep `.lcl/default/logs/content.log` for `minioadmin`, `secret`,
   `Authorization`.
 - **Expect** — no matches. Storage errors should name the key, never the credentials.
 
@@ -887,7 +887,7 @@ behind them.
 ---
 
 Raise anything unexpected against PR #276. Include the store id, the content id, the time and the matching lines
-from `build/lcl-logs/content.log` — the scheduler, the media writes and the storefront reads are all
+from `.lcl/default/logs/content.log` — the scheduler, the media writes and the storefront reads are all
 asynchronous or cached, so the log is usually the only place the real cause appears. For a console defect,
 attach the browser console and the failing request from the network panel: a 403 there is a permission problem,
 a 409 is a version conflict, and a 404 through `/spg/**` is usually a missing `pod` parameter.

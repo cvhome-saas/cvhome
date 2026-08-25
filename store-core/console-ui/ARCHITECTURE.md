@@ -281,7 +281,7 @@ binding — appear nowhere else.
 
 ## 12. QA
 
-Against the local stack (`run-lcl.sh`; use `restart console-ui`, never `kill` — the supervisor
+Against the local stack (`lcl start -d`; use `lcl restart console-ui`, never `kill` — the supervisor
 tracks the pid and will otherwise route to an instance it no longer knows):
 
 - Every page in **English and Arabic**, in **Forest, Midnight and Daylight**, at **1440 / 900 / 420**.
