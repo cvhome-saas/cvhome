@@ -22,7 +22,7 @@ ext.domainCoverageMinimum = [
         'pod-registry': [unit: 0.81, integration: 0.61, merged: 0.97],
         merchant      : [unit: 0.95, integration: 0.88, merged: 0.95],
         gateway       : [unit: 0.97, integration: 0.71, merged: 0.97],
-        payment       : [unit: 0.0, integration: 0.04, merged: 0.04],
+        payment       : [unit: 0.92, integration: 0.61, merged: 0.99],
         content       : [unit: 0.01, integration: 0.78, merged: 0.78],
         tenancy       : [unit: 0.43, integration: 0.1, merged: 0.47],
         catalog       : [unit: 0.01, integration: 0.04, merged: 0.06],
