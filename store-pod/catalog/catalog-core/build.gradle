@@ -4,6 +4,13 @@ plugins {
 
 dependencies {
     testImplementation libs.spring.data.commons
+    // The unit tests mock the repositories and hand the image service a MockMultipartFile, so the interfaces the
+    // production code only compiles against have to be on the test runtime classpath too.
+    testImplementation libs.spring.data.jpa
+    testImplementation libs.spring.web
+    testImplementation libs.jakarta.persistence.api
+    // StoreEntitlements is exercised for real rather than mocked: its cache is the behaviour under test.
+    testImplementation libs.caffeine
     api project(':store-pod:commons:store-commons')
     api project(':store-pod:catalog:catalog-commons')
     api project(':store-pod:merchant:merchant-external-api')
