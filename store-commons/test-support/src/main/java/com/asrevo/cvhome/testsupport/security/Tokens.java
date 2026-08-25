@@ -35,6 +35,10 @@ public final class Tokens {
 
     public static final String STORE_4 = "65f020632bc46470c104b76f";
 
+    /**
+     * Claim names. Named because checkstyle counts a repeated literal, and because a typo in one of these mints a
+     * token the resource server silently reads as anonymous rather than rejecting.
+     */
     private static final String CLAIM_SUBJECT = "sub";
 
     private static final String CLAIM_NAME = "name";
