@@ -4,7 +4,7 @@
 audit and isolation between named stacks. These cases prove it manages the full stack, single services, and
 several stacks at once (`--stack xxx`) without touching each other. `extra/scripts/run-lcl.sh` is a shim over the same tool.
 
-- **Scope** — `extra/scripts/lcl`, `extra/lcl/` (engine), `lcl.yml` + `extra/lcl-config/` (project), `docker-compose-lcl.yml`, `store-pod/spg/Caddyfile`
+- **Scope** — `extra/scripts/lcl`, `extra/lcl/` (engine), `lcl.yml` (project), `docker-compose-lcl.yml`, `store-pod/spg/Caddyfile`
   (`{$LCL_PORT_*}`), local Docker infra, Java services, frontends
 - **Change** — rewrite of the bash supervisor as a TypeScript multi-stack runner with dynamic port sequences
 - **Cases** — 14

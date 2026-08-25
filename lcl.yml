@@ -21,23 +21,53 @@ compose:
   env:                               # extra entries for the compose env file (LCL_PORT_<SERVICE> is always there)
     NAMESPACE: gateway.com
 
-env:                                 # for every process lcl starts
-  LCL_INSTANCE_YML: ${stack.dir}/spring-instance.yml
-
-files:                               # rendered per stack before anything starts
-  - path: ${stack.dir}/spring-instance.yml
-    template: extra/lcl-config/spring-instance.yml.tpl
-
 defaults:
   gradle:
     task: bootRun
     args:
       # `lcl` is the environment slice, `test-stores` seeds the demo orgs/stores and users the local hostnames point at.
-      - "--args=--spring.profiles.active=lcl,test-stores --spring.config.additional-location=file:${stack.dir}/spring-instance.yml"
+      - "--args=--spring.profiles.active=lcl,test-stores"
       # separate Gradle task state per stack, so two stacks can run the same module from this checkout
       - "--project-cache-dir=${stack.dir}/gradle"
       - "--console=plain"
     health: { path: /actuator/health, expect: '"status":"UP"', ready-log: 'Started \S+ in [\d.]+ seconds', timeout: 300 }
+    env:
+      # Spring reads SPRING_APPLICATION_JSON from the environment with the highest precedence, so this is how every
+      # Spring service learns this stack's ports: its own port, every other service's port, the local discovery table,
+      # the datasource, MinIO and the pod endpoint. Lists (handlers, pods, discovery entries) are replaced, not merged,
+      # by a higher-precedence source, so each list element is spelled out completely.
+      SPRING_APPLICATION_JSON: >-
+        {
+          "com.asrevo.cvhome.app.handlers[0].schema": "http",
+          "com.asrevo.cvhome.app.handlers[0].port": ${port.store-core-gateway},
+          {{#each services}}
+          "com.asrevo.cvhome.services.{{name}}.port": {{port}},
+          "spring.cloud.discovery.client.simple.instances.{{name}}[0].uri": "http://localhost:{{port}}",
+          "spring.cloud.discovery.client.simple.instances.{{name}}[0].instance-id": "{{name}}-1",
+          "spring.cloud.discovery.client.simple.instances.{{name}}[0].metadata.service-name": "{{name}}",
+          "spring.cloud.discovery.client.simple.instances.{{name}}[0].metadata.instance": "{{name}}-1",
+          {{/each}}
+          "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].uri": "http://localhost:${port.store-core-gateway}",
+          "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].instance-id": "store-core-gateway-ns-1",
+          "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.service-name": "store-core-gateway",
+          "spring.cloud.discovery.client.simple.instances[store-core-gateway.store-core.cvhome.lcl][0].metadata.instance": "store-core-gateway-ns-1",
+          "spring.datasource.url": "jdbc:postgresql://localhost:${port.postgres:5432}/cvhome",
+          "com.asrevo.cvhome.cdn.storage.s3-url": "http://localhost:${port.minio:9000}",
+          "com.asrevo.cvhome.cdn.base-path": "http://localhost:${port.minio:9000}/d0dd4299-963a-4458-b31f-8efe31c35e8e",
+          "com.asrevo.cvhome.pods[0].id": "507f1f77bcf86cd799439011",
+          "com.asrevo.cvhome.pods[0].name": "pod-507f1f77",
+          "com.asrevo.cvhome.pods[0].domain": "spg-507f1f77.gateway.com",
+          "com.asrevo.cvhome.pods[0].endpoint.endpoint": "http://spg-507f1f77.gateway.com:${port.spg}",
+          "com.asrevo.cvhome.pods[0].endpoint.type": "EXTERNAL",
+          "com.asrevo.cvhome.pod-info.pod.id": "507f1f77bcf86cd799439011",
+          "com.asrevo.cvhome.pod-info.pod.name": "pod-507f1f77",
+          "com.asrevo.cvhome.pod-info.pod.domain": "spg-507f1f77.gateway.com",
+          "com.asrevo.cvhome.pod-info.pod.endpoint.endpoint": "http://spg-507f1f77.gateway.com:${port.spg}",
+          "com.asrevo.cvhome.pod-info.pod.endpoint.type": "EXTERNAL",
+          "management.otlp.tracing.endpoint": "http://localhost:${port.otel-collector:4318}/v1/traces",
+          "management.otlp.metrics.export.url": "http://localhost:${port.otel-collector:4318}/v1/metrics",
+          "otel.exporter.otlp.endpoint": "http://localhost:${port.otel-collector:4317}"
+        }
   npm:
     health: { timeout: 240 }
 
