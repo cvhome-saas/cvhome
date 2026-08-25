@@ -255,14 +255,50 @@ services:
       ready-log: 'Ready! You are using Stripe API Version'
       timeout: 60
 
-  stripe-payment-webhook:
-    description: Stripe CLI listener forwarding one demo store's payment events through spg -> payment
-    # spg's `handle_path /payment*` strips the prefix, so payment sees its own /api/v1/public/webhook/{store}/{type}.
+  # One listener per seeded store — the store is identified by the id in the path, and each store verifies the
+  # delivery against its own payment_configuration.webhook_secret. Stripe has no idea which store an event belongs
+  # to, so with more than one of these running every event is delivered to every store path; only the store whose
+  # configured secret matches the delivering listener actually processes it. Keep the ones you are not testing
+  # stopped (`lcl stop stripe-org2-store2-webhook`) if the duplicate deliveries get noisy.
+  #
+  # spg's `handle_path /payment*` strips the prefix, so payment sees its own /api/v1/public/webhook/{store}/{type}.
+  stripe-org1-store1-webhook:
+    description: Stripe CLI listener forwarding ORG1-STORE1's payment events through spg -> payment
     command:
       - stripe
       - listen
       - --forward-to
       - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc46470c104b76f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org1-store2-webhook:
+    description: Stripe CLI listener forwarding ORG1-STORE2's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc46470c104b75f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org2-store1-webhook:
+    description: Stripe CLI listener forwarding ORG2-STORE1's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f020632bc46470c104b76f/STRIPE"
+    depends-on: [spg, payment]
+    health: *stripe-listen-health
+
+  stripe-org2-store2-webhook:
+    description: Stripe CLI listener forwarding ORG2-STORE2's payment events through spg -> payment
+    command:
+      - stripe
+      - listen
+      - --forward-to
+      - "http://spg-507f1f77.gateway.com:${port.spg.80}/payment/api/v1/public/webhook/65f023632bc26470c104b75f/STRIPE"
     depends-on: [spg, payment]
     health: *stripe-listen-health
 

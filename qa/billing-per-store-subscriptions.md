@@ -37,8 +37,8 @@ lcl logs stripe-billing-webhook -n 5            # its ready line prints this run
 COM_ASREVO_CVHOME_STRIPE_WEBHOOK_SIGNING_KEY=whsec_... lcl restart billing
 ```
 
-The listener follows the assigned port map, so it forwards to the right gateway on a shifted stack too. The
-store-side listener is the separate `stripe-payment-webhook` service.
+The listener follows the assigned port map, so it forwards to the right gateway on a shifted stack too. Store
+payment events are separate services, one per seeded store — `stripe-org1-store1-webhook` … `stripe-org2-store2-webhook`.
 
 **Sign-in.** Seller console `http://gateway.com:8000` — `org1-admin` / `admin`. The console works on one store
 at a time; use the store switcher in the header, because every billing answer on the page belongs to the store
