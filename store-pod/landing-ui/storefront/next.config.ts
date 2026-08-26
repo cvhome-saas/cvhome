@@ -45,6 +45,13 @@ const nextConfig: NextConfig = {
         '@store-front/theme-fashion',
         '@store-front/theme-basic',
         '@store-front/theme-grocery',
+        '@store-front/theme-pink',
+        '@store-front/theme-hunger',
+        '@store-front/theme-furniture',
+        '@store-front/theme-glasses',
+        '@store-front/theme-cosmetics',
+        '@store-front/theme-sports',
+        '@store-front/theme-jewellery',
         // @themes:end
     ],
 };

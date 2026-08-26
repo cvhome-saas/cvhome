@@ -60,7 +60,9 @@
     "../libs/theme/src/**/*",
     "../themes/*/src/**/*",
     ".next-default/types/**/*.ts",
-    ".next-default/dev/types/**/*.ts"
+    ".next-default/dev/types/**/*.ts",
+    ".next-hunger/types/**/*.ts",
+    ".next-hunger/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

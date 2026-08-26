@@ -1,0 +1,371 @@
+/*
+ * furniture — "The Home Floor Directory".
+ * A whole-home retailer is not a catalogue, it is a building with floors. The shop is rendered as its own
+ * directory: departments carry floor numbers and counts on enamel boards, every product group is a
+ * numbered plate, figures live in fixed tabular slots, and state is printed as a word plus a number —
+ * never as a tint. The ground is flat bone plaster and the aggregate appears only in the terrazzo
+ * landings between departments; the merchant's PRIMARY is the enamel field on the board and on the one
+ * action per view. Colour roles are NOT set here
+ * — they come from the merchant's ColorTheme preset through the bridge (inline style on <html>).
+ */
+[data-theme="furniture"] {
+    /* fonts — next/font variables from fonts.ts. Archivo letters the signs, Golos Text sets everything else. */
+    --font-body: var(--font-furniture-text), var(--font-furniture-arabic), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-furniture-sign), var(--font-furniture-text), var(--font-furniture-arabic), sans-serif;
+    --font-code: var(--font-furniture-text), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — body stays calm and roomy; the board's numerals and names jump two whole steps */
+    --type-xs: 0.75rem;
+    --type-sm: 0.875rem;
+    --type-base: 1rem;
+    --type-lg: 1.125rem;
+    --type-xl: 1.375rem;
+    --type-2xl: 1.75rem;
+    --type-3xl: 2.25rem;
+    --type-4xl: 3rem;
+    --type-5xl: 4.25rem;
+    --type-6xl: 6rem;
+    --line-tight: 0.95;
+    --line-snug: 1.2;
+    --line-normal: 1.55;
+    --line-relaxed: 1.7;
+    --track-tight: -0.02em;
+    --track-normal: 0;
+    --track-wide: 0.1em;
+
+    /* spacing & density — public architecture: wide gutters, air between floors */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 3.5rem;
+    --gutter: 1.25rem;
+
+    /* radius — a vitreous enamel sign has a shallow, constant corner; photographs are cut square */
+    --r-control: 0.1875rem;
+    --r-card: 0.1875rem;
+    --r-image: 0;
+    --r-badge: 0.125rem;
+    --r-overlay: 0.25rem;
+
+    /* borders & elevation — signs are mounted on a wall: real offset, real blur, never a halo */
+    --border-width: 1px;
+    --elev-sm: 0 1px 2px -1px rgb(0 0 0 / 0.10);
+    --elev-md: 0 6px 16px -8px rgb(0 0 0 / 0.22);
+    --elev-lg: 0 14px 34px -14px rgb(0 0 0 / 0.26);
+    --elev-overlay: 0 28px 64px -20px rgb(0 0 0 / 0.38);
+
+    /* containers */
+    --width-narrow: 44rem;
+    --width-content: 84rem;
+    --width-wide: 96rem;
+
+    /* motion — one authored moment: a figure that changes rolls in its slot */
+    --motion-fast: 130ms;
+    --motion-base: 240ms;
+    --motion-slow: 480ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* layout — a thin utility rail sits above the masthead from lg up, so the header is two rows there */
+    --header-h: 3.5rem;
+    --header-h-lg: 6.5rem;
+    --product-aspect: 4 / 5;
+
+    /* world materials */
+    --plaster: var(--background);
+    --ink: var(--foreground);
+    --enamel: var(--primary);
+    --enamel-ink: var(--primary-foreground);
+    /* brass: the hairline between directory rows and between plate keys */
+    --brass: color-mix(in srgb, var(--foreground) 28%, var(--accent) 16%);
+    --brass-faint: color-mix(in srgb, var(--foreground) 14%, transparent);
+    /* the enamel edge: a lit hairline inside every sign, the way vitreous enamel catches light */
+    --enamel-edge: inset 0 0 0 1px color-mix(in srgb, var(--primary-foreground) 22%, transparent);
+    --speckle: color-mix(in srgb, var(--foreground) 9%, transparent);
+    --speckle-warm: color-mix(in srgb, var(--accent) 11%, transparent);
+
+    /* browser surfaces carry the world too */
+    caret-color: var(--primary);
+    accent-color: var(--primary);
+    scrollbar-color: color-mix(in srgb, var(--foreground) 32%, transparent) transparent;
+    scrollbar-width: thin;
+}
+
+/* Arabic editions lead with Tajawal on both roles: next/font's metric fallback for Archivo and Golos
+   carries Arabic glyphs and would otherwise catch them before Tajawal ever gets a turn. */
+[data-theme="furniture"]:lang(ar) {
+    --font-body: var(--font-furniture-arabic), var(--font-furniture-text), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-furniture-arabic), var(--font-furniture-sign), var(--font-furniture-text), sans-serif;
+}
+
+/* Russian editions lead with Golos Text on the sign role: Archivo has no Cyrillic, and its metric
+   fallback does — without this, every board would silently letter itself in Arial. */
+[data-theme="furniture"]:lang(ru) {
+    --font-heading: var(--font-furniture-text), var(--font-furniture-sign), sans-serif;
+}
+
+@media (min-width: 1024px) {
+    [data-theme="furniture"] {
+        --section-y: 5.5rem;
+        --gutter: 2.5rem;
+    }
+}
+
+/* The ground is lime-washed plaster: flat and light. The aggregate lives in the terrazzo landings, where
+   it is a material a visitor can actually see — a faint dot field tiled across the whole page reads as a
+   grid overlay, not as plaster, so the body carries no pattern at all. */
+
+[data-theme="furniture"] ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+[data-theme="furniture"] a { text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+
+/* Drawer chrome, unlayered on purpose: every drawer in this theme opens under an enamel head, and the
+   shared primitives paint their own ink colour there — `text-foreground` on the title, the close button
+   inheriting the content's colour — which all but disappears on the enamel. Tailwind utilities live in
+   `@layer utilities` and would beat these rules at any specificity if they were layered too. */
+[data-theme="furniture"] [data-slot="sheet-content"] > button.absolute {
+    color: var(--primary-foreground);
+    opacity: 0.85;
+    padding: 0.25rem;
+}
+[data-theme="furniture"] [data-slot="sheet-content"] > button.absolute:hover { opacity: 1; }
+[data-theme="furniture"] .enamel-flat :is([data-slot="sheet-title"], [data-slot="sheet-description"]) {
+    color: var(--primary-foreground);
+}
+[data-theme="furniture"] .enamel-flat [data-slot="sheet-description"] { opacity: 0.85; }
+
+/* The shared shadcn primitives use `accent` as their neutral hover/highlight surface. In this platform's
+   colour bridge `accent` is the STATEMENT colour — here a signal orange — so every menu hover, every
+   highlighted select row and every open nav trigger would flash it. In this building the quiet hover
+   surface is the bone wash and the open/selected surface is the enamel itself. Unlayered on purpose:
+   the primitives set those colours with Tailwind utilities, which beat any layered rule. */
+[data-theme="furniture"] :is(
+    [data-slot="dropdown-menu-item"],
+    [data-slot="dropdown-menu-checkbox-item"],
+    [data-slot="dropdown-menu-radio-item"],
+    [data-slot="select-item"],
+    [data-slot="navigation-menu-link"]
+):is(:hover, :focus, :focus-visible, [data-highlighted]) {
+    background-color: var(--secondary);
+    color: var(--foreground);
+}
+
+/* A department's sign lights up when its floor list is open — the enamel, not the statement colour. */
+[data-theme="furniture"] [data-slot="navigation-menu-trigger"]:is(:hover, :focus, :focus-visible) {
+    background-color: var(--secondary);
+    color: var(--foreground);
+}
+[data-theme="furniture"] [data-slot="navigation-menu-trigger"][data-state="open"],
+[data-theme="furniture"] [data-slot="navigation-menu-trigger"][data-state="open"]:is(:hover, :focus, :focus-visible) {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+}
+
+/* The floor list itself is a plate hung under the sign, not a stock popover. */
+[data-theme="furniture"] [data-slot="navigation-menu-content"] {
+    background-color: var(--background);
+    border: 1px solid var(--brass);
+    border-radius: var(--r-card);
+    box-shadow: var(--elev-md);
+}
+
+[data-theme="furniture"] .swiper-pagination-bullet {
+    opacity: 1;
+    border-radius: 0;
+    width: 1.5rem;
+    height: 3px;
+    background: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+[data-theme="furniture"] .swiper-pagination-bullet-active { background: var(--primary); }
+[data-theme="furniture"] .swiper-button-next, [data-theme="furniture"] .swiper-button-prev {
+    color: var(--foreground);
+    --swiper-navigation-size: 1.5rem;
+}
+
+/* ---- world grammar as small utilities (scoped to the theme) ------------------------------------ */
+/* Layered under Tailwind's utilities so `h-*`, `text-*`, `lg:sticky` … on the same element still win. */
+@layer components {
+    /* ---- lettering ---- */
+
+    /* the enamel sign voice: department names, section names, every label on a plate */
+    [data-theme="furniture"] .sign {
+        font-family: var(--font-heading);
+        font-variation-settings: "wdth" 116;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        line-height: var(--line-snug);
+    }
+    /* the engraved register: the building's name, a department's name, a page's name. Mixed case on
+       purpose — tracked caps at this size break long merchant names and cannot be set in Arabic at all. */
+    [data-theme="furniture"] .sign-lg {
+        font-family: var(--font-heading);
+        font-variation-settings: "wdth" 122;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+        line-height: var(--line-tight);
+        text-wrap: balance;
+    }
+    /* Arabic has no case and no width axis here; the tracking that flatters caps only breaks Arabic joins */
+    [data-theme="furniture"] :is(.sign, .sign-lg, .floor-no, .figure):lang(ar) {
+        letter-spacing: 0;
+        text-transform: none;
+        font-variation-settings: normal;
+    }
+    [data-theme="furniture"] :is(.sign, .sign-lg):lang(ru) { font-variation-settings: normal; letter-spacing: 0.05em; }
+
+    /* every figure on the site sits in the same tabular slot: counts, prices, quantities, floor numbers */
+    [data-theme="furniture"] .figure {
+        font-family: var(--font-heading);
+        font-variant-numeric: tabular-nums lining-nums;
+        font-feature-settings: "tnum" 1, "lnum" 1;
+        font-variation-settings: "wdth" 104;
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+    /* the floor number on a directory row — the biggest figure on the page */
+    [data-theme="furniture"] .floor-no {
+        font-family: var(--font-heading);
+        font-variant-numeric: tabular-nums lining-nums;
+        font-variation-settings: "wdth" 124;
+        font-weight: 800;
+        line-height: 0.8;
+        letter-spacing: -0.01em;
+        font-size: var(--type-4xl);
+    }
+
+    /* ---- materials ---- */
+
+    /* an enamel sign: a solid field of the merchant's primary with a lit inner edge */
+    [data-theme="furniture"] .enamel {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-radius: var(--r-card);
+        box-shadow: var(--enamel-edge), var(--elev-md);
+    }
+    /* the same panel with no lift — used where a board is set into the page rather than mounted on it */
+    [data-theme="furniture"] .enamel-flat {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-radius: var(--r-card);
+        box-shadow: var(--enamel-edge);
+    }
+    /* the brass hairline that separates directory rows and plate keys */
+    [data-theme="furniture"] .rule-brass { border-color: var(--brass); }
+    [data-theme="furniture"] .rule-enamel { border-color: color-mix(in srgb, var(--primary-foreground) 26%, transparent); }
+
+    /* a quiet band of terrazzo: the landing floor between two departments */
+    [data-theme="furniture"] .terrazzo {
+        background-color: color-mix(in srgb, var(--secondary) 55%, var(--background));
+        background-image:
+            radial-gradient(circle at 20% 30%, var(--speckle) 0 1.4px, transparent 1.9px),
+            radial-gradient(circle at 72% 66%, var(--speckle-warm) 0 1.6px, transparent 2.1px),
+            radial-gradient(circle at 46% 84%, var(--speckle) 0 0.9px, transparent 1.4px),
+            radial-gradient(circle at 88% 18%, var(--speckle) 0 1.1px, transparent 1.6px),
+            radial-gradient(circle at 8% 72%, var(--speckle-warm) 0 1.1px, transparent 1.6px);
+        background-size: 47px 47px, 71px 71px, 34px 34px, 59px 59px, 83px 83px;
+    }
+
+    /* a photograph is set in a window: cut square, hairline framed, never floating */
+    [data-theme="furniture"] .window {
+        border: 1px solid var(--brass-faint);
+        background: color-mix(in srgb, var(--secondary) 40%, var(--background));
+        border-radius: var(--r-image);
+        overflow: hidden;
+    }
+
+    /* ---- state, printed ---- */
+
+    /* a state plate: a word, and a figure when there is one. Never colour alone. */
+    [data-theme="furniture"] .state-plate {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        border: 1px solid currentColor;
+        border-radius: var(--r-badge);
+        padding: 0.125rem 0.4rem;
+        font-family: var(--font-heading);
+        font-size: var(--type-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        line-height: 1.5;
+        background: var(--background);
+    }
+    [data-theme="furniture"] .state-plate:lang(ar) { letter-spacing: 0; text-transform: none; }
+
+    /* the shared empty/error primitives are lettered like every other sign in the building */
+    [data-theme="furniture"] :is([data-slot="empty-state-title"], [data-slot="error-state-title"]) {
+        font-family: var(--font-heading);
+        font-variation-settings: "wdth" 122;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        font-size: var(--type-xl);
+        line-height: var(--line-tight);
+    }
+    [data-theme="furniture"] :is([data-slot="empty-state-title"], [data-slot="error-state-title"]):lang(ar) {
+        letter-spacing: 0; text-transform: none; font-variation-settings: normal;
+    }
+    [data-theme="furniture"] :is([data-slot="empty-state-body"], [data-slot="error-state-body"]) { max-width: 48ch; }
+    [data-theme="furniture"] [data-slot="empty-state-icon"] svg { stroke-width: 1.25; }
+
+    /* ---- running copy: CMS pages, policies, posts, descriptions ---- */
+    [data-theme="furniture"] .copy {
+        line-height: var(--line-relaxed);
+        max-width: 68ch;
+    }
+    [data-theme="furniture"] .copy p { margin-block-end: 1rem; }
+    [data-theme="furniture"] .copy h2 {
+        font-family: var(--font-heading);
+        font-variation-settings: "wdth" 122;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        font-size: var(--type-lg);
+        line-height: var(--line-snug);
+        margin-block: 2.5rem 0.75rem;
+    }
+    [data-theme="furniture"] .copy h3 {
+        font-weight: 700;
+        font-size: var(--type-base);
+        margin-block: 1.75rem 0.5rem;
+    }
+    [data-theme="furniture"] .copy :is(h2, h3):lang(ar) { letter-spacing: 0; text-transform: none; font-variation-settings: normal; }
+    [data-theme="furniture"] .copy ul { list-style: disc; padding-inline-start: 1.25rem; margin-block-end: 1rem; }
+    [data-theme="furniture"] .copy ol { list-style: decimal; padding-inline-start: 1.25rem; margin-block-end: 1rem; }
+    [data-theme="furniture"] .copy li { margin-block-end: 0.25rem; }
+    [data-theme="furniture"] .copy a { text-decoration: underline; }
+    [data-theme="furniture"] .copy img { border: 1px solid var(--brass-faint); margin-block: 1.5rem; }
+    [data-theme="furniture"] .copy :first-child { margin-block-start: 0; }
+
+    /* ---- the one authored motion: a figure that changes rolls in its slot ---- */
+    @keyframes furniture-roll {
+        0%   { transform: translateY(38%); opacity: 0; }
+        60%  { transform: translateY(-6%); opacity: 1; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    [data-theme="furniture"] .roll-slot {
+        display: inline-grid;
+        overflow: hidden;
+        line-height: 1;
+    }
+    [data-theme="furniture"] .roll-slot > * { grid-area: 1 / 1; }
+    [data-theme="furniture"] .rolling {
+        animation: furniture-roll var(--motion-slow) var(--easing-emphasized) both;
+    }
+    /* the lift indicator, the one other moving thing: it only appears while a redirect is in flight */
+    @keyframes furniture-lift {
+        0%   { transform: translateX(-110%); }
+        100% { transform: translateX(320%); }
+    }
+    [data-theme="furniture"] .lift-bar {
+        animation: furniture-lift 1.4s var(--easing-standard) infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        [data-theme="furniture"] .rolling { animation: none; }
+        [data-theme="furniture"] .lift-bar { animation: none; width: 100%; transform: none; }
+    }
+}

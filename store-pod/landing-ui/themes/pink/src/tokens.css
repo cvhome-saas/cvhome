@@ -1,0 +1,509 @@
+/*
+ * pink — "TOKYO GIRLS ISSUE", fused to a mixed girly-lifestyle store.
+ * The shop is this month's issue of a Japanese girls' fashion magazine. The stock is paper; whole regions
+ * flood with the merchant's PRIMARY the way a cover floods with ink; every product is a die-cut ranged in
+ * a ruled cell with its price printed on a notched flag in the merchant's ACCENT; every category, listing
+ * page and product carries a printed page address, and the masthead always states where you are. Facts
+ * the shopper needs — sale, low stock, sold out — are marker annotations drawn over the goods.
+ * Type: Dela Gothic One for anything that names, prices or flags; M PLUS Rounded 1c for anything that
+ * explains; Cairo leads both roles in Arabic. One motion: a flag snaps onto the page.
+ */
+[data-theme="pink"] {
+    /* fonts — fonts.ts exports the variables; Cairo trails so Arabic glyphs fall through to it */
+    --font-body: var(--font-pink-sans), var(--font-pink-arabic), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-pink-display), var(--font-pink-arabic), var(--font-pink-sans), sans-serif;
+    --font-code: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* type scale — running text stays small and dense, cover lines jump to cover scale */
+    --type-xs: 0.6875rem;
+    --type-sm: 0.8125rem;
+    --type-base: 0.9375rem;
+    --type-lg: 1.0625rem;
+    --type-xl: 1.25rem;
+    --type-2xl: 1.625rem;
+    --type-3xl: 2.25rem;
+    --type-4xl: 3rem;
+    --type-5xl: 4rem;
+    --type-6xl: 5.5rem;
+    --line-tight: 0.88;
+    --line-snug: 1.2;
+    --line-normal: 1.55;
+    --line-relaxed: 1.7;
+    --track-tight: -0.03em;
+    --track-normal: 0;
+    --track-wide: 0.12em;
+
+    /* spacing & density — a spread packs tight, the gutters between spreads breathe */
+    --density: 1;
+    --space-unit: calc(0.25rem * var(--density));
+    --section-y: 2.75rem;
+    --gutter: 1rem;
+
+    /* radius — cells are cut square, controls are pressed as pills */
+    --r-control: 9999px;
+    --r-card: 0px;
+    --r-image: 0px;
+    --r-badge: 9999px;
+    --r-overlay: 0px;
+
+    /* borders & elevation — print has rules, not shadows; only lifted paper gets one */
+    --border-width: 1px;
+    --elev-sm: 0 1px 2px rgb(31 17 26 / 0.10);
+    --elev-md: 0 2px 4px rgb(31 17 26 / 0.10), 0 10px 24px -12px rgb(31 17 26 / 0.28);
+    --elev-lg: 0 4px 8px rgb(31 17 26 / 0.12), 0 22px 44px -18px rgb(31 17 26 / 0.34);
+    --elev-overlay: 0 28px 56px -20px rgb(31 17 26 / 0.45);
+
+    /* containers — a spread runs wide */
+    --width-narrow: 44rem;
+    --width-content: 82rem;
+    --width-wide: 98rem;
+
+    /* motion — one authored moment: the flag snap */
+    --motion-fast: 110ms;
+    --motion-base: 190ms;
+    --motion-slow: 460ms;
+    --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* layout */
+    --header-h: 3.5rem;
+    --header-h-lg: 6.5rem;
+    --product-aspect: 4 / 5;
+
+    /* world materials */
+    --paper: var(--background);
+    --ink: var(--foreground);
+    --flood: var(--primary);
+    --flood-ink: var(--primary-foreground);
+    --flag: var(--accent);
+    --flag-ink: var(--accent-foreground);
+    --wash: var(--secondary);
+    --wash-ink: var(--secondary-foreground);
+    --hair: var(--foreground);
+    --hair-soft: color-mix(in srgb, var(--foreground) 22%, transparent);
+    --tone-ink: color-mix(in srgb, var(--foreground) 30%, transparent);
+    /* the quiet ink for page numbers and counts: composited over its own ground, so it clears 4.5:1 on
+       paper (5.6:1) and on the wash (5.0:1). On a flooded field nothing may be dimmed — see .dim. */
+    --ink-dim: color-mix(in srgb, var(--ink) 65%, transparent);
+    --tone-light: color-mix(in srgb, var(--primary-foreground) 34%, transparent);
+
+    /* browser surfaces carry the issue too */
+    caret-color: var(--flood);
+    accent-color: var(--flood);
+    scrollbar-color: var(--flood) var(--wash);
+}
+
+@media (min-width: 1024px) {
+    [data-theme="pink"] {
+        --section-y: 4rem;
+        --gutter: 2rem;
+    }
+}
+
+/* Arabic edition: no stack swap is needed — neither Latin cut carries Arabic, so Arabic falls through to
+   Cairo per glyph while Latin on an Arabic page keeps its own voice. Cairo is variable, so the printed
+   roles ask it for the weight the Latin cuts get from their single heavy design. */
+[data-theme="pink"] :is(.display, .cover-line, .figure, .pagemark, .flag):lang(ar),
+[data-theme="pink"] :is(h1, h2, h3):lang(ar),
+[data-theme="pink"] [data-slot="button"]:lang(ar) { font-weight: 900; }
+[data-theme="pink"] .price-flag [data-slot="price-final"]:lang(ar) { font-weight: 900; }
+
+[data-theme="pink"] ::selection {
+    background: var(--flood);
+    color: var(--flood-ink);
+}
+
+[data-theme="pink"] body {
+    background-color: var(--paper);
+}
+
+/* ---- the issue's grammar, as small utilities scoped to the theme ------------------------------- */
+/* Layered under Tailwind's utilities so `text-*`, `p-*`, `lg:sticky` … on the same element still win. */
+@layer components {
+
+/* --- printed voices ---------------------------------------------------------------------------- */
+
+/* anything that names, prices or flags: the cover face */
+[data-theme="pink"] .display {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    line-height: var(--line-tight);
+    letter-spacing: var(--track-tight);
+}
+[data-theme="pink"] .display:lang(ar) { letter-spacing: 0; line-height: 1.15; }
+
+/* a cover line: the tracked caps a magazine sets over a photograph */
+[data-theme="pink"] .cover-line {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-sm);
+    letter-spacing: var(--track-wide);
+    text-transform: uppercase;
+    line-height: 1;
+}
+[data-theme="pink"] .cover-line:lang(ar) { letter-spacing: 0; text-transform: none; }
+
+/* every printed figure: prices, counts, totals, quantities */
+[data-theme="pink"] .figure {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.01em;
+}
+
+/* the quiet register: never opacity, which dims below the contrast floor on the flood */
+[data-theme="pink"] .dim { color: var(--ink-dim); }
+/* on a flooded field the foreground role is already only just over the floor, so the quiet register
+   is carried by size and weight alone and the colour stays at full strength */
+[data-theme="pink"] .flood .dim,
+[data-theme="pink"] .ink-field .dim { color: inherit; }
+
+/* the band's copy: plain and compact on a phone, tracked cover caps once there is room for them */
+[data-theme="pink"] .band-copy {
+    font-size: var(--type-sm);
+    font-weight: 700;
+    line-height: 1.35;
+}
+@media (min-width: 640px) {
+    [data-theme="pink"] .band-copy {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-size: var(--type-sm);
+        letter-spacing: var(--track-wide);
+        text-transform: uppercase;
+        line-height: 1;
+    }
+    [data-theme="pink"] .band-copy:lang(ar) { letter-spacing: 0; text-transform: none; font-weight: 900; }
+}
+
+/* --- the page address system ------------------------------------------------------------------- */
+
+/* the printed page number: a solid ink tab, always saying where this is */
+[data-theme="pink"] .pagemark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.3em 0.6em 0.26em;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-xs);
+    letter-spacing: 0.1em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+[data-theme="pink"] .pagemark:lang(ar) { letter-spacing: 0; }
+[data-theme="pink"] .pagemark-flood { background: var(--flood); color: var(--flood-ink); }
+[data-theme="pink"] .pagemark-open { background: transparent; color: var(--ink); border: 1px solid var(--hair); }
+
+/* --- fields, rules and stock ------------------------------------------------------------------- */
+
+/* a flooded field: the cover, a section opener, an active tab — colour owning a whole region */
+[data-theme="pink"] .flood { background: var(--flood); color: var(--flood-ink); }
+[data-theme="pink"] .wash { background: var(--wash); color: var(--wash-ink); }
+[data-theme="pink"] .ink-field { background: var(--ink); color: var(--paper); }
+
+/* screentone: the printed halftone a magazine lays under a field */
+[data-theme="pink"] .tone {
+    background-image: radial-gradient(var(--tone-ink) 1.1px, transparent 1.2px);
+    background-size: 7px 7px;
+}
+[data-theme="pink"] .tone-light {
+    background-image: radial-gradient(var(--tone-light) 1.1px, transparent 1.2px);
+    background-size: 7px 7px;
+}
+
+/* the hairline the whole issue is ruled on */
+[data-theme="pink"] .hair { border-color: var(--hair); }
+[data-theme="pink"] .hair-soft { border-color: var(--hair-soft); }
+
+/* a ruled cell: one entry ranged on a plate, sharing rules with its neighbours */
+[data-theme="pink"] .cell {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    transition: background-color var(--motion-fast) var(--easing-standard);
+}
+@media (hover: hover) {
+    [data-theme="pink"] .cell:hover,
+    [data-theme="pink"] .cell:focus-within { background: color-mix(in srgb, var(--wash) 45%, var(--paper)); }
+}
+
+/* a plate: cells ranged on one ruled sheet, sharing every hairline with their neighbours */
+[data-theme="pink"] .plate {
+    display: grid;
+    gap: 1px;
+    background: var(--hair);
+    border: 1px solid var(--hair);
+}
+[data-theme="pink"] .plate > * { background: var(--paper); }
+[data-theme="pink"] .plate .cell { border: 0; }
+
+/* the cover: the picture bleeds off the end edge while the type stays on the container's measure.
+   Column one is the trim — exactly the container's own margin, measured off the full-bleed section. */
+@media (min-width: 1024px) {
+    [data-theme="pink"] .cover-grid {
+        grid-template-columns:
+            max(var(--gutter), calc((100% - var(--width-content)) / 2 + var(--gutter)))
+            minmax(0, 1fr)
+            minmax(0, 34rem);
+    }
+}
+
+/* --- the price flag ---------------------------------------------------------------------------- */
+
+/* a notched pennant of flat colour: every price, every callout the issue prints beside a picture */
+[data-theme="pink"] .flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.3em 0.85em 0.26em 0.6em;
+    background: var(--flag);
+    color: var(--flag-ink);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-sm);
+    line-height: 1.1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums lining-nums;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%);
+}
+[data-theme="pink"][dir="rtl"] .flag,
+[data-theme="pink"] [dir="rtl"] .flag {
+    padding: 0.3em 0.6em 0.26em 0.85em;
+    clip-path: polygon(0 50%, 0.55em 0, 100% 0, 100% 100%, 0.55em 100%);
+}
+[data-theme="pink"] .flag-lg { font-size: var(--type-xl); padding: 0.28em 1em 0.24em 0.7em; }
+[data-theme="pink"] .flag-sale { background: var(--sale); color: var(--sale-foreground); }
+[data-theme="pink"] .flag-ink { background: var(--ink); color: var(--paper); }
+[data-theme="pink"] .flag-flood { background: var(--flood); color: var(--flood-ink); }
+
+/* the price as printed on the flag: the final figure rides the pennant, the old one is struck through */
+[data-theme="pink"] .price-flag { align-items: center; gap: 0.5rem; }
+[data-theme="pink"] .price-flag [data-slot="price-final"] {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3em 0.85em 0.26em 0.6em;
+    background: var(--flag);
+    color: var(--flag-ink);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-lg);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums lining-nums;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%);
+}
+[data-theme="pink"][dir="rtl"] .price-flag [data-slot="price-final"],
+[data-theme="pink"] [dir="rtl"] .price-flag [data-slot="price-final"] {
+    padding: 0.3em 0.6em 0.26em 0.85em;
+    clip-path: polygon(0 50%, 0.55em 0, 100% 0, 100% 100%, 0.55em 100%);
+}
+[data-theme="pink"] .price-flag [data-slot="price-original"] {
+    font-family: var(--font-heading);
+    font-size: var(--type-sm);
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums lining-nums;
+}
+[data-theme="pink"] .price-flag-lg [data-slot="price-final"] { font-size: var(--type-3xl); padding: 0.24em 0.9em 0.2em 0.55em; }
+[data-theme="pink"] .price-flag-lg [data-slot="price-original"] { font-size: var(--type-lg); }
+
+/* --- marker annotations ------------------------------------------------------------------------ */
+
+/* the reader's own pen: a fact circled or arrowed in the margin. Real facts only, never decoration. */
+[data-theme="pink"] .marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: var(--type-xs);
+    line-height: 1;
+    color: var(--sale);
+    rotate: -4deg;
+}
+[data-theme="pink"] .marker-ink { color: var(--ink); }
+[data-theme="pink"] .marker svg { overflow: visible; }
+[data-theme="pink"] .marker-stroke {
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    fill: none;
+    stroke-dasharray: var(--len, 200);
+    stroke-dashoffset: var(--len, 200);
+    animation: pink-draw var(--motion-slow) var(--easing-standard) 120ms forwards;
+}
+@keyframes pink-draw { to { stroke-dashoffset: 0; } }
+
+/* --- running text ------------------------------------------------------------------------------ */
+
+/* how the issue sets prose: display subheads, ruled quotes, ink underlines */
+[data-theme="pink"] .prose-issue { line-height: var(--line-relaxed); }
+[data-theme="pink"] .prose-issue :is(h2, h3, h4) {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    line-height: var(--line-tight);
+    letter-spacing: var(--track-tight);
+}
+[data-theme="pink"] .prose-issue h2 { margin: 2.25rem 0 0.75rem; font-size: var(--type-2xl); }
+[data-theme="pink"] .prose-issue h3 { margin: 1.75rem 0 0.5rem; font-size: var(--type-lg); }
+[data-theme="pink"] .prose-issue p { margin-bottom: 1rem; }
+[data-theme="pink"] .prose-issue :is(ul, ol) { margin-bottom: 1rem; padding-inline-start: 1.25rem; }
+[data-theme="pink"] .prose-issue ul { list-style: disc; }
+[data-theme="pink"] .prose-issue ol { list-style: decimal; }
+[data-theme="pink"] .prose-issue li { margin-bottom: 0.25rem; }
+[data-theme="pink"] .prose-issue a { text-decoration: underline; text-underline-offset: 2px; }
+[data-theme="pink"] .prose-issue img { margin: 1.5rem 0; }
+/* a pull quote is set, not fenced: the issue lifts it into the cover face between two hairlines */
+[data-theme="pink"] .prose-issue blockquote {
+    margin: 1.75rem 0;
+    padding: 0.75rem 0;
+    border-block: 1px solid var(--hair);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-xl);
+    line-height: var(--line-snug);
+    letter-spacing: var(--track-tight);
+}
+[data-theme="pink"] .prose-issue blockquote:lang(ar) { font-weight: 900; letter-spacing: 0; }
+[data-theme="pink"] .prose-issue blockquote p:last-child { margin-bottom: 0; }
+
+/* --- the one authored motion: a flag snaps onto the page --------------------------------------- */
+@keyframes pink-snap {
+    0%   { scale: 1.6; rotate: -12deg; opacity: 0; }
+    58%  { scale: 0.95; rotate: 2deg; opacity: 1; }
+    100% { scale: 1; rotate: 0deg; opacity: 1; }
+}
+[data-theme="pink"] .snap { animation: pink-snap var(--motion-slow) var(--easing-emphasized) both; }
+
+/* --- sold out: the die-cut prints grey ---------------------------------------------------------- */
+[data-theme="pink"] .greyed { filter: grayscale(1) contrast(0.92) brightness(1.04); opacity: 0.62; }
+
+}
+
+/* --- controls and form stock (outside @layer so they outrank the primitives' own defaults) ------- */
+
+/* the running head when it sits on a flooded field */
+/* on the flood the foreground role is only just over the floor, so the trail is not tinted at all:
+   the current page is marked by weight, the ancestors by an underline on hover */
+[data-theme="pink"] .crumbs-flood :is([data-slot="breadcrumb-link"], [data-slot="breadcrumb-separator"], [data-slot="breadcrumb-page"]) { color: var(--flood-ink); }
+[data-theme="pink"] .crumbs-flood [data-slot="breadcrumb-link"]:hover { text-decoration: underline; text-underline-offset: 3px; }
+[data-theme="pink"] .crumbs-flood [data-slot="breadcrumb-page"] { font-weight: 900; }
+
+/* the contents row is a row: the shared primitive's base ships flex-col, and utility order is not a
+   contract we can rely on, so the theme states it outright */
+[data-theme="pink"] header [data-slot="navigation-menu-link"],
+[data-theme="pink"] header [data-slot="navigation-menu-trigger"] {
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* while any drawer is open its scrim owns the screen: the announcement's dismiss would otherwise sit a
+   thumb away from the drawer's own close, inert and identical */
+[data-theme="pink"] body:has([data-slot="sheet-overlay"]) [data-slot="announcement-dismiss"],
+body:has([data-slot="sheet-overlay"]) [data-theme="pink"] [data-slot="announcement-dismiss"] { visibility: hidden; }
+
+/* the order slip is ruled stock: an empty run of it still reads as paper, not as a void */
+[data-theme="pink"] .ruled-stock {
+    background-image: repeating-linear-gradient(to bottom, transparent 0 2.75rem, var(--hair-soft) 2.75rem calc(2.75rem + 1px));
+}
+
+/* empty / error blocks, printed in the issue's voice: cover-face title, the icon in a flooded square */
+[data-theme="pink"] .issue-block [data-slot="empty-state-title"],
+[data-theme="pink"] .issue-block [data-slot="error-state-title"] {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-2xl);
+    line-height: var(--line-tight);
+    letter-spacing: var(--track-tight);
+}
+[data-theme="pink"] .issue-block [data-slot="empty-state-icon"],
+[data-theme="pink"] .issue-block [data-slot="error-state-icon"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    background: var(--flood);
+    color: var(--flood-ink);
+}
+[data-theme="pink"] .issue-block :is([data-slot="empty-state-icon"], [data-slot="error-state-icon"]) svg { width: 1.75rem; height: 1.75rem; }
+
+[data-theme="pink"] [data-slot="button"] {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+}
+[data-theme="pink"] [data-slot="button"]:lang(ar) { letter-spacing: 0; }
+
+[data-theme="pink"] [data-slot="input"],
+[data-theme="pink"] [data-slot="select-trigger"] {
+    border-radius: 9999px;
+    border-color: var(--hair-soft);
+    background: var(--paper);
+    box-shadow: none;
+}
+[data-theme="pink"] [data-slot="textarea"] {
+    border-radius: 1rem;
+    border-color: var(--hair-soft);
+    background: var(--paper);
+    box-shadow: none;
+}
+[data-theme="pink"] [data-slot="input"]:focus-visible,
+[data-theme="pink"] [data-slot="textarea"]:focus-visible,
+[data-theme="pink"] [data-slot="select-trigger"]:focus-visible {
+    border-color: var(--flood);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--flood) 32%, transparent);
+}
+[data-theme="pink"] [data-slot="label"] {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--type-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+[data-theme="pink"] [data-slot="label"]:lang(ar) { letter-spacing: 0; text-transform: none; }
+[data-theme="pink"] [data-slot="checkbox"],
+[data-theme="pink"] [data-slot="radio-group-item"] { border-color: var(--ink); }
+
+/* swiper controls stay in the world */
+[data-theme="pink"] .swiper-pagination-bullet { width: 1.5rem; height: 0.3rem; border-radius: 0; background: var(--ink); opacity: 0.3; }
+[data-theme="pink"] .swiper-pagination-bullet-active { opacity: 1; background: var(--flood); }
+/* the rail's page turns: a small ink chip, never a bare glyph floating on a die-cut */
+[data-theme="pink"] .swiper-button-next, [data-theme="pink"] .swiper-button-prev {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: -1.125rem;
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: var(--elev-md);
+    transition: background-color var(--motion-fast) var(--easing-standard);
+}
+[data-theme="pink"] .swiper-button-next:hover, [data-theme="pink"] .swiper-button-prev:hover { background: var(--flood); color: var(--flood-ink); }
+[data-theme="pink"] .swiper-button-next::after, [data-theme="pink"] .swiper-button-prev::after { font-size: var(--type-sm); font-weight: 900; }
+[data-theme="pink"] .swiper-button-disabled { opacity: 0.25; }
+/* touch reads by swiping: the page turns would only cover the goods */
+@media (max-width: 1023px) {
+    [data-theme="pink"] .swiper-button-next, [data-theme="pink"] .swiper-button-prev { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="pink"] .snap { animation: none; }
+    [data-theme="pink"] .marker-stroke { animation: none; stroke-dashoffset: 0; }
+}
+
+/* toasts: a small printed notice — square stock, cover face, the progress line flooded */
+[data-theme="pink"] .toast-nextjs {
+    border: 1px solid var(--hair);
+    border-radius: 0;
+    box-shadow: var(--elev-lg);
+}
+[data-theme="pink"] .toast-nextjs .message .text {
+    font-family: var(--font-heading);
+    font-size: var(--type-sm);
+}
+[data-theme="pink"] .toast-nextjs .check { border-radius: 0; animation: none; }
+[data-theme="pink"] .toast-nextjs.success .check { background-color: var(--flood) !important; color: var(--flood-ink) !important; }
+[data-theme="pink"] .toast-nextjs .progress::before { background-color: var(--flood) !important; }

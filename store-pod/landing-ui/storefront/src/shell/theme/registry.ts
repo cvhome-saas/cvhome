@@ -12,6 +12,13 @@ export const themeLoaders = {
     'fashion': () => import('@store-front/theme-fashion'),
     'basic': () => import('@store-front/theme-basic'),
     'grocery': () => import('@store-front/theme-grocery'),
+    'pink': () => import('@store-front/theme-pink'),
+    'hunger': () => import('@store-front/theme-hunger'),
+    'furniture': () => import('@store-front/theme-furniture'),
+    'glasses': () => import('@store-front/theme-glasses'),
+    'cosmetics': () => import('@store-front/theme-cosmetics'),
+    'sports': () => import('@store-front/theme-sports'),
+    'jewellery': () => import('@store-front/theme-jewellery'),
     // @themes:end
 } satisfies Record<string, () => Promise<{ default: ThemeDefinition }>>;
 

@@ -8,7 +8,9 @@
       "RECOMMENDED": "Recommended",
       "SHOP_NOW": "Shop now",
       "HERO_SLIDE": "Slide {index} of {total}",
-      "SINCE": "Since {year}"
+      "SINCE": "Since {year}",
+      "CONTENTS": "Contents",
+      "ITEMS_COUNT": "{count, plural, =0 {no items} =1 {1 item} other {# items}}"
     },
     "PRODUCT": {
       "HOME_TITLE": "Product Details",
@@ -36,7 +38,8 @@
       "GALLERY_IMAGE": "Image {index} of {total}",
       "UNAVAILABLE_COMBINATION": "Not available",
       "DETAILS": "Details",
-      "SPECIFICATIONS": "Specifications"
+      "SPECIFICATIONS": "Specifications",
+      "NO_RECORD": "The maker has listed no measurements for this piece yet."
     },
     "CHECKOUT": {
       "TITLE": "Checkout",
@@ -207,7 +210,8 @@
       "SALE": "Sale",
       "LOW_STOCK": "Low stock",
       "ADDED": "Added",
-      "CATALOGUE_NO": "No."
+      "CATALOGUE_NO": "No.",
+      "IN_BASKET": "In basket ({count})"
     },
     "HEADER": {
       "HOME_TITLE": "Home",
@@ -345,7 +349,15 @@
     "HOME": "Home",
     "LANGUAGE_LABEL": "Language",
     "CURRENCY": "Currency",
-    "ITEMS": "Items"
+    "ITEMS": "Items",
+    "DIRECTORY": "Directory",
+    "FLOOR": "Floor",
+    "DEPARTMENT": "Department",
+    "PLATE": "Plate {number}",
+    "FLOORS_COUNT": "{count, plural, =0 {no floors} =1 {1 floor} other {# floors}}",
+    "MANUFACTURER": "Maker",
+    "AVAILABILITY": "Availability",
+    "PRODUCT_RECORD": "Product record"
   },
   "STATES": {
     "REDIRECTING_LOGIN": "Redirecting to sign in…",
@@ -368,6 +380,7 @@
     "EMPTY_ORDERS_TITLE": "No orders yet",
     "EMPTY_ORDERS_BODY": "Your orders will appear here once you've placed one.",
     "EMPTY_SEARCH_TITLE": "No results",
-    "EMPTY_SEARCH_BODY": "Try a different word."
+    "EMPTY_SEARCH_BODY": "Try a different word.",
+    "BACK_TO_DIRECTORY": "Back to the directory"
   }
 }

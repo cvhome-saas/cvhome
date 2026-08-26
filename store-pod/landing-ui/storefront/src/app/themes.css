@@ -11,4 +11,18 @@
 @import "@store-front/theme-basic/tokens.css";
 @source "../../../themes/grocery/src";
 @import "@store-front/theme-grocery/tokens.css";
+@source "../../../themes/pink/src";
+@import "@store-front/theme-pink/tokens.css";
+@source "../../../themes/hunger/src";
+@import "@store-front/theme-hunger/tokens.css";
+@source "../../../themes/furniture/src";
+@import "@store-front/theme-furniture/tokens.css";
+@source "../../../themes/glasses/src";
+@import "@store-front/theme-glasses/tokens.css";
+@source "../../../themes/cosmetics/src";
+@import "@store-front/theme-cosmetics/tokens.css";
+@source "../../../themes/sports/src";
+@import "@store-front/theme-sports/tokens.css";
+@source "../../../themes/jewellery/src";
+@import "@store-front/theme-jewellery/tokens.css";
 /* @themes:end */
