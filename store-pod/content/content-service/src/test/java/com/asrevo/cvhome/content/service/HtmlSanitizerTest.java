@@ -8,13 +8,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HtmlSanitizerTest {
 
+    private static final String JS_SCHEME = "javascript:";
+
     @Test
     void stripsScriptsAndEventHandlersButKeepsFormatting() {
         String clean = HtmlSanitizer.clean("""
                 <h2 onclick="x()">Hi</h2><script>alert(1)</script><p dir="rtl">مرحبا <a href="javascript:x">a</a> \
                 <a href="https://a.b/c" target="_blank">ok</a></p>""");
         assertThat(clean).contains("<h2>Hi</h2>").contains("dir=\"rtl\"").contains("href=\"https://a.b/c\"")
-                .doesNotContain("script").doesNotContain("onclick").doesNotContain("javascript:");
+                .doesNotContain("script").doesNotContain("onclick").doesNotContain(JS_SCHEME);
     }
 
     @Test
@@ -34,7 +36,7 @@ class HtmlSanitizerTest {
                         + "<a href=\"mailto:a@b.c\">mail</a>, <a href=\"javascript:x()\">no</a></p>");
 
         assertThat(clean).contains("href=\"/content/sale\"").contains("href=\"mailto:a@b.c\"")
-                .doesNotContain("javascript:");
+                .doesNotContain(JS_SCHEME);
     }
 
     @Test

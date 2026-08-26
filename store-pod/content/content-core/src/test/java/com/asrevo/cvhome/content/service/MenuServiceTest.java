@@ -39,6 +39,8 @@ class MenuServiceTest {
 
     private static final String EN = "en";
 
+    private static final String MENUS = "menus";
+
     private static final String MAIN_MENU_NAME = "Main menu";
 
     private static final String SALE_PATH = "/sale";
@@ -341,7 +343,7 @@ class MenuServiceTest {
 
         service.contribute(ContentFixtures.STORE, new ContentSummary(), counts);
 
-        assertThat(counts).containsEntry("menus", 3L);
+        assertThat(counts).containsEntry(MENUS, 3L);
     }
 
     @Test
@@ -351,7 +353,7 @@ class MenuServiceTest {
 
         service.contribute(ContentFixtures.STORE, new ContentSummary(), counts);
 
-        assertThat(counts).containsEntry("menus", 0L);
+        assertThat(counts).containsEntry(MENUS, 0L);
     }
 
     @Test
