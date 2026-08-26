@@ -6,37 +6,34 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageAssetUnknownException;
 import com.asrevo.cvhome.catalog.errors.ProductImageNotFoundException;
-import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
-import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.model.product.PersistableProductImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.repositories.ProductImageRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
-import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
-import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
+import com.asrevo.cvhome.content.api.ExternalMediaService;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
+import com.asrevo.cvhome.content.model.media.ExternalMediaUsage;
+import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * The image service's own decisions, which the HTTP tests can see the result of but not steer: which upload becomes
- * the default, what an empty part does, and what happens when the CDN refuses to give a file up.
+ * The gallery's own decisions, which the HTTP tests can see the result of but not steer: which image becomes the
+ * default, what happens to an asset id that is not this store's, and what content is told afterwards.
  */
 @ExtendWith(MockitoExtension.class)
 class ProductImageServiceImplTest {
@@ -45,21 +42,11 @@ class ProductImageServiceImplTest {
 
     private static final String SKU = "SKU-1";
 
-    private static final String FIELD = "file";
+    private static final long PRODUCT_ID = 7L;
 
-    private static final String PNG = "image/png";
+    private static final String URL_ONE = "https://cdn.example/media/1/a.png";
 
-    private static final String CDN = "https://cdn.example/shoe.png";
-
-    private static final String FIRST_FILE = "a.png";
-
-    private static final String OLD_FILE = "old.png";
-
-    private static final String NEW_FILE = "new.png";
-
-    private static final String STORED_FILE = "shoe.png";
-
-    private static final String CONTEXT = "/ctx";
+    private static final String URL_TWO = "https://cdn.example/media/2/b.png";
 
     @Mock
     private ProductRepository productRepository;
@@ -68,201 +55,148 @@ class ProductImageServiceImplTest {
     private ProductImageRepository productImageRepository;
 
     @Mock
-    private ProductFileManager productFileManager;
-
-    @Mock
-    private ImageFilePath imageFilePath;
+    private ExternalMediaService media;
 
     private ProductImageServiceImpl service;
 
+    private Product product;
+
     @BeforeEach
     void setUp() {
-        service = new ProductImageServiceImpl(productRepository, productImageRepository, productFileManager,
-                new ImageMapper(imageFilePath));
-    }
-
-    private static Product product() {
-        Product product = new Product();
-        product.setId(3L);
-        product.setStore(STORE);
+        service = new ProductImageServiceImpl(productRepository, productImageRepository, media, new ImageMapper());
+        product = new Product();
+        product.setId(PRODUCT_ID);
         product.setSku(SKU);
-        return product;
+        product.setStore(STORE);
     }
 
-    private static MultipartFile file(String name, byte[] bytes) {
-        return new MockMultipartFile(FIELD, name, PNG, bytes);
+    private void productExists() {
+        when(productRepository.findByStoreAndId(STORE, PRODUCT_ID)).thenReturn(Optional.of(product));
+        when(productImageRepository.save(any())).thenAnswer(i -> i.getArgument(0));
     }
 
-    private void savesWhatItIsGiven() {
-        when(productImageRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    private void libraryHas(Long id, String url) {
+        ReadableMediaAsset asset = new ReadableMediaAsset();
+        asset.setId(id);
+        asset.setUrl(url);
+        when(media.resolve(any(), anyList())).thenReturn(List.of(asset));
     }
 
-    // -------------------------------------------------------------------------------------------------- adding
-
-    @Test
-    void theFirstImageOfAProductBecomesItsDefault() throws Exception {
-        Product product = product();
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
-        savesWhatItIsGiven();
-
-        service.add(STORE, 3L, new MultipartFile[]{file(FIRST_FILE, new byte[]{1}), file("b.png", new byte[]{2})},
-                0, false);
-
-        assertThat(product.getImages()).hasSize(2);
-        // exactly one default, and it is the first of the batch
-        assertThat(product.getImages().stream().filter(ProductImage::isDefaultImage).count()).isEqualTo(1);
-        assertThat(product.defaultImage()).get().extracting(ProductImage::getProductImage).isEqualTo(FIRST_FILE);
-        assertThat(product.getImages().stream().map(ProductImage::getSortOrder).toList()).contains(0, 1);
-        verify(productFileManager, org.mockito.Mockito.times(2)).addProductImage(any(), any());
+    private static PersistableProductImage item(Long assetId, boolean isDefault) {
+        PersistableProductImage p = new PersistableProductImage();
+        p.setMediaAssetId(assetId);
+        p.setDefaultImage(isDefault);
+        return p;
     }
 
     @Test
-    void aProductThatAlreadyHasADefaultKeepsIt() throws Exception {
-        Product product = product();
-        ProductImage existing = new ProductImage(product, OLD_FILE, 0, true);
-        product.getImages().add(existing);
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
-        savesWhatItIsGiven();
+    void theFirstImageOfAnEmptyGalleryBecomesTheDefault() throws Exception {
+        productExists();
+        libraryHas(1L, URL_ONE);
 
-        service.add(STORE, 3L, new MultipartFile[]{file(NEW_FILE, new byte[]{1})}, 4, false);
+        List<ReadableImage> out = service.attach(STORE, PRODUCT_ID, List.of(item(1L, false)));
 
-        assertThat(product.defaultImage()).contains(existing);
+        assertThat(out).singleElement().satisfies(i -> {
+            assertThat(i.isDefaultImage()).isTrue();
+            assertThat(i.getMediaAssetId()).isEqualTo(1L);
+            // The url is cached at attach time, so reading a product needs no call into content.
+            assertThat(i.getImageUrl()).isEqualTo(URL_ONE);
+        });
+    }
+
+    /**
+     * Content answering without the asset is how an id from another store is caught, so nothing is written and
+     * the seller is told which id was wrong.
+     */
+    @Test
+    void anAssetThatIsNotThisStoresIsRefused() {
+        when(productRepository.findByStoreAndId(STORE, PRODUCT_ID)).thenReturn(Optional.of(product));
+        when(media.resolve(any(), anyList())).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.attach(STORE, PRODUCT_ID, List.of(item(99L, false))))
+                .isInstanceOf(ProductImageAssetUnknownException.class);
+
+        verify(productImageRepository, org.mockito.Mockito.never()).save(any());
     }
 
     @Test
-    void askingForANewDefaultMovesIt() throws Exception {
-        Product product = product();
-        product.getImages().add(new ProductImage(product, OLD_FILE, 0, true));
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
-        savesWhatItIsGiven();
+    void replacingTheGalleryRenumbersAndHonoursTheChosenDefault() throws Exception {
+        product.getImages().add(new ProductImage(product, 1L, URL_ONE, null, 0, true));
+        productExists();
+        ReadableMediaAsset one = new ReadableMediaAsset();
+        one.setId(1L);
+        one.setUrl(URL_ONE);
+        ReadableMediaAsset two = new ReadableMediaAsset();
+        two.setId(2L);
+        two.setUrl(URL_TWO);
+        when(media.resolve(any(), anyList())).thenReturn(List.of(one, two));
 
-        service.add(STORE, 3L, new MultipartFile[]{file(NEW_FILE, new byte[]{1})}, 1, true);
+        List<ReadableImage> out = service.replace(STORE, PRODUCT_ID,
+                List.of(item(2L, true), item(1L, false)));
 
-        // both rows now claim it; the entity resolves that by taking the first it finds, and the console's
-        // next read shows the new one only once the old flag is cleared by an edit
-        assertThat(product.getImages()).hasSize(2);
-        assertThat(product.getImages().stream().filter(ProductImage::isDefaultImage).count()).isEqualTo(2);
+        assertThat(out).extracting(ReadableImage::getMediaAssetId).containsExactly(2L, 1L);
+        assertThat(out.getFirst().isDefaultImage()).isTrue();
+        assertThat(out.getLast().isDefaultImage()).isFalse();
+    }
+
+    /**
+     * Something has to be the default, or the storefront falls back to sort order and the seller's choice is lost.
+     */
+    @Test
+    void aGalleryWithNoChosenDefaultDefaultsToTheFirst() throws Exception {
+        productExists();
+        libraryHas(1L, URL_ONE);
+
+        List<ReadableImage> out = service.replace(STORE, PRODUCT_ID, List.of(item(1L, false)));
+
+        assertThat(out).singleElement().satisfies(i -> assertThat(i.isDefaultImage()).isTrue());
     }
 
     @Test
-    void anEmptyPartIsSkipped() throws Exception {
-        Product product = product();
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
+    void contentIsToldTheCompleteSetAndWhichProductHoldsIt() throws Exception {
+        productExists();
+        libraryHas(1L, URL_ONE);
 
-        service.add(STORE, 3L, new MultipartFile[]{file("empty.png", new byte[0])}, 0, false);
+        service.attach(STORE, PRODUCT_ID, List.of(item(1L, false)));
 
-        assertThat(product.getImages()).isEmpty();
-        verify(productImageRepository, never()).save(any());
+        ArgumentCaptor<ExternalMediaUsage> captor = ArgumentCaptor.forClass(ExternalMediaUsage.class);
+        verify(media).replaceUsage(any(), captor.capture());
+        ExternalMediaUsage usage = captor.getValue();
+        assertThat(usage.ownerKind()).isEqualTo(MediaOwnerKind.PRODUCT);
+        assertThat(usage.ownerRef()).isEqualTo(String.valueOf(PRODUCT_ID));
+        // The label travels with the call so content never has to ask catalog what a product is called.
+        assertThat(usage.ownerTitle()).isEqualTo(SKU);
+        assertThat(usage.refs()).singleElement()
+                .satisfies(r -> assertThat(r.assetId()).isEqualTo(1L));
     }
 
+    /**
+     * Detaching drops the row and restates what is left; the asset stays in the library, where other products may
+     * still be using it.
+     */
     @Test
-    void anUploadTheCdnRefusesIsReportedAsNotPersisted() throws Exception {
-        Product product = product();
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
-        doThrow(AssetUploadFailedException.of(FIRST_FILE, new IllegalStateException("bucket")))
-                .when(productFileManager).addProductImage(any(), any());
-
-        assertThatThrownBy(() -> service.add(STORE, 3L,
-                new MultipartFile[]{file(FIRST_FILE, new byte[]{1})}, 0, false))
-                .isInstanceOf(ProductImageNotPersistedException.class);
-
-        // no row is written for a file that never landed
-        verify(productImageRepository, never()).save(any());
-    }
-
-    @Test
-    void addingToAProductOfAnotherStoreIsNotFound() {
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.add(STORE, 3L, new MultipartFile[0], 0, false))
-                .isInstanceOf(ProductNotFoundException.class);
-        assertThatThrownBy(() -> service.list(STORE, 3L)).isInstanceOf(ProductNotFoundException.class);
-    }
-
-    // ------------------------------------------------------------------------------------------------- reading
-
-    @Test
-    void anExternalImageIsServedFromWhereverItLives() throws Exception {
-        Product product = product();
-        ProductImage external = new ProductImage(product, null, 0, true);
-        external.setImageType(ProductImage.TYPE_EXTERNAL_URL);
-        external.setProductImageUrl(CDN);
-        ProductImage stored = new ProductImage(product, STORED_FILE, 1, false);
-        product.getImages().add(external);
-        product.getImages().add(stored);
-        when(productRepository.findByStoreAndId(STORE, 3L)).thenReturn(Optional.of(product));
-        when(imageFilePath.getContextPath()).thenReturn(CONTEXT);
-        when(imageFilePath.buildProductImageUtils(STORE, SKU, STORED_FILE)).thenReturn(CDN);
-
-        List<ReadableImage> images = service.list(STORE, 3L);
-
-        assertThat(images).hasSize(2);
-        assertThat(images.getFirst().getImageUrl()).isEqualTo(CDN);
-        assertThat(images.getFirst().getVideoUrl()).isEqualTo(CDN);
-        // a stored file resolves to the CDN path, prefixed by the context path
-        assertThat(images.getLast().getImageUrl()).isEqualTo(String.format("%s%s", CONTEXT, CDN));
-        assertThat(images.getLast().getVideoUrl()).isNull();
-    }
-
-    // ------------------------------------------------------------------------------------------------ removing
-
-    @Test
-    void reorderAndDeleteNeedTheImageToBelongToTheProduct() throws Exception {
-        Product product = product();
-        ProductImage image = new ProductImage(product, STORED_FILE, 0, true);
-        image.setId(5L);
+    void detachingAnImageReleasesOnlyThatReference() throws Exception {
+        ProductImage image = new ProductImage(product, 1L, URL_ONE, null, 0, true);
+        image.setId(11L);
         product.getImages().add(image);
-        when(productImageRepository.findByStoreAndProductAndId(STORE, 3L, 5L)).thenReturn(Optional.of(image));
-        when(productImageRepository.findByStoreAndProductAndId(STORE, 3L, 6L)).thenReturn(Optional.empty());
+        when(productImageRepository.findByStoreAndProductAndId(STORE, PRODUCT_ID, 11L))
+                .thenReturn(Optional.of(image));
 
-        service.reorder(STORE, 3L, 5L, 9);
-        assertThat(image.getSortOrder()).isEqualTo(9);
-
-        service.delete(STORE, 3L, 5L);
-        assertThat(product.getImages()).isEmpty();
-        verify(productFileManager).removeProductImage(any(CmsProductImage.class));
-        verify(productImageRepository).delete(image);
-
-        assertThatThrownBy(() -> service.reorder(STORE, 3L, 6L, 1))
-                .isInstanceOf(ProductImageNotFoundException.class);
-        assertThatThrownBy(() -> service.delete(STORE, 3L, 6L))
-                .isInstanceOf(ProductImageNotFoundException.class);
-    }
-
-    @Test
-    void aFileTheCdnWillNotDropStillLosesItsRow() throws Exception {
-        // An orphan on the CDN is a smaller problem than a product that cannot be deleted, so the failure is
-        // logged and the row goes anyway.
-        Product product = product();
-        ProductImage image = new ProductImage(product, STORED_FILE, 0, true);
-        image.setId(5L);
-        product.getImages().add(image);
-        when(productImageRepository.findByStoreAndProductAndId(STORE, 3L, 5L)).thenReturn(Optional.of(image));
-        doThrow(AssetDeleteFailedException.of(STORED_FILE, new IllegalStateException("gone")))
-                .when(productFileManager).removeProductImage(any());
-
-        service.delete(STORE, 3L, 5L);
+        service.delete(STORE, PRODUCT_ID, 11L);
 
         verify(productImageRepository).delete(image);
+        ArgumentCaptor<ExternalMediaUsage> captor = ArgumentCaptor.forClass(ExternalMediaUsage.class);
+        verify(media).replaceUsage(any(), captor.capture());
+        assertThat(captor.getValue().refs()).isEmpty();
     }
 
     @Test
-    void anExternalImageHasNoFileToRemove() throws Exception {
-        Product product = product();
-        ProductImage external = new ProductImage(product, null, 0, false);
-        external.setImageType(ProductImage.TYPE_EXTERNAL_URL);
-        external.setProductImageUrl(CDN);
-        ProductImage nameless = new ProductImage(product, null, 1, false);
-        product.getImages().add(external);
-        product.getImages().add(nameless);
+    void detachingAnImageOfAnotherProductIsNotFound() {
+        when(productImageRepository.findByStoreAndProductAndId(STORE, PRODUCT_ID, 11L))
+                .thenReturn(Optional.empty());
 
-        service.removeFiles(product);
-
-        verifyNoFileWasRemoved();
-    }
-
-    private void verifyNoFileWasRemoved() throws AssetDeleteFailedException {
-        verify(productFileManager, never()).removeProductImage(any());
+        assertThatThrownBy(() -> service.delete(STORE, PRODUCT_ID, 11L))
+                .isInstanceOf(ProductImageNotFoundException.class);
     }
 
 }

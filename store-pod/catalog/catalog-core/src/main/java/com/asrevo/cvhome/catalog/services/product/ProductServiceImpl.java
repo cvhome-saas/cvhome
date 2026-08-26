@@ -173,7 +173,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void delete(StoreMerchantId store, Product product) {
-        productImageService.removeFiles(product);
+        // Releases the product's hold on its media assets. The assets themselves stay in the library — they may
+        // be used by other products, and deleting someone's uploads because a product went away would be wrong.
+        product.getImages().clear();
+        productImageService.forget(product);
         productRepository.delete(product);
     }
 

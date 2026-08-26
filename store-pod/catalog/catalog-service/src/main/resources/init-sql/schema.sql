@@ -167,18 +167,29 @@ create table if not exists catalog.product_description
     constraint UKlw13d26xneb2dsyd1q2rbwqqc unique (product_id, language_code)
 );
 create index if not exists product_description_sef_url on catalog.product_description (sef_url);
+-- A product image is a reference into the content service's media library, not a file catalog owns. media_asset_id
+-- is the source of truth; image_url caches the asset's public URL so reading a product needs no cross-service
+-- call. That cache is safe because an asset's bytes are never replaced in place — an upload either deduplicates
+-- onto the existing asset or mints a new id — and content refuses to delete one a product still references.
 create table if not exists catalog.product_image
 (
-    product_image_id  bigint not null primary key,
+    product_image_id  bigint  not null primary key,
     default_image     boolean,
-    image_crop        boolean,
     image_type        integer,
-    product_image     varchar(255),
-    product_image_url varchar(255),
+    media_asset_id    bigint,
+    image_url         varchar(500),
+    alt_text          varchar(255),
+    product_image_url varchar(500),
     sort_order        integer,
-    product_id        bigint not null
+    product_id        bigint  not null
         constraint fk6oo0cvcdtb6qmwsga468uuukk references catalog.product
 );
+alter table catalog.product_image add column if not exists media_asset_id bigint;
+alter table catalog.product_image add column if not exists image_url      varchar(500);
+alter table catalog.product_image add column if not exists alt_text       varchar(255);
+alter table catalog.product_image drop column if exists product_image;
+alter table catalog.product_image drop column if exists image_crop;
+create index if not exists product_image_media_idx on catalog.product_image (media_asset_id);
 create table if not exists catalog.product_group
 (
     product_group_id  bigint       not null primary key,

@@ -30,7 +30,6 @@ import com.asrevo.cvhome.merchant.api.ExternalMerchantStoreService;
 import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,14 +76,12 @@ class ProductMapperTest {
     @Mock
     private ExternalMerchantStoreService merchantStoreService;
 
-    @Mock
-    private ImageFilePath imageFilePath;
 
     private ProductMapper mapper;
 
     @BeforeEach
     void setUp() {
-        mapper = new ProductMapper(new ImageMapper(imageFilePath), merchantStoreService);
+        mapper = new ProductMapper(new ImageMapper(), merchantStoreService);
     }
 
     // ------------------------------------------------------------------------------------------------- fixtures
@@ -181,11 +178,9 @@ class ProductMapperTest {
         void theMinimalShapeCarriesCopyImagesAndTheBox() {
             storeWithUnits(MeasureUnit.CM, WeightUnit.KG);
             Product product = product();
-            ProductImage image = new ProductImage(product, IMAGE_FILE, 1, false);
+            ProductImage image = new ProductImage(product, 5L, CDN, null, 1, false);
             image.setId(3L);
             product.getImages().add(image);
-            when(imageFilePath.getContextPath()).thenReturn("");
-            when(imageFilePath.buildProductImageUtils(STORE, SKU, IMAGE_FILE)).thenReturn(CDN);
 
             ReadableMinimalProduct readable = mapper.toMinimal(product, EN);
 

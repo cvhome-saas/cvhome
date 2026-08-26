@@ -1,43 +1,41 @@
 package com.asrevo.cvhome.catalog.services.image;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.asrevo.cvhome.catalog.entity.Product;
 import com.asrevo.cvhome.catalog.entity.ProductImage;
+import com.asrevo.cvhome.catalog.errors.ProductImageAssetUnknownException;
 import com.asrevo.cvhome.catalog.errors.ProductImageNotFoundException;
-import com.asrevo.cvhome.catalog.errors.ProductImageNotPersistedException;
 import com.asrevo.cvhome.catalog.errors.ProductNotFoundException;
+import com.asrevo.cvhome.catalog.model.product.PersistableProductImage;
 import com.asrevo.cvhome.catalog.model.product.ReadableImage;
 import com.asrevo.cvhome.catalog.repositories.ProductImageRepository;
 import com.asrevo.cvhome.catalog.repositories.ProductRepository;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.ImageContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetDeleteFailedException;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
-import com.asrevo.cvhome.store.core.modules.cms.errors.ImageSizeMisconfiguredException;
-import com.asrevo.cvhome.store.core.modules.cms.errors.ImageUnreadableException;
-import com.asrevo.cvhome.store.core.modules.cms.model.CmsProductImage;
-import com.asrevo.cvhome.store.core.modules.cms.product.ProductFileManager;
+import com.asrevo.cvhome.content.api.ExternalMediaService;
+import com.asrevo.cvhome.content.model.MediaOwnerKind;
+import com.asrevo.cvhome.content.model.media.ExternalMediaUsage;
+import com.asrevo.cvhome.content.model.media.ReadableMediaAsset;
+import com.asrevo.cvhome.errors.RemoteServiceTimeoutException;
+import com.asrevo.cvhome.errors.RemoteServiceUnavailableException;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ProductImageServiceImpl implements ProductImageService {
 
     private final ProductRepository productRepository;
 
     private final ProductImageRepository productImageRepository;
 
-    private final ProductFileManager productFileManager;
+    private final ExternalMediaService media;
 
     private final ImageMapper imageMapper;
 
@@ -48,76 +46,148 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
-    @Transactional
-    public void add(StoreMerchantId store, Long productId, MultipartFile[] files, int firstPosition,
-                    boolean defaultImage) throws ProductNotFoundException, ProductImageNotPersistedException {
+    @Transactional(rollbackFor = Exception.class)
+    public List<ReadableImage> attach(StoreMerchantId store, Long productId, List<PersistableProductImage> items)
+            throws ProductNotFoundException, ProductImageAssetUnknownException, RemoteServiceUnavailableException,
+            RemoteServiceTimeoutException {
         Product product = requireProduct(store, productId);
-        boolean needsDefault = defaultImage || product.getImages().stream().noneMatch(ProductImage::isDefaultImage);
-        int position = firstPosition;
-        for (MultipartFile file : files) {
-            if (file.isEmpty()) {
-                continue;
+        Map<Long, String> urls = resolve(store, items);
+        int position = product.getImages().stream().mapToInt(ProductImage::getSortOrder).max().orElse(-1) + 1;
+        boolean needsDefault = product.getImages().stream().noneMatch(ProductImage::isDefaultImage);
+        for (PersistableProductImage item : items) {
+            ProductImage image = row(product, item, urls, position++);
+            if (item.isDefaultImage() || needsDefault) {
+                clearDefault(product);
+                image.setDefaultImage(true);
+                needsDefault = false;
             }
-            ProductImage image = new ProductImage(product, file.getOriginalFilename(), position++, needsDefault);
-            needsDefault = false;
-            store(product, image, file);
             product.getImages().add(productImageRepository.save(image));
         }
+        productImageRepository.flush();
+        publishUsage(store, product);
+        return imageMapper.toReadable(product);
     }
 
-    private void store(Product product, ProductImage image, MultipartFile file)
-            throws ProductImageNotPersistedException {
-        ImageContentFile content = new ImageContentFile();
-        content.setFileName(image.getProductImage());
-        content.setFileContentType(FileContentType.PRODUCT);
-        try (var stream = file.getInputStream()) {
-            content.setFile(stream);
-            productFileManager.addProductImage(cmsImage(product, image), content);
-        } catch (IOException | AssetUploadFailedException | ImageUnreadableException
-                 | ImageSizeMisconfiguredException e) {
-            throw ProductImageNotPersistedException.of(product.getSku(), e);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<ReadableImage> replace(StoreMerchantId store, Long productId, List<PersistableProductImage> items)
+            throws ProductNotFoundException, ProductImageAssetUnknownException, RemoteServiceUnavailableException,
+            RemoteServiceTimeoutException {
+        Product product = requireProduct(store, productId);
+        Map<Long, String> urls = resolve(store, items);
+        productImageRepository.deleteAll(product.getImages());
+        product.getImages().clear();
+        productImageRepository.flush();
+
+        int position = 0;
+        boolean defaulted = false;
+        for (PersistableProductImage item : items) {
+            ProductImage image = row(product, item, urls, position++);
+            if (item.isDefaultImage() && !defaulted) {
+                image.setDefaultImage(true);
+                defaulted = true;
+            }
+            product.getImages().add(productImageRepository.save(image));
         }
+        // Something has to be the default, or the storefront picks by sort order and the seller's choice is lost.
+        if (!defaulted) {
+            product.getImages().stream().min(java.util.Comparator.comparingInt(ProductImage::getSortOrder))
+                    .ifPresent(first -> first.setDefaultImage(true));
+        }
+        productImageRepository.flush();
+        publishUsage(store, product);
+        return imageMapper.toReadable(product);
     }
 
     @Override
-    @Transactional
-    public void reorder(StoreMerchantId store, Long productId, Long imageId, int position)
-            throws ProductImageNotFoundException {
-        requireImage(store, productId, imageId).setSortOrder(position);
-    }
-
-    @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(StoreMerchantId store, Long productId, Long imageId) throws ProductImageNotFoundException {
         ProductImage image = requireImage(store, productId, imageId);
-        removeFile(image);
-        image.getProduct().getImages().remove(image);
+        Product product = image.getProduct();
+        product.getImages().remove(image);
         productImageRepository.delete(image);
+        productImageRepository.flush();
+        publishUsage(store, product);
+    }
+
+    @Override
+    public void forget(Product product) {
+        publishUsage(product.getStore(), product);
     }
 
     /**
-     * Drops every file of a product; the rows go with the product itself.
+     * Confirms every asset belongs to this store and caches its public URL.
+     *
+     * <p>
+     * Content answering with the asset omitted is how an id from another store is caught, so this doubles as the
+     * ownership check. A transport failure is allowed to propagate: a row with no url renders as a broken image
+     * on the storefront, which is worse than a save the seller can retry.
+     * </p>
      */
-    @Override
-    public void removeFiles(Product product) {
-        product.getImages().forEach(this::removeFile);
+    private Map<Long, String> resolve(StoreMerchantId store, List<PersistableProductImage> items)
+            throws ProductImageAssetUnknownException, RemoteServiceUnavailableException,
+            RemoteServiceTimeoutException {
+        List<Long> ids = items.stream().map(PersistableProductImage::getMediaAssetId)
+                .filter(java.util.Objects::nonNull).distinct().toList();
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, String> urls = new LinkedHashMap<>();
+        for (ReadableMediaAsset asset : media.resolve(store, ids)) {
+            urls.put(asset.getId(), asset.getUrl());
+        }
+        for (Long id : ids) {
+            if (!urls.containsKey(id)) {
+                throw ProductImageAssetUnknownException.of(id, store);
+            }
+        }
+        return urls;
     }
 
-    private void removeFile(ProductImage image) {
-        if (image.isExternal() || image.getProductImage() == null) {
-            return;
-        }
-        try {
-            productFileManager.removeProductImage(cmsImage(image.getProduct(), image));
-        } catch (AssetDeleteFailedException e) {
-            // The row still goes: a file that could not be removed is an orphan on the CDN, not a broken product.
-            log.warn("Could not remove image file {} of product {}", image.getProductImage(),
-                    image.getProduct().getSku(), e);
-        }
+    /**
+     * Tells content the product's complete set of assets.
+     *
+     * <p>
+     * Deliberately inside the transaction, after the rows are flushed. A remote call in a transaction is normally
+     * wrong, but the alternative is a silent hole: the rows commit, content never learns the assets are in use,
+     * a seller deletes one from the library with a 200, and the cached url 404s. This is one small idempotent
+     * PUT, and a failure rolls the image rows back and shows the console an error.
+     * </p>
+     */
+    private void publishUsage(StoreMerchantId store, Product product) {
+        List<ExternalMediaUsage.Ref> refs = new ArrayList<>();
+        product.getImages().stream()
+                .sorted(java.util.Comparator.comparingInt(ProductImage::getSortOrder))
+                .forEach(image -> {
+                    if (image.getMediaAssetId() != null) {
+                        refs.add(new ExternalMediaUsage.Ref(
+                                String.format("image[%d]", image.getSortOrder()), image.getMediaAssetId()));
+                    }
+                });
+        media.replaceUsage(store, new ExternalMediaUsage(MediaOwnerKind.PRODUCT, String.valueOf(product.getId()),
+                label(product), refs));
     }
 
-    private static CmsProductImage cmsImage(Product product, ProductImage image) {
-        return new CmsProductImage(product.getId(), product.getStore(), product.getSku(), image.getProductImage());
+    /** What the media library shows beside the usage. Supplied by us so content never calls back into catalog. */
+    private static String label(Product product) {
+        return product.getSku();
+    }
+
+    private static ProductImage row(Product product, PersistableProductImage item, Map<Long, String> urls,
+                                    int position) {
+        ProductImage image = new ProductImage(product, item.getMediaAssetId(),
+                urls.get(item.getMediaAssetId()), item.getAltText(), position, false);
+        if (item.getMediaAssetId() == null) {
+            image.setImageType(ProductImage.TYPE_EXTERNAL_URL);
+            image.setProductImageUrl(item.getVideoUrl() != null ? item.getVideoUrl() : item.getExternalUrl());
+        } else {
+            image.setImageType(ProductImage.TYPE_MEDIA_ASSET);
+        }
+        return image;
+    }
+
+    private static void clearDefault(Product product) {
+        product.getImages().forEach(i -> i.setDefaultImage(false));
     }
 
     private Product requireProduct(StoreMerchantId store, Long productId) throws ProductNotFoundException {

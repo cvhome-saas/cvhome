@@ -19,8 +19,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * One image of a product. {@code imageType} 0 is a file the store keeps on its CDN under the product's sku;
- * {@code imageType} 1 is an external url (possibly a video).
+ * One image of a product.
+ *
+ * <p>
+ * {@code imageType} 0 is an asset in the content service's media library, held as {@code mediaAssetId} with its
+ * public URL cached alongside; {@code imageType} 1 is an external url (possibly a video). Catalog used to store
+ * the file itself under the product's sku, which gave product images no alt text, no metadata and no way for
+ * anything to know an image was still in use.
+ * </p>
+ *
+ * <p>
+ * The cached URL is safe to hold because an asset's bytes are never replaced in place: an upload either
+ * deduplicates onto the existing asset or mints a new id. It can only go stale if the asset is deleted, which
+ * the usage index refuses while a product still references it.
+ * </p>
  */
 @Entity
 @Table(name = "PRODUCT_IMAGE")
@@ -28,7 +40,7 @@ import lombok.Setter;
 @Setter
 public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
 
-    public static final int TYPE_FILE = 0;
+    public static final int TYPE_MEDIA_ASSET = 0;
 
     public static final int TYPE_EXTERNAL_URL = 1;
 
@@ -49,10 +61,23 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     private Product product;
 
     /**
-     * The file name on the CDN.
+     * The content media asset this image is, and the source of truth for it.
      */
-    @Column(name = "PRODUCT_IMAGE")
-    private String productImage;
+    @Column(name = "MEDIA_ASSET_ID")
+    private Long mediaAssetId;
+
+    /**
+     * The asset's public URL, cached so reading a product needs no call into content.
+     */
+    @Column(name = "IMAGE_URL", length = 500)
+    private String imageUrl;
+
+    /**
+     * Overrides the asset's own alt text for this product. The localised alt lives on the asset; duplicating the
+     * whole map here would be a second source of truth needing invalidation.
+     */
+    @Column(name = "ALT_TEXT")
+    private String altText;
 
     @Column(name = "PRODUCT_IMAGE_URL")
     private String productImageUrl;
@@ -69,19 +94,29 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     public ProductImage() {
     }
 
-    public ProductImage(Product product, String fileName, int sortOrder, boolean defaultImage) {
+    public ProductImage(Product product, Long mediaAssetId, String imageUrl, String altText, int sortOrder,
+                        boolean defaultImage) {
         this.product = product;
-        this.productImage = fileName;
+        this.mediaAssetId = mediaAssetId;
+        this.imageUrl = imageUrl;
+        this.altText = altText;
         this.sortOrder = sortOrder;
         this.defaultImage = defaultImage;
     }
 
     /**
-     * Reads the type through {@link #getImageType()} rather than the raw column: an image the upload path created
-     * has never had one set, and unboxing that null threw on the first read of every freshly uploaded image.
+     * Reads the type through {@link #getImageType()} rather than the raw column: an image created without one
+     * set would otherwise throw on unboxing the first time it was read.
      */
     public boolean isExternal() {
         return getImageType() == TYPE_EXTERNAL_URL && productImageUrl != null;
+    }
+
+    /**
+     * Where a browser fetches this image: the external url for an external row, else the cached library URL.
+     */
+    public String resolvedUrl() {
+        return isExternal() ? productImageUrl : imageUrl;
     }
 
     public boolean isDefaultImage() {
@@ -89,7 +124,7 @@ public class ProductImage extends SalesManagerEntity<Long, ProductImage> {
     }
 
     public int getImageType() {
-        return imageType == null ? TYPE_FILE : imageType;
+        return imageType == null ? TYPE_MEDIA_ASSET : imageType;
     }
 
     public int getSortOrder() {

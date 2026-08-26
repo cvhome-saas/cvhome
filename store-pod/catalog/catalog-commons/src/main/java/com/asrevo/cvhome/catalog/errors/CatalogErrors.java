@@ -53,6 +53,7 @@ public enum CatalogErrors implements ErrorCode {
      * Writing or removing a product image failed.
      */
     PRODUCT_IMAGE_NOT_PERSISTED("CATALOG.PRODUCT_IMAGE.NOT_PERSISTED", ErrorCategory.STORAGE),
+    PRODUCT_IMAGE_ASSET_UNKNOWN("CATALOG.PRODUCT_IMAGE.ASSET_UNKNOWN", ErrorCategory.VALIDATION),
 
     /**
      * The category is already attached to that product.
