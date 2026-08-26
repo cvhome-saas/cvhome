@@ -13,12 +13,19 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.UserOrgStoreIdentity;
+import com.asrevo.cvhome.s2s.jwt.RealmAwareJwtGrantedAuthoritiesConverter;
 
 public final class SecurityUtils {
 
     public static final String CLAIMS_ORG_KEY = "org";
 
     public static final String CLAIMS_STORE_KEY = "store";
+
+    /** The realm that mints staff and service tokens. */
+    public static final String REALM_UAA = "uaa";
+
+    /** The realm that mints shopper tokens. */
+    public static final String REALM_CUA = "cua";
 
     /**
      * Stands for "every store", for a principal that is not confined to one. Deliberately not a valid store id — a
@@ -56,6 +63,23 @@ public final class SecurityUtils {
 
     public static boolean hasScopeStorePod(Authentication authentication) {
         return hasRole(authentication, Roles.SCOPE_STORE_POD);
+    }
+
+    /**
+     * Whether this principal is known to come from an identity server <em>other</em> than {@code realm}.
+     *
+     * <p>
+     * Deliberately not "is from realm X". A principal carries a {@code REALM_} authority only where realms are
+     * configured, so asking the positive question would refuse every token under the legacy flat trust list and
+     * under Boot's single-issuer support. Asking the negative one refuses a shopper token presented for a staff
+     * check where the realm is known, and stays out of the way where it is not.
+     * </p>
+     */
+    public static boolean isForeignRealm(Authentication authentication, String realm) {
+        String expected = RealmAwareJwtGrantedAuthoritiesConverter.REALM_AUTHORITY_PREFIX + realm;
+        Set<String> roles = getRoles(authentication);
+        return roles.stream().anyMatch(it -> it.startsWith(RealmAwareJwtGrantedAuthoritiesConverter
+                .REALM_AUTHORITY_PREFIX)) && !roles.contains(expected);
     }
 
     public static boolean hasRole(Authentication authentication, Roles role) {

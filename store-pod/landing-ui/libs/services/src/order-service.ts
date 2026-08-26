@@ -12,7 +12,7 @@ export class OrderService {
     public static getOrderStatus = async (storeContext: StoreContext, orderId: number): Promise<OrderStatusResult> => {
         return apiFetch<OrderStatusResult>(
             `${storeBaseServiceUrl('checkout', storeContext)}/api/v1/order/${orderId}/status?store=${storeContext.store}&lang=${storeContext.locale}`,
-            get());
+            get({auth: true}));
     }
 
 }

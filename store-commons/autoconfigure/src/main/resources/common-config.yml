@@ -183,9 +183,14 @@ spring:
             user-name-attribute: sub
       resourceserver:
         jwt:
-          issuer-uri-set:
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
-            - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+          issuers:
+            # Staff and service principals. No `grants`: uaa's clients carry arbitrary scopes, and capping them
+            # here would lock out callers this realm is meant to admit.
+            uaa:
+              uris:
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}
+                - ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}
+              jwk-set-uri: ${com.asrevo.cvhome.services.uaa.schema}://${com.asrevo.cvhome.services.uaa.domain}:${com.asrevo.cvhome.services.uaa.port}/oauth2/jwks
 server:
   forward-headers-strategy: NATIVE
   port: ${com.asrevo.cvhome.services.${spring.application.name}.port}

@@ -1,6 +1,7 @@
 package com.asrevo.cvhome.s2s.services;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import com.asrevo.cvhome.commons.domain.ManagerOrgId;
 import com.asrevo.cvhome.commons.domain.Pod;
 import com.asrevo.cvhome.commons.domain.Roles;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
+import com.asrevo.cvhome.s2s.jwt.RealmAwareJwtGrantedAuthoritiesConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,6 +51,10 @@ class StoreRoleAccessCheckerTest {
 
     private static final String POD_NAME = "pod-1";
 
+    private static final String CUA = "cua";
+
+    private static final String UAA = "uaa";
+
     private final StoreRoleAccessChecker checker = new StoreRoleAccessChecker();
 
     private static Authentication principal(Map<String, Object> claims, Roles... roles) {
@@ -62,6 +68,16 @@ class StoreRoleAccessCheckerTest {
                 .build();
         return new JwtAuthenticationToken(jwt,
                 List.of(roles).stream().map(role -> new SimpleGrantedAuthority(role.name())).toList());
+    }
+
+    /** As {@link #principal}, plus the {@code REALM_} authority the authorities converter stamps on. */
+    private static Authentication fromRealm(String realm, Map<String, Object> claims, Roles... roles) {
+        Authentication base = principal(claims, roles);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        base.getAuthorities().forEach(it -> authorities.add(new SimpleGrantedAuthority(it.getAuthority())));
+        authorities.add(new SimpleGrantedAuthority(
+                RealmAwareJwtGrantedAuthoritiesConverter.REALM_AUTHORITY_PREFIX + realm));
+        return new JwtAuthenticationToken((Jwt) base.getPrincipal(), authorities);
     }
 
     private static Authentication staff(Roles role, String org, StoreMerchantId store) {
@@ -217,6 +233,55 @@ class StoreRoleAccessCheckerTest {
         void aPrincipalWithoutThePodScopeIsRefused() {
             assertThat(checker.isScopeStorePod(principal(Map.of(RESOURCE_CLAIM, POD_NAME), Roles.SCOPE_STORE_CORE),
                     pod(null))).isFalse();
+        }
+    }
+
+    /**
+     * The second guard on the boundary between the two authorization servers.
+     *
+     * <p>
+     * The realm cap in the authorities converter is the primary one: a cua token cannot carry a staff role out of
+     * the converter at all. These tests cover the case where it somehow does — a misconfigured realm, a legacy
+     * flat trust list widened by mistake — and prove the check itself still refuses to read a shopper principal
+     * as staff, or a staff principal as a shopper.
+     * </p>
+     */
+    @Nested
+    class Realms {
+
+        @Test
+        void aShopperPrincipalIsNotReadAsStaffEvenIfItClaimsAStaffRole() {
+            Authentication forged = fromRealm(CUA, Map.of(ORG_CLAIM, ORG, STORE_CLAIM, STORE.storeMerchantId()),
+                    Roles.ROLE_STORE_ADMIN);
+
+            assertThat(checker.isStoreAdmin(forged, STORE, pod(null))).isFalse();
+            assertThat(checker.isSuperAdmin(forged)).isFalse();
+            assertThat(checker.isScopeStoreCore(forged)).isFalse();
+        }
+
+        @Test
+        void aStaffPrincipalIsNotReadAsAShopper() {
+            Authentication staffToken = fromRealm(UAA, Map.of(CLIENT_ID_CLAIM, STORE.getId()), Roles.ROLE_CUSTOMER);
+
+            assertThat(checker.isStoreCustomer(staffToken, STORE)).isFalse();
+        }
+
+        @Test
+        void aPrincipalFromTheRightRealmIsUnaffected() {
+            Authentication shopper = fromRealm(CUA, Map.of(CLIENT_ID_CLAIM, STORE.getId()), Roles.ROLE_CUSTOMER);
+            Authentication admin = fromRealm(UAA, Map.of(ORG_CLAIM, ORG, STORE_CLAIM, STORE.storeMerchantId()),
+                    Roles.ROLE_STORE_ADMIN);
+
+            assertThat(checker.isStoreCustomer(shopper, STORE)).isTrue();
+            assertThat(checker.isStoreAdmin(admin, STORE, pod(null))).isTrue();
+        }
+
+        /** No realm authority means realms are not configured, and the checks must behave exactly as before. */
+        @Test
+        void aPrincipalWithNoRealmIsJudgedOnItsRolesAlone() {
+            assertThat(checker.isStoreAdmin(staff(Roles.ROLE_STORE_ADMIN, ORG, STORE), STORE, pod(null))).isTrue();
+            assertThat(checker.isStoreCustomer(principal(Map.of(CLIENT_ID_CLAIM, STORE.getId()),
+                    Roles.ROLE_CUSTOMER), STORE)).isTrue();
         }
     }
 }

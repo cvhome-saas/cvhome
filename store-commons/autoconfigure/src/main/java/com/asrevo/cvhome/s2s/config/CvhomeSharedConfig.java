@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Import;
 import com.asrevo.cvhome.errors.web.ErrorHandlingAutoConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.CustomPermissionEvaluator;
 import com.asrevo.cvhome.s2s.config.internal.EcsInfoConfig;
+import com.asrevo.cvhome.s2s.config.internal.IssuerRegistryConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.IssuerUriSetJwtDecoderConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.IssuerUriSetReactiveJwtDecoderConfiguration;
+import com.asrevo.cvhome.s2s.config.internal.JwtAuthenticationConverterConfiguration;
 import com.asrevo.cvhome.s2s.config.internal.ReactiveGatewayConfig;
 import com.asrevo.cvhome.s2s.config.internal.ServletPermissionConfig;
 import com.asrevo.cvhome.s2s.config.internal.SwaggerConfig;
@@ -29,7 +31,8 @@ import com.asrevo.cvhome.s2s.model.TestStoreProperties;
 
 @Configuration
 @Import({EcsInfoConfig.class, SwaggerConfig.class, WebConfig.class, WebClientServicesConfig.class,
-        ReactiveGatewayConfig.class, IssuerUriSetJwtDecoderConfiguration.class,
+        ReactiveGatewayConfig.class, IssuerRegistryConfiguration.class, IssuerUriSetJwtDecoderConfiguration.class,
+        JwtAuthenticationConverterConfiguration.class,
         IssuerUriSetReactiveJwtDecoderConfiguration.class, CustomPermissionEvaluator.class,
         ServletPermissionConfig.class, ErrorHandlingAutoConfiguration.class})
 @EnableConfigurationProperties({PodInfoProperties.class, ServiceDomainProperties.class, AppProperties.class,

@@ -17,9 +17,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.util.StringUtils;
 
-import com.asrevo.cvhome.s2s.jwt.IssuerUriSetConfigrationProperties;
+import com.asrevo.cvhome.s2s.jwt.IssuerRealm;
+import com.asrevo.cvhome.s2s.jwt.IssuerRegistry;
 import com.asrevo.cvhome.s2s.jwt.MultiIssuerReactiveJwtDecoder;
+import com.asrevo.cvhome.s2s.jwt.RealmIssuerValidator;
 
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
@@ -29,38 +32,41 @@ public class IssuerUriSetReactiveJwtDecoderConfiguration {
 
     static class IssuerUriSetReactiveJwtDecoderConfigurationImpl {
 
-        private final IssuerUriSetConfigrationProperties properties;
-
         private final List<OAuth2TokenValidator<Jwt>> additionalValidators;
 
-        IssuerUriSetReactiveJwtDecoderConfigurationImpl(IssuerUriSetConfigrationProperties properties,
-                                                        ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
-            this.properties = properties;
+        IssuerUriSetReactiveJwtDecoderConfigurationImpl(
+                ObjectProvider<OAuth2TokenValidator<Jwt>> additionalValidators) {
             this.additionalValidators = additionalValidators.orderedStream().toList();
         }
 
         @Bean
         @Conditional(IssuerUriSetCondition.class)
-        MultiIssuerReactiveJwtDecoder jwtDecoderByIssuerUri(
+        MultiIssuerReactiveJwtDecoder jwtDecoderByIssuerUri(IssuerRegistry registry,
                 ObjectProvider<JwkSetUriReactiveJwtDecoderBuilderCustomizer> customizers) {
-            Function<String, ReactiveJwtDecoder> stringReactiveJwtDecoderFunction = issuer -> {
-                NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builder = NimbusReactiveJwtDecoder
-                        .withIssuerLocation(issuer);
+
+            Function<IssuerRealm, ReactiveJwtDecoder> decoderFactory = realm -> {
+                NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builder = builderFor(realm);
                 customizers.orderedStream().forEach(customizer -> customizer.customize(builder));
                 NimbusReactiveJwtDecoder jwtDecoder = builder.build();
-                jwtDecoder.setJwtValidator(getValidators(JwtValidators.createDefaultWithIssuer(issuer)));
+                jwtDecoder.setJwtValidator(getValidators(new RealmIssuerValidator(realm)));
                 return jwtDecoder;
             };
 
-            return new MultiIssuerReactiveJwtDecoder(this.properties.getIssuerUriSet(),
-                    stringReactiveJwtDecoderFunction);
+            return new MultiIssuerReactiveJwtDecoder(registry, decoderFactory);
         }
 
-        private OAuth2TokenValidator<Jwt> getValidators(OAuth2TokenValidator<Jwt> defaultValidator) {
+        /** Same reasoning as the servlet twin: a known JWKS beats discovery, discovery stays as the fallback. */
+        private static NimbusReactiveJwtDecoder.JwkSetUriReactiveJwtDecoderBuilder builderFor(IssuerRealm realm) {
+            if (StringUtils.hasText(realm.jwkSetUri())) {
+                return NimbusReactiveJwtDecoder.withJwkSetUri(realm.jwkSetUri());
+            }
+            return NimbusReactiveJwtDecoder.withIssuerLocation(realm.issuerLocation());
+        }
 
+        private OAuth2TokenValidator<Jwt> getValidators(OAuth2TokenValidator<Jwt> issuerValidator) {
             List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
-            validators.add(defaultValidator);
-
+            validators.add(JwtValidators.createDefault());
+            validators.add(issuerValidator);
             validators.addAll(this.additionalValidators);
             return new DelegatingOAuth2TokenValidator<>(validators);
         }

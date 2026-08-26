@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -20,7 +19,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.asrevo.cvhome.cua.security.CustomOAuth2UserService;
 import com.asrevo.cvhome.cua.security.CustomOidcUserService;
-import com.asrevo.cvhome.s2s.jwt.UaaJwtGrantedAuthoritiesConverter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -91,14 +89,6 @@ public class AppSecurityConfig {
         RequestMatcher saveRequestMatcher = new AndRequestMatcher(getRequests, notFavicon, notError);
         cache.setRequestMatcher(saveRequestMatcher);
         return cache;
-    }
-
-    @Bean
-    public JwtAuthenticationConverter converter() {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        UaaJwtGrantedAuthoritiesConverter uaaJwtGrantedAuthoritiesConverter = new UaaJwtGrantedAuthoritiesConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(uaaJwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
     }
 
 }
