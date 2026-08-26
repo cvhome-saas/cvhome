@@ -1,5 +1,10 @@
 # Content owns appearance and media
 
+> **Status: delivered.** Shipped as six commits on `feat/content-owns-appearance`. Where the implementation
+> departed from this plan — the shape of `media_usage`, the `replaceUsage` contract, the permission token, the
+> seed strategy for demo images — the commit messages and `qa/content-owns-appearance-and-media.md` are the
+> record. Deferred work is in `store-core/console-ui/lessons.md` under "Module 15".
+
 ## Context
 
 The content platform (`store-pod/content`, port 8121) is built and running: pages, posts, banners, FAQ,
@@ -42,13 +47,11 @@ code replaced by the component that supersedes it.
 5. **One change, not phased.** A single sweep, `store-cms-commons` deleted at the end. Because there are no
    compat layers the build is red in the middle; follow *Execution order* so it converges.
 
-### Working-tree hazard — deal with this before touching anything
+### Working-tree hazard (resolved)
 
-`store-pod/landing-ui/libs/types/src/store.ts` is **modified** and seven themes (`cosmetics`, `furniture`,
-`glasses`, `hunger`, `jewellery`, `pink`, `sports`) plus several `libs/types` and `locales` files are
-**untracked**. A `git checkout`, `git stash` or branch switch mid-sweep silently destroys them, and the
-untracked themes will not fail any build if missed — they break at runtime. Commit the working tree first
-(§ Execution order step 0).
+At planning time `libs/types/src/store.ts` was modified and seven themes were untracked, so a `git checkout`
+or branch switch mid-sweep would have destroyed them silently. They landed on `develop` as #287 instead, and
+this branch was rebased onto it; all twelve themes are covered.
 
 ---
 
@@ -497,18 +500,22 @@ as-is**. This is a deliberate cost decision — repointing `hero`'s *source* in 
 `pages/Home.tsx` files or their `Hero`/`Masthead`/`HeroFrame` components need to change, which removes roughly
 half the theme churn for no loss of honesty (the field was always "what goes at the top of the home page").
 
-What each theme **must** change is mechanical and confined to two files:
+What each theme **must** change is mechanical, and turned out to be four files rather than the two predicted
+here:
 
-- `src/layout/Header.tsx` — `store.logo?.path` → `data.branding.logoUrl` (basic, cosmetics, jewellery, grocery,
-  glasses, beauty, sports, furniture, pink, starter, hunger; fashion passes `store.logo` to a `Wordmark`)
-- `src/layout/Footer.tsx` — `store.socialLinks` → `data.socialLinks` (all 12)
+- `src/layout/Header.tsx` — `store.logo?.path` → `data.branding.logo` (fashion passes it to a `Wordmark`)
+- `src/layout/Footer.tsx` — `store.socialLinks` → `data.socialLinks`
+- `src/sections/Hero.tsx` (and hunger's `Masthead`) — the slide type becomes `Banner`, so `s.url` is
+  `s.desktopUrl` and the alt is `s.altText`
+- `src/sections/Gallery.tsx` — `current?.imageName` was the alt fallback and becomes `current?.altText`
 
-`ProductCard.tsx` / `CartLineItem.tsx` / `sections/Gallery.tsx` need no change — they consume
-`product-presenter` helpers, not `Image` fields directly. `defineTheme` throws on a missing *page*, not a
-missing layout field, so nothing here is compiler-enforced: **grep for `store.logo` and `store.socialLinks`
-after the edit** to confirm none survive. Themes live in `store-pod/landing-ui/themes/` and several
-(cosmetics, furniture, glasses, hunger, jewellery, pink, sports) are **untracked in the working tree** — they
-must be edited too or they break at runtime, silently.
+**The two the plan missed both concerned the product `Image` type**, not `LayoutData`: the galleries used the
+*filename* as alt text, and the heroes typed their slides as `SliderImage`. `ProductCard.tsx` and
+`CartLineItem.tsx` genuinely needed nothing — they go through `product-presenter`.
+
+`defineTheme` throws on a missing *page*, not a missing layout field, so none of this is compiler-enforced at
+the theme boundary; `tsc` during `npm run build` is what actually catches it. **Grep for `store.logo` and
+`store.socialLinks` after the edit** to confirm none survive.
 
 `storefront/next.config.ts` needs no change (`images: {unoptimized: true}`, so the CDN URL is used verbatim).
 

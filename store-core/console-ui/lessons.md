@@ -3368,3 +3368,90 @@ for `hasAccessOnBillingQuotaCheck` to be widened so a human could call
   session's timezone, so a payment at 23:50 local lands on the previous day for an operator
   elsewhere. Doing it properly means an `AT TIME ZONE` parameter on both dated queries; no test pins
   a timezone-dependent bucket, so that change is still free to make.
+
+## Module 15 — content owns store appearance and media
+
+Store appearance and every uploaded file moved to the content service: merchant stopped owning the logo,
+banner, slider images and social links; catalog stopped storing product image files; the legacy `BOX`
+"snippets" were deleted; and `store-cms-commons` went with them.
+
+### Content — theme and colour scheme are still merchant's
+
+Deliberately out of scope. Content is meant to own views config, and `THEME` / `COLOR_THEME` on
+`merchant_store` — with landing-ui's `libs/theme/src/merchant-bridge.ts` deriving colour tokens from the
+merchant `ColorSchema` — are the last appearance concern outside it. Moving them completes the story and is
+the natural next change; store management still edits them today.
+
+**Why it was left:** the sweep already crossed five services and two frontends, and the colour derivation has
+its own contrast-enforcement logic in the theme package. A reviewable diff mattered more than finishing the
+last quarter.
+
+### Content — no server-side image derivatives, so a product thumbnail is a full-size original
+
+`store-cms-commons`' `ProductFileManagerImpl` used to write a cropped, resized `SMALL` variant beside the
+original and the storefront linked only that. Content's `MediaService` stores what it is given. Since catalog
+now references library assets, a product card downloads the full-resolution photo.
+
+**Why it is acceptable for now:** it was already true of every asset in the media library, so this made the
+behaviour consistent rather than worse; the console still enforces ≥800×800 square on upload; and
+`next/image` runs with `unoptimized: true`, so nothing was resizing these anyway.
+
+**What to do about it:** derivative sizes belong in `MediaService` at upload time, beside `ImageProbe`, with
+the widths exposed on `ReadableMediaAsset` so callers can pick one. Until then pages are heavier than they
+need to be.
+
+### Content — the media usage index is advisory, and a forced delete leaves a dead URL
+
+`catalog.product_image` caches the asset's public URL so reading a product needs no call into content. That
+cache can only go stale one way: the asset is deleted. `DELETE /media/{id}` refuses with 409
+`MEDIA.REFERENCED` while a product holds it — but `?force=true` overrides, and then the product's card falls
+back to `/placeholder.png`.
+
+**Why the cache is still right:** an asset's bytes are never replaced in place. An upload either deduplicates
+onto the existing asset or mints a new id, so the URL is immutable for the asset's lifetime. The alternative —
+resolving every product image through content on read — puts a cross-service call on the hottest path in the
+storefront.
+
+**The trade-off worth remembering:** `replaceUsage` is called *inside* catalog's transaction, after the rows
+flush. A remote call in a transaction is normally wrong, but the alternative is a silent hole — the rows
+commit, content never learns the asset is in use, a seller deletes it with a 200, and the listing breaks.
+
+### Content — an owner supplies its own display title, because content never calls back
+
+`media_usage` carries `owner_title` rather than resolving it. For a content-owned row the title still comes
+from the item; for a catalog product it is whatever catalog sent. Resolving it properly would mean content
+calling into catalog to render "which product uses this image", inverting the dependency the whole change
+exists to establish — content sits at the bottom.
+
+**The cost:** a product renamed after its images were attached shows its old label in the media drawer until
+the gallery is next saved.
+
+### Content — there is no Sections editor in the console yet
+
+`SECTION` is a real content type with a binding, an API and a storefront read, and the home page renders
+whatever rows a store has. The console has no editor for them: sections are creatable over HTTP only, through
+`content-service/http/sections-api.http`.
+
+**Why:** the tab that mattered was Store appearance — removing branding from store management without a
+replacement would have left a seller unable to set a logo at all. Sections degrade gracefully instead: with no
+rows, `loadHome` falls back to the four product groups it always drew.
+
+### Catalogue — the two gaps this closed
+
+Both were recorded here as "not expressible" and both now are:
+
+- **A logo could be uploaded but never removed.** Merchant had `addLogo`/`addBanner` and no delete, and
+  `PersistableMerchantStore` carried neither field, so an update could not clear one either. Clearing a slot
+  is an ordinary `PUT` with a null id now.
+- **A product's default image could not be changed after upload.** `PATCH …/image/{imageId}` set `sortOrder`
+  and nothing else. `PUT …/images` replaces the whole gallery, so the order and the default are one write.
+
+### Testing — a shared mock in a shared Spring context is shared state
+
+Catalog's integration tests import one `ExternalClientsTestConfiguration` so they share a context — and one
+Postgres and one MinIO container — rather than forking per class. That makes the stubs global: a test that
+re-stubs `ExternalMediaService.resolve` to return nothing changes the meaning of whatever runs next.
+
+**The fix that works:** the configuration exposes `stubMediaDefaults(service)` and each test resets and
+re-applies it in `setUp`. **The trap next to it:** re-stub with `doReturn(...).when(mock)`, never
+`when(mock.call(...))` — the latter *calls* the mock, which runs the existing answer with null arguments.

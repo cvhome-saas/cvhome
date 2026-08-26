@@ -94,7 +94,7 @@ counterpart and the whole `lb://` resolution story: `service-discovery.md`.
 | Path | `:store-commons:commons` (and siblings) | `:store-pod:commons:store-commons` |
 | Folder | `store-commons/` | `store-pod/commons/store-commons/` |
 | Scope | Platform-wide: security, JWT, AWS, crypto, primitives | Pod business domain shared across pods |
-| Consumers | `uaa`, `gateway-service`, `tenancy/*`, `cua`, and every `-service` (for `autoconfigure`) | Nearly every `store-pod` module: catalog, checkout, merchant, payment, customer, reference, cua, `store-cms-commons` |
+| Consumers | `uaa`, `gateway-service`, `tenancy/*`, `cua`, and every `-service` (for `autoconfigure`) | Nearly every `store-pod` module: catalog, checkout, merchant, payment, customer, reference, cua |
 | Example usage | `implementation project(':store-commons:commons')` | `api project(':store-pod:commons:store-commons')` |
 
 **Rule of thumb:** cross-cutting infrastructure (auth, secrets, discovery, primitives) → root `store-commons`.

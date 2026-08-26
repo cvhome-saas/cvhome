@@ -11,15 +11,15 @@ store-pod/
 ├── spg/                          INFRA :80    Caddy edge proxy (Caddyfile, compose.yml)
 ├── landing-ui/                   FE    :8110  Next.js storefront + template system
 ├── cua/                          BE+FE :8124  shopper OAuth2 auth server (standalone)
-├── merchant/                     BE    :8120  store entity, branding, domains
-├── content/                      BE    :8121  content platform (pages, posts, banners, FAQ, policies, menus, media)
+├── merchant/                     BE    :8120  store config: languages, currency, domains, address
+├── content/                      BE    :8121  content platform (pages, posts, banners, FAQ, policies, menus,
+│                                              media, store appearance, home sections)
 ├── content-deprecated/           —            the previous content service, kept as reference only (unregistered)
 ├── catalog/                      BE    :8122  products & categories
 ├── checkout/                     BE    :8123  cart, orders, customers
 ├── payment/                      BE    :8125  payment gateways & webhooks
 └── commons/                                   pod-shared libraries (grouping folder)
     ├── store-commons/                         pod-scoped shared domain
-    ├── store-modules/store-cms-commons/       CMS primitives
     ├── reference/{reference-commons, reference-core}    countries, zones, currencies, languages
     └── customer/{customer-commons, customer-core}       shared customer domain
 ```
@@ -41,8 +41,7 @@ The `Readable*` / `Persistable*` DTO pair is a repo-wide convention: `Readable*`
 
 ### `-core` — business logic
 
-Repositories, services, facades, and populators that map entity ↔ DTO. Depends on its own `-commons` plus
-`store-cms-commons`.
+Repositories, services, facades, and populators that map entity ↔ DTO. Depends on its own `-commons`.
 
 Evidence: `MerchantRepository`, `ContentRepository`/`ContentRepositoryImpl`, `MerchantStoreService`/`Impl`,
 `ContentService`/`Impl`, `StoreFacade`, `ContentFacade`, `ReadableMerchantStorePopulator`,
@@ -81,33 +80,45 @@ Evidence: `MerchantApplication`, `MerchantStoreApi`, `ContentApi`, `ExternalMerc
 ### `merchant` — the store entity
 
 `merchant-commons` / `merchant-core` / `merchant-external-api` / `merchant-service`, exposing `MerchantStoreApi`
-and `ExternalMerchantStoreApi`. CMS content used to live here as a second sub-domain; it moved to its own
-service (below). The Caddy `/merchant*` handler still forwards the legacy `/api/v1/content*` and
-`/api/v1/private/files` paths to `content`.
+and `ExternalMerchantStoreApi`.
+
+**Store configuration only.** Languages, currency, domains, address and contact — plus, for now, the theme and
+colour scheme. CMS content used to live here as a second sub-domain and moved to `content`; so, later, did the
+store's appearance: the logo, banner, slider images and social links are `content.site_settings` and CMS banners
+now, because content owns the media library they come from. The Caddy `/merchant*` handler still forwards the
+legacy `/api/v1/content*` and `/api/v1/private/files` paths to `content`.
 
 ### `content` — the content platform (port 8121)
 
-`content-commons` / `content-core` / `content-service`, package root `com.asrevo.cvhome.content`, JPA, schema
-`content`. One `content` + `content_description` table pair (the legacy CMS tables, extended in place with
-`status`, `publish_at`, `version`, `placement`, `policy_type`, `template`, `meta jsonb`, translation `state` …)
-holds every content type (`ContentType`: BOX = store "snippets", PAGE, POST, BANNER, FAQ, POLICY); new tables for
-revisions, status audit, redirects, menus, media, policy versions, FAQ groups. `init-sql/schema.sql` is both the
-DDL and the in-place migration (`add column if not exists … default`).
+`content-commons` / `content-core` / `content-external-api` / `content-service`, package root
+`com.asrevo.cvhome.content`, JPA, schema `content`. One `content` + `content_description` table pair holds every
+content type (`ContentType`: PAGE, SECTION, POST, BANNER, FAQ, POLICY); separate tables for revisions, status
+audit, redirects, menus, media, policy versions, FAQ groups and `site_settings`.
+
+**Content owns store appearance.** `site_settings` is one row per store carrying the logo, dark logo, favicon and
+share image as media asset ids, the social links, and the store's own per-locale SEO. `SECTION` rows are the
+home page's blocks, in `sort_order`. All of this used to be merchant's, or a legacy `BOX` "snippet" row — those
+are gone, and each moved to the component that supersedes it: site SEO, a STRIP banner, the live TERMS policy,
+SECTION rows.
 
 APIs under `api/v1/`:
-- private console API `/api/v1/private/content/{pages|posts|banners|faq|policies}` — one `WorkflowContentApi`
-  base (list/get/create/update/delete/publish/unpublish/submit-review/archive/restore/revisions/translations/
-  slug-available/bulk) per type, plus `ContentAdminApi` (`summary`, `snippets`, `redirects`), media and menus.
-  Writes need `STORE-POD.CONTENT.*`, reads `STORE-POD.CONTENT.READ` (moderators).
-- public storefront API `/api/v1/storefront/**` (cache-friendly, locale fallback).
-- `LegacyContentApi` `/api/v1/content/pages`, `/pages/name/{name}`, `/boxes/{code}` — the reads landing-ui makes
-  today, kept in their original shapes until the storefront moves; `@Deprecated`.
+- private console API `/api/v1/private/content/{pages|posts|banners|faq|policies|sections}` — one
+  `WorkflowContentApi` base (list/get/create/update/delete/publish/unpublish/submit-review/archive/restore/
+  revisions/translations/slug-available/bulk) per type, plus `ContentAdminApi` (`summary`, `redirects`),
+  `SiteSettingsApi`, media and menus. Writes need `STORE-POD.CONTENT.*`, reads `STORE-POD.CONTENT.READ`.
+- public storefront API `/api/v1/storefront/**` (cache-friendly, locale fallback), including `site` and
+  `home-sections`.
+- `ExternalMediaApi` `/api/v1/private/content/external/media` — how catalog resolves asset ids and states which
+  of them a product uses. The usage write needs `STORE-POD.CONTENT.MEDIA-USAGE`, mapped to `isSameStorePod`,
+  because `CONTENT.*` means "org or store admin" and the caller is a service.
 
-`ScheduledPublishJob` promotes `SCHEDULED` rows once a minute. Plan: `.agents/plans/console-ui-content.md`.
+`ScheduledPublishJob` promotes `SCHEDULED` rows once a minute. Plans: `.agents/plans/console-ui-content.md`,
+`.agents/plans/content-owns-appearance-and-media.md`.
 
 ```
 'store-pod:content:content-commons'
 'store-pod:content:content-core'
+'store-pod:content:content-external-api'
 'store-pod:content:content-service'
 ```
 
@@ -177,6 +188,5 @@ hand; `gateways-and-local-domains.md` has both edges' routing tables and the loc
 | Module | Role |
 |---|---|
 | `store-commons` (`:store-pod:commons:store-commons`) | Pod-scoped shared domain — consumed by essentially every pod module. **Not** the root `store-commons/`; see `shared-libraries.md`. |
-| `store-modules/store-cms-commons` | S3/MinIO asset primitives shared by content/catalog/merchant (`api project(':store-pod:commons:store-commons')`). |
 | `reference/{reference-commons, reference-core}` | Reference data: countries, zones, currencies, languages. |
 | `customer/{customer-commons, customer-core}` | Customer domain shared between checkout and cua. |
