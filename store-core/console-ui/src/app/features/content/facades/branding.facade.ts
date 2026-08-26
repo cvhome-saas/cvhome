@@ -7,6 +7,7 @@ import {ManagerStoreService} from '@api/tenancy/manager-store.service';
 import {ApiErrorService} from '@core/errors/api-error.service';
 import {ConsoleShellFacade} from '@layouts/console-shell/facades/console-shell.facade';
 import type {SiteBranding, SiteSettings, SocialLink} from '@models/content';
+import {socialLinkProblem} from '@models/social-links';
 import {ToastService} from '@shared/ui/toast/toast';
 
 /** The SEO fields the store writes about itself, in the order the form shows them. */
@@ -99,6 +100,18 @@ export class BrandingFacade {
   readonly branding = computed<SiteBranding | null>(() =>
     this.resource.hasValue() ? (this.resource.value().branding ?? null) : null,
   );
+
+  /**
+   * Whether every social link is a profile on the provider whose row it is in.
+   *
+   * Save is blocked rather than the bad value being dropped on the way out: a link silently
+   * discarded at save time looks to the operator exactly like one that saved.
+   */
+  readonly linksValid = computed<boolean>(() => {
+    const draft = this.draft();
+    return !draft || Object.entries(draft.socialLinks)
+      .every(([provider, url]) => socialLinkProblem(provider, url) === null);
+  });
 
   readonly providers = computed<readonly string[]>(() => {
     if (this.providersResource.hasValue()) {

@@ -19,10 +19,8 @@ import {
   HOME_TITLE_MAX,
   SHORT_DESCRIPTION_MAX,
   SLUG_PATTERN,
-  SOCIAL_LINK_HOSTS,
   UNBACKED_DETAIL_FIELDS,
   bareHostname,
-  isSocialLinkProvider,
   type SettingsSectionKey,
   type StoreSettings,
 } from '@models/store-settings';
@@ -107,7 +105,6 @@ export type EmptyForm = FormGroup<Record<string, never>>;
  * they are indexed rather than spelled out — `reset` brings them in line with what arrived.
  */
 export type HomeForm = FormGroup<Record<string, HomeCopyForm>>;
-export type SocialLinksForm = FormGroup<Record<string, FormControl<string>>>;
 export type SocialLoginForm = FormGroup<Record<string, LoginProviderForm>>;
 export type PaymentsForm = FormGroup<Record<string, GatewayForm>>;
 
@@ -115,7 +112,6 @@ export interface SettingsForms {
   branding: EmptyForm;
   home: HomeForm;
   domain: DomainForm;
-  social: SocialLinksForm;
   slider: EmptyForm;
   details: DetailsForm;
   'social-login': SocialLoginForm;
@@ -179,7 +175,6 @@ export class StoreSettingsFormService {
           asyncValidators: [this.dnsPointsToPod()],
         }),
       }),
-      social: new FormGroup<SocialLinksForm['controls']>({}),
       slider: new FormGroup<Record<string, never>>({}),
       details: this.details(),
       'social-login': new FormGroup<SocialLoginForm['controls']>({}),
@@ -428,8 +423,8 @@ export class StoreSettingsFormService {
    * what is gone. Existing controls are left in place so a reset does not rebuild the tree
    * the template is already bound to.
    *
-   * `make` is handed the key, because a social link's validator depends on which provider's row it
-   * is: the Facebook field and the TikTok field do not accept the same URLs.
+   * `make` is handed the key, because a login provider's controls depend on which provider's row it
+   * is: only the ones that carry credentials get a secret field.
    */
   private syncKeys<T extends FormGroup | FormControl>(
     group: FormGroup<Record<string, T>>,
@@ -495,51 +490,6 @@ export function titleForCopy(group: AbstractControl): ValidationErrors | null {
   );
   return hasCopy ? {titleForCopy: true} : null;
 }
-
-/**
- * A social profile link.
- *
- * The scheme is optional but allowed, because both shapes are real: the fixture this form was built
- * against held `instagram.com/acme`, and every store on the platform holds
- * `https://instagram.com/acme`. The stricter pattern rejected the stored values outright, which made
- * *Save changes* impossible on a store that had ever set a link — the section was unusable before a
- * character was typed. Whatever is entered is stored verbatim; the console does not rewrite it.
- */
-export const SOCIAL_URL_PATTERN = /^(https?:\/\/)?[^\s/]+\.[^\s]+$/;
-
-/**
- * A profile link that belongs to the provider whose row it is in.
- *
- * `SocialLink` is a provider and a free string, and nothing on the platform checks that the two
- * agree — so a TikTok URL sits happily in the Facebook row and the storefront renders it under a
- * Facebook mark, sending shoppers somewhere they did not mean to go. The host has to match, and
- * there has to be a profile after it: `facebook.com` on its own is the site, not a page on it.
- *
- * A provider the console does not know about — the enum is the server's and it may grow — is not
- * guessed at. It keeps the generic URL check and nothing more, the same known-set discipline
- * `shared/i18n/status-label.ts` applies to statuses.
- */
-export function socialProfileUrl(provider: string): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = String(control.value ?? '').trim();
-    if (!value || !isSocialLinkProvider(provider)) {
-      return null;
-    }
-
-    const withoutScheme = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '');
-    const [host, ...rest] = withoutScheme.split('/');
-    const hosts = SOCIAL_LINK_HOSTS[provider];
-    const bare = host.toLowerCase().replace(/:\d+$/, '');
-
-    // Suffix match, so `m.facebook.com` and `www.instagram.com` are the same site.
-    const onProvider = hosts.some((known) => bare === known || bare.endsWith(`.${known}`));
-    if (!onProvider) {
-      return {socialHost: {expected: hosts[0]}};
-    }
-    return rest.join('/').replace(/[?#].*$/, '').length > 0 ? null : {socialProfile: true};
-  };
-}
-
 
 
 /**

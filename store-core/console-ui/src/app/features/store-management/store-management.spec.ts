@@ -8,7 +8,6 @@ import {ToastService} from '@shared/ui/toast/toast';
 import type {
   DomainStatus,
   SettingsSectionKey,
-  SliderSlide,
   StoreSettings,
 } from '@models/store-settings';
 
@@ -264,11 +263,6 @@ describe('StoreManagement', () => {
     // only issues its request during change detection — one flush later than a root instance did.
     tick();
     fixture.detectChanges();
-  }
-
-  /** One social row's field, so an assertion reads that row's error rather than the first on screen. */
-  function socialField(element: HTMLElement, provider: string): HTMLElement {
-    return element.querySelector(`#social-${provider}`)!.closest('.link-field') as HTMLElement;
   }
 
   /** The add field's re-check button — the ghost action beside it. */

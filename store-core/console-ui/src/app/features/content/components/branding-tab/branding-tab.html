@@ -10,7 +10,7 @@
           @if (facade.dirty()) {
             <button class="ghost-action" type="button" (click)="facade.discard()">{{ t('content.branding.discard') }}</button>
           }
-          <button class="primary-action" type="button" [disabled]="!facade.dirty() || facade.busy()" (click)="facade.save()">
+          <button class="primary-action" type="button" [disabled]="!facade.dirty() || facade.busy() || !facade.linksValid()" (click)="facade.save()">
             <app-icon name="check" />{{ t('content.branding.save') }}
           </button>
         </div>
@@ -79,11 +79,13 @@
     <app-panel [title]="t('content.branding.socialTitle')" [subtitle]="t('content.branding.socialSubtitle')">
       <div class="branding-social">
         @for (provider of facade.providers(); track provider) {
-          <app-form-field [label]="provider">
+          <app-form-field [label]="providerLabel(provider)" [error]="linkError(provider)">
             <app-text-field
               [value]="linkValue(provider)"
               (valueChange)="facade.setSocialLink(provider, $event)"
               type="url"
+              [icon]="providerIcon(provider)"
+              [invalid]="linkError(provider) !== null"
               [placeholder]="t('content.branding.socialPlaceholder')"
               [disabled]="!canManage()"
             />

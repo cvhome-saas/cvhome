@@ -17,7 +17,6 @@ import {
   type DomainStatus,
   type SettingsSection,
   type SettingsSectionKey,
-  type SliderSlide,
   type StoreDomain,
   type StoreSettings,
 } from '@models/store-settings';
@@ -43,9 +42,6 @@ import {
  */
 /** How long the "Checking…" state stays up, however fast the resolver is. */
 const CHECK_MIN_VISIBLE_MS = 400;
-
-/** The same, for an upload — long enough that the well's spinner and its tick both register. */
-const UPLOAD_MIN_VISIBLE_MS = 600;
 
 @Injectable()
 export class StoreSettingsFacade {

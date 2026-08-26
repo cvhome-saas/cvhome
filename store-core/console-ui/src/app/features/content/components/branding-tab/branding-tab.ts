@@ -1,8 +1,15 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
-import {TranslocoDirective} from '@jsverse/transloco';
+import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
 import type {ReferenceOption} from '@core/reference/reference-data.service';
 import type {MediaAsset} from '@models/content';
+import {
+  SOCIAL_LINK_LABEL_KEY,
+  expectedSocialHost,
+  isSocialLinkProvider,
+  socialLinkIcon,
+  socialLinkProblem,
+} from '@models/social-links';
 import {BusyOverlay} from '@shared/ui/busy-overlay/busy-overlay';
 import {FormField} from '@shared/ui/form-field/form-field';
 import {Icon} from '@shared/ui/icon/icon';
@@ -46,6 +53,7 @@ import {MediaPickerDialog} from '../media-picker/media-picker-dialog';
 })
 export class BrandingTab {
   protected readonly facade = inject(BrandingFacade);
+  private readonly transloco = inject(TranslocoService);
 
   readonly locales = input.required<readonly ReferenceOption[]>();
   readonly defaultLocale = input.required<string>();
@@ -99,6 +107,44 @@ export class BrandingTab {
 
   protected linkValue(provider: string): string {
     return this.facade.draft()?.socialLinks[provider] ?? '';
+  }
+
+  /**
+   * The provider's brand name, or its bare enum value.
+   *
+   * The list is the server's — a member added to `SocialProvider` reaches the console before the
+   * console is taught its name — so an unknown provider is labelled `PINTEREST` rather than throwing.
+   * The field still saves; only the presentation degrades.
+   */
+  protected providerLabel(provider: string): string {
+    return isSocialLinkProvider(provider)
+      ? this.transloco.translate(SOCIAL_LINK_LABEL_KEY[provider])
+      : provider;
+  }
+
+  protected providerIcon = socialLinkIcon;
+
+  /**
+   * Why this row's URL is not a profile on this row's provider.
+   *
+   * Nothing server-side checks the pairing — `SocialLink` is a provider and a free string — so a
+   * TikTok URL in the Facebook row saves happily and the storefront then renders it under a Facebook
+   * mark, sending shoppers somewhere they did not mean to go. This is the only place it can be caught.
+   */
+  protected linkError(provider: string): string | null {
+    const problem = socialLinkProblem(provider, this.linkValue(provider));
+    if (!problem) {
+      return null;
+    }
+    // Written out rather than assembled, so `lint:i18n` can see all three keys are reached.
+    switch (problem) {
+      case 'host':
+        return this.transloco.translate('content.branding.socialHost', {host: expectedSocialHost(provider)});
+      case 'url':
+        return this.transloco.translate('content.branding.socialUrl');
+      case 'profile':
+        return this.transloco.translate('content.branding.socialProfile');
+    }
   }
 
   protected onPicked(asset: MediaAsset): void {

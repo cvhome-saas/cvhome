@@ -14,31 +14,22 @@ import type {
   ReadablePaymentConfiguration,
 } from '@models/payment';
 import type {
-  ContentTranslation,
-} from '@models/content';
-import type {
   ManagerStoreDomain,
   PersistableMerchantStore,
   ReadableMerchantStore,
   StoreAddress,
 } from '@models/merchant';
 import {
+  LOGIN_PROVIDER_FALLBACK_ICON,
   LOGIN_PROVIDER_ICON,
   PAYMENT_TYPES_WITHOUT_CREDENTIALS,
   PAYMENT_TYPE_ICON,
-  SOCIAL_LINK_FALLBACK_ICON,
-  SOCIAL_LINK_ICON,
   isLoginProvider,
   isPaymentType,
-  isSocialLinkProvider,
-  type BrandingSettings,
   type DomainStatus,
-  type HomePageCopy,
   type SettingsChoices,
   type SettingsSectionKey,
   type PaymentGatewayConfig,
-  type SliderSlide,
-  type SocialLinkSetting,
   type SocialLoginConfig,
   type StoreDetails,
   type StoreDomain,
@@ -55,8 +46,6 @@ export type SectionPatch = Readonly<Record<string, unknown>>;
  * added seconds ago looks exactly like one that never will be, and telling the operator their DNS is
  * broken while it propagates is the unhelpful reading.
  */
-/** The order the five providers are shown in when the reference call is the leg that failed. */
-const SOCIAL_LINK_ORDER = ['INSTAGRAM', 'FACEBOOK', 'X', 'TIKTOK', 'GITHUB'] as const;
 
 const DOMAIN_OUTCOME: Readonly<Record<CnameOutcome, DomainStatus>> = {
   'points-here': 'verified',
@@ -491,7 +480,7 @@ export class StoreSettingsApi {
       const config = stored.get(providerId);
       return {
         providerId,
-        icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : SOCIAL_LINK_FALLBACK_ICON,
+        icon: isLoginProvider(providerId) ? LOGIN_PROVIDER_ICON[providerId] : LOGIN_PROVIDER_FALLBACK_ICON,
         appId: config?.appId ?? '',
         appSecret: config?.appSecret ?? '',
         callbackUrl: this.callbackUrl(storefront, store.id, providerId),

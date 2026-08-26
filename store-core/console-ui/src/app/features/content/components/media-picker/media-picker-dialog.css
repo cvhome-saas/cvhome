@@ -8,10 +8,14 @@
   background: var(--background);
   color: var(--foreground);
   box-shadow: var(--lift);
-  display: flex;
   flex-direction: column;
 }
 
+/*
+ * Only when open. The base rule used to carry `display: flex` unconditionally, which overrode the UA's
+ * `dialog:not([open]) { display: none }` — so `close()` left the picker painted over the form, showing its
+ * empty state, until something else forced a repaint. The `[open]` rule below was always the intent.
+ */
 .picker[open] {
   display: flex;
 }

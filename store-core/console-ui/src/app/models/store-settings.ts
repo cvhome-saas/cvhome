@@ -7,9 +7,8 @@ import type {Tone} from '@models/ui';
  *
  * Shaped after the backend contracts it will eventually be served from —
  * `ReadableMerchantStore` + `MerchantStoreDetails`, `ManagerStoreDomain`,
- * `ReadableSliderImage`, `SocialLink`, `ReadableSocialLoginConfig` and
- * `ReadablePaymentConfiguration` — so swapping the mock for HTTP is a rename rather than a
- * rewrite. Provider lists are the real enums, not the mockup's inventions.
+ * `ReadableSocialLoginConfig` and `ReadablePaymentConfiguration` — so swapping the mock for HTTP is a
+ * rename rather than a rewrite. Provider lists are the real enums, not the mockup's inventions.
  */
 
 /**
@@ -36,9 +35,6 @@ export type DomainType = 'SUB_DOMAIN' | 'CUSTOM_DOMAIN';
  */
 export type DomainStatus = 'checking' | 'waiting' | 'verified' | 'failed';
 
-/** `SocialProvider` in `store-commons/commons`. The storefront footer's links. */
-export type SocialLinkProvider = 'FACEBOOK' | 'X' | 'TIKTOK' | 'INSTAGRAM' | 'GITHUB';
-
 /** `SocialProvider` in `cua`. Who a shopper can sign in with — a different, shorter list. */
 export type LoginProvider = 'GOOGLE' | 'FACEBOOK' | 'GITHUB';
 
@@ -46,39 +42,6 @@ export type LoginProvider = 'GOOGLE' | 'FACEBOOK' | 'GITHUB';
 export type PaymentType = 'COD' | 'MANUAL_TRANSFER' | 'STRIPE' | 'PAYPAL';
 
 export type LocaleCode = ConsoleLocale['code'];
-
-/** `ReadableImage`, reduced to what the page shows. */
-export interface StoredImage {
-  readonly name: string;
-  /** Absent until an upload completes — the zone shows its placeholder instead. */
-  readonly url: string | null;
-}
-
-/**
- * The store's marketing images.
- *
- * The mockup's upload-progress bar is gone: an upload is a single POST that either completes or
- * fails, and the section says which. A percentage that only ever read 0 or 100 was decoration.
- */
-export interface BrandingSettings {
-  readonly logo: StoredImage | null;
-  readonly banner: StoredImage | null;
-}
-
-/**
- * One language's landing copy, as one `ContentDescription` on the `LANDING_PAGE` content box.
- *
- * `title` is the description's `name` — seller-ui used it that way and the storefront reads it as
- * the headline — and `text` is its `description`. `id` and the fields the console does not edit are
- * not here; they are carried through on save from what the read returned.
- */
-export interface HomePageCopy {
-  readonly title: string;
-  readonly text: string;
-  readonly metaDescription: string;
-  /** Search keywords, stored on the landing snippet's translation as a comma-separated list. */
-  readonly tags: readonly string[];
-}
 
 /**
  * The CNAME an operator has to add at their registrar.
@@ -109,95 +72,6 @@ export interface StoreDomain {
   readonly domain: string;
   readonly type: DomainType;
   readonly hostname: string | null;
-}
-
-/**
- * `SocialLink(provider, url)`, with the mark the row is drawn with.
- *
- * `provider` is the server's string rather than the narrowed union: the row list is built from
- * `GET /public/social-links-providers`, so a member added to `SocialProvider` shows up here before the
- * console knows about it. `icon` and the label fall back for those; the field still saves.
- */
-export interface SocialLinkSetting {
-  readonly provider: string;
-  readonly icon: IconName;
-  readonly url: string;
-}
-
-/**
- * The mark each provider is drawn with.
- *
- * A lookup rather than a field on the record, because `SocialLink` carries only a provider and a URL —
- * the icon is the console's decision. Keyed by the five `SocialProvider` members; a provider the server
- * adds later falls back to a generic link mark rather than throwing, the same known-set discipline
- * `shared/i18n/status-label.ts` applies to enums.
- */
-export const SOCIAL_LINK_ICON: Readonly<Record<SocialLinkProvider, IconName>> = {
-  FACEBOOK: 'facebook',
-  X: 'xSocial',
-  TIKTOK: 'tiktok',
-  INSTAGRAM: 'instagram',
-  GITHUB: 'github',
-};
-
-export const SOCIAL_LINK_FALLBACK_ICON: IconName = 'link';
-
-/**
- * The hosts a profile link for each provider may live on.
- *
- * A Facebook field holding a TikTok URL is not a typo the storefront can recover from — it renders
- * the link under a Facebook mark and sends shoppers somewhere else entirely. Nothing server-side
- * checks this: `SocialLink` is a provider and a free string, so the console is the only place the
- * pairing can be enforced.
- *
- * The alternates are the ones these companies still serve rather than every domain they have ever
- * owned: `twitter.com` because a decade of links point at it and X redirects them, `fb.com` because
- * it is Facebook's own short domain. Subdomains are accepted against each entry (`m.facebook.com`,
- * `www.instagram.com`), which is why the check is a suffix match rather than equality.
- */
-export const SOCIAL_LINK_HOSTS: Readonly<Record<SocialLinkProvider, readonly string[]>> = {
-  FACEBOOK: ['facebook.com', 'fb.com'],
-  X: ['x.com', 'twitter.com'],
-  TIKTOK: ['tiktok.com'],
-  INSTAGRAM: ['instagram.com'],
-  GITHUB: ['github.com'],
-};
-
-/**
- * The host a provider's link is expected on, for the field's own message.
- *
- * The first entry rather than all of them: the message is telling an operator what to type, and
- * "use facebook.com" is advice where "use facebook.com or fb.com" is a quiz.
- */
-export function expectedSocialHost(provider: string): string | null {
-  return isSocialLinkProvider(provider) ? SOCIAL_LINK_HOSTS[provider][0] : null;
-}
-
-export function isSocialLinkProvider(value: string): value is SocialLinkProvider {
-  return value in SOCIAL_LINK_ICON;
-}
-
-/** Brand names. Kept translated (rather than hardcoded) so a right-to-left reader still sees them presented consistently — the names themselves do not change across languages. */
-export const SOCIAL_LINK_LABEL_KEY: Readonly<Record<SocialLinkProvider, string>> = {
-  FACEBOOK: 'storeSettings.socialProvider.facebook',
-  X: 'storeSettings.socialProvider.x',
-  TIKTOK: 'storeSettings.socialProvider.tiktok',
-  INSTAGRAM: 'storeSettings.socialProvider.instagram',
-  GITHUB: 'storeSettings.socialProvider.github',
-};
-
-/**
- * `ReadableSliderImage(priority, name, url)` — and that is the whole record.
- *
- * The design's `LIVE`/`SCHEDULED` tag, click-through link and `1600×640 · 248 KB · JPG` line are gone:
- * a slide is a position, a server-issued name and a path, and nothing stores a schedule, a target or
- * any file metadata. See lessons.md, "Store management — slider images carry no schedule, link or file
- * metadata". `name` is a UUID the pod assigns, not a filename, so it is not shown as a title.
- */
-export interface SliderSlide {
-  readonly priority: number;
-  readonly name: string;
-  readonly url: string | null;
 }
 
 /**
@@ -311,6 +185,9 @@ export const LOGIN_PROVIDER_ICON: Readonly<Record<LoginProvider, IconName>> = {
   FACEBOOK: 'facebook',
   GITHUB: 'github',
 };
+
+/** For a provider `cua` supports and the console has not been taught a mark for yet. */
+export const LOGIN_PROVIDER_FALLBACK_ICON: IconName = 'link';
 
 export function isLoginProvider(value: string): value is LoginProvider {
   return value in LOGIN_PROVIDER_ICON;

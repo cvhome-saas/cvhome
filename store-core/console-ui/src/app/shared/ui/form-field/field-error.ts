@@ -52,9 +52,18 @@ import {validationMessage} from '@shared/forms/validation-messages';
 export class FieldError {
   private readonly transloco = inject(TranslocoService);
 
-  readonly control = input.required<AbstractControl>();
+  readonly control = input<AbstractControl | null>(null);
   /** A sentence for this field in particular, when the shared vocabulary is too general. */
   readonly fallback = input('');
+  /**
+   * A message worked out by the caller, for a field that is not backed by a form control.
+   *
+   * Not every field in the console is reactive-forms: a draft held in a signal — the content hub's
+   * branding tab — validates in its own facade and has no `AbstractControl` to hand over. Without
+   * this such a field either grows its own error markup, which is how `.field-error` came to be
+   * styled by nobody in the first place, or it silently accepts bad input.
+   */
+  readonly text = input<string | null>(null);
 
   /**
    * A method, not a `computed`.
@@ -67,6 +76,9 @@ export class FieldError {
    */
   protected message(): string | null {
     const control = this.control();
+    if (!control) {
+      return this.text();
+    }
     if (!(control.dirty || control.touched)) {
       return null;
     }

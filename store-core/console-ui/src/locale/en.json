@@ -712,13 +712,6 @@
       "subtitle": "Let customers sign in with an external provider.",
       "title": "Store social login"
     },
-    "socialProvider": {
-      "facebook": "Facebook",
-      "x": "X",
-      "tiktok": "TikTok",
-      "instagram": "Instagram",
-      "github": "GitHub"
-    },
     "state": {
       "enabled": "Enabled",
       "disabled": "Disabled",
@@ -1782,7 +1775,6 @@
       "keywordsPlaceholder": "Add a keyword…"
     },
     "media": {
-      "drop": "Drop an image, or browse",
       "hint": "The thumbnail is set when the first image is uploaded and cannot be moved to another image afterwards — the platform has no way to change it. Reordering the rest is free.",
       "image": "Product image",
       "moveDown": "Move image {position} later",
@@ -1795,7 +1787,8 @@
       "storefrontThumbnail": "Storefront thumbnail",
       "subtitle": "The first image is the storefront thumbnail.",
       "title": "Images",
-      "view": "View image {position} full size"
+      "view": "View image {position} full size",
+      "pick": "Choose from media library"
     },
     "pricing": {
       "title": "Price and stock",
@@ -3517,7 +3510,17 @@
       },
       "socialTitle": "Social links",
       "socialSubtitle": "Shown in the storefront footer. Leave one empty to remove it.",
-      "socialPlaceholder": "https://…"
+      "socialPlaceholder": "https://…",
+      "socialProvider": {
+        "facebook": "Facebook",
+        "x": "X",
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "github": "GitHub"
+      },
+      "socialHost": "Use a {{host}} link.",
+      "socialUrl": "Enter a valid web address.",
+      "socialProfile": "Link to the profile page, not just the site."
     }
   }
 }
