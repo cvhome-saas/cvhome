@@ -120,6 +120,8 @@ class ContentPlatformIntegrationTest {
 
     private static final String CAMPAIGN_KEY = "campaign-shots";
 
+    private static final String BOTH = "%s&%s";
+
     private static final String USED_QUERY = "used=true";
 
     private static final String UNUSED_QUERY = "used=false";
@@ -299,19 +301,22 @@ class ContentPlatformIntegrationTest {
         expect(upload, HttpStatus.CREATED);
         long assetId = json(upload).get(0).get(ID).asLong();
 
-        // by folder, by free text on the filename, and by "not used anywhere yet"
-        assertThat(ids(get(query(MEDIA, String.format("folder=%d", folderId))))).contains(assetId);
+        // by folder, by free text on the filename, and by "not used anywhere yet". The used filters are scoped
+        // to the folder: the seeded store has hundreds of assets, so an unscoped first page says nothing about
+        // this one.
+        String inFolder = String.format("folder=%d", folderId);
+        assertThat(ids(get(query(MEDIA, inFolder)))).contains(assetId);
         assertThat(ids(get(query(MEDIA, "q=CAMPAIGN")))).contains(assetId);
-        assertThat(ids(get(query(MEDIA, UNUSED_QUERY)))).contains(assetId);
-        assertThat(ids(get(query(MEDIA, USED_QUERY)))).doesNotContain(assetId);
+        assertThat(ids(get(query(MEDIA, String.format(BOTH, inFolder, UNUSED_QUERY))))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, String.format(BOTH, inFolder, USED_QUERY))))).doesNotContain(assetId);
 
         // referencing it from a post flips it to "used"
         createAndPublish(POSTS, String.format("""
                 {"slug":"%s","heroMediaId":%d,
                  "translations":[{"language":"en","title":"Campaign","body":"<p>copy</p>"}]}""",
                 slug("campaign"), assetId));
-        assertThat(ids(get(query(MEDIA, USED_QUERY)))).contains(assetId);
-        assertThat(ids(get(query(MEDIA, UNUSED_QUERY)))).doesNotContain(assetId);
+        assertThat(ids(get(query(MEDIA, String.format(BOTH, inFolder, USED_QUERY))))).contains(assetId);
+        assertThat(ids(get(query(MEDIA, String.format(BOTH, inFolder, UNUSED_QUERY))))).doesNotContain(assetId);
 
         // a folder that still holds files refuses to go until its files have somewhere to move to
         var refused = send(HttpMethod.DELETE, path(MEDIA, FOLDERS, folderId), null);

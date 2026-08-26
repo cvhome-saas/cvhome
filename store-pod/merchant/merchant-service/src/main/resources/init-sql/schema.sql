@@ -22,8 +22,6 @@ create table if not exists merchant.merchant_store
                                'GRAPE','PEACH','MINT','SAND','RAINBOW','NEON','PASTEL')),
     seizeunitcode                     varchar(5),
     store_email                       varchar(60)  not null,
-    store_logo                        varchar(100),
-    store_banner                      varchar(100),
     store_template                    varchar(25),
     store_address                     varchar(255),
     store_city                        varchar(100),
@@ -47,22 +45,14 @@ create table if not exists merchant.merchant_language
     constraint merchant_language_pk
         unique (store_merchant_id, language_code)
 );
-create table if not exists merchant.merchant_slider_images
-(
-    store_merchant_id varchar(50)  not null
-        constraint fk6qg1wx3ow5v07pswgwf8dbguf references merchant.merchant_store,
-    priority          int,
-    name              varchar(100) not null,
-    constraint merchant_slider_images_store_priority_unique unique (store_merchant_id, priority)
-);
-create table if not exists merchant.social_links
-(
-    store_merchant_id varchar(50) not null
-        constraint fkfh74uew5thxc4fpf90vs8ebsy references merchant.merchant_store,
-    provider          varchar(10),
-    url               varchar(100),
-    constraint social_links_store_provider_unique unique (store_merchant_id, provider)
-);
+
+-- Store appearance moved to the content service: the logo, banner, slider images and social links now live in
+-- content.site_settings and content banners, where they can be picked from the media library and, unlike here,
+-- removed again. Merchant keeps store configuration — languages, currency, domains, address and contact.
+alter table merchant.merchant_store drop column if exists store_logo;
+alter table merchant.merchant_store drop column if exists store_banner;
+drop table if exists merchant.merchant_slider_images;
+drop table if exists merchant.social_links;
 
 create table if not exists merchant.store_domains
 (

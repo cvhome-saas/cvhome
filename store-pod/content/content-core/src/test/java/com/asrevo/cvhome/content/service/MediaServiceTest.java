@@ -481,8 +481,9 @@ class MediaServiceTest {
 
         @Test
         void aStoreWithNoFoldersGetsTheStarterSet() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any())).thenReturn(Optional.empty());
             when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
-                    .thenReturn(List.of()).thenReturn(List.of(folder(1L, BANNERS_KEY)));
+                    .thenReturn(List.of(folder(1L, BANNERS_KEY)));
             when(assets.countByStoreMerchantIdAndFolderId(STORE_ID, 1L)).thenReturn(4L);
 
             assertThat(service.folders(ContentFixtures.STORE)).singleElement()
@@ -491,13 +492,30 @@ class MediaServiceTest {
         }
 
         @Test
-        void anExistingSetIsNotSeededAgain() {
+        void aCompleteStarterSetIsNotSeededAgain() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any()))
+                    .thenReturn(Optional.of(folder(1L, BANNERS_KEY)));
             when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
                     .thenReturn(List.of(folder(1L, BANNERS_KEY)));
 
             service.folders(ContentFixtures.STORE);
 
             verify(folders, never()).save(any());
+        }
+
+        /**
+         * The starter set used to be skipped whenever the store had any folder at all, so a seller who made one
+         * of their own before opening the library never got the defaults.
+         */
+        @Test
+        void aSellersOwnFolderDoesNotSuppressTheStarterSet() {
+            when(folders.findByStoreMerchantIdAndKey(eq(STORE_ID), any())).thenReturn(Optional.empty());
+            when(folders.findByStoreMerchantIdOrderByPositionAscIdAsc(STORE_ID))
+                    .thenReturn(List.of(folder(9L, "campaign")));
+
+            service.folders(ContentFixtures.STORE);
+
+            verify(folders, org.mockito.Mockito.times(5)).save(any());
         }
 
         @Test

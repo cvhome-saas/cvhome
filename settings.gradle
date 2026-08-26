@@ -38,7 +38,6 @@ include(
 
         'store-pod:spg',
         'store-pod:commons:store-commons',
-        'store-pod:commons:store-modules:store-cms-commons',
         'store-pod:landing-ui',
         'store-pod:commons:reference:reference-commons',
         'store-pod:commons:reference:reference-core',

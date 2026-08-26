@@ -13,7 +13,6 @@ import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
 import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
@@ -95,8 +94,6 @@ class PersistableMerchantStorePopulatorTest {
         source.setRequireLoginForOrderPlacement(true);
         source.setDefaultLanguage(AR);
         source.setSupportedLanguages(List.of(AR.code(), EN.code()));
-        source.setSocialLinks(Set.of(new SocialLink(X, "https://x.com/riyadh")));
-        source.setSliderImages(List.of(SLIDE));
         source.setStoreDomains(Set.of(new ManagerStoreDomain(SUB_DOMAIN, DomainType.SUB_DOMAIN)));
         PersistableBaseAddress address = new PersistableBaseAddress();
         address.setAddress(STREET);
@@ -140,8 +137,6 @@ class PersistableMerchantStorePopulatorTest {
         assertThat(target.isRequireLoginForOrderPlacement()).isTrue();
         assertThat(target.getDefaultLanguageCode()).isEqualTo(AR);
         assertThat(target.getLanguages()).containsExactly(AR, EN);
-        assertThat(target.getSocialLinks()).extracting(SocialLink::provider).containsExactly(X);
-        assertThat(target.getSliderImages()).containsExactly(SLIDE);
         assertThat(target.getStoreDomains()).extracting(ManagerStoreDomain::domain).containsExactly(SUB_DOMAIN);
         assertThat(target.getStoreaddress()).isEqualTo(STREET);
         assertThat(target.getStorecity()).isEqualTo(CITY);
@@ -149,15 +144,6 @@ class PersistableMerchantStorePopulatorTest {
         assertThat(target.getStorepostalcode()).isEqualTo(POSTAL_CODE);
         assertThat(target.getZone()).isEqualTo(RIYADH);
         assertThat(target.getStorestateprovince()).isEqualTo(RIYADH);
-    }
-
-    @Test
-    void sliderImagesAreCopiedRatherThanShared() {
-        PersistableMerchantStore source = fullRequest();
-
-        MerchantStore target = populator.populate(source, new MerchantStore(), new MerchantStore(), EN);
-
-        assertThat(target.getSliderImages()).isNotSameAs(source.getSliderImages()).containsExactly(SLIDE);
     }
 
     @Test
@@ -171,23 +157,9 @@ class PersistableMerchantStorePopulatorTest {
         assertThat(target.getSeizeunitcode()).isEqualTo(MeasureUnit.IN.name());
         assertThat(target.getWeightunitcode()).isEqualTo(MeasureUnit.LB.name());
         assertThat(target.getLanguages()).isEmpty();
-        assertThat(target.getSocialLinks()).isEmpty();
-        assertThat(target.getSliderImages()).isEmpty();
         assertThat(target.getStoreDomains()).isEmpty();
         assertThat(target.getStorecity()).isNull();
         assertThat(target.getCountry()).isNull();
-    }
-
-    @Test
-    void existingLogoAndBannerSurviveAnUpdate() {
-        MerchantStore stored = new MerchantStore();
-        stored.setStoreLogo(LOGO);
-        stored.setStoreBanner(BANNER);
-
-        MerchantStore target = populator.populate(minimalRequest(), new MerchantStore(), stored, EN);
-
-        assertThat(target.getStoreLogo()).isEqualTo(LOGO);
-        assertThat(target.getStoreBanner()).isEqualTo(BANNER);
     }
 
     @Test
@@ -201,12 +173,11 @@ class PersistableMerchantStorePopulatorTest {
     @Test
     void twoArgumentFormBuildsAFreshEntity() {
         MerchantStore stored = new MerchantStore();
-        stored.setStoreLogo(LOGO);
+        stored.setStorename("Old name");
 
         MerchantStore target = populator.populate(fullRequest(), stored, EN);
 
         assertThat(target).isNotSameAs(stored);
-        assertThat(target.getStoreLogo()).isEqualTo(LOGO);
         assertThat(target.getStorename()).isEqualTo(NAME);
     }
 

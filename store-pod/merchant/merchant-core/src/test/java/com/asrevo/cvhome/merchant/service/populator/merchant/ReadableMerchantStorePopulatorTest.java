@@ -13,9 +13,6 @@ import com.asrevo.cvhome.commons.domain.CurrencyCode;
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.ReadableSliderImage;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.domain.Theme;
 import com.asrevo.cvhome.commons.domain.ZoneCode;
@@ -24,7 +21,6 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.store.core.entity.common.audit.AuditSection;
 import com.asrevo.cvhome.store.model.references.MeasureUnit;
 import com.asrevo.cvhome.store.model.references.WeightUnit;
-import com.asrevo.cvhome.store.utils.ImageFilePath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,19 +75,7 @@ class ReadableMerchantStorePopulatorTest {
 
     private static final Instant MODIFIED = Instant.parse("2024-04-01T10:00:00Z");
 
-    private static final ImageFilePath PATHS = new ImageFilePath() {
-        @Override
-        public String getContextPath() {
-            return "";
-        }
-
-        @Override
-        public String getBasePath(StoreMerchantId store) {
-            return BASE;
-        }
-    };
-
-    private final ReadableMerchantStorePopulator populator = new ReadableMerchantStorePopulator(PATHS);
+    private final ReadableMerchantStorePopulator populator = new ReadableMerchantStorePopulator();
 
     private static MerchantStore fullEntity() {
         MerchantStore source = new MerchantStore(STORE, NAME, EMAIL);
@@ -114,10 +98,6 @@ class ReadableMerchantStorePopulatorTest {
         source.setStorepostalcode(POSTAL_CODE);
         source.setZone(ZONE);
         source.setStorestateprovince(PROVINCE);
-        source.setStoreLogo(LOGO);
-        source.setStoreBanner(BANNER);
-        source.setSliderImages(List.of(new SliderImage(0, SLIDE)));
-        source.setSocialLinks(Set.of(new SocialLink(X, "https://x.com/riyadh")));
         source.setStoreDomains(Set.of(new ManagerStoreDomain(SUB_DOMAIN, DomainType.SUB_DOMAIN)));
         AuditSection audit = new AuditSection();
         audit.setDateCreated(CREATED);
@@ -129,7 +109,6 @@ class ReadableMerchantStorePopulatorTest {
 
     private static MerchantStore bareEntity() {
         MerchantStore source = new MerchantStore(STORE, NAME);
-        source.setStoreLogo(" ");
         source.setAuditSection(null);
         return source;
     }
@@ -161,14 +140,6 @@ class ReadableMerchantStorePopulatorTest {
         assertThat(target.getAddress().getCountry()).isEqualTo(SA);
         // the explicit state/province wins over the zone
         assertThat(target.getAddress().getStateProvince()).isEqualTo(PROVINCE);
-        assertThat(target.getLogo().getName()).isEqualTo(LOGO);
-        assertThat(target.getLogo().getPath()).isEqualTo(String.format("%s/files/%s/LOGO/%s", BASE, STORE.getId(), LOGO));
-        assertThat(target.getBanner().getName()).isEqualTo(BANNER);
-        assertThat(target.getBanner().getPath())
-                .isEqualTo(String.format("%s/files/%s/BANNER/%s", BASE, STORE.getId(), BANNER));
-        assertThat(target.getSliderImages()).extracting(ReadableSliderImage::url)
-                .containsExactly(String.format("%s/files/%s/SLIDER/%s", BASE, STORE.getId(), SLIDE));
-        assertThat(target.getSocialLinks()).extracting(SocialLink::provider).containsExactly(X);
         assertThat(target.getStoreDomains()).extracting(ManagerStoreDomain::domain).containsExactly(SUB_DOMAIN);
         assertThat(target.getReadableAudit().getCreated()).isEqualTo(CREATED);
         assertThat(target.getReadableAudit().getUser()).isEqualTo(EDITOR);
@@ -179,9 +150,6 @@ class ReadableMerchantStorePopulatorTest {
     void bareEntityLeavesOptionalSectionsEmpty() {
         ReadableMerchantStore target = populator.populate(bareEntity(), new ReadableMerchantStore(), null, EN);
 
-        assertThat(target.getLogo()).isNull();
-        assertThat(target.getBanner()).isNull();
-        assertThat(target.getSliderImages()).isNull();
         assertThat(target.getSupportedLanguages()).isNull();
         assertThat(target.getReadableAudit()).isNull();
         assertThat(target.getAddress().getCountry()).isNull();
@@ -212,20 +180,6 @@ class ReadableMerchantStorePopulatorTest {
         assertThat(target.getReadableAudit().getUser()).isEqualTo(EDITOR);
         assertThat(target.getReadableAudit().getCreated()).isNull();
         assertThat(target.getReadableAudit().getModified()).isNull();
-    }
-
-    @Test
-    void withoutAPathResolverImagesKeepOnlyTheirName() {
-        MerchantStore source = bareEntity();
-        source.setStoreLogo(LOGO);
-        source.setStoreBanner(BANNER);
-
-        ReadableMerchantStore target = new ReadableMerchantStorePopulator(null).populate(source, null, null, EN);
-
-        assertThat(target.getLogo().getName()).isEqualTo(LOGO);
-        assertThat(target.getLogo().getPath()).isNull();
-        assertThat(target.getBanner().getName()).isEqualTo(BANNER);
-        assertThat(target.getBanner().getPath()).isNull();
     }
 
     @Test

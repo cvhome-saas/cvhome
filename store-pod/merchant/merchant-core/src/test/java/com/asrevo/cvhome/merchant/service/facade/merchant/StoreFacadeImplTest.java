@@ -1,21 +1,14 @@
 package com.asrevo.cvhome.merchant.service.facade.merchant;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.commons.utils.DefaultStoresConstants;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
@@ -27,16 +20,11 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.populator.merchant.PersistableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.service.populator.merchant.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,8 +63,6 @@ class StoreFacadeImplTest {
 
     private ReadableMerchantStorePopulator readablePopulator;
 
-    private ContentAssetsManager assets;
-
     private StoreFacadeImpl facade;
 
     @BeforeEach
@@ -84,8 +70,7 @@ class StoreFacadeImplTest {
         service = mock(MerchantStoreService.class);
         persistablePopulator = mock(PersistableMerchantStorePopulator.class);
         readablePopulator = mock(ReadableMerchantStorePopulator.class);
-        assets = mock(ContentAssetsManager.class);
-        facade = new StoreFacadeImpl(service, persistablePopulator, readablePopulator, assets);
+        facade = new StoreFacadeImpl(service, persistablePopulator, readablePopulator);
     }
 
     private MerchantStore stored() {
@@ -95,17 +80,6 @@ class StoreFacadeImplTest {
         store.setLanguages(List.of(FR, EN));
         when(service.getByMerchantStoreId(STORE)).thenReturn(store);
         return store;
-    }
-
-    private static InputContentFile upload(String name, InputStream stream) {
-        InputContentFile file = new InputContentFile();
-        file.setFileName(name);
-        file.setFile(stream);
-        return file;
-    }
-
-    private static TrackedStream stream() {
-        return new TrackedStream();
     }
 
     // ------------------------------------------------------------------------------------------------- reads
@@ -179,13 +153,9 @@ class StoreFacadeImplTest {
     }
 
     @Test
-    void updateCarriesIdentityAndMediaOverFromTheStoredRow() throws MerchantStoreNotFoundException {
+    void updateCarriesIdentityAndDomainsOverFromTheStoredRow() throws MerchantStoreNotFoundException {
         MerchantStore store = stored();
-        Set<SocialLink> links = Set.of(new SocialLink("X", "https://x.com/me"));
-        List<SliderImage> slides = List.of(new SliderImage(0, SLIDE));
         Set<ManagerStoreDomain> domains = Set.of(new ManagerStoreDomain("me", DomainType.SUB_DOMAIN));
-        store.setSocialLinks(links);
-        store.setSliderImages(slides);
         store.setStoreDomains(domains);
         PersistableMerchantStore request = new PersistableMerchantStore();
         request.setId("something-else");
@@ -196,8 +166,6 @@ class StoreFacadeImplTest {
 
         assertThat(request.getId()).isEqualTo(STORE.getId());
         assertThat(request.getOrg()).isEqualTo(ORG);
-        assertThat(request.getSocialLinks()).isEqualTo(links);
-        assertThat(request.getSliderImages()).isEqualTo(slides);
         assertThat(request.getStoreDomains()).isEqualTo(domains);
         verify(service).update(store);
     }
@@ -207,18 +175,6 @@ class StoreFacadeImplTest {
         assertThatThrownBy(() -> facade.update(UNKNOWN, new PersistableMerchantStore()))
                 .isInstanceOf(MerchantStoreNotFoundException.class);
         verify(service, never()).update(any());
-    }
-
-    @Test
-    void socialLinksAndSliderImagesGoStraightToTheService() {
-        Set<SocialLink> links = Set.of(new SocialLink("TIKTOK", "https://tiktok.com/@me"));
-        List<SliderImage> slides = List.of(new SliderImage(1, SLIDE));
-
-        facade.updateSocialLinks(STORE, links);
-        facade.updateSliderImages(STORE, slides);
-
-        verify(service).updateSocialLinks(STORE, links);
-        verify(service).updateSliderImages(STORE, slides);
     }
 
     // ------------------------------------------------------------------------------------------------ delete
@@ -243,146 +199,6 @@ class StoreFacadeImplTest {
         facade.delete(STORE);
 
         verify(service).delete(store);
-    }
-
-    // ----------------------------------------------------------------------------------------------- uploads
-
-    @Test
-    void logoIsUploadedAsLogoAndRecordedOnTheStore() throws AssetUploadFailedException {
-        MerchantStore store = stored();
-        TrackedStream stream = stream();
-        InputContentFile file = upload(LOGO, stream);
-
-        facade.addStoreLogo(STORE, file);
-
-        assertThat(file.getFileContentType()).isEqualTo(FileContentType.LOGO);
-        assertThat(store.getStoreLogo()).isEqualTo(LOGO);
-        assertThat(stream.closed).isTrue();
-        verify(assets).addFile(STORE.getId(), Optional.empty(), file);
-        verify(service).save(store);
-    }
-
-    @Test
-    void bannerIsUploadedAsBannerAndRecordedOnTheStore() throws AssetUploadFailedException {
-        MerchantStore store = stored();
-        InputContentFile file = upload(BANNER, stream());
-        file.setPath(FOLDER);
-
-        facade.addStoreBanner(STORE, file);
-
-        assertThat(file.getFileContentType()).isEqualTo(FileContentType.BANNER);
-        assertThat(store.getStoreBanner()).isEqualTo(BANNER);
-        verify(assets).addFile(STORE.getId(), Optional.of(FOLDER), file);
-        verify(service).save(store);
-    }
-
-    @Test
-    void sliderImageTakesTheNextPriority() throws AssetUploadFailedException {
-        MerchantStore store = stored();
-        store.setSliderImages(List.of(new SliderImage(0, "a.png"), new SliderImage(4, "b.png")));
-        InputContentFile file = upload(SLIDE, stream());
-
-        SliderImage added = facade.addStoreSliderImage(STORE, file);
-
-        assertThat(added).isEqualTo(new SliderImage(5, SLIDE));
-        assertThat(file.getFileContentType()).isEqualTo(FileContentType.SLIDER);
-        assertThat(store.getSliderImages()).hasSize(3).contains(added);
-        verify(assets).addFile(eq(STORE.getId()), eq(Optional.empty()), eq(file));
-        verify(service).save(store);
-    }
-
-    @Test
-    void firstSliderImageStartsAtZero() {
-        stored();
-
-        SliderImage added = facade.addStoreSliderImage(STORE, upload(SLIDE, stream()));
-
-        assertThat(added.priority()).isZero();
-    }
-
-    @Test
-    void uploadWithoutAStreamIsRefusedBeforeTouchingStorage() {
-        InputContentFile file = upload(LOGO, null);
-
-        assertThatThrownBy(() -> facade.addLogo(STORE, file)).isInstanceOf(IllegalArgumentException.class);
-
-        verifyNoInteractions(assets);
-    }
-
-    @Test
-    void uploadForUnknownStoreIsNotFound() {
-        assertThatThrownBy(() -> facade.addStoreLogo(UNKNOWN, upload(LOGO, stream())))
-                .isInstanceOf(MerchantStoreNotFoundException.class);
-        verifyNoInteractions(assets);
-    }
-
-    @Test
-    void failedUploadStillClosesTheStreamAndSurfacesTheFailure() throws AssetUploadFailedException {
-        TrackedStream stream = stream();
-        InputContentFile file = upload(SLIDE, stream);
-        doThrow(uploadFailure())
-                .when(assets).addFile(any(), any(), any());
-
-        assertThatThrownBy(() -> facade.addSlider(STORE, file)).isInstanceOf(AssetUploadFailedException.class);
-
-        assertThat(stream.closed).isTrue();
-        assertThat(file.getFileContentType()).isEqualTo(FileContentType.SLIDER);
-    }
-
-    @Test
-    void aFailedSliderUploadLeavesTheStoreUntouched() throws AssetUploadFailedException {
-        stored();
-        doThrow(uploadFailure())
-                .when(assets).addFile(any(), any(), any());
-
-        assertThatThrownBy(() -> facade.addStoreSliderImage(STORE, upload(SLIDE, stream())))
-                .isInstanceOf(AssetUploadFailedException.class);
-
-        verify(service, never()).save(any());
-    }
-
-    @Test
-    void aStreamThatWillNotCloseDoesNotFailTheUpload() throws AssetUploadFailedException {
-        InputContentFile file = upload(BANNER, new InputStream() {
-            @Override
-            public int read() {
-                return -1;
-            }
-
-            @Override
-            public void close() throws IOException {
-                throw new IOException("stuck");
-            }
-        });
-
-        facade.addBanner(STORE, file);
-
-        ArgumentCaptor<InputContentFile> sent = ArgumentCaptor.forClass(InputContentFile.class);
-        verify(assets).addFile(eq(STORE.getId()), eq(Optional.empty()), sent.capture());
-        assertThat(sent.getValue().getFileContentType()).isEqualTo(FileContentType.BANNER);
-    }
-
-    private static AssetUploadFailedException uploadFailure() {
-        return AssetUploadFailedException.of("files/x", new IOException("storage down"));
-    }
-
-    /**
-     * Records whether the facade closed it, which the contract requires after success and failure alike.
-     */
-    private static final class TrackedStream extends ByteArrayInputStream {
-
-        private boolean closed;
-
-        TrackedStream() {
-            super(new byte[] {1, 2, 3});
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-            super.close();
-        }
-
     }
 
 }

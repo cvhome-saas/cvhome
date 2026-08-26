@@ -1,9 +1,6 @@
 package com.asrevo.cvhome.merchant.service.facade.merchant;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,8 +10,6 @@ import org.springframework.stereotype.Service;
 import com.asrevo.cvhome.commons.domain.DomainType;
 import com.asrevo.cvhome.commons.domain.LanguageCode;
 import com.asrevo.cvhome.commons.domain.ManagerStoreDomain;
-import com.asrevo.cvhome.commons.domain.SliderImage;
-import com.asrevo.cvhome.commons.domain.SocialLink;
 import com.asrevo.cvhome.commons.domain.StoreMerchantId;
 import com.asrevo.cvhome.merchant.entity.merchant.MerchantStore;
 import com.asrevo.cvhome.merchant.errors.DefaultStoreNotRemovableException;
@@ -25,12 +20,7 @@ import com.asrevo.cvhome.merchant.model.merchant.ReadableMerchantStore;
 import com.asrevo.cvhome.merchant.service.populator.merchant.PersistableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.service.populator.merchant.ReadableMerchantStorePopulator;
 import com.asrevo.cvhome.merchant.services.merchant.MerchantStoreService;
-import com.asrevo.cvhome.store.core.entity.content.FileContentType;
-import com.asrevo.cvhome.store.core.entity.content.InputContentFile;
-import com.asrevo.cvhome.store.core.modules.cms.content.ContentAssetsManager;
-import com.asrevo.cvhome.store.core.modules.cms.errors.AssetUploadFailedException;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.asrevo.cvhome.commons.utils.DefaultStoresConstants.DEFAULT_ORG1_STORE1;
@@ -45,15 +35,12 @@ public class StoreFacadeImpl implements StoreFacade {
 
     private final ReadableMerchantStorePopulator readableMerchantStorePopulator;
 
-    private final ContentAssetsManager assetsManager;
-
     public StoreFacadeImpl(MerchantStoreService merchantStoreService,
                            PersistableMerchantStorePopulator persistableMerchantStorePopulator,
-                           ReadableMerchantStorePopulator readableMerchantStorePopulator, ContentAssetsManager assetsManager) {
+                           ReadableMerchantStorePopulator readableMerchantStorePopulator) {
         this.merchantStoreService = merchantStoreService;
         this.persistableMerchantStorePopulator = persistableMerchantStorePopulator;
         this.readableMerchantStorePopulator = readableMerchantStorePopulator;
-        this.assetsManager = assetsManager;
     }
 
     @Override
@@ -131,8 +118,6 @@ public class StoreFacadeImpl implements StoreFacade {
         store.setId(mStore.getId().getId());
         store.setOrg(mStore.getOrg());
 
-        store.setSocialLinks(mStore.getSocialLinks());
-        store.setSliderImages(mStore.getSliderImages());
         store.setStoreDomains(mStore.getStoreDomains());
 
         mStore = persistableMerchantStorePopulator.populate(store, mStore, language);
@@ -158,98 +143,6 @@ public class StoreFacadeImpl implements StoreFacade {
     private MerchantStore getByMerchantStoreId(StoreMerchantId storeMerchantId)
             throws MerchantStoreNotFoundException {
         return getMerchantStoreByMerchantStoreId(storeMerchantId);
-    }
-
-    @SneakyThrows
-    @Override
-    public void addStoreLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-        MerchantStore store = getByMerchantStoreId(storeMerchantId);
-        addLogo(storeMerchantId, cmsContentImage);
-        store.setStoreLogo(cmsContentImage.getFileName());
-        saveMerchantStore(store);
-    }
-
-    @SneakyThrows
-    @Override
-    public void addStoreBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-        MerchantStore store = getByMerchantStoreId(storeMerchantId);
-        addBanner(storeMerchantId, cmsContentImage);
-        store.setStoreBanner(cmsContentImage.getFileName());
-        saveMerchantStore(store);
-    }
-
-    @SneakyThrows
-    @Override
-    public SliderImage addStoreSliderImage(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage) {
-        MerchantStore store = getByMerchantStoreId(storeMerchantId);
-        List<SliderImage> sliderImages = new ArrayList<>(store.getSliderImages());
-        Integer nextPriority = sliderImages.stream()
-                .map(SliderImage::priority)
-                .max(Comparator.naturalOrder())
-                .map(it -> it + 1)
-                .orElse(0);
-        SliderImage sliderImage = new SliderImage(nextPriority, cmsContentImage.getFileName());
-        sliderImages.add(sliderImage);
-        addSlider(storeMerchantId, cmsContentImage);
-        store.setSliderImages(sliderImages);
-        saveMerchantStore(store);
-        return sliderImage;
-    }
-
-    @Override
-    public void addLogo(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
-            throws AssetUploadFailedException {
-        cmsContentImage.setFileContentType(FileContentType.LOGO);
-        addImageToAssets(storeMerchantId, cmsContentImage);
-    }
-
-    @Override
-    public void addBanner(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
-            throws AssetUploadFailedException {
-        cmsContentImage.setFileContentType(FileContentType.BANNER);
-        addImageToAssets(storeMerchantId, cmsContentImage);
-    }
-
-    @Override
-    public void addSlider(StoreMerchantId storeMerchantId, InputContentFile cmsContentImage)
-            throws AssetUploadFailedException {
-        cmsContentImage.setFileContentType(FileContentType.SLIDER);
-        addImageToAssets(storeMerchantId, cmsContentImage);
-    }
-
-    @Override
-    public void updateSocialLinks(StoreMerchantId id, Set<SocialLink> socialLinks) {
-        merchantStoreService.updateSocialLinks(id, socialLinks);
-    }
-
-    @Override
-    public void updateSliderImages(StoreMerchantId id, List<SliderImage> sliderImages) {
-        merchantStoreService.updateSliderImages(id, sliderImages);
-    }
-
-    private void addImageToAssets(StoreMerchantId storeMerchantId, InputContentFile contentImage)
-            throws AssetUploadFailedException {
-
-        if (contentImage.getFile() == null) {
-            throw new IllegalArgumentException("File is null");
-        }
-        try {
-            log.info("Adding content image for merchant id {}", storeMerchantId);
-
-            String p = contentImage.getPath();
-            Optional<String> path = Optional.ofNullable(p);
-            // The blanket catch that used to sit here re-flattened AssetUploadFailedException, which already names the
-            // key that failed, back into an untyped ServiceException.
-            assetsManager.addFile(storeMerchantId.getId(), path, contentImage);
-
-        } finally {
-            try {
-                contentImage.getFile().close();
-            } catch (IOException e) {
-                // The upload has already succeeded or thrown; a failure to close is not the caller's business.
-                log.warn("Could not close the upload stream for {}", contentImage.getFileName(), e);
-            }
-        }
     }
 
     private void saveMerchantStore(MerchantStore store) {

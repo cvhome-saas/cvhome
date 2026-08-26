@@ -411,17 +411,27 @@ public class MediaService implements SummaryService.MediaFigures {
         });
     }
 
+    /**
+     * Creates whatever system folders this store is missing.
+     *
+     * <p>
+     * Keyed on each folder rather than on "the store has no folders at all": a seller who made a folder of their
+     * own before opening the library would otherwise never get the defaults, because the presence of their one
+     * folder looked like the defaults had already been seeded.
+     * </p>
+     */
     private void ensureDefaultFolders(StoreMerchantId store) {
-        if (!folders.findByStoreMerchantIdOrderByPositionAscIdAsc(store.getId()).isEmpty()) {
-            return;
-        }
         int position = 0;
         for (String[] def : DEFAULT_FOLDERS) {
+            int slot = position++;
+            if (folders.findByStoreMerchantIdAndKey(store.getId(), def[0]).isPresent()) {
+                continue;
+            }
             MediaFolder f = new MediaFolder();
             f.setStoreMerchantId(store.getId());
             f.setKey(def[0]);
             f.setName(def[1]);
-            f.setPosition(position++);
+            f.setPosition(slot);
             f.setSystem(true);
             folders.save(f);
         }
