@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T00:00:00Z",
+  "title": "Design System: Furniture",
+  "extensions": {
+    "colorMeta": {
+      "primary": {"role": "primary", "displayName": "Enamel Green", "canonical": "oklch(0.44 0.098 166)", "note": "Generated from THEME_DEFAULTS.furniture in libs/types/scripts/build-color-schemas.mjs; regenerate with `npm run gen:colors` in libs/types. The runtime value comes from the merchant's ColorTheme preset via the shell's colour bridge. Spent as whole enamel fields, never as a hairline.", "tonalRamp": ["oklch(0.15 0.04 166)", "oklch(0.24 0.06 166)", "oklch(0.34 0.08 166)", "oklch(0.44 0.098 166)", "oklch(0.56 0.09 166)", "oklch(0.69 0.07 166)", "oklch(0.83 0.045 166)", "oklch(0.95 0.02 166)"]},
+      "secondary": {"role": "secondary", "displayName": "Bone Wash", "canonical": "oklch(0.89 0.014 82)", "note": "Every quiet hover and highlight surface. Also the tint the terrazzo landing is mixed from.", "tonalRamp": ["oklch(0.15 0.008 82)", "oklch(0.26 0.010 82)", "oklch(0.38 0.012 82)", "oklch(0.50 0.014 82)", "oklch(0.62 0.014 82)", "oklch(0.74 0.014 82)", "oklch(0.85 0.014 82)", "oklch(0.95 0.008 82)"]},
+      "accent": {"role": "tertiary", "displayName": "Signal Orange", "canonical": "oklch(0.48 0.185 34)", "note": "The platform's STATEMENT colour. Deliberately kept out of hover surfaces — see the unlayered override block in tokens.css. Appears in the warm terrazzo speckle and wherever the bridge itself places it.", "tonalRamp": ["oklch(0.15 0.07 34)", "oklch(0.25 0.11 34)", "oklch(0.36 0.15 34)", "oklch(0.48 0.185 34)", "oklch(0.60 0.16 34)", "oklch(0.72 0.12 34)", "oklch(0.84 0.07 34)", "oklch(0.95 0.03 34)"]},
+      "background": {"role": "neutral", "displayName": "Bone Plaster", "canonical": "oklch(0.97 0.008 76)", "note": "Flat and unpatterned; exposed as --plaster. The body carries no texture at all.", "tonalRamp": ["oklch(0.15 0.006 76)", "oklch(0.27 0.007 76)", "oklch(0.39 0.008 76)", "oklch(0.51 0.008 76)", "oklch(0.63 0.008 76)", "oklch(0.76 0.008 76)", "oklch(0.88 0.008 76)", "oklch(0.97 0.008 76)"]},
+      "foreground": {"role": "neutral", "displayName": "Warm Graphite", "canonical": "oklch(0.20 0.012 55)", "note": "Body ink, and the solid field of the utility rail above the masthead; exposed as --ink.", "tonalRamp": ["oklch(0.20 0.012 55)", "oklch(0.30 0.012 55)", "oklch(0.40 0.012 55)", "oklch(0.50 0.012 55)", "oklch(0.62 0.010 55)", "oklch(0.74 0.008 55)", "oklch(0.86 0.006 55)", "oklch(0.95 0.004 55)"]},
+      "border": {"role": "neutral", "displayName": "Plaster Line", "canonical": "oklch(0.87 0.017 84)", "note": "The platform border role. The theme's own hairline is --brass = color-mix(in srgb, var(--foreground) 28%, var(--accent) 16%), with --brass-faint at foreground 14% for window frames.", "tonalRamp": ["oklch(0.15 0.008 84)", "oklch(0.26 0.011 84)", "oklch(0.38 0.014 84)", "oklch(0.50 0.017 84)", "oklch(0.62 0.017 84)", "oklch(0.74 0.017 84)", "oklch(0.87 0.017 84)", "oklch(0.95 0.010 84)"]},
+      "neutral": {"role": "neutral", "displayName": "Dust Grey", "canonical": "oklch(0.72 0.010 45)", "note": "Muted text: captions, counts beside sub-departments, disabled controls.", "tonalRamp": ["oklch(0.15 0.006 45)", "oklch(0.26 0.008 45)", "oklch(0.38 0.010 45)", "oklch(0.50 0.010 45)", "oklch(0.61 0.010 45)", "oklch(0.72 0.010 45)", "oklch(0.85 0.008 45)", "oklch(0.95 0.004 45)"]}
+    },
+    "typographyMeta": {
+      "display": {"displayName": "Sign, engraved (.sign-lg)", "purpose": "The building's name on the directory board, a department name, a page name, a product name. Mixed case on purpose — tracked caps at this size break long merchant names and cannot be set in Arabic."},
+      "headline": {"displayName": "Plate head (.sign-lg)", "purpose": "Numbered plate titles, category head, buy-box product name at lg."},
+      "title": {"displayName": "Panel head (.sign-lg)", "purpose": "Drawer heads, empty/error titles, form section heads."},
+      "floor-number": {"displayName": "Floor numeral (.floor-no)", "purpose": "The biggest figure on the page: directory rows, department plate, product floor tag, mobile drawer, and the struck-through 00 on not-found."},
+      "figure": {"displayName": "Figure slot (.figure)", "purpose": "Every number on the site — counts, prices, quantities, SKUs, phone numbers, plate-key values — in one tabular lining slot."},
+      "body": {"displayName": "Read (Golos Text)", "purpose": "Running copy, form fields, tables. .copy relaxes to 1.7 line-height at 68ch; empty/error bodies cap at 48ch."},
+      "label": {"displayName": "Sign (.sign)", "purpose": "The most-used role: captions, column heads, nav items, buttons, breadcrumbs, field labels, state plates."}
+    },
+    "shadows": [
+      {"name": "enamel-edge", "value": "inset 0 0 0 1px color-mix(in srgb, var(--primary-foreground) 22%, transparent)", "purpose": "The lit hairline inside every enamel field — the way vitreous enamel catches light. Always present on .enamel and .enamel-flat."},
+      {"name": "elev-sm", "value": "0 1px 2px -1px rgb(0 0 0 / 0.10)", "purpose": "The bone action mounted on the directory board; the hero caption plate."},
+      {"name": "elev-md", "value": "0 6px 16px -8px rgb(0 0 0 / 0.22)", "purpose": "A mounted enamel panel (.enamel) and the nav floor list."},
+      {"name": "elev-lg", "value": "0 14px 34px -14px rgb(0 0 0 / 0.26)", "purpose": "Reserved for lifted panels."},
+      {"name": "elev-overlay", "value": "0 28px 64px -20px rgb(0 0 0 / 0.38)", "purpose": "Drawers, dialogs, search suggestions."},
+      {"name": "gallery-selected", "value": "0 0 0 2px var(--primary)", "purpose": "The only ring in the theme: the selected gallery view."}
+    ],
+    "motion": [
+      {"name": "motion-fast", "value": "130ms", "purpose": "Every colour/transform state change: hovers, chevron nudge, press."},
+      {"name": "motion-base", "value": "240ms", "purpose": "Product card image cross-fade."},
+      {"name": "motion-slow", "value": "480ms", "purpose": "The figure roll."},
+      {"name": "easing-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Default easing; the redirect lift bar."},
+      {"name": "easing-emphasized", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The one authored motion — a figure rolling in its slot."},
+      {"name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce)", "purpose": "The roll is disabled and the lift bar becomes a static full-width bar."}
+    ],
+    "breakpoints": [
+      {"name": "sm", "value": "640px"},
+      {"name": "md", "value": "768px"},
+      {"name": "lg", "value": "1024px"},
+      {"name": "xl", "value": "1280px"}
+    ],
+    "layering": {
+      "rule": "World grammar lives in @layer components in tokens.css so Tailwind utilities on the same element still win. Two blocks near the top are deliberately UNLAYERED: the drawer-head chrome and the accent-as-hover re-point. The shadcn primitives set those colours with Tailwind utilities in @layer utilities, which beat any layered rule at any specificity — moving those blocks into the layer silently breaks them."
+    }
+  },
+  "components": [
+    {
+      "name": "Directory Board",
+      "kind": "custom",
+      "refersTo": "plate-number",
+      "description": "The signature surface: one enamel field carrying the store name, its facts, the one action, and a row per department — floor number, name, count, wayfinding mark — separated by enamel hairlines.",
+      "html": "<div class=\"ds-board\"><h1 class=\"ds-board-title\">Riyadh Fashion Hub</h1><p class=\"ds-board-facts\">Riyadh · Since 2024</p><a class=\"ds-board-action\" href=\"#\">SHOP NOW</a><div class=\"ds-board-head\"><span>FLOOR</span><span>DEPARTMENT</span><span class=\"ds-end\">ITEMS</span><span></span></div><a class=\"ds-board-row\" href=\"#\"><span class=\"ds-floor\">01</span><span class=\"ds-dept\">MEN</span><span class=\"ds-count\">128</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"m9 18 6-6-6-6\"/></svg></a><a class=\"ds-board-row\" href=\"#\"><span class=\"ds-floor\">02</span><span class=\"ds-dept\">WOMEN</span><span class=\"ds-count\">214</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"m9 18 6-6-6-6\"/></svg></a></div>",
+      "css": ".ds-board { background: var(--primary, #005A43); color: var(--primary-foreground, #fff); border-radius: 0.1875rem; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); padding: 2rem; font-family: Archivo, 'Golos Text', sans-serif; } .ds-board-title { font-weight: 800; font-variation-settings: 'wdth' 122; letter-spacing: 0.055em; line-height: 0.95; font-size: 2.25rem; margin: 0; } .ds-board-facts { font-family: 'Golos Text', sans-serif; font-size: 0.875rem; opacity: 0.8; margin: 0.75rem 0 0; } .ds-board-action { display: inline-flex; margin-top: 1.5rem; background: var(--background, #F9F6F2); color: var(--foreground, #1B1612); border-radius: 0.1875rem; padding: 0.75rem 1.25rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; text-decoration: none; box-shadow: 0 1px 2px -1px rgb(0 0 0 / 0.10); transition: transform 130ms cubic-bezier(0.2,0,0,1); } .ds-board-action:hover { transform: translateY(1px); } .ds-board-head { display: grid; grid-template-columns: 4rem 1fr auto 1.5rem; gap: 0 1rem; align-items: end; margin-top: 2.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.26); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.7; } .ds-end { text-align: end; } .ds-board-row { display: grid; grid-template-columns: 4rem 1fr auto 1.5rem; gap: 0 1rem; align-items: baseline; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.26); color: inherit; text-decoration: none; transition: background-color 130ms cubic-bezier(0.2,0,0,1); } .ds-board-row:last-child { border-bottom: 0; } .ds-board-row:hover, .ds-board-row:focus-visible { background: rgba(255,255,255,0.12); } .ds-board-row:hover .ds-dept { text-decoration: underline; } .ds-floor { font-variant-numeric: tabular-nums lining-nums; font-variation-settings: 'wdth' 124; font-weight: 800; font-size: 1.875rem; line-height: 0.8; opacity: 0.9; } .ds-dept { font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; font-size: 1rem; } .ds-count { font-variant-numeric: tabular-nums lining-nums; font-weight: 700; font-size: 1rem; opacity: 0.8; } .ds-board-row svg { align-self: center; opacity: 0.55; transition: transform 130ms cubic-bezier(0.2,0,0,1); } .ds-board-row:hover svg { transform: translateX(2px); }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single decisive action per view: a solid enamel field lettered like a sign.",
+      "html": "<button class=\"ds-btn-primary\">ADD TO CART</button>",
+      "css": ".ds-btn-primary { height: 3rem; padding: 0 1.5rem; background: var(--primary, #005A43); color: var(--primary-foreground, #fff); border: none; border-radius: 0.1875rem; font-family: Archivo, sans-serif; font-size: 0.6875rem; font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; cursor: pointer; transition: background-color 130ms cubic-bezier(0.2,0,0,1); } .ds-btn-primary:hover { background: color-mix(in srgb, var(--primary, #005A43) 90%, #000); } .ds-btn-primary:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary, #005A43) 50%, transparent); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "The card and secondary action: a brass hairline over plaster that commits to the whole enamel field on hover.",
+      "html": "<button class=\"ds-btn-outline\">VIEW DETAILS</button>",
+      "css": ".ds-btn-outline { width: 100%; padding: 0.625rem 0.875rem; background: transparent; color: var(--foreground, #1B1612); border: 1px solid color-mix(in srgb, var(--foreground, #1B1612) 28%, transparent); border-radius: 0.1875rem; font-family: Archivo, sans-serif; font-size: 0.625rem; font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; cursor: pointer; transition: background-color 130ms cubic-bezier(0.2,0,0,1), color 130ms cubic-bezier(0.2,0,0,1); } .ds-btn-outline:hover { background: var(--primary, #005A43); color: var(--primary-foreground, #fff); } .ds-btn-outline:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary, #005A43) 50%, transparent); outline-offset: 2px; } .ds-btn-outline:disabled { border-color: color-mix(in srgb, var(--foreground, #1B1612) 14%, transparent); color: #B1A9A3; cursor: not-allowed; } .ds-btn-outline:disabled:hover { background: transparent; color: #B1A9A3; }"
+    },
+    {
+      "name": "State Plate",
+      "kind": "chip",
+      "refersTo": "state-plate",
+      "description": "State printed, never tinted: a bordered plate carrying a word and, when there is one, a figure. Sale, sold out, low stock, in stock.",
+      "html": "<span class=\"ds-state\">SAVE 20%</span> <span class=\"ds-state ds-state-quiet\">SOLD OUT</span> <span class=\"ds-state ds-state-enamel\">FLOOR 02</span>",
+      "css": ".ds-state { display: inline-flex; align-items: center; gap: 0.375rem; border: 1px solid currentColor; border-radius: 0.125rem; padding: 0.125rem 0.4rem; background: var(--background, #F9F6F2); color: var(--foreground, #1B1612); font-family: Archivo, sans-serif; font-size: 0.75rem; font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; line-height: 1.5; } .ds-state-quiet { color: #B1A9A3; } .ds-state-enamel { border-color: transparent; background: var(--primary, #005A43); color: var(--primary-foreground, #fff); }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "product-window",
+      "description": "One piece on the floor: the photograph cut square in a hairline window, the name read plainly, and the price on its own small enamel plate so colour commits across the whole grid.",
+      "html": "<article class=\"ds-card\"><a class=\"ds-window\" href=\"#\"><span class=\"ds-window-fill\"></span><span class=\"ds-state ds-card-badge\">SAVE 20%</span></a><div class=\"ds-card-meta\"><h3 class=\"ds-card-name\">Oak Frame Lounge Chair</h3><span class=\"ds-price\">1,450 SAR</span></div><button class=\"ds-btn-outline\">ADD TO CART</button></article>",
+      "css": ".ds-card { display: flex; flex-direction: column; font-family: 'Golos Text', sans-serif; max-width: 18rem; } .ds-window { position: relative; display: block; aspect-ratio: 4 / 5; border: 1px solid color-mix(in srgb, var(--foreground, #1B1612) 14%, transparent); border-radius: 0; overflow: hidden; background: color-mix(in srgb, var(--secondary, #E2DDD4) 40%, var(--background, #F9F6F2)); } .ds-window-fill { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--secondary, #E2DDD4) 70%, transparent) 0 12px, transparent 12px 24px); } .ds-card-badge { position: absolute; inset-inline-start: 0.5rem; top: 0.5rem; font-size: 0.625rem; } .ds-card-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-top: 0.875rem; } .ds-card-name { flex: 1; margin: 0; font-size: 0.875rem; font-weight: 400; line-height: 1.3; } .ds-price { flex-shrink: 0; background: var(--primary, #005A43); color: var(--primary-foreground, #fff); border-radius: 0.1875rem; padding: 0.25rem 0.5rem; font-family: Archivo, sans-serif; font-weight: 700; font-size: 0.875rem; font-variant-numeric: tabular-nums lining-nums; font-variation-settings: 'wdth' 104; } .ds-card .ds-btn-outline { margin-top: 0.875rem; }"
+    },
+    {
+      "name": "Plate Key Row",
+      "kind": "custom",
+      "refersTo": "state-plate",
+      "description": "The product record as a furnishing catalogue's numbered plate list: a zero-padded figure, the merchant's label, a dotted brass leader, and the value in the figure slot. Renders nothing when the merchant listed no attributes.",
+      "html": "<dl class=\"ds-key\"><div class=\"ds-key-row\"><span class=\"ds-key-no\">01</span><dt class=\"ds-key-label\">Dimensions</dt><span class=\"ds-key-leader\"></span><dd class=\"ds-key-value\">78 × 82 × 74 cm</dd></div><div class=\"ds-key-row\"><span class=\"ds-key-no\">02</span><dt class=\"ds-key-label\">Material</dt><span class=\"ds-key-leader\"></span><dd class=\"ds-key-value\">Solid oak, wool</dd></div></dl>",
+      "css": ".ds-key { margin: 0; font-family: 'Golos Text', sans-serif; } .ds-key-row { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid color-mix(in srgb, var(--foreground, #1B1612) 28%, transparent); } .ds-key-row:last-child { border-bottom: 0; } .ds-key-no { width: 1.75rem; flex-shrink: 0; font-family: Archivo, sans-serif; font-weight: 700; font-size: 0.75rem; font-variant-numeric: tabular-nums lining-nums; color: #B1A9A3; } .ds-key-label { flex-shrink: 0; margin: 0; font-size: 0.875rem; color: #B1A9A3; } .ds-key-leader { flex: 1; min-width: 1rem; align-self: center; height: 1px; border-bottom: 1px dotted color-mix(in srgb, var(--foreground, #1B1612) 28%, transparent); } .ds-key-value { margin: 0; text-align: end; font-family: Archivo, sans-serif; font-weight: 700; font-size: 0.875rem; font-variant-numeric: tabular-nums lining-nums; font-variation-settings: 'wdth' 104; }"
+    },
+    {
+      "name": "Section Head (numbered plate)",
+      "kind": "custom",
+      "refersTo": "plate-number",
+      "description": "Every group of goods is a numbered plate: an enamel number square, the plate name, the count in the figure slot, and a brass hairline running to the end of the measure.",
+      "html": "<div class=\"ds-plate-head\"><span class=\"ds-plate-no\">01</span><h2 class=\"ds-plate-title\">New This Season</h2><span class=\"ds-plate-meta\">24 items</span><span class=\"ds-plate-rule\"></span></div>",
+      "css": ".ds-plate-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; font-family: Archivo, sans-serif; } .ds-plate-no { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; background: var(--primary, #005A43); color: var(--primary-foreground, #fff); border-radius: 0.1875rem; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); font-weight: 800; font-size: 1.5rem; line-height: 0.8; font-variant-numeric: tabular-nums lining-nums; font-variation-settings: 'wdth' 124; } .ds-plate-title { margin: 0; font-weight: 800; font-variation-settings: 'wdth' 122; letter-spacing: 0.055em; line-height: 0.95; font-size: 1.75rem; } .ds-plate-meta { font-weight: 700; font-size: 0.875rem; font-variant-numeric: tabular-nums lining-nums; color: #B1A9A3; } .ds-plate-rule { flex: 1; min-width: 2rem; height: 1px; border-top: 1px solid color-mix(in srgb, var(--foreground, #1B1612) 28%, transparent); }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "The masthead carries departments and nothing else, lettered like the signs hung over the aisles. Hover lands on the bone wash; an open floor list lights the sign as a full enamel field.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" href=\"#\">MEN</a><a class=\"ds-nav-item\" href=\"#\">WOMEN</a><button class=\"ds-nav-item ds-nav-open\">KIDS</button></nav>",
+      "css": ".ds-nav { display: flex; gap: 0; font-family: Archivo, sans-serif; } .ds-nav-item { padding: 0.5rem; border: none; background: transparent; color: var(--foreground, #1B1612); border-radius: 0.1875rem; font-size: 0.625rem; font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer; transition: background-color 130ms cubic-bezier(0.2,0,0,1); } .ds-nav-item:hover, .ds-nav-item:focus-visible { background: var(--secondary, #E2DDD4); } .ds-nav-open { background: var(--primary, #005A43); color: var(--primary-foreground, #fff); } .ds-nav-open:hover { background: var(--primary, #005A43); }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Shared primitives restyled by hairline and corner only; the label is a sign above the field.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-city\">City</label><input class=\"ds-input\" id=\"ds-city\" placeholder=\"Riyadh\"/></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.5rem; max-width: 20rem; } .ds-field-label { font-family: Archivo, sans-serif; font-size: 0.625rem; font-weight: 700; font-variation-settings: 'wdth' 116; letter-spacing: 0.09em; text-transform: uppercase; color: #B1A9A3; } .ds-input { height: 2.25rem; padding: 0 0.75rem; background: var(--background, #F9F6F2); color: var(--foreground, #1B1612); border: 1px solid color-mix(in srgb, var(--foreground, #1B1612) 28%, transparent); border-radius: 0.1875rem; font-family: 'Golos Text', sans-serif; font-size: 0.875rem; } .ds-input::placeholder { color: #B1A9A3; } .ds-input:focus-visible { outline: none; border-color: var(--primary, #005A43); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary, #005A43) 40%, transparent); } .ds-input[aria-invalid=\"true\"] { border-color: #B7191C; }"
+    },
+    {
+      "name": "Figure Slot",
+      "kind": "custom",
+      "refersTo": "price-plate",
+      "description": "The theme's one authored motion: every number lives in the same tabular slot and rolls in place when it changes (480ms, emphasized easing). Disabled under prefers-reduced-motion.",
+      "html": "<span class=\"ds-figure ds-roll-slot\"><span class=\"ds-rolling\">12</span></span>",
+      "css": "@keyframes ds-furniture-roll { 0% { transform: translateY(38%); opacity: 0; } 60% { transform: translateY(-6%); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } } .ds-figure { font-family: Archivo, sans-serif; font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'tnum' 1, 'lnum' 1; font-variation-settings: 'wdth' 104; } .ds-roll-slot { display: inline-grid; overflow: hidden; line-height: 1; } .ds-roll-slot > * { grid-area: 1 / 1; } .ds-rolling { animation: ds-furniture-roll 480ms cubic-bezier(0.16, 1, 0.3, 1) both; } @media (prefers-reduced-motion: reduce) { .ds-rolling { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Home Floor Directory",
+    "overview": "A whole-home retailer is not a catalogue, it is a building with floors. This theme renders the shop as its own department-store directory: departments carry floor numbers and product counts on one enamel board, every product group is a numbered plate, and the same floor number follows a shopper from the board to the department plate to a product's floor tag to the footer colophon to the mobile drawer. Wayfinding is the whole design; the shopper always knows which floor they are standing on.\n\nThe material world is public architecture, not a showroom. The ground is flat bone plaster and the ink is warm graphite; the merchant's PRIMARY appears as whole vitreous-enamel fields — the directory board, the department plate, the numbered plate square, the price plate on every card, the one action per view — each with a lit inner edge and a real mounted shadow. Brass hairlines separate directory rows and plate-key entries. Aggregate (terrazzo) exists only in the landings between departments, never as a page-wide field. Photographs are cut square in hairline windows and never float.\n\nIt refuses the airy-white Scandi arrangement that every furniture site ships — whitespace here is architecture, not absence — and refuses the dark spotlit showroom just as hard. Density is generous but structural: wide gutters, big tabular numerals, and lettering that behaves like signage rather than branding.",
+    "keyCharacteristics": [
+      "Floor numbers as the single wayfinding device, from one source of truth",
+      "Enamel fields of the merchant's primary, not thin accents",
+      "Every figure — counts, prices, quantities, floor numbers — in one tabular slot",
+      "State printed as a word plus a figure, never as a tint",
+      "Square-cut photographs in hairline windows; terrazzo only between departments",
+      "Exactly one authored motion (a figure that rolls when it changes)"
+    ],
+    "rules": [
+      {"name": "The Enamel Field Rule", "body": "The primary is spent as whole fields, never as a hairline or a thin accent. If a surface carries the primary it carries all of it, with the lit inner edge (--enamel-edge) and a mounted shadow. There is one enamel action per view; the boards, plates and price plates are the field.", "section": "colors"},
+      {"name": "The Printed State Rule", "body": "State is printed, never tinted. Sale, low stock, sold out, in stock — each is a bordered plate carrying a word and, when there is one, a figure. Strip every colour from the page and every state still reads.", "section": "colors"},
+      {"name": "The Accent-Is-Not-A-Hover Rule", "body": "In this platform's colour bridge accent is the STATEMENT colour. The shared shadcn primitives use accent as their neutral hover surface, which would flash signal orange on every menu row. tokens.css re-points those hovers to the bone wash (--secondary), and the open/selected nav trigger to the enamel. Those rules are deliberately unlayered — the primitives set their colours with Tailwind utilities in @layer utilities, which beat any layered rule at any specificity. Moving that block into @layer components silently breaks it.", "section": "colors"},
+      {"name": "The One Slot Rule", "body": "Every figure on the site sits in the same tabular slot (.figure, tnum/lnum). A number never renders in the body face, and never in proportional figures — the directory column, the cart tally, the quantity stepper and the price plate all align on the same rhythm.", "section": "typography"},
+      {"name": "The Script Lead Rule", "body": ":lang(ar) leads both roles with Tajawal and :lang(ru) leads the sign role with Golos Text, because next/font's metric fallback for Archivo/Golos carries those glyphs and would otherwise catch them before the intended face — a Russian board would silently letter itself in Arial. Arabic additionally drops uppercase, tracking and the width axis on .sign, .sign-lg, .floor-no, .figure, .state-plate and copy heads.", "section": "typography"},
+      {"name": "The No-Kicker Rule", "body": "A sign is a heading, not a line above one. Facts that would become a kicker — maker, catalogue number, floor, availability — sit in the record rule below the product name, never as an eyebrow above it.", "section": "typography"},
+      {"name": "The Landing Rule", "body": "Terrazzo is a floor between departments, never a page-wide field. A faint dot pattern tiled across the whole page reads as a grid overlay, not as plaster; the body carries no pattern at all.", "section": "layout"},
+      {"name": "The Honest Column Rule", "body": "A column that has no data is removed, not filled with dashes. The directory board drops its ITEMS column entirely when no department reports a count; the plate key does not render when the merchant listed no attributes, and the product page then gives the description the full measure instead of hanging a heading over one grey line.", "section": "layout"},
+      {"name": "The Mounted Sign Rule", "body": "A shadow means a sign is hung on the wall — offset and blurred, never a symmetric halo and never a hard offset block. Anything not mounted is flat and bounded by a brass hairline.", "section": "elevation"}
+    ],
+    "dos": [
+      "Do spend the primary as whole enamel fields with the lit inner edge, and keep to one enamel action per view.",
+      "Do put every number in the .figure tabular slot, and use Figure when the number can change while the page is open.",
+      "Do print state as a StatePlate — a word, plus a figure when there is one.",
+      "Do take floor numbers from src/components/floors.ts and nowhere else.",
+      "Do letter signage with .sign / .sign-lg and set everything read in Golos Text.",
+      "Do drop a column, a key or a whole section when the data is absent, rather than rendering dashes or an empty heading.",
+      "Do give Swiper observer / observeParents / resizeObserver anywhere it lives inside a stretching grid cell.",
+      "Do keep world grammar inside @layer components in tokens.css so Tailwind utilities on the same element still win.",
+      "Do wrap merchant addresses in <bdi> and set SKUs and phone numbers dir=\"ltr\"."
+    ],
+    "donts": [
+      "Don't move the two unlayered blocks at the top of tokens.css into @layer components. The shadcn primitives paint with Tailwind utilities in @layer utilities; layering those overrides silently breaks the drawer heads and re-admits signal orange as a hover surface.",
+      "Don't use accent as a hover or highlight surface. It is the statement colour here; the quiet hover surface is the bone wash and the committed surface is the enamel.",
+      "Don't round a photograph. Images are cut square in .window; the 3px corner belongs to controls, cards and enamel fields.",
+      "Don't tile terrazzo across the page or the body. It is a landing between departments and the footer ground.",
+      "Don't autoplay the hero or add a second animation. One authored motion (the rolling figure) plus the redirect lift bar is the whole motion budget; an unpausable carousel is both a second motion and a WCAG 2.2.2 failure.",
+      "Don't set tracked caps or the wdth axis on Arabic text, and don't let Archivo lead the stack for ar or ru.",
+      "Don't put a line above a heading. Facts belong in the record rule below the name.",
+      "Don't hard-code colour values. Read the role tokens; the merchant's preset replaces the whole palette at runtime, and the theme must hold up under a dark preset.",
+      "Don't hand-edit src/colors.ts — edit THEME_DEFAULTS.furniture in libs/types/scripts/build-color-schemas.mjs and regenerate.",
+      "Don't reformat a price. Prices arrive formatted from the API; the theme only places them in the figure slot."
+    ]
+  }
+}
